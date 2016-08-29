@@ -7,6 +7,7 @@ import static de.amr.games.pong.Globals.MENU_SELECTED_BACKGROUND;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
@@ -57,6 +58,7 @@ public class Menu extends Scene<PongGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(MENU_BACKGROUND);
 		g.fillRect(0, 0, getApp().getWidth(), getHeight());
 		g.setFont(FONT);

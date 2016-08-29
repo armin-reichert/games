@@ -9,6 +9,7 @@ import static java.awt.event.KeyEvent.VK_C;
 import static java.awt.event.KeyEvent.VK_CONTROL;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Random;
 
 import de.amr.easy.game.Application;
@@ -81,6 +82,7 @@ public class PlayScene extends Scene<PongGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		court.draw(g);
 		paddleLeft.draw(g);
 		paddleRight.draw(g);
