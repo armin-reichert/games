@@ -1,0 +1,88 @@
+package de.amr.easy.game.common;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+
+import de.amr.easy.game.Application;
+import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.math.Vector2;
+
+public class FlashText extends GameEntity {
+
+	private static final Font DEFAULT_FONT = new Font(Font.DIALOG, Font.BOLD, 12);
+
+	public static void show(String text, Font font, Color color, int displayTime, Vector2 position,
+			Vector2 velocity) {
+		FlashText flash = new FlashText();
+		flash.setText(text);
+		flash.setFont(font);
+		flash.setColor(color);
+		flash.setDisplayTime(displayTime);
+		flash.tr.moveTo(position);
+		flash.tr.setVel(velocity);
+		Application.Entities.add(flash);
+	}
+
+	private int timer;
+	private String text;
+	private Font font;
+	private Color color;
+
+	public FlashText() {
+		timer = 60;
+		text = "";
+		font = DEFAULT_FONT;
+		color = Color.BLACK;
+		tr.setVel(0, 0);
+	}
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void update() {
+		if (timer == 0) {
+			Application.Entities.remove(this);
+		} else {
+			tr.move();
+			--timer;
+		}
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		g.setColor(color);
+		g.setFont(font);
+		g.drawString(text, tr.getX(), tr.getY());
+	}
+
+	public void setDisplayTime(int displayTime) {
+		timer = displayTime;
+	}
+
+	public Font getFont() {
+		return font;
+	}
+
+	public void setFont(Font font) {
+		this.font = font;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+}
