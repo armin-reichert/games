@@ -1,4 +1,4 @@
-package de.zwickmann.windrad.model;
+package de.amr.games.windrad.model;
 
 import java.awt.geom.Point2D;
 

@@ -1,4 +1,4 @@
-package de.zwickmann.windrad.ui;
+package de.amr.games.windrad.ui;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -6,7 +6,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.zwickmann.windrad.model.WindradModell;
+import de.amr.games.windrad.model.WindradModell;
 import net.miginfocom.swing.MigLayout;
 
 public class WindradEditor extends JPanel {

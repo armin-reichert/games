@@ -1,4 +1,4 @@
-package de.zwickmann.windrad.ui;
+package de.amr.games.windrad.ui;
 
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -6,7 +6,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import de.zwickmann.windrad.model.WindparkModell;
+import de.amr.games.windrad.model.WindparkModell;
 
 public class WindparkFenster extends JFrame {
 

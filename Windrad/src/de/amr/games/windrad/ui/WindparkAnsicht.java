@@ -1,7 +1,7 @@
-package de.zwickmann.windrad.ui;
+package de.amr.games.windrad.ui;
 
-import static de.zwickmann.windrad.model.WindparkModell.BREITE;
-import static de.zwickmann.windrad.model.WindparkModell.HÖHE;
+import static de.amr.games.windrad.model.WindparkModell.BREITE;
+import static de.amr.games.windrad.model.WindparkModell.HÖHE;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.lang.Math.sqrt;
@@ -29,8 +29,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
-import de.zwickmann.windrad.model.WindparkModell;
-import de.zwickmann.windrad.model.WindradModell;
+import de.amr.games.windrad.model.WindparkModell;
+import de.amr.games.windrad.model.WindradModell;
 
 public class WindparkAnsicht extends JPanel {
 

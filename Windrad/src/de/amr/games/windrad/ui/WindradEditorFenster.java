@@ -1,10 +1,10 @@
-package de.zwickmann.windrad.ui;
+package de.amr.games.windrad.ui;
 
 import java.awt.BorderLayout;
 
 import javax.swing.JDialog;
 
-import de.zwickmann.windrad.model.WindradModell;
+import de.amr.games.windrad.model.WindradModell;
 
 public class WindradEditorFenster extends JDialog {
 

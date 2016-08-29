@@ -1,12 +1,12 @@
-package de.zwickmann.windrad;
+package de.amr.games.windrad;
 
 import java.awt.EventQueue;
 
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-import de.zwickmann.windrad.model.WindparkModell;
-import de.zwickmann.windrad.ui.WindparkFenster;
+import de.amr.games.windrad.model.WindparkModell;
+import de.amr.games.windrad.ui.WindparkFenster;
 
 public class WindradApp {
 

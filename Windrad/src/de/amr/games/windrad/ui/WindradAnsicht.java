@@ -1,6 +1,6 @@
-package de.zwickmann.windrad.ui;
+package de.amr.games.windrad.ui;
 
-import static de.zwickmann.windrad.model.WindradModell.ANZAHL_ROTOREN;
+import static de.amr.games.windrad.model.WindradModell.ANZAHL_ROTOREN;
 import static java.lang.Math.round;
 import static java.lang.Math.toRadians;
 
@@ -11,8 +11,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.Timer;
 
-import de.zwickmann.windrad.model.WindparkModell;
-import de.zwickmann.windrad.model.WindradModell;
+import de.amr.games.windrad.model.WindparkModell;
+import de.amr.games.windrad.model.WindradModell;
 
 public class WindradAnsicht {
 
