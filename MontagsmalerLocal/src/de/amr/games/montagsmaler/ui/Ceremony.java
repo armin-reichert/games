@@ -1,4 +1,4 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,12 +7,12 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
-import armin.mm.Tools;
-import armin.mm.game.Game;
-import armin.mm.game.Player;
-import armin.mm.game.Team;
-import armin.mm.sounds.Sound;
-import armin.mm.tools.ScrollingCanvas;
+import de.amr.games.montagsmaler.Tools;
+import de.amr.games.montagsmaler.game.Game;
+import de.amr.games.montagsmaler.game.Player;
+import de.amr.games.montagsmaler.game.Team;
+import de.amr.games.montagsmaler.sounds.Sound;
+import de.amr.games.montagsmaler.tools.ScrollingCanvas;
 
 /**
  * The ceremony for the winners (or for both teams in case of a draw). Plays a hymn and

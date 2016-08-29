@@ -1,4 +1,4 @@
-package armin.mm.game;
+package de.amr.games.montagsmaler.game;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package armin.mm.sounds;
+package de.amr.games.montagsmaler.sounds;
 
 import java.io.IOException;
 import java.net.URL;

@@ -1,4 +1,4 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,11 +24,11 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-import armin.mm.Tools;
-import armin.mm.game.Game;
-import armin.mm.game.Player;
-import armin.mm.game.Team;
-import armin.mm.tools.EnhancedFileChooser;
+import de.amr.games.montagsmaler.Tools;
+import de.amr.games.montagsmaler.game.Game;
+import de.amr.games.montagsmaler.game.Player;
+import de.amr.games.montagsmaler.game.Team;
+import de.amr.games.montagsmaler.tools.EnhancedFileChooser;
 
 public class GameEditor extends JDialog {
   

@@ -1,9 +1,9 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
 
-import armin.mm.tools.DrawingCanvas;
+import de.amr.games.montagsmaler.tools.DrawingCanvas;
 
 
 /**

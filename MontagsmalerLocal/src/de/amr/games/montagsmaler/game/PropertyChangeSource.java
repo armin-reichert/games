@@ -1,4 +1,4 @@
-package armin.mm.game;
+package de.amr.games.montagsmaler.game;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

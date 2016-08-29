@@ -1,4 +1,4 @@
-package armin.mm.tools;
+package de.amr.games.montagsmaler.tools;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import armin.mm.Tools;
+import de.amr.games.montagsmaler.Tools;
 
 /**
  * A canvas with interactive drawiing capability.

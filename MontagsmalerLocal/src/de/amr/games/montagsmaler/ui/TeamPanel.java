@@ -1,4 +1,4 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,9 +20,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import armin.mm.game.Game;
-import armin.mm.game.Player;
-import armin.mm.game.Team;
+import de.amr.games.montagsmaler.game.Game;
+import de.amr.games.montagsmaler.game.Player;
+import de.amr.games.montagsmaler.game.Team;
 
 public class TeamPanel extends JPanel {
 

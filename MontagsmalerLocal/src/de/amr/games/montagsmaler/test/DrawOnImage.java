@@ -1,4 +1,4 @@
-package test;
+package de.amr.games.montagsmaler.test;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

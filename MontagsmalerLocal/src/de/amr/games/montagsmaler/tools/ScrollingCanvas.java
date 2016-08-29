@@ -1,4 +1,4 @@
-package armin.mm.tools;
+package de.amr.games.montagsmaler.tools;
 
 import java.awt.Dimension;
 import java.awt.Image;

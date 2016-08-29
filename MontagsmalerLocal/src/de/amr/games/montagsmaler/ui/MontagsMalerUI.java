@@ -1,4 +1,4 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,11 +30,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import armin.mm.Tools;
-import armin.mm.game.Game;
-import armin.mm.game.Player;
-import armin.mm.game.Team;
-import armin.mm.sounds.Sound;
+import de.amr.games.montagsmaler.Tools;
+import de.amr.games.montagsmaler.game.Game;
+import de.amr.games.montagsmaler.game.Player;
+import de.amr.games.montagsmaler.game.Team;
+import de.amr.games.montagsmaler.sounds.Sound;
 
 /**
  * The Montagsmaler game UI.

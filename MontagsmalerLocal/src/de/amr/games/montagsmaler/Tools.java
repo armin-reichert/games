@@ -1,4 +1,4 @@
-package armin.mm;
+package de.amr.games.montagsmaler;
 
 import java.awt.Color;
 import java.awt.Cursor;

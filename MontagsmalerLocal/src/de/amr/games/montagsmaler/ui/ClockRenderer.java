@@ -1,4 +1,4 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -7,7 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
-import armin.mm.Tools;
+import de.amr.games.montagsmaler.Tools;
 
 public class ClockRenderer {
   

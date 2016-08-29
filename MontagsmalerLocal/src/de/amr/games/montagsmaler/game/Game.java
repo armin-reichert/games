@@ -1,4 +1,4 @@
-package armin.mm.game;
+package de.amr.games.montagsmaler.game;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

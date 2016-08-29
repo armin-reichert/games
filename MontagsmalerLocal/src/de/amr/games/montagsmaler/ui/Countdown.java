@@ -1,4 +1,4 @@
-package armin.mm.ui;
+package de.amr.games.montagsmaler.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -12,7 +12,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.Timer;
 
-import armin.mm.Tools;
+import de.amr.games.montagsmaler.Tools;
 
 public class Countdown implements ActionListener {
  
