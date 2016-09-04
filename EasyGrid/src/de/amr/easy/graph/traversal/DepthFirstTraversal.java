@@ -54,8 +54,8 @@ public class DepthFirstTraversal<V, E> extends GraphTraversal<V, E> implements S
 		return target;
 	}
 
-	public boolean isOnStack(V vertex) {
-		return stack.contains(vertex);
+	public boolean isOnStack(V v) {
+		return stack.contains(v);
 	}
 
 	@Override
@@ -66,10 +66,10 @@ public class DepthFirstTraversal<V, E> extends GraphTraversal<V, E> implements S
 		stack.push(currentVertex);
 		visit(currentVertex, null);
 		while (!stack.isEmpty() && !foundTarget(currentVertex)) {
-			V neighbor = unvisitedNeighbour(currentVertex);
+			V neighbor = findUnvisitedNeighbour(currentVertex);
 			if (neighbor != null) {
 				visit(neighbor, currentVertex);
-				if (unvisitedNeighbour(neighbor) != null) {
+				if (findUnvisitedNeighbour(neighbor) != null) {
 					stack.push(neighbor);
 				}
 				currentVertex = neighbor;
@@ -87,31 +87,31 @@ public class DepthFirstTraversal<V, E> extends GraphTraversal<V, E> implements S
 		}
 	}
 
-	private void visit(V vertex, V parent) {
-		setState(vertex, VISITED);
+	private void visit(V v, V parent) {
+		setState(v, VISITED);
 		if (parent != null) {
-			E edge = graph.getEdge(parent, vertex);
-			graph.fireEdgeChange(edge, UNVISITED, VISITED);
+			E e = graph.getEdge(parent, v);
+			graph.fireEdgeChange(e, UNVISITED, VISITED);
 		}
-		setParent(vertex, parent);
+		setParent(v, parent);
 	}
 
-	private boolean foundTarget(V vertex) {
-		if (vertex.equals(target)) {
-			stack.push(vertex);
+	private boolean foundTarget(V v) {
+		if (v.equals(target)) {
+			stack.push(v);
 			while (!stack.isEmpty()) {
-				V v = stack.pop();
-				setState(v, COMPLETED);
+				V w = stack.pop();
+				setState(w, COMPLETED);
 			}
 			return true;
 		}
 		return false;
 	}
 
-	private V unvisitedNeighbour(V vertex) {
-		for (V neighbor : graph.adjVertices(vertex)) {
-			if (getState(neighbor) == UNVISITED) {
-				return neighbor;
+	private V findUnvisitedNeighbour(V v) {
+		for (V w : graph.adjVertices(v)) {
+			if (getState(w) == UNVISITED) {
+				return w;
 			}
 		}
 		return null;
