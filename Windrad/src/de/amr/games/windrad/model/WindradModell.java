@@ -11,59 +11,62 @@ public class WindradModell {
 	public static final float MIN_TURM_HÖHE = 30;
 	public static final float MIN_ROTOR_LÄNGE = 20;
 
-	private final Point2D.Float basis = new Point2D.Float();
+	// Aufstellpunkt
+	private final Point2D.Float basis;
 
 	// Turm
-	public final Path2D turm = new Path2D.Float();
+	public final Path2D turm;
 	private float turmBreite;
 	private float turmHöhe;
 
-	// Nabe (Kreis)
-	public final Point2D.Float nabeZentrum = new Point2D.Float();
+	// Nabe
+	public final Point2D.Float nabeZentrum;
 	public float nabeRadius;
 
-	// Rotoren (Ellipsen)
-	public final Point2D.Float[] rotorZentren = new Point2D.Float[3];
+	// Rotoren
+	public final Point2D.Float[] rotorZentren;
 	public float rotorLänge;
 	public float rotorBreite;
-	public int rotorAuslenkung; // Auslenkung in Grad des ersten Rotors
+	public int rotorAuslenkungGrad; // Auslenkung des ersten Rotors in Grad
 
 	public WindradModell(float baseX, float baseY, float turmHöhe, float turmBreite, float nabeRadius,
 			float rotorLänge, float rotorBreite) {
-		
-		for (int i = 0; i < ANZAHL_ROTOREN; ++i) {
-			rotorZentren[i] = new Point2D.Float();
-		}
+
+		this.turmHöhe = turmHöhe;
+		this.turmBreite = turmBreite;
 		this.nabeRadius = nabeRadius;
 		this.rotorLänge = rotorLänge;
 		this.rotorBreite = rotorBreite;
-		rotorAuslenkung = 90;
-		
-		basis.setLocation(baseX, baseY);
-		this.turmHöhe = turmHöhe;
-		this.turmBreite = turmBreite;
-		
-		errichteWindrad(turmHöhe);
+		rotorAuslenkungGrad = 90;
+
+		basis = new Point2D.Float(baseX, baseY);
+		turm = new Path2D.Float();
+		nabeZentrum = new Point2D.Float();
+		rotorZentren = new Point2D.Float[ANZAHL_ROTOREN];
+		for (int i = 0; i < ANZAHL_ROTOREN; ++i) {
+			rotorZentren[i] = new Point2D.Float();
+		}
+		aufstellen(turmHöhe);
 	}
 
-	public void errichteWindrad(float turmHöhe) {
+	public void aufstellen(float turmHöhe) {
 		if (turmHöhe - rotorLänge < MIN_BODEN_ABSTAND) {
 			throw new IllegalStateException("Turmhöhe ist zu niedrig: " + turmHöhe);
 		}
 
-		// Turm
+		// Turm aktualisieren
 		this.turmHöhe = turmHöhe;
-		float radius = turmBreite / 2;
+		float hb = turmBreite / 2;
 		turm.reset();
-		turm.moveTo(basis.x - radius, basis.y); // links unten
-		turm.lineTo(basis.x - radius, basis.y + turmHöhe); // links oben
-		turm.lineTo(basis.x + radius, basis.y + turmHöhe); // rechts oben
-		turm.lineTo(basis.x + radius, basis.y); // rechts unten
+		turm.moveTo(basis.x - hb, basis.y); // links unten
+		turm.lineTo(basis.x - hb, basis.y + turmHöhe); // links oben
+		turm.lineTo(basis.x + hb, basis.y + turmHöhe); // rechts oben
+		turm.lineTo(basis.x + hb, basis.y); // rechts unten
 		turm.closePath();
 
-		// Nabe und Rotoren
+		// Nabe und Rotorpositionen aktualisieren
 		nabeZentrum.setLocation(basis.x, basis.y + turmHöhe + nabeRadius);
-		aktualisiereRotoren();
+		aktualisiereRotorPositionen();
 
 		System.out.println("Windrad errichtet, Höhe: " + turmHöhe);
 	}
@@ -76,11 +79,11 @@ public class WindradModell {
 		return turmBreite;
 	}
 
-	public float gesamtHöhe() {
+	public float höhe() {
 		return turmHöhe + nabeRadius * 2 + rotorLänge;
 	}
 
-	public float gesamtBreite() {
+	public float breite() {
 		return 2 * (nabeRadius + rotorLänge);
 	}
 
@@ -90,7 +93,7 @@ public class WindradModell {
 
 	public void verschiebe(float x, float y) {
 		basis.setLocation(x, y);
-		errichteWindrad(turmHöhe);
+		aufstellen(turmHöhe);
 	}
 
 	public void setzeRotorAuslenkung(int grad) {
@@ -99,19 +102,19 @@ public class WindradModell {
 		} else if (grad < 0) {
 			grad = grad % 360 + 360;
 		}
-		rotorAuslenkung = grad;
-		aktualisiereRotoren();
+		rotorAuslenkungGrad = grad;
+		aktualisiereRotorPositionen();
 	}
 
 	public void ändereRotorAuslenkung(int grad) {
-		setzeRotorAuslenkung(rotorAuslenkung + grad);
+		setzeRotorAuslenkung(rotorAuslenkungGrad + grad);
 	}
 
-	public void aktualisiereRotoren() {
-		double rotorAuslenkungRad = Math.toRadians(rotorAuslenkung);
+	public void aktualisiereRotorPositionen() {
+		double rotorAuslenkungRadians = Math.toRadians(rotorAuslenkungGrad);
 		double teilWinkel = 2 * Math.PI / ANZAHL_ROTOREN;
 		for (int i = 0; i < ANZAHL_ROTOREN; ++i) {
-			double winkel = rotorAuslenkungRad + i * teilWinkel;
+			double winkel = rotorAuslenkungRadians + i * teilWinkel;
 			double radius = (nabeRadius + rotorLänge / 2);
 			double x = nabeZentrum.getX() + radius * Math.cos(winkel);
 			double y = nabeZentrum.getY() + radius * Math.sin(winkel);
@@ -127,7 +130,7 @@ public class WindradModell {
 			throw new IllegalStateException("Rotorlänge zu groß: " + länge);
 		}
 		rotorLänge = länge;
-		aktualisiereRotoren();
+		aktualisiereRotorPositionen();
 		System.out.println("Neue Rotorlänge: " + länge);
 	}
 
@@ -140,13 +143,13 @@ public class WindradModell {
 		}
 		nabeRadius = radius;
 		nabeZentrum.y = basis.y + turmHöhe + radius;
-		aktualisiereRotoren();
+		aktualisiereRotorPositionen();
 		System.out.println("Neuer Nabenradius: " + radius);
 	}
 
 	public void minimieren() {
 		setzeRotorLänge(MIN_ROTOR_LÄNGE);
-		errichteWindrad(MIN_TURM_HÖHE);
+		aufstellen(MIN_TURM_HÖHE);
 		setzeNabeRadius(turmBreite() / 2);
 	}
 }

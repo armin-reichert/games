@@ -325,7 +325,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_schiebeNachOben(ActionEvent e) {
 		WindradModell windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
-		if (altePosition.y + 5 < getHeight() - windrad.gesamtHöhe()) {
+		if (altePosition.y + 5 < getHeight() - windrad.höhe()) {
 			windrad.verschiebe(altePosition.x, altePosition.y + 5);
 			repaint();
 		}
@@ -343,7 +343,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_schiebeNachLinks(ActionEvent e) {
 		WindradModell windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
-		if (altePosition.x - 5 > windrad.gesamtBreite() / 2 - getWidth() / 2) {
+		if (altePosition.x - 5 > windrad.breite() / 2 - getWidth() / 2) {
 			windrad.verschiebe(altePosition.x - 5, altePosition.y);
 			repaint();
 		}
@@ -352,7 +352,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_schiebeNachRechts(ActionEvent e) {
 		WindradModell windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
-		if (altePosition.x + 5 < getWidth() / 2 - windrad.gesamtBreite() / 2) {
+		if (altePosition.x + 5 < getWidth() / 2 - windrad.breite() / 2) {
 			windrad.verschiebe(altePosition.x + 5, altePosition.y);
 			repaint();
 		}
@@ -360,9 +360,9 @@ public class WindparkAnsicht extends JPanel {
 
 	public void action_vergrößereHöhe(ActionEvent e) {
 		WindradModell windrad = ausgewähltesWindrad();
-		if (windrad.basis().y + 20 < getHeight() - windrad.gesamtHöhe()) {
+		if (windrad.basis().y + 20 < getHeight() - windrad.höhe()) {
 			try {
-				windrad.errichteWindrad(windrad.turmHöhe() + 20);
+				windrad.aufstellen(windrad.turmHöhe() + 20);
 				repaint();
 			} catch (IllegalStateException x) {
 				System.out.println(x.getMessage());
@@ -373,7 +373,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_verkleinereHöhe(ActionEvent e) {
 		WindradModell windrad = ausgewähltesWindrad();
 		try {
-			windrad.errichteWindrad(windrad.turmHöhe() - 20);
+			windrad.aufstellen(windrad.turmHöhe() - 20);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());

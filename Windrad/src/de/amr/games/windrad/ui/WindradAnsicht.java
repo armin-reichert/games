@@ -95,7 +95,7 @@ public class WindradAnsicht {
 			Graphics2D gg = (Graphics2D) g.create();
 			gg.setColor(i == 0 ? Color.RED : Color.LIGHT_GRAY);
 			Point2D rotorZentrum = windrad.rotorZentren[i];
-			gg.rotate(toRadians(windrad.rotorAuslenkung + i * 360 / ANZAHL_ROTOREN), rotorZentrum.getX(),
+			gg.rotate(toRadians(windrad.rotorAuslenkungGrad + i * 360 / ANZAHL_ROTOREN), rotorZentrum.getX(),
 					rotorZentrum.getY());
 			int x = (int) round(rotorZentrum.getX() - windrad.rotorLänge / 2);
 			int y = (int) round(rotorZentrum.getY() - windrad.rotorBreite / 2);
