@@ -54,7 +54,8 @@ public class WindradAnsicht {
 	}
 
 	public void zeichneSchatten(Graphics2D g) {
-		Point2D.Float schattenStart = windrad.turmRU;
+		Point2D.Float schattenStart = new Point2D.Float(windrad.basis().x + windrad.turmBreite() / 2,
+				windrad.basis().y);
 		Point2D.Float schattenEnde = windpark.berechneSchattenPunkt(windrad);
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(2));
@@ -63,12 +64,8 @@ public class WindradAnsicht {
 	}
 
 	private void zeichneTurm(Graphics2D g) {
-		Graphics2D gg = (Graphics2D) g.create();
-		gg.setColor(Color.GRAY);
-		int breite = (int) windrad.turmRO.distance(windrad.turmLO);
-		int höhe = (int) windrad.turmRU.distance(windrad.turmRO);
-		gg.fillRect((int) windrad.turmLU.getX(), (int) windrad.turmLU.getY(), breite, höhe);
-		gg.dispose();
+		g.setColor(Color.GRAY);
+		g.fill(windrad.turm);
 	}
 
 	private void zeichneNabe(Graphics2D g, boolean selektiert) {

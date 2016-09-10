@@ -16,7 +16,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -160,12 +159,12 @@ public class WindparkAnsicht extends JPanel {
 
 		zeichneSonne(g);
 
-		for (WindradAnsicht ansicht : ansichten) {
-			// TODO test wieder entfernen, wenn Bug gefixt
-			if (windpark.zentrumSonne.y > ansicht.windrad.turmLO.y) {
-				ansicht.zeichneSchatten(g);
-			}
-		}
+		// for (WindradAnsicht ansicht : ansichten) {
+		// // TODO test wieder entfernen, wenn Bug gefixt
+		// if (windpark.zentrumSonne.y > ansicht.windrad.turmLO.y) {
+		// ansicht.zeichneSchatten(g);
+		// }
+		// }
 
 		for (WindradAnsicht ansicht : ansichten) {
 			if (ansichten.get(auswahl) != ansicht) {
@@ -198,9 +197,8 @@ public class WindparkAnsicht extends JPanel {
 			Ellipse2D.Float nabenKreis = new Ellipse2D.Float(windrad.nabeZentrum.x - windrad.nabeRadius,
 					windrad.nabeZentrum.y - windrad.nabeRadius, 2 * windrad.nabeRadius,
 					2 * windrad.nabeRadius);
-			Rectangle2D.Float turmRechteck = new Rectangle2D.Float(windrad.turmLU.x, windrad.turmLU.y,
-					windrad.turmBreite(), windrad.turmHöhe());
-			if (nabenKreis.contains(modelX, modelY) || turmRechteck.contains(modelX, modelY)) {
+
+			if (nabenKreis.contains(modelX, modelY) || windrad.turm.contains(modelX, modelY)) {
 				auswahl = ansichten.indexOf(bild);
 				break;
 			}
@@ -364,7 +362,7 @@ public class WindparkAnsicht extends JPanel {
 		WindradModell windrad = ausgewähltesWindrad();
 		if (windrad.basis().y + 20 < getHeight() - windrad.gesamtHöhe()) {
 			try {
-				windrad.baueWindrad(windrad.turmHöhe() + 20);
+				windrad.errichteWindrad(windrad.turmHöhe() + 20);
 				repaint();
 			} catch (IllegalStateException x) {
 				System.out.println(x.getMessage());
@@ -375,7 +373,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_verkleinereHöhe(ActionEvent e) {
 		WindradModell windrad = ausgewähltesWindrad();
 		try {
-			windrad.baueWindrad(windrad.turmHöhe() - 20);
+			windrad.errichteWindrad(windrad.turmHöhe() - 20);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());

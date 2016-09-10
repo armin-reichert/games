@@ -96,7 +96,7 @@ public class WindradEditor extends JPanel {
 
 	public void setWindradTurmHöhe(int value) {
 		try {
-			windrad.baueWindrad(value);
+			windrad.errichteWindrad(value);
 		} catch (IllegalStateException x) {
 			System.out.println("Ungültiger Zustand gemeldet, Wert zurückgesetzt");
 			getTurmHoeheSlider().setValue((int)windrad.turmHöhe());
