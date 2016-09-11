@@ -1,6 +1,5 @@
 package de.amr.games.windrad.ui;
 
-import static de.amr.games.windrad.model.WindradModell.ANZAHL_ROTOREN;
 import static java.lang.Math.round;
 import static java.lang.Math.toRadians;
 
@@ -91,12 +90,12 @@ public class WindradAnsicht {
 	}
 
 	private void zeichneRotoren(Graphics2D g) {
-		for (int i = 0; i < ANZAHL_ROTOREN; ++i) {
+		for (int i = 0; i < windrad.anzahlRotoren(); ++i) {
 			Graphics2D gg = (Graphics2D) g.create();
 			gg.setColor(i == 0 ? Color.RED : Color.LIGHT_GRAY);
 			Point2D rotorZentrum = windrad.rotorZentren[i];
-			gg.rotate(toRadians(windrad.rotorAuslenkungGrad + i * 360 / ANZAHL_ROTOREN), rotorZentrum.getX(),
-					rotorZentrum.getY());
+			gg.rotate(toRadians(windrad.rotorAuslenkungGrad + i * 360 / windrad.anzahlRotoren()),
+					rotorZentrum.getX(), rotorZentrum.getY());
 			int x = (int) round(rotorZentrum.getX() - windrad.rotorLänge / 2);
 			int y = (int) round(rotorZentrum.getY() - windrad.rotorBreite / 2);
 			gg.fillOval(x, y, (int) windrad.rotorLänge, (int) windrad.rotorBreite);

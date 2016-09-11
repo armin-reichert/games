@@ -5,8 +5,6 @@ import java.awt.geom.Point2D;
 
 public class WindradModell {
 
-	public static final int ANZAHL_ROTOREN = 3;
-
 	public static final float MIN_BODEN_ABSTAND = 10;
 	public static final float MIN_TURM_HÖHE = 30;
 	public static final float MIN_ROTOR_LÄNGE = 20;
@@ -24,6 +22,7 @@ public class WindradModell {
 	public float nabeRadius;
 
 	// Rotoren
+	private final int anzahlRotoren;
 	public final Point2D.Float[] rotorZentren;
 	public float rotorLänge;
 	public float rotorBreite;
@@ -37,13 +36,14 @@ public class WindradModell {
 		this.nabeRadius = nabeRadius;
 		this.rotorLänge = rotorLänge;
 		this.rotorBreite = rotorBreite;
+		anzahlRotoren = 3;
 		rotorAuslenkungGrad = 90;
 
 		basis = new Point2D.Float(baseX, baseY);
 		turm = new Path2D.Float();
 		nabeZentrum = new Point2D.Float();
-		rotorZentren = new Point2D.Float[ANZAHL_ROTOREN];
-		for (int i = 0; i < ANZAHL_ROTOREN; ++i) {
+		rotorZentren = new Point2D.Float[anzahlRotoren];
+		for (int i = 0; i < anzahlRotoren; ++i) {
 			rotorZentren[i] = new Point2D.Float();
 		}
 		aufstellen(turmHöhe);
@@ -71,6 +71,10 @@ public class WindradModell {
 		System.out.println("Windrad errichtet, Höhe: " + turmHöhe);
 	}
 
+	public int anzahlRotoren() {
+		return anzahlRotoren;
+	}
+	
 	public float turmHöhe() {
 		return turmHöhe;
 	}
@@ -112,8 +116,8 @@ public class WindradModell {
 
 	public void aktualisiereRotorPositionen() {
 		double rotorAuslenkungRadians = Math.toRadians(rotorAuslenkungGrad);
-		double teilWinkel = 2 * Math.PI / ANZAHL_ROTOREN;
-		for (int i = 0; i < ANZAHL_ROTOREN; ++i) {
+		double teilWinkel = 2 * Math.PI / anzahlRotoren;
+		for (int i = 0; i < anzahlRotoren; ++i) {
 			double winkel = rotorAuslenkungRadians + i * teilWinkel;
 			double radius = (nabeRadius + rotorLänge / 2);
 			double x = nabeZentrum.getX() + radius * Math.cos(winkel);
