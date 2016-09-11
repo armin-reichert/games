@@ -6,17 +6,17 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.amr.games.windrad.model.WindradModell;
+import de.amr.games.windrad.model.Windrad;
 import net.miginfocom.swing.MigLayout;
 
 public class WindradEditor extends JPanel {
 
-	private WindradModell windrad;
+	private Windrad windrad;
 	private WindparkAnsicht view;
 	private JSlider turmHoeheSlider;
 	private JSlider rotorLaengeSlider;
 
-	public void setModel(WindradModell windrad) {
+	public void setModel(Windrad windrad) {
 		this.windrad = windrad;
 		turmHoeheSlider.setValue((int)windrad.turmHöhe());
 		rotorLaengeSlider.setValue((int)windrad.rotorLänge);

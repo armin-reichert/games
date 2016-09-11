@@ -14,7 +14,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
 import de.amr.games.windrad.model.WindparkModell;
-import de.amr.games.windrad.model.WindradModell;
+import de.amr.games.windrad.model.Windrad;
 
 public class WindparkAnsicht extends JPanel {
 
@@ -97,7 +96,7 @@ public class WindparkAnsicht extends JPanel {
 		sonnenTimer.start();
 
 		// Windrad-Animationen
-		for (WindradModell windrad : windpark.windräder) {
+		for (Windrad windrad : windpark.windräder) {
 			ansichten.add(new WindradAnsicht(this, windrad));
 		}
 
@@ -193,19 +192,15 @@ public class WindparkAnsicht extends JPanel {
 
 	private void wähleWindradDurchMausklick(double modelX, double modelY) {
 		for (WindradAnsicht bild : ansichten) {
-			WindradModell windrad = bild.windrad;
-			Ellipse2D.Float nabenKreis = new Ellipse2D.Float(windrad.nabeZentrum.x - windrad.nabeRadius,
-					windrad.nabeZentrum.y - windrad.nabeRadius, 2 * windrad.nabeRadius,
-					2 * windrad.nabeRadius);
-
-			if (nabenKreis.contains(modelX, modelY) || windrad.turm.contains(modelX, modelY)) {
+			Windrad windrad = bild.windrad;
+			if (windrad.nabe.contains(modelX, modelY) || windrad.turm.contains(modelX, modelY)) {
 				auswahl = ansichten.indexOf(bild);
 				break;
 			}
 		}
 	}
 
-	public void wähleWindrad(WindradModell windrad) {
+	public void wähleWindrad(Windrad windrad) {
 		for (WindradAnsicht ansicht : ansichten) {
 			if (windrad == ansicht.windrad) {
 				auswahl = ansichten.indexOf(ansicht);
@@ -244,7 +239,7 @@ public class WindparkAnsicht extends JPanel {
 		return ansichten.get(auswahl);
 	}
 
-	private WindradModell ausgewähltesWindrad() {
+	private Windrad ausgewähltesWindrad() {
 		return ausgewählteAnsicht().windrad;
 	}
 
@@ -271,10 +266,9 @@ public class WindparkAnsicht extends JPanel {
 		float turmHöhe = getHeight() / 4;
 		float turmBreite = turmHöhe / 10;
 		float nabenRadius = turmBreite;
-		float rotorLänge = turmHöhe / 2 - WindradModell.MIN_BODEN_ABSTAND;
+		float rotorLänge = turmHöhe / 2 - Windrad.MIN_BODEN_ABSTAND;
 		float rotorBreite = rotorLänge / 10;
-		WindradModell windrad = new WindradModell(0, y, turmHöhe, turmBreite, nabenRadius, rotorLänge,
-				rotorBreite);
+		Windrad windrad = new Windrad(0, y, turmHöhe, turmBreite, nabenRadius, rotorLänge, rotorBreite);
 		windpark.windräder.add(windrad);
 		ansichten.add(new WindradAnsicht(this, windrad));
 		wähleWindrad(windrad);
@@ -323,7 +317,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_schiebeNachOben(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
 		if (altePosition.y + 5 < getHeight() - windrad.höhe()) {
 			windrad.verschiebe(altePosition.x, altePosition.y + 5);
@@ -332,7 +326,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_schiebeNachUnten(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
 		if (altePosition.y - 5 >= 0) {
 			windrad.verschiebe(altePosition.x, altePosition.y - 5);
@@ -341,7 +335,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_schiebeNachLinks(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
 		if (altePosition.x - 5 > windrad.breite() / 2 - getWidth() / 2) {
 			windrad.verschiebe(altePosition.x - 5, altePosition.y);
@@ -350,7 +344,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_schiebeNachRechts(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		Point2D.Float altePosition = windrad.basis();
 		if (altePosition.x + 5 < getWidth() / 2 - windrad.breite() / 2) {
 			windrad.verschiebe(altePosition.x + 5, altePosition.y);
@@ -359,7 +353,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_vergrößereHöhe(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		if (windrad.basis().y + 20 < getHeight() - windrad.höhe()) {
 			try {
 				windrad.aufstellen(windrad.turmHöhe() + 20);
@@ -371,7 +365,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_verkleinereHöhe(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		try {
 			windrad.aufstellen(windrad.turmHöhe() - 20);
 			repaint();
@@ -381,7 +375,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_vergrößereRotorLänge(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		try {
 			windrad.setzeRotorLänge(windrad.rotorLänge + 5);
 			repaint();
@@ -391,7 +385,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_verkleinereRotorLänge(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		try {
 			windrad.setzeRotorLänge(windrad.rotorLänge - 5);
 			repaint();
@@ -401,7 +395,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_vergrößereNabenGröße(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		try {
 			windrad.setzeNabeRadius(windrad.nabeRadius + 1);
 			repaint();
@@ -411,7 +405,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_verkleinereNabenGröße(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		try {
 			windrad.setzeNabeRadius(windrad.nabeRadius - 1);
 			repaint();
@@ -421,7 +415,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_zwickyWindrad(ActionEvent e) {
-		WindradModell windrad = ausgewähltesWindrad();
+		Windrad windrad = ausgewähltesWindrad();
 		try {
 			windrad.minimieren();
 			repaint();

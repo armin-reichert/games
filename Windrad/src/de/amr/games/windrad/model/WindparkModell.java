@@ -20,11 +20,11 @@ public class WindparkModell {
 	public static final int HÖHE = 600;
 
 	public final Point2D.Float zentrumSonne = new Point2D.Float();
-	public final List<WindradModell> windräder = new ArrayList<>();
+	public final List<Windrad> windräder = new ArrayList<>();
 
 	public void speichern() {
 		try (PrintWriter w = new PrintWriter(new FileWriter(WINDPARK_DATEI))) {
-			for (WindradModell windrad : windräder) {
+			for (Windrad windrad : windräder) {
 				speichern(w, windrad);
 			}
 		} catch (IOException e) {
@@ -32,7 +32,7 @@ public class WindparkModell {
 		}
 	}
 
-	private void speichern(PrintWriter w, WindradModell windrad) {
+	private void speichern(PrintWriter w, Windrad windrad) {
 		w.print(windrad.basis().x);
 		w.print(",");
 		w.print(windrad.basis().y);
@@ -62,7 +62,7 @@ public class WindparkModell {
 				float nabeRadius = Float.parseFloat(record[4]);
 				float rotorLänge = Float.parseFloat(record[5]);
 				float rotorBreite = Float.parseFloat(record[6]);
-				windräder.add(new WindradModell(x, y, turmHöhe, turmBreite, nabeRadius, rotorLänge, rotorBreite));
+				windräder.add(new Windrad(x, y, turmHöhe, turmBreite, nabeRadius, rotorLänge, rotorBreite));
 				line = r.readLine();
 			}
 		} catch (FileNotFoundException e) {
@@ -73,7 +73,7 @@ public class WindparkModell {
 	}
 
 	//TODO: funktioniert nur, wenn Sonne höher als Turmspitze steht
-	public Point2D.Float berechneSchattenPunkt(WindradModell windrad) {
+	public Point2D.Float berechneSchattenPunkt(Windrad windrad) {
 		Point2D.Float basis = windrad.basis();
 		Point2D.Float sonne = zentrumSonne;
 		float h = windrad.turmHöhe();
