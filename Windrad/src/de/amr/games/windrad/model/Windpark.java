@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WindparkModell {
+public class Windpark {
 
 	private static final File WINDPARK_DATEI = new File(
 			System.getProperty("user.dir") + File.separator + "windpark.txt");
@@ -37,11 +37,11 @@ public class WindparkModell {
 		w.print(",");
 		w.print(windrad.basis().y);
 		w.print(",");
-		w.print(windrad.turmHöhe());
+		w.print(windrad.getTurmHöhe());
 		w.print(",");
-		w.print(windrad.turmBreite());
+		w.print(windrad.getTurmBreite());
 		w.print(",");
-		w.print(windrad.nabeRadius);
+		w.print(windrad.nabenRadius);
 		w.print(",");
 		w.print(windrad.rotorLänge);
 		w.print(",");
@@ -76,7 +76,7 @@ public class WindparkModell {
 	public Point2D.Float berechneSchattenPunkt(Windrad windrad) {
 		Point2D.Float basis = windrad.basis();
 		Point2D.Float sonne = zentrumSonne;
-		float h = windrad.turmHöhe();
+		float h = windrad.getTurmHöhe();
 		float lambda = (basis.y - sonne.y) / (basis.y + h - sonne.y);
 		Point2D.Float schattenPunkt = new Point2D.Float();
 		schattenPunkt.x = sonne.x + lambda * (basis.x - sonne.x);

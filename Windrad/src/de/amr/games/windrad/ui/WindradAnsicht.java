@@ -1,20 +1,25 @@
 package de.amr.games.windrad.ui;
 
+import static java.lang.Math.PI;
+import static java.lang.Math.round;
+import static java.lang.Math.toRadians;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 import javax.swing.Timer;
 
-import de.amr.games.windrad.model.WindparkModell;
+import de.amr.games.windrad.model.Windpark;
 import de.amr.games.windrad.model.Windrad;
 
 public class WindradAnsicht {
 
-	public final WindparkModell windpark;
+	public final Windpark windpark;
 	public final Windrad windrad;
 	private final Timer rotorTimer;
 	private int rotorDrehungInGrad = 3;
@@ -26,7 +31,7 @@ public class WindradAnsicht {
 			windrad.ändereRotorAuslenkung(rotorDrehungInGrad);
 			windParkAnsicht.repaint();
 		});
-		rotorTimer.setDelay(20);
+		rotorTimer.setDelay(60);
 	}
 
 	public void ändereDrehrichtung() {
@@ -49,24 +54,38 @@ public class WindradAnsicht {
 		// Turm
 		g.setColor(Color.GRAY);
 		g.fill(windrad.turm);
+
 		// Nabe
 		g.setColor(selektiert ? Color.YELLOW : Color.LIGHT_GRAY);
 		g.fill(windrad.nabe);
+
 		// Rotoren
-		double teilWinkel = 2 * Math.PI / windrad.anzahlRotoren();
+		double teilWinkel = 2 * PI / windrad.anzahlRotoren();
 		for (int i = 0; i < windrad.anzahlRotoren(); ++i) {
-			Shape rotor = windrad.rotoren[i];
-			double winkel = Math.toRadians(windrad.rotorAuslenkungGrad) + i * teilWinkel;
+			Ellipse2D.Float rotor = windrad.rotoren[i];
+			double winkel = toRadians(windrad.rotorAuslenkungGrad) + i * teilWinkel;
 			AffineTransform t = new AffineTransform();
-			t.translate(windrad.nabe.getCenterX(), windrad.nabe.getCenterY());
+			t.translate(windrad.nabe.x + windrad.nabenRadius,
+					windrad.nabe.y + windrad.nabenRadius - windrad.rotorBreite / 2);
 			t.rotate(winkel);
+			Shape rotatedRotor = t.createTransformedShape(rotor);
 			g.setColor(i == 0 ? Color.RED : Color.LIGHT_GRAY);
-			g.fill(t.createTransformedShape(rotor));
+			g.fill(rotatedRotor);
+			g.setColor(Color.BLACK);
 		}
+
+		// debug
+		g.setColor(Color.RED);
+		int cx = (int) round(windrad.nabe.getCenterX());
+		int cy = (int) round(windrad.nabe.getCenterY());
+		int r = round(windrad.nabenRadius);
+		g.drawLine(cx, cy + r, cx, cy - r);
+		g.drawLine(cx - r, cy, cx + r, cy);
+
 	}
 
 	public void zeichneSchatten(Graphics2D g) {
-		Point2D.Float schattenStart = new Point2D.Float(windrad.basis().x + windrad.turmBreite() / 2,
+		Point2D.Float schattenStart = new Point2D.Float(windrad.basis().x + windrad.getTurmBreite() / 2,
 				windrad.basis().y);
 		Point2D.Float schattenEnde = windpark.berechneSchattenPunkt(windrad);
 		g.setColor(Color.BLACK);

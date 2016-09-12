@@ -6,11 +6,11 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import de.amr.games.windrad.model.WindparkModell;
+import de.amr.games.windrad.model.Windpark;
 
 public class WindparkFenster extends JFrame {
 
-	public WindparkFenster(WindparkModell windpark, int ansichtBreite, int ansichtHöhe) {
+	public WindparkFenster(Windpark windpark, int ansichtBreite, int ansichtHöhe) {
 		super("Windpark Simulation");
 		WindparkAnsicht ansicht = new WindparkAnsicht(windpark);
 		ansicht.setPreferredSize(new Dimension(ansichtBreite, ansichtHöhe));

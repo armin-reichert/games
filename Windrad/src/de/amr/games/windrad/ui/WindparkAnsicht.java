@@ -1,7 +1,7 @@
 package de.amr.games.windrad.ui;
 
-import static de.amr.games.windrad.model.WindparkModell.BREITE;
-import static de.amr.games.windrad.model.WindparkModell.HÖHE;
+import static de.amr.games.windrad.model.Windpark.BREITE;
+import static de.amr.games.windrad.model.Windpark.HÖHE;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.lang.Math.sqrt;
@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
-import de.amr.games.windrad.model.WindparkModell;
+import de.amr.games.windrad.model.Windpark;
 import de.amr.games.windrad.model.Windrad;
 
 public class WindparkAnsicht extends JPanel {
@@ -57,7 +57,7 @@ public class WindparkAnsicht extends JPanel {
 
 	private static final Font HILFE_FONT = new Font("Monospaced", Font.PLAIN, 14);
 
-	public final WindparkModell windpark;
+	public final Windpark windpark;
 	public final List<WindradAnsicht> ansichten = new ArrayList<>();
 
 	private boolean hilfeAn;
@@ -67,7 +67,7 @@ public class WindparkAnsicht extends JPanel {
 	private WindradEditorFenster editorFenster;
 	private final Timer sonnenTimer;
 
-	public WindparkAnsicht(WindparkModell windpark) {
+	public WindparkAnsicht(Windpark windpark) {
 		this.windpark = windpark;
 		hilfeAn = true;
 		auswahl = 0;
@@ -129,8 +129,8 @@ public class WindparkAnsicht extends JPanel {
 		belegeTaste("MINUS", this::action_verkleinereHöhe);
 		belegeTaste("control PLUS", this::action_vergrößereRotorLänge);
 		belegeTaste("control MINUS", this::action_verkleinereRotorLänge);
-		belegeTaste("shift PLUS", this::action_vergrößereNabenGröße);
-		belegeTaste("shift MINUS", this::action_verkleinereNabenGröße);
+		belegeTaste("shift PLUS", this::action_vergrößereNabenRadius);
+		belegeTaste("shift MINUS", this::action_verkleinereNabenRadius);
 		belegeTaste("Z", this::action_zwickyWindrad);
 	}
 
@@ -356,7 +356,7 @@ public class WindparkAnsicht extends JPanel {
 		Windrad windrad = ausgewähltesWindrad();
 		if (windrad.basis().y + 20 < getHeight() - windrad.höhe()) {
 			try {
-				windrad.aufstellen(windrad.turmHöhe() + 20);
+				windrad.aufstellen(windrad.getTurmHöhe() + 20);
 				repaint();
 			} catch (IllegalStateException x) {
 				System.out.println(x.getMessage());
@@ -367,7 +367,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_verkleinereHöhe(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.aufstellen(windrad.turmHöhe() - 20);
+			windrad.aufstellen(windrad.getTurmHöhe() - 20);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());
@@ -394,20 +394,20 @@ public class WindparkAnsicht extends JPanel {
 		}
 	}
 
-	public void action_vergrößereNabenGröße(ActionEvent e) {
+	public void action_vergrößereNabenRadius(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.setzeNabeRadius(windrad.nabeRadius + 1);
+			windrad.setzeNabenRadius(windrad.nabenRadius + 1);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());
 		}
 	}
 
-	public void action_verkleinereNabenGröße(ActionEvent e) {
+	public void action_verkleinereNabenRadius(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.setzeNabeRadius(windrad.nabeRadius - 1);
+			windrad.setzeNabenRadius(windrad.nabenRadius - 1);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());

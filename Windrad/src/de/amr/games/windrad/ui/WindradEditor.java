@@ -18,10 +18,10 @@ public class WindradEditor extends JPanel {
 
 	public void setModel(Windrad windrad) {
 		this.windrad = windrad;
-		turmHoeheSlider.setValue((int)windrad.turmHöhe());
-		rotorLaengeSlider.setValue((int)windrad.rotorLänge);
+		turmHoeheSlider.setValue((int) windrad.getTurmHöhe());
+		rotorLaengeSlider.setValue((int) windrad.rotorLänge);
 	}
-	
+
 	public void setView(WindparkAnsicht view) {
 		this.view = view;
 	}
@@ -87,7 +87,7 @@ public class WindradEditor extends JPanel {
 			windrad.setzeRotorLänge(value);
 		} catch (IllegalStateException x) {
 			System.out.println("Ungültiger Zustand gemeldet, Wert zurückgesetzt");
-			getRotorLaengeSlider().setValue((int)windrad.rotorLänge);
+			getRotorLaengeSlider().setValue((int) windrad.rotorLänge);
 		}
 		if (view != null) {
 			view.repaint();
@@ -99,7 +99,7 @@ public class WindradEditor extends JPanel {
 			windrad.aufstellen(value);
 		} catch (IllegalStateException x) {
 			System.out.println("Ungültiger Zustand gemeldet, Wert zurückgesetzt");
-			getTurmHoeheSlider().setValue((int)windrad.turmHöhe());
+			getTurmHoeheSlider().setValue((int) windrad.getTurmHöhe());
 		}
 		if (view != null) {
 			view.repaint();

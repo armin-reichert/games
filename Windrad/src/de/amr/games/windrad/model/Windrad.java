@@ -22,7 +22,7 @@ public class Windrad {
 	private float turmHöhe;
 
 	// Nabe
-	public float nabeRadius;
+	public float nabenRadius;
 
 	// Rotoren
 	private final int anzahlRotoren;
@@ -41,11 +41,11 @@ public class Windrad {
 
 		this.turmHöhe = turmHöhe;
 		this.turmBreite = turmBreite;
-		this.nabeRadius = nabeRadius;
+		this.nabenRadius = nabeRadius;
 		this.rotorLänge = rotorLänge;
 		this.rotorBreite = rotorBreite;
 		anzahlRotoren = 3;
-		rotorAuslenkungGrad = 90;
+		rotorAuslenkungGrad = 0;
 
 		basis = new Point2D.Float(baseX, baseY);
 		turm = new Path2D.Float();
@@ -73,31 +73,30 @@ public class Windrad {
 		turm.closePath();
 
 		// Nabe und Rotorpositionen aktualisieren
-		nabe.x = basis.x - nabeRadius;
+		nabe.x = basis.x - nabenRadius;
 		nabe.y = basis.y + turmHöhe;
-		aktualisiereRotoren();
 
 		System.out.println("Windrad errichtet, Höhe: " + turmHöhe);
+	}
+
+	public float getTurmBreite() {
+		return turmBreite;
+	}
+
+	public float getTurmHöhe() {
+		return turmHöhe;
 	}
 
 	public int anzahlRotoren() {
 		return anzahlRotoren;
 	}
 
-	public float turmHöhe() {
-		return turmHöhe;
-	}
-
-	public float turmBreite() {
-		return turmBreite;
-	}
-
 	public float höhe() {
-		return turmHöhe + nabeRadius * 2 + rotorLänge;
+		return turmHöhe + nabenRadius * 2 + rotorLänge;
 	}
 
 	public float breite() {
-		return 2 * (nabeRadius + rotorLänge);
+		return 2 * (nabenRadius + rotorLänge);
 	}
 
 	public Point2D.Float basis() {
@@ -120,48 +119,39 @@ public class Windrad {
 			grad = grad % 360 + 360;
 		}
 		rotorAuslenkungGrad = grad;
-		aktualisiereRotoren();
-	}
-
-	private void aktualisiereRotoren() {
-		for (Ellipse2D.Float rotor : rotoren) {
-			rotor.x = 0;
-			rotor.y = 0;
-			rotor.width = rotorLänge;
-			rotor.height = rotorBreite;
-		}
 	}
 
 	public void setzeRotorLänge(float länge) {
 		if (länge < MIN_ROTOR_LÄNGE) {
 			throw new IllegalStateException("Rotorlänge zu klein: " + länge);
 		}
-		if (turmHöhe() - länge < MIN_BODEN_ABSTAND) {
+		if (turmHöhe - länge < MIN_BODEN_ABSTAND) {
 			throw new IllegalStateException("Rotorlänge zu groß: " + länge);
 		}
 		rotorLänge = länge;
-		aktualisiereRotoren();
+		for (Ellipse2D.Float rotor : rotoren) {
+			rotor.width = rotorLänge;
+		}
 		System.out.println("Neue Rotorlänge: " + länge);
 	}
 
-	public void setzeNabeRadius(float radius) {
-		if (2 * radius < turmBreite()) {
+	public void setzeNabenRadius(float radius) {
+		if (2 * radius < turmBreite) {
 			throw new IllegalStateException("Nabenradius zu klein: " + radius);
 		}
-		if (radius > 2 * turmBreite()) {
-			throw new IllegalStateException("Nabenradius zu groß: " + radius);
-		}
-		nabeRadius = radius;
-		nabe.width = nabe.height = 2 * nabeRadius;
-		nabe.x = basis.x - nabeRadius;
+		// if (radius > 4 * turmBreite()) {
+		// throw new IllegalStateException("Nabenradius zu groß: " + radius);
+		// }
+		nabenRadius = radius;
+		nabe.width = nabe.height = 2 * nabenRadius;
+		nabe.x = basis.x - nabenRadius;
 		nabe.y = basis.y + turmHöhe;
-		aktualisiereRotoren();
-		System.out.println("Neuer Nabenradius: " + nabeRadius);
+		System.out.println("Neuer Nabenradius: " + nabenRadius);
 	}
 
 	public void minimieren() {
 		setzeRotorLänge(MIN_ROTOR_LÄNGE);
 		aufstellen(MIN_TURM_HÖHE);
-		setzeNabeRadius(turmBreite() / 2);
+		setzeNabenRadius(turmBreite / 2);
 	}
 }
