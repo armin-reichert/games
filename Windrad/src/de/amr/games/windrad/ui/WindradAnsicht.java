@@ -1,13 +1,10 @@
 package de.amr.games.windrad.ui;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.round;
 import static java.lang.Math.toRadians;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -62,17 +59,19 @@ public class WindradAnsicht {
 			g.draw(windrad.nabe);
 		}
 
+		Ellipse2D.Float rotor = new Ellipse2D.Float(0, -windrad.getRotorBreite() / 2,
+				windrad.getRotorLänge(), windrad.getRotorBreite());
 		g.setColor(Color.LIGHT_GRAY);
-		g.translate(windrad.nabe.getCenterX(), windrad.nabe.getCenterY());
-		for (int i = 0, n = windrad.anzahlRotoren(); i < n; ++i) {
-			Ellipse2D.Float ellipse = new Ellipse2D.Float(0, -windrad.rotorBreite / 2, windrad.rotorLänge,
-					windrad.rotorBreite);
-			int auslenkung = windrad.rotorAuslenkungGrad + i * 360 / n;
-			g.rotate(toRadians(auslenkung));
-			g.fill(ellipse);
-			g.rotate(-toRadians(auslenkung));
+		AffineTransform ot = g.getTransform();
+		for (int i = 0, n = windrad.anzahlRotoren; i < n; ++i) {
+			double auslenkung = toRadians(windrad.getRotorWinkel() + i * 360 / n);
+			AffineTransform t = AffineTransform.getTranslateInstance(windrad.nabe.getCenterX(),
+					windrad.nabe.getCenterY());
+			t.rotate(auslenkung);
+			g.transform(t);
+			g.fill(rotor);
+			g.setTransform(ot);
 		}
-		g.translate(-windrad.nabe.getCenterX(), -windrad.nabe.getCenterY());
 	}
 
 	public void zeichneSchatten(Graphics2D g) {

@@ -26,9 +26,10 @@ public class Windrad {
 
 	// Rotoren
 	public final int anzahlRotoren;
-	public float rotorLänge;
-	public float rotorBreite;
-	public int rotorAuslenkungGrad; // Auslenkung des ersten Rotors in Grad
+	private float rotorLänge;
+	private float rotorBreite;
+	private int rotorWinkel; // Auslenkungswinkel des ersten Rotors in Grad, Nullage horizontal nach
+														// rechts, Positive Richtung = Gegenuhrzeigersinn
 
 	// Shapes
 	public final Path2D turm;
@@ -43,7 +44,7 @@ public class Windrad {
 		this.rotorLänge = rotorLänge;
 		this.rotorBreite = rotorBreite;
 		anzahlRotoren = 3;
-		rotorAuslenkungGrad = 0;
+		rotorWinkel = 0;
 
 		basis = new Point2D.Float(baseX, baseY);
 		turm = new Path2D.Float();
@@ -73,16 +74,24 @@ public class Windrad {
 		System.out.println("Windrad errichtet, Höhe: " + turmHöhe);
 	}
 
+	public float getRotorBreite() {
+		return rotorBreite;
+	}
+
+	public float getRotorLänge() {
+		return rotorLänge;
+	}
+
+	public int getRotorWinkel() {
+		return rotorWinkel;
+	}
+
 	public float getTurmBreite() {
 		return turmBreite;
 	}
 
 	public float getTurmHöhe() {
 		return turmHöhe;
-	}
-
-	public int anzahlRotoren() {
-		return anzahlRotoren;
 	}
 
 	public float höhe() {
@@ -103,7 +112,7 @@ public class Windrad {
 	}
 
 	public void ändereRotorAuslenkung(int grad) {
-		setzeRotorAuslenkung(rotorAuslenkungGrad + grad);
+		setzeRotorAuslenkung(rotorWinkel + grad);
 	}
 
 	public void setzeRotorAuslenkung(int grad) {
@@ -112,7 +121,7 @@ public class Windrad {
 		} else if (grad < 0) {
 			grad = grad % 360 + 360;
 		}
-		rotorAuslenkungGrad = grad;
+		rotorWinkel = grad;
 	}
 
 	public void setzeRotorLänge(float länge) {

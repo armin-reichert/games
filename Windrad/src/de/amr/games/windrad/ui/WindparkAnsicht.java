@@ -39,7 +39,6 @@ public class WindparkAnsicht extends JPanel {
 		{"Shift SPACE", "Alle Windräder starten"},
 		{"S", "Nächstes Windrad auswählen"},
 		{"N", "Neues Windrad bauen"},
-		{"C", "Windrad konfigurieren"},
 		{"I", "Drehrichtung umkehren"},
 		{"UP", "Windrad nach oben schieben"},
 		{"DOWN", "Windrad nach unten schieben"},
@@ -64,7 +63,6 @@ public class WindparkAnsicht extends JPanel {
 	private Image hintergrundBild;
 	private int auswahl;
 
-	private WindradEditorFenster editorFenster;
 	private final Timer sonnenTimer;
 
 	public WindparkAnsicht(Windpark windpark) {
@@ -119,7 +117,6 @@ public class WindparkAnsicht extends JPanel {
 		belegeTaste("S", this::action_wähleNächstesWindrad);
 		belegeTaste("N", this::action_neuesWindrad);
 		belegeTaste("DELETE", this::action_löscheWindrad);
-		belegeTaste("C", this::action_öffneEditor);
 		belegeTaste("I", this::action_ändereDrehrichtung);
 		belegeTaste("UP", this::action_schiebeNachOben);
 		belegeTaste("DOWN", this::action_schiebeNachUnten);
@@ -305,13 +302,6 @@ public class WindparkAnsicht extends JPanel {
 		}
 	}
 
-	public void action_öffneEditor(ActionEvent e) {
-		editorFenster = new WindradEditorFenster(this, ausgewähltesWindrad());
-		editorFenster.setAlwaysOnTop(true);
-		editorFenster.setLocationRelativeTo(this);
-		editorFenster.setVisible(true);
-	}
-
 	public void action_ändereDrehrichtung(ActionEvent e) {
 		ausgewählteAnsicht().ändereDrehrichtung();
 	}
@@ -377,7 +367,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_vergrößereRotorLänge(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.setzeRotorLänge(windrad.rotorLänge + 5);
+			windrad.setzeRotorLänge(windrad.getRotorLänge() + 5);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());
@@ -387,7 +377,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_verkleinereRotorLänge(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.setzeRotorLänge(windrad.rotorLänge - 5);
+			windrad.setzeRotorLänge(windrad.getRotorLänge() - 5);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());

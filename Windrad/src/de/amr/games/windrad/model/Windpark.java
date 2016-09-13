@@ -43,9 +43,9 @@ public class Windpark {
 		w.print(",");
 		w.print(windrad.nabenRadius);
 		w.print(",");
-		w.print(windrad.rotorLänge);
+		w.print(windrad.getRotorLänge());
 		w.print(",");
-		w.print(windrad.rotorBreite);
+		w.print(windrad.getRotorBreite());
 		w.println();
 	}
 
