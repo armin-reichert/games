@@ -51,37 +51,28 @@ public class WindradAnsicht {
 	}
 
 	public void zeichne(Graphics2D g, boolean selektiert) {
-		// Turm
+
 		g.setColor(Color.GRAY);
 		g.fill(windrad.turm);
 
-		// Nabe
-		g.setColor(selektiert ? Color.YELLOW : Color.LIGHT_GRAY);
+		g.setColor(Color.WHITE);
 		g.fill(windrad.nabe);
-
-		// Rotoren
-		double teilWinkel = 2 * PI / windrad.anzahlRotoren();
-		for (int i = 0; i < windrad.anzahlRotoren(); ++i) {
-			Ellipse2D.Float rotor = windrad.rotoren[i];
-			double winkel = toRadians(windrad.rotorAuslenkungGrad) + i * teilWinkel;
-			AffineTransform t = new AffineTransform();
-			t.translate(windrad.nabe.x + windrad.nabenRadius,
-					windrad.nabe.y + windrad.nabenRadius - windrad.rotorBreite / 2);
-			t.rotate(winkel);
-			Shape rotatedRotor = t.createTransformedShape(rotor);
-			g.setColor(i == 0 ? Color.RED : Color.LIGHT_GRAY);
-			g.fill(rotatedRotor);
-			g.setColor(Color.BLACK);
+		if (selektiert) {
+			g.setColor(Color.RED);
+			g.draw(windrad.nabe);
 		}
 
-		// debug
-		g.setColor(Color.RED);
-		int cx = (int) round(windrad.nabe.getCenterX());
-		int cy = (int) round(windrad.nabe.getCenterY());
-		int r = round(windrad.nabenRadius);
-		g.drawLine(cx, cy + r, cx, cy - r);
-		g.drawLine(cx - r, cy, cx + r, cy);
-
+		g.setColor(Color.LIGHT_GRAY);
+		g.translate(windrad.nabe.getCenterX(), windrad.nabe.getCenterY());
+		for (int i = 0, n = windrad.anzahlRotoren(); i < n; ++i) {
+			Ellipse2D.Float ellipse = new Ellipse2D.Float(0, -windrad.rotorBreite / 2, windrad.rotorLänge,
+					windrad.rotorBreite);
+			int auslenkung = windrad.rotorAuslenkungGrad + i * 360 / n;
+			g.rotate(toRadians(auslenkung));
+			g.fill(ellipse);
+			g.rotate(-toRadians(auslenkung));
+		}
+		g.translate(-windrad.nabe.getCenterX(), -windrad.nabe.getCenterY());
 	}
 
 	public void zeichneSchatten(Graphics2D g) {

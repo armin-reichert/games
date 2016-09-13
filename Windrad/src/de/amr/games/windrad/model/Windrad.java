@@ -25,7 +25,7 @@ public class Windrad {
 	public float nabenRadius;
 
 	// Rotoren
-	private final int anzahlRotoren;
+	public final int anzahlRotoren;
 	public float rotorLänge;
 	public float rotorBreite;
 	public int rotorAuslenkungGrad; // Auslenkung des ersten Rotors in Grad
@@ -33,8 +33,6 @@ public class Windrad {
 	// Shapes
 	public final Path2D turm;
 	public final Ellipse2D.Float nabe;
-	// public final Point2D.Float[] rotorZentren;
-	public final Ellipse2D.Float[] rotoren;
 
 	public Windrad(float baseX, float baseY, float turmHöhe, float turmBreite, float nabeRadius,
 			float rotorLänge, float rotorBreite) {
@@ -50,10 +48,6 @@ public class Windrad {
 		basis = new Point2D.Float(baseX, baseY);
 		turm = new Path2D.Float();
 		nabe = new Ellipse2D.Float(0, 0, 2 * nabeRadius, 2 * nabeRadius);
-		rotoren = new Ellipse2D.Float[anzahlRotoren];
-		for (int i = 0; i < anzahlRotoren; ++i) {
-			rotoren[i] = new Ellipse2D.Float(0, 0, rotorLänge, rotorBreite);
-		}
 		aufstellen(turmHöhe);
 	}
 
@@ -129,9 +123,6 @@ public class Windrad {
 			throw new IllegalStateException("Rotorlänge zu groß: " + länge);
 		}
 		rotorLänge = länge;
-		for (Ellipse2D.Float rotor : rotoren) {
-			rotor.width = rotorLänge;
-		}
 		System.out.println("Neue Rotorlänge: " + länge);
 	}
 
