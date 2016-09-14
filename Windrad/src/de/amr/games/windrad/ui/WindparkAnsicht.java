@@ -1,19 +1,17 @@
 package de.amr.games.windrad.ui;
 
-import static de.amr.games.windrad.model.Windpark.BREITE;
-import static de.amr.games.windrad.model.Windpark.HÖHE;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.lang.Math.sqrt;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,72 +28,43 @@ import javax.swing.Timer;
 import de.amr.games.windrad.model.Windpark;
 import de.amr.games.windrad.model.Windrad;
 
+/**
+ * Windpark (View).
+ */
 public class WindparkAnsicht extends JPanel {
 
-	private static final String[][] HILFE_TEXTE = {
-		/*@formatter:off*/
-		{"F1", "Hilfe ein/aus"},
-		{"SPACE", "Windrad starten/stoppen"},
-		{"Shift SPACE", "Alle Windräder starten"},
-		{"S", "Nächstes Windrad auswählen"},
-		{"N", "Neues Windrad bauen"},
-		{"I", "Drehrichtung umkehren"},
-		{"UP", "Windrad nach oben schieben"},
-		{"DOWN", "Windrad nach unten schieben"},
-		{"LEFT", "Windrad nach links schieben"},
-		{"RIGHT", "Windrad nach rechts schieben"},
-		{"Z", "Zwicky-Windrad (mini)"},
-		{"+", "Windradhöhe vergrößern"},
-		{"-", "Windradhöhe verkleinern"},
-		{"Control +", "Rotorlänge vergrößern"},
-		{"Control -", "Rotorlänge verkleinern"},
-		{"Shift +", "Nabenradius vergrößern"},
-		{"Shift -", "Nabenradius verkleinern"},
-		/*@formatter:on*/
-	};
-
-	private static final Font HILFE_FONT = new Font("Monospaced", Font.PLAIN, 14);
-
-	public final Windpark windpark;
-	public final List<WindradAnsicht> ansichten = new ArrayList<>();
-
+	private final Windpark windpark;
+	private final List<WindradAnsicht> windradAnsichten = new ArrayList<>();
+	private final HilfeTextAnsicht hilfeText = new HilfeTextAnsicht();
 	private boolean hilfeAn;
 	private Image hintergrundBild;
 	private int auswahl;
+	private final Timer sonnenAnimation;
 
-	private final Timer sonnenTimer;
-
-	public WindparkAnsicht(Windpark windpark) {
+	public WindparkAnsicht(Windpark windpark, int breite, int höhe) throws IOException {
 		this.windpark = windpark;
 		hilfeAn = true;
 		auswahl = 0;
-
-		// Hintergrundbild
-		try {
-			hintergrundBild = ImageIO.read(getClass().getResourceAsStream("/hintergrund.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		hintergrundBild = ImageIO.read(getClass().getResourceAsStream("/hintergrund.png"));
 
 		// Sonnenanimation
-		windpark.zentrumSonne.setLocation(-BREITE / 2, HÖHE / 2);
-		sonnenTimer = new Timer(0, e -> {
+		windpark.zentrumSonne.setLocation(-breite / 2, höhe / 2);
+		sonnenAnimation = new Timer(0, e -> {
 			int deltaX = 1;
 			windpark.zentrumSonne.x += deltaX;
-			if (windpark.zentrumSonne.x > BREITE / 2) {
-				windpark.zentrumSonne.x = -BREITE / 2;
+			if (windpark.zentrumSonne.x > breite / 2) {
+				windpark.zentrumSonne.x = -breite / 2;
 			}
-			float radiusQuadrat = (float) 0.25 * (BREITE * BREITE + HÖHE * HÖHE);
+			float radiusQuadrat = (float) 0.25 * (breite * breite + höhe * höhe);
 			float xQuadrat = windpark.zentrumSonne.x * windpark.zentrumSonne.x;
 			windpark.zentrumSonne.y = (float) sqrt(radiusQuadrat - xQuadrat);
 			repaint();
 		});
-		sonnenTimer.setDelay(300);
-		sonnenTimer.start();
+		sonnenAnimation.setDelay(600);
+		sonnenAnimation.start();
 
-		// Windrad-Animationen
 		for (Windrad windrad : windpark.windräder) {
-			ansichten.add(new WindradAnsicht(this, windrad));
+			windradAnsichten.add(new WindradAnsicht(this, windrad));
 		}
 
 		// Maus
@@ -105,7 +74,7 @@ public class WindparkAnsicht extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				int modelX = e.getX() - getWidth() / 2;
 				int modelY = getHeight() - e.getY();
-				wähleWindradDurchMausklick(modelX, modelY);
+				wähleWindradAnPosition(modelX, modelY);
 				repaint();
 			}
 		});
@@ -135,7 +104,6 @@ public class WindparkAnsicht extends JPanel {
 	protected void paintComponent(Graphics gg) {
 		Graphics2D g = (Graphics2D) gg;
 		g.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-
 		super.paintComponent(g);
 
 		if (hintergrundBild != null) {
@@ -145,82 +113,69 @@ public class WindparkAnsicht extends JPanel {
 			g.fillRect(0, 0, getWidth(), getHeight());
 		}
 
-		if (hilfeAn) {
-			zeichneHilfeText(g);
-		}
-
-		// Koordinaten-Transformation Welt -> Anzeige
+		// Koordinaten-Transformation Model -> View
+		AffineTransform ot = g.getTransform();
 		g.translate(getWidth() / 2, getHeight());
 		g.scale(1, -1);
 
-		zeichneSonne(g);
-
-		// for (WindradAnsicht ansicht : ansichten) {
-		// // TODO test wieder entfernen, wenn Bug gefixt
-		// if (windpark.zentrumSonne.y > ansicht.windrad.turmLO.y) {
-		// ansicht.zeichneSchatten(g);
-		// }
-		// }
-
-		for (WindradAnsicht ansicht : ansichten) {
-			if (ansichten.get(auswahl) != ansicht) {
-				ansicht.zeichne(g, false);
-			}
-		}
-		ansichten.get(auswahl).zeichne(g, true);
-	}
-
-	private void zeichneSonne(Graphics2D g) {
+		// Sonne
 		int durchmesser = 40;
 		g.setColor(Color.YELLOW);
 		g.fillOval((int) (windpark.zentrumSonne.x - durchmesser / 2),
 				(int) (windpark.zentrumSonne.y - durchmesser / 2), durchmesser, durchmesser);
-	}
 
-	private void zeichneHilfeText(Graphics2D g) {
-		g.setFont(HILFE_FONT);
-		g.setColor(Color.WHITE);
-		int y = 2 * HILFE_FONT.getSize(), x = getWidth() - 380, lineHeight = HILFE_FONT.getSize() + 3;
-		for (String[] text : HILFE_TEXTE) {
-			g.drawString(String.format("%10s", text[0]) + " = " + text[1], x, y);
-			y += lineHeight;
+		// Windräder
+		if (!windradAnsichten.isEmpty()) {
+			for (WindradAnsicht w : windradAnsichten) {
+				if (windradAnsichten.get(auswahl) != w) {
+					w.draw(g, false);
+				}
+			}
+			windradAnsichten.get(auswahl).draw(g, true);
+		}
+
+		g.setTransform(ot);
+
+		// Hilfetext
+		if (hilfeAn) {
+			hilfeText.setLocation(getWidth() - 360, 20);
+			hilfeText.draw(g);
 		}
 	}
 
-	private void wähleWindradDurchMausklick(double modelX, double modelY) {
-		for (WindradAnsicht bild : ansichten) {
-			Windrad windrad = bild.windrad;
-			if (windrad.nabe.contains(modelX, modelY) || windrad.turm.contains(modelX, modelY)) {
-				auswahl = ansichten.indexOf(bild);
+	private void wähleWindradAnPosition(double modelX, double modelY) {
+		for (WindradAnsicht w : windradAnsichten) {
+			Windrad windrad = w.getWindrad();
+			if (windrad.getNabe().contains(modelX, modelY)
+					|| windrad.getTurm().contains(modelX, modelY)) {
+				auswahl = windradAnsichten.indexOf(w);
 				break;
 			}
 		}
 	}
 
 	public void wähleWindrad(Windrad windrad) {
-		for (WindradAnsicht ansicht : ansichten) {
-			if (windrad == ansicht.windrad) {
-				auswahl = ansichten.indexOf(ansicht);
+		for (WindradAnsicht w : windradAnsichten) {
+			if (windrad == w.getWindrad()) {
+				auswahl = windradAnsichten.indexOf(w);
 			}
 		}
 	}
 
 	public void wähleNächstesWindrad() {
 		// create [0, 1, 2, ... ]
-		Integer[] sortedByX = new Integer[ansichten.size()];
+		Integer[] sortedByX = new Integer[windradAnsichten.size()];
 		for (int i = 0; i < sortedByX.length; ++i) {
 			sortedByX[i] = i;
 		}
 		// sort by x-coordinate
 		Arrays.sort(sortedByX, (i1, i2) -> {
-			float x1 = ansichten.get(i1).windrad.basis().x;
-			float x2 = ansichten.get(i2).windrad.basis().x;
-			if (x1 == x2) {
-				float y1 = ansichten.get(i1).windrad.basis().y;
-				float y2 = ansichten.get(i2).windrad.basis().y;
-				return y1 < y2 ? -1 : y1 > y2 ? 1 : 0;
+			Point2D.Float pos1 = windradAnsichten.get(i1).getWindrad().getPosition();
+			Point2D.Float pos2 = windradAnsichten.get(i2).getWindrad().getPosition();
+			if (pos1.x == pos2.x) {
+				return pos1.y < pos2.y ? -1 : pos1.y > pos2.y ? 1 : 0;
 			}
-			return x1 < x2 ? -1 : 1;
+			return pos1.x < pos2.x ? -1 : 1;
 		});
 		// find selected index in new order
 		int index = 0;
@@ -233,11 +188,11 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public WindradAnsicht ausgewählteAnsicht() {
-		return ansichten.get(auswahl);
+		return windradAnsichten.get(auswahl);
 	}
 
 	private Windrad ausgewähltesWindrad() {
-		return ausgewählteAnsicht().windrad;
+		return ausgewählteAnsicht().getWindrad();
 	}
 
 	private void belegeTaste(String taste, Consumer<ActionEvent> action) {
@@ -261,13 +216,15 @@ public class WindparkAnsicht extends JPanel {
 	public void action_neuesWindrad(ActionEvent e) {
 		int y = getHeight() / 4;
 		float turmHöhe = getHeight() / 4;
-		float turmBreite = turmHöhe / 10;
-		float nabenRadius = turmBreite;
-		float rotorLänge = turmHöhe / 2 - Windrad.MIN_BODEN_ABSTAND;
+		float turmBreiteUnten = turmHöhe / 10;
+		float turmBreiteOben = turmBreiteUnten * 0.80f;
+		float nabenRadius = turmBreiteOben;
+		float rotorLänge = turmHöhe / 2 - Windrad.getMinBodenAbstand();
 		float rotorBreite = rotorLänge / 10;
-		Windrad windrad = new Windrad(0, y, turmHöhe, turmBreite, nabenRadius, rotorLänge, rotorBreite);
+		Windrad windrad = new Windrad(0, y, turmHöhe, turmBreiteUnten, turmBreiteOben, nabenRadius,
+				rotorLänge, rotorBreite);
 		windpark.windräder.add(windrad);
-		ansichten.add(new WindradAnsicht(this, windrad));
+		windradAnsichten.add(new WindradAnsicht(this, windrad));
 		wähleWindrad(windrad);
 		repaint();
 	}
@@ -276,8 +233,8 @@ public class WindparkAnsicht extends JPanel {
 		if (windpark.windräder.size() <= 1) {
 			return;
 		}
-		WindradAnsicht ansicht = ansichten.remove(auswahl);
-		windpark.windräder.remove(ansicht.windrad);
+		WindradAnsicht ansicht = windradAnsichten.remove(auswahl);
+		windpark.windräder.remove(ansicht.getWindrad());
 		repaint();
 		auswahl = 0;
 	}
@@ -287,7 +244,7 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_starteStoppeAusgewähltesWindrad(ActionEvent e) {
-		if (ausgewählteAnsicht().inBewegung()) {
+		if (ausgewählteAnsicht().drehtSich()) {
 			ausgewählteAnsicht().stop();
 		} else {
 			ausgewählteAnsicht().start();
@@ -295,8 +252,8 @@ public class WindparkAnsicht extends JPanel {
 	}
 
 	public void action_starteAlleWindräder(ActionEvent e) {
-		for (WindradAnsicht ansicht : ansichten) {
-			if (!ansicht.inBewegung()) {
+		for (WindradAnsicht ansicht : windradAnsichten) {
+			if (!ansicht.drehtSich()) {
 				ansicht.start();
 			}
 		}
@@ -308,8 +265,8 @@ public class WindparkAnsicht extends JPanel {
 
 	public void action_schiebeNachOben(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
-		Point2D.Float altePosition = windrad.basis();
-		if (altePosition.y + 5 < getHeight() - windrad.höhe()) {
+		Point2D.Float altePosition = windrad.getPosition();
+		if (altePosition.y + 5 < getHeight() - windrad.getHöhe()) {
 			windrad.verschiebe(altePosition.x, altePosition.y + 5);
 			repaint();
 		}
@@ -317,7 +274,7 @@ public class WindparkAnsicht extends JPanel {
 
 	public void action_schiebeNachUnten(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
-		Point2D.Float altePosition = windrad.basis();
+		Point2D.Float altePosition = windrad.getPosition();
 		if (altePosition.y - 5 >= 0) {
 			windrad.verschiebe(altePosition.x, altePosition.y - 5);
 			repaint();
@@ -326,8 +283,8 @@ public class WindparkAnsicht extends JPanel {
 
 	public void action_schiebeNachLinks(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
-		Point2D.Float altePosition = windrad.basis();
-		if (altePosition.x - 5 > windrad.breite() / 2 - getWidth() / 2) {
+		Point2D.Float altePosition = windrad.getPosition();
+		if (altePosition.x - 5 > windrad.getBreite() / 2 - getWidth() / 2) {
 			windrad.verschiebe(altePosition.x - 5, altePosition.y);
 			repaint();
 		}
@@ -335,8 +292,8 @@ public class WindparkAnsicht extends JPanel {
 
 	public void action_schiebeNachRechts(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
-		Point2D.Float altePosition = windrad.basis();
-		if (altePosition.x + 5 < getWidth() / 2 - windrad.breite() / 2) {
+		Point2D.Float altePosition = windrad.getPosition();
+		if (altePosition.x + 5 < getWidth() / 2 - windrad.getBreite() / 2) {
 			windrad.verschiebe(altePosition.x + 5, altePosition.y);
 			repaint();
 		}
@@ -344,9 +301,9 @@ public class WindparkAnsicht extends JPanel {
 
 	public void action_vergrößereHöhe(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
-		if (windrad.basis().y + 20 < getHeight() - windrad.höhe()) {
+		if (windrad.getPosition().y + 20 < getHeight() - windrad.getHöhe()) {
 			try {
-				windrad.aufstellen(windrad.getTurmHöhe() + 20);
+				windrad.errichte(windrad.getTurmHöhe() + 20);
 				repaint();
 			} catch (IllegalStateException x) {
 				System.out.println(x.getMessage());
@@ -357,7 +314,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_verkleinereHöhe(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.aufstellen(windrad.getTurmHöhe() - 20);
+			windrad.errichte(windrad.getTurmHöhe() - 20);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());
@@ -387,7 +344,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_vergrößereNabenRadius(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.setzeNabenRadius(windrad.nabenRadius + 1);
+			windrad.setzeNabenRadius(windrad.getNabenRadius() + 1);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());
@@ -397,7 +354,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_verkleinereNabenRadius(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.setzeNabenRadius(windrad.nabenRadius - 1);
+			windrad.setzeNabenRadius(windrad.getNabenRadius() - 1);
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());
@@ -407,7 +364,7 @@ public class WindparkAnsicht extends JPanel {
 	public void action_zwickyWindrad(ActionEvent e) {
 		Windrad windrad = ausgewähltesWindrad();
 		try {
-			windrad.minimieren();
+			windrad.minimiere();
 			repaint();
 		} catch (IllegalStateException x) {
 			System.out.println(x.getMessage());

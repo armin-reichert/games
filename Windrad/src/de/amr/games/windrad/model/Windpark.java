@@ -11,19 +11,21 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Windpark (Model).
+ */
 public class Windpark {
 
 	private static final File WINDPARK_DATEI = new File(
 			System.getProperty("user.dir") + File.separator + "windpark.txt");
-
-	public static final int BREITE = 1024;
-	public static final int HÖHE = 600;
 
 	public final Point2D.Float zentrumSonne = new Point2D.Float();
 	public final List<Windrad> windräder = new ArrayList<>();
 
 	public void speichern() {
 		try (PrintWriter w = new PrintWriter(new FileWriter(WINDPARK_DATEI))) {
+			w.println(
+					"# x, y, turmHöhe, turmBreiteUnten, turmBreiteOben, nabenRadius, rotorLänge, rotorBreite");
 			for (Windrad windrad : windräder) {
 				speichern(w, windrad);
 			}
@@ -33,54 +35,50 @@ public class Windpark {
 	}
 
 	private void speichern(PrintWriter w, Windrad windrad) {
-		w.print(windrad.basis().x);
-		w.print(",");
-		w.print(windrad.basis().y);
-		w.print(",");
+		w.print(windrad.getPosition().x);
+		w.print(", ");
+		w.print(windrad.getPosition().y);
+		w.print(", ");
 		w.print(windrad.getTurmHöhe());
-		w.print(",");
-		w.print(windrad.getTurmBreite());
-		w.print(",");
-		w.print(windrad.nabenRadius);
-		w.print(",");
+		w.print(", ");
+		w.print(windrad.getTurmBreiteUnten());
+		w.print(", ");
+		w.print(windrad.getTurmBreiteOben());
+		w.print(", ");
+		w.print(windrad.getNabenRadius());
+		w.print(", ");
 		w.print(windrad.getRotorLänge());
-		w.print(",");
+		w.print(", ");
 		w.print(windrad.getRotorBreite());
 		w.println();
 	}
 
-	public void laden() {
-		windräder.clear();
+	public static Windpark laden() {
+		Windpark windpark = new Windpark();
 		try (BufferedReader r = new BufferedReader(new FileReader(WINDPARK_DATEI))) {
-			String line = r.readLine();
-			while (line != null) {
+			String line = null;
+			while ((line = r.readLine()) != null) {
+				if (line.startsWith("#")) {
+					continue; // Comment line
+				}
 				String[] record = line.split(",");
-				float x = Float.parseFloat(record[0]);
-				float y = Float.parseFloat(record[1]);
-				float turmHöhe = Float.parseFloat(record[2]);
-				float turmBreite = Float.parseFloat(record[3]);
-				float nabeRadius = Float.parseFloat(record[4]);
-				float rotorLänge = Float.parseFloat(record[5]);
-				float rotorBreite = Float.parseFloat(record[6]);
-				windräder.add(new Windrad(x, y, turmHöhe, turmBreite, nabeRadius, rotorLänge, rotorBreite));
-				line = r.readLine();
+				int i = 0;
+				float x = Float.parseFloat(record[i++]);
+				float y = Float.parseFloat(record[i++]);
+				float turmHöhe = Float.parseFloat(record[i++]);
+				float turmBreiteUnten = Float.parseFloat(record[i++]);
+				float turmBreiteOben = Float.parseFloat(record[i++]);
+				float nabeRadius = Float.parseFloat(record[i++]);
+				float rotorLänge = Float.parseFloat(record[i++]);
+				float rotorBreite = Float.parseFloat(record[i++]);
+				windpark.windräder.add(new Windrad(x, y, turmHöhe, turmBreiteUnten, turmBreiteOben,
+						nabeRadius, rotorLänge, rotorBreite));
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Windparkdatei nicht gefunden " + WINDPARK_DATEI);
 		} catch (IOException e) {
 			System.out.println("Windparkdatei nicht lesbar " + WINDPARK_DATEI);
 		}
-	}
-
-	//TODO: funktioniert nur, wenn Sonne höher als Turmspitze steht
-	public Point2D.Float berechneSchattenPunkt(Windrad windrad) {
-		Point2D.Float basis = windrad.basis();
-		Point2D.Float sonne = zentrumSonne;
-		float h = windrad.getTurmHöhe();
-		float lambda = (basis.y - sonne.y) / (basis.y + h - sonne.y);
-		Point2D.Float schattenPunkt = new Point2D.Float();
-		schattenPunkt.x = sonne.x + lambda * (basis.x - sonne.x);
-		schattenPunkt.y = basis.y;
-		return schattenPunkt;
+		return windpark;
 	}
 }
