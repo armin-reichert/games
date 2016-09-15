@@ -5,17 +5,17 @@ import java.awt.EventQueue;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-import de.amr.games.windrad.model.Windpark;
-import de.amr.games.windrad.ui.WindparkFenster;
+import de.amr.games.windrad.model.WindFarm;
+import de.amr.games.windrad.ui.WindFarmWindow;
 
-public class WindradApp {
+public class WindFarmApp {
 
 	public static void main(String[] args) throws Exception {
 		UIManager.setLookAndFeel(NimbusLookAndFeel.class.getName());
-		EventQueue.invokeLater(WindradApp::new);
+		EventQueue.invokeLater(WindFarmApp::new);
 	}
 
-	public WindradApp() {
-		new WindparkFenster(Windpark.laden(), 1260, 700);
+	public WindFarmApp() {
+		new WindFarmWindow(WindFarm.loadFromFile(), 1260, 700);
 	}
 }

@@ -6,17 +6,17 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import de.amr.games.windrad.model.Windpark;
+import de.amr.games.windrad.model.WindFarm;
 
-public class WindparkFenster extends JFrame {
+public class WindFarmWindow extends JFrame {
 
-	public WindparkFenster(Windpark windpark, int ansichtBreite, int ansichtHöhe) {
+	public WindFarmWindow(WindFarm farm, int viewWidth, int viewHeight) {
 		super("Windpark Simulation");
 		try {
-			WindparkAnsicht ansicht = new WindparkAnsicht(windpark, ansichtBreite, ansichtHöhe);
-			ansicht.setPreferredSize(new Dimension(ansichtBreite, ansichtHöhe));
-			ansicht.setMinimumSize(ansicht.getPreferredSize());
-			add(ansicht);
+			WindFarmView farmView = new WindFarmView(farm, viewWidth, viewHeight);
+			farmView.setPreferredSize(new Dimension(viewWidth, viewHeight));
+			farmView.setMinimumSize(farmView.getPreferredSize());
+			add(farmView);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -26,7 +26,7 @@ public class WindparkFenster extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				windpark.speichern();
+				farm.save();
 			}
 		});
 		pack();
