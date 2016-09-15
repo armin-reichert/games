@@ -5,12 +5,14 @@ import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.lang.Math.sqrt;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -79,6 +81,8 @@ public class WindparkAnsicht extends JPanel {
 			}
 		});
 
+		new DragAndDropSupport();
+
 		// Tastatur
 		belegeTaste("F1", this::action_schalteHilfeEinAus);
 		belegeTaste("SPACE", this::action_starteStoppeAusgewähltesWindrad);
@@ -98,6 +102,56 @@ public class WindparkAnsicht extends JPanel {
 		belegeTaste("shift PLUS", this::action_vergrößereNabenRadius);
 		belegeTaste("shift MINUS", this::action_verkleinereNabenRadius);
 		belegeTaste("Z", this::action_zwickyWindrad);
+	}
+
+	private class DragAndDropSupport {
+
+		private boolean dragging;
+		private float offsetX;
+		private float offsetY;
+		private Windrad windrad;
+
+		public DragAndDropSupport() {
+
+			addMouseListener(new MouseAdapter() {
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					int modelX = e.getX() - getWidth() / 2;
+					int modelY = getHeight() - e.getY();
+					for (WindradAnsicht wa : windradAnsichten) {
+						if (wa.getWindrad().getTurm().contains(modelX, modelY)) {
+							windrad = wa.getWindrad();
+							offsetX = windrad.getPosition().x - modelX;
+							offsetY = windrad.getPosition().y - modelY;
+							dragging = true;
+							setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+						}
+					}
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					if (dragging) {
+						dragging = false;
+						setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
+				}
+			});
+
+			addMouseMotionListener(new MouseMotionAdapter() {
+
+				@Override
+				public void mouseDragged(MouseEvent e) {
+					if (dragging) {
+						int modelX = e.getX() - getWidth() / 2;
+						int modelY = getHeight() - e.getY();
+						windrad.verschiebe(modelX + offsetX, modelY + offsetY);
+						repaint();
+					}
+				}
+			});
+		}
 	}
 
 	@Override
@@ -141,6 +195,7 @@ public class WindparkAnsicht extends JPanel {
 			hilfeText.setLocation(getWidth() - 360, 20);
 			hilfeText.draw(g);
 		}
+		g.setColor(Color.RED);
 	}
 
 	private void wähleWindradAnPosition(double modelX, double modelY) {
