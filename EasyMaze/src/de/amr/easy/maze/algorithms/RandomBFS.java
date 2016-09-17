@@ -6,7 +6,6 @@ import static de.amr.easy.graph.api.TraversalState.VISITED;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -35,22 +34,22 @@ public class RandomBFS<Cell> implements Consumer<Cell> {
 		final Random rnd = new Random();
 		final Set<Cell> mazeCells = new HashSet<>();
 		final List<Cell> frontier = new LinkedList<>();
-		
+
 		mazeCells.add(start);
 		frontier.add(start);
 		grid.setContent(start, VISITED);
 		while (!frontier.isEmpty()) {
-			Cell cell = frontier.remove(rnd.nextInt(frontier.size()));
+			int index = frontier.size() == 1 ? 0 : rnd.nextInt(frontier.size());
+			Cell cell = frontier.remove(index);
 			/*@formatter:off*/
 			Stream.of(Direction.randomOrder())
 				.map(dir -> grid.neighbor(cell, dir))
-				.filter(Objects::nonNull)
-				.filter(neighbor -> !mazeCells.contains(neighbor))
-				.forEach(neighborNotInMaze -> {
-					grid.addEdge(new DefaultEdge<Cell>(cell, neighborNotInMaze));
-					grid.setContent(neighborNotInMaze, VISITED);
-					mazeCells.add(neighborNotInMaze);
-					frontier.add(neighborNotInMaze);
+				.filter(neighbor -> neighbor != null && !mazeCells.contains(neighbor))
+				.forEach(newMazeCell -> {
+					mazeCells.add(newMazeCell);
+					frontier.add(newMazeCell);
+					grid.setContent(newMazeCell, VISITED);
+					grid.addEdge(new DefaultEdge<>(cell, newMazeCell));
 				});
 			/*@formatter:on*/
 			grid.setContent(cell, COMPLETED);

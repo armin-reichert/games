@@ -4,7 +4,6 @@ import static de.amr.easy.graph.api.TraversalState.COMPLETED;
 import static de.amr.easy.graph.api.TraversalState.VISITED;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
@@ -52,11 +51,10 @@ public class PrimMST<Cell> implements Consumer<Cell> {
 		/*@formatter:off*/
 		Stream.of(Direction.randomOrder())
 			.map(dir -> grid.neighbor(cell, dir))
-			.filter(Objects::nonNull)
-			.filter(neighbor -> !mazeCells.contains(neighbor))
-			.forEach(neighborNotInMaze -> {
-				cut.add(new DefaultWeightedEdge<Cell>(cell, neighborNotInMaze, rnd.nextDouble()));
-				grid.setContent(neighborNotInMaze, VISITED);
+			.filter(neighbor -> neighbor != null && !mazeCells.contains(neighbor))
+			.forEach(newMazeCell -> {
+				cut.add(new DefaultWeightedEdge<>(cell, newMazeCell, rnd.nextDouble()));
+				grid.setContent(newMazeCell, VISITED);
 			});
 		/*@formatter:on*/
 	}
