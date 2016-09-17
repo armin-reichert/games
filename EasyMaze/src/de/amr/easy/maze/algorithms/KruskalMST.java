@@ -35,7 +35,7 @@ public class KruskalMST<Cell> implements Consumer<Cell> {
 
 	@Override
 	public void accept(Cell start) {
-		for (DefaultEdge<Cell> edge : fullGridEdgesInRandomOrder()) {
+		fullGridEdgesInRandomOrder().forEach(edge -> {
 			Cell either = edge.either(), other = edge.other(either);
 			EquivClass eitherTree = forest.find(either), otherTree = forest.find(other);
 			if (eitherTree != otherTree) {
@@ -44,11 +44,12 @@ public class KruskalMST<Cell> implements Consumer<Cell> {
 				grid.addEdge(edge);
 				forest.union(eitherTree, otherTree);
 			}
-		}
+		});
 	}
 
 	private Iterable<DefaultEdge<Cell>> fullGridEdgesInRandomOrder() {
-		List<DefaultEdge<Cell>> edges = new ArrayList<>(grid.numEdges());
+		int fullGridEdgeCount = 2 * grid.numCols() * grid.numRows() - grid.numRows() - grid.numCols();
+		List<DefaultEdge<Cell>> edges = new ArrayList<>(fullGridEdgeCount);
 		grid.setEventsEnabled(false);
 		grid.fillAllEdges();
 		grid.edges().iterator().forEachRemaining(edges::add);
