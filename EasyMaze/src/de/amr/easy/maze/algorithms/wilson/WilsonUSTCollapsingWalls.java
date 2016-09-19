@@ -3,7 +3,7 @@ package de.amr.easy.maze.algorithms.wilson;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
-import de.amr.easy.grid.iterators.traversals.ImplodingWalls;
+import de.amr.easy.grid.iterators.traversals.CollapsingWalls;
 
 /**
  * Wilson's algorithm where the vertices are selected column-wise left-to-right.
@@ -18,6 +18,6 @@ public class WilsonUSTCollapsingWalls<Cell> extends WilsonUST<Cell> {
 
 	@Override
 	protected Iterable<Cell> getCellSequence() {
-		return new ImplodingWalls<>(grid);
+		return new CollapsingWalls<>(grid);
 	}
 }

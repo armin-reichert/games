@@ -5,18 +5,18 @@ import java.util.Iterator;
 import de.amr.easy.grid.api.Grid2D;
 
 /**
- * A grid traversal where the left and right sides are imploding.
+ * A grid traversal where the left and right grid "walls" are "collapsing".
  * 
  * @author Armin Reichert
  *
  * @param <Cell>
  *          the grid cell type
  */
-public class ImplodingWalls<Cell> implements Iterable<Cell> {
+public class CollapsingWalls<Cell> implements Iterable<Cell> {
 
 	private final Grid2D<Cell, ?> grid;
 
-	public ImplodingWalls(Grid2D<Cell, ?> grid) {
+	public CollapsingWalls(Grid2D<Cell, ?> grid) {
 		this.grid = grid;
 	}
 
