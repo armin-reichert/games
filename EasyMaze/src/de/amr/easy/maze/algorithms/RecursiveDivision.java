@@ -20,7 +20,9 @@ public class RecursiveDivision<Cell> implements Consumer<Cell> {
 	public RecursiveDivision(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		this.grid = grid;
 		rnd = new Random();
+		grid.setEventsEnabled(false);
 		grid.fillAllEdges();
+		grid.setEventsEnabled(true);
 		grid.setDefaultContent(TraversalState.COMPLETED);
 	}
 
