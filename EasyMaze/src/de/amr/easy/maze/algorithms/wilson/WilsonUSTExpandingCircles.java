@@ -1,13 +1,14 @@
 package de.amr.easy.maze.algorithms.wilson;
 
 import static de.amr.easy.grid.api.GridPosition.CENTER;
+import static de.amr.easy.grid.iterators.IteratorFactory.parallel;
+import static de.amr.easy.grid.iterators.IteratorFactory.sequence;
 
 import java.util.Iterator;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
-import de.amr.easy.grid.iterators.IteratorFactory;
 import de.amr.easy.grid.iterators.traversals.ExpandingCircle;
 
 /**
@@ -35,9 +36,9 @@ public class WilsonUSTExpandingCircles<Cell> extends WilsonUST<Cell> {
 			public Iterator<Cell> iterator() {
 				int w = grid.numCols(), h = grid.numRows(), r = Math.max(w / 2, h / 2);
 				/*@formatter:off*/
-				return IteratorFactory.sequence(
+				return sequence(
 					// expand 4 circles in parallel to certain size	
-					IteratorFactory.parallel(
+					parallel(
 						expandingCircle(w / 4, h / 4, 1, r / 4),
 						expandingCircle(3 * w / 4, h / 4, 1, r / 4),
 						expandingCircle(w / 4, 3 * h / 4, 1, r / 4), 
@@ -46,7 +47,7 @@ public class WilsonUSTExpandingCircles<Cell> extends WilsonUST<Cell> {
 					// expand 5th circle to half its size
 					expandingCircle(w / 2, h / 2, 1, r / 2),
 					// expand first 4 circles to final size
-					IteratorFactory.parallel(
+					parallel(
 						expandingCircle(w / 4, h / 4, r / 4, r / 2),
 						expandingCircle(3 * w / 4, h / 4, r / 4, r / 2), 
 						expandingCircle(w / 4, 3 * h / 4, r / 4, r / 2),
