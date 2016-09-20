@@ -47,7 +47,7 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 		Cell current = start;
 		addCellToMaze(current);
 		while (current != null) {
-			Cell unvisitedNeighbor = findRandomNeighbor(current, UNVISITED);
+			Cell unvisitedNeighbor = grid.randomNeighbor(current, c -> grid.getContent(c) == UNVISITED);
 			if (unvisitedNeighbor != null) {
 				connect(current, unvisitedNeighbor);
 				current = unvisitedNeighbor;
@@ -66,19 +66,10 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 				fairGameIterator.next();
 			}
 			Cell cell = fairGameIterator.next();
-			Cell mazeCell = findRandomNeighbor(cell, COMPLETED); // always exists for a cell from the set!
+			// Note: a completed neighbor always exists:
+			Cell mazeCell = grid.randomNeighbor(cell, c -> grid.getContent(c) == COMPLETED);
 			connect(mazeCell, cell);
 			return cell;
-		}
-		return null;
-	}
-
-	private Cell findRandomNeighbor(Cell cell, TraversalState state) {
-		for (Direction dir : Direction.randomOrder()) {
-			Cell neighbor = grid.neighbor(cell, dir);
-			if (neighbor != null && grid.getContent(neighbor) == state) {
-				return neighbor;
-			}
 		}
 		return null;
 	}
@@ -99,6 +90,6 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 
 	private void connect(Cell mazeCell, Cell newCell) {
 		addCellToMaze(newCell);
-		grid.addEdge(new DefaultEdge<Cell>(mazeCell, newCell));
+		grid.addEdge(new DefaultEdge<>(mazeCell, newCell));
 	}
 }
