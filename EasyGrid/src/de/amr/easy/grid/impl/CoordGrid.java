@@ -44,11 +44,11 @@ public class CoordGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 		return col + row * numCols;
 	}
 
-	private int bit(Integer cell, Direction dir) {
+	private int bit(int cell, Direction dir) {
 		return cell * 4 + dir.ordinal();
 	}
 
-	private void setConnected(Integer p, Integer q, Direction dir, boolean connected) {
+	private void setConnected(int p, int q, Direction dir, boolean connected) {
 		edges.set(bit(p, dir), connected);
 		edges.set(bit(q, dir.inverse()), connected);
 	}
@@ -87,7 +87,7 @@ public class CoordGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 				if (isCellConnected(cell, dir)) {
 					Integer neighbor = neighbor(cell, dir);
 					if (neighbor != null && cell < neighbor) {
-						edgeSet.add(new DefaultEdge<Integer>(cell, neighbor));
+						edgeSet.add(new DefaultEdge<>(cell, neighbor));
 					}
 				}
 			});
@@ -119,7 +119,7 @@ public class CoordGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 	public DefaultEdge<Integer> getEdge(Integer p, Integer q) {
 		checkCell(p);
 		checkCell(q);
-		return adjacent(p, q) ? new DefaultEdge<Integer>(p, q) : null;
+		return adjacent(p, q) ? new DefaultEdge<>(p, q) : null;
 	}
 
 	@Override
