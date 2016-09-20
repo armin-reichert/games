@@ -14,16 +14,18 @@ public class PeanoCurveApp extends GridSampleApp {
 
 	public PeanoCurveApp() {
 		super("Peano Curve", 81, 81, 8);
-		work = () -> {
-			setDelay(3);
-			int depth = Utils.log(3, grid.numCols());
-			while (true) {
-				CurveUtil.buildGrid(grid, new PeanoCurve(depth), grid.cell(BOTTOM_LEFT),
-						() -> window.setTitle(composeTitle()));
-				new BFSAnimation(canvas, grid).runAnimation(grid.cell(BOTTOM_LEFT));
-				sleep(3000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		setDelay(3);
+		int depth = Utils.log(3, grid.numCols());
+		while (true) {
+			CurveUtil.buildGrid(grid, new PeanoCurve(depth), grid.cell(BOTTOM_LEFT),
+					() -> window.setTitle(composeTitle()));
+			new BFSAnimation(canvas, grid).runAnimation(grid.cell(BOTTOM_LEFT));
+			sleep(3000);
+			clear();
+		}
 	}
 }

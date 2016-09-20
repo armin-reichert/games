@@ -13,15 +13,17 @@ public class ArminsApp extends GridSampleApp {
 
 	public ArminsApp() {
 		super("Armin's algorithm", 300, 180, 4);
-		work = () -> {
-			setDelay(0);
-			while (true) {
-				new EllerInsideOut<>(grid).accept(null);
-				Integer startCell = grid.cell(GridPosition.CENTER);
-				new BFSAnimation(canvas, grid).runAnimation(startCell);
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		setDelay(0);
+		while (true) {
+			new EllerInsideOut<>(grid).accept(null);
+			Integer startCell = grid.cell(GridPosition.CENTER);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(1000);
+			clear();
+		}
 	}
 }

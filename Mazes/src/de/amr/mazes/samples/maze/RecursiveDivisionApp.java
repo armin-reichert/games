@@ -14,17 +14,19 @@ public class RecursiveDivisionApp extends GridSampleApp {
 
 	public RecursiveDivisionApp() {
 		super("Recursive Division Maze", 600, 360, 2);
-		work = () -> {
-			while (true) {
-				grid.fillAllEdges(); // does not fire events!
-				for (Integer cell : grid.vertices()) {
-					grid.setContent(cell, TraversalState.COMPLETED);
-				}
-				new RecursiveDivision<>(grid).accept(grid.cell(GridPosition.TOP_LEFT));
-				new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
-				sleep(1000);
-				clear();
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			grid.fillAllEdges(); // does not fire events!
+			for (Integer cell : grid.vertices()) {
+				grid.setContent(cell, TraversalState.COMPLETED);
 			}
-		};
+			new RecursiveDivision<>(grid).accept(grid.cell(GridPosition.TOP_LEFT));
+			new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
+			sleep(1000);
+			clear();
+		}
 	}
 }

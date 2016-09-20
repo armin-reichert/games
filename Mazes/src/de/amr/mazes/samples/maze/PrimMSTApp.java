@@ -13,14 +13,16 @@ public class PrimMSTApp extends GridSampleApp {
 
 	public PrimMSTApp() {
 		super("Prim Maze", 600, 360, 2);
-		work = () -> {
-			Integer startCell = grid.cell(GridPosition.TOP_LEFT);
-			while (true) {
-				new PrimMST<>(grid).accept(startCell);
-				new BFSAnimation(canvas, grid).runAnimation(startCell);
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		Integer startCell = grid.cell(GridPosition.TOP_LEFT);
+		while (true) {
+			new PrimMST<>(grid).accept(startCell);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(1000);
+			clear();
+		}
 	}
 }

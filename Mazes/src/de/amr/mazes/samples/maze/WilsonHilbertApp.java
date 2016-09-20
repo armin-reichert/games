@@ -13,14 +13,16 @@ public class WilsonHilbertApp extends GridSampleApp {
 
 	public WilsonHilbertApp() {
 		super("Wilson UST / Hilbert Curve Maze", 600, 360, 2);
+	}
+
+	@Override
+	public void run() {
 		Integer startCell = grid.cell(GridPosition.TOP_LEFT);
-		work = () -> {
-			while (true) {
-				new WilsonUSTHilbertCurve<>(grid).accept(startCell);
-				new BFSAnimation(canvas, grid).runAnimation(startCell);
-				sleep(3000);
-				clear();
-			}
-		};
+		while (true) {
+			new WilsonUSTHilbertCurve<>(grid).accept(startCell);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(3000);
+			clear();
+		}
 	}
 }

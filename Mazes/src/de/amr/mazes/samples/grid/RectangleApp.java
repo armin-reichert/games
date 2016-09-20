@@ -12,17 +12,19 @@ public class RectangleApp extends GridSampleApp {
 
 	public RectangleApp() {
 		super("Rectangles", 400, 300, 2);
-		work = () -> {
-			canvas.setDelay(3);
-			Rectangle<Integer> startRectangle = new Rectangle<Integer>(grid, grid.cell(0, 0), 1, 1);
-			ExpandingRectangle<Integer> expRect = new ExpandingRectangle<Integer>(startRectangle);
-			expRect.setExpandHorizontally(true);
-			expRect.setExpandVertically(true);
-			expRect.setExpansionRate(1);
-			expRect.setMaxExpansion(grid.numCols());
-			for (Integer cell : expRect) {
-				grid.setContent(cell, TraversalState.COMPLETED);
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		canvas.setDelay(3);
+		Rectangle<Integer> startRectangle = new Rectangle<>(grid, grid.cell(0, 0), 1, 1);
+		ExpandingRectangle<Integer> expRect = new ExpandingRectangle<>(startRectangle);
+		expRect.setExpandHorizontally(true);
+		expRect.setExpandVertically(true);
+		expRect.setExpansionRate(1);
+		expRect.setMaxExpansion(grid.numCols());
+		for (Integer cell : expRect) {
+			grid.setContent(cell, TraversalState.COMPLETED);
+		}
 	}
 }

@@ -13,13 +13,15 @@ public class EllerApp extends GridSampleApp {
 
 	public EllerApp() {
 		super("Eller's Algorithm", 600, 360, 2);
-		work = () -> {
-			while (true) {
-				new Eller<>(grid).accept(null);
-				new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			new Eller<>(grid).accept(null);
+			new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
+			sleep(1000);
+			clear();
+		}
 	}
 }

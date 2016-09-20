@@ -13,14 +13,16 @@ public class RandomBFSApp extends GridSampleApp {
 
 	public RandomBFSApp() {
 		super("Randomized Bread-First-Traversal Maze", 600, 360, 2);
-		work = () -> {
-			Integer startCell = grid.cell(GridPosition.CENTER);
-			while (true) {
-				new RandomBFS<>(grid).accept(startCell);
-				new BFSAnimation(canvas, grid).runAnimation(startCell);
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		Integer startCell = grid.cell(GridPosition.CENTER);
+		while (true) {
+			new RandomBFS<>(grid).accept(startCell);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(1000);
+			clear();
+		}
 	}
 }

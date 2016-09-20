@@ -13,14 +13,16 @@ public class HuntAndKillApp extends GridSampleApp {
 
 	public HuntAndKillApp() {
 		super("Hunt And Kill", 300, 180, 4);
-		work = () -> {
-			setDelay(0);
-			while (true) {
-				new HuntAndKill<>(grid).accept(grid.cell(GridPosition.CENTER));
-				new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		setDelay(0);
+		while (true) {
+			new HuntAndKill<>(grid).accept(grid.cell(GridPosition.CENTER));
+			new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
+			sleep(1000);
+			clear();
+		}
 	}
 }

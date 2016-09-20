@@ -13,15 +13,17 @@ public class AldousBroderUSTApp extends GridSampleApp {
 
 	public AldousBroderUSTApp() {
 		super("Aldous-Broder UST Maze", 100, 80, 8);
-		work = () -> {
-			setDelay(0);
-			Integer startCell = grid.cell(GridPosition.TOP_LEFT);
-			while (true) {
-				new AldousBroderUST<>(grid).accept(startCell);
-				new BFSAnimation(canvas, grid).runAnimation(startCell);
-				sleep(1000);
-				clear();
-			}
-		};
 	}
+
+	@Override
+	public void run() {
+		setDelay(0);
+		Integer startCell = grid.cell(GridPosition.TOP_LEFT);
+		while (true) {
+			new AldousBroderUST<>(grid).accept(startCell);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(1000);
+			clear();
+		}
+	};
 }

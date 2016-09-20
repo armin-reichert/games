@@ -14,13 +14,15 @@ public class KruskalMSTApp extends GridSampleApp {
 
 	public KruskalMSTApp() {
 		super("Kruskal Maze", 600, 360, 2);
-		work = () -> {
-			while (true) {
-				new KruskalMST<>(grid).accept(null);
-				new BFSAnimation(canvas, grid).runAnimation(grid.cell(TOP_LEFT));
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			new KruskalMST<>(grid).accept(null);
+			new BFSAnimation(canvas, grid).runAnimation(grid.cell(TOP_LEFT));
+			sleep(1000);
+			clear();
+		}
 	}
 }

@@ -13,14 +13,16 @@ public class BinaryTreeApp extends GridSampleApp {
 
 	public BinaryTreeApp() {
 		super("Binary Tree Maze", 300, 180, 4);
-		work = () -> {
-			Integer startCell = grid.cell(GridPosition.TOP_LEFT);
-			while (true) {
-				new BinaryTree<>(grid).accept(startCell);
-				new BFSAnimation(canvas, grid).runAnimation(startCell);
-				sleep(1000);
-				clear();
-			}
-		};
+	}
+
+	@Override
+	public void run() {
+		Integer startCell = grid.cell(GridPosition.TOP_LEFT);
+		while (true) {
+			new BinaryTree<>(grid).accept(startCell);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(1000);
+			clear();
+		}
 	}
 }

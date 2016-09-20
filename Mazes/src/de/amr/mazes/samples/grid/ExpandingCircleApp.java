@@ -13,10 +13,12 @@ public class ExpandingCircleApp extends GridSampleApp {
 
 	public ExpandingCircleApp() {
 		super("Expanding Circle", 300, 300, 2);
-		work = () -> {
-			setDelay(4);
-			new ExpandingCircle<>(grid, grid.cell(CENTER), 0, grid.numRows())
-					.forEach(cell -> grid.setContent(cell, COMPLETED));
-		};
+	}
+
+	@Override
+	public void run() {
+		setDelay(4);
+		new ExpandingCircle<>(grid, grid.cell(CENTER), 0, grid.numRows())
+				.forEach(cell -> grid.setContent(cell, COMPLETED));
 	}
 }

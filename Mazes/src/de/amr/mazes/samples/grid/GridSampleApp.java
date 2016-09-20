@@ -22,13 +22,10 @@ import de.amr.easy.maze.misc.Utils;
  * 
  * @author Armin Reichert
  */
-public class GridSampleApp {
-
-	static {
-		Utils.setLAF("Nimbus");
-	}
+public abstract class GridSampleApp implements Runnable {
 
 	public static void launch(GridSampleApp app) {
+		Utils.setLAF("Nimbus");
 		EventQueue.invokeLater(app::showUI);
 	}
 
@@ -38,14 +35,11 @@ public class GridSampleApp {
 	protected JFrame window;
 	protected GridCanvas<Integer, DefaultEdge<Integer>> canvas;
 	protected JSlider delaySlider;
-	protected Runnable work;
 
 	protected GridSampleApp(String appName, int gridWidth, int gridHeight, int cellSize) {
 		grid = new ObservableCoordDataGrid<>(gridWidth, gridHeight, UNVISITED);
 		this.appName = appName;
 		this.cellSize = cellSize;
-		work = () -> {
-		};
 	}
 
 	private void showUI() {
@@ -64,11 +58,12 @@ public class GridSampleApp {
 		window.add(delaySlider, BorderLayout.SOUTH);
 		window.pack();
 		window.setVisible(true);
-		new Thread(work).start();
+		new Thread(this).start();
 	}
 
 	protected void resize(int windowWidth, int windowHeight, int cellSize) {
-		grid = new ObservableCoordDataGrid<>(windowWidth / cellSize, windowHeight / cellSize, UNVISITED);
+		grid = new ObservableCoordDataGrid<>(windowWidth / cellSize, windowHeight / cellSize,
+				UNVISITED);
 		canvas.setGrid(grid);
 		canvas.setRenderingModel(createRenderingModel(cellSize));
 		window.setTitle(composeTitle());

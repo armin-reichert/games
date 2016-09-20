@@ -34,7 +34,6 @@ public class HilbertCurveApp extends GridSampleApp {
 
 	private HilbertCurveApp() {
 		super("Hilbert Curve", WIDTH / MAX_CELLSIZE, HEIGHT / MAX_CELLSIZE, MAX_CELLSIZE);
-		work = this::doWork;
 	}
 
 	@Override
@@ -57,7 +56,8 @@ public class HilbertCurveApp extends GridSampleApp {
 		}
 	}
 
-	private void doWork() {
+	@Override
+	public void run() {
 		setDelay(5);
 		Stream.of(TOP_RIGHT, TOP_LEFT, BOTTOM_LEFT, BOTTOM_RIGHT).forEach(startPos -> {
 			int cellSize = MAX_CELLSIZE;

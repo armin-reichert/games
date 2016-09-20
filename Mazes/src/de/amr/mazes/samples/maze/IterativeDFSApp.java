@@ -20,18 +20,20 @@ public class IterativeDFSApp extends GridSampleApp {
 
 	public IterativeDFSApp() {
 		super("DFS Maze Generation", WIN_WIDTH / MAX_CELLSIZE, WIN_HEIGHT / MAX_CELLSIZE, MAX_CELLSIZE);
-		work = () -> {
-			int cellSize = MAX_CELLSIZE;
-			do {
-				new IterativeDFS<>(grid).accept(grid.cell(TOP_LEFT));
-				new BFSAnimation(canvas, grid).runAnimation(grid.cell(TOP_LEFT));
-				sleep(2000);
-				cellSize /= 2;
-				if (cellSize < MIN_CELLSIZE) {
-					cellSize = MAX_CELLSIZE;
-				}
-				resize(WIN_WIDTH, WIN_HEIGHT, cellSize);
-			} while (true);
-		};
+	}
+
+	@Override
+	public void run() {
+		int cellSize = MAX_CELLSIZE;
+		do {
+			new IterativeDFS<>(grid).accept(grid.cell(TOP_LEFT));
+			new BFSAnimation(canvas, grid).runAnimation(grid.cell(TOP_LEFT));
+			sleep(2000);
+			cellSize /= 2;
+			if (cellSize < MIN_CELLSIZE) {
+				cellSize = MAX_CELLSIZE;
+			}
+			resize(WIN_WIDTH, WIN_HEIGHT, cellSize);
+		} while (true);
 	}
 }
