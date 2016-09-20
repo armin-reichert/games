@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
-import de.amr.easy.grid.api.Direction;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
 
 /**
@@ -43,12 +42,13 @@ public class IterativeDFS<Cell> implements Consumer<Cell> {
 		stack.push(current);
 		grid.setContent(current, VISITED);
 		while (!stack.isEmpty()) {
-			Cell neighbor = findRandomUnvisitedNeighbor(current);
+			Cell neighbor = grid.randomNeighbor(current,
+					cell -> grid.getContent(cell) == UNVISITED);
 			if (neighbor != null) {
-				if (findRandomUnvisitedNeighbor(neighbor) != null) {
+				if (grid.randomNeighbor(neighbor, cell -> true) != null) {
 					stack.push(neighbor);
 				}
-				grid.addEdge(new DefaultEdge<Cell>(current, neighbor));
+				grid.addEdge(new DefaultEdge<>(current, neighbor));
 				grid.setContent(neighbor, VISITED);
 				current = neighbor;
 			} else {
@@ -61,15 +61,5 @@ public class IterativeDFS<Cell> implements Consumer<Cell> {
 				}
 			}
 		}
-	}
-
-	private Cell findRandomUnvisitedNeighbor(Cell cell) {
-		for (Direction dir : Direction.randomOrder()) {
-			Cell neighbor = grid.neighbor(cell, dir);
-			if (neighbor != null && grid.getContent(neighbor) == UNVISITED) {
-				return neighbor;
-			}
-		}
-		return null;
 	}
 }

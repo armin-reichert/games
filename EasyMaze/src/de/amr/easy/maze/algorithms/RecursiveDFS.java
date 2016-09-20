@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
-import de.amr.easy.grid.api.Direction;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
 
 /**
@@ -20,21 +19,19 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
 public class RecursiveDFS<Cell> implements Consumer<Cell> {
 
 	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private Cell neighbor;
 
 	public RecursiveDFS(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
-		grid.setContent(start, VISITED);
-		for (Direction dir : Direction.randomOrder()) {
-			Cell neighbor = grid.neighbor(start, dir);
-			if (neighbor != null && grid.getContent(neighbor) == UNVISITED) {
-				grid.addEdge(new DefaultEdge<>(start, neighbor));
-				accept(neighbor);
-			}
+	public void accept(Cell cell) {
+		grid.setContent(cell, VISITED);
+		while ((neighbor = grid.randomNeighbor(cell, c -> grid.getContent(c) == UNVISITED)) != null) {
+			grid.addEdge(new DefaultEdge<>(cell, neighbor));
+			accept(neighbor);
 		}
-		grid.setContent(start, COMPLETED);
+		grid.setContent(cell, COMPLETED);
 	}
 }

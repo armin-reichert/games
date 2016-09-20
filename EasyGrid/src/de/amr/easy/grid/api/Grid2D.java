@@ -1,5 +1,7 @@
 package de.amr.easy.grid.api;
 
+import java.util.function.Predicate;
+
 import de.amr.easy.graph.api.Graph;
 
 /**
@@ -88,6 +90,25 @@ public interface Grid2D<Cell, Passage> extends Graph<Cell, Passage> {
 	 *         that direction
 	 */
 	public Cell neighbor(Cell cell, Direction dir);
+
+	/**
+	 * 
+	 * @param cell
+	 *          a grid cell
+	 * @param predicate
+	 *          a predicate that must hold for the returned cell
+	 * @return a randomly chosen neighbor cell fulfilling the predicate or <code>null</code> if no
+	 *         such neighbor exists
+	 */
+	public default Cell randomNeighbor(Cell cell, Predicate<Cell> predicate) {
+		for (Direction randomDir : Direction.randomOrder()) {
+			Cell neighbor = neighbor(cell, randomDir);
+			if (neighbor != null && predicate.test(neighbor)) {
+				return neighbor;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * 
