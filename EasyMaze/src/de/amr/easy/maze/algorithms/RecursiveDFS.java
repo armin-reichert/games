@@ -1,6 +1,7 @@
 package de.amr.easy.maze.algorithms;
 
 import static de.amr.easy.graph.api.TraversalState.COMPLETED;
+import static de.amr.easy.graph.api.TraversalState.UNVISITED;
 import static de.amr.easy.graph.api.TraversalState.VISITED;
 
 import java.util.function.Consumer;
@@ -29,18 +30,11 @@ public class RecursiveDFS<Cell> implements Consumer<Cell> {
 		grid.setContent(start, VISITED);
 		for (Direction dir : Direction.randomOrder()) {
 			Cell neighbor = grid.neighbor(start, dir);
-			if (neighbor != null && grid.getContent(neighbor) == TraversalState.UNVISITED) {
-				grid.addEdge(new DefaultEdge<Cell>(start, neighbor));
+			if (neighbor != null && grid.getContent(neighbor) == UNVISITED) {
+				grid.addEdge(new DefaultEdge<>(start, neighbor));
 				accept(neighbor);
 			}
 		}
-		// Direction.valuesShuffled().stream().map(dir -> grid.getNeighbor(start, dir))
-		// .filter(Objects::nonNull)
-		// .filter(neighbor -> grid.getContent(neighbor) == TraversalState.UNVISITED)
-		// .forEach(unvisitedNeighbor -> {
-		// grid.addEdge(new DefaultEdge<Cell>(start, unvisitedNeighbor));
-		// accept(unvisitedNeighbor);
-		// });
 		grid.setContent(start, COMPLETED);
 	}
 }
