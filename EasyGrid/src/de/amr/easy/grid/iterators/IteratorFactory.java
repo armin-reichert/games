@@ -9,7 +9,7 @@ public class IteratorFactory<C> {
 	}
 
 	@SafeVarargs
-	public final static <C> Iterator<C> seq(Iterator<C>... sources) {
+	public final static <C> Iterator<C> sequence(Iterator<C>... sources) {
 		return new SequentialIterator<>(sources);
 	}
 
@@ -17,11 +17,11 @@ public class IteratorFactory<C> {
 	public final static <C> Iterator<C> seq(Collection<Iterator<C>> sources) {
 		Iterator<?>[] sourcesArray = new Iterator[sources.size()];
 		sourcesArray = sources.toArray(sourcesArray);
-		return seq((Iterator<C>[]) sourcesArray);
+		return sequence((Iterator<C>[]) sourcesArray);
 	}
 
 	@SafeVarargs
-	public final static <C> Iterator<C> par(Iterator<C>... sources) {
+	public final static <C> Iterator<C> parallel(Iterator<C>... sources) {
 		return new ParallelIterator<>(sources);
 	}
 
@@ -29,6 +29,6 @@ public class IteratorFactory<C> {
 	public final static <C> Iterator<C> par(Collection<Iterator<C>> sources) {
 		Iterator<?>[] sourcesArray = new Iterator[sources.size()];
 		sourcesArray = sources.toArray(sourcesArray);
-		return par((Iterator<C>[]) sourcesArray);
+		return parallel((Iterator<C>[]) sourcesArray);
 	}
 }

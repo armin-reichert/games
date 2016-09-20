@@ -50,7 +50,7 @@ public class WilsonUSTNestedRectangles<Cell> extends WilsonUST<Cell> {
 				sweep.setExpansionRate(1);
 				sweep.setMaxExpansion(grid.numCols());
 
-				return IteratorFactory.seq(IteratorFactory.seq(expRectsArray), sweep.iterator());
+				return IteratorFactory.sequence(IteratorFactory.sequence(expRectsArray), sweep.iterator());
 			}
 		};
 	}

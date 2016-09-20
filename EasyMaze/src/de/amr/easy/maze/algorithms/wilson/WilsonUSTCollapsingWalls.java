@@ -6,13 +6,15 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
 import de.amr.easy.grid.iterators.traversals.CollapsingWalls;
 
 /**
- * Wilson's algorithm where the vertices are selected column-wise left-to-right.
+ * Wilson's algorithm where the vertices are selected alternating left-to-right and right-to-left
+ * column-wise.
  * 
  * @author Armin Reichert
  */
 public class WilsonUSTCollapsingWalls<Cell> extends WilsonUST<Cell> {
 
-	public WilsonUSTCollapsingWalls(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTCollapsingWalls(
+			ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		super(grid);
 	}
 
