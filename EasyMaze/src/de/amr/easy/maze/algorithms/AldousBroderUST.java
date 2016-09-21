@@ -42,7 +42,7 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
 public class AldousBroderUST<Cell> implements Consumer<Cell> {
 
 	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
-	private int numCompletedCells;
+	private int numMazeCells;
 
 	public AldousBroderUST(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		this.grid = grid;
@@ -50,24 +50,25 @@ public class AldousBroderUST<Cell> implements Consumer<Cell> {
 
 	@Override
 	public void accept(Cell start) {
+		numMazeCells = 0;
 		Cell v = start;
-		complete(v);
-		while (numCompletedCells < grid.numVertices()) {
-			Cell u = grid.neighbor(v, Direction.randomValue());
-			if (u == null)
-				continue;
-			animate(u);
-			if (grid.getContent(u) == UNVISITED) {
-				complete(u);
-				grid.addEdge(new DefaultEdge<Cell>(u, v));
+		addToMaze(v);
+		while (numMazeCells < grid.numVertices()) {
+			Cell w = grid.neighbor(v, Direction.randomValue());
+			if (w != null) {
+				animate(w);
+				if (grid.getContent(w) == UNVISITED) {
+					addToMaze(w);
+					grid.addEdge(new DefaultEdge<>(w, v));
+				}
+				v = w;
 			}
-			v = u;
 		}
 	}
 
-	private void complete(Cell cell) {
+	private void addToMaze(Cell cell) {
 		grid.setContent(cell, COMPLETED);
-		++numCompletedCells;
+		++numMazeCells;
 	}
 
 	private void animate(Cell cell) {
