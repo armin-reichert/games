@@ -15,21 +15,24 @@ import de.amr.easy.grid.api.Direction;
  */
 public class DefaultGridRenderingModel<Cell> implements GridRenderingModel<Cell> {
 
-	private static final Font FONT = new Font("Dialog", Font.PLAIN, 10);
+	public Color gridBgColor = Color.BLACK;
+	public Color cellTextColor = Color.BLACK;
+	public int cellSize = 4;
+	public Font textFont = new Font("Dialog", Font.PLAIN, 10);
 
 	@Override
 	public int getCellSize() {
-		return 4;
+		return cellSize;
 	}
 
 	@Override
 	public Color getGridBgColor() {
-		return Color.BLACK;
+		return gridBgColor;
 	}
 
 	@Override
-	public Color getPassageColor(Cell p, Direction dir) {
-		return getCellBgColor(p);
+	public Color getPassageColor(Cell cell, Direction dir) {
+		return getCellBgColor(cell);
 	}
 
 	@Override
@@ -38,22 +41,22 @@ public class DefaultGridRenderingModel<Cell> implements GridRenderingModel<Cell>
 	}
 
 	@Override
-	public Color getCellBgColor(Cell p) {
+	public Color getCellBgColor(Cell cell) {
 		return Color.WHITE;
 	}
 
 	@Override
-	public String getCellText(Cell p) {
+	public String getCellText(Cell cell) {
 		return "";
 	}
 
 	@Override
 	public Color getCellTextColor() {
-		return Color.BLACK;
+		return cellTextColor;
 	}
 
 	@Override
 	public Font getCellTextFont() {
-		return FONT;
+		return textFont;
 	}
 }

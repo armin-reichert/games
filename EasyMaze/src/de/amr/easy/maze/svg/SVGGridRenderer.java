@@ -11,7 +11,6 @@ import de.amr.easy.graph.event.GraphListener;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
 import de.amr.easy.grid.rendering.DefaultGridRenderingModel;
 import de.amr.easy.grid.rendering.GridRenderer;
-import de.amr.easy.grid.rendering.GridRenderingModel;
 
 public class SVGGridRenderer<Cell, Passage extends Edge<Cell>>
 		implements GraphListener<Cell, Passage> {
@@ -19,40 +18,23 @@ public class SVGGridRenderer<Cell, Passage extends Edge<Cell>>
 	private final ObservableDataGrid2D<Cell, Passage, TraversalState> grid;
 	private final SVGGraphics2D g;
 	private final GridRenderer<Cell, Passage> renderer;
-	private final GridRenderingModel<Cell> renderingModel;
-
-	private class SVGRenderingModel extends DefaultGridRenderingModel<Cell> {
-
-		private final int cellSize;
-
-		public SVGRenderingModel(int cellSize) {
-			this.cellSize = cellSize;
-		}
-
-		@Override
-		public int getCellSize() {
-			return cellSize;
-		}
-	}
 
 	public SVGGridRenderer(ObservableDataGrid2D<Cell, Passage, TraversalState> grid, int cellSize) {
 		this.grid = grid;
 		int width = grid.numCols() * cellSize, height = grid.numRows() * cellSize;
 		g = new SVGGraphics2D(width, height);
-		g.setBackground(Color.black);
-		g.clearRect(0, 0, width, height);
 		renderer = new GridRenderer<>();
-		renderingModel = new SVGRenderingModel(cellSize);
+		DefaultGridRenderingModel<Cell> renderingModel = new DefaultGridRenderingModel<>();
+		renderingModel.cellSize = cellSize;
+		renderingModel.gridBgColor = Color.DARK_GRAY;
 		renderer.setRenderingModel(renderingModel);
+		g.setBackground(renderingModel.gridBgColor);
+		g.clearRect(0, 0, width, height);
 		grid.addGraphListener(this);
 	}
 
-	public String getSVGDocument() {
-		return g.getSVGDocument();
-	}
-
-	public String getSVGElement() {
-		return g.getSVGElement();
+	public SVGGraphics2D getSVGGraphics() {
+		return g;
 	}
 
 	@Override
@@ -76,5 +58,4 @@ public class SVGGridRenderer<Cell, Passage extends Edge<Cell>>
 	@Override
 	public void graphChanged(ObservableGraph<Cell, Passage> graph) {
 	}
-
 }

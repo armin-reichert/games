@@ -33,6 +33,6 @@ public class SVGOutputTest {
 		svgRenderer = new SVGGridRenderer<>(grid, CELLSIZE);
 		mazeGenerator = new IterativeDFS<>(grid);
 		mazeGenerator.accept(grid.cell(TOP_LEFT));
-		SVGUtils.writeToSVG(out, svgRenderer.getSVGElement());
+		SVGUtils.writeToSVG(out, svgRenderer.getSVGGraphics().getSVGElement());
 	}
 }
