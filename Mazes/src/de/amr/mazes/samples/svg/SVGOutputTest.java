@@ -2,6 +2,7 @@ package de.amr.mazes.samples.svg;
 
 import static de.amr.easy.graph.api.TraversalState.UNVISITED;
 import static de.amr.easy.grid.api.GridPosition.TOP_LEFT;
+import static java.lang.System.out;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,6 @@ public class SVGOutputTest {
 
 	public static void main(String[] args) throws IOException {
 		SVGOutputTest app = new SVGOutputTest();
-		app.createMaze();
 		app.writeFile("maze.svg", OutputFormat.SVG);
 		app.writeFile("maze.html", OutputFormat.HTML);
 	}
@@ -41,24 +41,22 @@ public class SVGOutputTest {
 		grid = new ObservableCoordDataGrid<>(COLS, ROWS, UNVISITED);
 		svgRenderer = new SVGGridRenderer<>(grid, CELLSIZE);
 		mazeGenerator = new IterativeDFS<>(grid);
-	}
-
-	private void createMaze() {
 		StopWatch watch = new StopWatch();
-		watch.start("Generating maze with " + grid.numCells() + " cells");
+		watch.start();
 		mazeGenerator.accept(grid.cell(TOP_LEFT));
-		watch.stop("Time: %.6f seconds");
+		watch.stop();
+		out.println(String.format("Created maze with %d cells in %f seconds", grid.numCells(),
+				watch.getDuration()));
 	}
 
 	private void writeFile(String path, OutputFormat fmt) throws IOException {
 		File file = new File(path);
 		if (fmt == OutputFormat.SVG) {
 			SVGUtils.writeToSVG(file, svgRenderer.getSVGGraphics().getSVGElement());
-
 		} else if (fmt == OutputFormat.HTML) {
 			SVGUtils.writeToHTML(file, "Maze", svgRenderer.getSVGGraphics().getSVGElement());
 		}
-		System.out.println("Output file: " + file.getAbsolutePath());
-		System.out.println("File size: " + (file.length() / 1024) + " KB");
+		out.println(
+				String.format("Created file %s (%d KB)", file.getAbsolutePath(), file.length() / 1024));
 	}
 }

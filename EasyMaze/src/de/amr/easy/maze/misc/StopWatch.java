@@ -2,23 +2,40 @@ package de.amr.easy.maze.misc;
 
 public class StopWatch {
 
-	private long start;
-	private float duration;
+	private long startMillis;
+	private float duration; // seconds
 
-	public void start(String... msg) {
-		if (msg.length > 0) {
-			System.out.println(msg[0]);
-		}
-		start = System.currentTimeMillis();
+	/**
+	 * Starts the watch.
+	 */
+	public void start() {
+		startMillis = System.currentTimeMillis();
+		duration = 0;
 	}
 
-	public void stop(String... msg) {
-		duration = (System.currentTimeMillis() - start) / 1000f;
-		if (msg.length > 0) {
-			System.out.println(String.format(msg[0], duration));
-		}
+	/**
+	 * Stops the watch and stores the time elapsed since last start.
+	 */
+	public void stop() {
+		duration = (System.currentTimeMillis() - startMillis) / 1000f;
 	}
 
+	/**
+	 * Measures the execution of the given runnable.
+	 * 
+	 * @param runnable
+	 *          some runnable
+	 */
+	public void measure(Runnable runnable) {
+		start();
+		runnable.run();
+		stop();
+	}
+
+	/**
+	 * 
+	 * @return time in seconds between last start/stop sequence
+	 */
 	public float getDuration() {
 		return duration;
 	}

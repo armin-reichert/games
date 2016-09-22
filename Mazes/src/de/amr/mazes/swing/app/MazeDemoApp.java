@@ -6,7 +6,6 @@ import static de.amr.easy.grid.api.GridPosition.TOP_LEFT;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.text.MessageFormat;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
