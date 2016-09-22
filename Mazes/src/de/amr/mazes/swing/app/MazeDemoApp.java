@@ -69,8 +69,8 @@ public class MazeDemoApp {
 		return model.getGrid();
 	}
 
-	public void showMessage(String msg, Object... args) {
-		settingsWindow.getControlPanel().showMessage(MessageFormat.format(msg, args) + "\n");
+	public void showMessage(String msg) {
+		settingsWindow.getControlPanel().showMessage(msg + "\n");
 	}
 
 	void startTask(Runnable task) {

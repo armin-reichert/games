@@ -42,7 +42,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 				}
 			} catch (Exception x) {
 				x.printStackTrace(System.err);
-				app.showMessage("An exception occured: {0}", x);
+				app.showMessage("An exception occured: " + x);
 			} finally {
 				enableControls(true);
 				app.settingsWindow.setVisible(true);
@@ -68,8 +68,8 @@ public class CreateSingleMazeAction extends AbstractAction {
 		app.grid().removeAllEdges();
 		app.grid().setEventsEnabled(true);
 
-		app.showMessage("{0} cells, {1}", app.grid().numCols() * app.grid().numRows(),
-				generatorInfo.getDescription());
+		app.showMessage(
+				String.format("%d cells, %s", app.grid().numCells(), generatorInfo.getDescription()));
 
 		// Create generator object (must happen after grid preparation)
 		@SuppressWarnings("unchecked")
@@ -91,7 +91,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 			watch.start("");
 			generator.accept(startCell);
 			watch.stop();
-			app.showMessage("Done in {0} seconds.", watch.getDurationSeconds());
+			app.showMessage(String.format("Done in %.6f seconds.", watch.getDuration()));
 			// Render maze
 			app.canvas().clear();
 			app.canvas().render();

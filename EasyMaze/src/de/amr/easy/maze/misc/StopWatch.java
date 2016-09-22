@@ -5,16 +5,21 @@ public class StopWatch {
 	private long start;
 	private float duration;
 
-	public void start(String msg) {
-		System.err.println(msg);
+	public void start(String... msg) {
+		if (msg.length > 0) {
+			System.out.println(msg[0]);
+		}
 		start = System.currentTimeMillis();
 	}
 
-	public void stop() {
+	public void stop(String... msg) {
 		duration = (System.currentTimeMillis() - start) / 1000f;
+		if (msg.length > 0) {
+			System.out.println(String.format(msg[0], duration));
+		}
 	}
 
-	public String getDurationSeconds() {
-		return String.format("%.6f", duration);
+	public float getDuration() {
+		return duration;
 	}
 }

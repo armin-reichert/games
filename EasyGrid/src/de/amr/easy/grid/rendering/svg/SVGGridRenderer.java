@@ -1,4 +1,4 @@
-package de.amr.easy.maze.svg;
+package de.amr.easy.grid.rendering.svg;
 
 import java.awt.Color;
 
