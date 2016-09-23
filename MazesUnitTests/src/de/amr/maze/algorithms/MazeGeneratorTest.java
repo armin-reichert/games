@@ -1,5 +1,7 @@
 package de.amr.maze.algorithms;
 
+import static de.amr.easy.graph.api.TraversalState.UNVISITED;
+import static de.amr.easy.grid.api.GridPosition.CENTER;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
@@ -8,7 +10,6 @@ import org.junit.Test;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
-import de.amr.easy.grid.api.GridPosition;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
 import de.amr.easy.grid.impl.ObservableDataGrid;
 import de.amr.easy.maze.algorithms.AldousBroderUST;
@@ -46,7 +47,7 @@ public class MazeGeneratorTest {
 
 	@Before
 	public void setUp() {
-		grid = new ObservableDataGrid<>(WIDTH, HEIGHT, TraversalState.UNVISITED);
+		grid = new ObservableDataGrid<>(WIDTH, HEIGHT, UNVISITED);
 		assertEquals(grid.numVertices(), WIDTH * HEIGHT);
 		assertEquals(grid.numEdges(), 0);
 	}
@@ -59,37 +60,37 @@ public class MazeGeneratorTest {
 
 	@Test
 	public void testAldousBroder() {
-		new AldousBroderUST<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new AldousBroderUST<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testBinaryTree() {
-		new BinaryTree<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new BinaryTree<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testBinaryTreeRandom() {
-		new BinaryTreeRandom<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new BinaryTreeRandom<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testEller() {
-		new Eller<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new Eller<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testEllerInsideOut() {
-		new EllerInsideOut<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new EllerInsideOut<>(grid).accept(grid.cell(CENTER));
 	}
 	
 	@Test
 	public void testHuntAndKill() {
-		new HuntAndKill<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new HuntAndKill<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testIterativeDFS() {
-		new IterativeDFS<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new IterativeDFS<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
@@ -99,86 +100,86 @@ public class MazeGeneratorTest {
 
 	@Test
 	public void testPrim() {
-		new PrimMST<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new PrimMST<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testRandomBFS() {
-		new RandomBFS<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new RandomBFS<>(grid).accept(grid.cell(CENTER));
 	}
 
 	// @Test
 	public void testRecursiveDFS() {
-		new RecursiveDFS<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new RecursiveDFS<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testRecursiveDivision() {
-		new RecursiveDivision<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new RecursiveDivision<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTCollapsingCircle() {
-		new WilsonUSTCollapsingCircle<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTCollapsingCircle<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTCollapsingWalls() {
-		new WilsonUSTCollapsingWalls<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTCollapsingWalls<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTExpandingCircle() {
-		new WilsonUSTExpandingCircle<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTExpandingCircle<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTExpandingCircles() {
-		new WilsonUSTExpandingCircles<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTExpandingCircles<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTExpandingRectangle() {
-		new WilsonUSTExpandingRectangle<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTExpandingRectangle<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTExpandingSpiral() {
-		new WilsonUSTExpandingSpiral<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTExpandingSpiral<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTHilbertCurve() {
-		new WilsonUSTHilbertCurve<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTHilbertCurve<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTLeftToRightSweep() {
-		new WilsonUSTLeftToRightSweep<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTLeftToRightSweep<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTNestedRectangles() {
-		new WilsonUSTNestedRectangles<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTNestedRectangles<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTPeanoCurve() {
-		new WilsonUSTPeanoCurve<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTPeanoCurve<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTRandomCell() {
-		new WilsonUSTRandomCell<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTRandomCell<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTRightToLeftSweep() {
-		new WilsonUSTRightToLeftSweep<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTRightToLeftSweep<>(grid).accept(grid.cell(CENTER));
 	}
 
 	@Test
 	public void testWilsonUSTRowsTopDown() {
-		new WilsonUSTRowsTopDown<>(grid).accept(grid.cell(GridPosition.CENTER));
+		new WilsonUSTRowsTopDown<>(grid).accept(grid.cell(CENTER));
 	}
 }
