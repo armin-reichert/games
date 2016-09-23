@@ -2,6 +2,8 @@ package de.amr.mazes.samples.svg;
 
 import static de.amr.easy.graph.api.TraversalState.UNVISITED;
 import static de.amr.easy.grid.api.GridPosition.TOP_LEFT;
+import static de.amr.mazes.samples.svg.SVGOutputTest.OutputFormat.HTML;
+import static de.amr.mazes.samples.svg.SVGOutputTest.OutputFormat.SVG;
 import static java.lang.System.out;
 
 import java.io.File;
@@ -29,8 +31,8 @@ public class SVGOutputTest {
 
 	public static void main(String[] args) throws IOException {
 		SVGOutputTest app = new SVGOutputTest();
-		app.writeFile("maze.svg", OutputFormat.SVG);
-		app.writeFile("maze.html", OutputFormat.HTML);
+		app.writeFile("maze.svg", SVG);
+		app.writeFile("maze.html", HTML);
 	}
 
 	private final ObservableCoordDataGrid<TraversalState> grid;
@@ -51,9 +53,9 @@ public class SVGOutputTest {
 
 	private void writeFile(String path, OutputFormat fmt) throws IOException {
 		File file = new File(path);
-		if (fmt == OutputFormat.SVG) {
+		if (fmt == SVG) {
 			SVGUtils.writeToSVG(file, svgRenderer.getSVGGraphics().getSVGElement());
-		} else if (fmt == OutputFormat.HTML) {
+		} else if (fmt == HTML) {
 			SVGUtils.writeToHTML(file, "Maze", svgRenderer.getSVGGraphics().getSVGElement());
 		}
 		out.println(

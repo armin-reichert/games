@@ -9,19 +9,19 @@ import de.amr.easy.grid.impl.ObservableCoordDataGrid;
 
 public class CurveUtil {
 
-	public static void buildGrid(ObservableCoordDataGrid<TraversalState> grid, Iterable<Direction> curve,
-			Integer startCell, Runnable onEdgeAdded) {
+	public static void followCurve(ObservableCoordDataGrid<TraversalState> grid, Iterable<Direction> curve,
+			Integer startCell, Runnable edgeAddedAction) {
 		DefaultEdge<Integer> dummyEdge = new DefaultEdge<>(null, null);
-		Integer cell = startCell;
-		grid.setContent(cell, COMPLETED);
+		Integer current = startCell;
+		grid.setContent(current, COMPLETED);
 		for (Direction dir : curve) {
-			Integer next = grid.neighbor(cell, dir);
-			dummyEdge.setEither(cell);
+			Integer next = grid.neighbor(current, dir);
+			dummyEdge.setEither(current);
 			dummyEdge.setOther(next);
 			grid.addEdge(dummyEdge);
-			onEdgeAdded.run();
-			cell = next;
-			grid.setContent(cell, COMPLETED);
+			edgeAddedAction.run();
+			current = next;
+			grid.setContent(current, COMPLETED);
 		}
 	}
 }

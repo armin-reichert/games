@@ -8,12 +8,13 @@ import static de.amr.easy.grid.api.GridPosition.BOTTOM_LEFT;
 import static de.amr.easy.grid.api.GridPosition.BOTTOM_RIGHT;
 import static de.amr.easy.grid.api.GridPosition.TOP_LEFT;
 import static de.amr.easy.grid.api.GridPosition.TOP_RIGHT;
+import static de.amr.easy.maze.misc.Utils.log;
+import static de.amr.mazes.samples.grid.CurveUtil.followCurve;
 
 import java.util.stream.Stream;
 
 import de.amr.easy.grid.api.GridPosition;
 import de.amr.easy.grid.iterators.traversals.HilbertCurve;
-import de.amr.easy.maze.misc.Utils;
 import de.amr.mazes.swing.rendering.BFSAnimation;
 
 /**
@@ -60,17 +61,13 @@ public class HilbertCurveApp extends GridSampleApp {
 	public void run() {
 		setDelay(5);
 		Stream.of(TOP_RIGHT, TOP_LEFT, BOTTOM_LEFT, BOTTOM_RIGHT).forEach(startPos -> {
-			int cellSize = MAX_CELLSIZE;
-			while (cellSize >= MIN_CELLSIZE) {
-				int depth = Utils.log(2, WIDTH / cellSize);
+			for (int cellSize = MAX_CELLSIZE; cellSize >= MIN_CELLSIZE; cellSize /= 2, resize(WIDTH, HEIGHT, cellSize)) {
+				int depth = log(2, WIDTH / cellSize);
 				HilbertCurve curve = createCurve(startPos, depth);
-				CurveUtil.buildGrid(grid, curve, grid.cell(startPos),
-						() -> window.setTitle(composeTitle()));
+				followCurve(grid, curve, grid.cell(startPos), () -> window.setTitle(composeTitle()));
 				BFSAnimation bfs = new BFSAnimation(canvas, grid);
 				bfs.setDistancesVisible(false);
 				bfs.runAnimation(grid.cell(startPos));
-				cellSize /= 2;
-				resize(WIDTH, HEIGHT, cellSize);
 			}
 		});
 	}

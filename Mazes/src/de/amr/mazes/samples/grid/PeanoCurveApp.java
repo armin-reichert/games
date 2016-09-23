@@ -21,7 +21,7 @@ public class PeanoCurveApp extends GridSampleApp {
 		setDelay(3);
 		int depth = Utils.log(3, grid.numCols());
 		while (true) {
-			CurveUtil.buildGrid(grid, new PeanoCurve(depth), grid.cell(BOTTOM_LEFT),
+			CurveUtil.followCurve(grid, new PeanoCurve(depth), grid.cell(BOTTOM_LEFT),
 					() -> window.setTitle(composeTitle()));
 			new BFSAnimation(canvas, grid).runAnimation(grid.cell(BOTTOM_LEFT));
 			sleep(3000);
