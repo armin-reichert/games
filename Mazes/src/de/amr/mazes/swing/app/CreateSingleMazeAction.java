@@ -1,5 +1,7 @@
 package de.amr.mazes.swing.app;
 
+import static java.lang.String.format;
+
 import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 
@@ -13,6 +15,9 @@ import de.amr.mazes.swing.rendering.BFSAnimation;
 import de.amr.mazes.swing.rendering.DFSAnimation;
 import de.amr.mazes.swing.view.ControlPanel;
 
+/**
+ * Action for creating a maze and optionally running a path finder.
+ */
 public class CreateSingleMazeAction extends AbstractAction {
 
 	protected final MazeDemoApp app;
@@ -35,8 +40,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 			try {
 				enableControls(false);
 				generateMaze(app.settingsWindow.getAlgorithmMenu().getSelectedAlgorithm());
-				final AlgorithmInfo<?> pathFinder = app.settingsWindow.getPathFinderMenu()
-						.getSelectedPathFinder();
+				AlgorithmInfo<?> pathFinder = app.settingsWindow.getPathFinderMenu().getSelectedPathFinder();
 				if (pathFinder != null) {
 					runPathFinder(pathFinder);
 				}
@@ -60,7 +64,6 @@ public class CreateSingleMazeAction extends AbstractAction {
 	}
 
 	protected void generateMaze(AlgorithmInfo<?> generatorInfo) throws Exception {
-
 		// Prepare grid
 		app.grid().setEventsEnabled(false);
 		app.grid().clearContent();
@@ -68,8 +71,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 		app.grid().removeAllEdges();
 		app.grid().setEventsEnabled(true);
 
-		app.showMessage(
-				String.format("%d cells, %s", app.grid().numCells(), generatorInfo.getDescription()));
+		app.showMessage(String.format("%d cells, %s", app.grid().numCells(), generatorInfo.getDescription()));
 
 		// Create generator object (must happen after grid preparation)
 		@SuppressWarnings("unchecked")
@@ -81,7 +83,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 			app.canvas().render();
 		}
 
-		final Integer startCell = app.grid().cell(app.model.getGenerationStart());
+		Integer startCell = app.grid().cell(app.model.getGenerationStart());
 		if (app.model.isGenerationAnimated()) {
 			generator.accept(startCell);
 		} else {
@@ -89,7 +91,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 			app.canvas().stopListening();
 			StopWatch watch = new StopWatch();
 			watch.measure(() -> generator.accept(startCell));
-			app.showMessage(String.format("Done in %.6f seconds.", watch.getDuration()));
+			app.showMessage(format("Done in %.6f seconds.", watch.getDuration()));
 			// Render maze
 			app.canvas().clear();
 			app.canvas().render();

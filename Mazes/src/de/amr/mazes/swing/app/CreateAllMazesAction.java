@@ -21,14 +21,17 @@ public class CreateAllMazesAction extends CreateSingleMazeAction {
 		if (app.model.isHidingControlsWhenRunning()) {
 			app.settingsWindow.setVisible(false);
 		}
-		app.mazeWindow.getCanvas().setDelay(app.model.getDelay());
-		app.mazeWindow.getCanvas().resetRenderingModel();
+		app.canvas().setDelay(app.model.getDelay());
+		app.canvas().resetRenderingModel();
 		app.mazeWindow.setVisible(true);
 		app.startTask(() -> {
 			enableControls(false);
-			generateAllMazes();
-			enableControls(true);
-			app.settingsWindow.setVisible(true);
+			try {
+				generateAllMazes();
+			} finally {
+				enableControls(true);
+				app.settingsWindow.setVisible(true);
+			}
 		});
 	}
 
@@ -46,6 +49,7 @@ public class CreateAllMazesAction extends CreateSingleMazeAction {
 					try {
 						Thread.sleep(1500);
 					} catch (InterruptedException e) {
+						// ignore
 					}
 				}
 		});
@@ -55,11 +59,10 @@ public class CreateAllMazesAction extends CreateSingleMazeAction {
 
 	private void createNextMaze(AlgorithmInfo<?> algorithm) {
 		readyForNext = false;
-		app.mazeWindow.getCanvas().clear();
+		app.canvas().clear();
 		try {
 			generateMaze(algorithm);
-			final AlgorithmInfo<?> pathFinder = app.settingsWindow.getPathFinderMenu()
-					.getSelectedPathFinder();
+			AlgorithmInfo<?> pathFinder = app.settingsWindow.getPathFinderMenu().getSelectedPathFinder();
 			if (pathFinder != null) {
 				runPathFinder(pathFinder);
 			}
