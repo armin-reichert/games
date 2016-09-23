@@ -15,8 +15,8 @@ import de.amr.easy.graph.api.SingleSourcePathFinder;
 /**
  * Depth-first-traversal of an undirected graph.
  * <p>
- * Implements the {@link SingleSourcePathFinder} interface such that the traversal state of each vertex can be
- * queried and the path from the source to the target vertex can be asked for.
+ * Implements the {@link SingleSourcePathFinder} interface such that the traversal state of each
+ * vertex can be queried and the path from the source to the target vertex can be asked for.
  * 
  * <p>
  * During the traversal, a number of graph events are fired which can be processed by a listener,

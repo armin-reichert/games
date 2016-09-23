@@ -8,8 +8,7 @@ public class VertexChangeEvent<V, E> {
 	private Object oldValue;
 	private Object newValue;
 
-	public VertexChangeEvent(ObservableGraph<V, E> graph, V vertex, Object oldValue,
-			Object newValue) {
+	public VertexChangeEvent(ObservableGraph<V, E> graph, V vertex, Object oldValue, Object newValue) {
 		this.vertex = vertex;
 		this.oldValue = oldValue;
 		this.newValue = newValue;

@@ -16,10 +16,8 @@ public class A<C> extends Shape<C> implements Iterable<C> {
 		int x = grid.col(leftUpperCorner), y = grid.row(leftUpperCorner);
 		facets.add(new Rectangle<C>(grid, leftUpperCorner, thickness, height).iterator());
 		facets.add(new Rectangle<C>(grid, leftUpperCorner, width, thickness).iterator());
-		facets
-				.add(new Rectangle<C>(grid, grid.cell(x, y + height / 3), width, thickness).iterator());
-		facets
-				.add(new Rectangle<C>(grid, grid.cell(x + width - thickness, y), 1, height).iterator());
+		facets.add(new Rectangle<C>(grid, grid.cell(x, y + height / 3), width, thickness).iterator());
+		facets.add(new Rectangle<C>(grid, grid.cell(x + width - thickness, y), 1, height).iterator());
 	}
 
 	@Override

@@ -18,8 +18,7 @@ import de.amr.easy.graph.event.GraphListener;
  * @param <E>
  *          edge type
  */
-public class DefaultObservableGraph<V, E extends Edge<V>> extends DefaultGraph<V, E>
-		implements ObservableGraph<V, E> {
+public class DefaultObservableGraph<V, E extends Edge<V>> extends DefaultGraph<V, E> implements ObservableGraph<V, E> {
 
 	private Set<GraphListener<V, E>> listeners = new HashSet<>();
 	private boolean listeningSuspended = false;

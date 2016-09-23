@@ -11,7 +11,7 @@ import javax.swing.JSlider;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
-import de.amr.easy.grid.impl.ObservableCoordDataGrid;
+import de.amr.easy.grid.impl.ObservableDataGrid;
 import de.amr.easy.grid.rendering.DefaultGridRenderingModel;
 import de.amr.easy.grid.rendering.GridCanvas;
 import de.amr.easy.grid.rendering.GridRenderingModel;
@@ -29,7 +29,7 @@ public abstract class GridSampleApp implements Runnable {
 		EventQueue.invokeLater(app::showUI);
 	}
 
-	protected ObservableCoordDataGrid<TraversalState> grid;
+	protected ObservableDataGrid<TraversalState> grid;
 	protected int cellSize;
 	protected String appName;
 	protected JFrame window;
@@ -37,7 +37,7 @@ public abstract class GridSampleApp implements Runnable {
 	protected JSlider delaySlider;
 
 	protected GridSampleApp(String appName, int gridWidth, int gridHeight, int cellSize) {
-		grid = new ObservableCoordDataGrid<>(gridWidth, gridHeight, UNVISITED);
+		grid = new ObservableDataGrid<>(gridWidth, gridHeight, UNVISITED);
 		this.appName = appName;
 		this.cellSize = cellSize;
 	}
@@ -62,7 +62,7 @@ public abstract class GridSampleApp implements Runnable {
 	}
 
 	protected void resize(int windowWidth, int windowHeight, int cellSize) {
-		grid = new ObservableCoordDataGrid<>(windowWidth / cellSize, windowHeight / cellSize,
+		grid = new ObservableDataGrid<>(windowWidth / cellSize, windowHeight / cellSize,
 				UNVISITED);
 		canvas.setGrid(grid);
 		canvas.setRenderingModel(createRenderingModel(cellSize));

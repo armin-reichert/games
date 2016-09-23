@@ -7,7 +7,7 @@ import java.util.List;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.Grid2D;
 import de.amr.easy.grid.api.GridPosition;
-import de.amr.easy.grid.impl.CoordGrid;
+import de.amr.easy.grid.impl.RawGrid;
 import de.amr.easy.grid.iterators.shapes.Square;
 
 public class Spiral<Cell> implements Iterable<Cell> {
@@ -17,7 +17,7 @@ public class Spiral<Cell> implements Iterable<Cell> {
 	public Spiral(Grid2D<Cell, ?> grid, Cell start) {
 		int size = Math.max(grid.numCols(), grid.numRows());
 		int offsetY = (size - grid.numRows()) / 2;
-		Grid2D<Integer, DefaultEdge<Integer>> squareGrid = new CoordGrid(size, size);
+		Grid2D<Integer, DefaultEdge<Integer>> squareGrid = new RawGrid(size, size);
 		Integer luc = squareGrid.cell(GridPosition.CENTER);
 		for (int i = 0, n = size / 2 + 1; i < n; ++i) {
 			Square<Integer> square = new Square<Integer>(squareGrid, luc, 2 * i + 1);

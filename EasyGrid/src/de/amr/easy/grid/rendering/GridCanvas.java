@@ -57,8 +57,8 @@ public class GridCanvas<V, E extends Edge<V>> extends JComponent implements Grap
 	private void updateRenderingBuffer() {
 		int cellSize = currentRenderingModel().getCellSize();
 		Dimension size = new Dimension(grid.numCols() * cellSize, grid.numRows() * cellSize);
-		buffer = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-				.getDefaultConfiguration().createCompatibleImage(size.width, size.height);
+		buffer = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
+				.createCompatibleImage(size.width, size.height);
 		g = buffer.createGraphics();
 		setMinimumSize(size);
 		setPreferredSize(size);

@@ -9,8 +9,7 @@ import de.amr.easy.grid.api.GridContentStore;
  * 
  * @author Armin Reichert
  */
-public class DataGrid<Content> extends CoordGrid
-		implements Grid2D<Integer, DefaultEdge<Integer>>, GridContentStore<Integer, Content> {
+public class DataGrid<Content> extends RawGrid implements GridContentStore<Integer, Content> {
 
 	private GridContentStore<Integer, Content> contentStore;
 

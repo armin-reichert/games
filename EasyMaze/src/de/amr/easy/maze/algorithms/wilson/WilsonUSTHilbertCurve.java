@@ -10,7 +10,7 @@ import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.Direction;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
-import de.amr.easy.grid.impl.CoordGrid;
+import de.amr.easy.grid.impl.RawGrid;
 import de.amr.easy.grid.iterators.traversals.HilbertCurve;
 import de.amr.easy.maze.misc.Utils;
 
@@ -28,7 +28,7 @@ public class WilsonUSTHilbertCurve<Cell> extends WilsonUST<Cell> {
 	@Override
 	protected Iterable<Cell> getCellSequence() {
 		int nextPow2 = Utils.nextPow(2, max(grid.numCols(), grid.numRows()));
-		CoordGrid squareGrid = new CoordGrid(nextPow2, nextPow2);
+		RawGrid squareGrid = new RawGrid(nextPow2, nextPow2);
 		List<Cell> path = new ArrayList<>();
 		path.add(grid.cell(0, 0));
 		HilbertCurve hilbertCurve = new HilbertCurve(log(2, nextPow2), Direction.W, Direction.N,

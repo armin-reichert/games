@@ -13,7 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JSlider;
 
 import de.amr.easy.graph.api.TraversalState;
-import de.amr.easy.grid.impl.ObservableCoordDataGrid;
+import de.amr.easy.grid.impl.ObservableDataGrid;
 import de.amr.easy.maze.misc.Utils;
 import de.amr.mazes.swing.app.CreateAllMazesAction;
 import de.amr.mazes.swing.app.CreateSingleMazeAction;
@@ -60,7 +60,7 @@ public class SettingsWindow extends JFrame {
 			int cellSize = app.model.getGridCellSizes()[selector.getSelectedIndex()];
 			app.model.setGridCellSize(cellSize);
 			Dimension dim = Utils.maxGridDimensionForDisplay(cellSize);
-			app.model.setGrid(new ObservableCoordDataGrid<TraversalState>(dim.width, dim.height, UNVISITED));
+			app.model.setGrid(new ObservableDataGrid<TraversalState>(dim.width, dim.height, UNVISITED));
 			app.mazeWindow.invalidateCanvas();
 		});
 

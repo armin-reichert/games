@@ -46,7 +46,7 @@ public class PeanoCurve implements Iterable<Direction> {
 	public Iterator<Direction> iterator() {
 		return directions.iterator();
 	}
-	
+
 	public Stream<Direction> stream() {
 		return directions.stream();
 	}

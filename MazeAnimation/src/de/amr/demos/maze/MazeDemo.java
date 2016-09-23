@@ -8,7 +8,7 @@ import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.easy.game.Application;
 import de.amr.easy.graph.api.TraversalState;
-import de.amr.easy.grid.impl.ObservableCoordDataGrid;
+import de.amr.easy.grid.impl.ObservableDataGrid;
 
 public class MazeDemo extends Application {
 
@@ -23,7 +23,7 @@ public class MazeDemo extends Application {
 		launch(new MazeDemo());
 	}
 
-	private ObservableCoordDataGrid<TraversalState> grid;
+	private ObservableDataGrid<TraversalState> grid;
 	private GridAnimation animation;
 
 	@Override
@@ -33,14 +33,14 @@ public class MazeDemo extends Application {
 		Views.add(new BFSTraversal(this));
 
 		int cellSize = Settings.getInt("cellSize");
-		grid = new ObservableCoordDataGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
+		grid = new ObservableDataGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
 		animation = new GridAnimation(grid, cellSize, getWidth(), getHeight());
 		grid.addGraphListener(animation);
 
 		Views.show(Menu.class);
 	}
 
-	public ObservableCoordDataGrid<TraversalState> getGrid() {
+	public ObservableDataGrid<TraversalState> getGrid() {
 		return grid;
 	}
 

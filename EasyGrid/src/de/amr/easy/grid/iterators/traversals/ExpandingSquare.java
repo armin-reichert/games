@@ -43,8 +43,7 @@ public class ExpandingSquare<Cell> implements Iterable<Cell> {
 			@Override
 			public Cell next() {
 				if (!currentIterator.hasNext()) {
-					currentSquare = new Square<Cell>(currentSquare.getGrid(), topLeft,
-							currentSquare.getSize() + 1);
+					currentSquare = new Square<Cell>(currentSquare.getGrid(), topLeft, currentSquare.getSize() + 1);
 					currentIterator = currentSquare.iterator();
 				}
 				return currentIterator.next();

@@ -12,14 +12,14 @@ import de.amr.easy.graph.api.SingleSourcePathFinder;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.graph.traversal.BreadthFirstTraversal;
 import de.amr.easy.grid.api.Direction;
-import de.amr.easy.grid.impl.ObservableCoordGrid;
+import de.amr.easy.grid.impl.ObservableRawGrid;
 
 public class RouteMap {
 
-	private ObservableCoordGrid gridGraph;
+	private ObservableRawGrid gridGraph;
 
 	public RouteMap(Board board) {
-		gridGraph = new ObservableCoordGrid(Cols, Rows);
+		gridGraph = new ObservableRawGrid(Cols, Rows);
 		gridGraph.setEventsEnabled(false);
 		/*@formatter:off*/
 		gridGraph.verticesStream()

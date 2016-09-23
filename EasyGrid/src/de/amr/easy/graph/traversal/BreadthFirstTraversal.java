@@ -19,8 +19,8 @@ import de.amr.easy.graph.api.SingleSourcePathFinder;
  * being executed, the distance of each vertex from the source can be queried, additionally the
  * maximum distance from the source.
  * <p>
- * Implements the {@link SingleSourcePathFinder} interface such that the traversal state of each vertex can be
- * queried and a path from the source to any target vertex can be asked for.
+ * Implements the {@link SingleSourcePathFinder} interface such that the traversal state of each
+ * vertex can be queried and a path from the source to any target vertex can be asked for.
  * 
  * <p>
  * During the traversal, a number of graph events are fired which can be processed by a listener,

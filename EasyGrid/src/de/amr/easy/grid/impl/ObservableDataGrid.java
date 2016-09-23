@@ -9,19 +9,18 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class ObservableCoordDataGrid<Content> extends ObservableCoordGrid
+public class ObservableDataGrid<Content> extends ObservableRawGrid
 		implements ObservableDataGrid2D<Integer, DefaultEdge<Integer>, Content> {
 
 	private GridContentStore<Integer, Content> contentStore;
 
-	public ObservableCoordDataGrid(int numCols, int numRows, Content defaultContent, boolean sparse) {
+	public ObservableDataGrid(int numCols, int numRows, Content defaultContent, boolean sparse) {
 		super(numCols, numRows);
-		contentStore = sparse ? new HashMapContentStore<>()
-				: new ArrayContentStore<>(numCols * numRows);
+		contentStore = sparse ? new HashMapContentStore<>() : new ArrayContentStore<>(numCols * numRows);
 		contentStore.setDefaultContent(defaultContent);
 	}
 
-	public ObservableCoordDataGrid(int numCols, int numRows, Content defaultContent) {
+	public ObservableDataGrid(int numCols, int numRows, Content defaultContent) {
 		this(numCols, numRows, defaultContent, true);
 	}
 

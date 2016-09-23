@@ -54,8 +54,7 @@ public class GridRenderer<V, E extends Edge<V>> {
 		drawCellContent(g, grid, p);
 		drawHalfPassage(g, grid, p, dir, visible ? rm.getPassageColor(p, dir) : rm.getGridBgColor());
 		drawCellContent(g, grid, q);
-		drawHalfPassage(g, grid, q, dir.inverse(),
-				visible ? rm.getPassageColor(q, dir.inverse()) : rm.getGridBgColor());
+		drawHalfPassage(g, grid, q, dir.inverse(), visible ? rm.getPassageColor(q, dir.inverse()) : rm.getGridBgColor());
 	}
 
 	public void drawCell(Graphics2D g, Grid2D<V, E> grid, V cell) {
@@ -67,8 +66,7 @@ public class GridRenderer<V, E extends Edge<V>> {
 		}
 	}
 
-	private void drawHalfPassage(Graphics2D g, Grid2D<V, E> grid, V cell, Direction dir,
-			Color passageColor) {
+	private void drawHalfPassage(Graphics2D g, Grid2D<V, E> grid, V cell, Direction dir, Color passageColor) {
 		final int x = grid.col(cell) * cellSize;
 		final int y = grid.row(cell) * cellSize;
 		g.translate(x, y);
@@ -114,11 +112,9 @@ public class GridRenderer<V, E extends Edge<V>> {
 		}
 		g.setColor(rm.getCellTextColor());
 		g.setFont(rm.getCellTextFont().deriveFont(Font.PLAIN, fontSize));
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		Rectangle textBox = g.getFontMetrics().getStringBounds(text, g).getBounds();
 		g.drawString(text, (cellSize - textBox.width) / 2, (cellSize + textBox.height / 2) / 2);
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 	}
 }

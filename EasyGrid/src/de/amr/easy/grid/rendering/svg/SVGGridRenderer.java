@@ -12,8 +12,7 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
 import de.amr.easy.grid.rendering.DefaultGridRenderingModel;
 import de.amr.easy.grid.rendering.GridRenderer;
 
-public class SVGGridRenderer<Cell, Passage extends Edge<Cell>>
-		implements GraphListener<Cell, Passage> {
+public class SVGGridRenderer<Cell, Passage extends Edge<Cell>> implements GraphListener<Cell, Passage> {
 
 	private final ObservableDataGrid2D<Cell, Passage, TraversalState> grid;
 	private final SVGGraphics2D g;

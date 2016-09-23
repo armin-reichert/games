@@ -19,7 +19,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.api.GridPosition;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
-import de.amr.easy.grid.impl.ObservableCoordDataGrid;
+import de.amr.easy.grid.impl.ObservableDataGrid;
 import de.amr.easy.maze.algorithms.BinaryTree;
 import de.amr.easy.maze.algorithms.BinaryTreeRandom;
 import de.amr.easy.maze.algorithms.Eller;
@@ -42,7 +42,7 @@ public class MazeGeneration extends Scene<MazeDemo> {
 			PrimMST.class, RandomBFS.class, RecursiveDivision.class, WilsonUSTHilbertCurve.class,
 			WilsonUSTNestedRectangles.class };
 
-	private ObservableCoordDataGrid<TraversalState> grid;
+	private ObservableDataGrid<TraversalState> grid;
 	private Consumer<Integer> algorithm;
 	private Integer startCell;
 	private Thread mazeGeneration;

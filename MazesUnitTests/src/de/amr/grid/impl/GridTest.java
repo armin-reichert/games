@@ -14,10 +14,10 @@ import org.junit.Test;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.Direction;
 import de.amr.easy.grid.api.Grid2D;
-import de.amr.easy.grid.impl.CoordGrid;
+import de.amr.easy.grid.impl.RawGrid;
 
 /**
- * Test case for {@link CoordGrid}
+ * Test case for {@link RawGrid}
  * 
  * @author Armin Reichert
  *
@@ -31,7 +31,7 @@ public class GridTest {
 
 	@Before
 	public void setUp() {
-		grid = new CoordGrid(WIDTH, HEIGHT);
+		grid = new RawGrid(WIDTH, HEIGHT);
 	}
 
 	@After

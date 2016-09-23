@@ -19,7 +19,7 @@ import de.amr.easy.grid.api.GridPosition;
  * 
  * @author Armin Reichert
  */
-public class CoordGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
+public class RawGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 
 	private final int numCols;
 	private final int numRows;
@@ -53,7 +53,7 @@ public class CoordGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 		edges.set(bit(q, dir.inverse()), connected);
 	}
 
-	public CoordGrid(int numCols, int numRows) {
+	public RawGrid(int numCols, int numRows) {
 		if (numCols < 0) {
 			throw new IllegalArgumentException("Invalid number of columns: " + numCols);
 		}

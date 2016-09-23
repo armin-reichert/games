@@ -5,11 +5,11 @@ import static de.amr.easy.graph.api.TraversalState.COMPLETED;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.Direction;
-import de.amr.easy.grid.impl.ObservableCoordDataGrid;
+import de.amr.easy.grid.impl.ObservableDataGrid;
 
 public class CurveUtil {
 
-	public static void followCurve(ObservableCoordDataGrid<TraversalState> grid, Iterable<Direction> curve,
+	public static void followCurve(ObservableDataGrid<TraversalState> grid, Iterable<Direction> curve,
 			Integer startCell, Runnable edgeAddedAction) {
 		DefaultEdge<Integer> dummyEdge = new DefaultEdge<>(null, null);
 		Integer current = startCell;
