@@ -40,8 +40,7 @@ public class MazeWindow extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					app.settingsWindow.setVisible(true);
-					app.settingsWindow.requestFocus();
+					app.showSettingsWindow();
 				}
 			});
 			canvas.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "showControlsView");
@@ -50,10 +49,4 @@ public class MazeWindow extends JFrame {
 		return canvas;
 	}
 
-	public void setGridPassageThickness(int percent) {
-		app.model.setPassageThicknessPct(percent);
-		getCanvas().clear();
-		getCanvas().invalidateRenderer();
-		getCanvas().render();
-	}
 }

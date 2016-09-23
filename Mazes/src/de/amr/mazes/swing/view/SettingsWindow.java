@@ -12,7 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JSlider;
 
-import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.impl.ObservableDataGrid;
 import de.amr.easy.maze.misc.Utils;
 import de.amr.mazes.swing.app.CreateAllMazesAction;
@@ -60,15 +59,15 @@ public class SettingsWindow extends JFrame {
 			int cellSize = app.model.getGridCellSizes()[selector.getSelectedIndex()];
 			app.model.setGridCellSize(cellSize);
 			Dimension dim = Utils.maxGridDimensionForDisplay(cellSize);
-			app.model.setGrid(new ObservableDataGrid<TraversalState>(dim.width, dim.height, UNVISITED));
-			app.mazeWindow.invalidateCanvas();
+			app.model.setGrid(new ObservableDataGrid<>(dim.width, dim.height, UNVISITED));
+			app.updateCanvas();
 		});
 
 		controlPanel.getPassageThicknessSlider().setValue(app.model.getPassageThicknessPct());
 		controlPanel.getPassageThicknessSlider().addChangeListener(e -> {
 			JSlider slider = (JSlider) e.getSource();
 			if (!slider.getValueIsAdjusting()) {
-				app.mazeWindow.setGridPassageThickness(slider.getValue());
+				app.setGridPassageThickness(slider.getValue());
 			}
 		});
 
@@ -76,8 +75,7 @@ public class SettingsWindow extends JFrame {
 		controlPanel.getDelaySlider().addChangeListener(e -> {
 			JSlider slider = (JSlider) e.getSource();
 			if (!slider.getValueIsAdjusting()) {
-				app.model.setDelay(slider.getValue());
-				app.mazeWindow.getCanvas().setDelay(slider.getValue());
+				app.setDelay(slider.getValue());
 			}
 		});
 

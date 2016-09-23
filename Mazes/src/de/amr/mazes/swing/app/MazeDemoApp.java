@@ -30,8 +30,9 @@ public class MazeDemoApp {
 	}
 
 	public final MazeDemoModel model;
-	public final SettingsWindow settingsWindow;
-	public final MazeWindow mazeWindow;
+	
+	final SettingsWindow settingsWindow;
+	final MazeWindow mazeWindow;
 
 	private Thread taskThread;
 	private volatile boolean taskStopped;
@@ -70,6 +71,27 @@ public class MazeDemoApp {
 
 	public void showMessage(String msg) {
 		settingsWindow.getControlPanel().showMessage(msg + "\n");
+	}
+
+	public void showSettingsWindow() {
+		settingsWindow.setVisible(true);
+		settingsWindow.requestFocus();
+	}
+	
+	public void updateCanvas() {
+		mazeWindow.invalidateCanvas();
+	}
+	
+	public void setGridPassageThickness(int percent) {
+		model.setPassageThicknessPct(percent);
+		canvas().clear();
+		canvas().invalidateRenderer();
+		canvas().render();
+	}
+	
+	public void setDelay(int delay) {
+		model.setDelay(delay);
+		canvas().setDelay(delay);
 	}
 
 	void startTask(Runnable task) {
