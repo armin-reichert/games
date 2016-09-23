@@ -1,9 +1,10 @@
 package de.amr.mazes.samples.grid;
 
 import static de.amr.easy.grid.api.GridPosition.BOTTOM_LEFT;
+import static de.amr.easy.maze.misc.Utils.log;
+import static de.amr.mazes.samples.grid.CurveUtil.followCurve;
 
 import de.amr.easy.grid.iterators.traversals.PeanoCurve;
-import de.amr.easy.maze.misc.Utils;
 import de.amr.mazes.swing.rendering.BFSAnimation;
 
 public class PeanoCurveApp extends GridSampleApp {
@@ -13,16 +14,15 @@ public class PeanoCurveApp extends GridSampleApp {
 	}
 
 	public PeanoCurveApp() {
-		super("Peano Curve", 81, 81, 8);
+		super("Peano Curve", 243, 243, 2);
 	}
 
 	@Override
 	public void run() {
-		setDelay(3);
-		int depth = Utils.log(3, grid.numCols());
+		setDelay(0);
+		int depth = log(3, grid.numCols());
 		while (true) {
-			CurveUtil.followCurve(grid, new PeanoCurve(depth), grid.cell(BOTTOM_LEFT),
-					() -> window.setTitle(composeTitle()));
+			followCurve(grid, new PeanoCurve(depth), grid.cell(BOTTOM_LEFT), () -> window.setTitle(composeTitle()));
 			new BFSAnimation(canvas, grid).runAnimation(grid.cell(BOTTOM_LEFT));
 			sleep(3000);
 			clear();
