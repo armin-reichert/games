@@ -22,7 +22,7 @@ public class RouteMap {
 		gridGraph = new ObservableRawGrid(Cols, Rows);
 		gridGraph.setEventsEnabled(false);
 		/*@formatter:off*/
-		gridGraph.verticesStream()
+		gridGraph.vertexStream()
 			.filter(cell -> board.grid.getContent(cell) != Wall)
 			.forEach(cell -> {
 				Stream.of(Direction.values()).forEach(dir -> {

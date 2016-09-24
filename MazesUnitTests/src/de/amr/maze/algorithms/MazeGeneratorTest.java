@@ -48,14 +48,14 @@ public class MazeGeneratorTest {
 	@Before
 	public void setUp() {
 		grid = new ObservableDataGrid<>(WIDTH, HEIGHT, UNVISITED);
-		assertEquals(grid.numVertices(), WIDTH * HEIGHT);
-		assertEquals(grid.numEdges(), 0);
+		assertEquals(grid.vertexCount(), WIDTH * HEIGHT);
+		assertEquals(grid.edgeCount(), 0);
 	}
 
 	@After
 	public void tearDown() {
-		assertEquals(grid.numVertices(), WIDTH * HEIGHT);
-		assertEquals(grid.numEdges(), grid.numVertices() - 1);
+		assertEquals(grid.vertexCount(), WIDTH * HEIGHT);
+		assertEquals(grid.edgeCount(), grid.vertexCount() - 1);
 	}
 
 	@Test

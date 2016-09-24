@@ -49,7 +49,7 @@ public class DefaultGraph<V, E extends Edge<V>> implements Graph<V, E> {
 	}
 
 	@Override
-	public E getEdge(V v, V w) {
+	public E edge(V v, V w) {
 		assertVertexExists(v);
 		assertVertexExists(w);
 		for (E edge : adjEdges.get(v)) {
@@ -72,7 +72,7 @@ public class DefaultGraph<V, E extends Edge<V>> implements Graph<V, E> {
 	}
 
 	@Override
-	public void removeAllEdges() {
+	public void removeEdges() {
 		for (V v : vertexSet) {
 			adjEdges.get(v).clear();
 		}
@@ -92,22 +92,22 @@ public class DefaultGraph<V, E extends Edge<V>> implements Graph<V, E> {
 	}
 
 	@Override
-	public Set<V> vertices() {
+	public Set<V> vertexSequence() {
 		return Collections.unmodifiableSet((vertexSet));
 	}
 
 	@Override
-	public Stream<V> verticesStream() {
+	public Stream<V> vertexStream() {
 		return vertexSet.stream();
 	}
 
 	@Override
-	public int numVertices() {
+	public int vertexCount() {
 		return vertexSet.size();
 	}
 
 	@Override
-	public Set<E> edges() {
+	public Set<E> edgeSequence() {
 		Set<E> edges = new HashSet<>();
 		for (V v : vertexSet) {
 			for (E edge : adjEdges.get(v)) {
@@ -118,12 +118,12 @@ public class DefaultGraph<V, E extends Edge<V>> implements Graph<V, E> {
 	}
 
 	@Override
-	public Stream<E> edgesStream() {
-		return edges().stream(); // TODO more efficient way possible?
+	public Stream<E> edgeStream() {
+		return edgeSequence().stream(); // TODO more efficient way possible?
 	}
 
 	@Override
-	public int numEdges() {
+	public int edgeCount() {
 		return numEdges;
 	}
 
@@ -150,12 +150,12 @@ public class DefaultGraph<V, E extends Edge<V>> implements Graph<V, E> {
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append(numVertices()).append("\n");
-		s.append(numEdges()).append("\n");
+		s.append(vertexCount()).append("\n");
+		s.append(edgeCount()).append("\n");
 		for (V v : vertexSet) {
 			s.append(v).append("\n");
 		}
-		for (E e : edges()) {
+		for (E e : edgeSequence()) {
 			V v = e.either();
 			V w = e.other(v);
 			s.append(v).append(" ").append(w).append("\n");

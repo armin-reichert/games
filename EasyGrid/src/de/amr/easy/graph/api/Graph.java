@@ -15,34 +15,34 @@ import java.util.stream.Stream;
 public interface Graph<V, E> {
 
 	/**
-	 * @return the vertices of this graph
+	 * @return sequence of the vertices of this graph
 	 */
-	public Iterable<V> vertices();
+	public Iterable<V> vertexSequence();
 
 	/**
-	 * @return the vertices of this graph as stream
+	 * @return stream of the vertices of this graph
 	 */
-	public Stream<V> verticesStream();
+	public Stream<V> vertexStream();
 
 	/**
 	 * @return the number of vertices of this graph
 	 */
-	public int numVertices();
+	public int vertexCount();
 
 	/**
-	 * @return the edges of this graph
+	 * @return sequence of the edges of this graph
 	 */
-	public Iterable<E> edges();
+	public Iterable<E> edgeSequence();
 
 	/**
 	 * @return the edges of this graph as stream
 	 */
-	public Stream<E> edgesStream();
+	public Stream<E> edgeStream();
 
 	/**
 	 * @return the number of edges of this graph
 	 */
-	public int numEdges();
+	public int edgeCount();
 
 	/**
 	 * Adds the given vertex to this graph.
@@ -67,7 +67,7 @@ public interface Graph<V, E> {
 	 *          a vertex
 	 * @return the edge between the vertices if it exists or <code>null</code> otherwise
 	 */
-	public E getEdge(V v, V w);
+	public E edge(V v, V w);
 
 	/**
 	 * Removes the given edge from this graph.
@@ -80,7 +80,7 @@ public interface Graph<V, E> {
 	/**
 	 * Removes all edges from this graph.
 	 */
-	public void removeAllEdges();
+	public void removeEdges();
 
 	/**
 	 * @param v
@@ -96,7 +96,7 @@ public interface Graph<V, E> {
 	 *          a vertex
 	 * @param w
 	 *          a vertex
-	 * @return <code>true</code> if there exists an edge between these vertices
+	 * @return <code>true</code> if there exists an edge between the vertices
 	 */
 	public boolean adjacent(V v, V w);
 

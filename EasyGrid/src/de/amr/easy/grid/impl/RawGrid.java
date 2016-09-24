@@ -66,23 +66,23 @@ public class RawGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 	}
 
 	@Override
-	public Iterable<Integer> vertices() {
-		return verticesStream()::iterator;
+	public Iterable<Integer> vertexSequence() {
+		return vertexStream()::iterator;
 	}
 
 	@Override
-	public Stream<Integer> verticesStream() {
+	public Stream<Integer> vertexStream() {
 		return IntStream.range(0, numCells()).boxed();
 	}
 
 	@Override
-	public int numVertices() {
+	public int vertexCount() {
 		return numCells();
 	}
 
 	private Set<DefaultEdge<Integer>> createEdgeSet() {
 		Set<DefaultEdge<Integer>> edgeSet = new HashSet<>();
-		verticesStream().forEach(cell -> {
+		vertexStream().forEach(cell -> {
 			Stream.of(Direction.values()).forEach(dir -> {
 				if (isCellConnected(cell, dir)) {
 					Integer neighbor = neighbor(cell, dir);
@@ -96,17 +96,17 @@ public class RawGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 	}
 
 	@Override
-	public Iterable<DefaultEdge<Integer>> edges() {
+	public Iterable<DefaultEdge<Integer>> edgeSequence() {
 		return createEdgeSet();
 	}
 
 	@Override
-	public Stream<DefaultEdge<Integer>> edgesStream() {
+	public Stream<DefaultEdge<Integer>> edgeStream() {
 		return createEdgeSet().stream(); // TODO is there a more efficient way?
 	}
 
 	@Override
-	public int numEdges() {
+	public int edgeCount() {
 		return edges.cardinality() / 2; // two bits are set for each undirected edge
 	}
 
@@ -116,7 +116,7 @@ public class RawGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 	}
 
 	@Override
-	public DefaultEdge<Integer> getEdge(Integer p, Integer q) {
+	public DefaultEdge<Integer> edge(Integer p, Integer q) {
 		checkCell(p);
 		checkCell(q);
 		return adjacent(p, q) ? new DefaultEdge<>(p, q) : null;
@@ -143,7 +143,7 @@ public class RawGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 	}
 
 	@Override
-	public void removeAllEdges() {
+	public void removeEdges() {
 		edges.clear();
 	}
 
@@ -272,7 +272,7 @@ public class RawGrid implements Grid2D<Integer, DefaultEdge<Integer>> {
 
 	@Override
 	public void fillAllEdges() {
-		removeAllEdges();
+		removeEdges();
 		for (int col = 0; col < numCols; ++col) {
 			for (int row = 0; row < numRows; ++row) {
 				if (col + 1 < numCols) {

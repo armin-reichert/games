@@ -14,8 +14,8 @@ public class BinaryTreeRandom<Cell> extends BinaryTree<Cell> {
 
 	public BinaryTreeRandom(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		super(grid);
-		cellsInRandomOrder = new ArrayList<>(grid.numVertices());
-		for (Cell cell : grid.vertices()) {
+		cellsInRandomOrder = new ArrayList<>(grid.vertexCount());
+		for (Cell cell : grid.vertexSequence()) {
 			cellsInRandomOrder.add(cell);
 		}
 		Collections.shuffle(cellsInRandomOrder);

@@ -52,8 +52,8 @@ public class KruskalMST<Cell> implements Consumer<Cell> {
 		List<DefaultEdge<Cell>> edges = new ArrayList<>(fullGridEdgeCount);
 		grid.setEventsEnabled(false);
 		grid.fillAllEdges();
-		grid.edges().iterator().forEachRemaining(edges::add);
-		grid.removeAllEdges();
+		grid.edgeSequence().iterator().forEachRemaining(edges::add);
+		grid.removeEdges();
 		grid.setEventsEnabled(true);
 		Collections.shuffle(edges); // takes linear time
 		return edges;

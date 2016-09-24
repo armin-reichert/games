@@ -39,7 +39,7 @@ public class HilbertCurveApp extends GridSampleApp {
 
 	@Override
 	protected String composeTitle() {
-		return super.composeTitle() + ", " + grid.numEdges() + " edges";
+		return super.composeTitle() + ", " + grid.edgeCount() + " edges";
 	}
 
 	private HilbertCurve createCurve(GridPosition startPos, int depth) {

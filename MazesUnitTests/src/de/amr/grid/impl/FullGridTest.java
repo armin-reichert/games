@@ -38,15 +38,15 @@ public class FullGridTest {
 
 	@Test
 	public void testGridSize() {
-		assertEquals(grid.numEdges(), 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT));
-		assertEquals(grid.numVertices(), WIDTH * HEIGHT);
+		assertEquals(grid.edgeCount(), 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT));
+		assertEquals(grid.vertexCount(), WIDTH * HEIGHT);
 		assertEquals(grid.numCols(), WIDTH);
 		assertEquals(grid.numRows(), HEIGHT);
 	}
 
 	@Test
 	public void testGridEdgeIterator() {
-		Iterator<DefaultEdge<Integer>> edgeIterator = grid.edges().iterator();
+		Iterator<DefaultEdge<Integer>> edgeIterator = grid.edgeSequence().iterator();
 		for (int i = 0; i < 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT); ++i) {
 			assertTrue(edgeIterator.hasNext());
 			edgeIterator.next();

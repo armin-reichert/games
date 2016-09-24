@@ -50,7 +50,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 			if (!isCellInTree(walkStart)) {
 				loopErasedRandomWalk(walkStart);
 			}
-			if (grid.numEdges() == grid.numVertices() - 1)
+			if (grid.edgeCount() == grid.vertexCount() - 1)
 				return;
 		}
 		throw new IllegalStateException("Maze is incomplete");
@@ -88,7 +88,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 * @return iterator defining the cell order used by the maze generator
 	 */
 	protected Iterable<Cell> getCellSequence() {
-		return grid.vertices();
+		return grid.vertexSequence();
 	}
 
 	/**

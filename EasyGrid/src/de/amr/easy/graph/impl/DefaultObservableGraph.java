@@ -88,8 +88,8 @@ public class DefaultObservableGraph<V, E extends Edge<V>> extends DefaultGraph<V
 	}
 
 	@Override
-	public void removeAllEdges() {
-		super.removeAllEdges();
+	public void removeEdges() {
+		super.removeEdges();
 		fireGraphChange(this);
 	}
 }

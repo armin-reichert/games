@@ -68,7 +68,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 		app.grid().setEventsEnabled(false);
 		app.grid().clearContent();
 		app.grid().setDefaultContent(TraversalState.UNVISITED);
-		app.grid().removeAllEdges();
+		app.grid().removeEdges();
 		app.grid().setEventsEnabled(true);
 
 		app.showMessage(String.format("%d cells, %s", app.grid().numCells(), generatorInfo.getDescription()));
@@ -79,7 +79,7 @@ public class CreateSingleMazeAction extends AbstractAction {
 				.getConstructor(ObservableDataGrid2D.class).newInstance(app.model.getGrid());
 
 		app.canvas().resetRenderingModel();
-		if (app.grid().numEdges() > 0) {
+		if (app.grid().edgeCount() > 0) {
 			app.canvas().render();
 		}
 

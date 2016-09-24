@@ -29,8 +29,8 @@ public class EmptyGridTest {
 
 	@Test
 	public void testGridSize() {
-		assertEquals(grid.numEdges(), 0);
-		assertEquals(grid.numVertices(), 0);
+		assertEquals(grid.edgeCount(), 0);
+		assertEquals(grid.vertexCount(), 0);
 		assertEquals(grid.numCols(), 0);
 		assertEquals(grid.numRows(), 0);
 	}
@@ -42,19 +42,19 @@ public class EmptyGridTest {
 
 	@Test
 	public void testGridVertexIterator() {
-		Iterator<Integer> vertexIterator = grid.vertices().iterator();
+		Iterator<Integer> vertexIterator = grid.vertexSequence().iterator();
 		assertFalse(vertexIterator.hasNext());
 	}
 	
 	@Test
 	public void testGridEdgeIterator() {
-		Iterator<DefaultEdge<Integer>> edgeIterator = grid.edges().iterator();
+		Iterator<DefaultEdge<Integer>> edgeIterator = grid.edgeSequence().iterator();
 		assertFalse(edgeIterator.hasNext());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGridEdgeAccess() {
-		grid.getEdge(0, 1);
+		grid.edge(0, 1);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)

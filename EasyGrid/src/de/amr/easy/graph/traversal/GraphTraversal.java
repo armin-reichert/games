@@ -1,5 +1,7 @@
 package de.amr.easy.graph.traversal;
 
+import static de.amr.easy.graph.api.TraversalState.UNVISITED;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public abstract class GraphTraversal<V, E> implements Runnable {
 
 	public TraversalState getState(V v) {
 		TraversalState state = stateMap.get(v);
-		return state == null ? TraversalState.UNVISITED : state;
+		return state == null ? UNVISITED : state;
 	}
 
 	public void setState(V v, TraversalState state) {

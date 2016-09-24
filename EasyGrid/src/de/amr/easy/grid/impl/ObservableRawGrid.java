@@ -44,8 +44,8 @@ public class ObservableRawGrid extends RawGrid implements ObservableGrid2D<Integ
 	}
 
 	@Override
-	public void removeAllEdges() {
-		super.removeAllEdges();
+	public void removeEdges() {
+		super.removeEdges();
 		if (eventsEnabled) {
 			for (GraphListener<Integer, DefaultEdge<Integer>> listener : listeners) {
 				listener.graphChanged(this);

@@ -118,7 +118,7 @@ public class GridCanvas<V, E extends Edge<V>> extends JComponent implements Grap
 	private void sleep() {
 		if (delay == 0)
 			return;
-		int vertexFactor = Math.max(1, (int) Math.log10(grid.numVertices()));
+		int vertexFactor = Math.max(1, (int) Math.log10(grid.vertexCount()));
 		long sleepTime = (delay * (int) Math.sqrt(delay)) / vertexFactor;
 		if (sleepTime == 0)
 			return;

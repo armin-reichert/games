@@ -17,7 +17,7 @@ public class SpiralApp extends GridSampleApp {
 	@Override
 	public void run() {
 		canvas.setDelay(0);
-		for (Integer cell : grid.vertices()) {
+		for (Integer cell : grid.vertexSequence()) {
 			grid.setContent(cell, TraversalState.COMPLETED);
 		}
 		canvas.setDelay(4);

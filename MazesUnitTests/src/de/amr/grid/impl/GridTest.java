@@ -40,16 +40,16 @@ public class GridTest {
 
 	@Test
 	public void testGridSize() {
-		assertEquals(grid.numEdges(), 0);
-		assertEquals(grid.numVertices(), WIDTH * HEIGHT);
+		assertEquals(grid.edgeCount(), 0);
+		assertEquals(grid.vertexCount(), WIDTH * HEIGHT);
 		assertEquals(grid.numCols(), WIDTH);
 		assertEquals(grid.numRows(), HEIGHT);
 	}
 
 	@Test
 	public void testGridVertexIterator() {
-		Iterator<Integer> vertexIterator = grid.vertices().iterator();
-		for (int i = 0; i < grid.numVertices(); ++i) {
+		Iterator<Integer> vertexIterator = grid.vertexSequence().iterator();
+		for (int i = 0; i < grid.vertexCount(); ++i) {
 			assertTrue(vertexIterator.hasNext());
 			vertexIterator.next();
 		}
@@ -63,30 +63,30 @@ public class GridTest {
 
 	@Test
 	public void testGridEdgeIterator() {
-		Iterator<DefaultEdge<Integer>> edgeIterator = grid.edges().iterator();
+		Iterator<DefaultEdge<Integer>> edgeIterator = grid.edgeSequence().iterator();
 		assertFalse(edgeIterator.hasNext());
 	}
 
 	@Test
 	public void testGetNonexistingEdge() {
-		assertNull(grid.getEdge(0, 1));
+		assertNull(grid.edge(0, 1));
 	}
 
 	@Test
 	public void testGetExistingEdge() {
 		DefaultEdge<Integer> edge = new DefaultEdge<Integer>(0, 1);
 		grid.addEdge(edge);
-		assertEquals(edge, grid.getEdge(0, 1));
+		assertEquals(edge, grid.edge(0, 1));
 	}
 
 	@Test
 	public void testAddEdge() {
-		int numEdges = grid.numEdges();
-		assertNull(grid.getEdge(0, 1));
+		int numEdges = grid.edgeCount();
+		assertNull(grid.edge(0, 1));
 		DefaultEdge<Integer> edge = new DefaultEdge<Integer>(0, 1);
 		grid.addEdge(edge);
-		assertEquals(numEdges + 1, grid.numEdges());
-		assertEquals(edge, grid.getEdge(0, 1));
+		assertEquals(numEdges + 1, grid.edgeCount());
+		assertEquals(edge, grid.edge(0, 1));
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -97,20 +97,20 @@ public class GridTest {
 
 	@Test
 	public void testFillAllEdges() {
-		assertEquals(grid.numEdges(), 0);
+		assertEquals(grid.edgeCount(), 0);
 		grid.fillAllEdges();
-		assertEquals(grid.numEdges(), 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT));
+		assertEquals(grid.edgeCount(), 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT));
 	}
 
 	@Test
 	public void testRemoveEdge() {
-		int numEdges = grid.numEdges();
+		int numEdges = grid.edgeCount();
 		DefaultEdge<Integer> edge = new DefaultEdge<Integer>(0, 1);
 		grid.addEdge(edge);
-		assertEquals(grid.numEdges(), numEdges + 1);
+		assertEquals(grid.edgeCount(), numEdges + 1);
 		grid.removeEdge(edge);
-		assertEquals(grid.numEdges(), numEdges);
-		assertNull(grid.getEdge(0, 1));
+		assertEquals(grid.edgeCount(), numEdges);
+		assertNull(grid.edge(0, 1));
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -122,11 +122,11 @@ public class GridTest {
 
 	@Test
 	public void testRemoveAllEdges() {
-		assertEquals(grid.numEdges(), 0);
+		assertEquals(grid.edgeCount(), 0);
 		grid.fillAllEdges();
-		assertEquals(grid.numEdges(), 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT));
-		grid.removeAllEdges();
-		assertEquals(grid.numEdges(), 0);
+		assertEquals(grid.edgeCount(), 2 * WIDTH * HEIGHT - (WIDTH + HEIGHT));
+		grid.removeEdges();
+		assertEquals(grid.edgeCount(), 0);
 	}
 
 	@Test

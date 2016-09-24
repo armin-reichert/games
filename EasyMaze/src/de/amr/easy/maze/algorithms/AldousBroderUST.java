@@ -53,7 +53,7 @@ public class AldousBroderUST<Cell> implements Consumer<Cell> {
 		numMazeCells = 0;
 		Cell v = start;
 		addToMaze(v);
-		while (numMazeCells < grid.numVertices()) {
+		while (numMazeCells < grid.vertexCount()) {
 			Cell w = grid.neighbor(v, Direction.randomValue());
 			if (w != null) {
 				animate(w);

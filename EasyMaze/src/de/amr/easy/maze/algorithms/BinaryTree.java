@@ -46,6 +46,6 @@ public class BinaryTree<Cell> implements Consumer<Cell> {
 	 * Can be overriden by subclass to specify different cell iteration.
 	 */
 	protected Iterable<Cell> getCells() {
-		return grid.vertices();
+		return grid.vertexSequence();
 	}
 }

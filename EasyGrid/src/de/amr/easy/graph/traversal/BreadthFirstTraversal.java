@@ -27,9 +27,9 @@ import de.amr.easy.graph.api.SingleSourcePathFinder;
  * for example an animation.
  * 
  * @param <V>
- *          the vertex data type
+ *          the vertex type
  * @param <E>
- *          the edge data type
+ *          the edge type
  * 
  * @author Armin Reichert
  */
@@ -51,7 +51,7 @@ public class BreadthFirstTraversal<V, E> extends GraphTraversal<V, E> implements
 		distanceFromSource.clear();
 		maxDistance = -1;
 		maxDistanceVertex = null;
-		Queue<V> queue = new LinkedList<V>();
+		Queue<V> queue = new LinkedList<>();
 		visit(source, null, 0);
 		queue.add(source);
 		while (!queue.isEmpty()) {
@@ -75,7 +75,7 @@ public class BreadthFirstTraversal<V, E> extends GraphTraversal<V, E> implements
 		setState(vertex, VISITED);
 		setParent(vertex, parent);
 		if (parent != null) {
-			E edge = graph.getEdge(parent, vertex);
+			E edge = graph.edge(parent, vertex);
 			graph.fireEdgeChange(edge, UNVISITED, VISITED);
 		}
 	}
@@ -117,7 +117,7 @@ public class BreadthFirstTraversal<V, E> extends GraphTraversal<V, E> implements
 		if (getDistance(target) == -1) {
 			return Collections.emptyList();
 		}
-		List<V> path = new LinkedList<V>();
+		List<V> path = new LinkedList<>();
 		for (V vertex = target; vertex != null; vertex = getParent(vertex)) {
 			path.add(0, vertex);
 		}

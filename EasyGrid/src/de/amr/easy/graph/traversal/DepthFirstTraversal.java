@@ -90,7 +90,7 @@ public class DepthFirstTraversal<V, E> extends GraphTraversal<V, E> implements S
 	private void visit(V v, V parent) {
 		setState(v, VISITED);
 		if (parent != null) {
-			E e = graph.getEdge(parent, v);
+			E e = graph.edge(parent, v);
 			graph.fireEdgeChange(e, UNVISITED, VISITED);
 		}
 		setParent(v, parent);

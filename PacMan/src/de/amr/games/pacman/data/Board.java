@@ -46,7 +46,7 @@ public class Board {
 	}
 
 	public void init() {
-		grid.verticesStream()
+		grid.vertexStream()
 				.forEach(cell -> grid.setContent(cell, rows[grid.row(cell)].charAt(grid.col(cell))));
 	}
 
@@ -74,6 +74,6 @@ public class Board {
 	}
 
 	public long count(char data) {
-		return grid.verticesStream().filter(cell -> data == grid.getContent(cell)).count();
+		return grid.vertexStream().filter(cell -> data == grid.getContent(cell)).count();
 	}
 }

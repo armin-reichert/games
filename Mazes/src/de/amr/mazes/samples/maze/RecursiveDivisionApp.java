@@ -20,7 +20,7 @@ public class RecursiveDivisionApp extends GridSampleApp {
 	public void run() {
 		while (true) {
 			grid.fillAllEdges(); // does not fire events!
-			for (Integer cell : grid.vertices()) {
+			for (Integer cell : grid.vertexSequence()) {
 				grid.setContent(cell, TraversalState.COMPLETED);
 			}
 			new RecursiveDivision<>(grid).accept(grid.cell(GridPosition.TOP_LEFT));

@@ -60,9 +60,9 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 				grid.numRows());
 		connectCellsInsideLayer(true);
 
-		if (grid.numEdges() != grid.numVertices() - 1) {
+		if (grid.edgeCount() != grid.vertexCount() - 1) {
 			throw new IllegalStateException(
-					"#edges: " + grid.numEdges() + ", #cells: " + grid.numVertices());
+					"#edges: " + grid.edgeCount() + ", #cells: " + grid.vertexCount());
 		}
 	}
 

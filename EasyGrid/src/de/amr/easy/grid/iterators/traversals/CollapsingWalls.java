@@ -39,7 +39,7 @@ public class CollapsingWalls<Cell> implements Iterable<Cell> {
 
 			@Override
 			public boolean hasNext() {
-				return visited < grid.numVertices();
+				return visited < grid.vertexCount();
 			}
 
 			@Override
