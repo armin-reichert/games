@@ -37,7 +37,7 @@ public class RandomBFS<Cell> implements Consumer<Cell> {
 
 		mazeCells.add(start);
 		frontier.add(start);
-		grid.setContent(start, VISITED);
+		grid.set(start, VISITED);
 		while (!frontier.isEmpty()) {
 			int index = frontier.size() == 1 ? 0 : rnd.nextInt(frontier.size());
 			Cell cell = frontier.remove(index);
@@ -48,11 +48,11 @@ public class RandomBFS<Cell> implements Consumer<Cell> {
 				.forEach(newMazeCell -> {
 					mazeCells.add(newMazeCell);
 					frontier.add(newMazeCell);
-					grid.setContent(newMazeCell, VISITED);
+					grid.set(newMazeCell, VISITED);
 					grid.addEdge(new DefaultEdge<>(cell, newMazeCell));
 				});
 			/*@formatter:on*/
-			grid.setContent(cell, COMPLETED);
+			grid.set(cell, COMPLETED);
 		}
 	}
 }

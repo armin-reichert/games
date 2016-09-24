@@ -66,8 +66,8 @@ public class CreateSingleMazeAction extends AbstractAction {
 	protected void generateMaze(AlgorithmInfo<?> generatorInfo) throws Exception {
 		// Prepare grid
 		app.grid().setEventsEnabled(false);
-		app.grid().clearContent();
-		app.grid().setDefaultContent(TraversalState.UNVISITED);
+		app.grid().clear();
+		app.grid().setDefault(TraversalState.UNVISITED);
 		app.grid().removeEdges();
 		app.grid().setEventsEnabled(true);
 

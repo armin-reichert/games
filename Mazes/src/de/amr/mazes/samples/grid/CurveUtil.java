@@ -13,7 +13,7 @@ public class CurveUtil {
 			Integer startCell, Runnable edgeAddedAction) {
 		DefaultEdge<Integer> dummyEdge = new DefaultEdge<>(null, null);
 		Integer current = startCell;
-		grid.setContent(current, COMPLETED);
+		grid.set(current, COMPLETED);
 		for (Direction dir : curve) {
 			Integer next = grid.neighbor(current, dir);
 			dummyEdge.setEither(current);
@@ -21,7 +21,7 @@ public class CurveUtil {
 			grid.addEdge(dummyEdge);
 			edgeAddedAction.run();
 			current = next;
-			grid.setContent(current, COMPLETED);
+			grid.set(current, COMPLETED);
 		}
 	}
 }

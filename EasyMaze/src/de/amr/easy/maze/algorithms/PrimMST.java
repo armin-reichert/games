@@ -47,14 +47,14 @@ public class PrimMST<Cell> implements Consumer<Cell> {
 	private void expandMazeAtCell(Cell cell) {
 		Random rnd = new Random();
 		mazeCells.add(cell);
-		grid.setContent(cell, COMPLETED);
+		grid.set(cell, COMPLETED);
 		/*@formatter:off*/
 		Stream.of(Direction.randomOrder())
 			.map(dir -> grid.neighbor(cell, dir))
 			.filter(neighbor -> neighbor != null && !mazeCells.contains(neighbor))
 			.forEach(newMazeCell -> {
 				cut.add(new DefaultWeightedEdge<>(cell, newMazeCell, rnd.nextDouble()));
-				grid.setContent(newMazeCell, VISITED);
+				grid.set(newMazeCell, VISITED);
 			});
 		/*@formatter:on*/
 	}

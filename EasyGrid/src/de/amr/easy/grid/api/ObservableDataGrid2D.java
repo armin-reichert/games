@@ -15,5 +15,5 @@ import de.amr.easy.graph.api.ObservableGraph;
  *          content type
  */
 public interface ObservableDataGrid2D<Cell, Passage, Content>
-		extends Grid2D<Cell, Passage>, ObservableGraph<Cell, Passage>, GridContentStore<Cell, Content> {
+		extends Grid2D<Cell, Passage>, ObservableGraph<Cell, Passage>, GridDataAccess<Cell, Content> {
 }

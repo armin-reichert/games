@@ -57,7 +57,7 @@ public class AldousBroderUST<Cell> implements Consumer<Cell> {
 			Cell w = grid.neighbor(v, Direction.randomValue());
 			if (w != null) {
 				animate(w);
-				if (grid.getContent(w) == UNVISITED) {
+				if (grid.get(w) == UNVISITED) {
 					addToMaze(w);
 					grid.addEdge(new DefaultEdge<>(w, v));
 				}
@@ -67,13 +67,13 @@ public class AldousBroderUST<Cell> implements Consumer<Cell> {
 	}
 
 	private void addToMaze(Cell cell) {
-		grid.setContent(cell, COMPLETED);
+		grid.set(cell, COMPLETED);
 		++numMazeCells;
 	}
 
 	private void animate(Cell cell) {
-		TraversalState state = grid.getContent(cell);
-		grid.setContent(cell, VISITED);
-		grid.setContent(cell, state);
+		TraversalState state = grid.get(cell);
+		grid.set(cell, VISITED);
+		grid.set(cell, state);
 	}
 }

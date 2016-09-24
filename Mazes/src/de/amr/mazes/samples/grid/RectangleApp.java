@@ -24,7 +24,7 @@ public class RectangleApp extends GridSampleApp {
 		expRect.setExpansionRate(1);
 		expRect.setMaxExpansion(grid.numCols());
 		for (Integer cell : expRect) {
-			grid.setContent(cell, TraversalState.COMPLETED);
+			grid.set(cell, TraversalState.COMPLETED);
 		}
 	}
 }

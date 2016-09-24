@@ -23,7 +23,7 @@ public class RecursiveDivision<Cell> implements Consumer<Cell> {
 		grid.setEventsEnabled(false);
 		grid.fillAllEdges();
 		grid.setEventsEnabled(true);
-		grid.setDefaultContent(TraversalState.COMPLETED);
+		grid.setDefault(TraversalState.COMPLETED);
 	}
 
 	@Override

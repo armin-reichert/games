@@ -72,7 +72,7 @@ public abstract class GridSampleApp implements Runnable {
 
 	protected void clear() {
 		grid.removeEdges();
-		grid.clearContent();
+		grid.clear();
 		canvas.resetRenderingModel();
 		canvas.clear();
 	}
@@ -105,7 +105,7 @@ public abstract class GridSampleApp implements Runnable {
 
 			@Override
 			public Color getCellBgColor(Integer cell) {
-				switch (grid.getContent(cell)) {
+				switch (grid.get(cell)) {
 				case VISITED:
 					return Color.BLUE;
 				case COMPLETED:

@@ -35,7 +35,7 @@ public class GridVisualization extends DefaultGridRenderingModel<Integer> {
 
 	@Override
 	public Color getCellBgColor(Integer p) {
-		switch (grid.getContent(p)) {
+		switch (grid.get(p)) {
 		case UNVISITED:
 			return getGridBgColor();
 		case VISITED:

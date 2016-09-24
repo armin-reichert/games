@@ -27,11 +27,11 @@ public class RecursiveDFS<Cell> implements Consumer<Cell> {
 
 	@Override
 	public void accept(Cell cell) {
-		grid.setContent(cell, VISITED);
-		while ((neighbor = grid.randomNeighbor(cell, c -> grid.getContent(c) == UNVISITED)) != null) {
+		grid.set(cell, VISITED);
+		while ((neighbor = grid.randomNeighbor(cell, c -> grid.get(c) == UNVISITED)) != null) {
 			grid.addEdge(new DefaultEdge<>(cell, neighbor));
 			accept(neighbor);
 		}
-		grid.setContent(cell, COMPLETED);
+		grid.set(cell, COMPLETED);
 	}
 }

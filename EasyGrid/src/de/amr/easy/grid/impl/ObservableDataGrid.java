@@ -1,50 +1,53 @@
 package de.amr.easy.grid.impl;
 
 import de.amr.easy.graph.impl.DefaultEdge;
-import de.amr.easy.grid.api.GridContentStore;
+import de.amr.easy.grid.api.GridDataAccess;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
 
 /**
  * An observable grid with cell content.
+ * 
+ * @param <Content>
+ *          cell content data type
  * 
  * @author Armin Reichert
  */
 public class ObservableDataGrid<Content> extends ObservableRawGrid
 		implements ObservableDataGrid2D<Integer, DefaultEdge<Integer>, Content> {
 
-	private GridContentStore<Integer, Content> contentStore;
+	private GridDataAccess<Integer, Content> data;
 
 	public ObservableDataGrid(int numCols, int numRows, Content defaultContent, boolean sparse) {
 		super(numCols, numRows);
-		contentStore = sparse ? new HashMapContentStore<>() : new ArrayContentStore<>(numCols * numRows);
-		contentStore.setDefaultContent(defaultContent);
+		data = sparse ? new HashMapData<>() : new ArrayData<>(numCols * numRows);
+		data.setDefault(defaultContent);
 	}
 
 	public ObservableDataGrid(int numCols, int numRows, Content defaultContent) {
 		this(numCols, numRows, defaultContent, true);
 	}
 
-	// --- {@link GridContentStore} interface ---
+	// --- {@link GridDataAccess} interface ---
 
 	@Override
-	public void clearContent() {
-		contentStore.clearContent();
+	public void clear() {
+		data.clear();
 	}
 
 	@Override
-	public void setDefaultContent(Content content) {
-		contentStore.setDefaultContent(content);
+	public void setDefault(Content content) {
+		data.setDefault(content);
 	}
 
 	@Override
-	public Content getContent(Integer cell) {
-		return contentStore.getContent(cell);
+	public Content get(Integer cell) {
+		return data.get(cell);
 	}
 
 	@Override
-	public void setContent(Integer cell, Content content) {
-		Content oldContent = contentStore.getContent(cell);
-		contentStore.setContent(cell, content);
+	public void set(Integer cell, Content content) {
+		Content oldContent = data.get(cell);
+		data.set(cell, content);
 		fireVertexChange(cell, oldContent, content);
 	}
 }

@@ -47,7 +47,7 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 		Cell current = start;
 		addCellToMaze(current);
 		while (current != null) {
-			Cell unvisitedNeighbor = grid.randomNeighbor(current, c -> grid.getContent(c) == UNVISITED);
+			Cell unvisitedNeighbor = grid.randomNeighbor(current, c -> grid.get(c) == UNVISITED);
 			if (unvisitedNeighbor != null) {
 				connect(current, unvisitedNeighbor);
 				current = unvisitedNeighbor;
@@ -67,7 +67,7 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 			}
 			Cell cell = fairGameIterator.next();
 			// Note: a completed neighbor always exists:
-			Cell mazeCell = grid.randomNeighbor(cell, c -> grid.getContent(c) == COMPLETED);
+			Cell mazeCell = grid.randomNeighbor(cell, c -> grid.get(c) == COMPLETED);
 			connect(mazeCell, cell);
 			return cell;
 		}
@@ -75,13 +75,13 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 	}
 
 	private void addCellToMaze(Cell cell) {
-		grid.setContent(cell, COMPLETED);
+		grid.set(cell, COMPLETED);
 		fairGame.remove(cell);
 		for (Direction dir : Direction.values()) {
 			Cell neighbor = grid.neighbor(cell, dir);
 			if (neighbor == null)
 				continue;
-			TraversalState state = grid.getContent(neighbor);
+			TraversalState state = grid.get(neighbor);
 			if (state == TraversalState.UNVISITED) {
 				fairGame.add(neighbor);
 			}

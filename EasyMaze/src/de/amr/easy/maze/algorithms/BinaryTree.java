@@ -30,8 +30,8 @@ public class BinaryTree<Cell> implements Consumer<Cell> {
 			Cell neighbor = getRandomNeighbor(cell, Direction.S, Direction.E);
 			if (neighbor != null) {
 				grid.addEdge(new DefaultEdge<Cell>(cell, neighbor));
-				grid.setContent(cell, COMPLETED);
-				grid.setContent(neighbor, COMPLETED);
+				grid.set(cell, COMPLETED);
+				grid.set(neighbor, COMPLETED);
 			}
 		}
 	}

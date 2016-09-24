@@ -23,11 +23,11 @@ public class RouteMap {
 		gridGraph.setEventsEnabled(false);
 		/*@formatter:off*/
 		gridGraph.vertexStream()
-			.filter(cell -> board.grid.getContent(cell) != Wall)
+			.filter(cell -> board.grid.get(cell) != Wall)
 			.forEach(cell -> {
 				Stream.of(Direction.values()).forEach(dir -> {
 					Integer neighbor = gridGraph.neighbor(cell, dir);
-					if (neighbor != null && board.grid.getContent(neighbor) != Wall
+					if (neighbor != null && board.grid.get(neighbor) != Wall
 						&& !gridGraph.adjacent(cell, neighbor)) {
 						gridGraph.addEdge(new DefaultEdge<>(cell, neighbor));
 					}

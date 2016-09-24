@@ -47,7 +47,7 @@ public class Board {
 
 	public void init() {
 		grid.vertexStream()
-				.forEach(cell -> grid.setContent(cell, rows[grid.row(cell)].charAt(grid.col(cell))));
+				.forEach(cell -> grid.set(cell, rows[grid.row(cell)].charAt(grid.col(cell))));
 	}
 
 	public boolean isTileValid(Tile tile) {
@@ -57,7 +57,7 @@ public class Board {
 
 	public void setContent(Tile tile, char data) {
 		Integer cell = grid.cell(tile.getCol(), tile.getRow());
-		grid.setContent(cell, data);
+		grid.set(cell, data);
 	}
 
 	public boolean has(char data, Tile tile) {
@@ -66,7 +66,7 @@ public class Board {
 	
 	public boolean has(char data, int row, int col) {
 		Integer cell = grid.cell(col, row);
-		return data == grid.getContent(cell);
+		return data == grid.get(cell);
 	}
 
 	public Optional<Tile> checkContent(Tile tile, char data) {
@@ -74,6 +74,6 @@ public class Board {
 	}
 
 	public long count(char data) {
-		return grid.vertexStream().filter(cell -> data == grid.getContent(cell)).count();
+		return grid.vertexStream().filter(cell -> data == grid.get(cell)).count();
 	}
 }

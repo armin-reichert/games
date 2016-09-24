@@ -108,7 +108,7 @@ public class MazeGeneration extends Scene<MazeDemo> {
 	}
 
 	private void prepareGrid(Consumer<Integer> algorithm) {
-		grid.clearContent();
+		grid.clear();
 		if (algorithm.getClass() == RecursiveDivision.class) {
 			grid.fillAllEdges();
 		} else {

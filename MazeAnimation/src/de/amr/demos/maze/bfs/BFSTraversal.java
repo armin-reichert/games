@@ -56,7 +56,7 @@ public class BFSTraversal extends Scene<MazeDemo> {
 			bfs.findPath(startCell);
 			Log.info("BFS finished.");
 		}, "BreadFirstTraversal");
-		grid.clearContent();
+		grid.clear();
 		bfsRunner.start();
 		Log.info("BFS animation screen initialized.");
 	}

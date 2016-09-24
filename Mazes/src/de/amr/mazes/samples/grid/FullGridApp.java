@@ -15,7 +15,7 @@ public class FullGridApp extends GridSampleApp {
 
 	public FullGridApp(int gridWidth, int gridHeight, int cellSize) {
 		super("Full Grid", gridWidth, gridHeight, cellSize);
-		grid.setDefaultContent(TraversalState.COMPLETED);
+		grid.setDefault(TraversalState.COMPLETED);
 		grid.fillAllEdges();
 	}
 

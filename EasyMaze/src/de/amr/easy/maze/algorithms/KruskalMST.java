@@ -39,8 +39,8 @@ public class KruskalMST<Cell> implements Consumer<Cell> {
 			Cell either = edge.either(), other = edge.other(either);
 			EquivClass eitherTree = forest.find(either), otherTree = forest.find(other);
 			if (eitherTree != otherTree) {
-				grid.setContent(either, COMPLETED);
-				grid.setContent(other, COMPLETED);
+				grid.set(either, COMPLETED);
+				grid.set(other, COMPLETED);
 				grid.addEdge(edge);
 				forest.union(eitherTree, otherTree);
 			}

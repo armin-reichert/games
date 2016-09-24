@@ -107,7 +107,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 * @return <code>true</code> if the cell is part of the current tree
 	 */
 	protected boolean isCellInTree(Cell cell) {
-		return grid.getContent(cell) == COMPLETED;
+		return grid.get(cell) == COMPLETED;
 	}
 
 	/**
@@ -117,7 +117,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 *          a grid cell
 	 */
 	protected void addCellToTree(Cell cell) {
-		grid.setContent(cell, COMPLETED);
+		grid.set(cell, COMPLETED);
 	}
 
 }

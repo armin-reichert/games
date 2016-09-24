@@ -40,23 +40,23 @@ public class IterativeDFS<Cell> implements Consumer<Cell> {
 	public void accept(Cell start) {
 		Cell current = start;
 		stack.push(current);
-		grid.setContent(current, VISITED);
+		grid.set(current, VISITED);
 		while (!stack.isEmpty()) {
 			Cell neighbor = grid.randomNeighbor(current,
-					cell -> grid.getContent(cell) == UNVISITED);
+					cell -> grid.get(cell) == UNVISITED);
 			if (neighbor != null) {
 				if (grid.randomNeighbor(neighbor, cell -> true) != null) {
 					stack.push(neighbor);
 				}
 				grid.addEdge(new DefaultEdge<>(current, neighbor));
-				grid.setContent(neighbor, VISITED);
+				grid.set(neighbor, VISITED);
 				current = neighbor;
 			} else {
-				grid.setContent(current, COMPLETED);
+				grid.set(current, COMPLETED);
 				if (!stack.isEmpty()) {
 					current = stack.pop();
 				}
-				if (grid.getContent(current) != COMPLETED) {
+				if (grid.get(current) != COMPLETED) {
 					stack.push(current);
 				}
 			}

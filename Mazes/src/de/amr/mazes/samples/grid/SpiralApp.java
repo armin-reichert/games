@@ -18,15 +18,15 @@ public class SpiralApp extends GridSampleApp {
 	public void run() {
 		canvas.setDelay(0);
 		for (Integer cell : grid.vertexSequence()) {
-			grid.setContent(cell, TraversalState.COMPLETED);
+			grid.set(cell, TraversalState.COMPLETED);
 		}
 		canvas.setDelay(4);
 		Spiral<Integer> spiral = new Spiral<>(grid, grid.cell(GridPosition.CENTER));
 		Integer prevCell = null;
 		for (Integer cell : spiral) {
-			grid.setContent(cell, TraversalState.VISITED);
+			grid.set(cell, TraversalState.VISITED);
 			if (prevCell != null) {
-				grid.setContent(prevCell, TraversalState.UNVISITED);
+				grid.set(prevCell, TraversalState.UNVISITED);
 			}
 			prevCell = cell;
 		}

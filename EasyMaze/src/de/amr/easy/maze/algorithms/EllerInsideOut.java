@@ -108,8 +108,8 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 		}
 		// System.out.println(coord(v) + "->" + coord(w));
 		grid.addEdge(new DefaultEdge<Cell>(v, w));
-		grid.setContent(v, COMPLETED);
-		grid.setContent(w, COMPLETED);
+		grid.set(v, COMPLETED);
+		grid.set(w, COMPLETED);
 		mazeParts.union(mazeParts.find(v), mazeParts.find(w));
 	}
 

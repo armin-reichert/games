@@ -38,7 +38,7 @@ public class GridColoring extends DefaultGridRenderingModel<Integer> {
 
 	@Override
 	public Color getCellBgColor(Integer cell) {
-		switch (model.getGrid().getContent(cell)) {
+		switch (model.getGrid().get(cell)) {
 		case COMPLETED:
 			return super.getCellBgColor(cell);
 		case UNVISITED:
