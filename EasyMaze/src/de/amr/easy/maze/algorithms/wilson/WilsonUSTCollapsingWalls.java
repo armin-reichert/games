@@ -13,8 +13,7 @@ import de.amr.easy.grid.iterators.traversals.CollapsingWalls;
  */
 public class WilsonUSTCollapsingWalls<Cell> extends WilsonUST<Cell> {
 
-	public WilsonUSTCollapsingWalls(
-			ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTCollapsingWalls(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		super(grid);
 	}
 

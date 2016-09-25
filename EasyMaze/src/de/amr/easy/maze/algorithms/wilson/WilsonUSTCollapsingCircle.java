@@ -15,8 +15,7 @@ import de.amr.easy.grid.iterators.shapes.Circle;
  */
 public class WilsonUSTCollapsingCircle<Cell> extends WilsonUST<Cell> {
 
-	public WilsonUSTCollapsingCircle(
-			ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTCollapsingCircle(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		super(grid);
 	}
 

@@ -34,7 +34,6 @@ public class RandomBFS<Cell> implements Consumer<Cell> {
 		final Random rnd = new Random();
 		final Set<Cell> mazeCells = new HashSet<>();
 		final List<Cell> frontier = new LinkedList<>();
-
 		mazeCells.add(start);
 		frontier.add(start);
 		grid.set(start, VISITED);

@@ -42,8 +42,7 @@ public class WilsonUSTNestedRectangles<Cell> extends WilsonUST<Cell> {
 				}
 				Iterator<Cell>[] expRectsArray = expRects.toArray(new Iterator[expRects.size()]);
 
-				Rectangle<Cell> firstColumn = new Rectangle<>(grid, grid.cell(0, 0), 1,
-						grid.numRows());
+				Rectangle<Cell> firstColumn = new Rectangle<>(grid, grid.cell(0, 0), 1, grid.numRows());
 				ExpandingRectangle<Cell> sweep = new ExpandingRectangle<>(firstColumn);
 				sweep.setExpandHorizontally(true);
 				sweep.setExpandVertically(false);

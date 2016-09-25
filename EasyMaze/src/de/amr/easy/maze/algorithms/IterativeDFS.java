@@ -42,8 +42,7 @@ public class IterativeDFS<Cell> implements Consumer<Cell> {
 		stack.push(current);
 		grid.set(current, VISITED);
 		while (!stack.isEmpty()) {
-			Cell neighbor = grid.randomNeighbor(current,
-					cell -> grid.get(cell) == UNVISITED);
+			Cell neighbor = grid.randomNeighbor(current, cell -> grid.get(cell) == UNVISITED);
 			if (neighbor != null) {
 				if (grid.randomNeighbor(neighbor, cell -> true) != null) {
 					stack.push(neighbor);

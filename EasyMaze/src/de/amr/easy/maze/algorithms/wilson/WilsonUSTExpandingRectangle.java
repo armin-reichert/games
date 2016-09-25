@@ -13,8 +13,7 @@ import de.amr.easy.grid.iterators.traversals.ExpandingRectangle;
  */
 public class WilsonUSTExpandingRectangle<Cell> extends WilsonUST<Cell> {
 
-	public WilsonUSTExpandingRectangle(
-			ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTExpandingRectangle(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		super(grid);
 	}
 

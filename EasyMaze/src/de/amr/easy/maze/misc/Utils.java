@@ -60,10 +60,18 @@ public abstract class Utils {
 		return log;
 	}
 
+	/**
+	 * 
+	 * @param base
+	 *          base of power
+	 * @param n
+	 *          number
+	 * @return next integer which is greater or equals to n and a power of the given base
+	 */
 	public static int nextPow(int base, int n) {
 		int p = 1;
 		while (p < n) {
-			p = p * base;
+			p *= base;
 		}
 		return p;
 	}

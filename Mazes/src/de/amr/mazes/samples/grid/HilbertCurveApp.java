@@ -18,7 +18,8 @@ import de.amr.easy.grid.iterators.traversals.HilbertCurve;
 import de.amr.mazes.swing.rendering.BFSAnimation;
 
 /**
- * Hilbert curve sample.
+ * Creates Hilbert curves of different sizes and shows an animation of the creation and
+ * BFS-traversal of the underlying graph.
  * 
  * @author Armin Reichert
  */
@@ -42,8 +43,8 @@ public class HilbertCurveApp extends GridSampleApp {
 		return super.composeTitle() + ", " + grid.edgeCount() + " edges";
 	}
 
-	private HilbertCurve createCurve(GridPosition startPos, int depth) {
-		switch (startPos) {
+	private HilbertCurve createCurve(GridPosition start, int depth) {
+		switch (start) {
 		case TOP_RIGHT:
 			return new HilbertCurve(depth, N, E, S, W);
 		case TOP_LEFT:
@@ -60,14 +61,14 @@ public class HilbertCurveApp extends GridSampleApp {
 	@Override
 	public void run() {
 		setDelay(5);
-		Stream.of(TOP_RIGHT, TOP_LEFT, BOTTOM_LEFT, BOTTOM_RIGHT).forEach(startPos -> {
+		Stream.of(TOP_RIGHT, TOP_LEFT, BOTTOM_LEFT, BOTTOM_RIGHT).forEach(start -> {
 			for (int cellSize = MAX_CELLSIZE; cellSize >= MIN_CELLSIZE; cellSize /= 2, resize(WIDTH, HEIGHT, cellSize)) {
 				int depth = log(2, WIDTH / cellSize);
-				HilbertCurve curve = createCurve(startPos, depth);
-				followCurve(grid, curve, grid.cell(startPos), () -> window.setTitle(composeTitle()));
+				HilbertCurve hilbert = createCurve(start, depth);
+				followCurve(grid, hilbert, grid.cell(start), () -> window.setTitle(composeTitle()));
 				BFSAnimation bfs = new BFSAnimation(canvas, grid);
 				bfs.setDistancesVisible(false);
-				bfs.runAnimation(grid.cell(startPos));
+				bfs.runAnimation(grid.cell(start));
 			}
 		});
 	}

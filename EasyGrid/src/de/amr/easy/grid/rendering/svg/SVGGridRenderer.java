@@ -24,10 +24,10 @@ public class SVGGridRenderer<Cell, Passage extends Edge<Cell>> implements GraphL
 		g = new SVGGraphics2D(width, height);
 		renderer = new GridRenderer<>();
 		DefaultGridRenderingModel<Cell> renderingModel = new DefaultGridRenderingModel<>();
-		renderingModel.cellSize = cellSize;
-		renderingModel.gridBgColor = Color.DARK_GRAY;
+		renderingModel.setCellSize(cellSize);
+		renderingModel.setGridBgColor(Color.DARK_GRAY);
 		renderer.setRenderingModel(renderingModel);
-		g.setBackground(renderingModel.gridBgColor);
+		g.setBackground(renderingModel.getGridBgColor());
 		g.clearRect(0, 0, width, height);
 		grid.addGraphListener(this);
 	}

@@ -46,7 +46,7 @@ public abstract class GridSampleApp implements Runnable {
 		window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle(composeTitle());
-		canvas = new GridCanvas<>(grid, createRenderingModel(cellSize));
+		canvas = new GridCanvas<>(grid, changeRenderingModel(cellSize));
 		canvas.setDelay(0);
 		window.add(canvas, BorderLayout.CENTER);
 		delaySlider = new JSlider(0, 50);
@@ -62,10 +62,9 @@ public abstract class GridSampleApp implements Runnable {
 	}
 
 	protected void resize(int windowWidth, int windowHeight, int cellSize) {
-		grid = new ObservableDataGrid<>(windowWidth / cellSize, windowHeight / cellSize,
-				UNVISITED);
+		grid = new ObservableDataGrid<>(windowWidth / cellSize, windowHeight / cellSize, UNVISITED);
 		canvas.setGrid(grid);
-		canvas.setRenderingModel(createRenderingModel(cellSize));
+		canvas.setRenderingModel(changeRenderingModel(cellSize));
 		window.setTitle(composeTitle());
 		window.pack();
 	}
@@ -95,27 +94,25 @@ public abstract class GridSampleApp implements Runnable {
 		}
 	}
 
-	protected GridRenderingModel<Integer> createRenderingModel(final int cellSize) {
-		return new DefaultGridRenderingModel<Integer>() {
+	private DefaultGridRenderingModel<Integer> renderingModel = new DefaultGridRenderingModel<Integer>() {
 
-			@Override
-			public int getCellSize() {
-				return cellSize;
+		@Override
+		public Color getCellBgColor(Integer cell) {
+			switch (grid.get(cell)) {
+			case VISITED:
+				return Color.BLUE;
+			case COMPLETED:
+				return Color.WHITE;
+			case UNVISITED:
+				return getGridBgColor();
+			default:
+				return super.getCellBgColor(cell);
 			}
+		}
+	};
 
-			@Override
-			public Color getCellBgColor(Integer cell) {
-				switch (grid.get(cell)) {
-				case VISITED:
-					return Color.BLUE;
-				case COMPLETED:
-					return Color.WHITE;
-				case UNVISITED:
-					return getGridBgColor();
-				default:
-					return super.getCellBgColor(cell);
-				}
-			}
-		};
+	protected GridRenderingModel<Integer> changeRenderingModel(int cellSize) {
+		renderingModel.setCellSize(cellSize);
+		return renderingModel;
 	}
 }

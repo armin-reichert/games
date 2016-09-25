@@ -51,17 +51,17 @@ public class AldousBroderUST<Cell> implements Consumer<Cell> {
 	@Override
 	public void accept(Cell start) {
 		numMazeCells = 0;
-		Cell v = start;
-		addToMaze(v);
+		Cell u = start;
+		addToMaze(u);
 		while (numMazeCells < grid.vertexCount()) {
-			Cell w = grid.neighbor(v, Direction.randomValue());
-			if (w != null) {
-				animate(w);
-				if (grid.get(w) == UNVISITED) {
-					addToMaze(w);
-					grid.addEdge(new DefaultEdge<>(w, v));
+			Cell v = grid.neighbor(u, Direction.randomValue());
+			if (v != null) {
+				animate(v);
+				if (grid.get(v) == UNVISITED) {
+					addToMaze(v);
+					grid.addEdge(new DefaultEdge<>(v, u));
 				}
-				v = w;
+				u = v;
 			}
 		}
 	}

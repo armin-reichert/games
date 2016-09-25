@@ -15,10 +15,26 @@ import de.amr.easy.grid.api.Direction;
  */
 public class DefaultGridRenderingModel<Cell> implements GridRenderingModel<Cell> {
 
-	public Color gridBgColor = Color.BLACK;
-	public Color cellTextColor = Color.BLACK;
-	public int cellSize = 4;
-	public Font textFont = new Font("Dialog", Font.PLAIN, 10);
+	private Color gridBgColor = Color.BLACK;
+	private Color cellTextColor = Color.BLACK;
+	private int cellSize = 4;
+	private Font textFont = new Font("Dialog", Font.PLAIN, 10);
+
+	public void setGridBgColor(Color gridBgColor) {
+		this.gridBgColor = gridBgColor;
+	}
+
+	public void setCellTextColor(Color cellTextColor) {
+		this.cellTextColor = cellTextColor;
+	}
+
+	public void setCellSize(int cellSize) {
+		this.cellSize = cellSize;
+	}
+
+	public void setTextFont(Font textFont) {
+		this.textFont = textFont;
+	}
 
 	@Override
 	public int getCellSize() {

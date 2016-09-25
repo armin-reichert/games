@@ -14,8 +14,7 @@ import de.amr.easy.grid.iterators.traversals.Spiral;
  */
 public class WilsonUSTExpandingSpiral<Cell> extends WilsonUST<Cell> {
 
-	public WilsonUSTExpandingSpiral(
-			ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTExpandingSpiral(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
 		super(grid);
 	}
 
