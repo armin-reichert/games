@@ -1,13 +1,18 @@
 package de.amr.mazes.samples.grid;
 
 import static de.amr.easy.graph.api.TraversalState.UNVISITED;
+import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
+import javax.swing.KeyStroke;
 
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
@@ -36,17 +41,47 @@ public abstract class GridSampleApp implements Runnable {
 	protected GridCanvas<Integer, DefaultEdge<Integer>> canvas;
 	protected JSlider delaySlider;
 
-	protected GridSampleApp(String appName, int gridWidth, int gridHeight, int cellSize) {
-		grid = new ObservableDataGrid<>(gridWidth, gridHeight, UNVISITED);
+	protected GridSampleApp(String appName) {
+		this(appName, 16);
+	}
+
+	protected GridSampleApp(String appName, int cellSize) {
 		this.appName = appName;
+		Dimension gridDimension = Utils.maxGridDimensionForDisplay(cellSize);
+		init(gridDimension.width, gridDimension.height, cellSize);
+	}
+
+	protected GridSampleApp(String appName, int gridWidth, int gridHeight, int cellSize) {
+		this.appName = appName;
+		init(gridWidth, gridHeight, cellSize);
+	}
+
+	private void init(int gridWidth, int gridHeight, int cellSize) {
+		grid = new ObservableDataGrid<>(gridWidth, gridHeight, UNVISITED);
 		this.cellSize = cellSize;
+	}
+
+	protected void fitWindowSize(int windowWidth, int windowHeight, int cellSize) {
+		grid = new ObservableDataGrid<>(windowWidth / cellSize, windowHeight / cellSize, UNVISITED);
+		canvas.setGrid(grid);
+		canvas.setRenderingModel(changeRenderingModel(cellSize));
+		window.setTitle(composeTitle());
+		window.pack();
 	}
 
 	private void showUI() {
 		window = new JFrame();
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		window.setTitle(composeTitle());
 		canvas = new GridCanvas<>(grid, changeRenderingModel(cellSize));
+		canvas.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "exit");
+		canvas.getActionMap().put("exit", new AbstractAction() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
 		canvas.setDelay(0);
 		window.add(canvas, BorderLayout.CENTER);
 		delaySlider = new JSlider(0, 50);
@@ -56,17 +91,10 @@ public abstract class GridSampleApp implements Runnable {
 				canvas.setDelay(delaySlider.getValue());
 		});
 		window.add(delaySlider, BorderLayout.SOUTH);
+		window.setUndecorated(true);
 		window.pack();
 		window.setVisible(true);
 		new Thread(this).start();
-	}
-
-	protected void resize(int windowWidth, int windowHeight, int cellSize) {
-		grid = new ObservableDataGrid<>(windowWidth / cellSize, windowHeight / cellSize, UNVISITED);
-		canvas.setGrid(grid);
-		canvas.setRenderingModel(changeRenderingModel(cellSize));
-		window.setTitle(composeTitle());
-		window.pack();
 	}
 
 	protected void clear() {

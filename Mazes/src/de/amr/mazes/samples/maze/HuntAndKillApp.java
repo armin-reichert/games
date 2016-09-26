@@ -1,6 +1,9 @@
 package de.amr.mazes.samples.maze;
 
-import de.amr.easy.grid.api.GridPosition;
+import static de.amr.easy.grid.api.GridPosition.TOP_LEFT;
+
+import java.util.stream.Stream;
+
 import de.amr.easy.maze.algorithms.HuntAndKill;
 import de.amr.mazes.samples.grid.GridSampleApp;
 import de.amr.mazes.swing.rendering.BFSAnimation;
@@ -12,17 +15,19 @@ public class HuntAndKillApp extends GridSampleApp {
 	}
 
 	public HuntAndKillApp() {
-		super("Hunt And Kill", 300, 180, 4);
+		super("Hunt And Kill");
 	}
 
 	@Override
 	public void run() {
-		setDelay(0);
-		while (true) {
-			new HuntAndKill<>(grid).accept(grid.cell(GridPosition.CENTER));
-			new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
-			sleep(1000);
+		Integer startCell = grid.cell(TOP_LEFT);
+		Stream.of(128, 64, 32, 16, 8, 4, 2).forEach(cellSize -> {
+			fitWindowSize(window.getWidth(), window.getHeight(), cellSize);
+			new HuntAndKill<>(grid).accept(startCell);
+			new BFSAnimation(canvas, grid).runAnimation(startCell);
+			sleep(3000);
 			clear();
-		}
+		});
+		System.exit(0);
 	}
 }

@@ -76,6 +76,14 @@ public abstract class Utils {
 		return p;
 	}
 
+	/**
+	 * Computes the maximum possible grid dimension (width, height) such that the grid can be
+	 * displayed completely on the screen at the given grid cell size.
+	 * 
+	 * @param cellSize
+	 *          the grid cell size
+	 * @return pair (width, height) for grid
+	 */
 	public static Dimension maxGridDimensionForDisplay(int cellSize) {
 		DisplayMode displayMode = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDisplayMode();
