@@ -1,6 +1,7 @@
 package de.amr.mazes.samples.grid;
 
 import static de.amr.easy.graph.api.TraversalState.UNVISITED;
+import static java.awt.Frame.MAXIMIZED_BOTH;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 import java.awt.BorderLayout;
@@ -91,6 +92,7 @@ public abstract class GridSampleApp implements Runnable {
 				canvas.setDelay(delaySlider.getValue());
 		});
 		window.add(delaySlider, BorderLayout.SOUTH);
+		window.setExtendedState(MAXIMIZED_BOTH);
 		window.setUndecorated(true);
 		window.pack();
 		window.setVisible(true);
