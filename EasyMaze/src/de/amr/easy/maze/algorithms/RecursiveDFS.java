@@ -16,17 +16,17 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class RecursiveDFS<Cell> implements Consumer<Cell> {
+public class RecursiveDFS implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
-	private Cell neighbor;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
+	private Integer neighbor;
 
-	public RecursiveDFS(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public RecursiveDFS(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell cell) {
+	public void accept(Integer cell) {
 		grid.set(cell, VISITED);
 		while ((neighbor = grid.randomNeighbor(cell, c -> grid.get(c) == UNVISITED)) != null) {
 			grid.addEdge(new DefaultEdge<>(cell, neighbor));

@@ -32,21 +32,21 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  *      wikipedia.org/wiki/Loop -erased_random_walk</>
  * 
  */
-public abstract class WilsonUST<Cell> implements Consumer<Cell> {
+public abstract class WilsonUST implements Consumer<Integer> {
 
-	protected final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	protected final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	protected final Random rnd = new Random();
-	protected final Map<Cell, Direction> lastWalkDir = new HashMap<>();
+	protected final Map<Integer, Direction> lastWalkDir = new HashMap<>();
 
-	protected WilsonUST(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	protected WilsonUST(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		start = modifyStartVertex(start);
 		addCellToTree(start);
-		for (Cell walkStart : getCellSequence()) {
+		for (Integer walkStart : getCellSequence()) {
 			if (!isCellInTree(walkStart)) {
 				loopErasedRandomWalk(walkStart);
 			}
@@ -63,11 +63,11 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 * @param walkStart
 	 *          the start cell of the random walk
 	 */
-	protected void loopErasedRandomWalk(Cell walkStart) {
-		Cell v = walkStart;
+	protected void loopErasedRandomWalk(Integer walkStart) {
+		Integer v = walkStart;
 		while (!isCellInTree(v)) {
 			Direction dir = Direction.randomValue();
-			Cell w = grid.neighbor(v, dir);
+			Integer w = grid.neighbor(v, dir);
 			if (w == null) {
 				continue;
 			}
@@ -78,8 +78,8 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 		v = walkStart;
 		while (!isCellInTree(v)) {
 			addCellToTree(v);
-			Cell w = grid.neighbor(v, lastWalkDir.get(v));
-			grid.addEdge(new DefaultEdge<Cell>(v, w));
+			Integer w = grid.neighbor(v, lastWalkDir.get(v));
+			grid.addEdge(new DefaultEdge<>(v, w));
 			v = w;
 		}
 	}
@@ -87,7 +87,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	/**
 	 * @return iterator defining the cell order used by the maze generator
 	 */
-	protected Iterable<Cell> getCellSequence() {
+	protected Iterable<Integer> getCellSequence() {
 		return grid.vertexSequence();
 	}
 
@@ -97,7 +97,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 *          the start cell as passed to the run-method of the generator
 	 * @return the maybe modified start cell of the generator
 	 */
-	protected Cell modifyStartVertex(Cell start) {
+	protected Integer modifyStartVertex(Integer start) {
 		return start;
 	}
 
@@ -106,7 +106,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 *          a grid cell
 	 * @return <code>true</code> if the cell is part of the current tree
 	 */
-	protected boolean isCellInTree(Cell cell) {
+	protected boolean isCellInTree(Integer cell) {
 		return grid.get(cell) == COMPLETED;
 	}
 
@@ -116,7 +116,7 @@ public abstract class WilsonUST<Cell> implements Consumer<Cell> {
 	 * @param cell
 	 *          a grid cell
 	 */
-	protected void addCellToTree(Cell cell) {
+	protected void addCellToTree(Integer cell) {
 		grid.set(cell, COMPLETED);
 	}
 

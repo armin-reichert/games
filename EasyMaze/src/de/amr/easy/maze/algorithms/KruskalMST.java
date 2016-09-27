@@ -22,21 +22,21 @@ import de.amr.easy.maze.datastructures.Partition.EquivClass;
  * 
  * @author Armin Reichert
  */
-public class KruskalMST<Cell> implements Consumer<Cell> {
+public class KruskalMST implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	// Note: The partition has not to be initialized because the find-operation
 	// creates new equivalence-classes on demand.
-	private final Partition<Cell> forest = new Partition<>();
+	private final Partition<Integer> forest = new Partition<>();
 
-	public KruskalMST(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public KruskalMST(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		fullGridEdgesInRandomOrder().forEach(edge -> {
-			Cell either = edge.either(), other = edge.other(either);
+			Integer either = edge.either(), other = edge.other(either);
 			EquivClass eitherTree = forest.find(either), otherTree = forest.find(other);
 			if (eitherTree != otherTree) {
 				grid.set(either, COMPLETED);
@@ -47,9 +47,9 @@ public class KruskalMST<Cell> implements Consumer<Cell> {
 		});
 	}
 
-	private Iterable<DefaultEdge<Cell>> fullGridEdgesInRandomOrder() {
+	private Iterable<DefaultEdge<Integer>> fullGridEdgesInRandomOrder() {
 		int fullGridEdgeCount = 2 * grid.numCols() * grid.numRows() - grid.numRows() - grid.numCols();
-		List<DefaultEdge<Cell>> edges = new ArrayList<>(fullGridEdgeCount);
+		List<DefaultEdge<Integer>> edges = new ArrayList<>(fullGridEdgeCount);
 		grid.setEventsEnabled(false);
 		grid.fillAllEdges();
 		grid.edgeSequence().iterator().forEachRemaining(edges::add);

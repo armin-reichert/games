@@ -23,7 +23,7 @@ public class ArminsApp extends GridSampleApp {
 		Integer startCell = grid.cell(TOP_LEFT);
 		Stream.of(128, 64, 32, 16, 8, 4).forEach(cellSize -> {
 			fitWindowSize(window.getWidth(), window.getHeight(), cellSize);
-			new EllerInsideOut<>(grid).accept(null);
+			new EllerInsideOut(grid).accept(null);
 			new BFSAnimation(canvas, grid).runAnimation(startCell);
 			sleep(3000);
 			clear();

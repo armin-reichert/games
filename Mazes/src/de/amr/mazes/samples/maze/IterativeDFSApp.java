@@ -23,7 +23,7 @@ public class IterativeDFSApp extends GridSampleApp {
 		Integer startCell = grid.cell(TOP_LEFT);
 		Stream.of(128, 64, 32, 16, 8, 4, 2).forEach(cellSize -> {
 			fitWindowSize(window.getWidth(), window.getHeight(), cellSize);
-			new IterativeDFS<>(grid).accept(startCell);
+			new IterativeDFS(grid).accept(startCell);
 			new BFSAnimation(canvas, grid).runAnimation(startCell);
 			sleep(3000);
 			clear();

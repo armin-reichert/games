@@ -16,34 +16,34 @@ import de.amr.easy.grid.iterators.traversals.ExpandingRectangle;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTNestedRectangles<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTNestedRectangles extends WilsonUST {
 
-	public WilsonUSTNestedRectangles(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTNestedRectangles(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	protected Cell modifyStartVertex(Cell start) {
+	protected Integer modifyStartVertex(Integer start) {
 		return grid.cell(0, 0);
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
-		return new Iterable<Cell>() {
+	protected Iterable<Integer> getCellSequence() {
+		return new Iterable<Integer>() {
 
 			@Override
-			public Iterator<Cell> iterator() {
-				Rectangle<Cell> firstCell = new Rectangle<>(grid, grid.cell(0, 0), 1, 1);
-				List<Iterator<Cell>> expRects = new ArrayList<>();
+			public Iterator<Integer> iterator() {
+				Rectangle<Integer> firstCell = new Rectangle<>(grid, grid.cell(0, 0), 1, 1);
+				List<Iterator<Integer>> expRects = new ArrayList<>();
 				int rate = grid.numCols();
 				while (rate > 1) {
 					expRects.add(expandingRectangle(firstCell, rate).iterator());
 					rate /= 2;
 				}
-				Iterator<Cell>[] expRectsArray = expRects.toArray(new Iterator[expRects.size()]);
+				Iterator<Integer>[] expRectsArray = expRects.toArray(new Iterator[expRects.size()]);
 
-				Rectangle<Cell> firstColumn = new Rectangle<>(grid, grid.cell(0, 0), 1, grid.numRows());
-				ExpandingRectangle<Cell> sweep = new ExpandingRectangle<>(firstColumn);
+				Rectangle<Integer> firstColumn = new Rectangle<>(grid, grid.cell(0, 0), 1, grid.numRows());
+				ExpandingRectangle<Integer> sweep = new ExpandingRectangle<>(firstColumn);
 				sweep.setExpandHorizontally(true);
 				sweep.setExpandVertically(false);
 				sweep.setExpansionRate(1);
@@ -54,8 +54,8 @@ public class WilsonUSTNestedRectangles<Cell> extends WilsonUST<Cell> {
 		};
 	}
 
-	private ExpandingRectangle<Cell> expandingRectangle(Rectangle<Cell> startRectangle, int rate) {
-		ExpandingRectangle<Cell> r = new ExpandingRectangle<>(startRectangle);
+	private ExpandingRectangle<Integer> expandingRectangle(Rectangle<Integer> startRectangle, int rate) {
+		ExpandingRectangle<Integer> r = new ExpandingRectangle<>(startRectangle);
 		r.setExpandHorizontally(true);
 		r.setExpandVertically(true);
 		r.setExpansionRate(rate);

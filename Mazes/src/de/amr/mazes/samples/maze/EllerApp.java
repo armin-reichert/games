@@ -18,7 +18,7 @@ public class EllerApp extends GridSampleApp {
 	@Override
 	public void run() {
 		while (true) {
-			new Eller<>(grid).accept(null);
+			new Eller(grid).accept(null);
 			new BFSAnimation(canvas, grid).runAnimation(grid.cell(GridPosition.TOP_LEFT));
 			sleep(1000);
 			clear();

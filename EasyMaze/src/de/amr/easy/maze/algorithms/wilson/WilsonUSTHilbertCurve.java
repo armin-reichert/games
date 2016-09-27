@@ -23,19 +23,19 @@ import de.amr.easy.grid.iterators.traversals.HilbertCurve;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTHilbertCurve<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTHilbertCurve extends WilsonUST {
 
-	public WilsonUSTHilbertCurve(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTHilbertCurve(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
+	protected Iterable<Integer> getCellSequence() {
 		// Hilbert curve need a square grid, so create one
 		int n = nextPow(2, max(grid.numCols(), grid.numRows()));
 		RawGrid square = new RawGrid(n, n);
 		HilbertCurve hilbert = new HilbertCurve(log(2, n), W, N, E, S);
-		List<Cell> path = new ArrayList<>();
+		List<Integer> path = new ArrayList<>();
 		path.add(grid.cell(0, 0));
 		// Traverse the intersection of the square grid cells with the original grid
 		Integer cell = square.cell(0, 0);

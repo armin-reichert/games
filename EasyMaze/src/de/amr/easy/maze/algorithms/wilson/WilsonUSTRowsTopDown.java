@@ -9,18 +9,18 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTRowsTopDown<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTRowsTopDown extends WilsonUST {
 
-	public WilsonUSTRowsTopDown(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTRowsTopDown(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		addCellToTree(start);
 		for (int y = 0; y < grid.numRows(); ++y) {
 			for (int x = 0; x < grid.numCols(); ++x) {
-				Cell walkStart = grid.cell(x, y);
+				Integer walkStart = grid.cell(x, y);
 				if (!isCellInTree(walkStart)) {
 					loopErasedRandomWalk(walkStart);
 				}

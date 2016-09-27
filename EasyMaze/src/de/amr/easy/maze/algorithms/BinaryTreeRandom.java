@@ -8,21 +8,21 @@ import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.grid.api.ObservableDataGrid2D;
 
-public class BinaryTreeRandom<Cell> extends BinaryTree<Cell> {
+public class BinaryTreeRandom extends BinaryTree {
 
-	private final List<Cell> cellsInRandomOrder;
+	private final List<Integer> cellsInRandomOrder;
 
-	public BinaryTreeRandom(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public BinaryTreeRandom(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 		cellsInRandomOrder = new ArrayList<>(grid.vertexCount());
-		for (Cell cell : grid.vertexSequence()) {
+		for (Integer cell : grid.vertexSequence()) {
 			cellsInRandomOrder.add(cell);
 		}
 		Collections.shuffle(cellsInRandomOrder);
 	}
 
 	@Override
-	protected Iterable<Cell> getCells() {
+	protected Iterable<Integer> getCells() {
 		return cellsInRandomOrder;
 	}
 }

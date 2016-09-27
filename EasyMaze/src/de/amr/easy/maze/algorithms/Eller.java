@@ -24,20 +24,20 @@ import de.amr.easy.maze.datastructures.Partition.EquivClass;
  * 
  * @author Armin Reichert
  */
-public class Eller<Cell> implements Consumer<Cell> {
+public class Eller implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	private final Random rnd;
-	private final Partition<Cell> partition;
+	private final Partition<Integer> partition;
 
-	public Eller(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public Eller(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 		rnd = new Random();
-		partition = new Partition<Cell>();
+		partition = new Partition<>();
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		for (int y = 0; y < grid.numRows() - 1; ++y) {
 			connectCellsHorizontally(y, false);
 			connectCellsVertically(y);
@@ -45,8 +45,8 @@ public class Eller<Cell> implements Consumer<Cell> {
 		connectCellsHorizontally(grid.numRows() - 1, true);
 	}
 
-	private void connectCells(Cell v, Cell w) {
-		grid.addEdge(new DefaultEdge<Cell>(v, w));
+	private void connectCells(Integer v, Integer w) {
+		grid.addEdge(new DefaultEdge<>(v, w));
 		grid.set(v, COMPLETED);
 		grid.set(w, COMPLETED);
 		partition.union(partition.find(v), partition.find(w));
@@ -55,8 +55,8 @@ public class Eller<Cell> implements Consumer<Cell> {
 	private void connectCellsHorizontally(int y, boolean all) {
 		for (int x = 0; x < grid.numCols() - 1; ++x) {
 			if (all || rnd.nextBoolean()) {
-				Cell left = grid.cell(x, y);
-				Cell right = grid.cell(x + 1, y);
+				Integer left = grid.cell(x, y);
+				Integer right = grid.cell(x + 1, y);
 				if (partition.find(left) != partition.find(right)) {
 					connectCells(left, right);
 				}
@@ -68,16 +68,16 @@ public class Eller<Cell> implements Consumer<Cell> {
 		Set<EquivClass> connected = new HashSet<>();
 		for (int x = 0; x < grid.numCols(); ++x) {
 			if (rnd.nextBoolean()) {
-				Cell cell = grid.cell(x, y);
-				Cell below = grid.cell(x, y + 1);
+				Integer cell = grid.cell(x, y);
+				Integer below = grid.cell(x, y + 1);
 				connectCells(cell, below);
 				connected.add(partition.find(cell));
 			}
 		}
 		// collect cells of still unconnected components
-		List<Cell> unconnected = new ArrayList<>();
+		List<Integer> unconnected = new ArrayList<>();
 		for (int x = 0; x < grid.numCols(); ++x) {
-			Cell cell = grid.cell(x, y);
+			Integer cell = grid.cell(x, y);
 			EquivClass component = partition.find(cell);
 			if (!connected.contains(component)) {
 				unconnected.add(cell);
@@ -86,10 +86,10 @@ public class Eller<Cell> implements Consumer<Cell> {
 		// shuffle cells to avoid biased maze
 		Collections.shuffle(unconnected);
 		// connect cells and mark component as connected
-		for (Cell cell : unconnected) {
+		for (Integer cell : unconnected) {
 			EquivClass component = partition.find(cell);
 			if (!connected.contains(component)) {
-				Cell below = grid.cell(grid.col(cell), y + 1);
+				Integer below = grid.cell(grid.col(cell), y + 1);
 				connectCells(cell, below);
 				connected.add(component);
 			}

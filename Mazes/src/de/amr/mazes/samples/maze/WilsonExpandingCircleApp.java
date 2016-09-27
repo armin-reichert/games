@@ -23,7 +23,7 @@ public class WilsonExpandingCircleApp extends GridSampleApp {
 		Integer startCell = grid.cell(CENTER);
 		Stream.of(64, 32, 16, 8, 4, 2).forEach(cellSize -> {
 			fitWindowSize(window.getWidth(), window.getHeight(), cellSize);
-			new WilsonUSTExpandingCircle<>(grid).accept(startCell);
+			new WilsonUSTExpandingCircle(grid).accept(startCell);
 			new BFSAnimation(canvas, grid).runAnimation(startCell);
 			sleep(3000);
 			clear();

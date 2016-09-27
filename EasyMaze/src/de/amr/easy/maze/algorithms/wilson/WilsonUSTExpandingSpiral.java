@@ -12,20 +12,20 @@ import de.amr.easy.grid.iterators.traversals.Spiral;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTExpandingSpiral<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTExpandingSpiral extends WilsonUST {
 
-	public WilsonUSTExpandingSpiral(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTExpandingSpiral(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
-		Cell center = grid.cell(CENTER);
+	protected Iterable<Integer> getCellSequence() {
+		Integer center = grid.cell(CENTER);
 		return new Spiral<>(grid, center);
 	}
 
 	@Override
-	protected Cell modifyStartVertex(Cell start) {
+	protected Integer modifyStartVertex(Integer start) {
 		return grid.cell(CENTER);
 	}
 }

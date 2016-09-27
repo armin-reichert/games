@@ -27,27 +27,27 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  * 
- * @param <Cell>
+ * @param <Integer>
  *          grid cell type
  */
-public class HuntAndKill<Cell> implements Consumer<Cell> {
+public class HuntAndKill implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
-	private final Set<Cell> fairGame; // cells that are "hunted" for
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
+	private final Set<Integer> fairGame; // cells that are "hunted" for
 	private final Random rnd;
 
-	public HuntAndKill(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public HuntAndKill(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 		fairGame = new HashSet<>();
 		rnd = new Random();
 	}
 
 	@Override
-	public void accept(Cell start) {
-		Cell current = start;
+	public void accept(Integer start) {
+		Integer current = start;
 		addCellToMaze(current);
 		while (current != null) {
-			Cell unvisitedNeighbor = grid.randomNeighbor(current, c -> grid.get(c) == UNVISITED);
+			Integer unvisitedNeighbor = grid.randomNeighbor(current, c -> grid.get(c) == UNVISITED);
 			if (unvisitedNeighbor != null) {
 				connect(current, unvisitedNeighbor);
 				current = unvisitedNeighbor;
@@ -57,28 +57,28 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 		}
 	}
 
-	private Cell huntForCell() {
-		Iterator<Cell> fairGameIterator = fairGame.iterator();
+	private Integer huntForCell() {
+		Iterator<Integer> fairGameIterator = fairGame.iterator();
 		if (fairGameIterator.hasNext()) {
 			// pick a random set element
 			int i = rnd.nextInt(fairGame.size());
 			while (i-- > 0) {
 				fairGameIterator.next();
 			}
-			Cell cell = fairGameIterator.next();
+			Integer cell = fairGameIterator.next();
 			// Note: a completed neighbor always exists:
-			Cell mazeCell = grid.randomNeighbor(cell, c -> grid.get(c) == COMPLETED);
+			Integer mazeCell = grid.randomNeighbor(cell, c -> grid.get(c) == COMPLETED);
 			connect(mazeCell, cell);
 			return cell;
 		}
 		return null;
 	}
 
-	private void addCellToMaze(Cell cell) {
+	private void addCellToMaze(Integer cell) {
 		grid.set(cell, COMPLETED);
 		fairGame.remove(cell);
 		for (Direction dir : Direction.values()) {
-			Cell neighbor = grid.neighbor(cell, dir);
+			Integer neighbor = grid.neighbor(cell, dir);
 			if (neighbor == null)
 				continue;
 			TraversalState state = grid.get(neighbor);
@@ -88,7 +88,7 @@ public class HuntAndKill<Cell> implements Consumer<Cell> {
 		}
 	}
 
-	private void connect(Cell mazeCell, Cell newCell) {
+	private void connect(Integer mazeCell, Integer newCell) {
 		addCellToMaze(newCell);
 		grid.addEdge(new DefaultEdge<>(mazeCell, newCell));
 	}

@@ -23,26 +23,26 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  * 
- * @param <Cell>
+ * @param <Integer>
  *          grid cell type
  */
-public class IterativeDFS<Cell> implements Consumer<Cell> {
+public class IterativeDFS implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
-	private final Deque<Cell> stack;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
+	private final Deque<Integer> stack;
 
-	public IterativeDFS(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public IterativeDFS(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 		stack = new LinkedList<>();
 	}
 
 	@Override
-	public void accept(Cell start) {
-		Cell current = start;
+	public void accept(Integer start) {
+		Integer current = start;
 		stack.push(current);
 		grid.set(current, VISITED);
 		while (!stack.isEmpty()) {
-			Cell neighbor = grid.randomNeighbor(current, cell -> grid.get(cell) == UNVISITED);
+			Integer neighbor = grid.randomNeighbor(current, cell -> grid.get(cell) == UNVISITED);
 			if (neighbor != null) {
 				if (grid.randomNeighbor(neighbor, cell -> true) != null) {
 					stack.push(neighbor);

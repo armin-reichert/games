@@ -28,7 +28,7 @@ public class RecursiveDivisionApp extends GridSampleApp {
 			for (Integer cell : grid.vertexSequence()) {
 				grid.set(cell, TraversalState.COMPLETED);
 			}
-			new RecursiveDivision<>(grid).accept(startCell);
+			new RecursiveDivision(grid).accept(startCell);
 			new BFSAnimation(canvas, grid).runAnimation(startCell);
 			sleep(3000);
 			clear();

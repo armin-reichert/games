@@ -12,12 +12,12 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class RecursiveDivision<Cell> implements Consumer<Cell> {
+public class RecursiveDivision implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	private final Random rnd;
 
-	public RecursiveDivision(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public RecursiveDivision(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 		rnd = new Random();
 		grid.setEventsEnabled(false);
@@ -27,7 +27,7 @@ public class RecursiveDivision<Cell> implements Consumer<Cell> {
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		divide(0, 0, grid.numCols(), grid.numRows());
 	}
 
@@ -42,7 +42,7 @@ public class RecursiveDivision<Cell> implements Consumer<Cell> {
 			int passage = rnd.nextInt(w);
 			for (int i = 0; i < w; ++i) {
 				if (i != passage && grid.isValidCol(x + i) && grid.isValidRow(cutY - 1)) {
-					DefaultEdge<Cell> edge = grid.edge(grid.cell(x + i, cutY), grid.cell(x + i, cutY - 1));
+					DefaultEdge<Integer> edge = grid.edge(grid.cell(x + i, cutY), grid.cell(x + i, cutY - 1));
 					grid.removeEdge(edge);
 				}
 			}
@@ -54,7 +54,7 @@ public class RecursiveDivision<Cell> implements Consumer<Cell> {
 			int passage = rnd.nextInt(h);
 			for (int j = 0; j < h; ++j) {
 				if (j != passage && grid.isValidCol(cutX - 1) && grid.isValidRow(y + j)) {
-					DefaultEdge<Cell> edge = grid.edge(grid.cell(cutX, y + j), grid.cell(cutX - 1, y + j));
+					DefaultEdge<Integer> edge = grid.edge(grid.cell(cutX, y + j), grid.cell(cutX - 1, y + j));
 					grid.removeEdge(edge);
 				}
 			}

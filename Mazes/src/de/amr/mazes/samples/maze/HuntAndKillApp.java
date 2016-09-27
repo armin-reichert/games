@@ -23,7 +23,7 @@ public class HuntAndKillApp extends GridSampleApp {
 		Integer startCell = grid.cell(TOP_LEFT);
 		Stream.of(128, 64, 32, 16, 8, 4, 2).forEach(cellSize -> {
 			fitWindowSize(window.getWidth(), window.getHeight(), cellSize);
-			new HuntAndKill<>(grid).accept(startCell);
+			new HuntAndKill(grid).accept(startCell);
 			new BFSAnimation(canvas, grid).runAnimation(startCell);
 			sleep(3000);
 			clear();

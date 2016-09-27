@@ -18,17 +18,17 @@ import de.amr.easy.grid.iterators.traversals.PeanoCurve;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTPeanoCurve<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTPeanoCurve extends WilsonUST {
 
-	private final List<Cell> path;
+	private final List<Integer> path;
 
-	public WilsonUSTPeanoCurve(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTPeanoCurve(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 		path = new ArrayList<>();
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
+	protected Iterable<Integer> getCellSequence() {
 		int nextPow3 = nextPow(3, Math.max(grid.numCols(), grid.numRows()));
 		RawGrid squareGrid = new RawGrid(nextPow3, nextPow3);
 		Integer cell = squareGrid.cell(0, squareGrid.numRows() - 1);

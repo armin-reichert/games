@@ -12,20 +12,20 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTRandomCell<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTRandomCell extends WilsonUST {
 
-	private final List<Cell> cellsOutsideTree;
+	private final List<Integer> cellsOutsideTree;
 
-	public WilsonUSTRandomCell(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTRandomCell(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
-		cellsOutsideTree = new LinkedList<Cell>();
-		for (Cell cell : grid.vertexSequence()) {
+		cellsOutsideTree = new LinkedList<>();
+		for (Integer cell : grid.vertexSequence()) {
 			cellsOutsideTree.add(cell);
 		}
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		addCellToTree(start);
 		while (!cellsOutsideTree.isEmpty()) {
 			loopErasedRandomWalk(pickRandomCellOutsideTree());
@@ -33,18 +33,18 @@ public class WilsonUSTRandomCell<Cell> extends WilsonUST<Cell> {
 	}
 
 	@Override
-	protected void addCellToTree(Cell v) {
+	protected void addCellToTree(Integer v) {
 		super.addCellToTree(v);
 		cellsOutsideTree.remove(v);
 	}
 
-	protected void addEdge(Cell v, Cell w) {
-		grid.addEdge(new DefaultEdge<Cell>(v, w));
+	protected void addEdge(Integer v, Integer w) {
+		grid.addEdge(new DefaultEdge<>(v, w));
 		cellsOutsideTree.remove(v);
 		cellsOutsideTree.remove(w);
 	}
 
-	private Cell pickRandomCellOutsideTree() {
+	private Integer pickRandomCellOutsideTree() {
 		return cellsOutsideTree.get(rnd.nextInt(cellsOutsideTree.size()));
 	}
 }

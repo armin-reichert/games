@@ -10,19 +10,19 @@ import de.amr.easy.grid.iterators.traversals.RightToLeftSweep;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTRightToLeftSweep<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTRightToLeftSweep extends WilsonUST {
 
-	public WilsonUSTRightToLeftSweep(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTRightToLeftSweep(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
+	protected Iterable<Integer> getCellSequence() {
 		return new RightToLeftSweep<>(grid);
 	}
 
 	@Override
-	protected Cell modifyStartVertex(Cell start) {
+	protected Integer modifyStartVertex(Integer start) {
 		return grid.cell(grid.numCols() - 1, grid.numRows() - 1);
 	}
 }

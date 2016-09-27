@@ -11,20 +11,20 @@ import de.amr.easy.grid.iterators.traversals.ExpandingCircle;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTExpandingCircle<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTExpandingCircle extends WilsonUST {
 
-	public WilsonUSTExpandingCircle(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTExpandingCircle(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
-		Cell center = grid.cell(GridPosition.CENTER);
+	protected Iterable<Integer> getCellSequence() {
+		Integer center = grid.cell(GridPosition.CENTER);
 		return new ExpandingCircle<>(grid, center, 1, Math.max(grid.numCols(), grid.numRows()));
 	}
 
 	@Override
-	protected Cell modifyStartVertex(Cell start) {
+	protected Integer modifyStartVertex(Integer start) {
 		return grid.cell(GridPosition.CENTER);
 	}
 }

@@ -21,25 +21,25 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class RandomBFS<Cell> implements Consumer<Cell> {
+public class RandomBFS implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 
-	public RandomBFS(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public RandomBFS(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		final Random rnd = new Random();
-		final Set<Cell> mazeCells = new HashSet<>();
-		final List<Cell> frontier = new LinkedList<>();
+		final Set<Integer> mazeCells = new HashSet<>();
+		final List<Integer> frontier = new LinkedList<>();
 		mazeCells.add(start);
 		frontier.add(start);
 		grid.set(start, VISITED);
 		while (!frontier.isEmpty()) {
 			int index = frontier.size() == 1 ? 0 : rnd.nextInt(frontier.size());
-			Cell cell = frontier.remove(index);
+			Integer cell = frontier.remove(index);
 			/*@formatter:off*/
 			Stream.of(Direction.randomOrder())
 				.map(dir -> grid.neighbor(cell, dir))

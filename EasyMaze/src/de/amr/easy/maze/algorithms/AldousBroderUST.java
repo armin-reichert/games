@@ -39,22 +39,22 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class AldousBroderUST<Cell> implements Consumer<Cell> {
+public class AldousBroderUST implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	private int numMazeCells;
 
-	public AldousBroderUST(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public AldousBroderUST(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		numMazeCells = 0;
-		Cell u = start;
+		Integer u = start;
 		addToMaze(u);
 		while (numMazeCells < grid.vertexCount()) {
-			Cell v = grid.neighbor(u, Direction.randomValue());
+			Integer v = grid.neighbor(u, Direction.randomValue());
 			if (v != null) {
 				animate(v);
 				if (grid.get(v) == UNVISITED) {
@@ -66,12 +66,12 @@ public class AldousBroderUST<Cell> implements Consumer<Cell> {
 		}
 	}
 
-	private void addToMaze(Cell cell) {
+	private void addToMaze(Integer cell) {
 		grid.set(cell, COMPLETED);
 		++numMazeCells;
 	}
 
-	private void animate(Cell cell) {
+	private void animate(Integer cell) {
 		TraversalState state = grid.get(cell);
 		grid.set(cell, VISITED);
 		grid.set(cell, state);

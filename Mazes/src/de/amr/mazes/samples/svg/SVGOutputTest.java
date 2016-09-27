@@ -42,7 +42,7 @@ public class SVGOutputTest {
 	public SVGOutputTest() {
 		grid = new ObservableDataGrid<>(COLS, ROWS, UNVISITED);
 		svgRenderer = new SVGGridRenderer<>(grid, CELLSIZE);
-		mazeGenerator = new IterativeDFS<>(grid);
+		mazeGenerator = new IterativeDFS(grid);
 		StopWatch watch = new StopWatch();
 		watch.start();
 		mazeGenerator.accept(grid.cell(TOP_LEFT));

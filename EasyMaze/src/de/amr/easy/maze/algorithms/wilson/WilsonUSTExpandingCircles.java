@@ -16,23 +16,23 @@ import de.amr.easy.grid.iterators.traversals.ExpandingCircle;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTExpandingCircles<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTExpandingCircles extends WilsonUST {
 
-	public WilsonUSTExpandingCircles(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTExpandingCircles(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	protected Cell modifyStartVertex(Cell start) {
+	protected Integer modifyStartVertex(Integer start) {
 		return grid.cell(CENTER);
 	}
 
 	@Override
-	protected Iterable<Cell> getCellSequence() {
-		return new Iterable<Cell>() {
+	protected Iterable<Integer> getCellSequence() {
+		return new Iterable<Integer>() {
 
 			@Override
-			public Iterator<Cell> iterator() {
+			public Iterator<Integer> iterator() {
 				int w = grid.numCols(), h = grid.numRows(), r = Math.max(w / 2, h / 2);
 				/*@formatter:off*/
 				return sequence(
@@ -60,7 +60,7 @@ public class WilsonUSTExpandingCircles<Cell> extends WilsonUST<Cell> {
 		};
 	}
 
-	private Iterator<Cell> expandingCircle(int centerX, int centerY, int rmin, int rmax) {
+	private Iterator<Integer> expandingCircle(int centerX, int centerY, int rmin, int rmax) {
 		return new ExpandingCircle<>(grid, grid.cell(centerX, centerY), rmin, rmax).iterator();
 	}
 }

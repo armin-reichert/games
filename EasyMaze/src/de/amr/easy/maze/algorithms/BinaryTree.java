@@ -15,37 +15,37 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class BinaryTree<Cell> implements Consumer<Cell> {
+public class BinaryTree implements Consumer<Integer> {
 
-	protected final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	protected final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	private final Random rnd = new Random();
 
-	public BinaryTree(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public BinaryTree(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
-		for (Cell cell : getCells()) {
-			Cell neighbor = getRandomNeighbor(cell, Direction.S, Direction.E);
+	public void accept(Integer start) {
+		for (Integer cell : getCells()) {
+			Integer neighbor = getRandomNeighbor(cell, Direction.S, Direction.E);
 			if (neighbor != null) {
-				grid.addEdge(new DefaultEdge<Cell>(cell, neighbor));
+				grid.addEdge(new DefaultEdge<>(cell, neighbor));
 				grid.set(cell, COMPLETED);
 				grid.set(neighbor, COMPLETED);
 			}
 		}
 	}
 
-	private Cell getRandomNeighbor(Cell cell, Direction d1, Direction d2) {
+	private Integer getRandomNeighbor(Integer cell, Direction d1, Direction d2) {
 		boolean b = rnd.nextBoolean();
-		Cell neighbor = grid.neighbor(cell, b ? d1 : d2);
+		Integer neighbor = grid.neighbor(cell, b ? d1 : d2);
 		return neighbor != null ? neighbor : grid.neighbor(cell, b ? d2 : d1);
 	}
 
 	/*
 	 * Can be overriden by subclass to specify different cell iteration.
 	 */
-	protected Iterable<Cell> getCells() {
+	protected Iterable<Integer> getCells() {
 		return grid.vertexSequence();
 	}
 }

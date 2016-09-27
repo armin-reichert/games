@@ -23,7 +23,7 @@ public class PrimMSTApp extends GridSampleApp {
 		Integer startCell = grid.cell(TOP_LEFT);
 		Stream.of(128, 64, 32, 16, 8, 4, 2).forEach(cellSize -> {
 			fitWindowSize(window.getWidth(), window.getHeight(), cellSize);
-			new PrimMST<>(grid).accept(startCell);
+			new PrimMST(grid).accept(startCell);
 			new BFSAnimation(canvas, grid).runAnimation(startCell);
 			sleep(3000);
 			clear();

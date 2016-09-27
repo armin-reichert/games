@@ -28,30 +28,30 @@ import de.amr.easy.maze.datastructures.Partition.EquivClass;
  * 
  * @author Armin Reichert
  */
-public class EllerInsideOut<Cell> implements Consumer<Cell> {
+public class EllerInsideOut implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
 	private final RawGrid squareGrid;
 	private final Random rnd;
-	private final Partition<Cell> mazeParts;
+	private final Partition<Integer> mazeParts;
 	private Square<Integer> square;
-	private Iterable<Cell> layer;
-	private Map<Cell, Integer> cellIndex;
+	private Iterable<Integer> layer;
+	private Map<Integer, Integer> cellIndex;
 	private final int offsetX;
 	private final int offsetY;
 
-	public EllerInsideOut(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public EllerInsideOut(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 		int n = Math.max(grid.numCols(), grid.numRows());
 		offsetX = (n - grid.numCols()) / 2;
 		offsetY = (n - grid.numRows()) / 2;
 		squareGrid = new RawGrid(n, n);
 		rnd = new Random();
-		mazeParts = new Partition<Cell>();
+		mazeParts = new Partition<>();
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		while (nextLayer() <= squareGrid.numCols()) {
 			connectCellsInsideLayer(false);
 			connectCellsWithNextLayer();
@@ -67,7 +67,7 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 	private int nextLayer() {
 		int x, y, size;
 		if (square == null) {
-			Cell center = grid.cell(GridPosition.CENTER);
+			Integer center = grid.cell(GridPosition.CENTER);
 			x = grid.col(center) + offsetX;
 			y = grid.row(center) + offsetY;
 			size = 1;
@@ -83,15 +83,15 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 		return size;
 	}
 
-	private List<Cell> croppedLayer() {
-		List<Cell> result = new ArrayList<>();
+	private List<Integer> croppedLayer() {
+		List<Integer> result = new ArrayList<>();
 		cellIndex = new HashMap<>();
 		int index = 0;
 		for (Integer cell : square) {
 			int x = squareGrid.col(cell) - offsetX;
 			int y = squareGrid.row(cell) - offsetY;
 			if (grid.isValidCol(x) && grid.isValidRow(y)) {
-				Cell gridCell = grid.cell(x, y);
+				Integer gridCell = grid.cell(x, y);
 				result.add(gridCell);
 				cellIndex.put(gridCell, index);
 			}
@@ -100,20 +100,20 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 		return result;
 	}
 
-	private void connectCells(Cell v, Cell w) {
+	private void connectCells(Integer v, Integer w) {
 		if (grid.adjacent(v, w)) {
 			return;
 		}
 		// System.out.println(coord(v) + "->" + coord(w));
-		grid.addEdge(new DefaultEdge<Cell>(v, w));
+		grid.addEdge(new DefaultEdge<>(v, w));
 		grid.set(v, COMPLETED);
 		grid.set(w, COMPLETED);
 		mazeParts.union(mazeParts.find(v), mazeParts.find(w));
 	}
 
 	private void connectCellsInsideLayer(boolean all) {
-		Cell prevCell = null, firstCell = null;
-		for (Cell cell : layer) {
+		Integer prevCell = null, firstCell = null;
+		for (Integer cell : layer) {
 			if (firstCell == null) {
 				firstCell = cell;
 			}
@@ -141,30 +141,30 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 		// randomly select cells and connect with next layer unless another cell from the same
 		// equivalence class is already
 		// connected to the next layer
-		for (Cell cell : layer) {
+		for (Integer cell : layer) {
 			if (rnd.nextBoolean() && !connected.contains(mazeParts.find(cell))) {
-				List<Cell> candidates = getNeighborsInNextLayer(cell);
+				List<Integer> candidates = getNeighborsInNextLayer(cell);
 				if (!candidates.isEmpty()) {
-					Cell neighbor = candidates.get(rnd.nextInt(candidates.size()));
+					Integer neighbor = candidates.get(rnd.nextInt(candidates.size()));
 					connectCells(cell, neighbor);
 					connected.add(mazeParts.find(cell));
 				}
 			}
 		}
 		// collect cells of still unconnected maze parts and shuffle them to avoid biased maze
-		List<Cell> unconnectedCells = new ArrayList<>();
-		for (Cell cell : layer) {
+		List<Integer> unconnectedCells = new ArrayList<>();
+		for (Integer cell : layer) {
 			if (!connected.contains(mazeParts.find(cell))) {
 				unconnectedCells.add(cell);
 			}
 		}
 		Collections.shuffle(unconnectedCells);
 		// connect remaining cells and mark maze parts as connected
-		for (Cell cell : unconnectedCells) {
+		for (Integer cell : unconnectedCells) {
 			if (!connected.contains(mazeParts.find(cell))) {
-				List<Cell> candidates = getNeighborsInNextLayer(cell);
+				List<Integer> candidates = getNeighborsInNextLayer(cell);
 				if (!candidates.isEmpty()) {
-					Cell neighbor = candidates.get(rnd.nextInt(candidates.size()));
+					Integer neighbor = candidates.get(rnd.nextInt(candidates.size()));
 					connectCells(cell, neighbor);
 					connected.add(mazeParts.find(cell));
 				}
@@ -172,8 +172,8 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 		}
 	}
 
-	private List<Cell> getNeighborsInNextLayer(Cell cell) {
-		List<Cell> result = new ArrayList<>(4);
+	private List<Integer> getNeighborsInNextLayer(Integer cell) {
+		List<Integer> result = new ArrayList<>(4);
 		int squareSize = square.getSize();
 		if (squareSize == 1) {
 			addNeighborIfAny(cell, Direction.N, result);
@@ -207,14 +207,14 @@ public class EllerInsideOut<Cell> implements Consumer<Cell> {
 		return result;
 	}
 
-	private void addNeighborIfAny(Cell cell, Direction dir, List<Cell> list) {
-		Cell neighbour = grid.neighbor(cell, dir);
+	private void addNeighborIfAny(Integer cell, Direction dir, List<Integer> list) {
+		Integer neighbour = grid.neighbor(cell, dir);
 		if (neighbour != null) {
 			list.add(neighbour);
 		}
 	}
 
-	private boolean areNeighbors(Cell c, Cell d) {
+	private boolean areNeighbors(Integer c, Integer d) {
 		return d.equals(grid.neighbor(c, Direction.N)) || d.equals(grid.neighbor(c, Direction.E))
 				|| d.equals(grid.neighbor(c, Direction.S)) || d.equals(grid.neighbor(c, Direction.W));
 	}

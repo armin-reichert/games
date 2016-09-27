@@ -21,22 +21,22 @@ import de.amr.easy.grid.api.ObservableDataGrid2D;
  * 
  * @author Armin Reichert
  */
-public class PrimMST<Cell> implements Consumer<Cell> {
+public class PrimMST implements Consumer<Integer> {
 
-	private final ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid;
-	private final Set<Cell> mazeCells = new HashSet<>();
-	private final PriorityQueue<DefaultWeightedEdge<Cell>> cut = new PriorityQueue<>();
+	private final ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid;
+	private final Set<Integer> mazeCells = new HashSet<>();
+	private final PriorityQueue<DefaultWeightedEdge<Integer>> cut = new PriorityQueue<>();
 
-	public PrimMST(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public PrimMST(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		this.grid = grid;
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		expandMazeAtCell(start);
 		while (!cut.isEmpty()) {
-			DefaultWeightedEdge<Cell> edge = cut.poll();
-			Cell p = edge.either(), q = edge.other(p);
+			DefaultWeightedEdge<Integer> edge = cut.poll();
+			Integer p = edge.either(), q = edge.other(p);
 			if (!mazeCells.contains(p) || !mazeCells.contains(q)) {
 				grid.addEdge(edge);
 				expandMazeAtCell(mazeCells.contains(p) ? q : p);
@@ -44,7 +44,7 @@ public class PrimMST<Cell> implements Consumer<Cell> {
 		}
 	}
 
-	private void expandMazeAtCell(Cell cell) {
+	private void expandMazeAtCell(Integer cell) {
 		Random rnd = new Random();
 		mazeCells.add(cell);
 		grid.set(cell, COMPLETED);

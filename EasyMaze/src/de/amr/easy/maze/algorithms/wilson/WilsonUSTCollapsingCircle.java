@@ -13,18 +13,18 @@ import de.amr.easy.grid.iterators.shapes.Circle;
  * 
  * @author Armin Reichert
  */
-public class WilsonUSTCollapsingCircle<Cell> extends WilsonUST<Cell> {
+public class WilsonUSTCollapsingCircle extends WilsonUST {
 
-	public WilsonUSTCollapsingCircle(ObservableDataGrid2D<Cell, DefaultEdge<Cell>, TraversalState> grid) {
+	public WilsonUSTCollapsingCircle(ObservableDataGrid2D<Integer, DefaultEdge<Integer>, TraversalState> grid) {
 		super(grid);
 	}
 
 	@Override
-	public void accept(Cell start) {
+	public void accept(Integer start) {
 		addCellToTree(start);
-		Cell center = grid.cell(CENTER);
+		Integer center = grid.cell(CENTER);
 		for (int radius = max(grid.numRows(), grid.numCols()) - 1; radius >= 0; radius--) {
-			for (Cell walkStart : new Circle<>(grid, center, radius)) {
+			for (Integer walkStart : new Circle<>(grid, center, radius)) {
 				if (!isCellInTree(walkStart)) {
 					loopErasedRandomWalk(walkStart);
 				}
