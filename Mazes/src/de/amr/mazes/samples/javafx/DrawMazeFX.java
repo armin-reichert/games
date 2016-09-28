@@ -3,28 +3,50 @@ package de.amr.mazes.samples.javafx;
 import static de.amr.easy.graph.api.TraversalState.UNVISITED;
 import static de.amr.easy.grid.api.GridPosition.BOTTOM_RIGHT;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 import de.amr.easy.graph.api.TraversalState;
-import de.amr.easy.graph.impl.DefaultEdge;
 import de.amr.easy.graph.traversal.BreadthFirstTraversal;
+import de.amr.easy.grid.api.ObservableDataGrid2D;
 import de.amr.easy.grid.impl.ObservableDataGrid;
+import de.amr.easy.maze.algorithms.IterativeDFS;
 import de.amr.easy.maze.algorithms.KruskalMST;
+import de.amr.easy.maze.algorithms.PrimMST;
+import de.amr.easy.maze.algorithms.RandomBFS;
+import de.amr.easy.maze.algorithms.RecursiveDivision;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+/**
+ * Generates mazes using different generation algorithms, draws them and shows the path from top
+ * left to bottom right cell.
+ * <p>
+ * By pressing the PLUS-/MINUS-key the user can change the grid resolution.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class DrawMazeFX extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
 	}
+
+	private static final int MAZE_WIDTH = 1000;
+	private static final Random RAND = new Random();
+	private static final Class<?> GENERATOR_CLASSES[] = { KruskalMST.class, PrimMST.class, IterativeDFS.class,
+			RandomBFS.class, RecursiveDivision.class };
 
 	private Canvas canvas;
 	private Timer timer;
@@ -34,9 +56,14 @@ public class DrawMazeFX extends Application {
 	private int cellSize;
 
 	public DrawMazeFX() {
-		cols = 100;
-		rows = 50;
 		cellSize = 16;
+		computeGridSize();
+	}
+
+	private void computeGridSize() {
+		cols = MAZE_WIDTH / cellSize;
+		rows = cols / 2;
+		System.out.println(String.format("Cellsize: %d, cols: %d, rows: %d", cellSize, cols, rows));
 	}
 
 	@Override
@@ -45,12 +72,7 @@ public class DrawMazeFX extends Application {
 		canvas = new Canvas((cols + 1) * cellSize, (rows + 1) * cellSize);
 		root.getChildren().add(canvas);
 		Scene scene = new Scene(root);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Maze Generation & Pathfinding");
-		// primaryStage.setFullScreen(true);
-		primaryStage.setOnCloseRequest(event -> timer.cancel());
-		primaryStage.show();
-		
+
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 
@@ -58,17 +80,49 @@ public class DrawMazeFX extends Application {
 			public void run() {
 				Platform.runLater(DrawMazeFX.this::nextMaze);
 			}
-		}, 0, 3000);
+		}, 0, 2000);
+
+		scene.setOnKeyPressed(event -> {
+			if (event.getCode() == KeyCode.MINUS) {
+				if (cellSize < 128) {
+					cellSize *= 2;
+					computeGridSize();
+				}
+			} else if (event.getCode() == KeyCode.PLUS) {
+				if (cellSize > 4) {
+					cellSize /= 2;
+					computeGridSize();
+				}
+			}
+		});
+
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Maze Generation & Pathfinding");
+		primaryStage.setOnCloseRequest(event -> timer.cancel());
+		primaryStage.show();
 	}
 
 	private void nextMaze() {
 		maze = new ObservableDataGrid<>(cols, rows, UNVISITED);
 		canvas.resize((cols + 1) * cellSize, (rows + 1) * cellSize);
-		new KruskalMST(maze).accept(maze.cell(0, 0));
+		Consumer<Integer> generator = randomMazeGenerator();
+		generator.accept(maze.cell(0, 0));
 		drawGrid(canvas.getGraphicsContext2D());
-		BreadthFirstTraversal<Integer, DefaultEdge<Integer>> bfs = new BreadthFirstTraversal<>(maze, maze.cell(0, 0));
+		BreadthFirstTraversal<Integer, ?> bfs = new BreadthFirstTraversal<>(maze, maze.cell(0, 0));
 		bfs.run();
 		drawPath(bfs.findPath(maze.cell(BOTTOM_RIGHT)), canvas.getGraphicsContext2D());
+	}
+
+	@SuppressWarnings("unchecked")
+	private Consumer<Integer> randomMazeGenerator() {
+		Class<?> generatorClass = GENERATOR_CLASSES[RAND.nextInt(GENERATOR_CLASSES.length)];
+		try {
+			return (Consumer<Integer>) generatorClass.getConstructor(ObservableDataGrid2D.class).newInstance(maze);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not create maze generator instance");
+		}
 	}
 
 	private void drawGrid(GraphicsContext gc) {
