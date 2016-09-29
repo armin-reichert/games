@@ -107,10 +107,10 @@ public class DrawMazeFX extends Application {
 		canvas.resize((cols + 1) * cellSize, (rows + 1) * cellSize);
 		Consumer<Integer> generator = randomMazeGenerator();
 		generator.accept(maze.cell(0, 0));
-		drawGrid(canvas.getGraphicsContext2D());
+		drawGrid();
 		BreadthFirstTraversal<Integer, ?> bfs = new BreadthFirstTraversal<>(maze, maze.cell(0, 0));
 		bfs.run();
-		drawPath(bfs.findPath(maze.cell(BOTTOM_RIGHT)), canvas.getGraphicsContext2D());
+		drawPath(bfs.findPath(maze.cell(BOTTOM_RIGHT)));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -125,7 +125,13 @@ public class DrawMazeFX extends Application {
 		}
 	}
 
-	private void drawGrid(GraphicsContext gc) {
+	private void drawPassage(Integer u, Integer v) {
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		gc.strokeLine(maze.col(u) * cellSize, maze.row(u) * cellSize, maze.col(v) * cellSize, maze.row(v) * cellSize);
+	}
+
+	private void drawGrid() {
+		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.setFill(Color.BLACK);
 		gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -134,19 +140,20 @@ public class DrawMazeFX extends Application {
 		gc.setLineWidth(cellSize / 2);
 		maze.edgeSequence().forEach(edge -> {
 			Integer u = edge.either(), v = edge.other(u);
-			gc.strokeLine(maze.col(u) * cellSize, maze.row(u) * cellSize, maze.col(v) * cellSize, maze.row(v) * cellSize);
+			drawPassage(u, v);
 		});
 		gc.translate(-cellSize, -cellSize);
 	}
 
-	private void drawPath(Iterable<Integer> path, GraphicsContext gc) {
+	private void drawPath(Iterable<Integer> path) {
+		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.setStroke(Color.RED);
 		gc.setLineWidth(cellSize / 4);
 		gc.translate(cellSize, cellSize);
 		Integer u = null;
 		for (Integer v : path) {
 			if (u != null) {
-				gc.strokeLine(maze.col(u) * cellSize, maze.row(u) * cellSize, maze.col(v) * cellSize, maze.row(v) * cellSize);
+				drawPassage(u, v);
 			}
 			u = v;
 		}
