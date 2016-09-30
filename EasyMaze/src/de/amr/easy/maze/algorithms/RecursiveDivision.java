@@ -42,8 +42,8 @@ public class RecursiveDivision implements Consumer<Integer> {
 			int passage = rnd.nextInt(w);
 			for (int i = 0; i < w; ++i) {
 				if (i != passage && grid.isValidCol(x + i) && grid.isValidRow(cutY - 1)) {
-					DefaultEdge<Integer> edge = grid.edge(grid.cell(x + i, cutY), grid.cell(x + i, cutY - 1));
-					grid.removeEdge(edge);
+					Integer u = grid.cell(x + i, cutY), v = grid.cell(x + i, cutY - 1);
+					grid.removeEdge(grid.edge(u, v));
 				}
 			}
 			divide(x, y, w, cutY - y);
@@ -54,8 +54,8 @@ public class RecursiveDivision implements Consumer<Integer> {
 			int passage = rnd.nextInt(h);
 			for (int j = 0; j < h; ++j) {
 				if (j != passage && grid.isValidCol(cutX - 1) && grid.isValidRow(y + j)) {
-					DefaultEdge<Integer> edge = grid.edge(grid.cell(cutX, y + j), grid.cell(cutX - 1, y + j));
-					grid.removeEdge(edge);
+					Integer u = grid.cell(cutX, y + j), v = grid.cell(cutX - 1, y + j);
+					grid.removeEdge(grid.edge(u, v));
 				}
 			}
 			divide(x, y, cutX - x, h);
