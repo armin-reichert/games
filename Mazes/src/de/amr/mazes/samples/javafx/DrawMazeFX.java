@@ -3,7 +3,6 @@ package de.amr.mazes.samples.javafx;
 import static de.amr.easy.graph.api.TraversalState.UNVISITED;
 import static de.amr.easy.grid.api.GridPosition.BOTTOM_RIGHT;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -118,8 +117,7 @@ public class DrawMazeFX extends Application {
 		Class<?> generatorClass = GENERATOR_CLASSES[RAND.nextInt(GENERATOR_CLASSES.length)];
 		try {
 			return (Consumer<Integer>) generatorClass.getConstructor(ObservableDataGrid2D.class).newInstance(maze);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Could not create maze generator instance");
 		}
