@@ -3,12 +3,13 @@ package de.amr.easy.game.math.test;
 import static de.amr.easy.game.math.Vector2.angle;
 import static de.amr.easy.game.math.Vector2.diff;
 import static de.amr.easy.game.math.Vector2.dist;
+import static de.amr.easy.game.math.Vector2.dot;
 import static de.amr.easy.game.math.Vector2.inverse;
 import static de.amr.easy.game.math.Vector2.nullVector;
-import static de.amr.easy.game.math.Vector2.dot;
 import static de.amr.easy.game.math.Vector2.sum;
 import static de.amr.easy.game.math.Vector2.times;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
