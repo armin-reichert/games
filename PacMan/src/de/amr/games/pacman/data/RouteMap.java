@@ -45,7 +45,7 @@ public class RouteMap {
 		Integer pred = null;
 		for (Integer cell : pathFinder.findPath(targetCell)) {
 			if (pred != null) {
-				route.add(gridGraph.direction(pred, cell));
+				route.add(gridGraph.direction(pred, cell).get());
 			}
 			pred = cell;
 		}
