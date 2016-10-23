@@ -2,7 +2,7 @@ package de.amr.games.pacman.data;
 
 import java.util.Optional;
 
-import de.amr.easy.grid.impl.DataGrid;
+import de.amr.easy.grid.impl.Grid;
 
 public class Board {
 
@@ -36,12 +36,12 @@ public class Board {
 	public static final char Tunnel = 'T';
 	public static final char Wormhole = 'W';
 
-	public DataGrid<Character> grid;
+	public Grid<Character> grid;
 	private final String[] rows;
 
 	public Board(String boardData) {
 		rows = boardData.split("\n");
-		grid = new DataGrid<>(Cols, Rows, Empty, false);
+		grid = new Grid<>(Cols, Rows, Empty, false);
 		init();
 	}
 

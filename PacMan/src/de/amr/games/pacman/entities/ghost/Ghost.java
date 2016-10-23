@@ -152,7 +152,7 @@ public class Ghost extends BasePacManEntity {
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		for (Direction dir : Direction.randomOrder()) {
+		for (Direction dir : Direction.valuesPermuted()) {
 			Tile targetTile = currentTile().translate(dir.dx, dir.dy);
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
