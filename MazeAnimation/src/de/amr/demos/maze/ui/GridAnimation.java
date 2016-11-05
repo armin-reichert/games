@@ -10,19 +10,22 @@ import de.amr.easy.graph.api.event.EdgeAddedEvent;
 import de.amr.easy.graph.api.event.EdgeChangeEvent;
 import de.amr.easy.graph.api.event.EdgeRemovedEvent;
 import de.amr.easy.graph.api.event.GraphObserver;
+import de.amr.easy.graph.api.event.GraphTraversalListener;
 import de.amr.easy.graph.api.event.VertexChangeEvent;
 import de.amr.easy.grid.api.ObservableGrid2D;
 import de.amr.easy.grid.rendering.swing.SwingGridRenderer;
 
-public class GridAnimation implements GraphObserver<Integer, WeightedEdge<Integer>> {
+public class GridAnimation
+		implements GraphTraversalListener<Integer>, GraphObserver<Integer, WeightedEdge<Integer, Integer>> {
 
-	private final ObservableGrid2D<TraversalState> grid;
+	private final ObservableGrid2D<TraversalState,Integer> grid;
 	private final BufferedImage canvas;
 	private final SwingGridRenderer renderer;
 	private int delay;
 
-	public GridAnimation(ObservableGrid2D<TraversalState> grid, int gridCellSize, int width, int height) {
+	public GridAnimation(ObservableGrid2D<TraversalState,Integer> grid, int gridCellSize, int width, int height) {
 		this.grid = grid;
+		grid.addGraphObserver(this);
 		canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		renderer = new SwingGridRenderer();
 		setRenderingModel(new GridVisualization(grid, gridCellSize));
@@ -70,35 +73,48 @@ public class GridAnimation implements GraphObserver<Integer, WeightedEdge<Intege
 		}
 	}
 
-	// graph listener:
+	@Override
+	public void edgeTouched(Integer source, Integer target) {
+		delay();
+		if (grid.edge(source, target).isPresent()) {
+			renderer.drawPassage(getDrawGraphics(), grid, grid.edge(source, target).get(), true);
+		} else {
+			renderer.drawPassage(getDrawGraphics(), grid, null, false);
+		}
+	}
 
 	@Override
-	public void vertexChanged(VertexChangeEvent<Integer, WeightedEdge<Integer>> event) {
+	public void vertexTouched(Integer vertex, TraversalState oldState, TraversalState newState) {
+		delay();
+		renderer.drawCell(getDrawGraphics(), grid, vertex);
+	}
+
+	@Override
+	public void vertexChanged(VertexChangeEvent<Integer, WeightedEdge<Integer, Integer>> event) {
 		delay();
 		renderer.drawCell(getDrawGraphics(), grid, event.getVertex());
 	}
 
 	@Override
-	public void edgeChanged(EdgeChangeEvent<Integer, WeightedEdge<Integer>> event) {
+	public void edgeChanged(EdgeChangeEvent<Integer, WeightedEdge<Integer, Integer>> event) {
 		delay();
 		renderer.drawPassage(getDrawGraphics(), grid, event.getEdge(), true);
 	}
 
 	@Override
-	public void edgeAdded(EdgeAddedEvent<Integer, WeightedEdge<Integer>> event) {
+	public void edgeAdded(EdgeAddedEvent<Integer, WeightedEdge<Integer, Integer>> event) {
 		delay();
 		renderer.drawPassage(getDrawGraphics(), grid, event.getEdge(), true);
 	}
 
 	@Override
-	public void edgeRemoved(EdgeRemovedEvent<Integer, WeightedEdge<Integer>> event) {
+	public void edgeRemoved(EdgeRemovedEvent<Integer, WeightedEdge<Integer, Integer>> event) {
 		delay();
 		renderer.drawPassage(getDrawGraphics(), grid, event.getEdge(), false);
 	}
 
 	@Override
-	public void graphChanged(ObservableGraph<Integer, WeightedEdge<Integer>> graph) {
-		delay();
+	public void graphChanged(ObservableGraph<Integer, WeightedEdge<Integer, Integer>> graph) {
 		renderer.drawGrid(getDrawGraphics(), grid);
 	}
 }

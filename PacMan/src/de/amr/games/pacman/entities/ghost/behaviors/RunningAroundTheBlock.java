@@ -1,6 +1,6 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.fsm.State;
@@ -9,14 +9,14 @@ public class RunningAroundTheBlock extends State {
 
 	private final Ghost ghost;
 	private final Tile target;
-	private final Direction cycleStartDir;
+	private final Dir4 cycleStartDir;
 	private final boolean cycleClockwise;
 
 	private int pathIndex;
 	private Tile next;
 	private boolean targetReached;
 
-	public RunningAroundTheBlock(Ghost ghost, int targetRow, int targetCol, Direction cycleStartDir,
+	public RunningAroundTheBlock(Ghost ghost, int targetRow, int targetCol, Dir4 cycleStartDir,
 			boolean cycleClockwise) {
 		this.ghost = ghost;
 		this.target = new Tile(targetRow, targetCol);
@@ -55,13 +55,13 @@ public class RunningAroundTheBlock extends State {
 		}
 	}
 
-	private void computePathAroundWall(Tile start, Direction dir, boolean clockwise) {
+	private void computePathAroundWall(Tile start, Dir4 dir, boolean clockwise) {
 		ghost.route.clear();
 		pathIndex = 0;
 		next = new Tile(start);
 		extendPath(dir);
 		while (!next.equals(start)) {
-			Direction turn = clockwise ? dir.right() : dir.left();
+			Dir4 turn = clockwise ? dir.right() : dir.left();
 			if (ghost.canEnter(new Tile(next).translate(turn.dx, turn.dy))) {
 				dir = extendPath(turn);
 			} else if (ghost.canEnter(new Tile(next).translate(dir.dx, dir.dy))) {
@@ -72,7 +72,7 @@ public class RunningAroundTheBlock extends State {
 		}
 	}
 
-	private Direction extendPath(Direction dir) {
+	private Dir4 extendPath(Dir4 dir) {
 		ghost.route.add(dir);
 		next.translate(dir.dx, dir.dy);
 		return dir;
@@ -83,14 +83,14 @@ public class RunningAroundTheBlock extends State {
 		if (!ghost.isExactlyOverTile()) {
 			return;
 		}
-		Direction dir = getNextPathDir();
+		Dir4 dir = getNextPathDir();
 		if (ghost.canMoveTowards(dir)) {
 			ghost.changeMoveDir(dir);
 			pathIndex = (pathIndex + 1) == ghost.route.size() ? 0 : pathIndex + 1;
 		}
 	}
 
-	private Direction getNextPathDir() {
+	private Dir4 getNextPathDir() {
 		return ghost.route.get(pathIndex < ghost.route.size() - 1 ? pathIndex + 1 : 0);
 	}
 }

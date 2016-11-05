@@ -2,10 +2,10 @@ package de.amr.games.pacman.entities;
 
 import static de.amr.easy.game.Application.Entities;
 import static de.amr.easy.game.Application.Settings;
-import static de.amr.easy.grid.api.Direction.E;
-import static de.amr.easy.grid.api.Direction.N;
-import static de.amr.easy.grid.api.Direction.S;
-import static de.amr.easy.grid.api.Direction.W;
+import static de.amr.easy.grid.api.Dir4.E;
+import static de.amr.easy.grid.api.Dir4.N;
+import static de.amr.easy.grid.api.Dir4.S;
+import static de.amr.easy.grid.api.Dir4.W;
 import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.BonusCol;
 import static de.amr.games.pacman.data.Board.BonusRow;
@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -128,7 +128,7 @@ public class PacMan extends BasePacManEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		for (Direction dir : Direction.values()) {
+		for (Dir4 dir : Dir4.values()) {
 			getTheme().getPacManRunning(dir).setAnimated(animated);
 		}
 	}
@@ -177,7 +177,7 @@ public class PacMan extends BasePacManEntity {
 		/*@formatter:on*/
 	}
 
-	private Direction computeMoveDir() {
+	private Dir4 computeMoveDir() {
 		if (Key.down(VK_LEFT)) {
 			return W;
 		}

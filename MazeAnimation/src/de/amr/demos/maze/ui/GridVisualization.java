@@ -8,10 +8,10 @@ import de.amr.easy.grid.rendering.swing.SwingDefaultGridRenderingModel;
 
 public class GridVisualization extends SwingDefaultGridRenderingModel {
 
-	protected final ObservableGrid2D<TraversalState> grid;
+	protected final ObservableGrid2D<TraversalState,Integer> grid;
 	private final int gridCellSize;
 
-	public GridVisualization(ObservableGrid2D<TraversalState> grid, int gridCellSize) {
+	public GridVisualization(ObservableGrid2D<TraversalState,Integer> grid, int gridCellSize) {
 		this.grid = grid;
 		this.gridCellSize = gridCellSize;
 	}

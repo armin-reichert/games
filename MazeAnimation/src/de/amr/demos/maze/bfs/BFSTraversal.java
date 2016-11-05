@@ -20,8 +20,8 @@ import de.amr.easy.grid.impl.ObservableGrid;
 
 public class BFSTraversal extends Scene<MazeDemo> {
 
-	private ObservableGrid<TraversalState> grid;
-	private BreadthFirstTraversal<Integer, WeightedEdge<Integer>> bfs;
+	private ObservableGrid<TraversalState,Integer> grid;
+	private BreadthFirstTraversal<Integer, WeightedEdge<Integer,Integer>> bfs;
 	private GridAnimation animation;
 	private Thread bfsRunner;
 	private Integer startCell;
@@ -38,10 +38,8 @@ public class BFSTraversal extends Scene<MazeDemo> {
 		grid = getApp().getGrid();
 		startCell = grid.cell(GridPosition.TOP_LEFT);
 		animation = getApp().getAnimation();
-		animation.graphChanged(grid);
 		bfsRunner = new Thread(() -> {
 			animation.setDelay(0);
-			grid.removeGraphObserver(animation);
 			Log.info("Start first BFS to compute maximum distance:");
 			bfs = new BreadthFirstTraversal<>(grid, startCell);
 			bfs.findPath(startCell);
@@ -50,13 +48,14 @@ public class BFSTraversal extends Scene<MazeDemo> {
 			Log.info("Max distance: " + maxDistance);
 			animation.setRenderingModel(
 					new BFSAnimationRenderingModel(grid, Application.Settings.getInt("cellSize"), bfs, maxDistance));
-			grid.addGraphObserver(animation);
 			animation.setDelay(0);
 			Log.info("Start second, animated BFS:");
+			bfs.addObserver(animation);
 			bfs.findPath(startCell);
+			bfs.removeObserver(animation);
 			Log.info("BFS finished.");
 		}, "BreadFirstTraversal");
-		grid.clear();
+		grid.clearContent();
 		bfsRunner.start();
 		Log.info("BFS animation screen initialized.");
 	}
@@ -85,11 +84,9 @@ public class BFSTraversal extends Scene<MazeDemo> {
 
 	private void stopBreadthFirstTraversal() {
 		Log.info("Stopping BFS");
-		grid.removeGraphObserver(animation);
 		while (bfsRunner.isAlive()) {
 			/* wait for BFS thread to finish */
 		}
-		grid.addGraphObserver(animation);
 		Log.info("BFS finished");
 	}
 }

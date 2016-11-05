@@ -2,7 +2,7 @@ package de.amr.games.pacman.entities.ghost.behaviors;
 
 import static de.amr.games.pacman.PacManGame.Data;
 
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -32,7 +32,7 @@ public class DirectOrProactiveChasing extends State {
 		if (Data.board.isTileValid(targetTile)) {
 			chasingGhost.computeRoute(targetTile);
 			if (!chasingGhost.route.isEmpty()) {
-				Direction chaseDir = chasingGhost.route.get(0);
+				Dir4 chaseDir = chasingGhost.route.get(0);
 				if (chaseDir == chasingGhost.moveDir.inverse()) {
 					chasingGhost.move();
 					return;

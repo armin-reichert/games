@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.BasePacManEntity;
 import de.amr.games.pacman.entities.PacMan;
@@ -43,7 +43,7 @@ public class Ghost extends BasePacManEntity {
 
 	public Supplier<GhostState> stateAfterFrightened;
 	public final Color color;
-	public final List<Direction> route = new LinkedList<>();
+	public final List<Dir4> route = new LinkedList<>();
 	public final StateMachine<GhostState> control;
 	private GhostAction action;
 
@@ -131,7 +131,7 @@ public class Ghost extends BasePacManEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		for (Direction dir : Direction.values()) {
+		for (Dir4 dir : Dir4.values()) {
 			getTheme().getGhostNormal(GhostName.valueOf(getName()), dir).setAnimated(animated);
 			getTheme().getGhostDead(dir).setAnimated(animated);
 		}
@@ -152,7 +152,7 @@ public class Ghost extends BasePacManEntity {
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		for (Direction dir : Direction.valuesPermuted()) {
+		for (Dir4 dir : Dir4.valuesPermuted()) {
 			Tile targetTile = currentTile().translate(dir.dx, dir.dy);
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
@@ -275,7 +275,7 @@ public class Ghost extends BasePacManEntity {
 			}
 		}
 		int offset = TileSize / 2;
-		for (Direction dir : route) {
+		for (Dir4 dir : route) {
 			Tile nextTile = new Tile(tile).translate(dir.dx, dir.dy);
 			g.drawLine(tile.getCol() * TileSize + offset, tile.getRow() * TileSize + offset,
 					nextTile.getCol() * TileSize + offset, nextTile.getRow() * TileSize + offset);

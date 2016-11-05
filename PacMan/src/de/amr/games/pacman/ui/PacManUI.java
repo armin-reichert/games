@@ -9,7 +9,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
@@ -61,19 +61,19 @@ public abstract class PacManUI {
 
 	public abstract Sprite getBoard();
 	
-	public abstract Sprite getPacManStanding(Direction dir);
+	public abstract Sprite getPacManStanding(Dir4 dir);
 
-	public abstract Sprite getPacManRunning(Direction dir);
+	public abstract Sprite getPacManRunning(Dir4 dir);
 
 	public abstract Sprite getPacManDying();
 
-	public abstract Sprite getGhostNormal(GhostName ghost, Direction dir);
+	public abstract Sprite getGhostNormal(GhostName ghost, Dir4 dir);
 
 	public abstract Sprite getGhostFrightened();
 
 	public abstract Sprite getGhostRecovering();
 
-	public abstract Sprite getGhostDead(Direction dir);
+	public abstract Sprite getGhostDead(Dir4 dir);
 
 	public abstract Sprite getEnergizer();
 

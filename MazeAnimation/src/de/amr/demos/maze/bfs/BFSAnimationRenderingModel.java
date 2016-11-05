@@ -6,16 +6,16 @@ import de.amr.demos.maze.ui.GridVisualization;
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.api.WeightedEdge;
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.easy.grid.api.ObservableGrid2D;
 
 public class BFSAnimationRenderingModel extends GridVisualization {
 
-	private BreadthFirstTraversal<Integer, WeightedEdge<Integer>> bfs;
+	private BreadthFirstTraversal<Integer, WeightedEdge<Integer,Integer>> bfs;
 	private int maxDistance;
 
-	public BFSAnimationRenderingModel(ObservableGrid2D<TraversalState> grid, int gridCellSize,
-			BreadthFirstTraversal<Integer, WeightedEdge<Integer>> bfs, int maxDistance) {
+	public BFSAnimationRenderingModel(ObservableGrid2D<TraversalState,Integer> grid, int gridCellSize,
+			BreadthFirstTraversal<Integer, WeightedEdge<Integer,Integer>> bfs, int maxDistance) {
 		super(grid, gridCellSize);
 		this.bfs = bfs;
 		this.maxDistance = maxDistance;
@@ -27,7 +27,7 @@ public class BFSAnimationRenderingModel extends GridVisualization {
 	}
 
 	@Override
-	public Color getPassageColor(Integer p, Direction dir) {
+	public Color getPassageColor(Integer p, Dir4 dir) {
 		return getDistanceColor(p);
 	}
 

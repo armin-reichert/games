@@ -13,7 +13,7 @@ import java.awt.Rectangle;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -23,14 +23,14 @@ import de.amr.games.pacman.ui.PacManUI;
 public abstract class BasePacManEntity extends GameEntity {
 
 	public final Tile home;
-	public Direction moveDir;
-	public Direction nextMoveDir;
+	public Dir4 moveDir;
+	public Dir4 nextMoveDir;
 	public float speed;
 	public PacManUI theme;
 
 	public BasePacManEntity(Tile home) {
 		this.home = home;
-		moveDir = nextMoveDir = Direction.E;
+		moveDir = nextMoveDir = Dir4.E;
 		speed = 0;
 	}
 
@@ -84,7 +84,7 @@ public abstract class BasePacManEntity extends GameEntity {
 		return isExactlyOverTile(getRow(), getCol());
 	}
 
-	public boolean canMoveTowards(Direction dir) {
+	public boolean canMoveTowards(Dir4 dir) {
 		return canEnter(currentTile().translate(dir.dx, dir.dy));
 	}
 
@@ -109,10 +109,10 @@ public abstract class BasePacManEntity extends GameEntity {
 		// check if "worm hole"-tile has been entered
 		if (Data.board.has(Wormhole, newTile)) {
 			int col = newTile.getCol();
-			if (col == 0 && moveDir == Direction.W) {
+			if (col == 0 && moveDir == Dir4.W) {
 				// fall off left edge -> appear at right edge
 				tr.setX((Cols - 1) * TileSize - getWidth());
-			} else if (col == Cols - 1 && moveDir == Direction.E) {
+			} else if (col == Cols - 1 && moveDir == Dir4.E) {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}
@@ -151,7 +151,7 @@ public abstract class BasePacManEntity extends GameEntity {
 		return true;
 	}
 
-	public void changeMoveDir(Direction dir) {
+	public void changeMoveDir(Dir4 dir) {
 		nextMoveDir = dir;
 		boolean turn90 = (dir == moveDir.left() || dir == moveDir.right());
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {

@@ -23,7 +23,7 @@ public class MazeDemo extends Application {
 		launch(new MazeDemo());
 	}
 
-	private ObservableGrid<TraversalState> grid;
+	private ObservableGrid<TraversalState,Integer> grid;
 	private GridAnimation animation;
 
 	@Override
@@ -31,16 +31,13 @@ public class MazeDemo extends Application {
 		Views.add(new Menu(this));
 		Views.add(new MazeGeneration(this));
 		Views.add(new BFSTraversal(this));
-
 		int cellSize = Settings.getInt("cellSize");
 		grid = new ObservableGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
 		animation = new GridAnimation(grid, cellSize, getWidth(), getHeight());
-		grid.addGraphObserver(animation);
-
 		Views.show(Menu.class);
 	}
 
-	public ObservableGrid<TraversalState> getGrid() {
+	public ObservableGrid<TraversalState,Integer> getGrid() {
 		return grid;
 	}
 

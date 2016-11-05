@@ -27,6 +27,7 @@ import de.amr.easy.maze.alg.EllerInsideOut;
 import de.amr.easy.maze.alg.HuntAndKill;
 import de.amr.easy.maze.alg.IterativeDFS;
 import de.amr.easy.maze.alg.KruskalMST;
+import de.amr.easy.maze.alg.MazeAlgorithm;
 import de.amr.easy.maze.alg.PrimMST;
 import de.amr.easy.maze.alg.RandomBFS;
 import de.amr.easy.maze.alg.RecursiveDivision;
@@ -37,12 +38,16 @@ public class MazeGeneration extends Scene<MazeDemo> {
 
 	private static final Logger LOG = Logger.getLogger(MazeGeneration.class.getName());
 
-	private static final Class<?>[] ALGORITHMS = { BinaryTree.class, BinaryTreeRandom.class, Eller.class,
-			EllerInsideOut.class, HuntAndKill.class, IterativeDFS.class, KruskalMST.class, PrimMST.class, RandomBFS.class,
-			RecursiveDivision.class, WilsonUSTHilbertCurve.class, WilsonUSTNestedRectangles.class };
+	private static final Class<?>[] ALGORITHMS = {
+		/*@formatter:off*/
+		BinaryTree.class, BinaryTreeRandom.class, Eller.class,
+		EllerInsideOut.class, HuntAndKill.class, IterativeDFS.class, KruskalMST.class, PrimMST.class, RandomBFS.class,
+		RecursiveDivision.class, WilsonUSTHilbertCurve.class, WilsonUSTNestedRectangles.class
+		/*@formatter:on*/
+	};
 
-	private ObservableGrid<TraversalState> grid;
-	private Consumer<Integer> algorithm;
+	private ObservableGrid<TraversalState,Integer> grid;
+	private MazeAlgorithm algorithm;
 	private Integer startCell;
 	private Thread mazeGeneration;
 	private GridAnimation animation;
@@ -93,11 +98,10 @@ public class MazeGeneration extends Scene<MazeDemo> {
 		animation.render(g);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void chooseRandomAlgorithm() {
 		Class<?> algorithmClass = ALGORITHMS[new Random().nextInt(ALGORITHMS.length)];
 		try {
-			algorithm = (Consumer<Integer>) algorithmClass.getConstructor(Grid2D.class).newInstance(grid);
+			algorithm = (MazeAlgorithm) algorithmClass.getConstructor(Grid2D.class).newInstance(grid);
 			LOG.info("Maze generation algorithm: " + algorithmClass);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -105,21 +109,15 @@ public class MazeGeneration extends Scene<MazeDemo> {
 	}
 
 	private void prepareGrid(Consumer<Integer> algorithm) {
-		grid.clear();
-		if (algorithm.getClass() == RecursiveDivision.class) {
-			grid.makeFullGrid();
-		} else {
-			grid.removeEdges();
-		}
+		grid.clearContent();
+		grid.removeEdges();
 	}
 
 	private void stopGeneration() {
 		LOG.info("Stopping maze generation, this may take some time...");
-		grid.removeGraphObserver(animation);
 		while (mazeGeneration.isAlive()) {
 			/* wait for generator to finish */
 		}
-		grid.addGraphObserver(animation);
 		LOG.info("Maze generation finished");
 	}
 }

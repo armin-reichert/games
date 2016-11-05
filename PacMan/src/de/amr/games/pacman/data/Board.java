@@ -36,7 +36,7 @@ public class Board {
 	public static final char Tunnel = 'T';
 	public static final char Wormhole = 'W';
 
-	public Grid<Character> grid;
+	public Grid<Character,Integer> grid;
 	private final String[] rows;
 
 	public Board(String boardData) {

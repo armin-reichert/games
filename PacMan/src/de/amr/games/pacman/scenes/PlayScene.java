@@ -5,9 +5,9 @@ import static de.amr.easy.game.Application.Entities;
 import static de.amr.easy.game.Application.GameLoop;
 import static de.amr.easy.game.Application.Log;
 import static de.amr.easy.game.Application.Settings;
-import static de.amr.easy.grid.api.Direction.N;
-import static de.amr.easy.grid.api.Direction.S;
-import static de.amr.easy.grid.api.Direction.W;
+import static de.amr.easy.grid.api.Dir4.N;
+import static de.amr.easy.grid.api.Dir4.S;
+import static de.amr.easy.grid.api.Dir4.W;
 import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.BlinkyHomeCol;
 import static de.amr.games.pacman.data.Board.BlinkyHomeRow;
@@ -70,7 +70,7 @@ import de.amr.easy.game.input.Key;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Direction;
+import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
@@ -459,7 +459,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 		clyde.control.state(Waiting).update = state -> clyde.moveBackAndForth();
 
-		clyde.control.state(Scattering, new RunningAroundTheBlock(clyde, 32, 1, Direction.E, false));
+		clyde.control.state(Scattering, new RunningAroundTheBlock(clyde, 32, 1, Dir4.E, false));
 
 		clyde.control.state(Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
