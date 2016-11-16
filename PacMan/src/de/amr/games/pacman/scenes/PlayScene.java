@@ -5,9 +5,10 @@ import static de.amr.easy.game.Application.Entities;
 import static de.amr.easy.game.Application.GameLoop;
 import static de.amr.easy.game.Application.Log;
 import static de.amr.easy.game.Application.Settings;
-import static de.amr.easy.grid.api.Dir4.N;
-import static de.amr.easy.grid.api.Dir4.S;
-import static de.amr.easy.grid.api.Dir4.W;
+import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.N;
+import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.BlinkyHomeCol;
 import static de.amr.games.pacman.data.Board.BlinkyHomeRow;
@@ -70,7 +71,6 @@ import de.amr.easy.game.input.Key;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
@@ -143,8 +143,8 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		void log() {
-			Log.info(String.format("Level %d, wave %d: enter state %s for %d seconds", Data.levelNumber,
-					Data.waveNumber, stateID(), GameLoop.framesToSec(state().getDuration())));
+			Log.info(String.format("Level %d, wave %d: enter state %s for %d seconds", Data.levelNumber, Data.waveNumber,
+					stateID(), GameLoop.framesToSec(state().getDuration())));
 		}
 	}
 
@@ -404,8 +404,7 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			ghost.control.state(Recovering)
-					.setDuration(Data.getGhostRecoveringDuration(GhostName.valueOf(ghost.getName())));
+			ghost.control.state(Recovering).setDuration(Data.getGhostRecoveringDuration(GhostName.valueOf(ghost.getName())));
 
 			ghost.control.state(Recovering).update = state -> {
 				if (state.isTerminated()) {
@@ -459,7 +458,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 		clyde.control.state(Waiting).update = state -> clyde.moveBackAndForth();
 
-		clyde.control.state(Scattering, new RunningAroundTheBlock(clyde, 32, 1, Dir4.E, false));
+		clyde.control.state(Scattering, new RunningAroundTheBlock(clyde, 32, 1, E, false));
 
 		clyde.control.state(Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
@@ -506,17 +505,16 @@ public class PlayScene extends Scene<PacManGame> {
 
 	void announceLevel() {
 		Assets.sound("sfx/ready.mp3").play();
-		FlashText.show("Level " + Data.levelNumber, selectedTheme().getTextFont(), Color.YELLOW,
-				GameLoop.secToFrames(0.5f), new Vector2(11, 21).times(TileSize), Vector2.nullVector());
+		FlashText.show("Level " + Data.levelNumber, selectedTheme().getTextFont(), Color.YELLOW, GameLoop.secToFrames(0.5f),
+				new Vector2(11, 21).times(TileSize), Vector2.nullVector());
 	}
 
 	void flash(Object object, float x, float y) {
 		if (x > getWidth() - 3 * TileSize) {
 			x -= 3 * TileSize;
 		}
-		FlashText.show(String.valueOf(object),
-				selectedTheme().getTextFont().deriveFont(Font.PLAIN, SpriteSize), Color.YELLOW,
-				GameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+		FlashText.show(String.valueOf(object), selectedTheme().getTextFont().deriveFont(Font.PLAIN, SpriteSize),
+				Color.YELLOW, GameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
 	void bonus(boolean on) {
@@ -576,8 +574,7 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		}));
 
-		Data.bonus
-				.ifPresent(bonus -> drawSpriteAt(g, BonusRow, BonusCol, selectedTheme().getBonus(bonus)));
+		Data.bonus.ifPresent(bonus -> drawSpriteAt(g, BonusRow, BonusCol, selectedTheme().getBonus(bonus)));
 
 		if (Settings.getBool("drawGrid")) {
 			g.drawImage(gridLines(), 0, 0, null);
@@ -587,8 +584,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// mark home positions of ghosts
 			Entities.allOf(Ghost.class).forEach(ghost -> {
 				g.setColor(ghost.color);
-				g.fillRect(Math.round(ghost.home.x * TileSize), Math.round(ghost.home.y * TileSize),
-						TileSize, TileSize);
+				g.fillRect(Math.round(ghost.home.x * TileSize), Math.round(ghost.home.y * TileSize), TileSize, TileSize);
 			});
 		}
 	}
@@ -621,8 +617,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Lives
-		range(0, Data.liveCount)
-				.forEach(i -> drawSpriteAt(g, Rows - 2, 2 * (i + 1), selectedTheme().getLife()));
+		range(0, Data.liveCount).forEach(i -> drawSpriteAt(g, Rows - 2, 2 * (i + 1), selectedTheme().getLife()));
 
 		// Bonus score
 		float col = Cols - 2;

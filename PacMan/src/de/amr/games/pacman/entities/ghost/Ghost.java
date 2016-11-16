@@ -23,10 +23,10 @@ import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.BasePacManEntity;
 import de.amr.games.pacman.entities.PacMan;
@@ -43,7 +43,7 @@ public class Ghost extends BasePacManEntity {
 
 	public Supplier<GhostState> stateAfterFrightened;
 	public final Color color;
-	public final List<Dir4> route = new LinkedList<>();
+	public final List<Integer> route = new LinkedList<>();
 	public final StateMachine<GhostState> control;
 	private GhostAction action;
 
@@ -117,8 +117,7 @@ public class Ghost extends BasePacManEntity {
 		}
 		if (control.inState(Frightened)) {
 			PacMan pacMan = Entities.findAny(PacMan.class);
-			return pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering()
-					: getTheme().getGhostFrightened();
+			return pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : getTheme().getGhostFrightened();
 		}
 		if (control.inState(Recovering)) {
 			return getTheme().getGhostRecovering();
@@ -131,10 +130,10 @@ public class Ghost extends BasePacManEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		for (Dir4 dir : Dir4.values()) {
+		top.dirs().forEach(dir -> {
 			getTheme().getGhostNormal(GhostName.valueOf(getName()), dir).setAnimated(animated);
 			getTheme().getGhostDead(dir).setAnimated(animated);
-		}
+		});
 		getTheme().getGhostFrightened().setAnimated(animated);
 		getTheme().getGhostRecovering().setAnimated(animated);
 	}
@@ -143,7 +142,7 @@ public class Ghost extends BasePacManEntity {
 
 	public void moveBackAndForth() {
 		if (!move()) {
-			changeMoveDir(moveDir.inverse());
+			changeMoveDir(top.inv(moveDir));
 		}
 	}
 
@@ -152,16 +151,17 @@ public class Ghost extends BasePacManEntity {
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		for (Dir4 dir : Dir4.valuesPermuted()) {
-			Tile targetTile = currentTile().translate(dir.dx, dir.dy);
+		List<Integer> dirsPermuted = top.dirsPermuted().boxed().collect(Collectors.toList());
+		for (int dir : dirsPermuted) {
+			Tile targetTile = currentTile().translate(top.dx(dir), top.dy(dir));
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
 			if (Data.board.has(Wormhole, targetTile)) {
-				moveDir = moveDir.inverse();
+				moveDir = top.inv(moveDir);
 				return;
 			}
-			if (dir == moveDir.inverse()) {
+			if (dir == top.inv(moveDir)) {
 				return;
 			}
 			if (canEnter(targetTile)) {
@@ -275,8 +275,8 @@ public class Ghost extends BasePacManEntity {
 			}
 		}
 		int offset = TileSize / 2;
-		for (Dir4 dir : route) {
-			Tile nextTile = new Tile(tile).translate(dir.dx, dir.dy);
+		for (int dir : route) {
+			Tile nextTile = new Tile(tile).translate(top.dx(dir), top.dy(dir));
 			g.drawLine(tile.getCol() * TileSize + offset, tile.getRow() * TileSize + offset,
 					nextTile.getCol() * TileSize + offset, nextTile.getRow() * TileSize + offset);
 			tile = nextTile;

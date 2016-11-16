@@ -2,10 +2,10 @@ package de.amr.games.pacman.entities;
 
 import static de.amr.easy.game.Application.Entities;
 import static de.amr.easy.game.Application.Settings;
-import static de.amr.easy.grid.api.Dir4.E;
-import static de.amr.easy.grid.api.Dir4.N;
-import static de.amr.easy.grid.api.Dir4.S;
-import static de.amr.easy.grid.api.Dir4.W;
+import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.N;
+import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.BonusCol;
 import static de.amr.games.pacman.data.Board.BonusRow;
@@ -32,7 +32,6 @@ import java.util.function.Consumer;
 
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -128,9 +127,9 @@ public class PacMan extends BasePacManEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		for (Dir4 dir : Dir4.values()) {
+		top.dirs().forEach(dir -> {
 			getTheme().getPacManRunning(dir).setAnimated(animated);
-		}
+		});
 	}
 
 	public void freeze(int frames) {
@@ -150,8 +149,7 @@ public class PacMan extends BasePacManEntity {
 
 	@Override
 	public boolean canEnter(Tile tile) {
-		return Data.board.isTileValid(tile) && !Data.board.has(Wall, tile)
-				&& !Data.board.has(Door, tile);
+		return Data.board.isTileValid(tile) && !Data.board.has(Wall, tile) && !Data.board.has(Door, tile);
 	}
 
 	private void exploreMaze() {
@@ -164,8 +162,7 @@ public class PacMan extends BasePacManEntity {
 		final Tile tile = currentTile();
 		Data.board.checkContent(tile, Pellet).ifPresent(pelletFound);
 		Data.board.checkContent(tile, Energizer).ifPresent(energizerFound);
-		if (Data.bonus.isPresent() && getCol() == Math.round(BonusCol)
-				&& getRow() == Math.round(BonusRow)) {
+		if (Data.bonus.isPresent() && getCol() == Math.round(BonusCol) && getRow() == Math.round(BonusRow)) {
 			bonusFound.accept(Data.bonus.get());
 			Data.bonus = Optional.empty();
 			Data.bonusTimeRemaining = 0;
@@ -177,7 +174,7 @@ public class PacMan extends BasePacManEntity {
 		/*@formatter:on*/
 	}
 
-	private Dir4 computeMoveDir() {
+	private int computeMoveDir() {
 		if (Key.down(VK_LEFT)) {
 			return W;
 		}

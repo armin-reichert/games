@@ -18,12 +18,12 @@ import de.amr.easy.grid.rendering.swing.SwingGridRenderer;
 public class GridAnimation
 		implements GraphTraversalListener<Integer>, GraphObserver<Integer, WeightedEdge<Integer, Integer>> {
 
-	private final ObservableGrid2D<TraversalState,Integer> grid;
+	private final ObservableGrid2D<TraversalState, Integer> grid;
 	private final BufferedImage canvas;
 	private final SwingGridRenderer renderer;
 	private int delay;
 
-	public GridAnimation(ObservableGrid2D<TraversalState,Integer> grid, int gridCellSize, int width, int height) {
+	public GridAnimation(ObservableGrid2D<TraversalState, Integer> grid, int gridCellSize, int width, int height) {
 		this.grid = grid;
 		grid.addGraphObserver(this);
 		canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

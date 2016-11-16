@@ -1,8 +1,11 @@
 package de.amr.games.pacman.entities;
 
 import static de.amr.easy.game.Application.Settings;
+import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.N;
+import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
-import static de.amr.games.pacman.data.Board.Cols;
 import static de.amr.games.pacman.data.Board.Wormhole;
 import static de.amr.games.pacman.ui.PacManUI.SpriteSize;
 import static de.amr.games.pacman.ui.PacManUI.TileSize;
@@ -13,7 +16,9 @@ import java.awt.Rectangle;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
-import de.amr.easy.grid.api.Dir4;
+import de.amr.easy.grid.api.Topology;
+import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -22,15 +27,16 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public abstract class BasePacManEntity extends GameEntity {
 
+	protected final Topology top = new Top4();
 	public final Tile home;
-	public Dir4 moveDir;
-	public Dir4 nextMoveDir;
+	public int moveDir;
+	public int nextMoveDir;
 	public float speed;
 	public PacManUI theme;
 
 	public BasePacManEntity(Tile home) {
 		this.home = home;
-		moveDir = nextMoveDir = Dir4.E;
+		moveDir = nextMoveDir = Top4.E;
 		speed = 0;
 	}
 
@@ -45,8 +51,8 @@ public abstract class BasePacManEntity extends GameEntity {
 	}
 
 	public boolean isAtHome() {
-		Rectangle homeArea = new Rectangle(Math.round(home.x * TileSize), Math.round(home.y * TileSize),
-				TileSize, TileSize);
+		Rectangle homeArea = new Rectangle(Math.round(home.x * TileSize), Math.round(home.y * TileSize), TileSize,
+				TileSize);
 		return getCollisionBox().intersects(homeArea);
 	}
 
@@ -76,16 +82,15 @@ public abstract class BasePacManEntity extends GameEntity {
 
 	public boolean isExactlyOverTile(int row, int col) {
 		int tolerance = 1;
-		return Math.abs(tr.getX() - col * TileSize) <= tolerance
-				&& Math.abs(tr.getY() - row * TileSize) <= tolerance;
+		return Math.abs(tr.getX() - col * TileSize) <= tolerance && Math.abs(tr.getY() - row * TileSize) <= tolerance;
 	}
 
 	public boolean isExactlyOverTile() {
 		return isExactlyOverTile(getRow(), getCol());
 	}
 
-	public boolean canMoveTowards(Dir4 dir) {
-		return canEnter(currentTile().translate(dir.dx, dir.dy));
+	public boolean canMoveTowards(int dir) {
+		return canEnter(currentTile().translate(top.dx(dir), top.dy(dir)));
 	}
 
 	public abstract boolean canEnter(Tile pos);
@@ -98,7 +103,7 @@ public abstract class BasePacManEntity extends GameEntity {
 	public boolean move() {
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(moveDir.dx, moveDir.dy).times(speed));
+		tr.setVel(new Vector2(top.dx(moveDir), top.dy(moveDir)).times(speed));
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();
@@ -109,10 +114,10 @@ public abstract class BasePacManEntity extends GameEntity {
 		// check if "worm hole"-tile has been entered
 		if (Data.board.has(Wormhole, newTile)) {
 			int col = newTile.getCol();
-			if (col == 0 && moveDir == Dir4.W) {
+			if (col == 0 && moveDir == Top4.W) {
 				// fall off left edge -> appear at right edge
-				tr.setX((Cols - 1) * TileSize - getWidth());
-			} else if (col == Cols - 1 && moveDir == Dir4.E) {
+				tr.setX((Board.Cols - 1) * TileSize - getWidth());
+			} else if (col == Board.Cols - 1 && moveDir == Top4.E) {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}
@@ -120,7 +125,7 @@ public abstract class BasePacManEntity extends GameEntity {
 		}
 		// adjust position if entity touches disallowed neighbor tile
 		int row = newTile.getRow(), col = newTile.getCol();
-		Tile neighborTile = newTile.translate(moveDir.dx, moveDir.dy);
+		Tile neighborTile = newTile.translate(top.dx(moveDir), top.dy(moveDir));
 		boolean forbidden = !canEnter(neighborTile);
 		switch (moveDir) {
 		case E:
@@ -151,9 +156,9 @@ public abstract class BasePacManEntity extends GameEntity {
 		return true;
 	}
 
-	public void changeMoveDir(Dir4 dir) {
+	public void changeMoveDir(int dir) {
 		nextMoveDir = dir;
-		boolean turn90 = (dir == moveDir.left() || dir == moveDir.right());
+		boolean turn90 = (dir == top.left(moveDir) || dir == top.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
 			return;
 		}
@@ -176,7 +181,7 @@ public abstract class BasePacManEntity extends GameEntity {
 		g.translate(-margin, -margin);
 		super.draw(g);
 		g.translate(margin, margin);
-		
+
 		if (Settings.getBool("drawGrid")) {
 			if (isExactlyOverTile(getRow(), getCol())) {
 				drawCollisionBox(g, Color.GREEN);

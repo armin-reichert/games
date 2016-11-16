@@ -6,32 +6,31 @@ import de.amr.demos.maze.ui.GridVisualization;
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.api.WeightedEdge;
-import de.amr.easy.grid.api.Dir4;
 import de.amr.easy.grid.api.ObservableGrid2D;
 
 public class BFSAnimationRenderingModel extends GridVisualization {
 
-	private BreadthFirstTraversal<Integer, WeightedEdge<Integer,Integer>> bfs;
+	private BreadthFirstTraversal<Integer, WeightedEdge<Integer, Integer>> bfs;
 	private int maxDistance;
 
-	public BFSAnimationRenderingModel(ObservableGrid2D<TraversalState,Integer> grid, int gridCellSize,
-			BreadthFirstTraversal<Integer, WeightedEdge<Integer,Integer>> bfs, int maxDistance) {
+	public BFSAnimationRenderingModel(ObservableGrid2D<TraversalState, Integer> grid, int gridCellSize,
+			BreadthFirstTraversal<Integer, WeightedEdge<Integer, Integer>> bfs, int maxDistance) {
 		super(grid, gridCellSize);
 		this.bfs = bfs;
 		this.maxDistance = maxDistance;
 	}
 
 	@Override
-	public Color getCellBgColor(Integer p) {
+	public Color getCellBgColor(int p) {
 		return getDistanceColor(p);
 	}
 
 	@Override
-	public Color getPassageColor(Integer p, Dir4 dir) {
+	public Color getPassageColor(int p, int dir) {
 		return getDistanceColor(p);
 	}
 
-	private Color getDistanceColor(Integer p) {
+	private Color getDistanceColor(int p) {
 		if (maxDistance == -1) {
 			return super.getCellBgColor(p);
 		}
@@ -41,5 +40,4 @@ public class BFSAnimationRenderingModel extends GridVisualization {
 		}
 		return Color.getHSBColor(hue, 0.5f, 1f);
 	}
-
 }

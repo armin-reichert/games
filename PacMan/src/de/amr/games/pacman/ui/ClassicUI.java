@@ -3,10 +3,10 @@ package de.amr.games.pacman.ui;
 import static de.amr.easy.game.Application.Assets;
 import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
 import static de.amr.easy.game.sprite.AnimationMode.CYCLIC;
-import static de.amr.easy.grid.api.Dir4.E;
-import static de.amr.easy.grid.api.Dir4.N;
-import static de.amr.easy.grid.api.Dir4.S;
-import static de.amr.easy.grid.api.Dir4.W;
+import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.N;
+import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
 import static de.amr.games.pacman.entities.ghost.GhostName.Clyde;
 import static de.amr.games.pacman.entities.ghost.GhostName.Inky;
@@ -20,12 +20,12 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Dir4;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
@@ -33,13 +33,13 @@ import de.amr.games.pacman.entities.ghost.GhostName;
 public class ClassicUI extends PacManUI {
 
 	private final Sprite board;
-	private final Map<Dir4, Sprite> pacManRunning = new EnumMap<>(Dir4.class);
+	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
 	private final Sprite pacManStanding;
 	private final Sprite pacManDying;
-	private final Map<GhostName, Map<Dir4, Sprite>> ghostNormal = new EnumMap<>(GhostName.class);
+	private final Map<GhostName, Map<Integer, Sprite>> ghostNormal = new EnumMap<>(GhostName.class);
 	private final Sprite ghostFrightened;
 	private final Sprite ghostRecovering;
-	private final Map<Dir4, Sprite> ghostDead = new EnumMap<>(Dir4.class);
+	private final Map<Integer, Sprite> ghostDead = new HashMap<>();
 	private final Map<Bonus, Sprite> bonusSprites = new EnumMap<>(Bonus.class);
 	private final Sprite energizer;
 	private final Sprite pellet;
@@ -83,7 +83,7 @@ public class ClassicUI extends PacManUI {
 			bonusSprites.put(symbol, sprite);
 		}
 
-		List<Dir4> dirs = Arrays.asList(E, W, N, S);
+		List<Integer> dirs = Arrays.asList(E, W, N, S);
 		List<GhostName> ghostNames = Arrays.asList(Blinky, Pinky, Inky, Clyde);
 
 		// Pac-Man
@@ -109,7 +109,7 @@ public class ClassicUI extends PacManUI {
 		int ghostFrame = 333;
 
 		for (int ghost = 0; ghost < ghostNames.size(); ++ghost) {
-			ghostNormal.put(ghostNames.get(ghost), new EnumMap<>(Dir4.class));
+			ghostNormal.put(ghostNames.get(ghost), new HashMap<>());
 			for (int dir = 0; dir < dirs.size(); ++dir) {
 				Sprite sprite = new Sprite($(4 + ghost, 2 * dir), $(4 + ghost, 2 * dir + 1));
 				sprite.scale(SpriteSize, SpriteSize);
@@ -152,12 +152,12 @@ public class ClassicUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getPacManStanding(Dir4 dir) {
+	public Sprite getPacManStanding(int dir) {
 		return pacManStanding;
 	}
 
 	@Override
-	public Sprite getPacManRunning(Dir4 dir) {
+	public Sprite getPacManRunning(int dir) {
 		return pacManRunning.get(dir);
 	}
 
@@ -167,7 +167,7 @@ public class ClassicUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getGhostNormal(GhostName ghost, Dir4 dir) {
+	public Sprite getGhostNormal(GhostName ghost, int dir) {
 		return ghostNormal.get(ghost).get(dir);
 	}
 
@@ -182,7 +182,7 @@ public class ClassicUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getGhostDead(Dir4 dir) {
+	public Sprite getGhostDead(int dir) {
 		return ghostDead.get(dir);
 	}
 
