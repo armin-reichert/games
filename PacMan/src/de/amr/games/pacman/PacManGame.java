@@ -5,6 +5,7 @@ import static de.amr.games.pacman.data.Board.Rows;
 import static de.amr.games.pacman.ui.PacManUI.TileSize;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
@@ -26,6 +27,7 @@ public class PacManGame extends Application {
 		Settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
 		Settings.set("drawInternals", false);
 		Settings.set("drawGrid", false);
+		Log.setLevel(Level.ALL);
 		launch(new PacManGame());
 	}
 

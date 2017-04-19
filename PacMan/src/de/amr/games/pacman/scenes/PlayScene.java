@@ -37,11 +37,6 @@ import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Waiting;
-import static de.amr.games.pacman.scenes.PlayScene.Play.Crashing;
-import static de.amr.games.pacman.scenes.PlayScene.Play.GameOver;
-import static de.amr.games.pacman.scenes.PlayScene.Play.Playing;
-import static de.amr.games.pacman.scenes.PlayScene.Play.StartPlaying;
-import static de.amr.games.pacman.scenes.PlayScene.Play.StartingGame;
 import static de.amr.games.pacman.ui.PacManUI.SpriteSize;
 import static de.amr.games.pacman.ui.PacManUI.TileSize;
 import static java.awt.event.KeyEvent.VK_ALT;
@@ -93,21 +88,21 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public class PlayScene extends Scene<PacManGame> {
 
-	enum Attack {
+	private enum AttackState {
 		Starting, Scattering, Chasing, Complete
 	}
 
-	class AttackStateMachine extends StateMachine<Attack> {
+	private class AttackControl extends StateMachine<AttackState> {
 
-		AttackStateMachine() {
-			super("Attack", new EnumMap<>(Attack.class));
+		public AttackControl() {
+			super("Attack", new EnumMap<>(AttackState.class));
 
-			state(Attack.Starting).update = state -> {
+			state(AttackState.Starting).update = state -> {
 				log();
-				changeTo(Attack.Scattering);
+				changeTo(AttackState.Scattering);
 			};
 
-			state(Attack.Scattering).entry = state -> {
+			state(AttackState.Scattering).entry = state -> {
 				state.setDuration(Data.getScatteringDuration());
 				Entities.allOf(Ghost.class).forEach(ghost -> {
 					ghost.perform(GhostAction.Scatter);
@@ -115,16 +110,16 @@ public class PlayScene extends Scene<PacManGame> {
 				log();
 			};
 
-			state(Attack.Scattering).update = state -> {
+			state(AttackState.Scattering).update = state -> {
 				if (state.isTerminated()) {
-					state(Attack.Chasing).setDuration(Data.getChasingDuration());
-					changeTo(Attack.Chasing);
+					state(AttackState.Chasing).setDuration(Data.getChasingDuration());
+					changeTo(AttackState.Chasing);
 				} else {
 					Entities.all().forEach(GameEntity::update);
 				}
 			};
 
-			state(Attack.Chasing).entry = state -> {
+			state(AttackState.Chasing).entry = state -> {
 				Entities.allOf(Ghost.class).forEach(ghost -> {
 					ghost.perform(GhostAction.Chase);
 				});
@@ -132,14 +127,15 @@ public class PlayScene extends Scene<PacManGame> {
 				log();
 			};
 
-			state(Attack.Chasing).update = state -> {
+			state(AttackState.Chasing).update = state -> {
 				if (state.isTerminated()) {
-					changeTo(Attack.Complete);
+					changeTo(AttackState.Complete);
+				} else {
+					Entities.all().forEach(GameEntity::update);
 				}
-				Entities.all().forEach(GameEntity::update);
 			};
 
-			state(Attack.Complete).entry = state -> Assets.sound("sfx/waza.mp3").stop();
+			state(AttackState.Complete).entry = state -> Assets.sound("sfx/waza.mp3").stop();
 		}
 
 		void log() {
@@ -148,16 +144,16 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	enum Play {
+	private enum PlayState {
 		StartingGame, StartPlaying, Playing, Crashing, GameOver
 	}
 
-	class PlayStateMachine extends StateMachine<Play> {
+	private class PlayControl extends StateMachine<PlayState> {
 
-		PlayStateMachine() {
-			super("Play control", new EnumMap<>(Play.class));
+		public PlayControl() {
+			super("Play control", new EnumMap<>(PlayState.class));
 
-			state(StartingGame).entry = state -> {
+			state(PlayState.StartingGame).entry = state -> {
 				Data.init(new Board(Assets.text("board.txt")));
 				Data.initLevel();
 				createEntities();
@@ -165,12 +161,12 @@ public class PlayScene extends Scene<PacManGame> {
 				Assets.sound("sfx/insert-coin.mp3").play();
 			};
 
-			state(StartingGame).update = state -> {
+			state(PlayState.StartingGame).update = state -> {
 				if (Assets.sound("sfx/insert-coin.mp3").isRunning()) {
 					return;
 				}
 				if (Key.pressedOnce(VK_ENTER)) {
-					changeTo(StartPlaying, levelStart -> {
+					changeTo(PlayState.StartPlaying, levelStart -> {
 						levelStart.setDuration(Data.WaitTicksOnLevelStart);
 						announceLevel();
 					});
@@ -181,7 +177,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			// --
 
-			state(StartPlaying).entry = state -> {
+			state(PlayState.StartPlaying).entry = state -> {
 				selectedTheme().getEnergizer().setAnimated(true);
 				Entities.findAny(PacMan.class).control.changeTo(PacManState.Waiting);
 				Entities.allOf(Ghost.class).forEach(ghost -> {
@@ -190,40 +186,40 @@ public class PlayScene extends Scene<PacManGame> {
 				});
 			};
 
-			state(StartPlaying).update = state -> {
-				Entities.allOf(Ghost.class).forEach(Ghost::update);
+			state(PlayState.StartPlaying).update = state -> {
+				Entities.all().forEach(GameEntity::update);
 				if (state.isTerminated()) {
 					Entities.allOf(Ghost.class).forEach(ghost -> {
 						int waitTicks = Data.getGhostWaitingDuration(GhostName.valueOf(ghost.getName()));
 						ghost.control.state(GhostState.Waiting).setDuration(waitTicks);
-						changeTo(Playing);
 					});
+					changeTo(PlayState.Playing);
 				}
 			};
 
 			// --
 
-			state(Playing).entry = state -> {
+			state(PlayState.Playing).entry = state -> {
 				Entities.findAny(PacMan.class).control.changeTo(PacManState.Exploring);
 				Entities.findAny(PacMan.class).speed = Data.getPacManSpeed();
-				attack.changeTo(Attack.Starting);
+				attackControl.changeTo(AttackState.Starting);
 				Assets.sound("sfx/eating.mp3").loop();
 			};
 
-			state(Playing).update = state -> {
+			state(PlayState.Playing).update = state -> {
 				handleCheats();
 				if (Data.board.count(Pellet) == 0 && Data.board.count(Energizer) == 0) {
-					attack.changeTo(Attack.Complete);
+					attackControl.changeTo(AttackState.Complete);
 					++Data.levelNumber;
-					changeTo(StartPlaying, levelStarting -> {
+					changeTo(PlayState.StartPlaying, levelStarting -> {
 						levelStarting.setDuration(GameLoop.secToFrames(4));
 						Data.initLevel();
 						announceLevel();
 					});
-				} else if (attack.inState(Attack.Complete)) {
-					attack.changeTo(Attack.Starting, newState -> ++Data.waveNumber);
+				} else if (attackControl.inState(AttackState.Complete)) {
+					attackControl.changeTo(AttackState.Starting, newState -> ++Data.waveNumber);
 				} else {
-					attack.update();
+					attackControl.update();
 				}
 				Data.bonus.ifPresent(bonus -> {
 					if (--Data.bonusTimeRemaining <= 0) {
@@ -232,41 +228,41 @@ public class PlayScene extends Scene<PacManGame> {
 				});
 			};
 
-			state(Playing).exit = state -> {
+			state(PlayState.Playing).exit = state -> {
 				Assets.sound("sfx/eating.mp3").stop();
 				Entities.removeAll(FlashText.class);
 			};
 
 			// --
 
-			state(Crashing).entry = state -> {
+			state(PlayState.Crashing).entry = state -> {
 				state.setDuration(GameLoop.secToFrames(3));
 				Log.info("PacMan crashed, lives remaining: " + Data.liveCount);
 				selectedTheme().getEnergizer().setAnimated(false);
 				bonus(false);
-				attack.changeTo(Attack.Complete);
+				attackControl.changeTo(AttackState.Complete);
 				Assets.sounds().forEach(Sound::stop);
 				Assets.sound("sfx/die.mp3").play();
 			};
 
-			state(Crashing).update = state -> {
+			state(PlayState.Crashing).update = state -> {
 				if (state.isTerminated()) {
-					changeTo(StartPlaying, newState -> newState.setDuration(0));
+					changeTo(PlayState.StartPlaying, newState -> newState.setDuration(0));
 				}
 			};
 
-			state(Crashing).exit = state -> {
-				attack.changeTo(Attack.Complete);
+			state(PlayState.Crashing).exit = state -> {
+				attackControl.changeTo(AttackState.Complete);
 			};
 
 			// --
 
-			state(GameOver).entry = state -> {
+			state(PlayState.GameOver).entry = state -> {
 				Log.info("Game over.");
 				Entities.all().forEach(entity -> entity.setAnimated(false));
 				selectedTheme().getEnergizer().setAnimated(false);
 				bonus(false);
-				attack.changeTo(Attack.Complete);
+				attackControl.changeTo(AttackState.Complete);
 				if (Data.score > Data.highscore) {
 					Data.highscore = Data.score;
 					Data.saveHighscore();
@@ -275,18 +271,18 @@ public class PlayScene extends Scene<PacManGame> {
 				Assets.sound("sfx/die.mp3").play();
 			};
 
-			state(GameOver).update = state -> {
+			state(PlayState.GameOver).update = state -> {
 				if (Key.pressedOnce(VK_SPACE)) {
 					Entities.removeAll(GameEntity.class);
-					changeTo(StartingGame);
+					changeTo(PlayState.StartingGame);
 				}
 			};
 		}
 	}
 
-	final StateMachine<Attack> attack = new AttackStateMachine();
-	final StateMachine<Play> playState = new PlayStateMachine();
-	int selectedTheme;
+	private final StateMachine<AttackState> attackControl = new AttackControl();
+	private final StateMachine<PlayState> playControl = new PlayControl();
+	private int themeIndex;
 
 	public PlayScene(PacManGame game) {
 		super(game);
@@ -294,7 +290,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void init() {
-		playState.changeTo(StartingGame);
+		playControl.changeTo(PlayState.StartingGame);
 	}
 
 	@Override
@@ -304,12 +300,12 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (Key.pressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_G)) {
 			Settings.set("drawGrid", !Settings.getBool("drawGrid"));
 		}
-		playState.update();
+		playControl.update();
 	}
 
-	void createEntities() {
+	private void createEntities() {
 
-		// Pac-Man, the one and only
+		// Pac-Man entity
 
 		final PacMan pacMan = new PacMan(new Tile(PacManHomeRow, PacManHomeCol));
 		pacMan.setName("Pac-Man");
@@ -361,7 +357,7 @@ public class PlayScene extends Scene<PacManGame> {
 				Log.info(ghost.getName() + " kills Pac-Man.");
 				--Data.liveCount;
 				pacMan.control.changeTo(PacManState.Dying);
-				playState.changeTo(Data.liveCount > 0 ? Crashing : GameOver);
+				playControl.changeTo(Data.liveCount > 0 ? PlayState.Crashing : PlayState.GameOver);
 			}
 		};
 
@@ -371,16 +367,19 @@ public class PlayScene extends Scene<PacManGame> {
 		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), new Tile(InkyHomeRow, InkyHomeCol));
 		final Ghost pinky = new Ghost(Pinky, Color.PINK, new Tile(PinkyHomeRow, PinkyHomeCol));
 		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, new Tile(ClydeHomeRow, ClydeHomeCol));
-		Entities.add(blinky, inky, pinky, clyde);
+		Entities.add(blinky);
+		Entities.add(inky);
+		Entities.add(pinky);
+		Entities.add(clyde);
 
 		// Common ghost behavior
 		Entities.allOf(Ghost.class).forEach(ghost -> {
 
 			// state to restore after frightening or recovering ends
 			ghost.stateAfterFrightened = () -> {
-				if (attack.inState(Attack.Chasing)) {
+				if (attackControl.inState(AttackState.Chasing)) {
 					return Chasing;
-				} else if (attack.inState(Attack.Scattering)) {
+				} else if (attackControl.inState(AttackState.Scattering)) {
 					return Scattering;
 				} else {
 					return ghost.control.stateID();
@@ -473,28 +472,28 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 	}
 
-	List<PacManUI> themes() {
+	private List<PacManUI> themes() {
 		return Settings.get("themes");
 	}
 
-	PacManUI selectedTheme() {
-		return themes().get(selectedTheme);
+	private PacManUI selectedTheme() {
+		return themes().get(themeIndex);
 	}
 
-	void nextTheme() {
-		if (++selectedTheme == themes().size()) {
-			selectedTheme = 0;
+	private void nextTheme() {
+		if (++themeIndex == themes().size()) {
+			themeIndex = 0;
 		}
 		applyTheme();
 	}
 
-	void applyTheme() {
+	private void applyTheme() {
 		Entities.allOf(BasePacManEntity.class).forEach(e -> e.setTheme(selectedTheme()));
 		Entities.all().forEach(GameEntity::init);
 		selectedTheme().getEnergizer().setAnimated(false);
 	}
 
-	void handleCheats() {
+	private void handleCheats() {
 		if (Key.pressedOnce(VK_ALT, VK_L)) {
 			++Data.liveCount;
 		}
@@ -503,13 +502,13 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	void announceLevel() {
+	private void announceLevel() {
 		Assets.sound("sfx/ready.mp3").play();
 		FlashText.show("Level " + Data.levelNumber, selectedTheme().getTextFont(), Color.YELLOW, GameLoop.secToFrames(0.5f),
 				new Vector2(11, 21).times(TileSize), Vector2.nullVector());
 	}
 
-	void flash(Object object, float x, float y) {
+	private void flash(Object object, float x, float y) {
 		if (x > getWidth() - 3 * TileSize) {
 			x -= 3 * TileSize;
 		}
@@ -517,7 +516,7 @@ public class PlayScene extends Scene<PacManGame> {
 				Color.YELLOW, GameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
-	void bonus(boolean on) {
+	private void bonus(boolean on) {
 		if (on) {
 			Data.bonus = Optional.of(Data.getBonus());
 			Data.bonusTimeRemaining = GameLoop.secToFrames(9 + (float) Math.random());
@@ -527,7 +526,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	void score(int points) {
+	private void score(int points) {
 		if (Data.score < Data.ScoreForExtraLife && Data.score + points >= Data.ScoreForExtraLife) {
 			++Data.liveCount;
 			Assets.sound("sfx/extra-life.mp3").play();
@@ -537,33 +536,33 @@ public class PlayScene extends Scene<PacManGame> {
 
 	// --- drawing ---
 
-	void drawSpriteAt(Graphics2D g, float row, float col, Sprite sprite) {
-		Graphics2D gg = (Graphics2D) g.create();
-		gg.translate(TileSize * col, TileSize * row);
-		sprite.draw(gg);
-		gg.dispose();
-	}
-
-	void drawTextAt(Graphics2D g, float row, float col, String text) {
-		g.drawString(text, TileSize * col, TileSize * row);
-	}
-
-	void drawTextCenteredAt(Graphics2D g, float row, String text) {
-		g.drawString(text, (getWidth() - g.getFontMetrics().stringWidth(text)) / 2, TileSize * row);
-	}
-
 	@Override
 	public void draw(Graphics2D g) {
 		drawBoard(g, 3);
 		Entities.findAny(PacMan.class).draw(g);
-		if (playState.stateID() != Crashing) {
+		if (playControl.stateID() != PlayState.Crashing) {
 			Entities.allOf(Ghost.class).forEach(ghost -> ghost.draw(g));
 		}
 		drawGameState(g);
 		Entities.allOf(FlashText.class).forEach(text -> text.draw(g));
 	}
 
-	void drawBoard(Graphics2D g, int firstRow) {
+	private void drawSpriteAt(Graphics2D g, float row, float col, Sprite sprite) {
+		Graphics2D gg = (Graphics2D) g.create();
+		gg.translate(TileSize * col, TileSize * row);
+		sprite.draw(gg);
+		gg.dispose();
+	}
+
+	private void drawTextAt(Graphics2D g, float row, float col, String text) {
+		g.drawString(text, TileSize * col, TileSize * row);
+	}
+
+	private void drawTextCenteredAt(Graphics2D g, float row, String text) {
+		g.drawString(text, (getWidth() - g.getFontMetrics().stringWidth(text)) / 2, TileSize * row);
+	}
+
+	private void drawBoard(Graphics2D g, int firstRow) {
 		drawSpriteAt(g, firstRow, 0, selectedTheme().getBoard());
 
 		range(firstRow + 1, Rows - 3).forEach(row -> range(0, Cols).forEach(col -> {
@@ -589,7 +588,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	void drawGameState(Graphics2D g) {
+	private void drawGameState(Graphics2D g) {
 		g.setFont(selectedTheme().getTextFont());
 		g.setColor(selectedTheme().getHUDColor());
 
@@ -604,12 +603,12 @@ public class PlayScene extends Scene<PacManGame> {
 		drawTextAt(g, 2, 20, "Level " + Data.levelNumber);
 
 		// Ready!, Game Over!
-		if (playState.stateID() == StartingGame) {
+		if (playControl.stateID() == PlayState.StartingGame) {
 			g.setColor(Color.RED);
 			drawTextCenteredAt(g, 9.5f, "Press ENTER to start");
 			g.setColor(selectedTheme().getHUDColor());
 			drawTextCenteredAt(g, 21f, "Ready!");
-		} else if (playState.stateID() == GameOver) {
+		} else if (playControl.stateID() == PlayState.GameOver) {
 			g.setColor(Color.RED);
 			drawTextCenteredAt(g, 9.5f, "Press SPACE for new game");
 			g.setColor(selectedTheme().getHUDColor());
@@ -627,13 +626,13 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		if (Settings.getBool("drawInternals")) {
-			drawTextCenteredAt(g, 33, playState.stateID().toString());
+			drawTextCenteredAt(g, 33, playControl.stateID().toString());
 		}
 	}
 
-	Image gridLines;
+	private Image gridLines;
 
-	Image gridLines() {
+	private Image gridLines() {
 		if (gridLines == null) {
 			gridLines = PacManUI.createTransparentImage(getWidth(), getHeight());
 			Graphics g = gridLines.getGraphics();

@@ -3,6 +3,8 @@ package de.amr.games.pacman.fsm;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
+import de.amr.easy.game.Application;
+
 /**
  * A state of a finite state machine.
  */

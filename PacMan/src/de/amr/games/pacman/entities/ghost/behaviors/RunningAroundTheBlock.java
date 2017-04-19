@@ -1,5 +1,9 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
+import static de.amr.easy.game.Application.Log;
+import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.data.Board.Wall;
+
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.data.Tile;
@@ -8,14 +12,13 @@ import de.amr.games.pacman.fsm.State;
 
 public class RunningAroundTheBlock extends State {
 
-	private final Topology top = new Top4();
+	private final Topology tpl = new Top4();
 	private final Ghost ghost;
 	private final Tile target;
 	private final int cycleStartDir;
 	private final boolean cycleClockwise;
 
 	private int pathIndex;
-	private Tile next;
 	private boolean targetReached;
 
 	public RunningAroundTheBlock(Ghost ghost, int targetRow, int targetCol, int cycleStartDir, boolean cycleClockwise) {
@@ -47,36 +50,64 @@ public class RunningAroundTheBlock extends State {
 		if (targetReached) {
 			cycle();
 		} else if (ghost.isExactlyOverTile(target.getRow(), target.getCol())) {
+			targetReached = true;
 			ghost.moveDir = cycleStartDir;
 			ghost.nextMoveDir = cycleStartDir;
-			computePathAroundWall(target, cycleStartDir, cycleClockwise);
-			targetReached = true;
+			computePathAroundBlock(target, cycleStartDir, cycleClockwise);
 		} else {
 			ghost.followRoute(target);
 		}
 	}
 
-	private void computePathAroundWall(Tile start, int dir, boolean clockwise) {
+	private void computePathAroundBlock(Tile start, int dir_ahead, boolean clockwise) {
 		ghost.route.clear();
-		pathIndex = 0;
-		next = new Tile(start);
-		extendPath(dir);
-		while (!next.equals(start)) {
-			int turn = clockwise ? top.right(dir) : top.left(dir);
-			if (ghost.canEnter(new Tile(next).translate(top.dx(turn), top.dy(turn)))) {
-				dir = extendPath(turn);
-			} else if (ghost.canEnter(new Tile(next).translate(top.dx(turn), top.dy(turn)))) {
-				dir = extendPath(dir);
-			} else if (ghost.canEnter(new Tile(next).translate(top.dx(top.inv(turn)), top.dy(top.inv(turn))))) {
-				dir = extendPath(top.inv(turn));
+		Tile current = start;
+		do {
+			int dir_turn = clockwise ? tpl.right(dir_ahead) : tpl.left(dir_ahead);
+			int dir_antiturn = tpl.inv(dir_turn);
+			Tile antiturn = new Tile(current).translate(tpl.dx(dir_antiturn), tpl.dy(dir_antiturn));
+			Tile ahead = new Tile(current).translate(tpl.dx(dir_ahead), tpl.dy(dir_ahead));
+			Tile ahead_turn = new Tile(ahead).translate(tpl.dx(dir_turn), tpl.dy(dir_turn));
+			if (!Data.board.has(Wall, ahead)) {
+				// can move ahead or around a corner
+				if (Data.board.has(Wall, ahead_turn)) {
+					// move ahead
+					addToRoute(dir_ahead);
+					current = ahead;
+					if (current.equals(start)) {
+						break;
+					}
+				} else {
+					// move around corner
+					addToRoute(dir_ahead);
+					current = ahead;
+					if (current.equals(start)) {
+						break;
+					}
+					addToRoute(dir_turn);
+					dir_ahead = dir_turn;
+					current = ahead_turn;
+					if (current.equals(start)) {
+						break;
+					}
+				}
+			} else if (!Data.board.has(Wall, antiturn)) {
+				// move against turn direction
+				addToRoute(dir_antiturn);
+				dir_ahead = dir_antiturn;
+				current = antiturn;
+				if (current.equals(start)) {
+					break;
+				}
+			} else {
+				throw new IllegalStateException("Stuck while computing path around the block");
 			}
-		}
+		} while (true);
 	}
 
-	private int extendPath(int dir) {
+	private void addToRoute(int dir) {
 		ghost.route.add(dir);
-		next.translate(top.dx(dir), top.dy(dir));
-		return dir;
+		Log.info(tpl.getName(dir));
 	}
 
 	private void cycle() {

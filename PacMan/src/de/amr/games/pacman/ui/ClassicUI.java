@@ -91,9 +91,9 @@ public class ClassicUI extends PacManUI {
 		pacManStanding = new Sprite($(0, 2)).scale(SpriteSize, SpriteSize);
 
 		for (int dir = 0; dir < dirs.size(); ++dir) {
-			Sprite sprite = new Sprite($(dir, 1), $(dir, 0));
+			Sprite sprite = new Sprite($(0, 2), $(dir, 1), $(dir, 0));
 			sprite.scale(SpriteSize, SpriteSize);
-			sprite.createAnimation(BACK_AND_FORTH, 120);
+			sprite.createAnimation(BACK_AND_FORTH, 80);
 			pacManRunning.put(dirs.get(dir), sprite);
 		}
 
