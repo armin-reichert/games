@@ -32,7 +32,7 @@ import de.amr.games.pacman.entities.BasePacManEntity;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
-import de.amr.games.pacman.entities.ghost.behaviors.RunningAroundTheBlock;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
 
@@ -269,7 +269,7 @@ public class Ghost extends BasePacManEntity {
 		g.setStroke(new BasicStroke(1f));
 		Tile tile = currentTile();
 		if (control.inState(Scattering)) {
-			RunningAroundTheBlock state = (RunningAroundTheBlock) control.state();
+			GhostLoopingAroundWalls state = (GhostLoopingAroundWalls) control.state();
 			if (state.isTargetReached()) {
 				tile = new Tile(state.getTarget());
 			}

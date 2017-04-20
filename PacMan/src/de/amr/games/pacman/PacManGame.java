@@ -23,7 +23,7 @@ public class PacManGame extends Application {
 		Settings.width = Cols * TileSize;
 		Settings.height = Rows * TileSize;
 		Settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Settings.height : 1f;
-		Settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
+		Settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		Settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
 		Settings.set("drawInternals", false);
 		Settings.set("drawGrid", false);

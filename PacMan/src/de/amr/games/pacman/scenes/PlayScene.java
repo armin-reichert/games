@@ -79,7 +79,7 @@ import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.entities.ghost.behaviors.ProactiveChasing;
-import de.amr.games.pacman.entities.ghost.behaviors.RunningAroundTheBlock;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.fsm.StateMachine;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -419,7 +419,7 @@ public class PlayScene extends Scene<PacManGame> {
 			blinky.moveDir = W;
 		};
 
-		blinky.control.state(Scattering, new RunningAroundTheBlock(blinky, 4, 26, S, true));
+		blinky.control.state(Scattering, new GhostLoopingAroundWalls(blinky, 4, 26, S, true));
 
 		blinky.control.state(Chasing).update = state -> {
 			blinky.followRoute(pacMan.currentTile());
@@ -433,7 +433,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 		inky.control.state(Waiting).update = state -> inky.moveBackAndForth();
 
-		inky.control.state(Scattering, new RunningAroundTheBlock(inky, 32, 26, W, true));
+		inky.control.state(Scattering, new GhostLoopingAroundWalls(inky, 32, 26, W, true));
 
 		inky.control.state(Chasing, new DirectOrProactiveChasing(inky, blinky, pacMan));
 
@@ -445,7 +445,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 		pinky.control.state(Waiting).update = state -> pinky.moveBackAndForth();
 
-		pinky.control.state(Scattering, new RunningAroundTheBlock(pinky, 4, 1, S, false));
+		pinky.control.state(Scattering, new GhostLoopingAroundWalls(pinky, 4, 1, S, false));
 
 		pinky.control.state(Chasing, new ProactiveChasing(pinky, pacMan, 4));
 
@@ -457,7 +457,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 		clyde.control.state(Waiting).update = state -> clyde.moveBackAndForth();
 
-		clyde.control.state(Scattering, new RunningAroundTheBlock(clyde, 32, 1, E, false));
+		clyde.control.state(Scattering, new GhostLoopingAroundWalls(clyde, 32, 1, E, false));
 
 		clyde.control.state(Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
