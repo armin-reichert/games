@@ -270,8 +270,8 @@ public class Ghost extends BasePacManEntity {
 		Tile tile = currentTile();
 		if (control.inState(Scattering)) {
 			GhostLoopingAroundWalls state = (GhostLoopingAroundWalls) control.state();
-			if (state.isTargetReached()) {
-				tile = new Tile(state.getTarget());
+			if (state.isLoopStartReached()) {
+				tile = new Tile(state.getLoopStart());
 			}
 		}
 		int offset = TileSize / 2;

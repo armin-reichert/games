@@ -11,49 +11,47 @@ import de.amr.games.pacman.fsm.State;
 
 public class GhostLoopingAroundWalls extends State {
 
-	private final Topology topology = new Top4();
-	private final Ghost ghost;
-	private final Tile target;
-	private final boolean clockwise;
-	private int pathIndex;
-	private boolean targetReached;
+	private final Tile loopStart;
+	private boolean loopStartReached;
+	private int routeIndex;
 
-	public GhostLoopingAroundWalls(Ghost ghost, int targetRow, int targetCol, int startDirection, boolean clockwise) {
-		this.ghost = ghost;
-		this.target = new Tile(targetRow, targetCol);
-		this.clockwise = clockwise;
-		this.targetReached = false;
+	public GhostLoopingAroundWalls(Ghost ghost, int loopStartRow, int loopStartCol, int loopStartDir, boolean clockwise) {
+		this.loopStart = new Tile(loopStartRow, loopStartCol);
+		this.loopStartReached = false;
+
+		// entry action
 		entry = state -> {
-			pathIndex = 0;
+			routeIndex = 0;
+			loopStartReached = false;
 			ghost.route.clear();
-			targetReached = false;
 			ghost.adjustOnTile();
 		};
+
+		// update action
 		update = state -> {
-			if (targetReached) {
-				cycle();
-			} else if (ghost.isExactlyOverTile(target.getRow(), target.getCol())) {
-				targetReached = true;
-				ghost.moveDir = startDirection;
-				ghost.nextMoveDir = startDirection;
-				computePathAroundBlock(startDirection);
+			if (loopStartReached) {
+				// move along computed loop
+				ghost.move();
+				if (!ghost.isExactlyOverTile()) {
+					return;
+				}
+				int dir = ghost.route.get(routeIndex < ghost.route.size() - 1 ? routeIndex + 1 : 0);
+				ghost.changeMoveDir(dir);
+				routeIndex = (routeIndex + 1) == ghost.route.size() ? 0 : routeIndex + 1;
+			} else if (ghost.isExactlyOverTile(loopStartRow, loopStartCol)) {
+				loopStartReached = true;
+				ghost.moveDir = loopStartDir;
+				ghost.nextMoveDir = loopStartDir;
+				computePathAroundWalls(ghost, loopStartDir, clockwise, new Top4());
 			} else {
-				ghost.followRoute(target);
+				ghost.followRoute(loopStart);
 			}
 		};
 	}
 
-	public Tile getTarget() {
-		return new Tile(target);
-	}
-
-	public boolean isTargetReached() {
-		return targetReached;
-	}
-
-	private void computePathAroundBlock(int dir_forward) {
+	private void computePathAroundWalls(Ghost ghost, int dir_forward, boolean clockwise, Topology topology) {
 		ghost.route.clear();
-		Tile current = target;
+		Tile current = loopStart;
 		do {
 			int dir_turn = clockwise ? topology.right(dir_forward) : topology.left(dir_forward);
 			int dir_antiturn = topology.inv(dir_turn);
@@ -63,23 +61,23 @@ public class GhostLoopingAroundWalls extends State {
 			if (!Data.board.has(Wall, ahead)) {
 				// can move ahead
 				if (Data.board.has(Wall, around_corner)) {
-					// no corner ahead, move forward
+					// no corner in turn direction ahead, move forward
 					ghost.route.add(dir_forward);
 					current = ahead;
-					if (current.equals(target)) {
+					if (current.equals(loopStart)) {
 						break;
 					}
 				} else {
 					// corner ahead, move around corner
 					ghost.route.add(dir_forward);
 					current = ahead;
-					if (current.equals(target)) {
+					if (current.equals(loopStart)) {
 						break;
 					}
 					ghost.route.add(dir_turn);
 					dir_forward = dir_turn;
 					current = around_corner;
-					if (current.equals(target)) {
+					if (current.equals(loopStart)) {
 						break;
 					}
 				}
@@ -88,7 +86,7 @@ public class GhostLoopingAroundWalls extends State {
 				ghost.route.add(dir_antiturn);
 				dir_forward = dir_antiturn;
 				current = antiturn;
-				if (current.equals(target)) {
+				if (current.equals(loopStart)) {
 					break;
 				}
 			} else {
@@ -97,15 +95,12 @@ public class GhostLoopingAroundWalls extends State {
 		} while (true);
 	}
 
-	private void cycle() {
-		ghost.move();
-		if (!ghost.isExactlyOverTile()) {
-			return;
-		}
-		int dir = ghost.route.get(pathIndex < ghost.route.size() - 1 ? pathIndex + 1 : 0);
-		if (ghost.canMoveTowards(dir)) {
-			ghost.changeMoveDir(dir);
-			pathIndex = (pathIndex + 1) == ghost.route.size() ? 0 : pathIndex + 1;
-		}
+	public Tile getLoopStart() {
+		return new Tile(loopStart);
 	}
+
+	public boolean isLoopStartReached() {
+		return loopStartReached;
+	}
+
 }
