@@ -16,6 +16,7 @@ public abstract class GameEntity implements View {
 
 	public GameEntity(Sprite... sprites) {
 		this.sprites = sprites;
+		this.name = "unnamed";
 	}
 
 	@Override

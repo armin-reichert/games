@@ -47,6 +47,7 @@ import static java.awt.event.KeyEvent.VK_I;
 import static java.awt.event.KeyEvent.VK_L;
 import static java.awt.event.KeyEvent.VK_SPACE;
 import static java.awt.event.KeyEvent.VK_T;
+import static java.util.Arrays.asList;
 import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
@@ -55,7 +56,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -368,8 +368,7 @@ public class PlayScene extends Scene<PacManGame> {
 		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, new Tile(ClydeHomeRow, ClydeHomeCol));
 
 		// Common ghost behavior
-		Arrays.asList(blinky, inky, pinky, clyde).forEach(ghost -> {
-
+		asList(blinky, inky, pinky, clyde).forEach(ghost -> {
 			// state to restore after frightening or recovering ends
 			ghost.stateAfterFrightened = () -> {
 				if (attackControl.inState(AttackState.Chasing)) {
