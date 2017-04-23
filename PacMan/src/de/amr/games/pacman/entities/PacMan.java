@@ -39,7 +39,7 @@ import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
 
-public class PacMan extends BasePacManEntity {
+public class PacMan extends PacManGameEntity {
 
 	public enum PacManState {
 		Waiting, Exploring, Frightening, Dying;

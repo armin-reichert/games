@@ -25,7 +25,7 @@ import de.amr.games.pacman.ui.PacManUI;
 /**
  * Base class for Pac-Man and ghosts.
  */
-public abstract class BasePacManEntity extends GameEntity {
+public abstract class PacManGameEntity extends GameEntity {
 
 	protected final Topology top = new Top4();
 	public final Tile home;
@@ -34,7 +34,7 @@ public abstract class BasePacManEntity extends GameEntity {
 	public float speed;
 	public PacManUI theme;
 
-	public BasePacManEntity(Tile home) {
+	public PacManGameEntity(Tile home) {
 		this.home = home;
 		moveDir = nextMoveDir = Top4.E;
 		speed = 0;

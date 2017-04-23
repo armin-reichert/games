@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Tile;
-import de.amr.games.pacman.entities.BasePacManEntity;
+import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
@@ -39,7 +39,7 @@ import de.amr.games.pacman.fsm.StateMachine;
 /**
  * A ghost.
  */
-public class Ghost extends BasePacManEntity {
+public class Ghost extends PacManGameEntity {
 
 	public Supplier<GhostState> stateAfterFrightened;
 	public final Color color;

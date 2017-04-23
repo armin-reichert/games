@@ -70,7 +70,7 @@ import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
-import de.amr.games.pacman.entities.BasePacManEntity;
+import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.PacManState;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -488,7 +488,7 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private void applyTheme() {
-		Entities.allOf(BasePacManEntity.class).forEach(e -> e.setTheme(selectedTheme()));
+		Entities.allOf(PacManGameEntity.class).forEach(e -> e.setTheme(selectedTheme()));
 		Entities.all().forEach(GameEntity::init);
 		selectedTheme().getEnergizer().setAnimated(false);
 	}
