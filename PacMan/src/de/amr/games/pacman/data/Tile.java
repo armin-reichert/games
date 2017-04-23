@@ -27,4 +27,9 @@ public class Tile extends Point2D.Float {
 	public int getCol() {
 		return Math.round(x);
 	}
+	
+	@Override
+	public String toString() {
+		return "Tile[" + getRow() + "|" + getCol() + "]";
+	}
 }

@@ -41,11 +41,17 @@ import de.amr.games.pacman.fsm.StateMachine;
  */
 public class Ghost extends PacManGameEntity {
 
-	public Supplier<GhostState> stateAfterFrightened;
 	public final Color color;
 	public final List<Integer> route = new LinkedList<>();
 	public final StateMachine<GhostState> control;
+	public Supplier<GhostState> stateAfterFrightened;
+	
 	private GhostAction action;
+	
+	@Override
+	public String toString() {
+		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
+	}
 
 	public Ghost(GhostName ghostName, Color color, Tile home) {
 		super(home);

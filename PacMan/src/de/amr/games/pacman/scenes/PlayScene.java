@@ -55,6 +55,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -70,16 +71,16 @@ import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
-import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.PacManState;
+import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.GhostName;
 import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.entities.ghost.behaviors.ProactiveChasing;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.fsm.StateMachine;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -200,8 +201,9 @@ public class PlayScene extends Scene<PacManGame> {
 			// --
 
 			state(PlayState.Playing).entry = state -> {
-				Entities.findAny(PacMan.class).control.changeTo(PacManState.Exploring);
-				Entities.findAny(PacMan.class).speed = Data.getPacManSpeed();
+				PacMan pacMan = Entities.findAny(PacMan.class);
+				pacMan.control.changeTo(PacManState.Exploring);
+				pacMan.speed = Data.getPacManSpeed();
 				attackControl.changeTo(AttackState.Starting);
 				Assets.sound("sfx/eating.mp3").loop();
 			};
@@ -305,13 +307,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void createEntities() {
 
-		// Pac-Man entity
-
+		// Pac-Man
 		final PacMan pacMan = new PacMan(new Tile(PacManHomeRow, PacManHomeCol));
-		pacMan.setName("Pac-Man");
-		Entities.add(pacMan);
 
-		pacMan.pelletFound = tile -> {
+		pacMan.onPelletFound = tile -> {
 			Data.board.setContent(tile, Empty);
 			score(Data.PointsForPellet);
 			long pelletCount = Data.board.count(Pellet);
@@ -322,7 +321,7 @@ public class PlayScene extends Scene<PacManGame> {
 			Assets.sound("sfx/eat-pill.mp3").play();
 		};
 
-		pacMan.energizerFound = tile -> {
+		pacMan.onEnergizerFound = tile -> {
 			Data.board.setContent(tile, Empty);
 			score(Data.PointsForEnergizer);
 			Data.ghostValue = Data.PointsForFirstGhost;
@@ -331,7 +330,7 @@ public class PlayScene extends Scene<PacManGame> {
 			Assets.sound("sfx/eat-pill.mp3").play();
 		};
 
-		pacMan.bonusFound = bonus -> {
+		pacMan.onBonusFound = bonus -> {
 			int points = Data.getBonusValue();
 			score(points);
 			Data.bonusScore.add(bonus);
@@ -339,7 +338,7 @@ public class PlayScene extends Scene<PacManGame> {
 			Assets.sound("sfx/eat-fruit.mp3").play();
 		};
 
-		pacMan.ghostMet = ghost -> {
+		pacMan.onGhostMet = ghost -> {
 			if (ghost.control.inState(Dead, Waiting, Recovering)) {
 				return;
 			}
@@ -367,13 +366,9 @@ public class PlayScene extends Scene<PacManGame> {
 		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), new Tile(InkyHomeRow, InkyHomeCol));
 		final Ghost pinky = new Ghost(Pinky, Color.PINK, new Tile(PinkyHomeRow, PinkyHomeCol));
 		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, new Tile(ClydeHomeRow, ClydeHomeCol));
-		Entities.add(blinky);
-		Entities.add(inky);
-		Entities.add(pinky);
-		Entities.add(clyde);
 
 		// Common ghost behavior
-		Entities.allOf(Ghost.class).forEach(ghost -> {
+		Arrays.asList(blinky, inky, pinky, clyde).forEach(ghost -> {
 
 			// state to restore after frightening or recovering ends
 			ghost.stateAfterFrightened = () -> {
@@ -470,6 +465,13 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			}
 		};
+
+		// add entities to container
+		Entities.add(pacMan);
+		Entities.add(blinky);
+		Entities.add(inky);
+		Entities.add(pinky);
+		Entities.add(clyde);
 	}
 
 	private List<PacManUI> themes() {

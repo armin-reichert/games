@@ -1,6 +1,7 @@
 package de.amr.games.pacman.entities;
 
 import static de.amr.easy.game.Application.Entities;
+import static de.amr.easy.game.Application.Log;
 import static de.amr.easy.game.Application.Settings;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
@@ -46,10 +47,10 @@ public class PacMan extends PacManGameEntity {
 	};
 
 	public final StateMachine<PacManState> control;
-	public Consumer<Tile> pelletFound;
-	public Consumer<Tile> energizerFound;
-	public Consumer<Bonus> bonusFound;
-	public Consumer<Ghost> ghostMet;
+	public Consumer<Tile> onPelletFound;
+	public Consumer<Tile> onEnergizerFound;
+	public Consumer<Bonus> onBonusFound;
+	public Consumer<Ghost> onGhostMet;
 
 	private float speedBeforeFrightening;
 	private int freezeTimer;
@@ -57,6 +58,27 @@ public class PacMan extends PacManGameEntity {
 
 	public PacMan(Tile home) {
 		super(home);
+		setName("Pac-Man");
+
+		// default event handler
+
+		onPelletFound = tile -> {
+			Log.info("PacMan finds pellet at tile " + tile);
+		};
+
+		onEnergizerFound = tile -> {
+			Log.info("PacMan finds energizer at tile " + tile);
+		};
+
+		onBonusFound = bonus -> {
+			Log.info("PacMan finds bonus " + bonus);
+		};
+
+		onGhostMet = ghost -> {
+			Log.info("PacMan meets ghost " + ghost);
+		};
+
+		// state machine
 
 		control = new StateMachine<>("Pac-Man", new EnumMap<>(PacManState.class));
 
@@ -160,17 +182,17 @@ public class PacMan extends PacManGameEntity {
 		changeMoveDir(computeMoveDir());
 		couldMove = move();
 		final Tile tile = currentTile();
-		Data.board.checkContent(tile, Pellet).ifPresent(pelletFound);
-		Data.board.checkContent(tile, Energizer).ifPresent(energizerFound);
+		Data.board.checkContent(tile, Pellet).ifPresent(onPelletFound);
+		Data.board.checkContent(tile, Energizer).ifPresent(onEnergizerFound);
 		if (Data.bonus.isPresent() && getCol() == Math.round(BonusCol) && getRow() == Math.round(BonusRow)) {
-			bonusFound.accept(Data.bonus.get());
+			onBonusFound.accept(Data.bonus.get());
 			Data.bonus = Optional.empty();
 			Data.bonusTimeRemaining = 0;
 		}
 		/*@formatter:off*/
 		Entities.allOf(Ghost.class)
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())
-			.forEach(ghostMet);
+			.forEach(onGhostMet);
 		/*@formatter:on*/
 	}
 
