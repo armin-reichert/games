@@ -13,41 +13,60 @@ import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
 
+/**
+ * Base class of the different Pac-Man UI themes.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public abstract class PacManUI {
 
+	/** Pixel size of a tile. */
 	public static int TileSize = 8 * 2;
+
+	/** Pixel size of the sprites for Pac-Man and ghosts. */
 	public static int SpriteSize = 16 * 2;
 
+	/** A 1x1 opaque image. */
+	public static final Image EmptyImage = createOpaqueImage(1, 1);
+
+	/** Creates a buffered image which is able to show pictures with transparent areas. */
 	public static Image createTransparentImage(int width, int height) {
-		// GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
-		// .getDefaultScreenDevice().getDefaultConfiguration();
-		// return gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 		return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	}
 
+	/** Creates a buffered image for showing opaque pictures. */
 	public static Image createOpaqueImage(int width, int height) {
-		// GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
-		// .getDefaultScreenDevice().getDefaultConfiguration();
-		// return gc.createCompatibleImage(width, height, Transparency.OPAQUE);
 		return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	}
 
-	protected static final Image EmptyImage = createOpaqueImage(1, 1);
-
+	/**
+	 * Creates a text sprite with optional blinking effect.
+	 * 
+	 * @param text
+	 *          the text to display
+	 * @param fontSize
+	 *          the text's font size
+	 * @param color
+	 *          the text color
+	 * @param blinkTime
+	 *          the blink time in milliseconds
+	 */
 	protected Sprite createTextSprite(String text, float fontSize, Color color, int blinkTime) {
 
+		// create temporary image for computing the text width
 		Image img = createOpaqueImage(TileSize * Board.Cols, (int) fontSize);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.setColor(color);
 		g.setFont(getTextFont().deriveFont(fontSize));
 		int textWidth = g.getFontMetrics().stringWidth(text);
+		img.flush();
 
 		Image scaled = createOpaqueImage(textWidth, (int) fontSize);
 		Graphics2D g2 = (Graphics2D) scaled.getGraphics();
 		g2.setColor(g.getColor());
 		g2.setFont(g.getFont());
 		g2.drawString(text, 0, (int) fontSize - g2.getFontMetrics().getDescent());
-		img.flush();
 
 		if (blinkTime > 0) {
 			Sprite sprite = new Sprite(scaled, EmptyImage);
@@ -58,31 +77,45 @@ public abstract class PacManUI {
 		}
 	}
 
+	/** Returns the board as a "sprite". */
 	public abstract Sprite getBoard();
-	
+
+	/** Returns the sprite for Pac-Man when standing and looking into the given direction. */
 	public abstract Sprite getPacManStanding(int dir);
 
+	/** Returns the sprite for Pac-Man when running into given direction. */
 	public abstract Sprite getPacManRunning(int dir);
 
+	/** Returns the sprite for Pac-Man when dying. */
 	public abstract Sprite getPacManDying();
 
+	/** Returns the sprite for the specified ghost when looking into the given direction. */
 	public abstract Sprite getGhostNormal(GhostName ghost, int dir);
 
+	/** Returns the sprite for a frightened ghost. */
 	public abstract Sprite getGhostFrightened();
 
+	/** Returns the sprite for a recovering ghost. */
 	public abstract Sprite getGhostRecovering();
 
+	/** Returns the sprite for a dead ghost when looking into the given direction. */
 	public abstract Sprite getGhostDead(int dir);
 
+	/** Returns the sprite for an energizer pellet. */
 	public abstract Sprite getEnergizer();
 
+	/** Returns the sprite for a pellet. */
 	public abstract Sprite getPellet();
 
+	/** Returns the sprite for a single life in the life counter. */
 	public abstract Sprite getLife();
 
+	/** Returns the sprite for the specified bonus symbol. */
 	public abstract Sprite getBonus(Bonus symbol);
 
+	/** Returns the font for drawing texts inside the board. */
 	public abstract Font getTextFont();
 
+	/** Returns the color of the HUD (score, high score, level number). */
 	public abstract Color getHUDColor();
 }

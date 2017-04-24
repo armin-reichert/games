@@ -30,6 +30,12 @@ import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
 
+/**
+ * A Pac-Man UI which tries to be close to the classic Arcade game.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class ClassicUI extends PacManUI {
 
 	private final Sprite board;

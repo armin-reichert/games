@@ -14,12 +14,23 @@ import de.amr.games.pacman.scenes.PlayScene;
 import de.amr.games.pacman.ui.ClassicUI;
 import de.amr.games.pacman.ui.ModernUI;
 
+/**
+ * The Pac-Man game.
+ * 
+ * Represents the entry point into the game.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class PacManGame extends Application {
 
+	/**
+	 * The game data.
+	 */
 	public static final PacManGameData Data = new PacManGameData();
 
 	public static void main(String... args) {
-		Settings.title = "Zwick-Man";
+		Settings.title = "Armin's Pac-Man";
 		Settings.width = Cols * TileSize;
 		Settings.height = Rows * TileSize;
 		Settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Settings.height : 1f;

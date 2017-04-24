@@ -28,6 +28,12 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
 
+/**
+ * A Pac-Man UI with smoother sprites.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class ModernUI extends PacManUI {
 
 	private final Sprite board;
