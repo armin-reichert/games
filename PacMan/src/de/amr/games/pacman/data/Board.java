@@ -2,9 +2,13 @@ package de.amr.games.pacman.data;
 
 import java.util.Optional;
 
+import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Grid;
+import de.amr.easy.grid.impl.Top4;
 
 public class Board {
+
+	public static final Topology topology = new Top4();
 
 	public static final int Rows = 36;
 	public static final int Cols = 28;
@@ -36,7 +40,7 @@ public class Board {
 	public static final char Tunnel = 'T';
 	public static final char Wormhole = 'W';
 
-	public Grid<Character,Integer> grid;
+	public Grid<Character, Integer> grid;
 	private final String[] rows;
 
 	public Board(String boardData) {
@@ -46,8 +50,7 @@ public class Board {
 	}
 
 	public void init() {
-		grid.vertexStream()
-				.forEach(cell -> grid.set(cell, rows[grid.row(cell)].charAt(grid.col(cell))));
+		grid.vertexStream().forEach(cell -> grid.set(cell, rows[grid.row(cell)].charAt(grid.col(cell))));
 	}
 
 	public boolean isTileValid(Tile tile) {
@@ -63,7 +66,7 @@ public class Board {
 	public boolean has(char data, Tile tile) {
 		return has(data, tile.getRow(), tile.getCol());
 	}
-	
+
 	public boolean has(char data, int row, int col) {
 		Integer cell = grid.cell(col, row);
 		return data == grid.get(cell);

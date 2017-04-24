@@ -4,19 +4,35 @@ import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.Wall;
 
 import de.amr.easy.grid.api.Topology;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.fsm.State;
 
+/**
+ * A ghost behavior that lets the specified ghost walk to the start tile (e.g. a corner tile) and
+ * then lets it run around the walls in that corner.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class GhostLoopingAroundWalls extends State {
-
-	private static final Topology topology = new Top4();
 
 	private final Tile loopStart;
 	private boolean loopStarted;
 	private int routeIndex;
 
+	/**
+	 * @param ghost
+	 *          the ghost to be controlled
+	 * @param loopStartRow
+	 *          the start row of the loop
+	 * @param loopStartCol
+	 *          the start column of the loop
+	 * @param loopStartDir
+	 *          the start direction of the loop
+	 * @param clockwise
+	 *          if the ghost should walk clockwise or counter-clockwise
+	 */
 	public GhostLoopingAroundWalls(Ghost ghost, int loopStartRow, int loopStartCol, int loopStartDir, boolean clockwise) {
 
 		this.loopStart = new Tile(loopStartRow, loopStartCol);
@@ -51,7 +67,19 @@ public class GhostLoopingAroundWalls extends State {
 		};
 	}
 
+	/**
+	 * Computes the route around the walls when the ghost starts at the start tile and moves clockwise
+	 * or counter-clockwise
+	 * 
+	 * @param ghost
+	 *          the ghost to be controlled
+	 * @param dir_forward
+	 *          the initial forward direction
+	 * @param clockwise
+	 *          if the ghost should walk clockwise or counter-clockwise
+	 */
 	private void computePathAroundWalls(Ghost ghost, int dir_forward, boolean clockwise) {
+		final Topology topology = Data.board.topology;
 		ghost.route.clear();
 		Tile current = loopStart;
 		do {
@@ -70,7 +98,7 @@ public class GhostLoopingAroundWalls extends State {
 						break;
 					}
 				} else {
-					// corner ahead, move around corner
+					// corner is ahead, move around corner
 					ghost.route.add(dir_forward);
 					current = current_ahead;
 					if (current.equals(loopStart)) {
@@ -97,10 +125,17 @@ public class GhostLoopingAroundWalls extends State {
 		} while (true);
 	}
 
+	/**
+	 * 
+	 * @return the start tile of the loop
+	 */
 	public Tile getLoopStart() {
 		return new Tile(loopStart);
 	}
 
+	/**
+	 * @return if the looping has started
+	 */
 	public boolean hasLoopStarted() {
 		return loopStarted;
 	}
