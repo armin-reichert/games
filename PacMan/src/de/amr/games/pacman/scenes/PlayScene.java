@@ -86,6 +86,11 @@ import de.amr.games.pacman.ui.PacManUI;
 
 /**
  * The play scene of the Pac-Man game.
+ * 
+ * There are two inner classes representing state machines for controlling the attach waves of the
+ * ghosts and the overall game state.
+ * 
+ * @author Armin Reichert
  */
 public class PlayScene extends Scene<PacManGame> {
 
@@ -93,6 +98,10 @@ public class PlayScene extends Scene<PacManGame> {
 		Starting, Scattering, Chasing, Complete
 	}
 
+	/**
+	 * The state machine controlling the ghost attack waves.
+	 *
+	 */
 	private class AttackControl extends StateMachine<AttackState> {
 
 		public AttackControl() {
@@ -149,6 +158,10 @@ public class PlayScene extends Scene<PacManGame> {
 		StartingGame, StartPlaying, Playing, Crashing, GameOver
 	}
 
+	/**
+	 * The state machine controlling the playing.
+	 *
+	 */
 	private class PlayControl extends StateMachine<PlayState> {
 
 		public PlayControl() {
@@ -157,7 +170,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(PlayState.StartingGame).entry = state -> {
 				Data.init(new Board(Assets.text("board.txt")));
 				Data.initLevel();
-				createEntities();
+				createPacManAndGhosts();
 				applyTheme();
 				Assets.sound("sfx/insert-coin.mp3").play();
 			};
@@ -305,9 +318,10 @@ public class PlayScene extends Scene<PacManGame> {
 		playControl.update();
 	}
 
-	private void createEntities() {
+	private void createPacManAndGhosts() {
 
-		// Pac-Man
+		// Create Pac-Man and define its event handlers
+		
 		final PacMan pacMan = new PacMan(new Tile(PacManHomeRow, PacManHomeCol));
 
 		pacMan.onPelletFound = tile -> {
@@ -360,7 +374,7 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// Ghosts
+		// Create the four ghosts and define their behavior
 
 		final Ghost blinky = new Ghost(Blinky, Color.RED, new Tile(BlinkyHomeRow, BlinkyHomeCol));
 		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), new Tile(InkyHomeRow, InkyHomeCol));
@@ -369,7 +383,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Common ghost behavior
 		asList(blinky, inky, pinky, clyde).forEach(ghost -> {
-			// state to restore after frightening or recovering ends
+
+			// state to restore ghost to after its frightening or recovering state ends
 			ghost.stateAfterFrightened = () -> {
 				if (attackControl.inState(AttackState.Chasing)) {
 					return Chasing;

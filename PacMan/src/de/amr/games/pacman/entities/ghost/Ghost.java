@@ -276,7 +276,7 @@ public class Ghost extends PacManGameEntity {
 		Tile tile = currentTile();
 		if (control.inState(Scattering)) {
 			GhostLoopingAroundWalls state = (GhostLoopingAroundWalls) control.state();
-			if (state.isLoopStartReached()) {
+			if (state.hasLoopStarted()) {
 				tile = new Tile(state.getLoopStart());
 			}
 		}
