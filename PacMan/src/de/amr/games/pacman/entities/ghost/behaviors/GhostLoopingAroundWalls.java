@@ -1,10 +1,10 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
 import static de.amr.games.pacman.PacManGame.Data;
-import static de.amr.games.pacman.data.Board.Wall;
 
 import de.amr.easy.grid.api.Topology;
 import de.amr.games.pacman.data.Tile;
+import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.fsm.State;
 
@@ -88,9 +88,9 @@ public class GhostLoopingAroundWalls extends State {
 			Tile current_antiturn = new Tile(current).translate(topology.dx(dir_turn_inv), topology.dy(dir_turn_inv));
 			Tile current_ahead = new Tile(current).translate(topology.dx(dir_forward), topology.dy(dir_forward));
 			Tile current_around_corner = new Tile(current_ahead).translate(topology.dx(dir_turn), topology.dy(dir_turn));
-			if (!Data.board.has(Wall, current_ahead)) {
+			if (!Data.board.has(TileContent.Wall, current_ahead)) {
 				// can move ahead
-				if (Data.board.has(Wall, current_around_corner)) {
+				if (Data.board.has(TileContent.Wall, current_around_corner)) {
 					// no corner in turn direction ahead, move forward
 					ghost.route.add(dir_forward);
 					current = current_ahead;
@@ -111,7 +111,7 @@ public class GhostLoopingAroundWalls extends State {
 						break;
 					}
 				}
-			} else if (!Data.board.has(Wall, current_antiturn)) {
+			} else if (!Data.board.has(TileContent.Wall, current_antiturn)) {
 				// turn against loop direction
 				dir_forward = topology.inv(dir_turn);
 				ghost.route.add(dir_forward);

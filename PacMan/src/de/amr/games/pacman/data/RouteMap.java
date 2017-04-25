@@ -1,8 +1,7 @@
 package de.amr.games.pacman.data;
 
-import static de.amr.games.pacman.data.Board.Cols;
-import static de.amr.games.pacman.data.Board.Rows;
-import static de.amr.games.pacman.data.Board.Wall;
+import static de.amr.games.pacman.data.Board.NUM_COLS;
+import static de.amr.games.pacman.data.Board.NUM_ROWS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +15,15 @@ public class RouteMap {
 	private ObservableBareGrid<?> gridGraph;
 
 	public RouteMap(Board board) {
-		gridGraph = new ObservableBareGrid<>(Cols, Rows);
+		gridGraph = new ObservableBareGrid<>(NUM_COLS, NUM_ROWS);
 		gridGraph.setEventsEnabled(false);
 		/*@formatter:off*/
 		gridGraph.vertexStream()
-			.filter(cell -> board.grid.get(cell) != Wall)
+			.filter(cell -> board.grid.get(cell) != TileContent.Wall.toChar())
 			.forEach(cell -> {
 				gridGraph.getTopology().dirs().forEach(dir -> {
 					gridGraph.neighbor(cell, dir).ifPresent(neighbor -> {
-						if (board.grid.get(neighbor) != Wall
+						if (board.grid.get(neighbor) != TileContent.Wall.toChar()
 							&& !gridGraph.adjacent(cell, neighbor)) {
 							gridGraph.addEdge(cell, neighbor);
 						}

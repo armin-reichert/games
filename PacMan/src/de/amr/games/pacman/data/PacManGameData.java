@@ -1,9 +1,8 @@
 package de.amr.games.pacman.data;
 
+import static de.amr.easy.game.Application.Assets;
 import static de.amr.easy.game.Application.GameLoop;
 import static de.amr.easy.game.Application.Log;
-import static de.amr.games.pacman.data.Board.Energizer;
-import static de.amr.games.pacman.data.Board.Pellet;
 import static de.amr.games.pacman.data.Bonus.Apple;
 import static de.amr.games.pacman.data.Bonus.Bell;
 import static de.amr.games.pacman.data.Bonus.Cherries;
@@ -12,7 +11,7 @@ import static de.amr.games.pacman.data.Bonus.Grapes;
 import static de.amr.games.pacman.data.Bonus.Key;
 import static de.amr.games.pacman.data.Bonus.Peach;
 import static de.amr.games.pacman.data.Bonus.Strawberry;
-import static de.amr.games.pacman.ui.PacManUI.TileSize;
+import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,10 +40,9 @@ public class PacManGameData {
 	public final int WaitTicksOnEatingEnergizer = 3;
 	public final int WaitTicksOnLevelStart = 240;
 
-	public final float BaseSpeed = 8 * TileSize / 60f;
+	public final float BaseSpeed = 8 * TILE_SIZE / 60f;
 
-	private final File HighscoreFile = new File(
-			System.getProperty("user.dir") + File.separator + "pacman.high.txt");
+	private final File HighscoreFile = new File(System.getProperty("user.dir") + File.separator + "pacman.high.txt");
 
 	private final Object[][] LevelData = {
 			///*@formatter:off*/
@@ -123,8 +121,8 @@ public class PacManGameData {
 		}
 	}
 
-	public void init(Board board) {
-		this.board = board;
+	public void newBoard() {
+		board = new Board(Assets.text("board.txt"));
 		routeMap = new RouteMap(board);
 		levelNumber = 1;
 		waveNumber = 1;
@@ -141,13 +139,13 @@ public class PacManGameData {
 	}
 
 	public void initLevel() {
-		board.init();
+		board.reset();
 		waveNumber = 1;
 		bonus = Optional.empty();
 		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
 		Log.info(String.format("Level %d: %d pellets and %d energizers. Frames/sec: %d", levelNumber,
-				board.count(Pellet), board.count(Energizer), GameLoop.getFrameRate()));
+				board.count(TileContent.Pellet), board.count(TileContent.Energizer), GameLoop.getFrameRate()));
 	}
 
 	public int getGhostWaitingDuration(GhostName ghostName) {
@@ -165,7 +163,7 @@ public class PacManGameData {
 		}
 		return 0;
 	}
-	
+
 	public int getGhostRecoveringDuration(GhostName ghostName) {
 		return GameLoop.secToFrames(2);
 	}

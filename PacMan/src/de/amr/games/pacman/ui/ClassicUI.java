@@ -7,6 +7,8 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
+import static de.amr.games.pacman.data.Board.NUM_COLS;
+import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
 import static de.amr.games.pacman.entities.ghost.GhostName.Clyde;
 import static de.amr.games.pacman.entities.ghost.GhostName.Inky;
@@ -26,7 +28,6 @@ import java.util.Map;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
 
@@ -59,18 +60,18 @@ public class ClassicUI extends PacManUI {
 	}
 
 	private Sprite createEnergizerSprite() {
-		Image energizer = createOpaqueImage(TileSize, TileSize);
+		Image energizer = createOpaqueImage(TILE_SIZE, TILE_SIZE);
 		Graphics2D g = (Graphics2D) energizer.getGraphics();
 		g.setColor(Color.PINK);
-		g.fillOval(0, 0, TileSize, TileSize);
+		g.fillOval(0, 0, TILE_SIZE, TILE_SIZE);
 		Sprite sprite = new Sprite(energizer, EmptyImage);
 		sprite.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
 		return sprite;
 	}
 
 	private Sprite createPelletSprite() {
-		int size = TileSize / 4, offset = TileSize * 3 / 8;
-		Image pellet = createOpaqueImage(TileSize, TileSize);
+		int size = TILE_SIZE / 4, offset = TILE_SIZE * 3 / 8;
+		Image pellet = createOpaqueImage(TILE_SIZE, TILE_SIZE);
 		Graphics2D g = (Graphics2D) pellet.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Color.PINK);
@@ -81,11 +82,11 @@ public class ClassicUI extends PacManUI {
 	public ClassicUI() {
 		BufferedImage sheet = Assets.image("pacman_original.png");
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248));
-		board.scale(TileSize * Board.Cols, TileSize * (Board.Rows - 5));
+		board.scale(TILE_SIZE * NUM_COLS, TILE_SIZE * (NUM_ROWS - 5));
 
 		for (Bonus symbol : Bonus.values()) {
 			Sprite sprite = new Sprite(sheet.getSubimage(488 + symbol.ordinal() * 16, 48, 16, 16));
-			sprite.scale(SpriteSize, SpriteSize);
+			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 			bonusSprites.put(symbol, sprite);
 		}
 
@@ -94,11 +95,11 @@ public class ClassicUI extends PacManUI {
 
 		// Pac-Man
 
-		pacManStanding = new Sprite($(0, 2)).scale(SpriteSize, SpriteSize);
+		pacManStanding = new Sprite($(0, 2)).scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		for (int dir = 0; dir < dirs.size(); ++dir) {
 			Sprite sprite = new Sprite($(0, 2), $(dir, 1), $(dir, 0));
-			sprite.scale(SpriteSize, SpriteSize);
+			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 			sprite.createAnimation(BACK_AND_FORTH, 80);
 			pacManRunning.put(dirs.get(dir), sprite);
 		}
@@ -108,7 +109,7 @@ public class ClassicUI extends PacManUI {
 			dyingAnimationFrames[col - 3] = $(0, col);
 		}
 		pacManDying = new Sprite(dyingAnimationFrames);
-		pacManDying.scale(SpriteSize, SpriteSize);
+		pacManDying.scale(SPRITE_SIZE, SPRITE_SIZE);
 		pacManDying.createAnimation(AnimationMode.LEFT_TO_RIGHT, 160);
 
 		// Ghosts
@@ -118,23 +119,23 @@ public class ClassicUI extends PacManUI {
 			ghostNormal.put(ghostNames.get(ghost), new HashMap<>());
 			for (int dir = 0; dir < dirs.size(); ++dir) {
 				Sprite sprite = new Sprite($(4 + ghost, 2 * dir), $(4 + ghost, 2 * dir + 1));
-				sprite.scale(SpriteSize, SpriteSize);
+				sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 				sprite.createAnimation(CYCLIC, ghostFrame);
 				ghostNormal.get(ghostNames.get(ghost)).put(dirs.get(dir), sprite);
 			}
 		}
 
 		ghostFrightened = new Sprite($(4, 8), $(4, 9));
-		ghostFrightened.scale(SpriteSize, SpriteSize);
+		ghostFrightened.scale(SPRITE_SIZE, SPRITE_SIZE);
 		ghostFrightened.createAnimation(CYCLIC, ghostFrame);
 
 		ghostRecovering = new Sprite($(4, 8), $(4, 10), $(4, 9), $(4, 11));
-		ghostRecovering.scale(SpriteSize, SpriteSize);
+		ghostRecovering.scale(SPRITE_SIZE, SPRITE_SIZE);
 		ghostRecovering.createAnimation(CYCLIC, ghostFrame);
 
 		for (int dir = 0; dir < dirs.size(); ++dir) {
 			Sprite sprite = new Sprite($(5, 8 + dir));
-			sprite.scale(SpriteSize, SpriteSize);
+			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 			ghostDead.put(dirs.get(dir), sprite);
 		}
 
@@ -144,10 +145,10 @@ public class ClassicUI extends PacManUI {
 
 		// Lives
 		life = new Sprite($(1, 1));
-		life.scale(SpriteSize, SpriteSize);
+		life.scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		// Text display
-		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TileSize * 1.5f, Font.PLAIN);
+		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
 		textFont = Assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}

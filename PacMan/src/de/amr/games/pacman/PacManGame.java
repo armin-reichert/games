@@ -1,8 +1,8 @@
 package de.amr.games.pacman;
 
-import static de.amr.games.pacman.data.Board.Cols;
-import static de.amr.games.pacman.data.Board.Rows;
-import static de.amr.games.pacman.ui.PacManUI.TileSize;
+import static de.amr.games.pacman.data.Board.NUM_COLS;
+import static de.amr.games.pacman.data.Board.NUM_ROWS;
+import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -31,8 +31,8 @@ public class PacManGame extends Application {
 
 	public static void main(String... args) {
 		Settings.title = "Armin's Pac-Man";
-		Settings.width = Cols * TileSize;
-		Settings.height = Rows * TileSize;
+		Settings.width = NUM_COLS * TILE_SIZE;
+		Settings.height = NUM_ROWS * TILE_SIZE;
 		Settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Settings.height : 1f;
 		Settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		Settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));

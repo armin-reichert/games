@@ -2,18 +2,13 @@ package de.amr.games.pacman.entities.ghost;
 
 import static de.amr.easy.game.Application.Entities;
 import static de.amr.games.pacman.PacManGame.Data;
-import static de.amr.games.pacman.data.Board.Door;
-import static de.amr.games.pacman.data.Board.GhostHouse;
-import static de.amr.games.pacman.data.Board.Tunnel;
-import static de.amr.games.pacman.data.Board.Wall;
-import static de.amr.games.pacman.data.Board.Wormhole;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Waiting;
-import static de.amr.games.pacman.ui.PacManUI.TileSize;
+import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -27,12 +22,14 @@ import java.util.stream.Collectors;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.grid.api.Topology;
 import de.amr.games.pacman.data.Tile;
-import de.amr.games.pacman.entities.PacManGameEntity;
+import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
+import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
 
@@ -45,9 +42,9 @@ public class Ghost extends PacManGameEntity {
 	public final List<Integer> route = new LinkedList<>();
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateAfterFrightened;
-	
+
 	private GhostAction action;
-	
+
 	@Override
 	public String toString() {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
@@ -136,7 +133,7 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		top.dirs().forEach(dir -> {
+		Data.board.topology.dirs().forEach(dir -> {
 			getTheme().getGhostNormal(GhostName.valueOf(getName()), dir).setAnimated(animated);
 			getTheme().getGhostDead(dir).setAnimated(animated);
 		});
@@ -148,11 +145,12 @@ public class Ghost extends PacManGameEntity {
 
 	public void moveBackAndForth() {
 		if (!move()) {
-			changeMoveDir(top.inv(moveDir));
+			changeMoveDir(Data.board.topology.inv(moveDir));
 		}
 	}
 
 	public void moveRandomly() {
+		final Topology top = Data.board.topology;
 		move();
 		if (!isExactlyOverTile()) {
 			return;
@@ -163,7 +161,7 @@ public class Ghost extends PacManGameEntity {
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
-			if (Data.board.has(Wormhole, targetTile)) {
+			if (Data.board.has(TileContent.Wormhole, targetTile)) {
 				moveDir = top.inv(moveDir);
 				return;
 			}
@@ -206,9 +204,9 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public boolean move() {
-		if (Data.board.has(Tunnel, currentTile())) {
+		if (Data.board.has(TileContent.Tunnel, currentTile())) {
 			speed = Data.getGhostSpeedInTunnel();
-		} else if (Data.board.has(GhostHouse, currentTile())) {
+		} else if (Data.board.has(TileContent.GhostHouse, currentTile())) {
 			speed = Data.getGhostSpeedInHouse();
 		} else if (control.inState(Frightened)) {
 			speed = Data.getGhostSpeedWhenFrightened();
@@ -221,20 +219,20 @@ public class Ghost extends PacManGameEntity {
 	// --- predicates
 
 	public boolean insideGhostHouse() {
-		return Data.board.has(GhostHouse, currentTile());
+		return Data.board.has(TileContent.GhostHouse, currentTile());
 	}
 
 	@Override
 	public boolean canEnter(Tile targetTile) {
-		if (Data.board.has(Door, targetTile)) {
+		if (Data.board.has(TileContent.Door, targetTile)) {
 			if (control.inState(Dead))
 				return true; // eyes can pass through door
 			if (control.inState(Waiting))
 				return false; // while waiting door is closed
 
 			// when inside ghost house or already in door, ghost can walk through
-			return insideGhostHouse() || Data.board.has(Door, currentTile());
-		} else if (Data.board.has(Wall, targetTile)) {
+			return insideGhostHouse() || Data.board.has(TileContent.Door, currentTile());
+		} else if (Data.board.has(TileContent.Wall, targetTile)) {
 			return false;
 		}
 		return true;
@@ -253,7 +251,7 @@ public class Ghost extends PacManGameEntity {
 
 	private void drawState(Graphics2D g) {
 		g.setColor(Color.WHITE);
-		g.setFont(new Font(Font.DIALOG, Font.PLAIN, TileSize * 9 / 10));
+		g.setFont(new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10));
 		State state = control.state();
 		StringBuilder text = new StringBuilder();
 		text.append(getName()).append(" (").append(control.stateID());
@@ -280,11 +278,12 @@ public class Ghost extends PacManGameEntity {
 				tile = new Tile(state.getLoopStart());
 			}
 		}
-		int offset = TileSize / 2;
+		Topology top = Data.board.topology;
+		int offset = TILE_SIZE / 2;
 		for (int dir : route) {
 			Tile nextTile = new Tile(tile).translate(top.dx(dir), top.dy(dir));
-			g.drawLine(tile.getCol() * TileSize + offset, tile.getRow() * TileSize + offset,
-					nextTile.getCol() * TileSize + offset, nextTile.getRow() * TileSize + offset);
+			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
+					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
 			tile = nextTile;
 		}
 	}

@@ -6,77 +6,73 @@ import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Grid;
 import de.amr.easy.grid.impl.Top4;
 
+/**
+ * The board for the Pac-Man game.
+ * 
+ * @author Armin Reichert
+ */
 public class Board {
 
-	public static final Topology topology = new Top4();
+	public static final int NUM_ROWS = 36;
+	public static final int NUM_COLS = 28;
 
-	public static final int Rows = 36;
-	public static final int Cols = 28;
+	public static final float PACMAN_HOME_ROW = 26;
+	public static final float PACMAN_HOME_COL = 13.5f;
 
-	public static final float PacManHomeRow = 26;
-	public static final float PacManHomeCol = 13.5f;
+	public static final float BLINKY_HOME_ROW = 14;
+	public static final float BLINKY_HOME_COL = 13.5f;
 
-	public static final float BlinkyHomeRow = 14;
-	public static final float BlinkyHomeCol = 13.5f;
+	public static final float INKY_HOME_ROW = 17.5f;
+	public static final float INKY_HOME_COL = 11.5f;
 
-	public static final float InkyHomeRow = 17.5f;
-	public static final float InkyHomeCol = 11.5f;
+	public static final float PINKY_HOME_ROW = 17.5f;
+	public static final float PINKY_HOME_COL = 13.5f;
 
-	public static final float PinkyHomeRow = 17.5f;
-	public static final float PinkyHomeCol = 13.5f;
+	public static final float CLYDE_HOME_ROW = 17.5f;
+	public static final float CLYDE_HOME_COL = 15.5f;
 
-	public static final float ClydeHomeRow = 17.5f;
-	public static final float ClydeHomeCol = 15.5f;
+	public static final float BONUS_ROW = 19.5f;
+	public static final float BONUS_COL = 13;
 
-	public static final float BonusRow = 19.5f;
-	public static final float BonusCol = 13;
+	public final Topology topology = new Top4();
+	public final Grid<Character, Integer> grid;
 
-	public static final char Empty = ' ';
-	public static final char Wall = '#';
-	public static final char Door = 'D';
-	public static final char GhostHouse = 'G';
-	public static final char Pellet = '.';
-	public static final char Energizer = 'O';
-	public static final char Tunnel = 'T';
-	public static final char Wormhole = 'W';
-
-	public Grid<Character, Integer> grid;
-	private final String[] rows;
+	private final String[] boardDataRows;
 
 	public Board(String boardData) {
-		rows = boardData.split("\n");
-		grid = new Grid<>(Cols, Rows, Empty, false);
-		init();
+		boardDataRows = boardData.split("\n");
+		grid = new Grid<>(NUM_COLS, NUM_ROWS, TileContent.Empty.toChar(), false);
+		reset();
 	}
 
-	public void init() {
-		grid.vertexStream().forEach(cell -> grid.set(cell, rows[grid.row(cell)].charAt(grid.col(cell))));
+	public void reset() {
+		grid.vertexStream().forEach(cell -> grid.set(cell, boardDataRows[grid.row(cell)].charAt(grid.col(cell))));
 	}
 
 	public boolean isTileValid(Tile tile) {
 		int row = tile.getRow(), col = tile.getCol();
-		return row >= 0 && row < Rows && col >= 0 && col < Cols;
+		return row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS;
 	}
 
-	public void setContent(Tile tile, char data) {
+	public void setContent(Tile tile, TileContent content) {
 		Integer cell = grid.cell(tile.getCol(), tile.getRow());
-		grid.set(cell, data);
+		grid.set(cell, content.toChar());
 	}
 
-	public boolean has(char data, Tile tile) {
-		return has(data, tile.getRow(), tile.getCol());
+	public boolean has(TileContent content, Tile tile) {
+		return has(content, tile.getRow(), tile.getCol());
 	}
 
-	public boolean has(char data, int row, int col) {
+	public boolean has(TileContent content, int row, int col) {
 		Integer cell = grid.cell(col, row);
-		return data == grid.get(cell);
+		return content.toChar() == grid.get(cell);
 	}
 
-	public Optional<Tile> checkContent(Tile tile, char data) {
-		return has(data, tile.getRow(), tile.getCol()) ? Optional.of(tile) : Optional.empty();
+	public Optional<Tile> checkContent(Tile tile, TileContent content) {
+		return has(content, tile.getRow(), tile.getCol()) ? Optional.of(tile) : Optional.empty();
 	}
 
-	public long count(char data) {
-		return grid.vertexStream().filter(cell -> data == grid.get(cell)).count();
+	public long count(TileContent content) {
+		return grid.vertexStream().filter(cell -> content.toChar() == grid.get(cell)).count();
 	}
 }

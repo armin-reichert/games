@@ -10,23 +10,18 @@ import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
-import static de.amr.games.pacman.data.Board.BlinkyHomeCol;
-import static de.amr.games.pacman.data.Board.BlinkyHomeRow;
-import static de.amr.games.pacman.data.Board.BonusCol;
-import static de.amr.games.pacman.data.Board.BonusRow;
-import static de.amr.games.pacman.data.Board.ClydeHomeCol;
-import static de.amr.games.pacman.data.Board.ClydeHomeRow;
-import static de.amr.games.pacman.data.Board.Cols;
-import static de.amr.games.pacman.data.Board.Empty;
-import static de.amr.games.pacman.data.Board.Energizer;
-import static de.amr.games.pacman.data.Board.InkyHomeCol;
-import static de.amr.games.pacman.data.Board.InkyHomeRow;
-import static de.amr.games.pacman.data.Board.PacManHomeCol;
-import static de.amr.games.pacman.data.Board.PacManHomeRow;
-import static de.amr.games.pacman.data.Board.Pellet;
-import static de.amr.games.pacman.data.Board.PinkyHomeCol;
-import static de.amr.games.pacman.data.Board.PinkyHomeRow;
-import static de.amr.games.pacman.data.Board.Rows;
+import static de.amr.games.pacman.data.Board.BLINKY_HOME_COL;
+import static de.amr.games.pacman.data.Board.BLINKY_HOME_ROW;
+import static de.amr.games.pacman.data.Board.BONUS_COL;
+import static de.amr.games.pacman.data.Board.BONUS_ROW;
+import static de.amr.games.pacman.data.Board.CLYDE_HOME_COL;
+import static de.amr.games.pacman.data.Board.CLYDE_HOME_ROW;
+import static de.amr.games.pacman.data.Board.INKY_HOME_COL;
+import static de.amr.games.pacman.data.Board.INKY_HOME_ROW;
+import static de.amr.games.pacman.data.Board.NUM_COLS;
+import static de.amr.games.pacman.data.Board.NUM_ROWS;
+import static de.amr.games.pacman.data.Board.PINKY_HOME_COL;
+import static de.amr.games.pacman.data.Board.PINKY_HOME_ROW;
 import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
 import static de.amr.games.pacman.entities.ghost.GhostName.Clyde;
 import static de.amr.games.pacman.entities.ghost.GhostName.Inky;
@@ -37,8 +32,8 @@ import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Waiting;
-import static de.amr.games.pacman.ui.PacManUI.SpriteSize;
-import static de.amr.games.pacman.ui.PacManUI.TileSize;
+import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
+import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_ALT;
 import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_CONTROL;
@@ -71,6 +66,7 @@ import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
+import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.PacManState;
 import de.amr.games.pacman.entities.PacManGameEntity;
@@ -168,7 +164,7 @@ public class PlayScene extends Scene<PacManGame> {
 			super("Play control", new EnumMap<>(PlayState.class));
 
 			state(PlayState.StartingGame).entry = state -> {
-				Data.init(new Board(Assets.text("board.txt")));
+				Data.newBoard();
 				Data.initLevel();
 				createPacManAndGhosts();
 				applyTheme();
@@ -223,7 +219,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(PlayState.Playing).update = state -> {
 				handleCheats();
-				if (Data.board.count(Pellet) == 0 && Data.board.count(Energizer) == 0) {
+				if (Data.board.count(TileContent.Pellet) == 0 && Data.board.count(TileContent.Energizer) == 0) {
 					attackControl.changeTo(AttackState.Complete);
 					++Data.levelNumber;
 					changeTo(PlayState.StartPlaying, levelStarting -> {
@@ -321,13 +317,13 @@ public class PlayScene extends Scene<PacManGame> {
 	private void createPacManAndGhosts() {
 
 		// Create Pac-Man and define its event handlers
-		
-		final PacMan pacMan = new PacMan(new Tile(PacManHomeRow, PacManHomeCol));
+
+		final PacMan pacMan = new PacMan(new Tile(Board.PACMAN_HOME_ROW, Board.PACMAN_HOME_COL));
 
 		pacMan.onPelletFound = tile -> {
-			Data.board.setContent(tile, Empty);
+			Data.board.setContent(tile, TileContent.Empty);
 			score(Data.PointsForPellet);
-			long pelletCount = Data.board.count(Pellet);
+			long pelletCount = Data.board.count(TileContent.Pellet);
 			if (pelletCount == Data.PelletsLeftForBonus1 || pelletCount == Data.PelletsLeftForBonus2) {
 				bonus(true);
 			}
@@ -336,7 +332,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		pacMan.onEnergizerFound = tile -> {
-			Data.board.setContent(tile, Empty);
+			Data.board.setContent(tile, TileContent.Empty);
 			score(Data.PointsForEnergizer);
 			Data.ghostValue = Data.PointsForFirstGhost;
 			pacMan.freeze(Data.WaitTicksOnEatingEnergizer);
@@ -348,7 +344,7 @@ public class PlayScene extends Scene<PacManGame> {
 			int points = Data.getBonusValue();
 			score(points);
 			Data.bonusScore.add(bonus);
-			flash(points, BonusCol * TileSize, BonusRow * TileSize);
+			flash(points, BONUS_COL * TILE_SIZE, BONUS_ROW * TILE_SIZE);
 			Assets.sound("sfx/eat-fruit.mp3").play();
 		};
 
@@ -376,10 +372,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Create the four ghosts and define their behavior
 
-		final Ghost blinky = new Ghost(Blinky, Color.RED, new Tile(BlinkyHomeRow, BlinkyHomeCol));
-		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), new Tile(InkyHomeRow, InkyHomeCol));
-		final Ghost pinky = new Ghost(Pinky, Color.PINK, new Tile(PinkyHomeRow, PinkyHomeCol));
-		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, new Tile(ClydeHomeRow, ClydeHomeCol));
+		final Ghost blinky = new Ghost(Blinky, Color.RED, new Tile(BLINKY_HOME_ROW, BLINKY_HOME_COL));
+		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), new Tile(INKY_HOME_ROW, INKY_HOME_COL));
+		final Ghost pinky = new Ghost(Pinky, Color.PINK, new Tile(PINKY_HOME_ROW, PINKY_HOME_COL));
+		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, new Tile(CLYDE_HOME_ROW, CLYDE_HOME_COL));
 
 		// Common ghost behavior
 		asList(blinky, inky, pinky, clyde).forEach(ghost -> {
@@ -521,14 +517,14 @@ public class PlayScene extends Scene<PacManGame> {
 	private void announceLevel() {
 		Assets.sound("sfx/ready.mp3").play();
 		FlashText.show("Level " + Data.levelNumber, selectedTheme().getTextFont(), Color.YELLOW, GameLoop.secToFrames(0.5f),
-				new Vector2(11, 21).times(TileSize), Vector2.nullVector());
+				new Vector2(11, 21).times(TILE_SIZE), Vector2.nullVector());
 	}
 
 	private void flash(Object object, float x, float y) {
-		if (x > getWidth() - 3 * TileSize) {
-			x -= 3 * TileSize;
+		if (x > getWidth() - 3 * TILE_SIZE) {
+			x -= 3 * TILE_SIZE;
 		}
-		FlashText.show(String.valueOf(object), selectedTheme().getTextFont().deriveFont(Font.PLAIN, SpriteSize),
+		FlashText.show(String.valueOf(object), selectedTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
 				Color.YELLOW, GameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
@@ -565,31 +561,32 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void drawSpriteAt(Graphics2D g, float row, float col, Sprite sprite) {
 		Graphics2D gg = (Graphics2D) g.create();
-		gg.translate(TileSize * col, TileSize * row);
+		gg.translate(TILE_SIZE * col, TILE_SIZE * row);
 		sprite.draw(gg);
 		gg.dispose();
 	}
 
 	private void drawTextAt(Graphics2D g, float row, float col, String text) {
-		g.drawString(text, TileSize * col, TileSize * row);
+		g.drawString(text, TILE_SIZE * col, TILE_SIZE * row);
 	}
 
 	private void drawTextCenteredAt(Graphics2D g, float row, String text) {
-		g.drawString(text, (getWidth() - g.getFontMetrics().stringWidth(text)) / 2, TileSize * row);
+		g.drawString(text, (getWidth() - g.getFontMetrics().stringWidth(text)) / 2, TILE_SIZE * row);
 	}
 
 	private void drawBoard(Graphics2D g, int firstRow) {
 		drawSpriteAt(g, firstRow, 0, selectedTheme().getBoard());
 
-		range(firstRow + 1, Rows - 3).forEach(row -> range(0, Cols).forEach(col -> {
-			if (Data.board.has(Pellet, row, col)) {
+		range(firstRow + 1, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
+			if (Data.board.has(TileContent.Pellet, row, col)) {
 				drawSpriteAt(g, row, col, selectedTheme().getPellet());
-			} else if (Data.board.has(Energizer, row, col)) {
+			} else if (Data.board.has(TileContent.Energizer, row, col)) {
 				drawSpriteAt(g, row, col, selectedTheme().getEnergizer());
 			}
 		}));
 
-		Data.bonus.ifPresent(bonus -> drawSpriteAt(g, BonusRow, BonusCol, selectedTheme().getBonus(bonus)));
+		Data.bonus.ifPresent(
+				bonus -> drawSpriteAt(g, BONUS_ROW, BONUS_COL, selectedTheme().getBonus(bonus)));
 
 		if (Settings.getBool("drawGrid")) {
 			g.drawImage(gridLines(), 0, 0, null);
@@ -599,7 +596,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// mark home positions of ghosts
 			Entities.allOf(Ghost.class).forEach(ghost -> {
 				g.setColor(ghost.color);
-				g.fillRect(Math.round(ghost.home.x * TileSize), Math.round(ghost.home.y * TileSize), TileSize, TileSize);
+				g.fillRect(Math.round(ghost.home.x * TILE_SIZE), Math.round(ghost.home.y * TILE_SIZE), TILE_SIZE, TILE_SIZE);
 			});
 		}
 	}
@@ -632,12 +629,13 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Lives
-		range(0, Data.liveCount).forEach(i -> drawSpriteAt(g, Rows - 2, 2 * (i + 1), selectedTheme().getLife()));
+		range(0, Data.liveCount)
+				.forEach(i -> drawSpriteAt(g, NUM_ROWS - 2, 2 * (i + 1), selectedTheme().getLife()));
 
 		// Bonus score
-		float col = Cols - 2;
+		float col = NUM_COLS - 2;
 		for (Bonus bonus : Data.bonusScore) {
-			drawSpriteAt(g, Rows - 2, col, selectedTheme().getBonus(bonus));
+			drawSpriteAt(g, NUM_ROWS - 2, col, selectedTheme().getBonus(bonus));
 			col -= 2f;
 		}
 
@@ -653,10 +651,10 @@ public class PlayScene extends Scene<PacManGame> {
 			gridLines = PacManUI.createTransparentImage(getWidth(), getHeight());
 			Graphics g = gridLines.getGraphics();
 			g.setColor(new Color(200, 200, 200, 100));
-			for (int col = 1, x = TileSize; col < Cols; ++col, x += TileSize) {
+			for (int col = 1, x = TILE_SIZE; col < NUM_COLS; ++col, x += TILE_SIZE) {
 				g.drawLine(x, 0, x, getHeight());
 			}
-			for (int row = 1, y = TileSize; row < Rows; ++row, y += TileSize) {
+			for (int row = 1, y = TILE_SIZE; row < NUM_ROWS; ++row, y += TILE_SIZE) {
 				g.drawLine(0, y, getWidth(), y);
 			}
 		}

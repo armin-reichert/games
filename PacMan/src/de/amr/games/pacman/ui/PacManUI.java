@@ -1,6 +1,7 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.easy.game.sprite.AnimationMode.CYCLIC;
+import static de.amr.games.pacman.data.Board.NUM_COLS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -9,7 +10,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.entities.ghost.GhostName;
 
@@ -22,10 +22,10 @@ import de.amr.games.pacman.entities.ghost.GhostName;
 public abstract class PacManUI {
 
 	/** Pixel size of a tile. */
-	public static int TileSize = 8 * 2;
+	public static int TILE_SIZE = 8 * 2;
 
 	/** Pixel size of the sprites for Pac-Man and ghosts. */
-	public static int SpriteSize = 16 * 2;
+	public static int SPRITE_SIZE = 16 * 2;
 
 	/** A 1x1 opaque image. */
 	public static final Image EmptyImage = createOpaqueImage(1, 1);
@@ -55,7 +55,7 @@ public abstract class PacManUI {
 	protected Sprite createTextSprite(String text, float fontSize, Color color, int blinkTime) {
 
 		// create temporary image for computing the text width
-		Image img = createOpaqueImage(TileSize * Board.Cols, (int) fontSize);
+		Image img = createOpaqueImage(TILE_SIZE * NUM_COLS, (int) fontSize);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.setColor(color);
 		g.setFont(getTextFont().deriveFont(fontSize));

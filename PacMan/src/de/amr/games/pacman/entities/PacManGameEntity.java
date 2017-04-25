@@ -6,9 +6,9 @@ import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
-import static de.amr.games.pacman.data.Board.Wormhole;
-import static de.amr.games.pacman.ui.PacManUI.SpriteSize;
-import static de.amr.games.pacman.ui.PacManUI.TileSize;
+import static de.amr.games.pacman.data.Board.NUM_COLS;
+import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
+import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -18,8 +18,8 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
+import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.ui.PacManUI;
 
 /**
@@ -27,7 +27,6 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public abstract class PacManGameEntity extends GameEntity {
 
-	protected final Topology top = new Top4();
 	public final Tile home;
 	public int moveDir;
 	public int nextMoveDir;
@@ -42,26 +41,26 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return TileSize;
+		return TILE_SIZE;
 	}
 
 	@Override
 	public int getHeight() {
-		return TileSize;
+		return TILE_SIZE;
 	}
 
 	public boolean isAtHome() {
-		Rectangle homeArea = new Rectangle(Math.round(home.x * TileSize), Math.round(home.y * TileSize), TileSize,
-				TileSize);
+		Rectangle homeArea = new Rectangle(Math.round(home.x * TILE_SIZE), Math.round(home.y * TILE_SIZE), TILE_SIZE,
+				TILE_SIZE);
 		return getCollisionBox().intersects(homeArea);
 	}
 
 	public int getCol() {
-		return getCenter().roundedX() / TileSize;
+		return getCenter().roundedX() / TILE_SIZE;
 	}
 
 	public int getRow() {
-		return getCenter().roundedY() / TileSize;
+		return getCenter().roundedY() / TILE_SIZE;
 	}
 
 	public Tile currentTile() {
@@ -69,7 +68,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public void placeAt(Tile tile) {
-		tr.moveTo(tile.x * TileSize, tile.y * TileSize);
+		tr.moveTo(tile.x * TILE_SIZE, tile.y * TILE_SIZE);
 	}
 
 	public void adjustOnTile() {
@@ -82,7 +81,7 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public boolean isExactlyOverTile(int row, int col) {
 		int tolerance = 1;
-		return Math.abs(tr.getX() - col * TileSize) <= tolerance && Math.abs(tr.getY() - row * TileSize) <= tolerance;
+		return Math.abs(tr.getX() - col * TILE_SIZE) <= tolerance && Math.abs(tr.getY() - row * TILE_SIZE) <= tolerance;
 	}
 
 	public boolean isExactlyOverTile() {
@@ -90,6 +89,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public boolean canMoveTowards(int dir) {
+		final Topology top = Data.board.topology;
 		return canEnter(currentTile().translate(top.dx(dir), top.dy(dir)));
 	}
 
@@ -101,6 +101,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	 * @return <code>true</code> iff entity can move
 	 */
 	public boolean move() {
+		final Topology top = Data.board.topology;
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
 		tr.setVel(new Vector2(top.dx(moveDir), top.dy(moveDir)).times(speed));
@@ -112,12 +113,12 @@ public abstract class PacManGameEntity extends GameEntity {
 			return false;
 		}
 		// check if "worm hole"-tile has been entered
-		if (Data.board.has(Wormhole, newTile)) {
+		if (Data.board.has(TileContent.Wormhole, newTile)) {
 			int col = newTile.getCol();
 			if (col == 0 && moveDir == Top4.W) {
 				// fall off left edge -> appear at right edge
-				tr.setX((Board.Cols - 1) * TileSize - getWidth());
-			} else if (col == Board.Cols - 1 && moveDir == Top4.E) {
+				tr.setX((NUM_COLS - 1) * TILE_SIZE - getWidth());
+			} else if (col == NUM_COLS - 1 && moveDir == Top4.E) {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}
@@ -129,26 +130,26 @@ public abstract class PacManGameEntity extends GameEntity {
 		boolean forbidden = !canEnter(neighborTile);
 		switch (moveDir) {
 		case E:
-			if (forbidden && tr.getX() + TileSize >= (col + 1) * TileSize) {
-				tr.setX(col * TileSize);
+			if (forbidden && tr.getX() + TILE_SIZE >= (col + 1) * TILE_SIZE) {
+				tr.setX(col * TILE_SIZE);
 				return false;
 			}
 			break;
 		case W:
-			if (forbidden && tr.getX() < col * TileSize) {
-				tr.setX(col * TileSize);
+			if (forbidden && tr.getX() < col * TILE_SIZE) {
+				tr.setX(col * TILE_SIZE);
 				return false;
 			}
 			break;
 		case N:
-			if (forbidden && tr.getY() < row * TileSize) {
-				tr.setY(row * TileSize);
+			if (forbidden && tr.getY() < row * TILE_SIZE) {
+				tr.setY(row * TILE_SIZE);
 				return false;
 			}
 			break;
 		case S:
-			if (forbidden && tr.getY() + TileSize >= (row + 1) * TileSize) {
-				tr.setY(row * TileSize);
+			if (forbidden && tr.getY() + TILE_SIZE >= (row + 1) * TILE_SIZE) {
+				tr.setY(row * TILE_SIZE);
 				return false;
 			}
 			break;
@@ -157,6 +158,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public void changeMoveDir(int dir) {
+		final Topology top = Data.board.topology;
 		nextMoveDir = dir;
 		boolean turn90 = (dir == top.left(moveDir) || dir == top.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
@@ -177,7 +179,7 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		int margin = (SpriteSize - TileSize) / 2;
+		int margin = (SPRITE_SIZE - TILE_SIZE) / 2;
 		g.translate(-margin, -margin);
 		super.draw(g);
 		g.translate(margin, margin);

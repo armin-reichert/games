@@ -8,17 +8,13 @@ import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
-import static de.amr.games.pacman.data.Board.BonusCol;
-import static de.amr.games.pacman.data.Board.BonusRow;
-import static de.amr.games.pacman.data.Board.Door;
-import static de.amr.games.pacman.data.Board.Energizer;
-import static de.amr.games.pacman.data.Board.Pellet;
-import static de.amr.games.pacman.data.Board.Wall;
+import static de.amr.games.pacman.data.Board.BONUS_COL;
+import static de.amr.games.pacman.data.Board.BONUS_ROW;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Dying;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Exploring;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Frightening;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Waiting;
-import static de.amr.games.pacman.ui.PacManUI.TileSize;
+import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -35,6 +31,7 @@ import de.amr.easy.game.input.Key;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
+import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.fsm.State;
@@ -149,7 +146,7 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		top.dirs().forEach(dir -> {
+		Data.board.topology.dirs().forEach(dir -> {
 			getTheme().getPacManRunning(dir).setAnimated(animated);
 		});
 	}
@@ -171,7 +168,8 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public boolean canEnter(Tile tile) {
-		return Data.board.isTileValid(tile) && !Data.board.has(Wall, tile) && !Data.board.has(Door, tile);
+		return Data.board.isTileValid(tile) && !Data.board.has(TileContent.Wall, tile)
+				&& !Data.board.has(TileContent.Door, tile);
 	}
 
 	private void exploreMaze() {
@@ -182,9 +180,9 @@ public class PacMan extends PacManGameEntity {
 		changeMoveDir(computeMoveDir());
 		couldMove = move();
 		final Tile tile = currentTile();
-		Data.board.checkContent(tile, Pellet).ifPresent(onPelletFound);
-		Data.board.checkContent(tile, Energizer).ifPresent(onEnergizerFound);
-		if (Data.bonus.isPresent() && getCol() == Math.round(BonusCol) && getRow() == Math.round(BonusRow)) {
+		Data.board.checkContent(tile, TileContent.Pellet).ifPresent(onPelletFound);
+		Data.board.checkContent(tile, TileContent.Energizer).ifPresent(onEnergizerFound);
+		if (Data.bonus.isPresent() && getCol() == Math.round(BONUS_COL) && getRow() == Math.round(BONUS_ROW)) {
 			onBonusFound.accept(Data.bonus.get());
 			Data.bonus = Optional.empty();
 			Data.bonusTimeRemaining = 0;
@@ -219,7 +217,7 @@ public class PacMan extends PacManGameEntity {
 		super.draw(g);
 		if (Settings.getBool("drawInternals")) {
 			g.setColor(Color.WHITE);
-			g.setFont(new Font(Font.DIALOG, Font.PLAIN, TileSize * 9 / 10));
+			g.setFont(new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10));
 			State state = control.state();
 			StringBuilder text = new StringBuilder();
 			text.append(getName()).append(" (").append(control.stateID());
