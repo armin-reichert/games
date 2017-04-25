@@ -1,8 +1,8 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
 import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.data.Board.TOPOLOGY;
 
-import de.amr.easy.grid.api.Topology;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -22,8 +22,8 @@ public class DirectOrProactiveChasing extends State {
 	}
 
 	private void chase() {
-		Topology top = Data.board.topology;
-		Tile middle = new Tile(pacMan.getRow() + 2 * top.dy(pacMan.moveDir), pacMan.getCol() + 2 * top.dx(pacMan.moveDir));
+		Tile middle = new Tile(pacMan.getRow() + 2 * TOPOLOGY.dy(pacMan.moveDir),
+				pacMan.getCol() + 2 * TOPOLOGY.dx(pacMan.moveDir));
 		Tile helperGhostTile = helperGhost.currentTile();
 		int dx = middle.getCol() - helperGhostTile.getCol();
 		int dy = middle.getRow() - helperGhostTile.getRow();
@@ -32,7 +32,7 @@ public class DirectOrProactiveChasing extends State {
 			chasingGhost.computeRoute(targetTile);
 			if (!chasingGhost.route.isEmpty()) {
 				int chaseDir = chasingGhost.route.get(0);
-				if (chaseDir == top.inv(chasingGhost.moveDir)) {
+				if (chaseDir == TOPOLOGY.inv(chasingGhost.moveDir)) {
 					chasingGhost.move();
 					return;
 				}

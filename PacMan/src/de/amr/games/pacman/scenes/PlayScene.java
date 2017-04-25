@@ -22,6 +22,9 @@ import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.data.Board.PINKY_HOME_COL;
 import static de.amr.games.pacman.data.Board.PINKY_HOME_ROW;
+import static de.amr.games.pacman.data.TileContent.Energizer;
+import static de.amr.games.pacman.data.TileContent.None;
+import static de.amr.games.pacman.data.TileContent.Pellet;
 import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
 import static de.amr.games.pacman.entities.ghost.GhostName.Clyde;
 import static de.amr.games.pacman.entities.ghost.GhostName.Inky;
@@ -66,7 +69,6 @@ import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
-import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.PacManState;
 import de.amr.games.pacman.entities.PacManGameEntity;
@@ -219,7 +221,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(PlayState.Playing).update = state -> {
 				handleCheats();
-				if (Data.board.count(TileContent.Pellet) == 0 && Data.board.count(TileContent.Energizer) == 0) {
+				if (Data.board.count(Pellet) == 0 && Data.board.count(Energizer) == 0) {
 					attackControl.changeTo(AttackState.Complete);
 					++Data.levelNumber;
 					changeTo(PlayState.StartPlaying, levelStarting -> {
@@ -321,9 +323,9 @@ public class PlayScene extends Scene<PacManGame> {
 		final PacMan pacMan = new PacMan(new Tile(Board.PACMAN_HOME_ROW, Board.PACMAN_HOME_COL));
 
 		pacMan.onPelletFound = tile -> {
-			Data.board.setContent(tile, TileContent.Empty);
+			Data.board.setContent(tile, None);
 			score(Data.PointsForPellet);
-			long pelletCount = Data.board.count(TileContent.Pellet);
+			long pelletCount = Data.board.count(Pellet);
 			if (pelletCount == Data.PelletsLeftForBonus1 || pelletCount == Data.PelletsLeftForBonus2) {
 				bonus(true);
 			}
@@ -332,7 +334,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		pacMan.onEnergizerFound = tile -> {
-			Data.board.setContent(tile, TileContent.Empty);
+			Data.board.setContent(tile, None);
 			score(Data.PointsForEnergizer);
 			Data.ghostValue = Data.PointsForFirstGhost;
 			pacMan.freeze(Data.WaitTicksOnEatingEnergizer);
@@ -370,17 +372,21 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// Create the four ghosts and define their behavior
+		// Create the ghosts and define their behavior
 
-		final Ghost blinky = new Ghost(Blinky, Color.RED, new Tile(BLINKY_HOME_ROW, BLINKY_HOME_COL));
-		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), new Tile(INKY_HOME_ROW, INKY_HOME_COL));
-		final Ghost pinky = new Ghost(Pinky, Color.PINK, new Tile(PINKY_HOME_ROW, PINKY_HOME_COL));
-		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, new Tile(CLYDE_HOME_ROW, CLYDE_HOME_COL));
+		final Ghost blinky = new Ghost(Blinky, Color.RED, BLINKY_HOME_ROW, BLINKY_HOME_COL);
+
+		final Ghost inky = new Ghost(Inky, new Color(64, 224, 208), INKY_HOME_ROW, INKY_HOME_COL);
+
+		final Ghost pinky = new Ghost(Pinky, Color.PINK, PINKY_HOME_ROW, PINKY_HOME_COL);
+
+		final Ghost clyde = new Ghost(Clyde, Color.ORANGE, CLYDE_HOME_ROW, CLYDE_HOME_COL);
 
 		// Common ghost behavior
+
 		asList(blinky, inky, pinky, clyde).forEach(ghost -> {
 
-			// state to restore ghost to after its frightening or recovering state ends
+			// ghost state after frightening or recovering ends
 			ghost.stateAfterFrightened = () -> {
 				if (attackControl.inState(AttackState.Chasing)) {
 					return Chasing;
@@ -391,15 +397,21 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
+			// "frightened" state
+
 			ghost.control.state(Frightened).entry = state -> {
 				ghost.speed = Data.getGhostSpeedWhenFrightened();
 			};
+
 			ghost.control.state(Frightened).update = state -> {
 				ghost.moveRandomly();
 			};
+
 			ghost.control.state(Frightened).exit = state -> {
 				ghost.speed = Data.getGhostSpeedNormal();
 			};
+
+			// "dead" state
 
 			ghost.control.state(Dead).update = state -> {
 				ghost.walkHome();
@@ -407,6 +419,8 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.control.changeTo(Recovering);
 				}
 			};
+
+			// "recovering" state
 
 			ghost.control.state(Recovering).setDuration(Data.getGhostRecoveringDuration(GhostName.valueOf(ghost.getName())));
 
@@ -417,7 +431,9 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 		});
 
-		// "Blinky"-specific behavior
+		// Define individual ghost behavior
+
+		// "Blinky" directly follows Pac-Man
 
 		blinky.control.state(Waiting).entry = state -> {
 			blinky.placeAt(blinky.home);
@@ -430,7 +446,7 @@ public class PlayScene extends Scene<PacManGame> {
 			blinky.followRoute(pacMan.currentTile());
 		};
 
-		// "Inky"-specific behavior
+		// "Inky" aims at tile in front of Pac-Man or directly follows Pac-Man
 
 		inky.control.state(Waiting).entry = state -> {
 			inky.placeAt(inky.home);
@@ -442,7 +458,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		inky.control.state(Chasing, new DirectOrProactiveChasing(inky, blinky, pacMan));
 
-		// "Pinky"-specific behavior
+		// "Pinky" aims at tile which is 4 tiles ahead of Pac-Man
 
 		pinky.control.state(Waiting).entry = state -> {
 			pinky.placeAt(pinky.home);
@@ -454,7 +470,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		pinky.control.state(Chasing, new ProactiveChasing(pinky, pacMan, 4));
 
-		// "Clyde"-specific behavior
+		// "Clyde" follows Pac-Man if it is more than 8 tiles away, otherwise moves randomly
 
 		clyde.control.state(Waiting).entry = state -> {
 			clyde.placeAt(clyde.home);
@@ -476,7 +492,7 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// add entities to container
+		// add entities into collection
 		Entities.add(pacMan);
 		Entities.add(blinky);
 		Entities.add(inky);
@@ -578,15 +594,14 @@ public class PlayScene extends Scene<PacManGame> {
 		drawSpriteAt(g, firstRow, 0, selectedTheme().getBoard());
 
 		range(firstRow + 1, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
-			if (Data.board.has(TileContent.Pellet, row, col)) {
+			if (Data.board.contains(row, col, Pellet)) {
 				drawSpriteAt(g, row, col, selectedTheme().getPellet());
-			} else if (Data.board.has(TileContent.Energizer, row, col)) {
+			} else if (Data.board.contains(row, col, Energizer)) {
 				drawSpriteAt(g, row, col, selectedTheme().getEnergizer());
 			}
 		}));
 
-		Data.bonus.ifPresent(
-				bonus -> drawSpriteAt(g, BONUS_ROW, BONUS_COL, selectedTheme().getBonus(bonus)));
+		Data.bonus.ifPresent(bonus -> drawSpriteAt(g, BONUS_ROW, BONUS_COL, selectedTheme().getBonus(bonus)));
 
 		if (Settings.getBool("drawGrid")) {
 			g.drawImage(gridLines(), 0, 0, null);
@@ -629,8 +644,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Lives
-		range(0, Data.liveCount)
-				.forEach(i -> drawSpriteAt(g, NUM_ROWS - 2, 2 * (i + 1), selectedTheme().getLife()));
+		range(0, Data.liveCount).forEach(i -> drawSpriteAt(g, NUM_ROWS - 2, 2 * (i + 1), selectedTheme().getLife()));
 
 		// Bonus score
 		float col = NUM_COLS - 2;

@@ -7,6 +7,7 @@ import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
+import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 
@@ -16,7 +17,6 @@ import java.awt.Rectangle;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
-import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
@@ -89,8 +89,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public boolean canMoveTowards(int dir) {
-		final Topology top = Data.board.topology;
-		return canEnter(currentTile().translate(top.dx(dir), top.dy(dir)));
+		return canEnter(currentTile().translate(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir)));
 	}
 
 	public abstract boolean canEnter(Tile pos);
@@ -101,10 +100,9 @@ public abstract class PacManGameEntity extends GameEntity {
 	 * @return <code>true</code> iff entity can move
 	 */
 	public boolean move() {
-		final Topology top = Data.board.topology;
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(top.dx(moveDir), top.dy(moveDir)).times(speed));
+		tr.setVel(new Vector2(TOPOLOGY.dx(moveDir), TOPOLOGY.dy(moveDir)).times(speed));
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();
@@ -113,7 +111,7 @@ public abstract class PacManGameEntity extends GameEntity {
 			return false;
 		}
 		// check if "worm hole"-tile has been entered
-		if (Data.board.has(TileContent.Wormhole, newTile)) {
+		if (Data.board.contains(newTile, TileContent.Wormhole)) {
 			int col = newTile.getCol();
 			if (col == 0 && moveDir == Top4.W) {
 				// fall off left edge -> appear at right edge
@@ -126,7 +124,7 @@ public abstract class PacManGameEntity extends GameEntity {
 		}
 		// adjust position if entity touches disallowed neighbor tile
 		int row = newTile.getRow(), col = newTile.getCol();
-		Tile neighborTile = newTile.translate(top.dx(moveDir), top.dy(moveDir));
+		Tile neighborTile = newTile.translate(TOPOLOGY.dx(moveDir), TOPOLOGY.dy(moveDir));
 		boolean forbidden = !canEnter(neighborTile);
 		switch (moveDir) {
 		case E:
@@ -158,9 +156,8 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public void changeMoveDir(int dir) {
-		final Topology top = Data.board.topology;
 		nextMoveDir = dir;
-		boolean turn90 = (dir == top.left(moveDir) || dir == top.right(moveDir));
+		boolean turn90 = (dir == TOPOLOGY.left(moveDir) || dir == TOPOLOGY.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
 			return;
 		}

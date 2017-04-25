@@ -2,6 +2,11 @@ package de.amr.games.pacman.data;
 
 import java.awt.geom.Point2D;
 
+/**
+ * A tile in the maze.
+ * 
+ * @author Armin Reichert
+ */
 public class Tile extends Point2D.Float {
 
 	public Tile(float row, float col) {
@@ -27,7 +32,7 @@ public class Tile extends Point2D.Float {
 	public int getCol() {
 		return Math.round(x);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Tile[" + getRow() + "|" + getCol() + "]";

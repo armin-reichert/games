@@ -1,8 +1,8 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
 import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.data.Board.TOPOLOGY;
 
-import de.amr.easy.grid.api.Topology;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -79,18 +79,17 @@ public class GhostLoopingAroundWalls extends State {
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
 	private void computePathAroundWalls(Ghost ghost, int dir_forward, boolean clockwise) {
-		final Topology topology = Data.board.topology;
 		ghost.route.clear();
 		Tile current = loopStart;
 		do {
-			int dir_turn = clockwise ? topology.right(dir_forward) : topology.left(dir_forward);
-			int dir_turn_inv = topology.inv(dir_turn);
-			Tile current_antiturn = new Tile(current).translate(topology.dx(dir_turn_inv), topology.dy(dir_turn_inv));
-			Tile current_ahead = new Tile(current).translate(topology.dx(dir_forward), topology.dy(dir_forward));
-			Tile current_around_corner = new Tile(current_ahead).translate(topology.dx(dir_turn), topology.dy(dir_turn));
-			if (!Data.board.has(TileContent.Wall, current_ahead)) {
+			int dir_turn = clockwise ? TOPOLOGY.right(dir_forward) : TOPOLOGY.left(dir_forward);
+			int dir_turn_inv = TOPOLOGY.inv(dir_turn);
+			Tile current_antiturn = new Tile(current).translate(TOPOLOGY.dx(dir_turn_inv), TOPOLOGY.dy(dir_turn_inv));
+			Tile current_ahead = new Tile(current).translate(TOPOLOGY.dx(dir_forward), TOPOLOGY.dy(dir_forward));
+			Tile current_around_corner = new Tile(current_ahead).translate(TOPOLOGY.dx(dir_turn), TOPOLOGY.dy(dir_turn));
+			if (!Data.board.contains(current_ahead, TileContent.Wall)) {
 				// can move ahead
-				if (Data.board.has(TileContent.Wall, current_around_corner)) {
+				if (Data.board.contains(current_around_corner, TileContent.Wall)) {
 					// no corner in turn direction ahead, move forward
 					ghost.route.add(dir_forward);
 					current = current_ahead;
@@ -111,9 +110,9 @@ public class GhostLoopingAroundWalls extends State {
 						break;
 					}
 				}
-			} else if (!Data.board.has(TileContent.Wall, current_antiturn)) {
+			} else if (!Data.board.contains(current_antiturn, TileContent.Wall)) {
 				// turn against loop direction
-				dir_forward = topology.inv(dir_turn);
+				dir_forward = TOPOLOGY.inv(dir_turn);
 				ghost.route.add(dir_forward);
 				current = current_antiturn;
 				if (current.equals(loopStart)) {

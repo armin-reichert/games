@@ -10,6 +10,12 @@ import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.PathFinder;
 import de.amr.easy.grid.impl.ObservableBareGrid;
 
+/**
+ * A helper class for computing routes inside the maze.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class RouteMap {
 
 	private ObservableBareGrid<?> gridGraph;

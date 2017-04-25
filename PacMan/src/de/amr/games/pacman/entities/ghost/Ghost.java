@@ -2,6 +2,7 @@ package de.amr.games.pacman.entities.ghost;
 
 import static de.amr.easy.game.Application.Entities;
 import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened;
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.api.Topology;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
@@ -50,8 +50,8 @@ public class Ghost extends PacManGameEntity {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(GhostName ghostName, Color color, Tile home) {
-		super(home);
+	public Ghost(GhostName ghostName, Color color, float homeRow, float homeCol) {
+		super(new Tile(homeRow, homeCol));
 		this.color = color;
 		setName(ghostName.name());
 		control = new StateMachine<>(getName(), new EnumMap<>(GhostState.class));
@@ -133,7 +133,7 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		Data.board.topology.dirs().forEach(dir -> {
+		TOPOLOGY.dirs().forEach(dir -> {
 			getTheme().getGhostNormal(GhostName.valueOf(getName()), dir).setAnimated(animated);
 			getTheme().getGhostDead(dir).setAnimated(animated);
 		});
@@ -145,27 +145,26 @@ public class Ghost extends PacManGameEntity {
 
 	public void moveBackAndForth() {
 		if (!move()) {
-			changeMoveDir(Data.board.topology.inv(moveDir));
+			changeMoveDir(TOPOLOGY.inv(moveDir));
 		}
 	}
 
 	public void moveRandomly() {
-		final Topology top = Data.board.topology;
 		move();
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		List<Integer> dirsPermuted = top.dirsPermuted().boxed().collect(Collectors.toList());
+		List<Integer> dirsPermuted = TOPOLOGY.dirsPermuted().boxed().collect(Collectors.toList());
 		for (int dir : dirsPermuted) {
-			Tile targetTile = currentTile().translate(top.dx(dir), top.dy(dir));
+			Tile targetTile = currentTile().translate(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
-			if (Data.board.has(TileContent.Wormhole, targetTile)) {
-				moveDir = top.inv(moveDir);
+			if (Data.board.contains(targetTile, TileContent.Wormhole)) {
+				moveDir = TOPOLOGY.inv(moveDir);
 				return;
 			}
-			if (dir == top.inv(moveDir)) {
+			if (dir == TOPOLOGY.inv(moveDir)) {
 				return;
 			}
 			if (canEnter(targetTile)) {
@@ -204,9 +203,9 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public boolean move() {
-		if (Data.board.has(TileContent.Tunnel, currentTile())) {
+		if (Data.board.contains(currentTile(), TileContent.Tunnel)) {
 			speed = Data.getGhostSpeedInTunnel();
-		} else if (Data.board.has(TileContent.GhostHouse, currentTile())) {
+		} else if (Data.board.contains(currentTile(), TileContent.GhostHouse)) {
 			speed = Data.getGhostSpeedInHouse();
 		} else if (control.inState(Frightened)) {
 			speed = Data.getGhostSpeedWhenFrightened();
@@ -219,20 +218,20 @@ public class Ghost extends PacManGameEntity {
 	// --- predicates
 
 	public boolean insideGhostHouse() {
-		return Data.board.has(TileContent.GhostHouse, currentTile());
+		return Data.board.contains(currentTile(), TileContent.GhostHouse);
 	}
 
 	@Override
 	public boolean canEnter(Tile targetTile) {
-		if (Data.board.has(TileContent.Door, targetTile)) {
+		if (Data.board.contains(targetTile, TileContent.Door)) {
 			if (control.inState(Dead))
 				return true; // eyes can pass through door
 			if (control.inState(Waiting))
 				return false; // while waiting door is closed
 
 			// when inside ghost house or already in door, ghost can walk through
-			return insideGhostHouse() || Data.board.has(TileContent.Door, currentTile());
-		} else if (Data.board.has(TileContent.Wall, targetTile)) {
+			return insideGhostHouse() || Data.board.contains(currentTile(), TileContent.Door);
+		} else if (Data.board.contains(targetTile, TileContent.Wall)) {
 			return false;
 		}
 		return true;
@@ -278,10 +277,9 @@ public class Ghost extends PacManGameEntity {
 				tile = new Tile(state.getLoopStart());
 			}
 		}
-		Topology top = Data.board.topology;
 		int offset = TILE_SIZE / 2;
 		for (int dir : route) {
-			Tile nextTile = new Tile(tile).translate(top.dx(dir), top.dy(dir));
+			Tile nextTile = new Tile(tile).translate(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
 			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
 					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
 			tile = nextTile;

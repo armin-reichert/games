@@ -26,9 +26,12 @@ import java.util.Optional;
 
 import de.amr.games.pacman.entities.ghost.GhostName;
 
+/**
+ * Data structure containing global data and constants for the Pac-Man game.
+ * 
+ * @author Armin Reichert
+ */
 public class PacManGameData {
-
-	// Constants
 
 	public final int PointsForPellet = 10;
 	public final int PointsForEnergizer = 50;
@@ -45,7 +48,7 @@ public class PacManGameData {
 	private final File HighscoreFile = new File(System.getProperty("user.dir") + File.separator + "pacman.high.txt");
 
 	private final Object[][] LevelData = {
-			///*@formatter:off*/
+			/*@formatter:off*/
 			null,
 			{ Cherries, 	100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, .85f, .90f, .79f, .50f, 6 },
 			{ Strawberry, 300, 	.90f, .79f, .85f, .45f, 20, .8f, 10, .85f, .95f, .79f, .55f, 5 },
@@ -99,7 +102,7 @@ public class PacManGameData {
 	public int ghostValue;
 	public int ghostsEatenAtLevel;
 
-	// Highscore
+	// Highscore management
 
 	private void loadHighscore() {
 		try (BufferedReader r = new BufferedReader(new FileReader(HighscoreFile))) {

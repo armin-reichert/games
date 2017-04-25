@@ -34,44 +34,105 @@ public class Board {
 	public static final float BONUS_ROW = 19.5f;
 	public static final float BONUS_COL = 13;
 
-	public final Topology topology = new Top4();
-	public final Grid<Character, Integer> grid;
+	public static final Topology TOPOLOGY = new Top4();
 
 	private final String[] boardDataRows;
+	public final Grid<Character, Integer> grid;
 
-	public Board(String boardData) {
-		boardDataRows = boardData.split("\n");
-		grid = new Grid<>(NUM_COLS, NUM_ROWS, TileContent.Empty.toChar(), false);
+	/**
+	 * Initializes the board from the specified textual data.
+	 * 
+	 * @param boardAsText
+	 *          board data as read from text file
+	 */
+	public Board(String boardAsText) {
+		boardDataRows = boardAsText.split("\n");
+		grid = new Grid<>(NUM_COLS, NUM_ROWS, TileContent.None.toChar(), false);
 		reset();
 	}
 
+	/**
+	 * Resets the board to its initial content.
+	 */
 	public void reset() {
 		grid.vertexStream().forEach(cell -> grid.set(cell, boardDataRows[grid.row(cell)].charAt(grid.col(cell))));
 	}
 
+	/**
+	 * Tells if the specified tile is valid for this board.
+	 * 
+	 * @param tile
+	 *          a tile
+	 * @return <code>true</code> if the tile is valid
+	 */
 	public boolean isTileValid(Tile tile) {
 		int row = tile.getRow(), col = tile.getCol();
 		return row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS;
 	}
 
+	/**
+	 * Sets the content of the specified tile.
+	 * 
+	 * @param tile
+	 *          a tile
+	 * @param content
+	 *          some tile content
+	 */
 	public void setContent(Tile tile, TileContent content) {
 		Integer cell = grid.cell(tile.getCol(), tile.getRow());
 		grid.set(cell, content.toChar());
 	}
 
-	public boolean has(TileContent content, Tile tile) {
-		return has(content, tile.getRow(), tile.getCol());
+	/**
+	 * Tells if the given tile contains the given content.
+	 * 
+	 * @param tile
+	 *          a tile
+	 * @param content
+	 *          some tile content
+	 * @return <code>true</code> if the tile contains this content
+	 */
+	public boolean contains(Tile tile, TileContent content) {
+		return contains(tile.getRow(), tile.getCol(), content);
 	}
 
-	public boolean has(TileContent content, int row, int col) {
+	/**
+	 * Tells if the tile with the given coordinates contains the given content.
+	 * 
+	 * @param row
+	 *          tile row
+	 * @param col
+	 *          tile column
+	 * @param content
+	 *          some content
+	 * @return <code>true</code> if the tile contains this content
+	 */
+	public boolean contains(int row, int col, TileContent content) {
 		Integer cell = grid.cell(col, row);
 		return content.toChar() == grid.get(cell);
 	}
 
-	public Optional<Tile> checkContent(Tile tile, TileContent content) {
-		return has(content, tile.getRow(), tile.getCol()) ? Optional.of(tile) : Optional.empty();
+	/**
+	 * Checks if the given tile contains the specified content.
+	 * 
+	 * @param tile
+	 *          a tile
+	 * @param content
+	 *          some content
+	 * @return an Optional containing the tile if it contains the content or an empty Optional if it
+	 *         doesn't.
+	 */
+	public Optional<Tile> getContent(Tile tile, TileContent content) {
+		return contains(tile.getRow(), tile.getCol(), content) ? Optional.of(tile) : Optional.empty();
 	}
 
+	/**
+	 * Returns the number of occurrences of the given content inside the whole board.
+	 * 
+	 * @param content
+	 *          some tile content
+	 * @return the number of occurrences of this content
+	 */
 	public long count(TileContent content) {
 		return grid.vertexStream().filter(cell -> content.toChar() == grid.get(cell)).count();
 	}

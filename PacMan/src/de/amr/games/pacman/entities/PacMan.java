@@ -10,6 +10,7 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Data;
 import static de.amr.games.pacman.data.Board.BONUS_COL;
 import static de.amr.games.pacman.data.Board.BONUS_ROW;
+import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Dying;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Exploring;
 import static de.amr.games.pacman.entities.PacMan.PacManState.Frightening;
@@ -146,7 +147,7 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		Data.board.topology.dirs().forEach(dir -> {
+		TOPOLOGY.dirs().forEach(dir -> {
 			getTheme().getPacManRunning(dir).setAnimated(animated);
 		});
 	}
@@ -168,8 +169,8 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public boolean canEnter(Tile tile) {
-		return Data.board.isTileValid(tile) && !Data.board.has(TileContent.Wall, tile)
-				&& !Data.board.has(TileContent.Door, tile);
+		return Data.board.isTileValid(tile) && !Data.board.contains(tile, TileContent.Wall)
+				&& !Data.board.contains(tile, TileContent.Door);
 	}
 
 	private void exploreMaze() {
@@ -180,8 +181,8 @@ public class PacMan extends PacManGameEntity {
 		changeMoveDir(computeMoveDir());
 		couldMove = move();
 		final Tile tile = currentTile();
-		Data.board.checkContent(tile, TileContent.Pellet).ifPresent(onPelletFound);
-		Data.board.checkContent(tile, TileContent.Energizer).ifPresent(onEnergizerFound);
+		Data.board.getContent(tile, TileContent.Pellet).ifPresent(onPelletFound);
+		Data.board.getContent(tile, TileContent.Energizer).ifPresent(onEnergizerFound);
 		if (Data.bonus.isPresent() && getCol() == Math.round(BONUS_COL) && getRow() == Math.round(BONUS_ROW)) {
 			onBonusFound.accept(Data.bonus.get());
 			Data.bonus = Optional.empty();
