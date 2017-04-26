@@ -7,7 +7,7 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
-import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.BONUS_COL;
 import static de.amr.games.pacman.data.Board.BONUS_ROW;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
@@ -169,8 +169,8 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public boolean canEnter(Tile tile) {
-		return Data.board.isTileValid(tile) && !Data.board.contains(tile, TileContent.Wall)
-				&& !Data.board.contains(tile, TileContent.Door);
+		return Game.board.isTileValid(tile) && !Game.board.contains(tile, TileContent.Wall)
+				&& !Game.board.contains(tile, TileContent.Door);
 	}
 
 	private void exploreMaze() {
@@ -181,12 +181,12 @@ public class PacMan extends PacManGameEntity {
 		changeMoveDir(computeMoveDir());
 		couldMove = move();
 		final Tile tile = currentTile();
-		Data.board.getContent(tile, TileContent.Pellet).ifPresent(onPelletFound);
-		Data.board.getContent(tile, TileContent.Energizer).ifPresent(onEnergizerFound);
-		if (Data.bonus.isPresent() && getCol() == Math.round(BONUS_COL) && getRow() == Math.round(BONUS_ROW)) {
-			onBonusFound.accept(Data.bonus.get());
-			Data.bonus = Optional.empty();
-			Data.bonusTimeRemaining = 0;
+		Game.board.getContent(tile, TileContent.Pellet).ifPresent(onPelletFound);
+		Game.board.getContent(tile, TileContent.Energizer).ifPresent(onEnergizerFound);
+		if (Game.bonus.isPresent() && getCol() == Math.round(BONUS_COL) && getRow() == Math.round(BONUS_ROW)) {
+			onBonusFound.accept(Game.bonus.get());
+			Game.bonus = Optional.empty();
+			Game.bonusTimeRemaining = 0;
 		}
 		/*@formatter:off*/
 		Entities.allOf(Ghost.class)

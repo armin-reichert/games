@@ -3,7 +3,7 @@ package de.amr.games.pacman.data;
 import java.awt.geom.Point2D;
 
 /**
- * A tile in the maze.
+ * A tile of the board.
  * 
  * @author Armin Reichert
  */

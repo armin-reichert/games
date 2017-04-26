@@ -49,7 +49,7 @@ public abstract class Application {
 		});
 	}
 
-	public Application() {
+	protected Application() {
 		GameLoop = new GameLoop(this::update, this::render);
 		GameLoop.setFrameRate(Settings.fps);
 		defaultView = new DefaultView(this);

@@ -1,6 +1,6 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
-import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 
 import de.amr.games.pacman.data.Tile;
@@ -27,7 +27,7 @@ public class ProactiveChasing extends State {
 		for (int tiles = maxLookAhead; tiles >= 0; --tiles) {
 			Tile target = new Tile(pacManPosition).translate(tiles * TOPOLOGY.dx(pacMan.moveDir),
 					tiles * TOPOLOGY.dy(pacMan.moveDir));
-			if (Data.board.isTileValid(target) && !Data.board.contains(target, TileContent.GhostHouse)
+			if (Game.board.isTileValid(target) && !Game.board.contains(target, TileContent.GhostHouse)
 					&& ghost.canEnter(target)) {
 				ghost.followRoute(target);
 				return;

@@ -1,7 +1,7 @@
 package de.amr.games.pacman.entities.ghost;
 
 import static de.amr.easy.game.Application.Entities;
-import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Dead;
@@ -160,7 +160,7 @@ public class Ghost extends PacManGameEntity {
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
-			if (Data.board.contains(targetTile, TileContent.Wormhole)) {
+			if (Game.board.contains(targetTile, TileContent.Wormhole)) {
 				moveDir = TOPOLOGY.inv(moveDir);
 				return;
 			}
@@ -178,7 +178,7 @@ public class Ghost extends PacManGameEntity {
 
 	public void computeRoute(Tile target) {
 		route.clear();
-		route.addAll(Data.routeMap.shortestRoute(currentTile(), target));
+		route.addAll(Game.routeMap.shortestRoute(currentTile(), target));
 	}
 
 	public void followRoute(Tile target) {
@@ -203,14 +203,14 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public boolean move() {
-		if (Data.board.contains(currentTile(), TileContent.Tunnel)) {
-			speed = Data.getGhostSpeedInTunnel();
-		} else if (Data.board.contains(currentTile(), TileContent.GhostHouse)) {
-			speed = Data.getGhostSpeedInHouse();
+		if (Game.board.contains(currentTile(), TileContent.Tunnel)) {
+			speed = Game.getGhostSpeedInTunnel();
+		} else if (Game.board.contains(currentTile(), TileContent.GhostHouse)) {
+			speed = Game.getGhostSpeedInHouse();
 		} else if (control.inState(Frightened)) {
-			speed = Data.getGhostSpeedWhenFrightened();
+			speed = Game.getGhostSpeedWhenFrightened();
 		} else {
-			speed = Data.getGhostSpeedNormal();
+			speed = Game.getGhostSpeedNormal();
 		}
 		return super.move();
 	}
@@ -218,20 +218,20 @@ public class Ghost extends PacManGameEntity {
 	// --- predicates
 
 	public boolean insideGhostHouse() {
-		return Data.board.contains(currentTile(), TileContent.GhostHouse);
+		return Game.board.contains(currentTile(), TileContent.GhostHouse);
 	}
 
 	@Override
 	public boolean canEnter(Tile targetTile) {
-		if (Data.board.contains(targetTile, TileContent.Door)) {
+		if (Game.board.contains(targetTile, TileContent.Door)) {
 			if (control.inState(Dead))
 				return true; // eyes can pass through door
 			if (control.inState(Waiting))
 				return false; // while waiting door is closed
 
 			// when inside ghost house or already in door, ghost can walk through
-			return insideGhostHouse() || Data.board.contains(currentTile(), TileContent.Door);
-		} else if (Data.board.contains(targetTile, TileContent.Wall)) {
+			return insideGhostHouse() || Game.board.contains(currentTile(), TileContent.Door);
+		} else if (Game.board.contains(targetTile, TileContent.Wall)) {
 			return false;
 		}
 		return true;

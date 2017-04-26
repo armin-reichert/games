@@ -1,6 +1,6 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
-import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 
 import de.amr.games.pacman.data.Tile;
@@ -8,6 +8,10 @@ import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.fsm.State;
 
+/**
+ * @author Armin Reichert
+ *
+ */
 public class DirectOrProactiveChasing extends State {
 
 	private final Ghost chasingGhost;
@@ -28,7 +32,7 @@ public class DirectOrProactiveChasing extends State {
 		int dx = middle.getCol() - helperGhostTile.getCol();
 		int dy = middle.getRow() - helperGhostTile.getRow();
 		Tile targetTile = new Tile(helperGhostTile.getRow() + 2 * dy, helperGhostTile.getCol() + 2 * dx);
-		if (Data.board.isTileValid(targetTile)) {
+		if (Game.board.isTileValid(targetTile)) {
 			chasingGhost.computeRoute(targetTile);
 			if (!chasingGhost.route.isEmpty()) {
 				int chaseDir = chasingGhost.route.get(0);

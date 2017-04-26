@@ -5,7 +5,7 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
-import static de.amr.games.pacman.PacManGame.Data;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
@@ -111,7 +111,7 @@ public abstract class PacManGameEntity extends GameEntity {
 			return false;
 		}
 		// check if "worm hole"-tile has been entered
-		if (Data.board.contains(newTile, TileContent.Wormhole)) {
+		if (Game.board.contains(newTile, TileContent.Wormhole)) {
 			int col = newTile.getCol();
 			if (col == 0 && moveDir == Top4.W) {
 				// fall off left edge -> appear at right edge
