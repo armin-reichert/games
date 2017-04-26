@@ -1,5 +1,6 @@
 package de.amr.games.birdy.scenes.start;
 
+import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.GameEvent.Tick;
 import static de.amr.games.birdy.Globals.JUMP_KEY;
@@ -15,7 +16,6 @@ import java.util.Map;
 
 import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMState;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.timing.Countdown;
 import de.amr.games.birdy.GameEvent;
@@ -59,7 +59,7 @@ public class StartSceneControl extends FSM<StartSceneState, GameEvent> {
 			.end()
 			
 			.state(StartPlaying)
-				.entering(() -> Application.Views.show(PlayScene.class))
+				.entering(() -> Game.views.show(PlayScene.class))
 			.end()
 			
 		.endFSM();

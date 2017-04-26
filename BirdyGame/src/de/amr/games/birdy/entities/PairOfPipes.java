@@ -1,5 +1,6 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.Globals.OBSTACLE_PASSAGE_HEIGHT;
 import static de.amr.games.birdy.Globals.OBSTACLE_PIPE_HEIGHT;
 import static de.amr.games.birdy.Globals.WORLD_SPEED;
@@ -8,7 +9,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
 
 public class PairOfPipes {
@@ -51,11 +51,11 @@ public class PairOfPipes {
 	}
 
 	public PairOfPipes(int centerY) {
-		pipeDown = Application.Entities.add(new PipeDown());
+		pipeDown = Game.entities.add(new PipeDown());
 		pipeDown.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2 - OBSTACLE_PIPE_HEIGHT);
 		passage = new Passage();
 		passage.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2);
-		pipeUp = Application.Entities.add(new PipeUp());
+		pipeUp = Game.entities.add(new PipeUp());
 		pipeUp.tr.setY(centerY + OBSTACLE_PASSAGE_HEIGHT / 2);
 		setVelocityX(WORLD_SPEED);
 	}

@@ -1,5 +1,6 @@
 package de.amr.games.birdy.scenes.play;
 
+import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.GameEvent.BirdCrashed;
 import static de.amr.games.birdy.GameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
@@ -21,10 +22,8 @@ import java.util.Map;
 
 import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMState;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.input.Key;
-import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.GameEvent;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.scenes.start.StartScene;
@@ -37,7 +36,7 @@ public class PlaySceneControl extends FSM<PlaySceneState, GameEvent> {
 	}
 
 	public PlaySceneControl(PlayScene scene) {
-		final Bird bird = BirdyGame.Entities.findAny(Bird.class);
+		final Bird bird = Game.entities.findAny(Bird.class);
 		final Score score = scene.getApp().score;
 		//@formatter:off
 		beginFSM()
@@ -95,7 +94,7 @@ public class PlaySceneControl extends FSM<PlaySceneState, GameEvent> {
 			.end()
 			
 			.state(StartingNewGame)
-				.entering(() -> Application.Views.show(StartScene.class))
+				.entering(() -> Game.views.show(StartScene.class))
 			.end()
 				
 		.endFSM();

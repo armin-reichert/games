@@ -1,5 +1,6 @@
 package de.amr.games.breakout.entities;
 
+import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.Globals.BRICK_HEIGHT;
 import static de.amr.games.breakout.Globals.BRICK_WIDTH;
 
@@ -17,9 +18,8 @@ public class Brick extends GameEntity {
 
 	public Brick(BrickColor color, int value) {
 		this.value = value;
-		setSprites(new Sprite("Bricks/brick_" + color + "_small.png").scale(BRICK_WIDTH, BRICK_HEIGHT),
-				new Sprite("Bricks/brick_" + color + "_small_cracked.png").scale(BRICK_WIDTH,
-						BRICK_HEIGHT));
+		setSprites(new Sprite(Game.assets, "Bricks/brick_" + color + "_small.png").scale(BRICK_WIDTH, BRICK_HEIGHT),
+				new Sprite(Game.assets, "Bricks/brick_" + color + "_small_cracked.png").scale(BRICK_WIDTH, BRICK_HEIGHT));
 		cracked = false;
 	}
 

@@ -12,24 +12,26 @@ public class FlashText extends GameEntity {
 
 	private static final Font DEFAULT_FONT = new Font(Font.DIALOG, Font.BOLD, 12);
 
-	public static void show(String text, Font font, Color color, int displayTime, Vector2 position,
+	public static void show(Application app, String text, Font font, Color color, int displayTime, Vector2 position,
 			Vector2 velocity) {
-		FlashText flash = new FlashText();
+		FlashText flash = new FlashText(app);
 		flash.setText(text);
 		flash.setFont(font);
 		flash.setColor(color);
 		flash.setDisplayTime(displayTime);
 		flash.tr.moveTo(position);
 		flash.tr.setVel(velocity);
-		Application.Entities.add(flash);
 	}
 
+	private Application app;
 	private int timer;
 	private String text;
 	private Font font;
 	private Color color;
 
-	public FlashText() {
+	public FlashText(Application app) {
+		this.app = app;
+		app.entities.add(this);
 		timer = 60;
 		text = "";
 		font = DEFAULT_FONT;
@@ -44,7 +46,7 @@ public class FlashText extends GameEntity {
 	@Override
 	public void update() {
 		if (timer == 0) {
-			Application.Entities.remove(this);
+			app.entities.remove(this);
 		} else {
 			tr.move();
 			--timer;

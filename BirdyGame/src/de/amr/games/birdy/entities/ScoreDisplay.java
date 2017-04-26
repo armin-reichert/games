@@ -1,6 +1,7 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.Application.Assets;
+
+import static de.amr.games.birdy.BirdyGame.Game;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -21,7 +22,7 @@ public class ScoreDisplay extends GameEntity {
 		this.scale = scale;
 		this.digits = new Image[10];
 		for (int d = 0; d <= 9; d++) {
-			BufferedImage digitImage = Assets.image("number_score_0" + d);
+			BufferedImage digitImage = Game.assets.image("number_score_0" + d);
 			digits[d] = digitImage.getScaledInstance(-1, Math.round(scale) * digitImage.getHeight(),
 					Image.SCALE_SMOOTH);
 		}

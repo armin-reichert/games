@@ -13,12 +13,14 @@ public class BreakoutGame extends Application {
 		PlayScene
 	}
 
+	public static final BreakoutGame Game = new BreakoutGame();
+
 	public static void main(String[] args) {
-		Settings.title = "Breakout";
-		Settings.width = 300;
-		Settings.height = 300;
-		Settings.scale = 2;
-		launch(new BreakoutGame());
+		Game.settings.title = "Breakout";
+		Game.settings.width = 300;
+		Game.settings.height = 300;
+		Game.settings.scale = 2;
+		launch(Game);
 	}
 
 	private final Score score;
@@ -30,18 +32,18 @@ public class BreakoutGame extends Application {
 	@Override
 	protected void init() {
 
-		Assets.image("Background/background.jpg");
-		Assets.image("Balls/ball_green.png");
-		Assets.image("Bats/bat_blue.png");
-		Assets.sound("Sounds/plop.mp3");
-		Assets.sound("Sounds/point.mp3");
+		assets.image("Background/background.jpg");
+		assets.image("Balls/ball_green.png");
+		assets.image("Bats/bat_blue.png");
+		assets.sound("Sounds/plop.mp3");
+		assets.sound("Sounds/point.mp3");
 
-		Entities.add(new Ball(getWidth(), getHeight()));
-		Entities.add(new Bat(getWidth()));
-		Entities.add(new ScoreDisplay(this));
+		entities.add(new Ball(getWidth(), getHeight()));
+		entities.add(new Bat(getWidth()));
+		entities.add(new ScoreDisplay(this));
 
-		Views.add(new PlayScene(this));
-		Views.show(PlayScene.class);
+		views.add(new PlayScene(this));
+		views.show(PlayScene.class);
 	}
 
 	public Score getScore() {

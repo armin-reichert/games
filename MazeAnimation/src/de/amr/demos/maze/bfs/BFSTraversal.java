@@ -1,15 +1,15 @@
 package de.amr.demos.maze.bfs;
 
+import static de.amr.demos.maze.MazeDemoApp.App;
 import static de.amr.easy.game.Application.Log;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
-import de.amr.demos.maze.MazeDemo;
+import de.amr.demos.maze.MazeDemoApp;
 import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
@@ -18,17 +18,17 @@ import de.amr.easy.graph.api.WeightedEdge;
 import de.amr.easy.grid.api.GridPosition;
 import de.amr.easy.grid.impl.ObservableGrid;
 
-public class BFSTraversal extends Scene<MazeDemo> {
+public class BFSTraversal extends Scene<MazeDemoApp> {
 
-	private ObservableGrid<TraversalState,Integer> grid;
-	private BreadthFirstTraversal<Integer, WeightedEdge<Integer,Integer>> bfs;
+	private ObservableGrid<TraversalState, Integer> grid;
+	private BreadthFirstTraversal<Integer, WeightedEdge<Integer, Integer>> bfs;
 	private GridAnimation animation;
 	private Thread bfsRunner;
 	private Integer startCell;
 	private int maxDistance;
 	private boolean aborted;
 
-	public BFSTraversal(MazeDemo app) {
+	public BFSTraversal(MazeDemoApp app) {
 		super(app);
 	}
 
@@ -47,7 +47,7 @@ public class BFSTraversal extends Scene<MazeDemo> {
 			maxDistance = bfs.getMaxDistance();
 			Log.info("Max distance: " + maxDistance);
 			animation.setRenderingModel(
-					new BFSAnimationRenderingModel(grid, Application.Settings.getInt("cellSize"), bfs, maxDistance));
+					new BFSAnimationRenderingModel(grid, getApp().settings.getInt("cellSize"), bfs, maxDistance));
 			animation.setDelay(0);
 			Log.info("Start second, animated BFS:");
 			bfs.addObserver(animation);
@@ -69,11 +69,11 @@ public class BFSTraversal extends Scene<MazeDemo> {
 		} else if (Key.pressedOnce(KeyEvent.VK_CONTROL) && Key.pressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Key.pressedOnce(KeyEvent.VK_ENTER) && !bfsRunner.isAlive()) {
-			Application.Views.show(MazeGeneration.class);
+			App.views.show(MazeGeneration.class);
 		}
 		if (aborted) {
 			stopBreadthFirstTraversal();
-			Application.Views.show(Menu.class);
+			App.views.show(Menu.class);
 		}
 	}
 

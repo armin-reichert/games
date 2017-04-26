@@ -4,13 +4,13 @@ import static de.amr.games.pong.Globals.FONT;
 import static de.amr.games.pong.Globals.MENU_BACKGROUND;
 import static de.amr.games.pong.Globals.MENU_HIGHLIGHT;
 import static de.amr.games.pong.Globals.MENU_SELECTED_BACKGROUND;
+import static de.amr.games.pong.PongGame.Game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pong.PongGame;
@@ -52,7 +52,7 @@ public class Menu extends Scene<PongGame> {
 			int current = getApp().getPlayMode().ordinal();
 			getApp().setPlayMode(current == 0 ? values[values.length - 1] : values[current - 1]);
 		} else if (Key.pressedOnce(KeyEvent.VK_ENTER)) {
-			Application.Views.show(PlayScene.class);
+			Game.views.show(PlayScene.class);
 		}
 	}
 

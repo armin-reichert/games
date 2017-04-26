@@ -1,10 +1,10 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.easy.game.Application.Assets;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
@@ -51,17 +51,18 @@ public class ModernUI extends PacManUI {
 	private final Color hudColor;
 
 	private Image $(BufferedImage sheet, int row, int col) {
-		return sheet.getSubimage(col * 32, row * 32, 32, 32).getScaledInstance(SPRITE_SIZE, SPRITE_SIZE, Image.SCALE_SMOOTH);
+		return sheet.getSubimage(col * 32, row * 32, 32, 32).getScaledInstance(SPRITE_SIZE, SPRITE_SIZE,
+				Image.SCALE_SMOOTH);
 	}
 
 	private Image $(int row, int col) {
-		BufferedImage sheet = Assets.image("chompersprites.png");
+		BufferedImage sheet = Game.assets.image("chompersprites.png");
 		return $(sheet, row, col);
 	}
 
 	public ModernUI() {
 
-		BufferedImage sheet = Assets.image("pacman_original.png");
+		BufferedImage sheet = Game.assets.image("pacman_original.png");
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248)).scale(NUM_COLS * TILE_SIZE, (NUM_ROWS - 5) * TILE_SIZE);
 
 		int size = TILE_SIZE * 15 / 10;
@@ -104,7 +105,7 @@ public class ModernUI extends PacManUI {
 		ghostDead.createAnimation(AnimationMode.CYCLIC, ghostFrame);
 
 		life = new Sprite($(2, 11)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		BufferedImage sheet2 = Assets.image("" + "chompermazetiles.png");
+		BufferedImage sheet2 = Game.assets.image("" + "chompermazetiles.png");
 
 		energizer = new Sprite($(sheet2, 2, 7), $(sheet2, 2, 8)).scale(TILE_SIZE, TILE_SIZE);
 		energizer.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
@@ -112,8 +113,8 @@ public class ModernUI extends PacManUI {
 		pill = new Sprite($(sheet2, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
 
 		// Text display
-		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
-		textFont = Assets.font("textFont");
+		Game.assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		textFont = Game.assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
 

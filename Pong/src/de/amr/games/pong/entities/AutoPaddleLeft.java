@@ -2,6 +2,7 @@ package de.amr.games.pong.entities;
 
 import static de.amr.games.pong.Globals.BALL_SIZE;
 import static de.amr.games.pong.Globals.PADDLE_SPEED;
+import static de.amr.games.pong.PongGame.Game;
 import static java.awt.event.KeyEvent.VK_UNDEFINED;
 
 import de.amr.games.pong.PongGame;
@@ -16,7 +17,7 @@ public class AutoPaddleLeft extends Paddle {
 
 	@Override
 	public void update() {
-		Ball ball = PongGame.Entities.findAny(Ball.class);
+		Ball ball = Game.entities.findAny(Ball.class);
 		int targetY = game.getHeight() / 2 + getHeight();
 		if (ball.tr.getVelX() < 0) {
 			computeBallPositionLeft();
@@ -32,7 +33,7 @@ public class AutoPaddleLeft extends Paddle {
 	}
 
 	private void computeBallPositionLeft() {
-		Ball ball = PongGame.Entities.findAny(Ball.class);
+		Ball ball = Game.entities.findAny(Ball.class);
 		ballLeftY = ball.tr.getY() + ball.getHeight() / 2;
 		for (float x = ball.tr.getX(); x > getWidth() - 1; x += ball.tr.getVelX()) {
 			ballLeftY += ball.tr.getVelY();

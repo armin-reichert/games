@@ -1,8 +1,6 @@
 package de.amr.games.pacman.entities;
 
-import static de.amr.easy.game.Application.Entities;
 import static de.amr.easy.game.Application.Log;
-import static de.amr.easy.game.Application.Settings;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
@@ -99,7 +97,7 @@ public class PacMan extends PacManGameEntity {
 
 		control.state(Frightening).entry = state -> {
 			speedBeforeFrightening = this.speed;
-			Entities.allOf(Ghost.class).forEach(ghost -> ghost.perform(GhostAction.GetFrightened));
+			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.perform(GhostAction.GetFrightened));
 		};
 
 		control.state(Frightening).update = state -> {
@@ -111,7 +109,7 @@ public class PacMan extends PacManGameEntity {
 
 		control.state(Frightening).exit = state -> {
 			speed = speedBeforeFrightening;
-			Entities.allOf(Ghost.class).forEach(ghost -> ghost.perform(GhostAction.EndFrightened));
+			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.perform(GhostAction.EndFrightened));
 		};
 
 		control.state(Dying).entry = state -> {
@@ -189,7 +187,7 @@ public class PacMan extends PacManGameEntity {
 			Game.bonusTimeRemaining = 0;
 		}
 		/*@formatter:off*/
-		Entities.allOf(Ghost.class)
+		Game.entities.allOf(Ghost.class)
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())
 			.forEach(onGhostMet);
 		/*@formatter:on*/
@@ -216,7 +214,7 @@ public class PacMan extends PacManGameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		if (Settings.getBool("drawInternals")) {
+		if (Game.settings.getBool("drawInternals")) {
 			g.setColor(Color.WHITE);
 			g.setFont(new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10));
 			State state = control.state();

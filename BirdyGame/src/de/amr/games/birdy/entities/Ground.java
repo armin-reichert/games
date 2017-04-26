@@ -1,5 +1,7 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.games.birdy.BirdyGame.Game;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 
@@ -12,7 +14,7 @@ public class Ground extends GameEntity {
 	private float startX;
 
 	public Ground() {
-		setSprites(new Sprite("land"));
+		setSprites(new Sprite(Game.assets, "land"));
 		width = currentSprite().getWidth();
 	}
 

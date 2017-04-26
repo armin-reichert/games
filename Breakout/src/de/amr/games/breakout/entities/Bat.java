@@ -1,5 +1,7 @@
 package de.amr.games.breakout.entities;
 
+import static de.amr.games.breakout.BreakoutGame.Game;
+
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -13,7 +15,7 @@ public class Bat extends GameEntity {
 
 	public Bat(int gameWidth) {
 		this.gameWidth = gameWidth;
-		setSprites(new Sprite("Bats/bat_blue.png").scale(120, 26));
+		setSprites(new Sprite(Game.assets, "Bats/bat_blue.png").scale(120, 26));
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package de.amr.games.pacman.entities.ghost;
 
-import static de.amr.easy.game.Application.Entities;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
@@ -119,7 +118,7 @@ public class Ghost extends PacManGameEntity {
 			return getTheme().getGhostNormal(GhostName.valueOf(getName()), moveDir);
 		}
 		if (control.inState(Frightened)) {
-			PacMan pacMan = Entities.findAny(PacMan.class);
+			PacMan pacMan = Game.entities.findAny(PacMan.class);
 			return pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : getTheme().getGhostFrightened();
 		}
 		if (control.inState(Recovering)) {
@@ -242,7 +241,7 @@ public class Ghost extends PacManGameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		if (Application.Settings.getBool("drawInternals")) {
+		if (Game.settings.getBool("drawInternals")) {
 			drawState(g);
 			drawRoute(g);
 		}

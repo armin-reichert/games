@@ -26,11 +26,16 @@ public abstract class Application {
 	private static final int PAUSE_TOGGLE_KEY = KeyEvent.VK_P;
 
 	public static final Logger Log = Logger.getLogger(Application.class.getName());
-	public static final ApplicationSettings Settings = new ApplicationSettings();
-	public static final Assets Assets = new Assets();
-	public static final EntitySet Entities = new EntitySet();
-	public static final ViewManager Views = new ViewManager();
-	public static GameLoop GameLoop;
+
+	public final ApplicationSettings settings = new ApplicationSettings();
+
+	public final Assets assets = new Assets();
+
+	public final EntitySet entities = new EntitySet();
+
+	public final ViewManager views = new ViewManager();
+
+	public final GameLoop gameLoop;
 
 	private boolean paused;
 	private ApplicationShell shell;
@@ -50,8 +55,8 @@ public abstract class Application {
 	}
 
 	protected Application() {
-		GameLoop = new GameLoop(this::update, this::render);
-		GameLoop.setFrameRate(Settings.fps);
+		gameLoop = new GameLoop(this::update, this::render);
+		gameLoop.setFrameRate(settings.fps);
 		defaultView = new DefaultView(this);
 		Log.info("Application " + getClass().getSimpleName() + " created.");
 	}
@@ -60,19 +65,19 @@ public abstract class Application {
 		defaultView.init();
 		init();
 		Log.info("Application initialized.");
-		Log.info("Application Assets:\n" + Assets.overview());
+		Log.info("Application Assets:\n" + assets.overview());
 	}
 
 	protected abstract void init();
 
 	public final void start() {
 		_init();
-		GameLoop.start();
+		gameLoop.start();
 		Log.info("Application started.");
 	}
 
 	public final void stop() {
-		GameLoop.stop();
+		gameLoop.stop();
 		Log.info("Application stopped.");
 	}
 
@@ -93,9 +98,9 @@ public abstract class Application {
 			pause(!paused);
 		}
 		if (!paused) {
-			if (Views.current() != null) {
+			if (views.current() != null) {
 				CollisionHandler.update();
-				Views.current().update();
+				views.current().update();
 			} else {
 				defaultView.update();
 			}
@@ -103,7 +108,7 @@ public abstract class Application {
 	}
 
 	private void render() {
-		View currentView = Views.current();
+		View currentView = views.current();
 		shell.draw(currentView != null ? currentView : defaultView);
 	}
 
@@ -112,11 +117,11 @@ public abstract class Application {
 	}
 
 	public int getWidth() {
-		return Settings.width;
+		return settings.width;
 	}
 
 	public int getHeight() {
-		return Settings.height;
+		return settings.height;
 	}
 
 	public boolean isPaused() {

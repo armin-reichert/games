@@ -15,14 +15,16 @@ import de.amr.games.birdy.scenes.util.SpriteBrowser;
 
 public class BirdyGame extends Application {
 
+	public static final BirdyGame Game = new BirdyGame();
+
 	public static void main(String[] args) {
-		Settings.fps = 60;
-		Settings.title = "Zwick, das listige Vögelchen";
-		Settings.width = 640;
-		Settings.height = 480;
-		Settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
-		Settings.fullScreenOnStart = false;
-		launch(new BirdyGame());
+		Game.settings.fps = 60;
+		Game.settings.title = "Zwick, das listige Vögelchen";
+		Game.settings.width = 640;
+		Game.settings.height = 480;
+		Game.settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
+		Game.settings.fullScreenOnStart = false;
+		launch(Game);
 	}
 
 	public final Score score = new Score();
@@ -32,21 +34,21 @@ public class BirdyGame extends Application {
 		readSpriteSheet();
 		BirdySound.PLAYING_MUSIC.volume(-20);
 
-		Entities.add(new Bird(score));
-		Entities.add(new Ground());
-		Entities.add(new City());
+		entities.add(new Bird(score));
+		entities.add(new Ground());
+		entities.add(new City());
 
-		Views.add(new StartScene(this));
-		Views.add(new PlayScene(this));
-		Views.add(new SpriteBrowser(this));
+		views.add(new StartScene(this));
+		views.add(new PlayScene(this));
+		views.add(new SpriteBrowser(this));
 
-		Views.show(StartScene.class);
+		views.show(StartScene.class);
 		Log.info("Birdy app initialized.");
 	}
 
 	private void readSpriteSheet() {
-		BufferedImage spriteImage = Assets.image("spritesheet/atlas.png");
-		String[] spriteMap = Assets.readTextFile("spritesheet/atlas.txt").split("\\s+");
+		BufferedImage spriteImage = assets.image("spritesheet/atlas.png");
+		String[] spriteMap = assets.readTextFile("spritesheet/atlas.txt").split("\\s+");
 		int scale = 1024;
 		for (int i = 0; i < spriteMap.length;) {
 			String spriteName = spriteMap[i++];
@@ -55,7 +57,7 @@ public class BirdyGame extends Application {
 			int y = Math.round(Float.parseFloat(spriteMap[i++]) * scale);
 			int width = Math.round(Float.parseFloat(spriteMap[i++]) * scale);
 			int height = Math.round(Float.parseFloat(spriteMap[i++]) * scale);
-			Assets.storeImage(spriteName, spriteImage.getSubimage(x, y, width, height));
+			assets.storeImage(spriteName, spriteImage.getSubimage(x, y, width, height));
 		}
 	}
 }

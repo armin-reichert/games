@@ -1,5 +1,6 @@
 package de.amr.games.birdy.scenes.start;
 
+import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.GameEvent.Tick;
@@ -49,22 +50,22 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 	}
 
 	void reset() {
-		city = Application.Entities.findAny(City.class);
+		city = Game.entities.findAny(City.class);
 		city.setWidth(getWidth());
 		city.setNight(new Random().nextBoolean());
-		ground = Application.Entities.findAny(Ground.class);
+		ground = Game.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
 		ground.tr.moveTo(0, getHeight() - ground.getHeight());
 		ground.tr.setVel(WORLD_SPEED, 0);
-		bird = Application.Entities.findAny(Bird.class);
+		bird = Game.entities.findAny(Bird.class);
 		bird.init();
 		bird.tr.moveTo(getWidth() / 8, ground.tr.getY() / 2);
 		bird.tr.setVel(0, 0);
 		bird.setFeathers(city.isNight() ? Feathers.BLUE : Feathers.YELLOW);
-		displayedText = Application.Entities.add(new TitleText());
-		PumpingText readyText = new PumpingText("text_ready", 0.2f);
+		displayedText = Game.entities.add(new TitleText());
+		PumpingText readyText = new PumpingText(Game, "text_ready", 0.2f);
 		readyText.setName("readyText");
-		Application.Entities.add(readyText);
+		Game.entities.add(readyText);
 		CollisionHandler.clear();
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
 		Area birdWorld = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
@@ -101,8 +102,7 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 	private void showState(Graphics2D g) {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(
-				toString() + ", bird state:" + bird.getFlightState() + " - " + bird.getHealthState(), 20,
+		g.drawString(toString() + ", bird state:" + bird.getFlightState() + " - " + bird.getHealthState(), 20,
 				getHeight() - 50);
 	}
 
@@ -112,11 +112,11 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 	}
 
 	void showReadyText() {
-		displayedText = Application.Entities.findByName(PumpingText.class, "readyText");
+		displayedText = Game.entities.findByName(PumpingText.class, "readyText");
 	}
 
 	void showTitleText() {
-		displayedText = Application.Entities.findAny(TitleText.class);
+		displayedText = Game.entities.findAny(TitleText.class);
 	}
 
 	void stopScrolling() {

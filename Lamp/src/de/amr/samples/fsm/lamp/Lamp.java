@@ -1,11 +1,11 @@
 package de.amr.samples.fsm.lamp;
 
-import static de.amr.easy.game.Application.Assets;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,13 +14,18 @@ import javax.swing.JPanel;
 
 public class Lamp extends JPanel {
 
-	private static final Icon BULB_BRIGHT, BULB_DARK;
+	private static Icon BULB_BRIGHT = null, BULB_DARK = null;
 
 	static {
-		BufferedImage bulbs = Assets.image("bulbs.png");
-		int w = bulbs.getWidth() / 2, h = bulbs.getHeight();
-		BULB_DARK = new ImageIcon(bulbs.getSubimage(0, 0, w, h));
-		BULB_BRIGHT = new ImageIcon(bulbs.getSubimage(w, 0, w, h));
+		BufferedImage bulbs;
+		try {
+			bulbs = ImageIO.read(Lamp.class.getResourceAsStream("assets/bulbs.png"));
+			int w = bulbs.getWidth() / 2, h = bulbs.getHeight();
+			BULB_DARK = new ImageIcon(bulbs.getSubimage(0, 0, w, h));
+			BULB_BRIGHT = new ImageIcon(bulbs.getSubimage(w, 0, w, h));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private final JLabel bulb;
@@ -42,12 +47,12 @@ public class Lamp extends JPanel {
 	public void switchOn() {
 		bulb.setIcon(BULB_BRIGHT);
 		lightSwitch.setText("Ausschalten");
-		lightSwitch.setIcon(new ImageIcon(Assets.image("lightbulb_off.png")));
+		lightSwitch.setIcon(new ImageIcon("assets/lightbulb_off.png"));
 	}
 
 	public void switchOff() {
 		bulb.setIcon(BULB_DARK);
 		lightSwitch.setText("Einschalten");
-		lightSwitch.setIcon(new ImageIcon(Assets.image("lightbulb.png")));
+		lightSwitch.setIcon(new ImageIcon("assets/lightbulb.png"));
 	}
 }

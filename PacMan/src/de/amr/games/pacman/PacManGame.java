@@ -46,22 +46,22 @@ public class PacManGame extends Application {
 	public static final PacManGame Game = new PacManGame();
 
 	public static void main(String... args) {
-		Settings.title = "Armin's Pac-Man";
-		Settings.width = NUM_COLS * TILE_SIZE;
-		Settings.height = NUM_ROWS * TILE_SIZE;
-		Settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Settings.height : 1f;
-		Settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
-		Settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
-		Settings.set("drawInternals", false);
-		Settings.set("drawGrid", false);
+		Game.settings.title = "Armin's Pac-Man";
+		Game.settings.width = NUM_COLS * TILE_SIZE;
+		Game.settings.height = NUM_ROWS * TILE_SIZE;
+		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1f;
+		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		Game.settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
+		Game.settings.set("drawInternals", false);
+		Game.settings.set("drawGrid", false);
 		Log.setLevel(Level.ALL);
 		launch(Game);
 	}
 
 	@Override
 	protected void init() {
-		Views.add(new PlayScene(this));
-		Views.show(PlayScene.class);
+		views.add(new PlayScene(this));
+		views.show(PlayScene.class);
 	}
 
 	public Board board;
@@ -154,7 +154,7 @@ public class PacManGame extends Application {
 	}
 
 	public void initData() {
-		board = new Board(Assets.text("board.txt"));
+		board = new Board(assets.text("board.txt"));
 		routeMap = new RouteMap(board);
 		levelNumber = 1;
 		waveNumber = 1;
@@ -177,41 +177,41 @@ public class PacManGame extends Application {
 		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
 		Log.info(String.format("Level %d: %d pellets and %d energizers. Frames/sec: %d", levelNumber,
-				board.count(TileContent.Pellet), board.count(TileContent.Energizer), GameLoop.getFrameRate()));
+				board.count(TileContent.Pellet), board.count(TileContent.Energizer), gameLoop.getFrameRate()));
 	}
 
 	public int getGhostWaitingDuration(GhostName ghostName) {
 		switch (ghostName) {
 		case Blinky:
-			return GameLoop.secToFrames(0);
+			return gameLoop.secToFrames(0);
 		case Clyde:
-			return GameLoop.secToFrames(1.5f);
+			return gameLoop.secToFrames(1.5f);
 		case Inky:
-			return GameLoop.secToFrames(1);
+			return gameLoop.secToFrames(1);
 		case Pinky:
-			return GameLoop.secToFrames(0.5f);
+			return gameLoop.secToFrames(0.5f);
 		case Stinky:
-			return GameLoop.secToFrames(10);
+			return gameLoop.secToFrames(10);
 		}
 		return 0;
 	}
 
 	public int getGhostRecoveringDuration(GhostName ghostName) {
-		return GameLoop.secToFrames(2);
+		return gameLoop.secToFrames(2);
 	}
 
 	public int getScatteringDuration() {
 		int nCols = ScatterDuractionSeconds[0].length;
 		int row = (levelNumber == 1) ? 0 : (levelNumber <= 4) ? 1 : 2;
 		int col = waveNumber <= nCols ? waveNumber - 1 : nCols - 1;
-		return GameLoop.secToFrames(ScatterDuractionSeconds[row][col]);
+		return gameLoop.secToFrames(ScatterDuractionSeconds[row][col]);
 	}
 
 	public int getChasingDuration() {
 		int nCols = ChaseDurationSeconds[0].length;
 		int row = (levelNumber == 1) ? 0 : (levelNumber <= 4) ? 1 : 2;
 		int col = waveNumber <= nCols ? waveNumber - 1 : nCols - 1;
-		return GameLoop.secToFrames(ChaseDurationSeconds[row][col]);
+		return gameLoop.secToFrames(ChaseDurationSeconds[row][col]);
 	}
 
 	public Bonus getBonus() {
@@ -247,7 +247,7 @@ public class PacManGame extends Application {
 	}
 
 	public int getGhostFrightenedDuration() {
-		return GameLoop.secToFrames((Integer) LevelData[levelNumber][13]);
+		return gameLoop.secToFrames((Integer) LevelData[levelNumber][13]);
 	}
 
 }

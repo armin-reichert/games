@@ -10,34 +10,36 @@ import de.amr.easy.game.Application;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.impl.ObservableGrid;
 
-public class MazeDemo extends Application {
+public class MazeDemoApp extends Application {
+
+	public static final MazeDemoApp App = new MazeDemoApp();
 
 	public static void main(String[] args) {
-		Settings.title = "Maze Generation Demo";
-		Settings.bgColor = Color.WHITE;
-		// Settings.fullscreen = FullScreen.Mode(1280, 800, 32);
-		Settings.width = 640;
-		Settings.height = 640;
-		Settings.fps = 30;
-		Settings.set("cellSize", 4);
-		launch(new MazeDemo());
+		App.settings.title = "Maze Generation Demo";
+		App.settings.bgColor = Color.WHITE;
+		// App.Settings.fullscreen = FullScreen.Mode(1280, 800, 32);
+		App.settings.width = 640;
+		App.settings.height = 640;
+		App.settings.fps = 30;
+		App.settings.set("cellSize", 4);
+		launch(App);
 	}
 
-	private ObservableGrid<TraversalState,Integer> grid;
+	private ObservableGrid<TraversalState, Integer> grid;
 	private GridAnimation animation;
 
 	@Override
 	protected void init() {
-		Views.add(new Menu(this));
-		Views.add(new MazeGeneration(this));
-		Views.add(new BFSTraversal(this));
-		int cellSize = Settings.getInt("cellSize");
+		views.add(new Menu(this));
+		views.add(new MazeGeneration(this));
+		views.add(new BFSTraversal(this));
+		int cellSize = settings.getInt("cellSize");
 		grid = new ObservableGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
 		animation = new GridAnimation(grid, cellSize, getWidth(), getHeight());
-		Views.show(Menu.class);
+		views.show(Menu.class);
 	}
 
-	public ObservableGrid<TraversalState,Integer> getGrid() {
+	public ObservableGrid<TraversalState, Integer> getGrid() {
 		return grid;
 	}
 

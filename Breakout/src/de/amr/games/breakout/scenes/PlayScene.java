@@ -1,6 +1,6 @@
 package de.amr.games.breakout.scenes;
 
-import static de.amr.easy.game.Application.Assets;
+import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.Globals.BRICK_COLS;
 import static de.amr.games.breakout.Globals.BRICK_ROWS;
 import static de.amr.games.breakout.Globals.BRICK_WIDTH;
@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.fsm.FSM;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.scene.Scene;
@@ -35,8 +34,8 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void init() {
-		ball = Application.Entities.findAny(Ball.class);
-		bat = Application.Entities.findAny(Bat.class);
+		ball = Game.entities.findAny(Ball.class);
+		bat = Game.entities.findAny(Bat.class);
 		CollisionHandler.detectCollisionStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -53,7 +52,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(Assets.image("Background/background.jpg"), 0, 0, getWidth(), getHeight(), null);
+		g.drawImage(Game.assets.image("Background/background.jpg"), 0, 0, getWidth(), getHeight(), null);
 		for (int i = 0; i < BRICK_ROWS; ++i) {
 			for (int j = 0; j < BRICK_COLS; ++j) {
 				Brick brick = bricks[i][j];
@@ -62,7 +61,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 				}
 			}
 		}
-		Application.Entities.findAny(ScoreDisplay.class).draw(g);
+		Game.entities.findAny(ScoreDisplay.class).draw(g);
 		bat.draw(g);
 		ball.draw(g);
 	}
@@ -129,7 +128,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	void bounceBallFromBat() {
 		ball.tr.setVelY(-ball.tr.getVelY());
 		ball.tr.setY(bat.tr.getY() - ball.getHeight());
-		Assets.sound("Sounds/plop.mp3").play();
+		Game.assets.sound("Sounds/plop.mp3").play();
 	}
 
 	void bounceBallFromBrick(Brick brick) {
@@ -157,7 +156,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 			bounceBallFromBrick(brick);
 			brick.crack();
 		} else {
-			Assets.sound("Sounds/point.mp3").play();
+			Game.assets.sound("Sounds/point.mp3").play();
 			addToScore(brick.getValue());
 			removeBrick(brick);
 		}

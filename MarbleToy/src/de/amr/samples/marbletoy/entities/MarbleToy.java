@@ -1,6 +1,6 @@
 package de.amr.samples.marbletoy.entities;
 
-import static de.amr.easy.game.Application.Assets;
+import static de.amr.samples.marbletoy.MarbleToySimulation.App;
 import static de.amr.samples.marbletoy.router.RoutingPoint.C;
 import static de.amr.samples.marbletoy.router.RoutingPoint.D;
 import static de.amr.samples.marbletoy.router.RoutingPoint.E;
@@ -35,7 +35,7 @@ public class MarbleToy extends GameEntity {
 	private Character inputSlot;
 
 	public MarbleToy() {
-		super(new Sprite(Assets.image("toy.png")));
+		super(new Sprite(App.assets.image("toy.png")));
 		marble = new Marble();
 		marble.tr.moveTo(-marble.getWidth(), -marble.getHeight());
 		levers[0] = new Lever(178, 82);

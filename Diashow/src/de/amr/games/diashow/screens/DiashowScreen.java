@@ -1,6 +1,6 @@
 package de.amr.games.diashow.screens;
 
-import static de.amr.easy.game.Application.Assets;
+import static de.amr.games.diashow.Diashow.App;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -26,8 +26,7 @@ public class DiashowScreen extends Scene<Diashow> {
 	public void init() {
 		images = new Image[nImages];
 		for (int i = 0; i < nImages; i++) {
-			images[i] = Assets.readImage(i + ".jpg").getScaledInstance(getApp().getWidth(), -1,
-					Image.SCALE_SMOOTH);
+			images[i] = App.assets.readImage(i + ".jpg").getScaledInstance(getApp().getWidth(), -1, Image.SCALE_SMOOTH);
 		}
 		current = 0;
 	}

@@ -1,10 +1,9 @@
 package de.amr.easy.game.sprite;
 
-import static de.amr.easy.game.Application.Assets;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.view.Drawable;
 
 public class Sprite implements Drawable {
@@ -19,14 +18,14 @@ public class Sprite implements Drawable {
 		this.images = images;
 	}
 
-	public Sprite(String... imageKeys) {
+	public Sprite(Assets assets, String... imageKeys) {
 		if (imageKeys.length == 0) {
 			throw new IllegalArgumentException("Sprite needs at least one image");
 		}
 		images = new Image[imageKeys.length];
 		int i = 0;
 		for (String key : imageKeys) {
-			images[i++] = Assets.image(key);
+			images[i++] = assets.image(key);
 		}
 	}
 
@@ -78,7 +77,7 @@ public class Sprite implements Drawable {
 		animation.setFrameDuration(frameDurationMillis);
 		animation.setEnabled(true);
 	}
-	
+
 	public void setAnimated(boolean enabled) {
 		if (animation == null && images != null && images.length > 1) {
 			createAnimation(AnimationMode.BACK_AND_FORTH, 300);
@@ -87,7 +86,7 @@ public class Sprite implements Drawable {
 			animation.setEnabled(enabled);
 		}
 	}
-	
+
 	public void resetAnimation() {
 		if (animation != null) {
 			animation.reset();

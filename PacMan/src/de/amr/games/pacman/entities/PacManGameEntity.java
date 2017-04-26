@@ -1,6 +1,5 @@
 package de.amr.games.pacman.entities;
 
-import static de.amr.easy.game.Application.Settings;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
@@ -181,7 +180,7 @@ public abstract class PacManGameEntity extends GameEntity {
 		super.draw(g);
 		g.translate(margin, margin);
 
-		if (Settings.getBool("drawGrid")) {
+		if (Game.settings.getBool("drawGrid")) {
 			if (isExactlyOverTile(getRow(), getCol())) {
 				drawCollisionBox(g, Color.GREEN);
 			} else {

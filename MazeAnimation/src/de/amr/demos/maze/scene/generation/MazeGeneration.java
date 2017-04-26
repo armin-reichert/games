@@ -1,6 +1,6 @@
 package de.amr.demos.maze.scene.generation;
 
-import static de.amr.easy.game.Application.Views;
+import static de.amr.demos.maze.MazeDemoApp.App;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -8,12 +8,11 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import de.amr.demos.maze.MazeDemo;
+import de.amr.demos.maze.MazeDemoApp;
 import de.amr.demos.maze.bfs.BFSTraversal;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.demos.maze.ui.GridVisualization;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.graph.api.TraversalState;
@@ -34,7 +33,7 @@ import de.amr.easy.maze.alg.RecursiveDivision;
 import de.amr.easy.maze.alg.wilson.WilsonUSTHilbertCurve;
 import de.amr.easy.maze.alg.wilson.WilsonUSTNestedRectangles;
 
-public class MazeGeneration extends Scene<MazeDemo> {
+public class MazeGeneration extends Scene<MazeDemoApp> {
 
 	private static final Logger LOG = Logger.getLogger(MazeGeneration.class.getName());
 
@@ -46,14 +45,14 @@ public class MazeGeneration extends Scene<MazeDemo> {
 		/*@formatter:on*/
 	};
 
-	private ObservableGrid<TraversalState,Integer> grid;
+	private ObservableGrid<TraversalState, Integer> grid;
 	private MazeAlgorithm algorithm;
 	private Integer startCell;
 	private Thread mazeGeneration;
 	private GridAnimation animation;
 	private boolean aborted;
 
-	public MazeGeneration(MazeDemo game) {
+	public MazeGeneration(MazeDemoApp game) {
 		super(game);
 	}
 
@@ -65,7 +64,7 @@ public class MazeGeneration extends Scene<MazeDemo> {
 		startCell = grid.cell(GridPosition.TOP_LEFT);
 		mazeGeneration = new Thread(() -> {
 			chooseRandomAlgorithm();
-			animation.setRenderingModel(new GridVisualization(grid, Application.Settings.getInt("cellSize")));
+			animation.setRenderingModel(new GridVisualization(grid, getApp().settings.getInt("cellSize")));
 			animation.clearCanvas();
 			prepareGrid(algorithm);
 			algorithm.accept(startCell);
@@ -79,7 +78,7 @@ public class MazeGeneration extends Scene<MazeDemo> {
 		if (Key.pressedOnce(KeyEvent.VK_CONTROL) && Key.pressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Key.pressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
-			Application.Views.show(MazeGeneration.class);
+			App.views.show(MazeGeneration.class);
 		} else if (Key.pressedOnce(KeyEvent.VK_PLUS)) {
 			animation.faster(1);
 		} else if (Key.pressedOnce(KeyEvent.VK_MINUS)) {
@@ -87,9 +86,9 @@ public class MazeGeneration extends Scene<MazeDemo> {
 		}
 		if (aborted) {
 			stopGeneration();
-			Application.Views.show(Menu.class);
+			App.views.show(Menu.class);
 		} else if (!mazeGeneration.isAlive()) {
-			Views.show(BFSTraversal.class);
+			App.views.show(BFSTraversal.class);
 		}
 	}
 

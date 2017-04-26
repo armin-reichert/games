@@ -5,21 +5,23 @@ import de.amr.games.diashow.screens.DiashowScreen;
 
 public class Diashow extends Application {
 
+	public static final Diashow App = new Diashow();
+
 	public static void main(String[] args) {
-		Settings.title = "Diashow";
-		Settings.width = 900;
-		Settings.height = 600;
-		Settings.fps = 5;
-		launch(new Diashow());
+		App.settings.title = "Diashow";
+		App.settings.width = 900;
+		App.settings.height = 600;
+		App.settings.fps = 5;
+		launch(App);
 	}
 
 	@Override
 	protected void init() {
-		Assets.image("0.jpg");
-		Assets.image("1.jpg");
-		Assets.image("2.jpg");
-		Assets.image("3.jpg");
-		Views.add(new DiashowScreen(this));
-		Views.show(DiashowScreen.class);
+		assets.image("0.jpg");
+		assets.image("1.jpg");
+		assets.image("2.jpg");
+		assets.image("3.jpg");
+		views.add(new DiashowScreen(this));
+		views.show(DiashowScreen.class);
 	}
 }

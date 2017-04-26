@@ -22,12 +22,14 @@ public class PongGame extends Application {
 		Player1_Player2, Player1_Computer, Computer_Player2, Computer_Computer
 	}
 
+	public static final PongGame Game = new PongGame();
+
 	public static void main(String[] args) {
-		Settings.title = "Pong";
-		Settings.width = 640;
-		Settings.height = 480;
-		Settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
-		launch(new PongGame());
+		Game.settings.title = "Pong";
+		Game.settings.width = 640;
+		Game.settings.height = 480;
+		Game.settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
+		launch(Game);
 	}
 
 	private PlayMode playMode;
@@ -42,25 +44,25 @@ public class PongGame extends Application {
 	protected void init() {
 		setPlayMode(PlayMode.Player1_Player2);
 
-		Assets.sound("plop.mp3");
-		Assets.sound("plip.mp3");
-		Assets.sound("out.mp3");
+		assets.sound("plop.mp3");
+		assets.sound("plip.mp3");
+		assets.sound("out.mp3");
 
-		Entities.add(new AutoPaddleLeft(this));
-		Entities.add(new AutoPaddleRight(this));
-		Entities.add(new Ball(getHeight()));
-		Entities.add(new Court(this));
+		entities.add(new AutoPaddleLeft(this));
+		entities.add(new AutoPaddleRight(this));
+		entities.add(new Ball(getHeight()));
+		entities.add(new Court(this));
 		Paddle paddleLeft = new Paddle(this, KeyEvent.VK_A, KeyEvent.VK_Y);
 		paddleLeft.setName("paddleLeft");
-		Entities.add(paddleLeft);
+		entities.add(paddleLeft);
 		Paddle paddleRight = new Paddle(this, KeyEvent.VK_UP, KeyEvent.VK_DOWN);
 		paddleRight.setName("paddleRight");
-		Entities.add(paddleRight);
-		Entities.add(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
+		entities.add(paddleRight);
+		entities.add(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
 
-		Views.add(new Menu(this));
-		Views.add(new PlayScene(this));
-		Views.show(Menu.class);
+		views.add(new Menu(this));
+		views.add(new PlayScene(this));
+		views.show(Menu.class);
 	}
 
 	public void setPlayMode(PlayMode playMode) {

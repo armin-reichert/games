@@ -1,12 +1,12 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.easy.game.Application.Assets;
 import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
 import static de.amr.easy.game.sprite.AnimationMode.CYCLIC;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
+import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
@@ -55,7 +55,7 @@ public class ClassicUI extends PacManUI {
 	private final Color hudColor;
 
 	private Image $(int row, int col) {
-		BufferedImage sheet = Assets.image("pacman_original.png");
+		BufferedImage sheet = Game.assets.image("pacman_original.png");
 		return sheet.getSubimage(456 + col * 16, row * 16, 16, 16);
 	}
 
@@ -80,7 +80,7 @@ public class ClassicUI extends PacManUI {
 	}
 
 	public ClassicUI() {
-		BufferedImage sheet = Assets.image("pacman_original.png");
+		BufferedImage sheet = Game.assets.image("pacman_original.png");
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248));
 		board.scale(TILE_SIZE * NUM_COLS, TILE_SIZE * (NUM_ROWS - 5));
 
@@ -148,8 +148,8 @@ public class ClassicUI extends PacManUI {
 		life.scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		// Text display
-		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
-		textFont = Assets.font("textFont");
+		Game.assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		textFont = Game.assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
 

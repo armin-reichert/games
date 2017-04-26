@@ -1,5 +1,6 @@
 package de.amr.games.birdy.scenes.play;
 
+import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.GameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
@@ -69,13 +70,13 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 	}
 
 	void initEntities() {
-		ground = Application.Entities.findAny(Ground.class);
-		city = Application.Entities.findAny(City.class);
-		bird = Application.Entities.findAny(Bird.class);
+		ground = Game.entities.findAny(Ground.class);
+		city = Game.entities.findAny(City.class);
+		bird = Game.entities.findAny(Bird.class);
 		scoreDisplay = new ScoreDisplay(getApp().score, 1.5f);
 		scoreDisplay.centerHor(getWidth());
 		scoreDisplay.tr.setY(ground.tr.getY() / 4);
-		gameOverText = Application.Entities.add(new GameOverText());
+		gameOverText = Game.entities.add(new GameOverText());
 		gameOverText.center(getWidth(), getHeight());
 		pipesManager = new PipesManager();
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
@@ -113,8 +114,7 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 	private void showState(Graphics2D g) {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(
-				toString() + ", bird state:" + bird.getFlightState() + " - " + bird.getHealthState(), 20,
+		g.drawString(toString() + ", bird state:" + bird.getFlightState() + " - " + bird.getHealthState(), 20,
 				getHeight() - 50);
 	}
 
@@ -143,8 +143,7 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 
 		private PipesManager() {
 			pipesList = new LinkedList<>();
-			pipeCreation321 = new Countdown(
-					Util.randomInt(OBSTACLE_MIN_CREATION_TIME, OBSTACLE_MAX_CREATION_TIME));
+			pipeCreation321 = new Countdown(Util.randomInt(OBSTACLE_MIN_CREATION_TIME, OBSTACLE_MAX_CREATION_TIME));
 			running = false;
 		}
 
@@ -176,9 +175,8 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 
 		private void addPipes() {
 			if (pipeCreation321.isComplete()) {
-				PairOfPipes pipes = new PairOfPipes(
-						Util.randomInt(OBSTACLE_MIN_PIPE_HEIGHT + OBSTACLE_PASSAGE_HEIGHT / 2,
-								(int) ground.tr.getY() - OBSTACLE_MIN_PIPE_HEIGHT - OBSTACLE_PASSAGE_HEIGHT / 2));
+				PairOfPipes pipes = new PairOfPipes(Util.randomInt(OBSTACLE_MIN_PIPE_HEIGHT + OBSTACLE_PASSAGE_HEIGHT / 2,
+						(int) ground.tr.getY() - OBSTACLE_MIN_PIPE_HEIGHT - OBSTACLE_PASSAGE_HEIGHT / 2));
 				pipes.setPositionX(getApp().getWidth());
 				pipes.setLighted(city.isNight() && new Random().nextBoolean());
 				pipesList.add(pipes);
@@ -202,8 +200,8 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 					it.remove();
 				}
 			}
-			Application.Entities.removeAll(PipeUp.class);
-			Application.Entities.removeAll(PipeDown.class);
+			Game.entities.removeAll(PipeUp.class);
+			Game.entities.removeAll(PipeDown.class);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package de.amr.games.breakout.scenes;
 
+import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBat;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBrick;
 import static de.amr.games.breakout.scenes.PlayEvent.Tick;
@@ -14,7 +15,6 @@ import java.util.Map;
 
 import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMState;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Key;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Brick;
@@ -27,7 +27,7 @@ public class PlaySceneControl extends FSM<PlayState, PlayEvent> {
 	}
 
 	public PlaySceneControl(PlayScene scene) {
-		final Ball ball = Application.Entities.findAny(Ball.class);
+		final Ball ball = Game.entities.findAny(Ball.class);
 		/*@formatter:off*/
 		beginFSM()
 			.description("Breakout Application Control")

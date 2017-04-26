@@ -1,10 +1,6 @@
 package de.amr.games.pacman.scenes;
 
-import static de.amr.easy.game.Application.Assets;
-import static de.amr.easy.game.Application.Entities;
-import static de.amr.easy.game.Application.GameLoop;
 import static de.amr.easy.game.Application.Log;
-import static de.amr.easy.game.Application.Settings;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
@@ -112,7 +108,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(AttackState.Scattering).entry = state -> {
 				state.setDuration(Game.getScatteringDuration());
-				Entities.allOf(Ghost.class).forEach(ghost -> {
+				Game.entities.allOf(Ghost.class).forEach(ghost -> {
 					ghost.perform(GhostAction.Scatter);
 				});
 				log();
@@ -123,15 +119,15 @@ public class PlayScene extends Scene<PacManGame> {
 					state(AttackState.Chasing).setDuration(Game.getChasingDuration());
 					changeTo(AttackState.Chasing);
 				} else {
-					Entities.all().forEach(GameEntity::update);
+					Game.entities.all().forEach(GameEntity::update);
 				}
 			};
 
 			state(AttackState.Chasing).entry = state -> {
-				Entities.allOf(Ghost.class).forEach(ghost -> {
+				Game.entities.allOf(Ghost.class).forEach(ghost -> {
 					ghost.perform(GhostAction.Chase);
 				});
-				Assets.sound("sfx/waza.mp3").loop();
+				Game.assets.sound("sfx/waza.mp3").loop();
 				log();
 			};
 
@@ -139,16 +135,16 @@ public class PlayScene extends Scene<PacManGame> {
 				if (state.isTerminated()) {
 					changeTo(AttackState.Complete);
 				} else {
-					Entities.all().forEach(GameEntity::update);
+					Game.entities.all().forEach(GameEntity::update);
 				}
 			};
 
-			state(AttackState.Complete).entry = state -> Assets.sound("sfx/waza.mp3").stop();
+			state(AttackState.Complete).entry = state -> Game.assets.sound("sfx/waza.mp3").stop();
 		}
 
 		void log() {
 			Log.info(String.format("Level %d, wave %d: enter state %s for %d seconds", Game.levelNumber, Game.waveNumber,
-					stateID(), GameLoop.framesToSec(state().getDuration())));
+					stateID(), Game.gameLoop.framesToSec(state().getDuration())));
 		}
 	}
 
@@ -170,11 +166,11 @@ public class PlayScene extends Scene<PacManGame> {
 				Game.initLevel();
 				createPacManAndGhosts();
 				applyTheme();
-				Assets.sound("sfx/insert-coin.mp3").play();
+				Game.assets.sound("sfx/insert-coin.mp3").play();
 			};
 
 			state(PlayState.StartingGame).update = state -> {
-				if (Assets.sound("sfx/insert-coin.mp3").isRunning()) {
+				if (Game.assets.sound("sfx/insert-coin.mp3").isRunning()) {
 					return;
 				}
 				if (Key.pressedOnce(VK_ENTER)) {
@@ -191,17 +187,17 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(PlayState.StartPlaying).entry = state -> {
 				selectedTheme().getEnergizer().setAnimated(true);
-				Entities.findAny(PacMan.class).control.changeTo(PacManState.Waiting);
-				Entities.allOf(Ghost.class).forEach(ghost -> {
+				Game.entities.findAny(PacMan.class).control.changeTo(PacManState.Waiting);
+				Game.entities.allOf(Ghost.class).forEach(ghost -> {
 					ghost.init();
 					ghost.setAnimated(true);
 				});
 			};
 
 			state(PlayState.StartPlaying).update = state -> {
-				Entities.all().forEach(GameEntity::update);
+				Game.entities.all().forEach(GameEntity::update);
 				if (state.isTerminated()) {
-					Entities.allOf(Ghost.class).forEach(ghost -> {
+					Game.entities.allOf(Ghost.class).forEach(ghost -> {
 						int waitTicks = Game.getGhostWaitingDuration(GhostName.valueOf(ghost.getName()));
 						ghost.control.state(GhostState.Waiting).setDuration(waitTicks);
 					});
@@ -212,11 +208,11 @@ public class PlayScene extends Scene<PacManGame> {
 			// --
 
 			state(PlayState.Playing).entry = state -> {
-				PacMan pacMan = Entities.findAny(PacMan.class);
+				PacMan pacMan = Game.entities.findAny(PacMan.class);
 				pacMan.control.changeTo(PacManState.Exploring);
 				pacMan.speed = Game.getPacManSpeed();
 				attackControl.changeTo(AttackState.Starting);
-				Assets.sound("sfx/eating.mp3").loop();
+				Game.assets.sound("sfx/eating.mp3").loop();
 			};
 
 			state(PlayState.Playing).update = state -> {
@@ -225,7 +221,7 @@ public class PlayScene extends Scene<PacManGame> {
 					attackControl.changeTo(AttackState.Complete);
 					++Game.levelNumber;
 					changeTo(PlayState.StartPlaying, levelStarting -> {
-						levelStarting.setDuration(GameLoop.secToFrames(4));
+						levelStarting.setDuration(Game.gameLoop.secToFrames(4));
 						Game.initLevel();
 						announceLevel();
 					});
@@ -242,20 +238,20 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(PlayState.Playing).exit = state -> {
-				Assets.sound("sfx/eating.mp3").stop();
-				Entities.removeAll(FlashText.class);
+				Game.assets.sound("sfx/eating.mp3").stop();
+				Game.entities.removeAll(FlashText.class);
 			};
 
 			// --
 
 			state(PlayState.Crashing).entry = state -> {
-				state.setDuration(GameLoop.secToFrames(3));
+				state.setDuration(Game.gameLoop.secToFrames(3));
 				Log.info("PacMan crashed, lives remaining: " + Game.liveCount);
 				selectedTheme().getEnergizer().setAnimated(false);
 				bonus(false);
 				attackControl.changeTo(AttackState.Complete);
-				Assets.sounds().forEach(Sound::stop);
-				Assets.sound("sfx/die.mp3").play();
+				Game.assets.sounds().forEach(Sound::stop);
+				Game.assets.sound("sfx/die.mp3").play();
 			};
 
 			state(PlayState.Crashing).update = state -> {
@@ -272,7 +268,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(PlayState.GameOver).entry = state -> {
 				Log.info("Game over.");
-				Entities.all().forEach(entity -> entity.setAnimated(false));
+				Game.entities.all().forEach(entity -> entity.setAnimated(false));
 				selectedTheme().getEnergizer().setAnimated(false);
 				bonus(false);
 				attackControl.changeTo(AttackState.Complete);
@@ -280,13 +276,13 @@ public class PlayScene extends Scene<PacManGame> {
 					Game.highscorePoints = Game.score;
 					Game.saveHighscore();
 				}
-				Assets.sounds().forEach(Sound::stop);
-				Assets.sound("sfx/die.mp3").play();
+				Game.assets.sounds().forEach(Sound::stop);
+				Game.assets.sound("sfx/die.mp3").play();
 			};
 
 			state(PlayState.GameOver).update = state -> {
 				if (Key.pressedOnce(VK_SPACE)) {
-					Entities.removeAll(GameEntity.class);
+					Game.entities.removeAll(GameEntity.class);
 					changeTo(PlayState.StartingGame);
 				}
 			};
@@ -309,9 +305,9 @@ public class PlayScene extends Scene<PacManGame> {
 	@Override
 	public void update() {
 		if (Key.pressedOnce(VK_CONTROL, VK_I)) {
-			Settings.set("drawInternals", !Settings.getBool("drawInternals"));
+			Game.settings.set("drawInternals", !Game.settings.getBool("drawInternals"));
 		} else if (Key.pressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_G)) {
-			Settings.set("drawGrid", !Settings.getBool("drawGrid"));
+			Game.settings.set("drawGrid", !Game.settings.getBool("drawGrid"));
 		}
 		playControl.update();
 	}
@@ -330,7 +326,7 @@ public class PlayScene extends Scene<PacManGame> {
 				bonus(true);
 			}
 			pacMan.freeze(Game.WaitTicksOnEatingPellet);
-			Assets.sound("sfx/eat-pill.mp3").play();
+			Game.assets.sound("sfx/eat-pill.mp3").play();
 		};
 
 		pacMan.onEnergizerFound = tile -> {
@@ -339,7 +335,7 @@ public class PlayScene extends Scene<PacManGame> {
 			Game.ghostValue = Game.PointsForFirstGhost;
 			pacMan.freeze(Game.WaitTicksOnEatingEnergizer);
 			pacMan.startAttacking(Game.getGhostFrightenedDuration(), Game.getPacManAttackingSpeed());
-			Assets.sound("sfx/eat-pill.mp3").play();
+			Game.assets.sound("sfx/eat-pill.mp3").play();
 		};
 
 		pacMan.onBonusFound = bonus -> {
@@ -347,7 +343,7 @@ public class PlayScene extends Scene<PacManGame> {
 			score(points);
 			Game.bonusScore.add(bonus);
 			flash(points, BONUS_COL * TILE_SIZE, BONUS_ROW * TILE_SIZE);
-			Assets.sound("sfx/eat-fruit.mp3").play();
+			Game.assets.sound("sfx/eat-fruit.mp3").play();
 		};
 
 		pacMan.onGhostMet = ghost -> {
@@ -356,7 +352,7 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 			if (pacMan.control.inState(PacManState.Frightening)) {
 				Log.info("Pac-Man eats " + ghost.getName() + ".");
-				Assets.sound("sfx/eat-ghost.mp3").play();
+				Game.assets.sound("sfx/eat-ghost.mp3").play();
 				score(Game.ghostValue);
 				flash(Game.ghostValue, ghost.tr.getX(), ghost.tr.getY());
 				Game.ghostValue *= 2;
@@ -493,15 +489,15 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// add entities into collection
-		Entities.add(pacMan);
-		Entities.add(blinky);
-		Entities.add(inky);
-		Entities.add(pinky);
-		Entities.add(clyde);
+		Game.entities.add(pacMan);
+		Game.entities.add(blinky);
+		Game.entities.add(inky);
+		Game.entities.add(pinky);
+		Game.entities.add(clyde);
 	}
 
 	private List<PacManUI> themes() {
-		return Settings.get("themes");
+		return Game.settings.get("themes");
 	}
 
 	private PacManUI selectedTheme() {
@@ -516,8 +512,8 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private void applyTheme() {
-		Entities.allOf(PacManGameEntity.class).forEach(e -> e.setTheme(selectedTheme()));
-		Entities.all().forEach(GameEntity::init);
+		Game.entities.allOf(PacManGameEntity.class).forEach(e -> e.setTheme(selectedTheme()));
+		Game.entities.all().forEach(GameEntity::init);
 		selectedTheme().getEnergizer().setAnimated(false);
 	}
 
@@ -531,23 +527,23 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private void announceLevel() {
-		Assets.sound("sfx/ready.mp3").play();
-		FlashText.show("Level " + Game.levelNumber, selectedTheme().getTextFont(), Color.YELLOW, GameLoop.secToFrames(0.5f),
-				new Vector2(11, 21).times(TILE_SIZE), Vector2.nullVector());
+		Game.assets.sound("sfx/ready.mp3").play();
+		FlashText.show(Game, "Level " + Game.levelNumber, selectedTheme().getTextFont(), Color.YELLOW,
+				Game.gameLoop.secToFrames(0.5f), new Vector2(11, 21).times(TILE_SIZE), Vector2.nullVector());
 	}
 
 	private void flash(Object object, float x, float y) {
 		if (x > getWidth() - 3 * TILE_SIZE) {
 			x -= 3 * TILE_SIZE;
 		}
-		FlashText.show(String.valueOf(object), selectedTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
-				Color.YELLOW, GameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+		FlashText.show(Game, String.valueOf(object), selectedTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
+				Color.YELLOW, Game.gameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
 	private void bonus(boolean on) {
 		if (on) {
 			Game.bonus = Optional.of(Game.getBonus());
-			Game.bonusTimeRemaining = GameLoop.secToFrames(9 + (float) Math.random());
+			Game.bonusTimeRemaining = Game.gameLoop.secToFrames(9 + (float) Math.random());
 		} else {
 			Game.bonus = Optional.empty();
 			Game.bonusTimeRemaining = 0;
@@ -557,7 +553,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private void score(int points) {
 		if (Game.score < Game.ScoreForExtraLife && Game.score + points >= Game.ScoreForExtraLife) {
 			++Game.liveCount;
-			Assets.sound("sfx/extra-life.mp3").play();
+			Game.assets.sound("sfx/extra-life.mp3").play();
 		}
 		Game.score += points;
 	}
@@ -567,12 +563,12 @@ public class PlayScene extends Scene<PacManGame> {
 	@Override
 	public void draw(Graphics2D g) {
 		drawBoard(g, 3);
-		Entities.findAny(PacMan.class).draw(g);
+		Game.entities.findAny(PacMan.class).draw(g);
 		if (playControl.stateID() != PlayState.Crashing) {
-			Entities.allOf(Ghost.class).forEach(ghost -> ghost.draw(g));
+			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.draw(g));
 		}
 		drawGameState(g);
-		Entities.allOf(FlashText.class).forEach(text -> text.draw(g));
+		Game.entities.allOf(FlashText.class).forEach(text -> text.draw(g));
 	}
 
 	private void drawSpriteAt(Graphics2D g, float row, float col, Sprite sprite) {
@@ -603,13 +599,13 @@ public class PlayScene extends Scene<PacManGame> {
 
 		Game.bonus.ifPresent(bonus -> drawSpriteAt(g, BONUS_ROW, BONUS_COL, selectedTheme().getBonus(bonus)));
 
-		if (Settings.getBool("drawGrid")) {
+		if (Game.settings.getBool("drawGrid")) {
 			g.drawImage(gridLines(), 0, 0, null);
 		}
 
-		if (Settings.getBool("drawInternals")) {
+		if (Game.settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
-			Entities.allOf(Ghost.class).forEach(ghost -> {
+			Game.entities.allOf(Ghost.class).forEach(ghost -> {
 				g.setColor(ghost.color);
 				g.fillRect(Math.round(ghost.home.x * TILE_SIZE), Math.round(ghost.home.y * TILE_SIZE), TILE_SIZE, TILE_SIZE);
 			});
@@ -653,7 +649,7 @@ public class PlayScene extends Scene<PacManGame> {
 			col -= 2f;
 		}
 
-		if (Settings.getBool("drawInternals")) {
+		if (Game.settings.getBool("drawInternals")) {
 			drawTextCenteredAt(g, 33, playControl.stateID().toString());
 		}
 	}

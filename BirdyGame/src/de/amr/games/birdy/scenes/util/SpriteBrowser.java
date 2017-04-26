@@ -1,6 +1,6 @@
 package de.amr.games.birdy.scenes.util;
 
-import static de.amr.easy.game.Application.Assets;
+import static de.amr.games.birdy.BirdyGame.Game;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.birdy.BirdyGame;
@@ -26,7 +25,7 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 	public SpriteBrowser(BirdyGame game) {
 		super(game);
 		spriteNames = new ArrayList<>();
-		for (String name : Assets.imageNames()) {
+		for (String name : Game.assets.imageNames()) {
 			spriteNames.add(name);
 		}
 		Collections.sort(spriteNames);
@@ -43,14 +42,14 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 		} else if (Key.pressedOnce(KeyEvent.VK_LEFT)) {
 			index = index == 0 ? spriteNames.size() - 1 : index - 1;
 		} else if (Key.pressedOnce(KeyEvent.VK_X)) {
-			Application.Views.show(StartScene.class);
+			Game.views.show(StartScene.class);
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		String name = spriteNames.get(index);
-		BufferedImage image = Assets.image(name);
+		BufferedImage image = Game.assets.image(name);
 		String text = name + " (" + image.getWidth() + "x" + image.getHeight() + ")";
 		text += " (Keys: LEFT=Previous, RIGHT=Next, X=Exit)";
 		g.setColor(Color.WHITE);

@@ -116,7 +116,7 @@ public class Assets {
 		}
 	}
 
-	public BufferedImage scaledImage(Image image, int width, int height) {
+	public static BufferedImage scaledImage(Image image, int width, int height) {
 		Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 		BufferedImage copy = new BufferedImage(scaled.getWidth(null), scaled.getHeight(null),
 				BufferedImage.TYPE_INT_ARGB);

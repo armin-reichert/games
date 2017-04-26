@@ -1,21 +1,23 @@
 package de.amr.easy.game.ui;
 
-import static de.amr.easy.game.Application.GameLoop;
-import static de.amr.easy.game.Application.Settings;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.amr.easy.game.Application;
+
+@SuppressWarnings("serial")
 public class AppControlDialog extends JDialog {
 
+	private final Application app;
 	private JSlider fpsControl;
 
-	public AppControlDialog(JFrame parent) {
+	public AppControlDialog(JFrame parent, Application app) {
 		super(parent);
-		setTitle("Application Control for: " + Settings.title);
+		this.app = app;
+		setTitle("Application Control for: " + app.settings.title);
 		addFPSControl();
 		setSize(600, 100);
 	}
@@ -26,10 +28,10 @@ public class AppControlDialog extends JDialog {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				GameLoop.setFrameRate(fpsControl.getValue());
+				app.gameLoop.setFrameRate(fpsControl.getValue());
 			}
 		});
-		fpsControl.setValue(GameLoop.getFrameRate());
+		fpsControl.setValue(app.gameLoop.getFrameRate());
 		fpsControl.setMajorTickSpacing(10);
 		fpsControl.setMinorTickSpacing(1);
 		fpsControl.setPaintTicks(true);

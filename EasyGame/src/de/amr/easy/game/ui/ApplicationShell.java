@@ -1,8 +1,6 @@
 package de.amr.easy.game.ui;
 
-import static de.amr.easy.game.Application.GameLoop;
 import static de.amr.easy.game.Application.Log;
-import static de.amr.easy.game.Application.Settings;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -39,9 +37,9 @@ public class ApplicationShell implements PropertyChangeListener {
 	public ApplicationShell(Application app) {
 		this.app = app;
 		app.setShell(this);
-		GameLoop.addFPSListener(this);
-		GameLoop.addUPSListener(this);
-		fullScreen = Settings.fullScreenOnStart;
+		app.gameLoop.addFPSListener(this);
+		app.gameLoop.addUPSListener(this);
+		fullScreen = app.settings.fullScreenOnStart;
 		device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		canvas = createCanvas();
 		frame = createFrame();
@@ -60,16 +58,16 @@ public class ApplicationShell implements PropertyChangeListener {
 	}
 
 	private void updateTitle() {
-		frame.setTitle(Settings.title + " - " + fps + " frames/s" + " - " + ups + " updates/s");
+		frame.setTitle(app.settings.title + " - " + fps + " frames/s" + " - " + ups + " updates/s");
 	}
 
 	public void show() {
 		if (fullScreen) {
-			if (Settings.fullScreenMode == null) {
+			if (app.settings.fullScreenMode == null) {
 				Log.info("Cannot enter full-screen mode: No full-screen mode specified.");
 				return;
 			}
-			DisplayMode mode = Settings.fullScreenMode.getDisplayMode();
+			DisplayMode mode = app.settings.fullScreenMode.getDisplayMode();
 			if (!isValidDisplayMode(mode)) {
 				Log.info("Cannot enter full-screen mode: Display mode not supported: " + format(mode));
 				return;
@@ -95,16 +93,16 @@ public class ApplicationShell implements PropertyChangeListener {
 				try {
 					g = (Graphics2D) buffer.getDrawGraphics();
 					if (g != null) {
-						g.setColor(Settings.bgColor);
+						g.setColor(app.settings.bgColor);
 						g.fillRect(0, 0, getWidth(), getHeight());
 						if (fullScreen) {
-							DisplayMode mode = Settings.fullScreenMode.getDisplayMode();
-							float scaledWidth = Settings.width * Settings.scale;
+							DisplayMode mode = app.settings.fullScreenMode.getDisplayMode();
+							float scaledWidth = app.settings.width * app.settings.scale;
 							if (mode.getWidth() > scaledWidth) {
 								g.translate((mode.getWidth() - scaledWidth) / 2, 0);
 							}
 						}
-						g.scale(Settings.scale, Settings.scale);
+						g.scale(app.settings.scale, app.settings.scale);
 						view.draw(g);
 					}
 				} catch (Exception x) {
@@ -124,8 +122,8 @@ public class ApplicationShell implements PropertyChangeListener {
 	}
 
 	private JFrame createFrame() {
-		JFrame frame = new JFrame(Settings.title);
-		frame.setBackground(Settings.bgColor);
+		JFrame frame = new JFrame(app.settings.title);
+		frame.setBackground(app.settings.bgColor);
 		frame.setResizable(false);
 		frame.setFocusable(true);
 		frame.setIgnoreRepaint(true);
@@ -161,18 +159,18 @@ public class ApplicationShell implements PropertyChangeListener {
 
 	private void showControlDialog() {
 		if (controlDialog == null) {
-			controlDialog = new AppControlDialog(frame);
+			controlDialog = new AppControlDialog(frame, app);
 		}
 		controlDialog.setVisible(true);
 	}
 
 	private Canvas createCanvas() {
 		Canvas canvas = new Canvas();
-		Dimension size = new Dimension(Math.round(Settings.width * Settings.scale),
-				Math.round(Settings.height * Settings.scale));
+		Dimension size = new Dimension(Math.round(app.settings.width * app.settings.scale),
+				Math.round(app.settings.height * app.settings.scale));
 		canvas.setPreferredSize(size);
 		canvas.setSize(size);
-		canvas.setBackground(Settings.bgColor);
+		canvas.setBackground(app.settings.bgColor);
 		canvas.setIgnoreRepaint(true);
 		canvas.setFocusable(false);
 		return canvas;
@@ -188,7 +186,7 @@ public class ApplicationShell implements PropertyChangeListener {
 			Log.info("Full-screen mode not supported for this device.");
 			return;
 		}
-		DisplayMode mode = Settings.fullScreenMode.getDisplayMode();
+		DisplayMode mode = app.settings.fullScreenMode.getDisplayMode();
 		frame.setVisible(false);
 		frame.dispose();
 		frame.setUndecorated(true);
@@ -223,7 +221,7 @@ public class ApplicationShell implements PropertyChangeListener {
 	}
 
 	private String format(DisplayMode mode) {
-		return String.format("%d x %d, depth: %d, refresh rate: %d", mode.getWidth(), mode.getHeight(),
-				mode.getBitDepth(), mode.getRefreshRate());
+		return String.format("%d x %d, depth: %d, refresh rate: %d", mode.getWidth(), mode.getHeight(), mode.getBitDepth(),
+				mode.getRefreshRate());
 	}
 }

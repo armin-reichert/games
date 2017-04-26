@@ -1,5 +1,6 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.Globals.CITY_MAX_STARS;
 
 import java.awt.Graphics2D;
@@ -8,7 +9,6 @@ import java.awt.Image;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.game.timing.Countdown;
-import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.utils.Util;
 
 public class City extends GameEntity {
@@ -18,7 +18,7 @@ public class City extends GameEntity {
 	private Countdown starLifetime;
 
 	public City() {
-		setSprites(new Sprite("bg_night"), new Sprite("bg_day"));
+		setSprites(new Sprite(Game.assets, "bg_night"), new Sprite(Game.assets, "bg_day"));
 	}
 
 	@Override
@@ -32,15 +32,15 @@ public class City extends GameEntity {
 				createStars();
 				starLifetime.restart();
 			}
-			BirdyGame.Entities.allOf(Star.class).forEach(GameEntity::update);
+			Game.entities.allOf(Star.class).forEach(GameEntity::update);
 			starLifetime.update();
 		}
 	}
 
 	private void createStars() {
-		BirdyGame.Entities.removeAll(Star.class);
+		Game.entities.removeAll(Star.class);
 		for (int i = 0; i < Util.randomInt(1, CITY_MAX_STARS); ++i) {
-			Star star = BirdyGame.Entities.add(new Star());
+			Star star = Game.entities.add(new Star());
 			star.tr.moveTo(Util.randomInt(50, width - 50), Util.randomInt(100, 180));
 		}
 		starLifetime = new Countdown(300);
@@ -56,7 +56,7 @@ public class City extends GameEntity {
 		if (night) {
 			createStars();
 		} else {
-			BirdyGame.Entities.removeAll(Star.class);
+			Game.entities.removeAll(Star.class);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class City extends GameEntity {
 		for (int x = 0; x < width; x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
-		BirdyGame.Entities.allOf(Star.class).forEach(e -> e.draw(g));
+		Game.entities.allOf(Star.class).forEach(e -> e.draw(g));
 		g.translate(-tr.getX(), -tr.getY());
 	}
 }

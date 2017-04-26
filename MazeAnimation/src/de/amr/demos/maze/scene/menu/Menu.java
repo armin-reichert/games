@@ -1,6 +1,6 @@
 package de.amr.demos.maze.scene.menu;
 
-import static de.amr.easy.game.Application.Views;
+import static de.amr.demos.maze.MazeDemoApp.App;
 import static java.awt.event.KeyEvent.VK_ENTER;
 import static java.awt.event.KeyEvent.VK_ESCAPE;
 
@@ -10,12 +10,12 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.amr.demos.maze.MazeDemo;
+import de.amr.demos.maze.MazeDemoApp;
 import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.easy.game.input.Key;
 import de.amr.easy.game.scene.Scene;
 
-public class Menu extends Scene<MazeDemo> {
+public class Menu extends Scene<MazeDemoApp> {
 
 	private Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
 	private Color textColor = Color.BLACK;
@@ -35,10 +35,10 @@ public class Menu extends Scene<MazeDemo> {
 
 	private List<MenuEntry> entries = new ArrayList<>();
 
-	public Menu(MazeDemo app) {
+	public Menu(MazeDemoApp app) {
 		super(app);
-		entries
-				.add(new MenuEntry("Press ENTER to start maze generation", VK_ENTER, () -> Views.show(MazeGeneration.class)));
+		entries.add(
+				new MenuEntry("Press ENTER to start maze generation", VK_ENTER, () -> App.views.show(MazeGeneration.class)));
 		entries.add(new MenuEntry("Press ESCAPE to exit program", VK_ESCAPE, null));
 	}
 
