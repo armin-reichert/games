@@ -190,7 +190,6 @@ public class ApplicationShell implements PropertyChangeListener {
 		frame.setVisible(false);
 		frame.dispose();
 		frame.setUndecorated(true);
-		frame.requestFocus();
 		device.setFullScreenWindow(frame);
 		device.setDisplayMode(mode);
 		frame.createBufferStrategy(2);
@@ -206,6 +205,7 @@ public class ApplicationShell implements PropertyChangeListener {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		canvas.createBufferStrategy(2);
+		canvas.requestFocus();
 		buffer = canvas.getBufferStrategy();
 		Log.info("Window-mode: " + app.getWidth() + "x" + app.getHeight());
 	}
