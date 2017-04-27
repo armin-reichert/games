@@ -8,7 +8,7 @@ import static de.amr.games.pong.Globals.PADDLE_WIDTH;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pong.PongGame;
 
 public class Paddle extends GameEntity {
@@ -28,10 +28,10 @@ public class Paddle extends GameEntity {
 
 	@Override
 	public void update() {
-		if (Key.down(paddleUpKey)) {
+		if (Keyboard.down(paddleUpKey)) {
 			tr.setVelY(-PADDLE_SPEED);
 		}
-		if (Key.down(paddleDownKey)) {
+		if (Keyboard.down(paddleDownKey)) {
 			tr.setVelY(PADDLE_SPEED);
 		}
 		moveAndStopAtBorder();

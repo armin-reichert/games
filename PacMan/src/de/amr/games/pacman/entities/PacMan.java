@@ -26,7 +26,7 @@ import java.util.EnumMap;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
@@ -194,16 +194,16 @@ public class PacMan extends PacManGameEntity {
 	}
 
 	private int computeMoveDir() {
-		if (Key.down(VK_LEFT)) {
+		if (Keyboard.down(VK_LEFT)) {
 			return W;
 		}
-		if (Key.down(VK_RIGHT)) {
+		if (Keyboard.down(VK_RIGHT)) {
 			return E;
 		}
-		if (Key.down(VK_UP)) {
+		if (Keyboard.down(VK_UP)) {
 			return N;
 		}
-		if (Key.down(VK_DOWN)) {
+		if (Keyboard.down(VK_DOWN)) {
 			return S;
 		}
 		return nextMoveDir;

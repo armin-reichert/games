@@ -5,7 +5,7 @@ import static de.amr.games.breakout.BreakoutGame.Game;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 
 public class Bat extends GameEntity {
@@ -24,10 +24,10 @@ public class Bat extends GameEntity {
 
 	@Override
 	public void update() {
-		if (Key.down(KeyEvent.VK_LEFT)) {
+		if (Keyboard.down(KeyEvent.VK_LEFT)) {
 			tr.setVelX(-speed);
 		}
-		if (Key.down(KeyEvent.VK_RIGHT)) {
+		if (Keyboard.down(KeyEvent.VK_RIGHT)) {
 			tr.setVelX(speed);
 		}
 		tr.move();

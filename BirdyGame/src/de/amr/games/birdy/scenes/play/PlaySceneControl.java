@@ -23,7 +23,7 @@ import java.util.Map;
 import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMState;
 import de.amr.easy.game.common.Score;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.games.birdy.GameEvent;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.scenes.start.StartScene;
@@ -85,7 +85,7 @@ public class PlaySceneControl extends FSM<PlaySceneState, GameEvent> {
 				.entering(() -> {
 					scene.stopScrolling();
 				})
-				.into(StartingNewGame).when(() -> Key.pressedOnce(KeyEvent.VK_SPACE))
+				.into(StartingNewGame).when(() -> Keyboard.pressedOnce(KeyEvent.VK_SPACE))
 				.keep().on(BirdTouchedGround).act(() -> PLAYING_MUSIC.stop())
 				.keep().on(BirdTouchedPipe)
 				.keep().on(BirdLeftPassage)

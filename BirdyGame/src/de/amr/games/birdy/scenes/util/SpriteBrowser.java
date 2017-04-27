@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.scenes.start.StartScene;
@@ -37,11 +37,11 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 
 	@Override
 	public void update() {
-		if (Key.pressedOnce(KeyEvent.VK_RIGHT)) {
+		if (Keyboard.pressedOnce(KeyEvent.VK_RIGHT)) {
 			index = index + 1 == spriteNames.size() ? 0 : index + 1;
-		} else if (Key.pressedOnce(KeyEvent.VK_LEFT)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_LEFT)) {
 			index = index == 0 ? spriteNames.size() - 1 : index - 1;
-		} else if (Key.pressedOnce(KeyEvent.VK_X)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_X)) {
 			Game.views.show(StartScene.class);
 		}
 	}

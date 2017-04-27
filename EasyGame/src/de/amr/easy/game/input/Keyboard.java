@@ -1,6 +1,6 @@
 package de.amr.easy.game.input;
 
-public class Key {
+public class Keyboard {
 
 	public static boolean pressedOnce(int key) {
 		return KeyboardHandler.INSTANCE.pressedOnce(key);

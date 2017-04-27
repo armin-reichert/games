@@ -15,7 +15,7 @@ import java.util.Map;
 
 import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMState;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.games.birdy.GameEvent;
 import de.amr.games.birdy.assets.BirdySound;
 
@@ -37,7 +37,7 @@ public class FlightControl extends FSM<FlightState, GameEvent> {
 			.state(Flying)
 				.entering(bird::lookFlying)
 				.keep().act(bird::fly)
-				.keep().when(() -> Key.down(JUMP_KEY)).act(bird::jump)
+				.keep().when(() -> Keyboard.down(JUMP_KEY)).act(bird::jump)
 				.into(OnGround).on(BirdTouchedGround)
 				.into(Crashing).on(BirdCrashed)
 				.into(Crashing).on(BirdLeftWorld)

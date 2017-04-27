@@ -15,7 +15,7 @@ import java.util.Map;
 
 import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMState;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Brick;
 
@@ -37,7 +37,7 @@ public class PlaySceneControl extends FSM<PlayState, PlayEvent> {
 			
 			.state(Initial)
 				.entering(scene::reset)
-				.into(Playing).when(() -> Key.pressedOnce(VK_SPACE))
+				.into(Playing).when(() -> Keyboard.pressedOnce(VK_SPACE))
 				.keep()
 			.end()
 			
@@ -54,7 +54,7 @@ public class PlaySceneControl extends FSM<PlayState, PlayEvent> {
 			
 			.state(BallOut)
 				.entering(() -> {	scene.resetBat();	scene.resetBall(); })
-				.into(Playing).when(() -> Key.pressedOnce(VK_SPACE))
+				.into(Playing).when(() -> Keyboard.pressedOnce(VK_SPACE))
 				.keep()
 			.end()
 		.endFSM();

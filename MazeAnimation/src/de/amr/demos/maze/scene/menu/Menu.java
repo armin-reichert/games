@@ -12,7 +12,7 @@ import java.util.List;
 
 import de.amr.demos.maze.MazeDemoApp;
 import de.amr.demos.maze.scene.generation.MazeGeneration;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 
 public class Menu extends Scene<MazeDemoApp> {
@@ -49,7 +49,7 @@ public class Menu extends Scene<MazeDemoApp> {
 	@Override
 	public void update() {
 		for (MenuEntry entry : entries) {
-			if (Key.pressedOnce(entry.key) && entry.action != null) {
+			if (Keyboard.pressedOnce(entry.key) && entry.action != null) {
 				entry.action.run();
 			}
 		}

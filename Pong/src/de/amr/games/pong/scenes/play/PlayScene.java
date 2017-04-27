@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Random;
 
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.entities.AutoPaddleLeft;
@@ -66,7 +66,7 @@ public class PlayScene extends Scene<PongGame> {
 
 	@Override
 	public void update() {
-		if (Key.pressedOnce(VK_CONTROL, VK_C)) {
+		if (Keyboard.pressedOnce(VK_CONTROL, VK_C)) {
 			Game.views.show(Menu.class);
 		}
 		control.run(PlaySceneEvent.Tick);

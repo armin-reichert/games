@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Bonus;
-import de.amr.games.pacman.entities.ghost.GhostName;
 
 /**
  * Base class of the different Pac-Man UI themes.
@@ -90,7 +89,7 @@ public abstract class PacManUI {
 	public abstract Sprite getPacManDying();
 
 	/** Returns the sprite for the specified ghost when looking into the given direction. */
-	public abstract Sprite getGhostNormal(GhostName ghost, int dir);
+	public abstract Sprite getGhostNormal(String ghostName, int dir);
 
 	/** Returns the sprite for a frightened ghost. */
 	public abstract Sprite getGhostFrightened();

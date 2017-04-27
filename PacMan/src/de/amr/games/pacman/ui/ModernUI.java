@@ -7,11 +7,6 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
-import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
-import static de.amr.games.pacman.entities.ghost.GhostName.Clyde;
-import static de.amr.games.pacman.entities.ghost.GhostName.Inky;
-import static de.amr.games.pacman.entities.ghost.GhostName.Pinky;
-import static de.amr.games.pacman.entities.ghost.GhostName.Stinky;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -26,7 +21,6 @@ import java.util.Map;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Bonus;
-import de.amr.games.pacman.entities.ghost.GhostName;
 
 /**
  * A Pac-Man UI with smoother sprites.
@@ -39,7 +33,7 @@ public class ModernUI extends PacManUI {
 	private final Sprite board;
 	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
 	private final Sprite pacManStanding;
-	private final Map<GhostName, Map<Integer, Sprite>> ghostNormal = new HashMap<>();
+	private final Map<String, Map<Integer, Sprite>> ghostNormal = new HashMap<>();
 	private final Sprite ghostFrightened;
 	private final Sprite ghostRecovering;
 	private final Sprite ghostDead;
@@ -72,7 +66,7 @@ public class ModernUI extends PacManUI {
 		}
 
 		List<Integer> dirs = Arrays.asList(E, S, W, N);
-		List<GhostName> ghostNames = Arrays.asList(Blinky, Clyde, Pinky, Stinky, Inky);
+		List<String> ghostNames = Arrays.asList("Blinky", "Clyde", "Pinky", "Stinky", "Inky");
 
 		pacManStanding = new Sprite($(2, 11));
 
@@ -139,8 +133,8 @@ public class ModernUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getGhostNormal(GhostName ghost, int dir) {
-		return ghostNormal.get(ghost).get(dir);
+	public Sprite getGhostNormal(String ghostName, int dir) {
+		return ghostNormal.get(ghostName).get(dir);
 	}
 
 	@Override

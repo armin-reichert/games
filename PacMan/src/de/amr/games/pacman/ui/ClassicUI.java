@@ -9,10 +9,6 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
-import static de.amr.games.pacman.entities.ghost.GhostName.Blinky;
-import static de.amr.games.pacman.entities.ghost.GhostName.Clyde;
-import static de.amr.games.pacman.entities.ghost.GhostName.Inky;
-import static de.amr.games.pacman.entities.ghost.GhostName.Pinky;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -29,7 +25,6 @@ import java.util.Map;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Bonus;
-import de.amr.games.pacman.entities.ghost.GhostName;
 
 /**
  * A Pac-Man UI which tries to be close to the classic Arcade game.
@@ -43,7 +38,7 @@ public class ClassicUI extends PacManUI {
 	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
 	private final Sprite pacManStanding;
 	private final Sprite pacManDying;
-	private final Map<GhostName, Map<Integer, Sprite>> ghostNormal = new EnumMap<>(GhostName.class);
+	private final Map<String, Map<Integer, Sprite>> ghostNormal = new HashMap<>();
 	private final Sprite ghostFrightened;
 	private final Sprite ghostRecovering;
 	private final Map<Integer, Sprite> ghostDead = new HashMap<>();
@@ -91,7 +86,7 @@ public class ClassicUI extends PacManUI {
 		}
 
 		List<Integer> dirs = Arrays.asList(E, W, N, S);
-		List<GhostName> ghostNames = Arrays.asList(Blinky, Pinky, Inky, Clyde);
+		List<String> ghostNames = Arrays.asList("Blinky", "Pinky", "Inky", "Clyde");
 
 		// Pac-Man
 
@@ -174,8 +169,8 @@ public class ClassicUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getGhostNormal(GhostName ghost, int dir) {
-		return ghostNormal.get(ghost).get(dir);
+	public Sprite getGhostNormal(String ghostName, int dir) {
+		return ghostNormal.get(ghostName).get(dir);
 	}
 
 	@Override

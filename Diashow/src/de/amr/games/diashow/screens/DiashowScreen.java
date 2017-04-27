@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.diashow.Diashow;
 
@@ -33,7 +33,7 @@ public class DiashowScreen extends Scene<Diashow> {
 
 	@Override
 	public void update() {
-		if (Key.pressedOnce(KEY_NEXT)) {
+		if (Keyboard.pressedOnce(KEY_NEXT)) {
 			current = current < nImages - 1 ? current + 1 : 0;
 			System.out.println("NEXT pressed once");
 		}

@@ -13,7 +13,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.config.ApplicationSettings;
 import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.entity.collision.CollisionHandler;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.KeyboardHandler;
 import de.amr.easy.game.timing.GameLoop;
 import de.amr.easy.game.ui.ApplicationShell;
@@ -94,7 +94,7 @@ public abstract class Application {
 
 	private void update() {
 		KeyboardHandler.poll();
-		if (Key.down(VK_CONTROL) && Key.pressedOnce(PAUSE_TOGGLE_KEY)) {
+		if (Keyboard.down(VK_CONTROL) && Keyboard.pressedOnce(PAUSE_TOGGLE_KEY)) {
 			pause(!paused);
 		}
 		if (!paused) {

@@ -49,10 +49,10 @@ public class Ghost extends PacManGameEntity {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(GhostName ghostName, Color color, float homeRow, float homeCol) {
+	public Ghost(String ghostName, Color color, float homeRow, float homeCol) {
 		super(new Tile(homeRow, homeCol));
 		this.color = color;
-		setName(ghostName.name());
+		setName(ghostName);
 		control = new StateMachine<>(getName(), new EnumMap<>(GhostState.class));
 	}
 
@@ -115,7 +115,7 @@ public class Ghost extends PacManGameEntity {
 	@Override
 	public Sprite currentSprite() {
 		if (insideGhostHouse()) {
-			return getTheme().getGhostNormal(GhostName.valueOf(getName()), moveDir);
+			return getTheme().getGhostNormal(getName(), moveDir);
 		}
 		if (control.inState(Frightened)) {
 			PacMan pacMan = Game.entities.findAny(PacMan.class);
@@ -127,13 +127,13 @@ public class Ghost extends PacManGameEntity {
 		if (control.inState(Dead)) {
 			return getTheme().getGhostDead(moveDir);
 		}
-		return getTheme().getGhostNormal(GhostName.valueOf(getName()), moveDir);
+		return getTheme().getGhostNormal(getName(), moveDir);
 	}
 
 	@Override
 	public void setAnimated(boolean animated) {
 		TOPOLOGY.dirs().forEach(dir -> {
-			getTheme().getGhostNormal(GhostName.valueOf(getName()), dir).setAnimated(animated);
+			getTheme().getGhostNormal(getName(), dir).setAnimated(animated);
 			getTheme().getGhostDead(dir).setAnimated(animated);
 		});
 		getTheme().getGhostFrightened().setAnimated(animated);

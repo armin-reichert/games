@@ -10,7 +10,7 @@ import de.amr.demos.maze.MazeDemoApp;
 import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
-import de.amr.easy.game.input.Key;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.TraversalState;
@@ -62,13 +62,13 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 
 	@Override
 	public void update() {
-		if (Key.pressedOnce(KeyEvent.VK_PLUS)) {
+		if (Keyboard.pressedOnce(KeyEvent.VK_PLUS)) {
 			animation.faster(1);
-		} else if (Key.pressedOnce(KeyEvent.VK_MINUS)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_MINUS)) {
 			animation.slower(1);
-		} else if (Key.pressedOnce(KeyEvent.VK_CONTROL) && Key.pressedOnce(KeyEvent.VK_C)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_CONTROL) && Keyboard.pressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
-		} else if (Key.pressedOnce(KeyEvent.VK_ENTER) && !bfsRunner.isAlive()) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ENTER) && !bfsRunner.isAlive()) {
 			App.views.show(MazeGeneration.class);
 		}
 		if (aborted) {
