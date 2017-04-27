@@ -47,13 +47,6 @@ import static java.util.Arrays.asList;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -70,6 +63,7 @@ import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
+import de.amr.games.pacman.data.Highscore;
 import de.amr.games.pacman.data.RouteMap;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
@@ -101,11 +95,11 @@ public class PacManGame extends Application {
 		Game.settings.width = NUM_COLS * TILE_SIZE;
 		Game.settings.height = NUM_ROWS * TILE_SIZE;
 		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1f;
+		Game.settings.fullScreenOnStart = false;
 		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		Game.settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
 		Game.settings.set("drawInternals", false);
 		Game.settings.set("drawGrid", false);
-		Game.settings.fullScreenOnStart = false;
 		Log.setLevel(Level.ALL);
 		launch(Game);
 	}
@@ -113,26 +107,26 @@ public class PacManGame extends Application {
 	// Game parameters
 
 	private static final Object[][] LEVELS = {
-			/*@formatter:off*/
-			null,
-			{ Cherries, 	100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
-			{ Strawberry, 300, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 5 },
-			{ Peach, 			500, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 4 },
-			{ Peach, 			500, 	.90f, .79f, .85f, .50f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 3 },
-			{ Apple, 			700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f,   	1f, 	.79f, 	.60f, 2 },
-			{ Apple, 			700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
-			{ Grapes, 		1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
-			{ Grapes, 		1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
-			{ Galaxian, 	2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
-			{ Galaxian, 	2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
-			{ Bell, 			3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
-			{ Bell, 			3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
-			{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
-			{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 3 }, 
-			{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
-			{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
-			{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 0 }, 
-			/*@formatter:on*/
+		/*@formatter:off*/
+		null,
+		{ Cherries, 	100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
+		{ Strawberry, 300, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 5 },
+		{ Peach, 			500, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 4 },
+		{ Peach, 			500, 	.90f, .79f, .85f, .50f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 3 },
+		{ Apple, 			700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f,   	1f, 	.79f, 	.60f, 2 },
+		{ Apple, 			700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
+		{ Grapes, 		1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
+		{ Grapes, 		1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
+		{ Galaxian, 	2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
+		{ Galaxian, 	2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
+		{ Bell, 			3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
+		{ Bell, 			3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
+		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
+		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 3 }, 
+		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
+		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
+		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 0 }, 
+		/*@formatter:on*/
 	};
 
 	private static final int[][] SCATTER_DURATION_SECS = {
@@ -170,23 +164,23 @@ public class PacManGame extends Application {
 	private int wave;
 	public int liveCount;
 	public int score;
-	public int highscorePoints;
-	public int highscoreLevel;
+	public Highscore highscore;
 	public List<Bonus> bonusScore;
 	public Optional<Bonus> bonus;
 	public int bonusTimeRemaining;
 	private int ghostValue;
 	private int ghostsEatenAtLevel;
-	private final StateMachine<PlayState> playControl = new PlayControl();
-	private final StateMachine<AttackState> attackControl = new AttackControl();
-	private final File highscoreFile = new File(System.getProperty("user.dir") + File.separator + "pacman.high.txt");
+	private StateMachine<PlayState> playControl;
+	private StateMachine<AttackState> attackControl;
 	private int themeIndex;
 
 	@Override
 	protected void init() {
+		playControl = new PlayControl();
+		attackControl = new AttackControl();
+		reset();
 		views.add(new PlayScene(this));
 		views.show(PlayScene.class);
-		reset();
 	}
 
 	public void updateGameState() {
@@ -200,9 +194,7 @@ public class PacManGame extends Application {
 		wave = 1;
 		liveCount = 3;
 		score = 0;
-		highscorePoints = 0;
-		highscoreLevel = 1;
-		loadHighscore();
+		highscore = new Highscore("pacman.high.txt");
 		bonusScore = new ArrayList<>();
 		bonus = Optional.empty();
 		bonusTimeRemaining = 0;
@@ -210,6 +202,7 @@ public class PacManGame extends Application {
 		ghostsEatenAtLevel = 0;
 		createPacManAndGhosts();
 		applyTheme();
+		highscore.load();
 		playControl.changeTo(PlayState.StartingGame);
 	}
 
@@ -403,26 +396,6 @@ public class PacManGame extends Application {
 		entities.removeAll(PacMan.class);
 		entities.removeAll(Ghost.class);
 		entities.add(pacMan, blinky, inky, pinky, clyde);
-	}
-
-	private void loadHighscore() {
-		try (BufferedReader r = new BufferedReader(new FileReader(highscoreFile))) {
-			String[] record = r.readLine().split(",");
-			highscorePoints = Integer.parseInt(record[0]);
-			highscoreLevel = record.length == 2 ? Integer.parseInt(record[1]) : 1;
-		} catch (FileNotFoundException e) {
-			Log.warning("Highscore file not found: " + highscoreFile);
-		} catch (IOException e) {
-			Log.warning("Could not read from highscore file: " + highscoreFile);
-		}
-	}
-
-	private void saveHighscore() {
-		try (PrintWriter w = new PrintWriter(new FileWriter(highscoreFile))) {
-			w.println(highscorePoints + "," + level);
-		} catch (IOException e) {
-			Log.warning("Could not save highscore: " + highscoreFile);
-		}
 	}
 
 	private void score(int points) {
@@ -742,9 +715,8 @@ public class PacManGame extends Application {
 				selectedTheme().getEnergizer().setAnimated(false);
 				enableBonus(false);
 				attackControl.changeTo(AttackState.Complete);
-				if (score > highscorePoints) {
-					highscorePoints = score;
-					saveHighscore();
+				if (score > highscore.getPoints()) {
+					highscore.save(score, level);
 				}
 				assets.sounds().forEach(Sound::stop);
 				assets.sound("sfx/die.mp3").play();

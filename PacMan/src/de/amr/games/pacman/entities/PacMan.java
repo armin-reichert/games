@@ -119,6 +119,11 @@ public class PacMan extends PacManGameEntity {
 			}
 		};
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("Pacman[row=%d,col=%d]", getRow(), getCol());
+	}
 
 	@Override
 	public void init() {

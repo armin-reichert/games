@@ -104,7 +104,7 @@ public class PlayScene extends Scene<PacManGame> {
 		drawText(g, 1, 12, "SCORE");
 		g.setColor(theme.getHUDColor());
 		drawText(g, 2, 1, String.format("%02d", getApp().score));
-		drawText(g, 2, 8, String.format("%02d   L%d", getApp().highscorePoints, getApp().highscoreLevel));
+		drawText(g, 2, 8, String.format("%02d   L%d", getApp().highscore.getPoints(), getApp().highscore.getLevel()));
 		drawText(g, 2, 20, "Level " + getApp().level);
 
 		// Ready!, Game Over!
