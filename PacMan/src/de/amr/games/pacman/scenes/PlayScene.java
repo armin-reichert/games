@@ -26,7 +26,6 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.PacManGame.PlayState;
 import de.amr.games.pacman.data.Bonus;
-import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -88,7 +87,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Pac-Man
-		entities.findAny(PacMan.class).draw(g);
+		getApp().pacMan.draw(g);
 
 		// Ghosts
 		if (getApp().getPlayState() != PlayState.Crashing) {
@@ -131,7 +130,7 @@ public class PlayScene extends Scene<PacManGame> {
 			col -= 2f;
 		}
 
-		// Game play state
+		// Play state
 		if (getApp().settings.getBool("drawInternals")) {
 			drawTextCentered(g, getWidth(), 33, getApp().getPlayState().toString());
 		}

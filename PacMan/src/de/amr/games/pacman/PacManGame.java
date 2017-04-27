@@ -14,6 +14,8 @@ import static de.amr.games.pacman.data.Board.INKY_HOME_COL;
 import static de.amr.games.pacman.data.Board.INKY_HOME_ROW;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
+import static de.amr.games.pacman.data.Board.PACMAN_HOME_COL;
+import static de.amr.games.pacman.data.Board.PACMAN_HOME_ROW;
 import static de.amr.games.pacman.data.Board.PINKY_HOME_COL;
 import static de.amr.games.pacman.data.Board.PINKY_HOME_ROW;
 import static de.amr.games.pacman.data.Bonus.Apple;
@@ -69,7 +71,6 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.RouteMap;
-import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.PacManState;
@@ -159,9 +160,10 @@ public class PacManGame extends Application {
 	public static final int WAIT_TICKS_ON_EATING_PELLET = 1;
 	public static final int WAIT_TICKS_ON_EATING_ENERGIZER = 3;
 	public static final int WAIT_TICKS_ON_LEVEL_START = 240;
-	public static final float BASE_SPEED = 8 * TILE_SIZE / 60f;
 
 	// Game data
+	public PacMan pacMan;
+	public Ghost blinky, inky, pinky, clyde;
 	public Board board;
 	public RouteMap routeMap;
 	public int level;
@@ -200,17 +202,18 @@ public class PacManGame extends Application {
 		score = 0;
 		highscorePoints = 0;
 		highscoreLevel = 1;
+		loadHighscore();
 		bonusScore = new ArrayList<>();
 		bonus = Optional.empty();
 		bonusTimeRemaining = 0;
 		ghostValue = 0;
 		ghostsEatenAtLevel = 0;
-		loadHighscore();
 		createPacManAndGhosts();
+		applyTheme();
 		playControl.changeTo(PlayState.StartingGame);
 	}
 
-	private void startLevel() {
+	private void initLevel() {
 		board.reset();
 		wave = 1;
 		bonus = Optional.empty();
@@ -224,7 +227,7 @@ public class PacManGame extends Application {
 
 		// Create Pac-Man and define its event handlers
 
-		final PacMan pacMan = new PacMan(new Tile(Board.PACMAN_HOME_ROW, Board.PACMAN_HOME_COL));
+		pacMan = new PacMan(PACMAN_HOME_ROW, PACMAN_HOME_COL);
 
 		pacMan.onPelletFound = tile -> {
 			board.setContent(tile, None);
@@ -278,13 +281,13 @@ public class PacManGame extends Application {
 
 		// Create the ghosts and define their behavior
 
-		final Ghost blinky = new Ghost("Blinky", Color.RED, BLINKY_HOME_ROW, BLINKY_HOME_COL);
+		blinky = new Ghost("Blinky", Color.RED, BLINKY_HOME_ROW, BLINKY_HOME_COL);
 
-		final Ghost inky = new Ghost("Inky", new Color(64, 224, 208), INKY_HOME_ROW, INKY_HOME_COL);
+		inky = new Ghost("Inky", new Color(64, 224, 208), INKY_HOME_ROW, INKY_HOME_COL);
 
-		final Ghost pinky = new Ghost("Pinky", Color.PINK, PINKY_HOME_ROW, PINKY_HOME_COL);
+		pinky = new Ghost("Pinky", Color.PINK, PINKY_HOME_ROW, PINKY_HOME_COL);
 
-		final Ghost clyde = new Ghost("Clyde", Color.ORANGE, CLYDE_HOME_ROW, CLYDE_HOME_COL);
+		clyde = new Ghost("Clyde", Color.ORANGE, CLYDE_HOME_ROW, CLYDE_HOME_COL);
 
 		// Common ghost behavior
 
@@ -396,13 +399,10 @@ public class PacManGame extends Application {
 			}
 		};
 
-		// add entities into collection
-		entities.removeAll(GameEntity.class);
-		entities.add(pacMan);
-		entities.add(blinky);
-		entities.add(inky);
-		entities.add(pinky);
-		entities.add(clyde);
+		// add entities to collection
+		entities.removeAll(PacMan.class);
+		entities.removeAll(Ghost.class);
+		entities.add(pacMan, blinky, inky, pinky, clyde);
 	}
 
 	private void loadHighscore() {
@@ -445,7 +445,7 @@ public class PacManGame extends Application {
 
 	private void announceLevel() {
 		assets.sound("sfx/ready.mp3").play();
-		FlashText.show(Game, "Level " + level, selectedTheme().getTextFont(), Color.YELLOW, gameLoop.secToFrames(0.5f),
+		FlashText.show(this, "Level " + level, selectedTheme().getTextFont(), Color.YELLOW, gameLoop.secToFrames(0.5f),
 				new Vector2(11, 21).times(TILE_SIZE), Vector2.nullVector());
 	}
 
@@ -485,6 +485,10 @@ public class PacManGame extends Application {
 		entities.allOf(PacManGameEntity.class).forEach(e -> e.setTheme(selectedTheme()));
 		entities.all().forEach(GameEntity::init);
 		selectedTheme().getEnergizer().setAnimated(false);
+	}
+
+	private float getBaseSpeed() {
+		return TILE_SIZE * 8 / settings.fps;
 	}
 
 	public int getGhostWaitingDuration(String ghostName) {
@@ -530,15 +534,15 @@ public class PacManGame extends Application {
 	}
 
 	public float getPacManSpeed() {
-		return BASE_SPEED * (Float) LEVELS[level][2];
+		return getBaseSpeed() * (Float) LEVELS[level][2];
 	}
 
 	public float getGhostSpeedNormal() {
-		return BASE_SPEED * (Float) LEVELS[level][4];
+		return getBaseSpeed() * (Float) LEVELS[level][4];
 	}
 
 	public float getGhostSpeedInTunnel() {
-		return BASE_SPEED * (Float) LEVELS[level][5];
+		return getBaseSpeed() * (Float) LEVELS[level][5];
 	}
 
 	public float getGhostSpeedInHouse() {
@@ -546,11 +550,11 @@ public class PacManGame extends Application {
 	}
 
 	public float getPacManAttackingSpeed() {
-		return BASE_SPEED * (Float) LEVELS[level][10];
+		return getBaseSpeed() * (Float) LEVELS[level][10];
 	}
 
 	public float getGhostSpeedWhenFrightened() {
-		return BASE_SPEED * (Float) LEVELS[level][12];
+		return getBaseSpeed() * (Float) LEVELS[level][12];
 	}
 
 	public int getGhostFrightenedDuration() {
@@ -632,8 +636,7 @@ public class PacManGame extends Application {
 
 			state(PlayState.StartingGame).entry = state -> {
 				reset();
-				startLevel();
-				applyTheme();
+				initLevel();
 				assets.sound("sfx/insert-coin.mp3").play();
 			};
 
@@ -655,7 +658,7 @@ public class PacManGame extends Application {
 
 			state(PlayState.StartPlaying).entry = state -> {
 				selectedTheme().getEnergizer().setAnimated(true);
-				entities.findAny(PacMan.class).control.changeTo(PacManState.Waiting);
+				pacMan.control.changeTo(PacManState.Waiting);
 				entities.allOf(Ghost.class).forEach(ghost -> {
 					ghost.init();
 					ghost.setAnimated(true);
@@ -676,7 +679,6 @@ public class PacManGame extends Application {
 			// --
 
 			state(PlayState.Playing).entry = state -> {
-				PacMan pacMan = entities.findAny(PacMan.class);
 				pacMan.control.changeTo(PacManState.Exploring);
 				pacMan.speed = getPacManSpeed();
 				attackControl.changeTo(AttackState.Starting);
@@ -690,7 +692,7 @@ public class PacManGame extends Application {
 					++level;
 					changeTo(PlayState.StartPlaying, levelStarting -> {
 						levelStarting.setDuration(gameLoop.secToFrames(4));
-						startLevel();
+						initLevel();
 						announceLevel();
 					});
 				} else if (attackControl.inState(AttackState.Complete)) {
@@ -756,5 +758,4 @@ public class PacManGame extends Application {
 			};
 		}
 	}
-
 }

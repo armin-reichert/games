@@ -52,8 +52,8 @@ public class PacMan extends PacManGameEntity {
 	private int freezeTimer;
 	private boolean couldMove;
 
-	public PacMan(Tile home) {
-		super(home);
+	public PacMan(float homeRow, float homeCol) {
+		super(new Tile(homeRow, homeCol));
 		setName("Pac-Man");
 
 		// default event handler
