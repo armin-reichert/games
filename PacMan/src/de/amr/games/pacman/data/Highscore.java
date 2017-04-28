@@ -10,6 +10,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * Class for loading and storing highscore.
+ * 
+ * @author Armin Reichert
+ */
 public class Highscore {
 
 	private File file;
@@ -20,6 +25,7 @@ public class Highscore {
 		file = new File(System.getProperty("user.dir") + File.separator + "pacman.high.txt");
 		points = 0;
 		level = 1;
+		load();
 	}
 
 	public void load() {
@@ -41,12 +47,11 @@ public class Highscore {
 			Log.warning("Could not save highscore: " + file);
 		}
 	}
-	
-	
+
 	public int getPoints() {
 		return points;
 	}
-	
+
 	public int getLevel() {
 		return level;
 	}

@@ -24,7 +24,6 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
-import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
@@ -118,8 +117,7 @@ public class Ghost extends PacManGameEntity {
 			return getTheme().getGhostNormal(getName(), moveDir);
 		}
 		if (control.inState(Frightened)) {
-			PacMan pacMan = Game.entities.findAny(PacMan.class);
-			return pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : getTheme().getGhostFrightened();
+			return Game.pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : getTheme().getGhostFrightened();
 		}
 		if (control.inState(Recovering)) {
 			return getTheme().getGhostRecovering();

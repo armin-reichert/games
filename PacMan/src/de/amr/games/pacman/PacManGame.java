@@ -92,7 +92,7 @@ public class PacManGame extends Application {
 		Game.settings.height = NUM_ROWS * TILE_SIZE;
 		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1;
 		Game.settings.fullScreenOnStart = false;
-		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
 		Game.settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
 		Game.settings.set("drawInternals", false);
 		Game.settings.set("drawGrid", false);
@@ -173,8 +173,10 @@ public class PacManGame extends Application {
 	@Override
 	protected void init() {
 		board = new Board(assets.text("board.txt"));
+		routeMap = new RouteMap(board);
 		playControl = new PlayControl();
 		attackControl = new AttackControl();
+		highscore = new Highscore("pacman-hiscore.txt");
 		reset();
 		views.add(new PlayScene(this));
 		views.show(PlayScene.class);
@@ -185,22 +187,19 @@ public class PacManGame extends Application {
 	}
 
 	private void reset() {
-		board.reset();
-		routeMap = new RouteMap(board);
 		level = 1;
 		wave = 1;
 		lives = 3;
 		score = 0;
-		highscore = new Highscore("pacman.high.txt");
 		bonusScore = new ArrayList<>();
 		bonus = Optional.empty();
 		bonusTimeRemaining = 0;
 		ghostValue = 0;
 		ghostsEatenAtLevel = 0;
+		board.reset();
 		entities.removeAll(GameEntity.class);
 		createPacManAndGhosts();
 		applyTheme();
-		highscore.load();
 		playControl.changeTo(PlayState.StartingGame);
 	}
 
@@ -215,9 +214,7 @@ public class PacManGame extends Application {
 	}
 
 	private void createPacManAndGhosts() {
-
 		// Create Pac-Man and define its event handlers
-
 		pacMan = new PacMan(PACMAN_HOME_ROW, PACMAN_HOME_COL);
 
 		pacMan.onPelletFound = tile -> {
@@ -454,19 +451,25 @@ public class PacManGame extends Application {
 	}
 
 	public int getGhostWaitingDuration(String ghostName) {
+		float seconds = 0;
 		switch (ghostName) {
 		case "Blinky":
-			return gameLoop.secToFrames(0);
+			seconds = 0;
+			break;
 		case "Clyde":
-			return gameLoop.secToFrames(1.5f);
+			seconds = 1.5f;
+			break;
 		case "Inky":
-			return gameLoop.secToFrames(1);
+			seconds = 10;
+			break;
 		case "Pinky":
-			return gameLoop.secToFrames(0.5f);
+			seconds = 0.5f;
+			break;
 		case "Stinky":
-			return gameLoop.secToFrames(10);
+			seconds = 10;
+			break;
 		}
-		return 0;
+		return gameLoop.secToFrames(seconds);
 	}
 
 	public int getGhostRecoveringDuration(String ghostName) {
