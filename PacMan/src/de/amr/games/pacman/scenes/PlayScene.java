@@ -7,8 +7,11 @@ import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.data.TileContent.Energizer;
 import static de.amr.games.pacman.data.TileContent.Pellet;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_CONTROL;
 import static java.awt.event.KeyEvent.VK_I;
+import static java.awt.event.KeyEvent.VK_L;
 import static java.lang.Math.round;
 import static java.util.stream.IntStream.range;
 
@@ -53,6 +56,10 @@ public class PlayScene extends Scene<PacManGame> {
 			getApp().settings.set("drawInternals", !getApp().settings.getBool("drawInternals"));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_G)) {
 			getApp().settings.set("drawGrid", !getApp().settings.getBool("drawGrid"));
+		} else if (Keyboard.pressedOnce(VK_ALT, VK_L)) {
+			getApp().lives += 1;
+		} else if (Keyboard.pressedOnce(VK_ALT, VK_B)) {
+			getApp().bonusScore.add(getApp().getBonus());
 		}
 		getApp().updateGameState();
 	}
@@ -121,7 +128,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Lives
-		range(0, getApp().liveCount).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLife()));
+		range(0, getApp().lives).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLife()));
 
 		// Bonus score
 		float col = NUM_COLS - 2;

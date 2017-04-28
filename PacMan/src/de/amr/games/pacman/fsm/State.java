@@ -3,15 +3,13 @@ package de.amr.games.pacman.fsm;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-import de.amr.easy.game.Application;
-
 /**
  * A state of a finite state machine.
  */
 public class State {
-	
+
 	public static final int FOREVER = -1;
-	
+
 	/** The action performed when entering this state. */
 	public Consumer<State> entry;
 
@@ -56,7 +54,7 @@ public class State {
 			--timer;
 		}
 	}
-	
+
 	public void terminate() {
 		timer = 0;
 	}
@@ -75,7 +73,7 @@ public class State {
 	public void resetTimer() {
 		timer = duration;
 	}
-	
+
 	public int getDuration() {
 		return duration;
 	}

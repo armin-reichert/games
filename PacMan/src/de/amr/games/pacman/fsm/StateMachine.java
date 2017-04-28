@@ -1,9 +1,9 @@
 package de.amr.games.pacman.fsm;
 
+import static de.amr.easy.game.Application.Log;
+
 import java.util.Map;
 import java.util.function.Consumer;
-
-import de.amr.easy.game.Application;
 
 /**
  * A finite state machine.
@@ -31,7 +31,7 @@ public class StateMachine<StateID> {
 		for (StateID stateID : stateIDs) {
 			if (currentStateID == stateID) {
 				return true;
-			};
+			}
 		}
 		return false;
 	}
@@ -67,7 +67,7 @@ public class StateMachine<StateID> {
 		if (currentStateID == stateID) {
 			return;
 		}
-		Application.Log.info("FSM(" + description + "): " + currentStateID + " -> "  + stateID);
+		Log.info("FSM(" + description + "): " + currentStateID + " -> " + stateID);
 		if (currentStateID != null) {
 			state().doExit();
 		}

@@ -283,5 +283,7 @@ public class Ghost extends PacManGameEntity {
 					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
 			tile = nextTile;
 		}
+		g.fillRect(tile.getCol() * TILE_SIZE + TILE_SIZE / 4, tile.getRow() * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 2,
+				TILE_SIZE / 2);
 	}
 }

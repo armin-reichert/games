@@ -37,10 +37,7 @@ import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Scattering
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
-import static java.awt.event.KeyEvent.VK_ALT;
-import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_ENTER;
-import static java.awt.event.KeyEvent.VK_L;
 import static java.awt.event.KeyEvent.VK_SPACE;
 import static java.awt.event.KeyEvent.VK_T;
 import static java.util.Arrays.asList;
@@ -65,7 +62,6 @@ import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Highscore;
 import de.amr.games.pacman.data.RouteMap;
-import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.PacManState;
 import de.amr.games.pacman.entities.PacManGameEntity;
@@ -94,7 +90,7 @@ public class PacManGame extends Application {
 		Game.settings.title = "Armin's Pac-Man";
 		Game.settings.width = NUM_COLS * TILE_SIZE;
 		Game.settings.height = NUM_ROWS * TILE_SIZE;
-		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1f;
+		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1;
 		Game.settings.fullScreenOnStart = false;
 		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		Game.settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
@@ -150,7 +146,7 @@ public class PacManGame extends Application {
 	public static final int BONUS1_REMAINING_PELLETS = 170;
 	public static final int BONUS2_REMAINING_PELLETS = 70;
 	public static final int EXTRA_LIFE_SCORE = 10000;
-	public static final int FIRST_GHOST_POINTS = 200;
+	public static final int FIRST_GHOST_VALUE = 200;
 	public static final int WAIT_TICKS_ON_EATING_PELLET = 1;
 	public static final int WAIT_TICKS_ON_EATING_ENERGIZER = 3;
 	public static final int WAIT_TICKS_ON_LEVEL_START = 240;
@@ -162,7 +158,7 @@ public class PacManGame extends Application {
 	public RouteMap routeMap;
 	public int level;
 	private int wave;
-	public int liveCount;
+	public int lives;
 	public int score;
 	public Highscore highscore;
 	public List<Bonus> bonusScore;
@@ -176,6 +172,7 @@ public class PacManGame extends Application {
 
 	@Override
 	protected void init() {
+		board = new Board(assets.text("board.txt"));
 		playControl = new PlayControl();
 		attackControl = new AttackControl();
 		reset();
@@ -188,11 +185,11 @@ public class PacManGame extends Application {
 	}
 
 	private void reset() {
-		board = new Board(assets.text("board.txt"));
+		board.reset();
 		routeMap = new RouteMap(board);
 		level = 1;
 		wave = 1;
-		liveCount = 3;
+		lives = 3;
 		score = 0;
 		highscore = new Highscore("pacman.high.txt");
 		bonusScore = new ArrayList<>();
@@ -200,6 +197,7 @@ public class PacManGame extends Application {
 		bonusTimeRemaining = 0;
 		ghostValue = 0;
 		ghostsEatenAtLevel = 0;
+		entities.removeAll(GameEntity.class);
 		createPacManAndGhosts();
 		applyTheme();
 		highscore.load();
@@ -212,8 +210,8 @@ public class PacManGame extends Application {
 		bonus = Optional.empty();
 		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
-		Log.info(String.format("Level %d: %d pellets and %d energizers. Frames/sec: %d", level,
-				board.count(TileContent.Pellet), board.count(TileContent.Energizer), gameLoop.getFrameRate()));
+		Log.info(String.format("Level %d: %d pellets and %d energizers. Frames/sec: %d", level, board.count(Pellet),
+				board.count(Energizer), gameLoop.getFrameRate()));
 	}
 
 	private void createPacManAndGhosts() {
@@ -236,7 +234,7 @@ public class PacManGame extends Application {
 		pacMan.onEnergizerFound = tile -> {
 			board.setContent(tile, None);
 			score(POINTS_FOR_ENERGIZER);
-			ghostValue = FIRST_GHOST_POINTS;
+			ghostValue = FIRST_GHOST_VALUE;
 			pacMan.freeze(WAIT_TICKS_ON_EATING_ENERGIZER);
 			pacMan.startAttacking(getGhostFrightenedDuration(), getPacManAttackingSpeed());
 			assets.sound("sfx/eat-pill.mp3").play();
@@ -266,9 +264,9 @@ public class PacManGame extends Application {
 				ghost.perform(GhostAction.Die);
 			} else {
 				Log.info(ghost.getName() + " kills Pac-Man.");
-				--liveCount;
+				--lives;
 				pacMan.control.changeTo(PacManState.Dying);
-				playControl.changeTo(liveCount > 0 ? PlayState.Crashing : PlayState.GameOver);
+				playControl.changeTo(lives > 0 ? PlayState.Crashing : PlayState.GameOver);
 			}
 		};
 
@@ -400,7 +398,7 @@ public class PacManGame extends Application {
 
 	private void score(int points) {
 		if (score < EXTRA_LIFE_SCORE && score + points >= EXTRA_LIFE_SCORE) {
-			++liveCount;
+			++lives;
 			assets.sound("sfx/extra-life.mp3").play();
 		}
 		score += points;
@@ -428,15 +426,6 @@ public class PacManGame extends Application {
 		}
 		FlashText.show(this, String.valueOf(object), selectedTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
 				Color.YELLOW, gameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
-	}
-
-	private void handleCheats() {
-		if (Keyboard.pressedOnce(VK_ALT, VK_L)) {
-			++liveCount;
-		}
-		if (Keyboard.pressedOnce(VK_ALT, VK_B)) {
-			bonusScore.add(getBonus());
-		}
 	}
 
 	private List<PacManUI> themes() {
@@ -652,14 +641,13 @@ public class PacManGame extends Application {
 			// --
 
 			state(PlayState.Playing).entry = state -> {
-				pacMan.control.changeTo(PacManState.Exploring);
 				pacMan.speed = getPacManSpeed();
+				pacMan.control.changeTo(PacManState.Exploring);
 				attackControl.changeTo(AttackState.Starting);
 				assets.sound("sfx/eating.mp3").loop();
 			};
 
 			state(PlayState.Playing).update = state -> {
-				handleCheats();
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					attackControl.changeTo(AttackState.Complete);
 					++level;
@@ -688,13 +676,13 @@ public class PacManGame extends Application {
 			// --
 
 			state(PlayState.Crashing).entry = state -> {
+				assets.sounds().forEach(Sound::stop);
+				assets.sound("sfx/die.mp3").play();
 				state.setDuration(gameLoop.secToFrames(3));
-				Log.info("PacMan crashed, lives remaining: " + liveCount);
+				Log.info("PacMan crashed, lives remaining: " + lives);
 				selectedTheme().getEnergizer().setAnimated(false);
 				enableBonus(false);
 				attackControl.changeTo(AttackState.Complete);
-				assets.sounds().forEach(Sound::stop);
-				assets.sound("sfx/die.mp3").play();
 			};
 
 			state(PlayState.Crashing).update = state -> {
@@ -710,6 +698,8 @@ public class PacManGame extends Application {
 			// --
 
 			state(PlayState.GameOver).entry = state -> {
+				assets.sounds().forEach(Sound::stop);
+				assets.sound("sfx/die.mp3").play();
 				Log.info("Game over.");
 				entities.all().forEach(entity -> entity.setAnimated(false));
 				selectedTheme().getEnergizer().setAnimated(false);
@@ -718,13 +708,10 @@ public class PacManGame extends Application {
 				if (score > highscore.getPoints()) {
 					highscore.save(score, level);
 				}
-				assets.sounds().forEach(Sound::stop);
-				assets.sound("sfx/die.mp3").play();
 			};
 
 			state(PlayState.GameOver).update = state -> {
 				if (Keyboard.pressedOnce(VK_SPACE)) {
-					entities.removeAll(GameEntity.class);
 					changeTo(PlayState.StartingGame);
 				}
 			};
