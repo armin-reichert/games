@@ -6,6 +6,6 @@ package de.amr.games.pacman.entities.ghost.behaviors;
  * @author Armin Reichert
  *
  */
-public enum GhostAction {
-	Scatter, Chase, GetFrightened, EndFrightened, Die
+public enum GhostMessage {
+	Scatter, Chase, StartBeingFrightened, EndBeingFrightened, Die
 }

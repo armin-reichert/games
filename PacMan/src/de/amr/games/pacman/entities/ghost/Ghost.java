@@ -1,5 +1,6 @@
 package de.amr.games.pacman.entities.ghost;
 
+import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
@@ -20,13 +21,12 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacManGameEntity;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
@@ -36,30 +36,36 @@ import de.amr.games.pacman.fsm.StateMachine;
  */
 public class Ghost extends PacManGameEntity {
 
-	public final Color color;
 	public final List<Integer> route = new LinkedList<>();
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateAfterFrightened;
-
-	private GhostAction action;
+	private Color color;
+	private GhostMessage message;
 
 	@Override
 	public String toString() {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(String ghostName, Color color, float homeRow, float homeCol) {
+	public Ghost(float homeRow, float homeCol) {
 		super(new Tile(homeRow, homeCol));
-		this.color = color;
-		setName(ghostName);
+		this.color = Color.WHITE;
 		control = new StateMachine<>(getName(), new EnumMap<>(GhostState.class));
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public Color getColor() {
+		return color;
 	}
 
 	@Override
 	public void init() {
 		route.clear();
 		setAnimated(false);
-		action = null;
+		message = null;
 		control.changeTo(Waiting);
 	}
 
@@ -71,21 +77,21 @@ public class Ghost extends PacManGameEntity {
 		if (!control.state().isTerminated()) {
 			return;
 		}
-		if (action != null) {
-			nextAction();
+		if (message != null) {
+			processMessage();
 		}
 	}
 
-	public void perform(GhostAction action) {
-		this.action = action;
+	public void receive(GhostMessage message) {
+		this.message = message;
 		if (!control.inState(Dead, Recovering)) {
 			control.state().terminate();
 		}
 	}
 
-	private void nextAction() {
-		Application.Log.info(getName() + " performs action: " + action);
-		switch (action) {
+	private void processMessage() {
+		Log.info(getName() + " handles message: " + message);
+		switch (message) {
 		case Chase:
 			if (control.stateID() != Frightened) {
 				control.changeTo(Chasing);
@@ -96,17 +102,17 @@ public class Ghost extends PacManGameEntity {
 				control.changeTo(Scattering);
 			}
 			break;
-		case GetFrightened:
+		case StartBeingFrightened:
 			control.changeTo(Frightened);
 			break;
-		case EndFrightened:
+		case EndBeingFrightened:
 			control.changeTo(stateAfterFrightened.get());
 			break;
 		case Die:
 			control.changeTo(Dead);
 			break;
 		}
-		action = null;
+		message = null;
 	}
 
 	// --- Look ---

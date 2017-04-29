@@ -88,7 +88,7 @@ public class PlayScene extends Scene<PacManGame> {
 		if (getApp().settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
 			entities.allOf(Ghost.class).forEach(ghost -> {
-				g.setColor(ghost.color);
+				g.setColor(ghost.getColor());
 				g.fillRect(round(ghost.home.x * TILE_SIZE), round(ghost.home.y * TILE_SIZE), TILE_SIZE, TILE_SIZE);
 			});
 		}
@@ -115,7 +115,7 @@ public class PlayScene extends Scene<PacManGame> {
 		drawText(g, 2, 20, "Level " + getApp().level);
 
 		// Ready!, Game Over!
-		if (getApp().getPlayState() == PlayState.StartingGame) {
+		if (getApp().getPlayState() == PlayState.Initializing) {
 			g.setColor(Color.RED);
 			drawTextCentered(g, getWidth(), 9.5f, "Press ENTER to start");
 			g.setColor(theme.getHUDColor());

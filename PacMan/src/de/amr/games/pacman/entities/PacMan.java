@@ -9,10 +9,10 @@ import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.BONUS_COL;
 import static de.amr.games.pacman.data.Board.BONUS_ROW;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
-import static de.amr.games.pacman.entities.PacMan.PacManState.Dying;
-import static de.amr.games.pacman.entities.PacMan.PacManState.Exploring;
-import static de.amr.games.pacman.entities.PacMan.PacManState.Frightening;
-import static de.amr.games.pacman.entities.PacMan.PacManState.Waiting;
+import static de.amr.games.pacman.entities.PacManState.Dying;
+import static de.amr.games.pacman.entities.PacManState.Frightening;
+import static de.amr.games.pacman.entities.PacManState.Peaceful;
+import static de.amr.games.pacman.entities.PacManState.Waiting;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
@@ -32,31 +32,33 @@ import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostAction;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
 
+/**
+ * The Pac-Man.
+ * 
+ * @author Armin Reichert
+ */
 public class PacMan extends PacManGameEntity {
 
-	public enum PacManState {
-		Waiting, Exploring, Frightening, Dying;
-	};
-
 	public final StateMachine<PacManState> control;
+	
 	public Consumer<Tile> onPelletFound;
 	public Consumer<Tile> onEnergizerFound;
 	public Consumer<Bonus> onBonusFound;
 	public Consumer<Ghost> onGhostMet;
 
-	private float speedBeforeFrightening;
+	private float speedBeforeBecomingFrightening;
 	private int freezeTimer;
 	private boolean couldMove;
 
 	public PacMan(float homeRow, float homeCol) {
 		super(new Tile(homeRow, homeCol));
 		setName("Pac-Man");
-
-		// default event handler
+		
+		// default event handlers
 
 		onPelletFound = tile -> {
 			Log.info("PacMan finds pellet at tile " + tile);
@@ -87,29 +89,29 @@ public class PacMan extends PacManGameEntity {
 			placeAt(home);
 		};
 
-		control.state(Exploring).entry = state -> {
+		control.state(Peaceful).entry = state -> {
 			setAnimated(true);
 		};
 
-		control.state(Exploring).update = state -> {
+		control.state(Peaceful).update = state -> {
 			exploreMaze();
 		};
 
 		control.state(Frightening).entry = state -> {
-			speedBeforeFrightening = this.speed;
-			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.perform(GhostAction.GetFrightened));
+			speedBeforeBecomingFrightening = this.speed;
+			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.receive(GhostMessage.StartBeingFrightened));
 		};
 
 		control.state(Frightening).update = state -> {
 			exploreMaze();
 			if (state.isTerminated()) {
-				control.changeTo(Exploring);
+				control.changeTo(Peaceful);
 			}
 		};
 
 		control.state(Frightening).exit = state -> {
-			speed = speedBeforeFrightening;
-			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.perform(GhostAction.EndFrightened));
+			speed = speedBeforeBecomingFrightening;
+			Game.entities.allOf(Ghost.class).forEach(ghost -> ghost.receive(GhostMessage.EndBeingFrightened));
 		};
 
 		control.state(Dying).entry = state -> {
@@ -132,6 +134,10 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public void update() {
+		if (freezeTimer > 0) {
+			--freezeTimer;
+			return;
+		}
 		control.update();
 	}
 
@@ -177,10 +183,6 @@ public class PacMan extends PacManGameEntity {
 	}
 
 	private void exploreMaze() {
-		if (freezeTimer > 0) {
-			--freezeTimer;
-			return;
-		}
 		changeMoveDir(computeMoveDir());
 		couldMove = move();
 		final Tile tile = currentTile();
