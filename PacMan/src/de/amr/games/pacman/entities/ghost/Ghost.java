@@ -47,10 +47,11 @@ public class Ghost extends PacManGameEntity {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(float homeRow, float homeCol) {
+	public Ghost(String name, float homeRow, float homeCol) {
 		super(new Tile(homeRow, homeCol));
 		this.color = Color.WHITE;
-		control = new StateMachine<>(getName(), new EnumMap<>(GhostState.class));
+		setName(name);
+		control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
 	}
 
 	public void setColor(Color color) {

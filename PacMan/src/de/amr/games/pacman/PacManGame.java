@@ -67,8 +67,8 @@ import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.PacManState;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
+import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.entities.ghost.behaviors.ProactiveChasing;
 import de.amr.games.pacman.fsm.StateMachine;
@@ -149,7 +149,6 @@ public class PacManGame extends Application {
 	public static final int FIRST_GHOST_VALUE = 200;
 	public static final int WAIT_TICKS_ON_EATING_PELLET = 1;
 	public static final int WAIT_TICKS_ON_EATING_ENERGIZER = 3;
-	public static final int WAIT_TICKS_ON_LEVEL_START = 240;
 
 	// Game data
 	public PacMan pacMan;
@@ -266,20 +265,16 @@ public class PacManGame extends Application {
 
 		// Create the ghosts and define their behavior
 
-		blinky = new Ghost(BLINKY_HOME_ROW, BLINKY_HOME_COL);
-		blinky.setName("Blinky");
+		blinky = new Ghost("Blinky", BLINKY_HOME_ROW, BLINKY_HOME_COL);
 		blinky.setColor(Color.RED);
 
-		inky = new Ghost(INKY_HOME_ROW, INKY_HOME_COL);
-		inky.setName("Inky");
+		inky = new Ghost("Inky", INKY_HOME_ROW, INKY_HOME_COL);
 		inky.setColor(new Color(64, 224, 208));
 
-		pinky = new Ghost(PINKY_HOME_ROW, PINKY_HOME_COL);
-		pinky.setName("Pinky");
+		pinky = new Ghost("Pinky", PINKY_HOME_ROW, PINKY_HOME_COL);
 		pinky.setColor(Color.PINK);
 
-		clyde = new Ghost(CLYDE_HOME_ROW, CLYDE_HOME_COL);
-		clyde.setName("Clyde");
+		clyde = new Ghost("Clyde", CLYDE_HOME_ROW, CLYDE_HOME_COL);
 		clyde.setColor(Color.ORANGE);
 
 		// Common ghost behavior
@@ -414,12 +409,6 @@ public class PacManGame extends Application {
 			bonus = Optional.empty();
 			bonusTimeRemaining = 0;
 		}
-	}
-
-	private void announceLevel() {
-		assets.sound("sfx/ready.mp3").play();
-		FlashText.show(this, "Level " + level, selectedTheme().getTextFont(), Color.YELLOW, gameLoop.secToFrames(0.5f),
-				new Vector2(11, 21).times(TILE_SIZE), Vector2.nullVector());
 	}
 
 	private void showFlashText(Object object, float x, float y) {
@@ -588,7 +577,7 @@ public class PacManGame extends Application {
 	}
 
 	public enum PlayState {
-		Initializing, Starting, Playing, Crashing, GameOver
+		Initializing, Ready, StartingLevel, Playing, Crashing, GameOver
 	}
 
 	private class PlayControl extends StateMachine<PlayState> {
@@ -596,52 +585,54 @@ public class PacManGame extends Application {
 		public PlayControl() {
 			super("Play control", new EnumMap<>(PlayState.class));
 
+			// Initializing
+			
 			state(PlayState.Initializing).entry = state -> {
-				initGame();
 				assets.sound("sfx/insert-coin.mp3").play();
+				initGame();
 			};
 
 			state(PlayState.Initializing).update = state -> {
-				if (assets.sound("sfx/insert-coin.mp3").isRunning()) {
-					return;
+				if (!assets.sound("sfx/insert-coin.mp3").isRunning()) {
+					changeTo(PlayState.Ready);
 				}
+			};
+
+			// Ready
+
+			state(PlayState.Ready).update = state -> {
 				if (Keyboard.pressedOnce(VK_ENTER)) {
-					changeTo(PlayState.Starting, levelStart -> {
-						levelStart.setDuration(WAIT_TICKS_ON_LEVEL_START);
-						announceLevel();
-					});
+					changeTo(PlayState.StartingLevel);
 				} else if (Keyboard.pressedOnce(VK_T)) {
 					nextTheme();
 				}
 			};
 
-			// --
+			// StartingLevel
 
-			state(PlayState.Starting).entry = state -> {
+			state(PlayState.StartingLevel).entry = state -> {
+				assets.sound("sfx/ready.mp3").play();
 				selectedTheme().getEnergizer().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Waiting);
 				entities.allOf(Ghost.class).forEach(ghost -> {
+					ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingDuration(ghost));
 					ghost.init();
 					ghost.setAnimated(true);
 				});
 			};
 
-			state(PlayState.Starting).update = state -> {
+			state(PlayState.StartingLevel).update = state -> {
 				entities.all().forEach(GameEntity::update);
-				if (state.isTerminated()) {
-					entities.allOf(Ghost.class).forEach(ghost -> {
-						int waitTicks = getGhostWaitingDuration(ghost);
-						ghost.control.state(GhostState.Waiting).setDuration(waitTicks);
-					});
+				if (!assets.sound("sfx/ready.mp3").isRunning()) {
 					changeTo(PlayState.Playing);
 				}
 			};
 
-			// --
+			// Playing
 
 			state(PlayState.Playing).entry = state -> {
 				pacMan.speed = getPacManSpeed();
-				pacMan.control.changeTo(PacManState.Peaceful);
+				pacMan.control.changeTo(PacManState.Eating);
 				attackControl.changeTo(AttackState.Starting);
 				assets.sound("sfx/eating.mp3").loop();
 			};
@@ -649,10 +640,9 @@ public class PacManGame extends Application {
 			state(PlayState.Playing).update = state -> {
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					attackControl.changeTo(AttackState.Complete);
-					changeTo(PlayState.Starting, levelStarting -> {
-						levelStarting.setDuration(gameLoop.secToFrames(4));
+					changeTo(PlayState.StartingLevel, newState -> {
+						newState.setDuration(gameLoop.secToFrames(4));
 						initLevel(++level);
-						announceLevel();
 					});
 				} else if (attackControl.inState(AttackState.Complete)) {
 					attackControl.changeTo(AttackState.Starting, newState -> ++wave);
@@ -671,7 +661,7 @@ public class PacManGame extends Application {
 				entities.removeAll(FlashText.class);
 			};
 
-			// --
+			// Crashing
 
 			state(PlayState.Crashing).entry = state -> {
 				assets.sounds().forEach(Sound::stop);
@@ -685,7 +675,14 @@ public class PacManGame extends Application {
 
 			state(PlayState.Crashing).update = state -> {
 				if (state.isTerminated()) {
-					changeTo(PlayState.Starting, newState -> newState.setDuration(0));
+					selectedTheme().getEnergizer().setAnimated(true);
+					pacMan.control.changeTo(PacManState.Waiting);
+					entities.allOf(Ghost.class).forEach(ghost -> {
+						ghost.init();
+						ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingDuration(ghost));
+						ghost.setAnimated(true);
+					});
+					changeTo(PlayState.Playing, newState -> newState.setDuration(0));
 				}
 			};
 
@@ -693,7 +690,7 @@ public class PacManGame extends Application {
 				attackControl.changeTo(AttackState.Complete);
 			};
 
-			// --
+			// GameOver
 
 			state(PlayState.GameOver).entry = state -> {
 				assets.sounds().forEach(Sound::stop);

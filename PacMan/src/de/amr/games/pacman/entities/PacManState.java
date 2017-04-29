@@ -6,5 +6,5 @@ package de.amr.games.pacman.entities;
  * @author Armin Reichert
  */
 public enum PacManState {
-	Waiting, Peaceful, Frightening, Dying;
+	Waiting, Eating, Frightening, Dying;
 }

@@ -7,11 +7,8 @@ import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.data.TileContent.Energizer;
 import static de.amr.games.pacman.data.TileContent.Pellet;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
-import static java.awt.event.KeyEvent.VK_ALT;
-import static java.awt.event.KeyEvent.VK_B;
 import static java.awt.event.KeyEvent.VK_CONTROL;
 import static java.awt.event.KeyEvent.VK_I;
-import static java.awt.event.KeyEvent.VK_L;
 import static java.lang.Math.round;
 import static java.util.stream.IntStream.range;
 
@@ -29,6 +26,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.PacManGame.PlayState;
 import de.amr.games.pacman.data.Bonus;
+import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -56,10 +54,17 @@ public class PlayScene extends Scene<PacManGame> {
 			getApp().settings.set("drawInternals", !getApp().settings.getBool("drawInternals"));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_G)) {
 			getApp().settings.set("drawGrid", !getApp().settings.getBool("drawGrid"));
-		} else if (Keyboard.pressedOnce(VK_ALT, VK_L)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_L)) {
 			getApp().lives += 1;
-		} else if (Keyboard.pressedOnce(VK_ALT, VK_B)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_B)) {
 			getApp().bonusScore.add(getApp().getBonus());
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_A)) {
+			getApp().board.tilesWithContent(Pellet).forEach(tile -> {
+				getApp().board.setContent(tile, TileContent.None);
+			});
+			// getApp().board.tilesWithContent(Energizer).forEach(tile -> {
+			// getApp().board.setContent(tile, TileContent.None);
+			// });
 		}
 		getApp().updateGameState();
 	}
@@ -115,16 +120,25 @@ public class PlayScene extends Scene<PacManGame> {
 		drawText(g, 2, 20, "Level " + getApp().level);
 
 		// Ready!, Game Over!
-		if (getApp().getPlayState() == PlayState.Initializing) {
+		switch (getApp().getPlayState()) {
+		case Ready:
 			g.setColor(Color.RED);
 			drawTextCentered(g, getWidth(), 9.5f, "Press ENTER to start");
 			g.setColor(theme.getHUDColor());
 			drawTextCentered(g, getWidth(), 21f, "Ready!");
-		} else if (getApp().getPlayState() == PlayState.GameOver) {
+			break;
+		case StartingLevel:
+			g.setColor(theme.getHUDColor());
+			drawTextCentered(g, getWidth(), 21f, "Level " + getApp().level);
+			break;
+		case GameOver:
 			g.setColor(Color.RED);
 			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE for new game");
 			g.setColor(theme.getHUDColor());
 			drawTextCentered(g, getWidth(), 21f, "Game Over!");
+			break;
+		default:
+			break;
 		}
 
 		// Lives

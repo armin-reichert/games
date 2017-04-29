@@ -11,7 +11,7 @@ import static de.amr.games.pacman.data.Board.BONUS_ROW;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.PacManState.Dying;
 import static de.amr.games.pacman.entities.PacManState.Frightening;
-import static de.amr.games.pacman.entities.PacManState.Peaceful;
+import static de.amr.games.pacman.entities.PacManState.Eating;
 import static de.amr.games.pacman.entities.PacManState.Waiting;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
@@ -89,11 +89,11 @@ public class PacMan extends PacManGameEntity {
 			placeAt(home);
 		};
 
-		control.state(Peaceful).entry = state -> {
+		control.state(Eating).entry = state -> {
 			setAnimated(true);
 		};
 
-		control.state(Peaceful).update = state -> {
+		control.state(Eating).update = state -> {
 			exploreMaze();
 		};
 
@@ -105,7 +105,7 @@ public class PacMan extends PacManGameEntity {
 		control.state(Frightening).update = state -> {
 			exploreMaze();
 			if (state.isTerminated()) {
-				control.changeTo(Peaceful);
+				control.changeTo(Eating);
 			}
 		};
 

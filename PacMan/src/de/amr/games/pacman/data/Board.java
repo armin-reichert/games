@@ -1,6 +1,7 @@
 package de.amr.games.pacman.data;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Grid;
@@ -108,8 +109,7 @@ public class Board {
 	 * @return <code>true</code> if the tile contains this content
 	 */
 	public boolean contains(int row, int col, TileContent content) {
-		Integer cell = grid.cell(col, row);
-		return content.toChar() == grid.get(cell);
+		return content.toChar() == grid.get(grid.cell(col, row));
 	}
 
 	/**
@@ -135,5 +135,20 @@ public class Board {
 	 */
 	public long count(TileContent content) {
 		return grid.vertexStream().filter(cell -> content.toChar() == grid.get(cell)).count();
+	}
+
+	/**
+	 * Returns a stream of all tiles containg the given content.
+	 * 
+	 * @param content
+	 *          some tile content
+	 * @return a stream of all tiles with that content
+	 */
+	public Stream<Tile> tilesWithContent(TileContent content) {
+		///*@formatter:off*/
+		return grid.vertexStream()
+				.filter(cell -> grid.get(cell) == content.toChar())
+				.map(cell -> new Tile(grid.row(cell), grid.col(cell)));
+		///*@formatter:on*/
 	}
 }
