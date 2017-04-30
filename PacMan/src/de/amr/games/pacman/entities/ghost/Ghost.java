@@ -176,7 +176,7 @@ public class Ghost extends PacManGameEntity {
 	// --- Navigation ---
 
 	public void computeRoute(Tile target) {
-		route = Game.routeMap.shortestRoute(currentTile(), target);
+		route = Game.board.shortestRoute(currentTile(), target);
 	}
 
 	public void followRoute(Tile target) {

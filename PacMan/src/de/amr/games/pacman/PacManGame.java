@@ -61,7 +61,6 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Bonus;
 import de.amr.games.pacman.data.Highscore;
-import de.amr.games.pacman.data.RouteMap;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.PacManState;
@@ -154,7 +153,6 @@ public class PacManGame extends Application {
 	public PacMan pacMan;
 	public Ghost blinky, inky, pinky, clyde;
 	public Board board;
-	public RouteMap routeMap;
 	public int level;
 	private int wave;
 	public int lives;
@@ -172,7 +170,6 @@ public class PacManGame extends Application {
 	@Override
 	protected void init() {
 		board = new Board(assets.text("board.txt"));
-		routeMap = new RouteMap(board);
 		playControl = new PlayControl();
 		attackControl = new AttackControl();
 		highscore = new Highscore("pacman-hiscore.txt");

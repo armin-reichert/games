@@ -1,10 +1,15 @@
 package de.amr.games.pacman.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
+import de.amr.easy.graph.api.PathFinder;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Grid;
+import de.amr.easy.grid.impl.ObservableBareGrid;
 import de.amr.easy.grid.impl.Top4;
 
 /**
@@ -50,6 +55,7 @@ public class Board {
 		boardDataRows = boardAsText.split("\n");
 		grid = new Grid<>(NUM_COLS, NUM_ROWS, TileContent.None.toChar(), false);
 		reset();
+		buildRouteMap();
 	}
 
 	/**
@@ -129,7 +135,7 @@ public class Board {
 	public TileContent getContent(Tile tile) {
 		return TileContent.valueOf(grid.get(grid.cell(tile.getCol(), tile.getRow())));
 	}
-	
+
 	/**
 	 * Returns the number of occurrences of the given content inside the whole board.
 	 * 
@@ -155,4 +161,54 @@ public class Board {
 				.map(cell -> new Tile(grid.row(cell), grid.col(cell)));
 		///*@formatter:on*/
 	}
+
+	private ObservableBareGrid<?> gridGraph;
+
+	/**
+	 * Creates a route planner based on a grid representation of this board.
+	 */
+	private void buildRouteMap() {
+		gridGraph = new ObservableBareGrid<>(NUM_COLS, NUM_ROWS);
+		gridGraph.setEventsEnabled(false);
+		/*@formatter:off*/
+		gridGraph.vertexStream()
+			.filter(cell -> grid.get(cell) != TileContent.Wall.toChar())
+			.forEach(cell -> {
+				gridGraph.getTopology().dirs().forEach(dir -> {
+					gridGraph.neighbor(cell, dir).ifPresent(neighbor -> {
+						if (grid.get(neighbor) != TileContent.Wall.toChar()
+							&& !gridGraph.adjacent(cell, neighbor)) {
+							gridGraph.addEdge(cell, neighbor);
+						}
+					});
+				});
+			});
+		/*@formatter:on*/
+	}
+
+	/**
+	 * Computes the shortest route between the given tiles.
+	 * 
+	 * @param source
+	 *          route start
+	 * @param target
+	 *          route target
+	 * @return list of directions to walk from the source tile to reach the target tile
+	 */
+	public List<Integer> shortestRoute(Tile source, Tile target) {
+		Integer sourceCell = gridGraph.cell(source.getCol(), source.getRow());
+		Integer targetCell = gridGraph.cell(target.getCol(), target.getRow());
+		PathFinder<Integer> pathFinder = new BreadthFirstTraversal<>(gridGraph, sourceCell);
+		pathFinder.run();
+		List<Integer> route = new ArrayList<>();
+		Integer pred = null;
+		for (Integer cell : pathFinder.findPath(targetCell)) {
+			if (pred != null) {
+				route.add(gridGraph.direction(pred, cell).getAsInt());
+			}
+			pred = cell;
+		}
+		return route;
+	}
+
 }
