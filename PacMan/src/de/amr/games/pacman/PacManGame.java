@@ -266,16 +266,16 @@ public class PacManGame extends Application {
 		// Create the ghosts and define their behavior
 
 		blinky = new Ghost("Blinky", BLINKY_HOME_ROW, BLINKY_HOME_COL);
-		blinky.setColor(Color.RED);
+		blinky.color = Color.RED;
 
 		inky = new Ghost("Inky", INKY_HOME_ROW, INKY_HOME_COL);
-		inky.setColor(new Color(64, 224, 208));
+		inky.color = new Color(64, 224, 208);
 
 		pinky = new Ghost("Pinky", PINKY_HOME_ROW, PINKY_HOME_COL);
-		pinky.setColor(Color.PINK);
+		pinky.color = Color.PINK;
 
 		clyde = new Ghost("Clyde", CLYDE_HOME_ROW, CLYDE_HOME_COL);
-		clyde.setColor(Color.ORANGE);
+		clyde.color = Color.ORANGE;
 
 		// Common ghost behavior
 
@@ -586,7 +586,7 @@ public class PacManGame extends Application {
 			super("Play control", new EnumMap<>(PlayState.class));
 
 			// Initializing
-			
+
 			state(PlayState.Initializing).entry = state -> {
 				assets.sound("sfx/insert-coin.mp3").play();
 				initGame();

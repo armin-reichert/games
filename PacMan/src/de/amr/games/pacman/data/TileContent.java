@@ -18,4 +18,13 @@ public enum TileContent {
 	public char toChar() {
 		return ch;
 	}
+
+	public static TileContent valueOf(char c) {
+		for (TileContent content : values()) {
+			if (c == content.ch) {
+				return content;
+			}
+		}
+		throw new IllegalArgumentException("Unknown tile content '" + c + "'");
+	}
 };

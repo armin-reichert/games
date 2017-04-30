@@ -126,6 +126,10 @@ public class Board {
 		return contains(tile.getRow(), tile.getCol(), content) ? Optional.of(tile) : Optional.empty();
 	}
 
+	public TileContent getContent(Tile tile) {
+		return TileContent.valueOf(grid.get(grid.cell(tile.getCol(), tile.getRow())));
+	}
+	
 	/**
 	 * Returns the number of occurrences of the given content inside the whole board.
 	 * 

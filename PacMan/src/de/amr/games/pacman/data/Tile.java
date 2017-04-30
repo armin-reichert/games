@@ -1,5 +1,7 @@
 package de.amr.games.pacman.data;
 
+import static java.lang.Math.round;
+
 import java.awt.geom.Point2D;
 
 /**
@@ -26,11 +28,11 @@ public class Tile extends Point2D.Float {
 	}
 
 	public int getRow() {
-		return Math.round(y);
+		return round(y);
 	}
 
 	public int getCol() {
-		return Math.round(x);
+		return round(x);
 	}
 
 	@Override

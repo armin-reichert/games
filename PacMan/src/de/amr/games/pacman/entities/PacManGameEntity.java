@@ -9,6 +9,7 @@ import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static java.lang.Math.round;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -49,7 +50,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public boolean isAtHome() {
-		Rectangle homeArea = new Rectangle(Math.round(home.x * TILE_SIZE), Math.round(home.y * TILE_SIZE), TILE_SIZE,
+		Rectangle homeArea = new Rectangle(round(home.x * TILE_SIZE), round(home.y * TILE_SIZE), TILE_SIZE,
 				TILE_SIZE);
 		return getCollisionBox().intersects(homeArea);
 	}

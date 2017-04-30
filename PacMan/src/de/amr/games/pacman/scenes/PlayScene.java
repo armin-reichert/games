@@ -7,8 +7,6 @@ import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.data.TileContent.Energizer;
 import static de.amr.games.pacman.data.TileContent.Pellet;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
-import static java.awt.event.KeyEvent.VK_CONTROL;
-import static java.awt.event.KeyEvent.VK_I;
 import static java.lang.Math.round;
 import static java.util.stream.IntStream.range;
 
@@ -19,7 +17,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.common.FlashText;
-import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
@@ -50,30 +47,26 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(VK_CONTROL, VK_I)) {
+		// cheats and debug keys
+		if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_I)) {
 			getApp().settings.set("drawInternals", !getApp().settings.getBool("drawInternals"));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_G)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_G)) {
 			getApp().settings.set("drawGrid", !getApp().settings.getBool("drawGrid"));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_L)) {
 			getApp().lives += 1;
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_B)) {
 			getApp().bonusScore.add(getApp().getBonus());
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_A)) {
-			getApp().board.tilesWithContent(Pellet).forEach(tile -> {
-				getApp().board.setContent(tile, TileContent.None);
-			});
-			// getApp().board.tilesWithContent(Energizer).forEach(tile -> {
-			// getApp().board.setContent(tile, TileContent.None);
-			// });
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_P)) {
+			getApp().board.tilesWithContent(Pellet).forEach(tile -> getApp().board.setContent(tile, TileContent.None));
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_E)) {
+			getApp().board.tilesWithContent(Energizer).forEach(tile -> getApp().board.setContent(tile, TileContent.None));
 		}
 		getApp().updateGameState();
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-
 		final PacManUI theme = getApp().selectedTheme();
-		final EntitySet entities = getApp().entities;
 
 		// Board
 		drawSprite(g, 3, 0, theme.getBoard());
@@ -86,31 +79,27 @@ public class PlayScene extends Scene<PacManGame> {
 		}));
 		getApp().bonus.ifPresent(bonus -> drawSprite(g, BONUS_ROW, BONUS_COL, theme.getBonus(bonus)));
 
-		// Debugging
+		// Grid
 		if (getApp().settings.getBool("drawGrid")) {
 			g.drawImage(getGridImage(), 0, 0, null);
 		}
 		if (getApp().settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
-			entities.allOf(Ghost.class).forEach(ghost -> {
-				g.setColor(ghost.getColor());
+			getApp().entities.allOf(Ghost.class).forEach(ghost -> {
+				g.setColor(ghost.color);
 				g.fillRect(round(ghost.home.x * TILE_SIZE), round(ghost.home.y * TILE_SIZE), TILE_SIZE, TILE_SIZE);
 			});
 		}
 
-		// Pac-Man
+		// Entities
 		getApp().pacMan.draw(g);
-
-		// Ghosts
 		if (getApp().getPlayState() != PlayState.Crashing) {
-			entities.allOf(Ghost.class).forEach(ghost -> ghost.draw(g));
+			getApp().entities.allOf(Ghost.class).forEach(ghost -> ghost.draw(g));
 		}
-
-		g.setFont(theme.getTextFont());
-		g.setColor(theme.getHUDColor());
 
 		// HUD
 		g.setColor(Color.LIGHT_GRAY);
+		g.setFont(theme.getTextFont());
 		drawText(g, 1, 1, "SCORE");
 		drawText(g, 1, 8, "HIGH");
 		drawText(g, 1, 12, "SCORE");
@@ -119,7 +108,7 @@ public class PlayScene extends Scene<PacManGame> {
 		drawText(g, 2, 8, String.format("%02d   L%d", getApp().highscore.getPoints(), getApp().highscore.getLevel()));
 		drawText(g, 2, 20, "Level " + getApp().level);
 
-		// Ready!, Game Over!
+		// Status messages
 		switch (getApp().getPlayState()) {
 		case Ready:
 			g.setColor(Color.RED);
@@ -157,16 +146,16 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Flash texts
-		entities.allOf(FlashText.class).forEach(text -> text.draw(g));
+		getApp().entities.allOf(FlashText.class).forEach(text -> text.draw(g));
 	}
 
 	// Helper methods
 
 	private static void drawSprite(Graphics2D g, float row, float col, Sprite sprite) {
-		Graphics2D gg = (Graphics2D) g.create();
-		gg.translate(TILE_SIZE * col, TILE_SIZE * row);
-		sprite.draw(gg);
-		gg.dispose();
+		float x = TILE_SIZE * col, y = TILE_SIZE * row;
+		g.translate(x, y);
+		sprite.draw(g);
+		g.translate(-x, -y);
 	}
 
 	private static void drawText(Graphics2D g, float row, float col, String text) {

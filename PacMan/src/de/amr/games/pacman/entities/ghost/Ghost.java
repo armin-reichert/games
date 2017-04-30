@@ -3,6 +3,9 @@ package de.amr.games.pacman.entities.ghost;
 import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.TOPOLOGY;
+import static de.amr.games.pacman.data.TileContent.Door;
+import static de.amr.games.pacman.data.TileContent.GhostHouse;
+import static de.amr.games.pacman.data.TileContent.Tunnel;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened;
@@ -15,8 +18,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -36,10 +39,10 @@ import de.amr.games.pacman.fsm.StateMachine;
  */
 public class Ghost extends PacManGameEntity {
 
-	public final List<Integer> route = new LinkedList<>();
 	public final StateMachine<GhostState> control;
+	public List<Integer> route;
 	public Supplier<GhostState> stateAfterFrightened;
-	private Color color;
+	public Color color;
 	private GhostMessage message;
 
 	@Override
@@ -54,17 +57,9 @@ public class Ghost extends PacManGameEntity {
 		control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
 	}
 
-	public void setColor(Color color) {
-		this.color = color;
-	}
-
-	public Color getColor() {
-		return color;
-	}
-
 	@Override
 	public void init() {
-		route.clear();
+		route = Collections.emptyList();
 		setAnimated(false);
 		message = null;
 		control.changeTo(Waiting);
@@ -181,8 +176,7 @@ public class Ghost extends PacManGameEntity {
 	// --- Navigation ---
 
 	public void computeRoute(Tile target) {
-		route.clear();
-		route.addAll(Game.routeMap.shortestRoute(currentTile(), target));
+		route = Game.routeMap.shortestRoute(currentTile(), target);
 	}
 
 	public void followRoute(Tile target) {
@@ -207,9 +201,10 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public boolean move() {
-		if (Game.board.contains(currentTile(), TileContent.Tunnel)) {
+		TileContent content = Game.board.getContent(currentTile());
+		if (content == Tunnel) {
 			speed = Game.getGhostSpeedInTunnel();
-		} else if (Game.board.contains(currentTile(), TileContent.GhostHouse)) {
+		} else if (content == GhostHouse) {
 			speed = Game.getGhostSpeedInHouse();
 		} else if (control.inState(Frightened)) {
 			speed = Game.getGhostSpeedWhenFrightened();
@@ -222,19 +217,19 @@ public class Ghost extends PacManGameEntity {
 	// --- predicates
 
 	public boolean insideGhostHouse() {
-		return Game.board.contains(currentTile(), TileContent.GhostHouse);
+		return Game.board.contains(currentTile(), GhostHouse);
 	}
 
 	@Override
 	public boolean canEnter(Tile targetTile) {
-		if (Game.board.contains(targetTile, TileContent.Door)) {
+		if (Game.board.contains(targetTile, Door)) {
 			if (control.inState(Dead))
 				return true; // eyes can pass through door
 			if (control.inState(Waiting))
 				return false; // while waiting door is closed
 
 			// when inside ghost house or already in door, ghost can walk through
-			return insideGhostHouse() || Game.board.contains(currentTile(), TileContent.Door);
+			return insideGhostHouse() || Game.board.contains(currentTile(), Door);
 		} else if (Game.board.contains(targetTile, TileContent.Wall)) {
 			return false;
 		}
