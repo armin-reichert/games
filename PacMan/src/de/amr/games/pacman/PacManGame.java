@@ -96,6 +96,7 @@ public class PacManGame extends Application {
 		Game.settings.set("drawInternals", false);
 		Game.settings.set("drawGrid", false);
 		Log.setLevel(Level.ALL);
+		Game.gameLoop.log = true;
 		launch(Game);
 	}
 
@@ -169,30 +170,18 @@ public class PacManGame extends Application {
 
 	@Override
 	protected void init() {
-		board = new Board(assets.text("board.txt"));
 		playControl = new PlayControl();
 		attackControl = new AttackControl();
+		board = new Board(assets.text("board.txt"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusScore = new ArrayList<>();
-		initGame();
 		views.add(new PlayScene(this));
 		views.show(PlayScene.class);
+		playControl.changeTo(PlayState.Initializing);
 	}
 
 	public void updateGameState() {
 		playControl.update();
-	}
-
-	private void initGame() {
-		lives = 3;
-		score = 0;
-		bonusScore.clear();
-		ghostValue = 0;
-		initLevel(1);
-		entities.removeAll(GameEntity.class);
-		createPacManAndGhosts();
-		applyTheme();
-		playControl.changeTo(PlayState.Initializing);
 	}
 
 	private void initLevel(int newLevel) {
@@ -203,7 +192,7 @@ public class PacManGame extends Application {
 		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
 		Log.info(String.format("Level %d: %d pellets and %d energizers. Frames/sec: %d", level, board.count(Pellet),
-				board.count(Energizer), gameLoop.getFrameRate()));
+				board.count(Energizer), gameLoop.getTargetFrameRate()));
 	}
 
 	private void createPacManAndGhosts() {
@@ -586,7 +575,14 @@ public class PacManGame extends Application {
 
 			state(PlayState.Initializing).entry = state -> {
 				assets.sound("sfx/insert-coin.mp3").play();
-				initGame();
+				lives = 3;
+				score = 0;
+				bonusScore.clear();
+				ghostValue = 0;
+				initLevel(1);
+				entities.removeAll(GameEntity.class);
+				createPacManAndGhosts();
+				applyTheme();
 			};
 
 			state(PlayState.Initializing).update = state -> {

@@ -56,7 +56,7 @@ public abstract class Application {
 
 	protected Application() {
 		gameLoop = new GameLoop(this::update, this::render);
-		gameLoop.setFrameRate(settings.fps);
+		gameLoop.setTargetFrameRate(settings.fps);
 		defaultView = new DefaultView(this);
 		Log.info("Application " + getClass().getSimpleName() + " created.");
 	}

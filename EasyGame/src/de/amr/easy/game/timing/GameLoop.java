@@ -1,27 +1,19 @@
 package de.amr.easy.game.timing;
 
+import static java.lang.String.format;
 import static java.lang.System.out;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.beans.PropertyChangeListener;
-import java.util.concurrent.TimeUnit;
 
 public class GameLoop {
 
 	public boolean log = false;
 
-	private static void sleep(long time, TimeUnit unit) {
-		try {
-			unit.sleep(time);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private final Task renderTask;
 	private final Task updateTask;
-	private int fps;
+	private int targetFPS;
 	private long updateCount;
 	private long period;
 	private Thread thread;
@@ -30,16 +22,16 @@ public class GameLoop {
 	public GameLoop(Runnable updateTask, Runnable renderTask) {
 		this.updateTask = new Task(updateTask, "ups", SECONDS.toNanos(1));
 		this.renderTask = new Task(renderTask, "fps", SECONDS.toNanos(1));
-		setFrameRate(60);
+		setTargetFrameRate(60);
 	}
 
-	public void setFrameRate(int fps) {
-		this.fps = fps;
+	public void setTargetFrameRate(int fps) {
+		this.targetFPS = fps;
 		period = fps > 0 ? SECONDS.toNanos(1) / fps : Integer.MAX_VALUE;
 	}
 
-	public int getFrameRate() {
-		return fps;
+	public int getTargetFrameRate() {
+		return targetFPS;
 	}
 
 	public long getUpdateCount() {
@@ -47,11 +39,11 @@ public class GameLoop {
 	}
 
 	public int secToFrames(float seconds) {
-		return Math.round(getFrameRate() * seconds);
+		return Math.round(getTargetFrameRate() * seconds);
 	}
 
 	public int framesToSec(int frames) {
-		return frames / getFrameRate();
+		return frames / getTargetFrameRate();
 	}
 
 	public synchronized void addFPSListener(PropertyChangeListener observer) {
@@ -81,36 +73,35 @@ public class GameLoop {
 		}
 	}
 
-	private void printDuration(Task task, String taskName) {
-		out.println(String.format("%s time: %f millis", taskName, task.getUsedTime() / 1000000f));
-	}
-
 	private void run() {
 		long overTime = 0;
 		while (running) {
 			updateTask.run();
-			if (log) {
-				printDuration(updateTask, "\nUpdate");
-			}
-			++updateCount;
 			renderTask.run();
 			if (log) {
-				printDuration(renderTask, "Rendering");
+				out.println();
+				out.println(format("Update time:    %10.2f millis", updateTask.getUsedTime() / 1000000f));
+				out.println(format("Rendering time: %10.2f millis", renderTask.getUsedTime() / 1000000f));
 			}
-			long timeLeft = period - (updateTask.getUsedTime() + renderTask.getUsedTime());
+			++updateCount;
+			long usedTime = updateTask.getUsedTime() + renderTask.getUsedTime();
+			long timeLeft = (period - usedTime);
 			if (timeLeft > 0) {
 				long sleepTime = timeLeft;
-				sleep(sleepTime, NANOSECONDS);
+				try {
+					NANOSECONDS.sleep(sleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				if (log) {
-					out.println(String.format("Sleep time: %f millis", sleepTime / 1000000f));
+					out.println(format("Sleep time:     %10.2f millis", sleepTime / 1000000f));
 				}
 			} else if (timeLeft < 0) {
 				overTime += (-timeLeft);
-				for (int extraUpdates = 2; extraUpdates > 0
-						&& overTime > period; overTime -= period, --extraUpdates) {
+				for (int extraUpdates = 2; extraUpdates > 0 && overTime > period; overTime -= period, --extraUpdates) {
 					updateTask.run();
 					if (log) {
-						printDuration(updateTask, "- Extra Update");
+						out.println(format("Extra Update time: %10.2f millis", updateTask.getUsedTime() / 1000000f));
 					}
 					++updateCount;
 				}
