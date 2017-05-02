@@ -45,11 +45,9 @@ import static java.util.Arrays.asList;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Sound;
@@ -77,7 +75,7 @@ import de.amr.games.pacman.ui.ModernUI;
 import de.amr.games.pacman.ui.PacManUI;
 
 /**
- * The Pac-Man game main class.
+ * The Pac-Man game application.
  * 
  * @author Armin Reichert
  */
@@ -92,11 +90,11 @@ public class PacManGame extends Application {
 		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1;
 		Game.settings.fullScreenOnStart = false;
 		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
-		Game.settings.set("themes", Arrays.asList(new ClassicUI(), new ModernUI()));
+		Game.settings.set("themes", asList(new ClassicUI(), new ModernUI()));
 		Game.settings.set("drawInternals", false);
 		Game.settings.set("drawGrid", false);
-		Log.setLevel(Level.ALL);
-		Game.gameLoop.log = true;
+		Game.gameLoop.log = false;
+		Game.gameLoop.setTargetFrameRate(60);
 		launch(Game);
 	}
 
@@ -448,20 +446,6 @@ public class PacManGame extends Application {
 		return gameLoop.secToFrames(2);
 	}
 
-	public int getScatteringDuration() {
-		int nCols = SCATTER_DURATION_SECS[0].length;
-		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-		int col = wave <= nCols ? wave - 1 : nCols - 1;
-		return gameLoop.secToFrames(SCATTER_DURATION_SECS[row][col]);
-	}
-
-	public int getChasingDuration() {
-		int nCols = CHASE_DURATION_SECS[0].length;
-		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-		int col = wave <= nCols ? wave - 1 : nCols - 1;
-		return gameLoop.secToFrames(CHASE_DURATION_SECS[row][col]);
-	}
-
 	public Bonus getBonus() {
 		return (Bonus) LEVELS[level][0];
 	}
@@ -505,6 +489,20 @@ public class PacManGame extends Application {
 	}
 
 	private class AttackControl extends StateMachine<AttackState> {
+
+		private int getScatteringDuration() {
+			int nCols = SCATTER_DURATION_SECS[0].length;
+			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
+			int col = wave <= nCols ? wave - 1 : nCols - 1;
+			return gameLoop.secToFrames(SCATTER_DURATION_SECS[row][col]);
+		}
+
+		private int getChasingDuration() {
+			int nCols = CHASE_DURATION_SECS[0].length;
+			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
+			int col = wave <= nCols ? wave - 1 : nCols - 1;
+			return gameLoop.secToFrames(CHASE_DURATION_SECS[row][col]);
+		}
 
 		public AttackControl() {
 			super("Attack", new EnumMap<>(AttackState.class));
