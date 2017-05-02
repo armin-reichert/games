@@ -2,7 +2,6 @@ package de.amr.games.pacman.entities.ghost;
 
 import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.PacManGame.Game;
-import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.data.TileContent.Door;
 import static de.amr.games.pacman.data.TileContent.GhostHouse;
 import static de.amr.games.pacman.data.TileContent.Tunnel;
@@ -132,7 +131,7 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		TOPOLOGY.dirs().forEach(dir -> {
+		Game.board.topology.dirs().forEach(dir -> {
 			getTheme().getGhostNormal(getName(), dir).setAnimated(animated);
 			getTheme().getGhostDead(dir).setAnimated(animated);
 		});
@@ -144,7 +143,7 @@ public class Ghost extends PacManGameEntity {
 
 	public void moveBackAndForth() {
 		if (!move()) {
-			changeMoveDir(TOPOLOGY.inv(moveDir));
+			changeMoveDir(Game.board.topology.inv(moveDir));
 		}
 	}
 
@@ -153,17 +152,17 @@ public class Ghost extends PacManGameEntity {
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		List<Integer> dirsPermuted = TOPOLOGY.dirsPermuted().boxed().collect(Collectors.toList());
+		List<Integer> dirsPermuted = Game.board.topology.dirsPermuted().boxed().collect(Collectors.toList());
 		for (int dir : dirsPermuted) {
-			Tile targetTile = currentTile().translate(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
+			Tile targetTile = currentTile().translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
 			if (Game.board.contains(targetTile, TileContent.Wormhole)) {
-				moveDir = TOPOLOGY.inv(moveDir);
+				moveDir = Game.board.topology.inv(moveDir);
 				return;
 			}
-			if (dir == TOPOLOGY.inv(moveDir)) {
+			if (dir == Game.board.topology.inv(moveDir)) {
 				return;
 			}
 			if (canEnter(targetTile)) {
@@ -278,7 +277,7 @@ public class Ghost extends PacManGameEntity {
 		}
 		int offset = TILE_SIZE / 2;
 		for (int dir : route) {
-			Tile nextTile = new Tile(tile).translate(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
+			Tile nextTile = new Tile(tile).translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
 			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
 					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
 			tile = nextTile;

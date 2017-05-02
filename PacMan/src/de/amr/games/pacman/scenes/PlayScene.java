@@ -61,7 +61,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_E)) {
 			getApp().board.tilesWithContent(Energizer).forEach(tile -> getApp().board.setContent(tile, TileContent.None));
 		}
-		getApp().updateGameState();
+		getApp().update();
 	}
 
 	@Override

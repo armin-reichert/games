@@ -61,17 +61,13 @@ public abstract class Application {
 		Log.info("Application " + getClass().getSimpleName() + " created.");
 	}
 
-	private final void _init() {
-		defaultView.init();
-		init();
-		Log.info("Application initialized.");
-		Log.info("Application Assets:\n" + assets.overview());
-	}
-
 	protected abstract void init();
 
 	public final void start() {
-		_init();
+		defaultView.init();
+		init();
+		Log.info("Application Assets:\n" + assets.overview());
+		Log.info("Application initialized.");
 		gameLoop.start();
 		Log.info("Application started.");
 	}

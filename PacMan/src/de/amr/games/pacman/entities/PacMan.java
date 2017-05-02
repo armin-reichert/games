@@ -8,10 +8,9 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.BONUS_COL;
 import static de.amr.games.pacman.data.Board.BONUS_ROW;
-import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.entities.PacManState.Dying;
-import static de.amr.games.pacman.entities.PacManState.Frightening;
 import static de.amr.games.pacman.entities.PacManState.Eating;
+import static de.amr.games.pacman.entities.PacManState.Frightening;
 import static de.amr.games.pacman.entities.PacManState.Waiting;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
@@ -44,7 +43,7 @@ import de.amr.games.pacman.fsm.StateMachine;
 public class PacMan extends PacManGameEntity {
 
 	public final StateMachine<PacManState> control;
-	
+
 	public Consumer<Tile> onPelletFound;
 	public Consumer<Tile> onEnergizerFound;
 	public Consumer<Bonus> onBonusFound;
@@ -57,7 +56,7 @@ public class PacMan extends PacManGameEntity {
 	public PacMan(float homeRow, float homeCol) {
 		super(new Tile(homeRow, homeCol));
 		setName("Pac-Man");
-		
+
 		// default event handlers
 
 		onPelletFound = tile -> {
@@ -121,7 +120,7 @@ public class PacMan extends PacManGameEntity {
 			}
 		};
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("Pacman[row=%d,col=%d]", getRow(), getCol());
@@ -156,7 +155,7 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		TOPOLOGY.dirs().forEach(dir -> {
+		Game.board.topology.dirs().forEach(dir -> {
 			getTheme().getPacManRunning(dir).setAnimated(animated);
 		});
 	}

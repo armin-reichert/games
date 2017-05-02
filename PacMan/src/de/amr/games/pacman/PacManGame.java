@@ -103,39 +103,23 @@ public class PacManGame extends Application {
 	private static final Object[][] LEVELS = {
 		/*@formatter:off*/
 		null,
-		{ Cherries, 	100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
-		{ Strawberry, 300, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 5 },
-		{ Peach, 			500, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 4 },
-		{ Peach, 			500, 	.90f, .79f, .85f, .50f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 3 },
-		{ Apple, 			700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f,   	1f, 	.79f, 	.60f, 2 },
-		{ Apple, 			700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
-		{ Grapes, 		1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
-		{ Grapes, 		1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
-		{ Galaxian, 	2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
-		{ Galaxian, 	2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
-		{ Bell, 			3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
-		{ Bell, 			3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
-		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
-		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 3 }, 
-		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
-		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
-		{ Key, 				5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 0 }, 
-		/*@formatter:on*/
-	};
-
-	private static final int[][] SCATTER_DURATION_SECS = {
-		/*@formatter:off*/
-		{ 7, 7, 5, 5, 0 }, 	// level 1
-		{ 7, 7, 5, 0, 0 }, 	// level 2-4
-		{ 5, 5, 5, 0, 0 }   // level 5-
-		/*@formatter:on*/
-	};
-
-	private static final int[][] CHASE_DURATION_SECS = {
-		/*@formatter:off*/
-		{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
-		{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
-		{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5-
+		{ Cherries, 		100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
+		{ Strawberry, 	300, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 5 },
+		{ Peach, 				500, 	.90f, .79f, .85f, .45f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 4 },
+		{ Peach, 				500, 	.90f, .79f, .85f, .50f, 20, .8f, 10, 	.85f, 	.95f, 	.79f, 	.55f, 3 },
+		{ Apple, 				700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f,   	1f, 	.79f, 	.60f, 2 },
+		{ Apple, 				700, 		1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
+		{ Grapes, 			1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
+		{ Grapes, 			1000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
+		{ Galaxian, 		2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
+		{ Galaxian, 		2000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 5 },
+		{ Bell, 				3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 2 },
+		{ Bell, 				3000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
+		{ Key, 					5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 },
+		{ Key, 					5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 3 }, 
+		{ Key, 					5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
+		{ Key, 					5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 1 }, 
+		{ Key, 					5000, 	1f, .87f, .95f, .50f, 20, .8f, 10, 	.85f, 		1f, 	.79f, 	.60f, 0 }, 
 		/*@formatter:on*/
 	};
 
@@ -148,9 +132,15 @@ public class PacManGame extends Application {
 	public static final int WAIT_TICKS_ON_EATING_PELLET = 1;
 	public static final int WAIT_TICKS_ON_EATING_ENERGIZER = 3;
 
-	// Game data
+	// Game control
+	private StateMachine<PlayState> playControl;
+	private StateMachine<AttackState> attackControl;
+
+	// Game entities
 	public PacMan pacMan;
 	public Ghost blinky, inky, pinky, clyde;
+
+	// Game data
 	public Board board;
 	public int level;
 	private int wave;
@@ -162,15 +152,17 @@ public class PacManGame extends Application {
 	public int bonusTimeRemaining;
 	private int ghostValue;
 	private int ghostsEatenAtLevel;
-	private StateMachine<PlayState> playControl;
-	private StateMachine<AttackState> attackControl;
 	private int themeIndex;
+
+	public void update() {
+		playControl.update();
+	}
 
 	@Override
 	protected void init() {
 		playControl = new PlayControl();
 		attackControl = new AttackControl();
-		board = new Board(assets.text("board.txt"));
+		board = new Board(assets.text("board.txt").split("\n"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusScore = new ArrayList<>();
 		views.add(new PlayScene(this));
@@ -178,12 +170,8 @@ public class PacManGame extends Application {
 		playControl.changeTo(PlayState.Initializing);
 	}
 
-	public void updateGameState() {
-		playControl.update();
-	}
-
 	private void initLevel(int newLevel) {
-		board.reset();
+		board.resetContent();
 		level = newLevel;
 		wave = 1;
 		bonus = Optional.empty();
@@ -490,18 +478,39 @@ public class PacManGame extends Application {
 
 	private class AttackControl extends StateMachine<AttackState> {
 
+		private final int[][] CHASE_DURATION_SECS = {
+			/*@formatter:off*/
+			{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
+			{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
+			{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5-
+			/*@formatter:on*/
+		};
+
+		private final int[][] SCATTER_DURATION_SECS = {
+			/*@formatter:off*/
+			{ 7, 7, 5, 5, 0 }, 	// level 1
+			{ 7, 7, 5, 0, 0 }, 	// level 2-4
+			{ 5, 5, 5, 0, 0 }   // level 5-
+			/*@formatter:on*/
+		};
+
 		private int getScatteringDuration() {
-			int nCols = SCATTER_DURATION_SECS[0].length;
+			int colCount = SCATTER_DURATION_SECS[0].length;
 			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-			int col = wave <= nCols ? wave - 1 : nCols - 1;
+			int col = wave <= colCount ? wave - 1 : colCount - 1;
 			return gameLoop.secToFrames(SCATTER_DURATION_SECS[row][col]);
 		}
 
 		private int getChasingDuration() {
-			int nCols = CHASE_DURATION_SECS[0].length;
+			int colCount = CHASE_DURATION_SECS[0].length;
 			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-			int col = wave <= nCols ? wave - 1 : nCols - 1;
+			int col = wave <= colCount ? wave - 1 : colCount - 1;
 			return gameLoop.secToFrames(CHASE_DURATION_SECS[row][col]);
+		}
+
+		private void log() {
+			Log.info(String.format("Level %d, wave %d: enter state %s for %d seconds", level, wave, stateID(),
+					gameLoop.framesToSec(state().getDuration())));
 		}
 
 		public AttackControl() {
@@ -548,10 +557,6 @@ public class PacManGame extends Application {
 			state(AttackState.Complete).entry = state -> assets.sound("sfx/waza.mp3").stop();
 		}
 
-		void log() {
-			Log.info(String.format("Level %d, wave %d: enter state %s for %d seconds", level, wave, stateID(),
-					gameLoop.framesToSec(state().getDuration())));
-		}
 	}
 
 	// State machine for controlling the playing

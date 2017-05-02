@@ -6,7 +6,6 @@ import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
-import static de.amr.games.pacman.data.Board.TOPOLOGY;
 import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.lang.Math.round;
@@ -50,8 +49,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public boolean isAtHome() {
-		Rectangle homeArea = new Rectangle(round(home.x * TILE_SIZE), round(home.y * TILE_SIZE), TILE_SIZE,
-				TILE_SIZE);
+		Rectangle homeArea = new Rectangle(round(home.x * TILE_SIZE), round(home.y * TILE_SIZE), TILE_SIZE, TILE_SIZE);
 		return getCollisionBox().intersects(homeArea);
 	}
 
@@ -89,7 +87,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public boolean canMoveTowards(int dir) {
-		return canEnter(currentTile().translate(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir)));
+		return canEnter(currentTile().translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir)));
 	}
 
 	public abstract boolean canEnter(Tile pos);
@@ -102,7 +100,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	public boolean move() {
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(TOPOLOGY.dx(moveDir), TOPOLOGY.dy(moveDir)).times(speed));
+		tr.setVel(new Vector2(Game.board.topology.dx(moveDir), Game.board.topology.dy(moveDir)).times(speed));
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();
@@ -124,7 +122,7 @@ public abstract class PacManGameEntity extends GameEntity {
 		}
 		// adjust position if entity touches disallowed neighbor tile
 		int row = newTile.getRow(), col = newTile.getCol();
-		Tile neighborTile = newTile.translate(TOPOLOGY.dx(moveDir), TOPOLOGY.dy(moveDir));
+		Tile neighborTile = newTile.translate(Game.board.topology.dx(moveDir), Game.board.topology.dy(moveDir));
 		boolean forbidden = !canEnter(neighborTile);
 		switch (moveDir) {
 		case E:
@@ -157,7 +155,7 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public void changeMoveDir(int dir) {
 		nextMoveDir = dir;
-		boolean turn90 = (dir == TOPOLOGY.left(moveDir) || dir == TOPOLOGY.right(moveDir));
+		boolean turn90 = (dir == Game.board.topology.left(moveDir) || dir == Game.board.topology.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
 			return;
 		}

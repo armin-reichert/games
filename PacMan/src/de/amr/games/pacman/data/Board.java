@@ -1,5 +1,8 @@
 package de.amr.games.pacman.data;
 
+import static de.amr.games.pacman.data.TileContent.None;
+import static de.amr.games.pacman.data.TileContent.Wall;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +12,6 @@ import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.PathFinder;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Grid;
-import de.amr.easy.grid.impl.ObservableBareGrid;
 import de.amr.easy.grid.impl.Top4;
 
 /**
@@ -40,10 +42,11 @@ public class Board {
 	public static final float BONUS_ROW = 19.5f;
 	public static final float BONUS_COL = 13;
 
-	public static final Topology TOPOLOGY = new Top4();
+	public final Topology topology;
 
-	private final String[] boardDataRows;
-	public final Grid<Character, Integer> grid;
+	private final String[] boardAsTextRows;
+
+	private final Grid<Character, Integer> graph;
 
 	/**
 	 * Initializes the board from the specified textual data.
@@ -51,18 +54,33 @@ public class Board {
 	 * @param boardAsText
 	 *          board data as read from text file
 	 */
-	public Board(String boardAsText) {
-		boardDataRows = boardAsText.split("\n");
-		grid = new Grid<>(NUM_COLS, NUM_ROWS, TileContent.None.toChar(), false);
-		reset();
-		buildRouteMap();
+	public Board(String[] boardAsTextRows) {
+		this.boardAsTextRows = boardAsTextRows;
+		// create orthogonal grid graph from board data
+		topology = new Top4();
+		graph = new Grid<>(NUM_COLS, NUM_ROWS, None.toChar(), false);
+		graph.setTopology(topology);
+		resetContent();
+		/*@formatter:off*/
+		graph.vertexStream()
+			.filter(tile -> graph.get(tile) != Wall.toChar())
+			.forEach(tile -> {
+				topology.dirs().forEach(dir -> {
+					graph.neighbor(tile, dir).ifPresent(neighbor -> {
+						if (graph.get(neighbor) != Wall.toChar()	&& !graph.adjacent(tile, neighbor)) {
+							graph.addEdge(tile, neighbor);
+						}
+					});
+				});
+			});
+		/*@formatter:on*/
 	}
 
 	/**
 	 * Resets the board to its initial content.
 	 */
-	public void reset() {
-		grid.vertexStream().forEach(cell -> grid.set(cell, boardDataRows[grid.row(cell)].charAt(grid.col(cell))));
+	public void resetContent() {
+		graph.vertexStream().forEach(cell -> graph.set(cell, boardAsTextRows[graph.row(cell)].charAt(graph.col(cell))));
 	}
 
 	/**
@@ -86,8 +104,8 @@ public class Board {
 	 *          some tile content
 	 */
 	public void setContent(Tile tile, TileContent content) {
-		Integer cell = grid.cell(tile.getCol(), tile.getRow());
-		grid.set(cell, content.toChar());
+		Integer cell = graph.cell(tile.getCol(), tile.getRow());
+		graph.set(cell, content.toChar());
 	}
 
 	/**
@@ -115,7 +133,7 @@ public class Board {
 	 * @return <code>true</code> if the tile contains this content
 	 */
 	public boolean contains(int row, int col, TileContent content) {
-		return content.toChar() == grid.get(grid.cell(col, row));
+		return content.toChar() == graph.get(graph.cell(col, row));
 	}
 
 	/**
@@ -132,8 +150,15 @@ public class Board {
 		return contains(tile.getRow(), tile.getCol(), content) ? Optional.of(tile) : Optional.empty();
 	}
 
+	/**
+	 * Returns the content at the specified tile.
+	 * 
+	 * @param tile
+	 *          a tile
+	 * @return the tile content
+	 */
 	public TileContent getContent(Tile tile) {
-		return TileContent.valueOf(grid.get(grid.cell(tile.getCol(), tile.getRow())));
+		return TileContent.valueOf(graph.get(graph.cell(tile.getCol(), tile.getRow())));
 	}
 
 	/**
@@ -144,7 +169,7 @@ public class Board {
 	 * @return the number of occurrences of this content
 	 */
 	public long count(TileContent content) {
-		return grid.vertexStream().filter(cell -> content.toChar() == grid.get(cell)).count();
+		return graph.vertexStream().filter(cell -> content.toChar() == graph.get(cell)).count();
 	}
 
 	/**
@@ -156,34 +181,10 @@ public class Board {
 	 */
 	public Stream<Tile> tilesWithContent(TileContent content) {
 		///*@formatter:off*/
-		return grid.vertexStream()
-				.filter(cell -> grid.get(cell) == content.toChar())
-				.map(cell -> new Tile(grid.row(cell), grid.col(cell)));
+		return graph.vertexStream()
+				.filter(cell -> graph.get(cell) == content.toChar())
+				.map(cell -> new Tile(graph.row(cell), graph.col(cell)));
 		///*@formatter:on*/
-	}
-
-	private ObservableBareGrid<?> gridGraph;
-
-	/**
-	 * Creates a route planner based on a grid representation of this board.
-	 */
-	private void buildRouteMap() {
-		gridGraph = new ObservableBareGrid<>(NUM_COLS, NUM_ROWS);
-		gridGraph.setEventsEnabled(false);
-		/*@formatter:off*/
-		gridGraph.vertexStream()
-			.filter(cell -> grid.get(cell) != TileContent.Wall.toChar())
-			.forEach(cell -> {
-				gridGraph.getTopology().dirs().forEach(dir -> {
-					gridGraph.neighbor(cell, dir).ifPresent(neighbor -> {
-						if (grid.get(neighbor) != TileContent.Wall.toChar()
-							&& !gridGraph.adjacent(cell, neighbor)) {
-							gridGraph.addEdge(cell, neighbor);
-						}
-					});
-				});
-			});
-		/*@formatter:on*/
 	}
 
 	/**
@@ -196,19 +197,18 @@ public class Board {
 	 * @return list of directions to walk from the source tile to reach the target tile
 	 */
 	public List<Integer> shortestRoute(Tile source, Tile target) {
-		Integer sourceCell = gridGraph.cell(source.getCol(), source.getRow());
-		Integer targetCell = gridGraph.cell(target.getCol(), target.getRow());
-		PathFinder<Integer> pathFinder = new BreadthFirstTraversal<>(gridGraph, sourceCell);
+		Integer sourceCell = graph.cell(source.getCol(), source.getRow());
+		Integer targetCell = graph.cell(target.getCol(), target.getRow());
+		PathFinder<Integer> pathFinder = new BreadthFirstTraversal<>(graph, sourceCell);
 		pathFinder.run();
 		List<Integer> route = new ArrayList<>();
 		Integer pred = null;
 		for (Integer cell : pathFinder.findPath(targetCell)) {
 			if (pred != null) {
-				route.add(gridGraph.direction(pred, cell).getAsInt());
+				route.add(graph.direction(pred, cell).getAsInt());
 			}
 			pred = cell;
 		}
 		return route;
 	}
-
 }
