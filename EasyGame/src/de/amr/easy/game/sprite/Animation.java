@@ -43,7 +43,12 @@ abstract class Animation {
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+		if (this.enabled != enabled) {
+			this.enabled = enabled;
+			if (!enabled) {
+				reset();
+			}
+		}
 	}
 
 	public boolean isEnabled() {

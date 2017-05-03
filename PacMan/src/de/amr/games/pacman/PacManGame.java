@@ -252,6 +252,13 @@ public class PacManGame extends Application {
 		// Common ghost behavior
 
 		asList(blinky, inky, pinky, clyde).forEach(ghost -> {
+			
+			// if leaving ghost house and pacman is frightening, then become frightened
+			ghost.control.state(Waiting).exit = state -> {
+				if (pacMan.control.inState(PacManState.Frightening)) {
+					ghost.receive(GhostMessage.StartBeingFrightened);
+				}
+			};
 
 			// ghost state after frightening or recovering ends
 			ghost.stateAfterFrightened = () -> {

@@ -44,18 +44,18 @@ public class Board {
 
 	public final Topology topology;
 
-	private final String[] boardAsTextRows;
+	private final String[] boardRows;
 
 	private final Grid<Character, Integer> graph;
 
 	/**
 	 * Initializes the board from the specified textual data.
 	 * 
-	 * @param boardAsText
-	 *          board data as read from text file
+	 * @param boardRows
+	 *          board data rows as text
 	 */
-	public Board(String[] boardAsTextRows) {
-		this.boardAsTextRows = boardAsTextRows;
+	public Board(String[] boardRows) {
+		this.boardRows = boardRows;
 		// create orthogonal grid graph from board data
 		topology = new Top4();
 		graph = new Grid<>(NUM_COLS, NUM_ROWS, None.toChar(), false);
@@ -76,11 +76,15 @@ public class Board {
 		/*@formatter:on*/
 	}
 
+	private char getOriginalContent(int row, int col) {
+		return boardRows[row].charAt(col);
+	}
+
 	/**
 	 * Resets the board to its initial content.
 	 */
 	public void resetContent() {
-		graph.vertexStream().forEach(cell -> graph.set(cell, boardAsTextRows[graph.row(cell)].charAt(graph.col(cell))));
+		graph.vertexStream().forEach(cell -> graph.set(cell, getOriginalContent(graph.row(cell), graph.col(cell))));
 	}
 
 	/**
