@@ -111,6 +111,10 @@ public abstract class Application {
 	public void setShell(ApplicationShell shell) {
 		this.shell = shell;
 	}
+	
+	public ApplicationShell getShell() {
+		return shell;
+	}
 
 	public int getWidth() {
 		return settings.width;

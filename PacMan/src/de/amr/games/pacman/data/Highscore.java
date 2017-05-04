@@ -22,7 +22,7 @@ public class Highscore {
 	private int level;
 
 	public Highscore(String fileName) {
-		file = new File(System.getProperty("user.dir") + File.separator + "pacman.high.txt");
+		file = new File(System.getProperty("user.dir") + File.separator + fileName);
 		points = 0;
 		level = 1;
 		load();

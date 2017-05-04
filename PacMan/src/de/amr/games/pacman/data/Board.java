@@ -15,7 +15,7 @@ import de.amr.easy.grid.impl.Grid;
 import de.amr.easy.grid.impl.Top4;
 
 /**
- * The board for the Pac-Man game.
+ * The board of the Pac-Man game.
  * 
  * @author Armin Reichert
  */
@@ -46,7 +46,7 @@ public class Board {
 
 	private final String[] boardRows;
 
-	private final Grid<Character, Integer> graph;
+	public final Grid<Character, Integer> graph;
 
 	/**
 	 * Initializes the board from the specified textual data.
@@ -177,7 +177,7 @@ public class Board {
 	}
 
 	/**
-	 * Returns a stream of all tiles containg the given content.
+	 * Returns a stream of all tiles containing the given content.
 	 * 
 	 * @param content
 	 *          some tile content

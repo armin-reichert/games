@@ -64,6 +64,11 @@ public class GhostLoopingAroundWalls extends State {
 				ghost.followRoute(loopStart);
 			}
 		};
+		
+		// exit action
+		exit = state -> {
+			ghost.route.clear();
+		};
 	}
 
 	/**

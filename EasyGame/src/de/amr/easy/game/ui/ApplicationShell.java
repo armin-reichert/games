@@ -175,6 +175,10 @@ public class ApplicationShell implements PropertyChangeListener {
 		canvas.setFocusable(false);
 		return canvas;
 	}
+	
+	public Canvas getCanvas() {
+		return canvas;
+	}
 
 	private void toggleFullScreen() {
 		fullScreen = !fullScreen;

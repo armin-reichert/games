@@ -70,6 +70,7 @@ import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.entities.ghost.behaviors.ProactiveChasing;
 import de.amr.games.pacman.fsm.StateMachine;
 import de.amr.games.pacman.scenes.PlayScene;
+import de.amr.games.pacman.scenes.TestScene;
 import de.amr.games.pacman.ui.ClassicUI;
 import de.amr.games.pacman.ui.ModernUI;
 import de.amr.games.pacman.ui.PacManUI;
@@ -168,6 +169,9 @@ public class PacManGame extends Application {
 		views.add(new PlayScene(this));
 		views.show(PlayScene.class);
 		playControl.changeTo(PlayState.Initializing);
+		
+		views.add(new TestScene());
+		views.show(TestScene.class);
 	}
 
 	private void initLevel(int newLevel) {

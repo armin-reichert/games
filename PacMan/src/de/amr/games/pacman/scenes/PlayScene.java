@@ -6,20 +6,21 @@ import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
 import static de.amr.games.pacman.data.TileContent.Energizer;
 import static de.amr.games.pacman.data.TileContent.Pellet;
+import static de.amr.games.pacman.scenes.DrawUtil.drawGridLines;
+import static de.amr.games.pacman.scenes.DrawUtil.drawSprite;
+import static de.amr.games.pacman.scenes.DrawUtil.drawText;
+import static de.amr.games.pacman.scenes.DrawUtil.drawTextCentered;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.lang.Math.round;
 import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.common.FlashText;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.PacManGame.PlayState;
 import de.amr.games.pacman.data.Bonus;
@@ -34,15 +35,12 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public class PlayScene extends Scene<PacManGame> {
 
-	private Image gridLines;
-
 	public PlayScene(PacManGame game) {
 		super(game);
 	}
 
 	@Override
 	public void init() {
-		gridLines = null;
 	}
 
 	@Override
@@ -81,7 +79,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Grid
 		if (getApp().settings.getBool("drawGrid")) {
-			g.drawImage(getGridImage(), 0, 0, null);
+			drawGridLines(g, getWidth(), getHeight());
 		}
 		if (getApp().settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
@@ -149,35 +147,4 @@ public class PlayScene extends Scene<PacManGame> {
 		getApp().entities.allOf(FlashText.class).forEach(text -> text.draw(g));
 	}
 
-	// Helper methods
-
-	private static void drawSprite(Graphics2D g, float row, float col, Sprite sprite) {
-		float x = TILE_SIZE * col, y = TILE_SIZE * row;
-		g.translate(x, y);
-		sprite.draw(g);
-		g.translate(-x, -y);
-	}
-
-	private static void drawText(Graphics2D g, float row, float col, String text) {
-		g.drawString(text, TILE_SIZE * col, TILE_SIZE * row);
-	}
-
-	private static void drawTextCentered(Graphics2D g, int width, float row, String text) {
-		g.drawString(text, (width - g.getFontMetrics().stringWidth(text)) / 2, TILE_SIZE * row);
-	}
-
-	private Image getGridImage() {
-		if (gridLines == null) {
-			gridLines = PacManUI.createTransparentImage(getWidth(), getHeight());
-			Graphics g = gridLines.getGraphics();
-			g.setColor(new Color(200, 200, 200, 100));
-			for (int col = 1, x = TILE_SIZE; col < NUM_COLS; ++col, x += TILE_SIZE) {
-				g.drawLine(x, 0, x, getHeight());
-			}
-			for (int row = 1, y = TILE_SIZE; row < NUM_ROWS; ++row, y += TILE_SIZE) {
-				g.drawLine(0, y, getWidth(), y);
-			}
-		}
-		return gridLines;
-	}
 }
