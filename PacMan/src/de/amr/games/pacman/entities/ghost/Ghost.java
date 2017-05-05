@@ -5,6 +5,7 @@ import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.TileContent.Door;
 import static de.amr.games.pacman.data.TileContent.GhostHouse;
 import static de.amr.games.pacman.data.TileContent.Tunnel;
+import static de.amr.games.pacman.data.TileContent.Wormhole;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened;
@@ -154,12 +155,11 @@ public class Ghost extends PacManGameEntity {
 		}
 		List<Integer> dirsPermuted = Game.board.topology.dirsPermuted().boxed().collect(Collectors.toList());
 		for (int dir : dirsPermuted) {
-			Tile targetTile = currentTile();
-			targetTile.translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
+			Tile targetTile = currentTile().neighbor(dir);
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
-			if (Game.board.contains(targetTile, TileContent.Wormhole)) {
+			if (Game.board.contains(targetTile, Wormhole)) {
 				moveDir = Game.board.topology.inv(moveDir);
 				return;
 			}
@@ -175,9 +175,9 @@ public class Ghost extends PacManGameEntity {
 
 	// --- Navigation ---
 
-//	public void computeRoute(Tile target) {
-//		route = Game.board.shortestRoute(currentTile(), target);
-//	}
+	// public void computeRoute(Tile target) {
+	// route = Game.board.shortestRoute(currentTile(), target);
+	// }
 
 	public void followRoute(Tile target) {
 		route = Game.board.shortestRoute(currentTile(), target);
@@ -270,8 +270,7 @@ public class Ghost extends PacManGameEntity {
 		}
 		int offset = TILE_SIZE / 2;
 		for (int dir : route) {
-			Tile nextTile = new Tile(tile);
-			nextTile.translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
+			Tile nextTile = tile.neighbor(dir);
 			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
 					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
 			tile = nextTile;

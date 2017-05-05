@@ -45,15 +45,21 @@ public class TestScene extends Scene<PacManGame> {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (ghostRunning) {
-					return;
-				}
 				Tile clickedTile = new Tile(e.getY() / TILE_SIZE, e.getX() / TILE_SIZE);
-				route = Game.board.shortestRoute(targetTile, clickedTile);
-				if (!route.isEmpty()) {
-					Log.info("New target tile: " + clickedTile);
-					startTile = targetTile;
-					targetTile = clickedTile;
+				if (ghostRunning) {
+					route = Game.board.shortestRoute(startTile, clickedTile);
+					if (!route.isEmpty()) {
+						ghost.placeAt(startTile);
+						targetTile = clickedTile;
+						Log.info("New target tile: " + targetTile);
+					}
+				} else {
+					route = Game.board.shortestRoute(targetTile, clickedTile);
+					if (!route.isEmpty()) {
+						startTile = targetTile;
+						targetTile = clickedTile;
+						Log.info("New target tile: " + targetTile);
+					}
 				}
 			}
 		};

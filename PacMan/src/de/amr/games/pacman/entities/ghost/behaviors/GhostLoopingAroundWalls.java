@@ -88,12 +88,9 @@ public class GhostLoopingAroundWalls extends State {
 		do {
 			int dir_turn = clockwise ? Game.board.topology.right(dir_forward) : Game.board.topology.left(dir_forward);
 			int dir_turn_inv = Game.board.topology.inv(dir_turn);
-			Tile current_antiturn = new Tile(current);
-			current_antiturn.translate(Game.board.topology.dx(dir_turn_inv), Game.board.topology.dy(dir_turn_inv));
-			Tile current_ahead = new Tile(current);
-			current_ahead.translate(Game.board.topology.dx(dir_forward), Game.board.topology.dy(dir_forward));
-			Tile current_around_corner = new Tile(current_ahead);
-			current_around_corner.translate(Game.board.topology.dx(dir_turn), Game.board.topology.dy(dir_turn));
+			Tile current_antiturn = current.neighbor(dir_turn_inv);
+			Tile current_ahead = current.neighbor(dir_forward);
+			Tile current_around_corner = current_ahead.neighbor(dir_turn);
 			if (!Game.board.contains(current_ahead, TileContent.Wall)) {
 				// can move ahead
 				if (Game.board.contains(current_around_corner, TileContent.Wall)) {

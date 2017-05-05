@@ -87,9 +87,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	}
 
 	public boolean canMoveTowards(int dir) {
-		Tile neighborTile = currentTile();
-		neighborTile.translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
-		return canEnter(neighborTile);
+		return canEnter(currentTile().neighbor(dir));
 	}
 
 	public abstract boolean canEnter(Tile pos);
@@ -124,8 +122,7 @@ public abstract class PacManGameEntity extends GameEntity {
 		}
 		// adjust position if entity touches disallowed neighbor tile
 		int row = newTile.getRow(), col = newTile.getCol();
-		Tile neighborTile = new Tile(newTile);
-		neighborTile.translate(Game.board.topology.dx(moveDir), Game.board.topology.dy(moveDir));
+		Tile neighborTile = newTile.neighbor(moveDir);
 		boolean forbidden = !canEnter(neighborTile);
 		switch (moveDir) {
 		case E:
