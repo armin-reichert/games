@@ -290,7 +290,7 @@ public class PacManGame extends Application {
 			// "dead" state
 
 			ghost.control.state(Dead).update = state -> {
-				ghost.walkHome();
+				ghost.followRoute(ghost.home);
 				if (ghost.isAtHome()) {
 					ghost.control.changeTo(Recovering);
 				}
@@ -358,7 +358,7 @@ public class PacManGame extends Application {
 
 		clyde.control.state(Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
-				clyde.leaveGhostHouse();
+				clyde.followRoute(Board.GHOST_HOUSE_ENTRY);
 			} else {
 				if (clyde.currentTile().distance(pacMan.currentTile()) > 8) {
 					clyde.followRoute(pacMan.currentTile());

@@ -75,7 +75,8 @@ public class DrawUtil {
 		Tile from = start, to = null;
 		for (Integer dir : route) {
 			int dx = board.topology.dx(dir), dy = board.topology.dy(dir);
-			to = new Tile(from).translate(dx, dy);
+			to = new Tile(from);
+			to.translate(dx, dy);
 			int offset = TILE_SIZE / 4;
 			int x1 = from.getCol() * TILE_SIZE + offset;
 			int y1 = from.getRow() * TILE_SIZE + offset;

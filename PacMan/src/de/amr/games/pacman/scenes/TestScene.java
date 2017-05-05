@@ -38,7 +38,7 @@ public class TestScene extends Scene<PacManGame> {
 	private List<Integer> route;
 	private boolean ghostRunning;
 	private MouseListener clickHandler;
-	
+
 	public TestScene() {
 		super(Game);
 		clickHandler = new MouseAdapter() {
@@ -76,30 +76,24 @@ public class TestScene extends Scene<PacManGame> {
 	}
 
 	private void reset() {
-		startTile = new Tile(4,1);
+		startTile = new Tile(4, 1);
 		targetTile = new Tile(Board.NUM_ROWS - 4, Board.NUM_COLS - 2);
 		route = Game.board.shortestRoute(startTile, targetTile);
 		ghost.placeAt(startTile);
 		ghostRunning = false;
 		ghost.setAnimated(false);
 	}
-	
+
 	@Override
 	public void update() {
-
 		if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_X)) {
 			exit();
-			return;
-		}
-		
-		if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
 			reset();
-		}
-		
-		if (!ghost.currentTile().equals(targetTile)) {
-			ghost.followRoute(targetTile);
+		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;
 			ghost.setAnimated(true);
+			ghost.followRoute(targetTile);
 		} else {
 			ghostRunning = false;
 			ghost.setAnimated(false);

@@ -41,6 +41,8 @@ public class Board {
 
 	public static final float BONUS_ROW = 19.5f;
 	public static final float BONUS_COL = 13;
+	
+	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13); 
 
 	public final Topology topology;
 

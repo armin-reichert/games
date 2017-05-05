@@ -32,7 +32,7 @@ public class DirectOrProactiveChasing extends State {
 		int dy = middle.getRow() - helperGhostTile.getRow();
 		Tile targetTile = new Tile(helperGhostTile.getRow() + 2 * dy, helperGhostTile.getCol() + 2 * dx);
 		if (Game.board.isTileValid(targetTile)) {
-			chasingGhost.computeRoute(targetTile);
+			chasingGhost.route = Game.board.shortestRoute(chasingGhost.currentTile(), targetTile);
 			if (!chasingGhost.route.isEmpty()) {
 				int chaseDir = chasingGhost.route.get(0);
 				if (chaseDir == Game.board.topology.inv(chasingGhost.moveDir)) {

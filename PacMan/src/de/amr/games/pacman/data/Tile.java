@@ -5,7 +5,8 @@ import static java.lang.Math.round;
 import java.awt.geom.Point2D;
 
 /**
- * A tile of the board.
+ * A tile of the board. Tile coordinates are floats because entities can be positioned between
+ * tiles.
  * 
  * @author Armin Reichert
  */
@@ -21,10 +22,9 @@ public class Tile extends Point2D.Float {
 		y = other.y;
 	}
 
-	public Tile translate(float dx, float dy) {
+	public void translate(float dx, float dy) {
 		x += dx;
 		y += dy;
-		return this;
 	}
 
 	public int getRow() {

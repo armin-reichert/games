@@ -154,7 +154,8 @@ public class Ghost extends PacManGameEntity {
 		}
 		List<Integer> dirsPermuted = Game.board.topology.dirsPermuted().boxed().collect(Collectors.toList());
 		for (int dir : dirsPermuted) {
-			Tile targetTile = currentTile().translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
+			Tile targetTile = currentTile();
+			targetTile.translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
 			if (targetTile.getCol() < 0) {
 				continue; // TODO
 			}
@@ -174,12 +175,12 @@ public class Ghost extends PacManGameEntity {
 
 	// --- Navigation ---
 
-	public void computeRoute(Tile target) {
-		route = Game.board.shortestRoute(currentTile(), target);
-	}
+//	public void computeRoute(Tile target) {
+//		route = Game.board.shortestRoute(currentTile(), target);
+//	}
 
 	public void followRoute(Tile target) {
-		computeRoute(target);
+		route = Game.board.shortestRoute(currentTile(), target);
 		followRoute();
 	}
 
@@ -188,14 +189,6 @@ public class Ghost extends PacManGameEntity {
 			changeMoveDir(route.get(0));
 		}
 		move();
-	}
-
-	public void walkHome() {
-		followRoute(home);
-	}
-
-	public void leaveGhostHouse() {
-		followRoute(new Tile(14, 13));
 	}
 
 	@Override
@@ -277,7 +270,8 @@ public class Ghost extends PacManGameEntity {
 		}
 		int offset = TILE_SIZE / 2;
 		for (int dir : route) {
-			Tile nextTile = new Tile(tile).translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
+			Tile nextTile = new Tile(tile);
+			nextTile.translate(Game.board.topology.dx(dir), Game.board.topology.dy(dir));
 			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
 					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
 			tile = nextTile;
