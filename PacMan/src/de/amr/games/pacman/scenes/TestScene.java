@@ -80,7 +80,8 @@ public class TestScene extends Scene<PacManGame> {
 		targetTile = new Tile(Board.NUM_ROWS - 4, Board.NUM_COLS - 2);
 		route = Game.board.shortestRoute(startTile, targetTile);
 		ghost.placeAt(startTile);
-		ghost.setAnimated(true);
+		ghostRunning = false;
+		ghost.setAnimated(false);
 	}
 	
 	@Override

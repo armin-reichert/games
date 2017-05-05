@@ -643,10 +643,8 @@ public class PacManGame extends Application {
 			state(PlayState.Playing).update = state -> {
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					attackControl.changeTo(AttackState.Complete);
-					changeTo(PlayState.StartingLevel, newState -> {
-						newState.setDuration(gameLoop.secToFrames(4));
-						initLevel(++level);
-					});
+					initLevel(++level);
+					changeTo(PlayState.StartingLevel);
 				} else if (attackControl.inState(AttackState.Complete)) {
 					attackControl.changeTo(AttackState.Starting, newState -> ++wave);
 				} else {
@@ -705,6 +703,7 @@ public class PacManGame extends Application {
 				attackControl.changeTo(AttackState.Complete);
 				if (score > highscore.getPoints()) {
 					highscore.save(score, level);
+					highscore.load();
 				}
 			};
 
