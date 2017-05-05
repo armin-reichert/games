@@ -58,6 +58,13 @@ public class PlayScene extends Scene<PacManGame> {
 			getApp().board.tilesWithContent(Pellet).forEach(tile -> getApp().board.setContent(tile, TileContent.None));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_E)) {
 			getApp().board.tilesWithContent(Energizer).forEach(tile -> getApp().board.setContent(tile, TileContent.None));
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_T)) {
+			getApp().nextTheme();
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_X)) {
+			getApp().settings.set("testMode", !getApp().settings.getBool("testMode"));
+			if (getApp().settings.getBool("testMode")) {
+				getApp().views.show(TestScene.class);
+			}
 		}
 		getApp().update();
 	}

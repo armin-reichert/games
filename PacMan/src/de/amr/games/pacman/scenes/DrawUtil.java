@@ -12,7 +12,6 @@ import java.awt.RenderingHints;
 import java.util.List;
 
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.graph.api.WeightedEdge;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
@@ -67,22 +66,34 @@ public class DrawUtil {
 							radius, radius);
 				});
 		board.graph.edgeStream().forEach(edge -> {
-			drawEdge(g, board, edge);
+			Integer from = edge.either(), to = edge.other(from);
+			drawEdge(g, board, from, to);
 		});
 	}
-	
-	public static void drawRoute(Tile source, List<Integer> route) {
-		
+
+	public static void drawRoute(Graphics2D g, Board board, Tile start, List<Integer> route) {
+		Tile from = start, to = null;
+		for (Integer dir : route) {
+			int dx = board.topology.dx(dir), dy = board.topology.dy(dir);
+			to = new Tile(from).translate(dx, dy);
+			int offset = TILE_SIZE / 4;
+			int x1 = from.getCol() * TILE_SIZE + offset;
+			int y1 = from.getRow() * TILE_SIZE + offset;
+			int x2 = to.getCol() * TILE_SIZE + offset;
+			int y2 = to.getRow() * TILE_SIZE + offset;
+			g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
+			g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);
+			g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);
+			from = to;
+		}
 	}
 
-	private static void drawEdge(Graphics2D g, Board board, WeightedEdge<Integer, ?> edge) {
-		Integer u = edge.either();
-		Integer v = edge.other(u);
+	private static void drawEdge(Graphics2D g, Board board, Integer from, Integer to) {
 		int offset = TILE_SIZE / 2;
-		int x1 = board.graph.col(u) * TILE_SIZE + offset;
-		int y1 = board.graph.row(u) * TILE_SIZE + offset;
-		int x2 = board.graph.col(v) * TILE_SIZE + offset;
-		int y2 = board.graph.row(v) * TILE_SIZE + offset;
+		int x1 = board.graph.col(from) * TILE_SIZE + offset;
+		int y1 = board.graph.row(from) * TILE_SIZE + offset;
+		int x2 = board.graph.col(to) * TILE_SIZE + offset;
+		int y2 = board.graph.row(to) * TILE_SIZE + offset;
 		g.drawLine(x1, y1, x2, y2);
 	}
 

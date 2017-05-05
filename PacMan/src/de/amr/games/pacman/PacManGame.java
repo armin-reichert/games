@@ -94,6 +94,7 @@ public class PacManGame extends Application {
 		Game.settings.set("themes", asList(new ClassicUI(), new ModernUI()));
 		Game.settings.set("drawInternals", false);
 		Game.settings.set("drawGrid", false);
+		Game.settings.set("testMode", false);
 		Game.gameLoop.log = false;
 		Game.gameLoop.setTargetFrameRate(60);
 		launch(Game);
@@ -161,17 +162,15 @@ public class PacManGame extends Application {
 
 	@Override
 	protected void init() {
+		views.add(new PlayScene(this));
+		views.add(new TestScene());
 		playControl = new PlayControl();
 		attackControl = new AttackControl();
 		board = new Board(assets.text("board.txt").split("\n"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusScore = new ArrayList<>();
-		views.add(new PlayScene(this));
-		views.show(PlayScene.class);
 		playControl.changeTo(PlayState.Initializing);
-		
-		views.add(new TestScene());
-		views.show(TestScene.class);
+		views.show(PlayScene.class);
 	}
 
 	private void initLevel(int newLevel) {
@@ -410,7 +409,7 @@ public class PacManGame extends Application {
 		return themes().get(themeIndex);
 	}
 
-	private void nextTheme() {
+	public void nextTheme() {
 		if (++themeIndex == themes().size()) {
 			themeIndex = 0;
 		}
@@ -610,8 +609,6 @@ public class PacManGame extends Application {
 			state(PlayState.Ready).update = state -> {
 				if (Keyboard.pressedOnce(VK_ENTER)) {
 					changeTo(PlayState.StartingLevel);
-				} else if (Keyboard.pressedOnce(VK_T)) {
-					nextTheme();
 				}
 			};
 
