@@ -37,10 +37,11 @@ public class TestScene extends Scene<PacManGame> {
 	private Tile targetTile;
 	private List<Integer> route;
 	private boolean ghostRunning;
-
+	private MouseListener clickHandler;
+	
 	public TestScene() {
 		super(Game);
-		MouseListener clickHandler = new MouseAdapter() {
+		clickHandler = new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -56,16 +57,23 @@ public class TestScene extends Scene<PacManGame> {
 				}
 			}
 		};
-		Game.getShell().getCanvas().addMouseListener(clickHandler);
 	}
 
 	@Override
 	public void init() {
+		Game.getShell().getCanvas().addMouseListener(clickHandler);
 		ghost = new Ghost("Pinky", 4, 1);
 		ghost.setTheme(Game.selectedTheme());
 		Game.entities.add(ghost);
 		reset();
 	};
+
+	private void exit() {
+		Game.getShell().getCanvas().removeMouseListener(clickHandler);
+		Game.entities.remove(ghost);
+		Game.settings.set("testMode", false);
+		Game.views.show(PlayScene.class);
+	}
 
 	private void reset() {
 		startTile = new Tile(4,1);
@@ -74,14 +82,12 @@ public class TestScene extends Scene<PacManGame> {
 		ghost.placeAt(startTile);
 		ghost.setAnimated(true);
 	}
-
+	
 	@Override
 	public void update() {
 
 		if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_X)) {
-			Game.entities.remove(ghost);
-			Game.settings.set("testMode", false);
-			Game.views.show(PlayScene.class);
+			exit();
 			return;
 		}
 		

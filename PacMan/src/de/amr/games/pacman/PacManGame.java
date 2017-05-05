@@ -39,7 +39,6 @@ import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_ENTER;
 import static java.awt.event.KeyEvent.VK_SPACE;
-import static java.awt.event.KeyEvent.VK_T;
 import static java.util.Arrays.asList;
 
 import java.awt.Color;
@@ -255,7 +254,7 @@ public class PacManGame extends Application {
 		// Common ghost behavior
 
 		asList(blinky, inky, pinky, clyde).forEach(ghost -> {
-			
+
 			// if leaving ghost house and pacman is frightening, then become frightened
 			ghost.control.state(Waiting).exit = state -> {
 				if (pacMan.control.inState(PacManState.Frightening)) {
