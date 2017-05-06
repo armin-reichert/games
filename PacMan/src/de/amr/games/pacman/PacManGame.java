@@ -65,7 +65,6 @@ import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.entities.ghost.behaviors.ProactiveChasing;
 import de.amr.games.pacman.fsm.StateMachine;
 import de.amr.games.pacman.scenes.PlayScene;
@@ -151,7 +150,7 @@ public class PacManGame extends Application {
 	public List<Bonus> bonusScore;
 	public Optional<Bonus> bonus;
 	public int bonusTimeRemaining;
-	private int ghostValue;
+	private int killedGhostValue;
 	private int ghostsEatenAtLevel;
 	private int themeIndex;
 
@@ -202,7 +201,7 @@ public class PacManGame extends Application {
 		pacMan.onEnergizerFound = tile -> {
 			board.setContent(tile, None);
 			score(POINTS_FOR_ENERGIZER);
-			ghostValue = FIRST_GHOST_VALUE;
+			killedGhostValue = FIRST_GHOST_VALUE;
 			pacMan.freeze(WAIT_TICKS_ON_EATING_ENERGIZER);
 			pacMan.startAttacking(getGhostFrightenedDuration(), getPacManAttackingSpeed());
 			assets.sound("sfx/eat-pill.mp3").play();
@@ -223,9 +222,9 @@ public class PacManGame extends Application {
 			if (pacMan.control.inState(PacManState.Frightening)) {
 				Log.info("Pac-Man meets ghost " + ghost.getName());
 				assets.sound("sfx/eat-ghost.mp3").play();
-				score(ghostValue);
-				showFlashText(ghostValue, ghost.tr.getX(), ghost.tr.getY());
-				ghostValue *= 2;
+				score(killedGhostValue);
+				showFlashText(killedGhostValue, ghost.tr.getX(), ghost.tr.getY());
+				killedGhostValue *= 2;
 				if (++ghostsEatenAtLevel == 16) {
 					score(12000);
 				}
@@ -418,7 +417,6 @@ public class PacManGame extends Application {
 
 	public void applyTheme() {
 		entities.allOf(PacManGameEntity.class).forEach(e -> e.setTheme(selectedTheme()));
-		entities.all().forEach(GameEntity::init);
 		selectedTheme().getEnergizer().setAnimated(false);
 	}
 
@@ -591,11 +589,11 @@ public class PacManGame extends Application {
 				lives = 3;
 				score = 0;
 				bonusScore.clear();
-				ghostValue = 0;
-				level = 1;
+				killedGhostValue = 0;
 				entities.removeAll(GameEntity.class);
 				createPacManAndGhosts();
 				applyTheme();
+				level = 1;
 				initLevel();
 			};
 
@@ -610,13 +608,13 @@ public class PacManGame extends Application {
 			state(PlayState.Ready).entry = state -> {
 				asList(blinky, inky, pinky, clyde).forEach(ghost -> ghost.setAnimated(true));
 			};
-			
+
 			state(PlayState.Ready).update = state -> {
 				if (Keyboard.pressedOnce(VK_ENTER)) {
 					changeTo(PlayState.StartingLevel);
 				}
 			};
-			
+
 			// StartingLevel
 
 			state(PlayState.StartingLevel).entry = state -> {
@@ -681,7 +679,6 @@ public class PacManGame extends Application {
 			};
 
 			state(PlayState.Crashing).exit = state -> {
-				attackControl.changeTo(AttackState.Complete);
 				pacMan.init();
 				asList(blinky, inky, pinky, clyde).forEach(Ghost::init);
 			};
@@ -689,14 +686,11 @@ public class PacManGame extends Application {
 			// GameOver
 
 			state(PlayState.GameOver).entry = state -> {
-				entities.all().forEach(entity -> entity.setAnimated(false));
-				selectedTheme().getEnergizer().setAnimated(false);
-				enableBonus(false);
 				if (score > highscore.getPoints()) {
 					highscore.save(score, level);
 					highscore.load();
 				}
-				attackControl.changeTo(AttackState.Complete);
+				entities.all().forEach(entity -> entity.setAnimated(false));
 				Log.info("Game over.");
 			};
 
