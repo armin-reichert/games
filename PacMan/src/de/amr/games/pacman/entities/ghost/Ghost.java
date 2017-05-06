@@ -59,9 +59,9 @@ public class Ghost extends PacManGameEntity {
 
 	@Override
 	public void init() {
+		message = null;
 		route = Collections.emptyList();
 		setAnimated(false);
-		message = null;
 		control.changeTo(Waiting);
 	}
 

@@ -172,13 +172,14 @@ public class PacManGame extends Application {
 		views.show(PlayScene.class);
 	}
 
-	private void initLevel(int newLevel) {
-		board.resetContent();
-		level = newLevel;
+	private void initLevel() {
 		wave = 1;
 		bonus = Optional.empty();
 		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
+		board.resetContent();
+		pacMan.init();
+		asList(blinky, inky, pinky, clyde).forEach(Ghost::init);
 		Log.info(String.format("Level %d: %d pellets and %d energizers. Frames/sec: %d", level, board.count(Pellet),
 				board.count(Energizer), gameLoop.getTargetFrameRate()));
 	}
@@ -233,7 +234,7 @@ public class PacManGame extends Application {
 				Log.info("Ghost " + ghost.getName() + " kills Pac-Man.");
 				--lives;
 				pacMan.control.changeTo(PacManState.Dying);
-				playControl.changeTo(lives > 0 ? PlayState.Crashing : PlayState.GameOver);
+				playControl.changeTo(PlayState.Crashing);
 			}
 		};
 
@@ -591,10 +592,11 @@ public class PacManGame extends Application {
 				score = 0;
 				bonusScore.clear();
 				ghostValue = 0;
-				initLevel(1);
+				level = 1;
 				entities.removeAll(GameEntity.class);
 				createPacManAndGhosts();
 				applyTheme();
+				initLevel();
 			};
 
 			state(PlayState.Initializing).update = state -> {
@@ -605,12 +607,16 @@ public class PacManGame extends Application {
 
 			// Ready
 
+			state(PlayState.Ready).entry = state -> {
+				asList(blinky, inky, pinky, clyde).forEach(ghost -> ghost.setAnimated(true));
+			};
+			
 			state(PlayState.Ready).update = state -> {
 				if (Keyboard.pressedOnce(VK_ENTER)) {
 					changeTo(PlayState.StartingLevel);
 				}
 			};
-
+			
 			// StartingLevel
 
 			state(PlayState.StartingLevel).entry = state -> {
@@ -627,14 +633,7 @@ public class PacManGame extends Application {
 			// Playing
 
 			state(PlayState.Playing).entry = state -> {
-
 				selectedTheme().getEnergizer().setAnimated(true);
-				entities.allOf(Ghost.class).forEach(ghost -> {
-					ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingDuration(ghost));
-					ghost.init();
-					ghost.setAnimated(true);
-				});
-
 				pacMan.speed = getPacManSpeed();
 				pacMan.control.changeTo(PacManState.Eating);
 				attackControl.changeTo(AttackState.Starting);
@@ -644,7 +643,8 @@ public class PacManGame extends Application {
 			state(PlayState.Playing).update = state -> {
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					attackControl.changeTo(AttackState.Complete);
-					initLevel(++level);
+					++level;
+					initLevel();
 					changeTo(PlayState.StartingLevel);
 				} else if (attackControl.inState(AttackState.Complete)) {
 					attackControl.changeTo(AttackState.Starting, newState -> ++wave);
@@ -676,29 +676,28 @@ public class PacManGame extends Application {
 
 			state(PlayState.Crashing).update = state -> {
 				if (!assets.sound("sfx/die.mp3").isRunning()) {
-					changeTo(PlayState.Playing);
+					changeTo(lives > 0 ? PlayState.Playing : PlayState.GameOver);
 				}
 			};
 
 			state(PlayState.Crashing).exit = state -> {
 				attackControl.changeTo(AttackState.Complete);
-				pacMan.control.changeTo(PacManState.Waiting);
+				pacMan.init();
+				asList(blinky, inky, pinky, clyde).forEach(Ghost::init);
 			};
 
 			// GameOver
 
 			state(PlayState.GameOver).entry = state -> {
-				assets.sounds().forEach(Sound::stop);
-				assets.sound("sfx/die.mp3").play();
-				Log.info("Game over.");
 				entities.all().forEach(entity -> entity.setAnimated(false));
 				selectedTheme().getEnergizer().setAnimated(false);
 				enableBonus(false);
-				attackControl.changeTo(AttackState.Complete);
 				if (score > highscore.getPoints()) {
 					highscore.save(score, level);
 					highscore.load();
 				}
+				attackControl.changeTo(AttackState.Complete);
+				Log.info("Game over.");
 			};
 
 			state(PlayState.GameOver).update = state -> {

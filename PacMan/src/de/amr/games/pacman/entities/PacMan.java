@@ -128,6 +128,7 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public void init() {
+		placeAt(home);
 		control.changeTo(Waiting);
 	}
 
