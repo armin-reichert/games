@@ -615,13 +615,6 @@ public class PacManGame extends Application {
 
 			state(PlayState.StartingLevel).entry = state -> {
 				assets.sound("sfx/ready.mp3").play();
-				selectedTheme().getEnergizer().setAnimated(true);
-				pacMan.control.changeTo(PacManState.Waiting);
-				entities.allOf(Ghost.class).forEach(ghost -> {
-					ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingDuration(ghost));
-					ghost.init();
-					ghost.setAnimated(true);
-				});
 			};
 
 			state(PlayState.StartingLevel).update = state -> {
@@ -634,6 +627,14 @@ public class PacManGame extends Application {
 			// Playing
 
 			state(PlayState.Playing).entry = state -> {
+
+				selectedTheme().getEnergizer().setAnimated(true);
+				entities.allOf(Ghost.class).forEach(ghost -> {
+					ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingDuration(ghost));
+					ghost.init();
+					ghost.setAnimated(true);
+				});
+
 				pacMan.speed = getPacManSpeed();
 				pacMan.control.changeTo(PacManState.Eating);
 				attackControl.changeTo(AttackState.Starting);
@@ -667,28 +668,21 @@ public class PacManGame extends Application {
 			state(PlayState.Crashing).entry = state -> {
 				assets.sounds().forEach(Sound::stop);
 				assets.sound("sfx/die.mp3").play();
-				state.setDuration(gameLoop.secToFrames(3));
-				Log.info("PacMan crashed, lives remaining: " + lives);
 				selectedTheme().getEnergizer().setAnimated(false);
 				enableBonus(false);
 				attackControl.changeTo(AttackState.Complete);
+				Log.info("PacMan crashed, lives remaining: " + lives);
 			};
 
 			state(PlayState.Crashing).update = state -> {
-				if (state.isTerminated()) {
-					selectedTheme().getEnergizer().setAnimated(true);
-					pacMan.control.changeTo(PacManState.Waiting);
-					entities.allOf(Ghost.class).forEach(ghost -> {
-						ghost.init();
-						ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingDuration(ghost));
-						ghost.setAnimated(true);
-					});
-					changeTo(PlayState.Playing, newState -> newState.setDuration(0));
+				if (!assets.sound("sfx/die.mp3").isRunning()) {
+					changeTo(PlayState.Playing);
 				}
 			};
 
 			state(PlayState.Crashing).exit = state -> {
 				attackControl.changeTo(AttackState.Complete);
+				pacMan.control.changeTo(PacManState.Waiting);
 			};
 
 			// GameOver
