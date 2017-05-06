@@ -7,5 +7,5 @@ package de.amr.games.pacman.entities.ghost.behaviors;
  *
  */
 public enum GhostMessage {
-	Scatter, Chase, StartBeingFrightened, EndBeingFrightened, Die
+	StartScattering, StartChasing, StartBeingFrightened, EndBeingFrightened, Die
 }

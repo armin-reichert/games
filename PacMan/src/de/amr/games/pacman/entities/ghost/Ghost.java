@@ -88,12 +88,12 @@ public class Ghost extends PacManGameEntity {
 	private void processMessage() {
 		Log.info(getName() + " handles message: " + message);
 		switch (message) {
-		case Chase:
+		case StartChasing:
 			if (control.stateID() != Frightened) {
 				control.changeTo(Chasing);
 			}
 			break;
-		case Scatter:
+		case StartScattering:
 			if (control.stateID() != Frightened) {
 				control.changeTo(Scattering);
 			}

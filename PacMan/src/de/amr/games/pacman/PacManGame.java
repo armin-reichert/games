@@ -481,7 +481,7 @@ public class PacManGame extends Application {
 	// State machine for ghost attacks
 
 	public enum AttackState {
-		Starting, Scattering, Chasing, Complete
+		Starting, Scattering, Chasing, Over
 	}
 
 	private class AttackControl extends StateMachine<AttackState> {
@@ -520,26 +520,24 @@ public class PacManGame extends Application {
 			Log.info(String.format("Level %d, wave %d: enter state %s for %d seconds", level, wave, stateID(),
 					gameLoop.framesToSec(state().getDuration())));
 		}
-
+		
 		public AttackControl() {
 			super("Attack", new EnumMap<>(AttackState.class));
 
 			state(AttackState.Starting).update = state -> {
-				log();
 				changeTo(AttackState.Scattering);
 			};
 
 			state(AttackState.Scattering).entry = state -> {
+				log();
 				state.setDuration(getScatteringDuration());
 				entities.allOf(Ghost.class).forEach(ghost -> {
-					ghost.receive(GhostMessage.Scatter);
+					ghost.receive(GhostMessage.StartScattering);
 				});
-				log();
 			};
 
 			state(AttackState.Scattering).update = state -> {
 				if (state.isTerminated()) {
-					state(AttackState.Chasing).setDuration(getChasingDuration());
 					changeTo(AttackState.Chasing);
 				} else {
 					entities.all().forEach(GameEntity::update);
@@ -547,24 +545,26 @@ public class PacManGame extends Application {
 			};
 
 			state(AttackState.Chasing).entry = state -> {
+				log();
+				state.setDuration(getChasingDuration());
 				entities.allOf(Ghost.class).forEach(ghost -> {
-					ghost.receive(GhostMessage.Chase);
+					ghost.receive(GhostMessage.StartChasing);
 				});
 				assets.sound("sfx/waza.mp3").loop();
-				log();
 			};
 
 			state(AttackState.Chasing).update = state -> {
 				if (state.isTerminated()) {
-					changeTo(AttackState.Complete);
+					changeTo(AttackState.Over);
 				} else {
 					entities.all().forEach(GameEntity::update);
 				}
 			};
 
-			state(AttackState.Complete).entry = state -> assets.sound("sfx/waza.mp3").stop();
+			state(AttackState.Over).entry = state -> {
+				assets.sound("sfx/waza.mp3").stop();
+			};
 		}
-
 	}
 
 	// State machine for controlling the playing
@@ -640,11 +640,11 @@ public class PacManGame extends Application {
 
 			state(PlayState.Playing).update = state -> {
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-					attackControl.changeTo(AttackState.Complete);
+					attackControl.changeTo(AttackState.Over);
 					++level;
 					initLevel();
 					changeTo(PlayState.StartingLevel);
-				} else if (attackControl.inState(AttackState.Complete)) {
+				} else if (attackControl.inState(AttackState.Over)) {
 					attackControl.changeTo(AttackState.Starting, newState -> ++wave);
 				} else {
 					attackControl.update();
@@ -668,7 +668,7 @@ public class PacManGame extends Application {
 				assets.sound("sfx/die.mp3").play();
 				selectedTheme().getEnergizer().setAnimated(false);
 				enableBonus(false);
-				attackControl.changeTo(AttackState.Complete);
+				attackControl.changeTo(AttackState.Over);
 				Log.info("PacMan crashed, lives remaining: " + lives);
 			};
 
