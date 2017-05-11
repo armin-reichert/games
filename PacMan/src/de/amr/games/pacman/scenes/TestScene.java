@@ -99,7 +99,7 @@ public class TestScene extends Scene<PacManGame> {
 		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;
 			ghost.setAnimated(true);
-			ghost.followRoute(targetTile);
+			ghost.enterRoute(targetTile);
 		} else {
 			ghostRunning = false;
 			ghost.setAnimated(false);

@@ -13,12 +13,12 @@ import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Recovering
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static java.util.Collections.emptyList;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Supplier;
@@ -60,7 +60,7 @@ public class Ghost extends PacManGameEntity {
 	@Override
 	public void init() {
 		message = null;
-		route = Collections.emptyList();
+		route = emptyList();
 		setAnimated(false);
 		control.changeTo(Waiting);
 	}
@@ -175,11 +175,7 @@ public class Ghost extends PacManGameEntity {
 
 	// --- Navigation ---
 
-	// public void computeRoute(Tile target) {
-	// route = Game.board.shortestRoute(currentTile(), target);
-	// }
-
-	public void followRoute(Tile target) {
+	public void enterRoute(Tile target) {
 		route = Game.board.shortestRoute(currentTile(), target);
 		followRoute();
 	}

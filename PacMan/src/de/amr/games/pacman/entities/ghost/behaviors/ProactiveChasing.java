@@ -27,7 +27,7 @@ public class ProactiveChasing extends State {
 			target.translate(tiles * Game.board.topology.dx(pacMan.moveDir), tiles * Game.board.topology.dy(pacMan.moveDir));
 			if (Game.board.isTileValid(target) && !Game.board.contains(target, TileContent.GhostHouse)
 					&& ghost.canEnter(target)) {
-				ghost.followRoute(target);
+				ghost.enterRoute(target);
 				return;
 			}
 		}

@@ -61,7 +61,7 @@ public class GhostLoopingAroundWalls extends State {
 				ghost.moveDir = ghost.nextMoveDir = loopStartDir;
 				computePathAroundWalls(ghost, loopStartDir, clockwise);
 			} else {
-				ghost.followRoute(loopStart);
+				ghost.enterRoute(loopStart);
 			}
 		};
 
