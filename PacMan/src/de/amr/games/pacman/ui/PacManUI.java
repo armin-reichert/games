@@ -10,7 +10,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.data.Bonus;
+import de.amr.games.pacman.data.BonusSymbol;
 
 /**
  * Base class of the different Pac-Man UI themes.
@@ -110,7 +110,7 @@ public abstract class PacManUI {
 	public abstract Sprite getLife();
 
 	/** Returns the sprite for the specified bonus symbol. */
-	public abstract Sprite getBonus(Bonus symbol);
+	public abstract Sprite getBonus(BonusSymbol symbol);
 
 	/** Returns the font for drawing texts inside the board. */
 	public abstract Font getTextFont();

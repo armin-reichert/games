@@ -13,10 +13,12 @@ import static java.lang.Math.round;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.Objects;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.ui.PacManUI;
@@ -26,14 +28,17 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public abstract class PacManGameEntity extends GameEntity {
 
+	public final Board board;
 	public final Tile home;
 	public int moveDir;
 	public int nextMoveDir;
 	public float speed;
 	public PacManUI theme;
 
-	public PacManGameEntity(Tile home) {
-		this.home = home;
+	public PacManGameEntity(Board board, Tile home) {
+		this.board = Objects.requireNonNull(board);
+		this.home = Objects.requireNonNull(home);
+		placeAt(home);
 		moveDir = nextMoveDir = Top4.E;
 		speed = 0;
 	}
@@ -100,7 +105,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	public boolean move() {
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(Game.board.topology.dx(moveDir), Game.board.topology.dy(moveDir)).times(speed));
+		tr.setVel(new Vector2(board.topology.dx(moveDir), board.topology.dy(moveDir)).times(speed));
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();
@@ -109,7 +114,7 @@ public abstract class PacManGameEntity extends GameEntity {
 			return false;
 		}
 		// check if "worm hole"-tile has been entered
-		if (Game.board.contains(newTile, TileContent.Wormhole)) {
+		if (board.contains(newTile, TileContent.Wormhole)) {
 			int col = newTile.getCol();
 			if (col == 0 && moveDir == Top4.W) {
 				// fall off left edge -> appear at right edge
@@ -155,7 +160,7 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public void changeMoveDir(int dir) {
 		nextMoveDir = dir;
-		boolean turn90 = (dir == Game.board.topology.left(moveDir) || dir == Game.board.topology.right(moveDir));
+		boolean turn90 = (dir == board.topology.left(moveDir) || dir == board.topology.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
 			return;
 		}

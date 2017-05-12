@@ -24,26 +24,6 @@ public class Board {
 	public static final int NUM_ROWS = 36;
 	public static final int NUM_COLS = 28;
 
-	public static final float PACMAN_HOME_ROW = 26;
-	public static final float PACMAN_HOME_COL = 13.5f;
-
-	public static final float BLINKY_HOME_ROW = 14;
-	public static final float BLINKY_HOME_COL = 13.5f;
-
-	public static final float INKY_HOME_ROW = 17.5f;
-	public static final float INKY_HOME_COL = 11.5f;
-
-	public static final float PINKY_HOME_ROW = 17.5f;
-	public static final float PINKY_HOME_COL = 13.5f;
-
-	public static final float CLYDE_HOME_ROW = 17.5f;
-	public static final float CLYDE_HOME_COL = 15.5f;
-
-	public static final float BONUS_ROW = 19.5f;
-	public static final float BONUS_COL = 13;
-	
-	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13); 
-
 	public final Topology topology;
 
 	private final String[] boardRows;

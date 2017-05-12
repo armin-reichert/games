@@ -1,7 +1,5 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
-import static de.amr.games.pacman.PacManGame.Game;
-
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -25,17 +23,17 @@ public class DirectOrProactiveChasing extends State {
 	}
 
 	private void chase() {
-		Tile middle = new Tile(pacMan.getRow() + 2 * Game.board.topology.dy(pacMan.moveDir),
-				pacMan.getCol() + 2 * Game.board.topology.dx(pacMan.moveDir));
+		Tile middle = new Tile(pacMan.getRow() + 2 * chasingGhost.board.topology.dy(pacMan.moveDir),
+				pacMan.getCol() + 2 * chasingGhost.board.topology.dx(pacMan.moveDir));
 		Tile helperGhostTile = helperGhost.currentTile();
 		int dx = middle.getCol() - helperGhostTile.getCol();
 		int dy = middle.getRow() - helperGhostTile.getRow();
 		Tile targetTile = new Tile(helperGhostTile.getRow() + 2 * dy, helperGhostTile.getCol() + 2 * dx);
-		if (Game.board.isTileValid(targetTile)) {
-			chasingGhost.route = Game.board.shortestRoute(chasingGhost.currentTile(), targetTile);
+		if (chasingGhost.board.isTileValid(targetTile)) {
+			chasingGhost.route = chasingGhost.board.shortestRoute(chasingGhost.currentTile(), targetTile);
 			if (!chasingGhost.route.isEmpty()) {
 				int chaseDir = chasingGhost.route.get(0);
-				if (chaseDir == Game.board.topology.inv(chasingGhost.moveDir)) {
+				if (chaseDir == chasingGhost.board.topology.inv(chasingGhost.moveDir)) {
 					chasingGhost.move();
 					return;
 				}

@@ -5,6 +5,6 @@ package de.amr.games.pacman.data;
  * 
  * @author Armin Reichert
  */
-public enum Bonus {
+public enum BonusSymbol {
 	Cherries, Strawberry, Peach, Apple, Grapes, Galaxian, Bell, Key;
 }

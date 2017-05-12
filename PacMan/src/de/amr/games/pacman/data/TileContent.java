@@ -7,7 +7,7 @@ package de.amr.games.pacman.data;
  */
 public enum TileContent {
 
-	None(' '), Wall('#'), Door('D'), GhostHouse('G'), Pellet('.'), Energizer('O'), Tunnel('T'), Wormhole('W');
+	None(' '), Wall('#'), Door('D'), GhostHouse('G'), Pellet('.'), Energizer('O'), Tunnel('T'), Wormhole('W'), Bonus('B');
 
 	private TileContent(char ch) {
 		this.ch = ch;

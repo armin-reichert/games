@@ -32,6 +32,8 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public class TestScene extends Scene<PacManGame> {
 
+	private PacManUI theme;
+	private Board board;
 	private Ghost ghost;
 	private Tile startTile;
 	private Tile targetTile;
@@ -41,20 +43,26 @@ public class TestScene extends Scene<PacManGame> {
 
 	public TestScene() {
 		super(Game);
+	}
+
+	@Override
+	public void init() {
+		theme = Game.selectedTheme();
+		board = new Board(Game.assets.text("board.txt").split("\n"));
 		clickHandler = new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Tile clickedTile = new Tile(e.getY() / TILE_SIZE, e.getX() / TILE_SIZE);
 				if (ghostRunning) {
-					route = Game.board.shortestRoute(startTile, clickedTile);
+					route = board.shortestRoute(startTile, clickedTile);
 					if (!route.isEmpty()) {
 						ghost.placeAt(startTile);
 						targetTile = clickedTile;
 						Log.info("New target tile: " + targetTile);
 					}
 				} else {
-					route = Game.board.shortestRoute(targetTile, clickedTile);
+					route = board.shortestRoute(targetTile, clickedTile);
 					if (!route.isEmpty()) {
 						startTile = targetTile;
 						targetTile = clickedTile;
@@ -63,28 +71,17 @@ public class TestScene extends Scene<PacManGame> {
 				}
 			}
 		};
-	}
-
-	@Override
-	public void init() {
 		Game.getShell().getCanvas().addMouseListener(clickHandler);
-		ghost = new Ghost("Pinky", 4, 1);
-		ghost.setTheme(Game.selectedTheme());
-		Game.entities.add(ghost);
+		ghost = new Ghost("Pinky", board, new Tile(4, 1));
+		ghost.setTheme(theme);
+		ghost.speed = Game.getGhostSpeedNormal(1);
 		reset();
 	};
-
-	private void exit() {
-		Game.getShell().getCanvas().removeMouseListener(clickHandler);
-		Game.entities.remove(ghost);
-		Game.settings.set("testMode", false);
-		Game.views.show(PlayScene.class);
-	}
 
 	private void reset() {
 		startTile = new Tile(4, 1);
 		targetTile = new Tile(Board.NUM_ROWS - 4, Board.NUM_COLS - 2);
-		route = Game.board.shortestRoute(startTile, targetTile);
+		route = board.shortestRoute(startTile, targetTile);
 		ghost.placeAt(startTile);
 		ghostRunning = false;
 		ghost.setAnimated(false);
@@ -92,9 +89,7 @@ public class TestScene extends Scene<PacManGame> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_X)) {
-			exit();
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
+		if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
 			reset();
 		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;
@@ -108,7 +103,6 @@ public class TestScene extends Scene<PacManGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		final PacManUI theme = Game.selectedTheme();
 		drawSprite(g, 3, 0, theme.getBoard());
 		ghost.draw(g);
 		g.setColor(Color.GREEN);
@@ -116,8 +110,8 @@ public class TestScene extends Scene<PacManGame> {
 		g.setColor(Color.YELLOW);
 		g.fillRect(targetTile.getCol() * TILE_SIZE, targetTile.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		drawGridLines(g, Game.getWidth(), Game.getHeight());
-		drawRouteMap(g, Game.board);
+		drawRouteMap(g, board);
 		g.setColor(Color.RED);
-		drawRoute(g, Game.board, startTile, route);
+		drawRoute(g, board, startTile, route);
 	}
 }

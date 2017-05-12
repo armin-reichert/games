@@ -6,8 +6,6 @@ import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Game;
-import static de.amr.games.pacman.data.Board.BONUS_COL;
-import static de.amr.games.pacman.data.Board.BONUS_ROW;
 import static de.amr.games.pacman.entities.PacManState.Dying;
 import static de.amr.games.pacman.entities.PacManState.Eating;
 import static de.amr.games.pacman.entities.PacManState.Frightening;
@@ -22,12 +20,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.EnumMap;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.data.Bonus;
+import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -46,29 +43,32 @@ public class PacMan extends PacManGameEntity {
 
 	public Consumer<Tile> onPelletFound;
 	public Consumer<Tile> onEnergizerFound;
-	public Consumer<Bonus> onBonusFound;
+	public Consumer<Tile> onBonusFound;
 	public Consumer<Ghost> onGhostMet;
 
 	private float speedBeforeBecomingFrightening;
 	private int freezeTimer;
 	private boolean couldMove;
 
-	public PacMan(float homeRow, float homeCol) {
-		super(new Tile(homeRow, homeCol));
+	public PacMan(Board board, Tile home) {
+		super(board, home);
 		setName("Pac-Man");
 
 		// default event handlers
 
 		onPelletFound = tile -> {
-			Log.info("PacMan finds pellet at tile " + tile);
+			Log.info("PacMan eats pellet at tile " + tile);
+			board.setContent(tile, TileContent.None);
 		};
 
 		onEnergizerFound = tile -> {
-			Log.info("PacMan finds energizer at tile " + tile);
+			Log.info("PacMan eats energizer at tile " + tile);
+			board.setContent(tile, TileContent.None);
 		};
 
-		onBonusFound = bonus -> {
-			Log.info("PacMan finds bonus " + bonus);
+		onBonusFound = tile -> {
+			Log.info("PacMan eats bonus ");
+			board.setContent(tile, TileContent.None);
 		};
 
 		onGhostMet = ghost -> {
@@ -156,7 +156,7 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		Game.board.topology.dirs().forEach(dir -> {
+		board.topology.dirs().forEach(dir -> {
 			getTheme().getPacManRunning(dir).setAnimated(animated);
 		});
 	}
@@ -178,21 +178,17 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public boolean canEnter(Tile tile) {
-		return Game.board.isTileValid(tile) && !Game.board.contains(tile, TileContent.Wall)
-				&& !Game.board.contains(tile, TileContent.Door);
+		return board.isTileValid(tile) && !board.contains(tile, TileContent.Wall)
+				&& !board.contains(tile, TileContent.Door);
 	}
 
 	private void exploreMaze() {
 		changeMoveDir(computeMoveDir());
 		couldMove = move();
-		final Tile tile = currentTile();
-		Game.board.getContent(tile, TileContent.Pellet).ifPresent(onPelletFound);
-		Game.board.getContent(tile, TileContent.Energizer).ifPresent(onEnergizerFound);
-		if (Game.bonus.isPresent() && getCol() == Math.round(BONUS_COL) && getRow() == Math.round(BONUS_ROW)) {
-			onBonusFound.accept(Game.bonus.get());
-			Game.bonus = Optional.empty();
-			Game.bonusTimeRemaining = 0;
-		}
+		final Tile currentTile = currentTile();
+		board.getContent(currentTile, TileContent.Pellet).ifPresent(onPelletFound);
+		board.getContent(currentTile, TileContent.Energizer).ifPresent(onEnergizerFound);
+		board.getContent(currentTile, TileContent.Bonus).ifPresent(onBonusFound);
 		/*@formatter:off*/
 		Game.entities.allOf(Ghost.class)
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())

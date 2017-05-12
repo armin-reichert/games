@@ -20,7 +20,7 @@ import java.util.Map;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.data.Bonus;
+import de.amr.games.pacman.data.BonusSymbol;
 
 /**
  * A Pac-Man UI with smoother sprites.
@@ -37,7 +37,7 @@ public class ModernUI extends PacManUI {
 	private final Sprite ghostFrightened;
 	private final Sprite ghostRecovering;
 	private final Sprite ghostDead;
-	private final Map<Bonus, Sprite> bonusSymbols = new EnumMap<>(Bonus.class);
+	private final Map<BonusSymbol, Sprite> bonusSymbols = new EnumMap<>(BonusSymbol.class);
 	private final Sprite energizer;
 	private final Sprite pill;
 	private final Sprite life;
@@ -60,7 +60,7 @@ public class ModernUI extends PacManUI {
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248)).scale(NUM_COLS * TILE_SIZE, (NUM_ROWS - 5) * TILE_SIZE);
 
 		int size = TILE_SIZE * 15 / 10;
-		for (Bonus symbol : Bonus.values()) {
+		for (BonusSymbol symbol : BonusSymbol.values()) {
 			bonusSymbols.put(symbol,
 					new Sprite(sheet.getSubimage(488 + symbol.ordinal() * 16, 48, 16, 16)).scale(size, size));
 		}
@@ -168,7 +168,7 @@ public class ModernUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getBonus(Bonus symbol) {
+	public Sprite getBonus(BonusSymbol symbol) {
 		return bonusSymbols.get(symbol);
 	}
 

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.data.Bonus;
+import de.amr.games.pacman.data.BonusSymbol;
 
 /**
  * A Pac-Man UI which tries to be close to the classic Arcade game.
@@ -42,7 +42,7 @@ public class ClassicUI extends PacManUI {
 	private final Sprite ghostFrightened;
 	private final Sprite ghostRecovering;
 	private final Map<Integer, Sprite> ghostDead = new HashMap<>();
-	private final Map<Bonus, Sprite> bonusSprites = new EnumMap<>(Bonus.class);
+	private final Map<BonusSymbol, Sprite> bonusSprites = new EnumMap<>(BonusSymbol.class);
 	private final Sprite energizer;
 	private final Sprite pellet;
 	private final Sprite life;
@@ -79,7 +79,7 @@ public class ClassicUI extends PacManUI {
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248));
 		board.scale(TILE_SIZE * NUM_COLS, TILE_SIZE * (NUM_ROWS - 5));
 
-		for (Bonus symbol : Bonus.values()) {
+		for (BonusSymbol symbol : BonusSymbol.values()) {
 			Sprite sprite = new Sprite(sheet.getSubimage(488 + symbol.ordinal() * 16, 48, 16, 16));
 			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 			bonusSprites.put(symbol, sprite);
@@ -204,7 +204,7 @@ public class ClassicUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getBonus(Bonus bonus) {
+	public Sprite getBonus(BonusSymbol bonus) {
 		return bonusSprites.get(bonus);
 	}
 
