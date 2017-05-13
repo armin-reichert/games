@@ -56,10 +56,11 @@ public class GhostLoopingAroundWalls extends State {
 			} else if (ghost.isExactlyOverTile(loopStartRow, loopStartCol)) {
 				// loop start tile reached for the first time, start looping
 				loopStarted = true;
-				ghost.moveDir = ghost.nextMoveDir = loopStartDir;
+				ghost.setMoveDir(loopStartDir);
+				ghost.setNextMoveDir(loopStartDir);
 				computePathAroundWalls(ghost, loopStartDir, clockwise);
 			} else {
-				ghost.enterRoute(loopStart);
+				ghost.followRoute(loopStart);
 			}
 		};
 

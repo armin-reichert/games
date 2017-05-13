@@ -40,9 +40,9 @@ import de.amr.games.pacman.fsm.StateMachine;
 public class Ghost extends PacManGameEntity {
 
 	public final StateMachine<GhostState> control;
-	public List<Integer> route;
 	public Supplier<GhostState> stateAfterFrightened;
-	public Color color;
+	public List<Integer> route;
+	private Color color;
 	private GhostMessage message;
 
 	@Override
@@ -50,11 +50,10 @@ public class Ghost extends PacManGameEntity {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(String name, Board board, Tile home) {
+	public Ghost(Board board, Tile home) {
 		super(board, home);
 		this.color = Color.WHITE;
-		setName(name);
-		control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
+		control = new StateMachine<>("Ghost", new EnumMap<>(GhostState.class));
 	}
 
 	@Override
@@ -112,6 +111,14 @@ public class Ghost extends PacManGameEntity {
 	}
 
 	// --- Look ---
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
 
 	@Override
 	public Sprite currentSprite() {
@@ -175,12 +182,12 @@ public class Ghost extends PacManGameEntity {
 
 	// --- Navigation ---
 
-	public void enterRoute(Tile target) {
+	public void followRoute(Tile target) {
 		route = board.shortestRoute(currentTile(), target);
-		followRoute();
+		moveAlongRoute();
 	}
 
-	public void followRoute() {
+	public void moveAlongRoute() {
 		if (!route.isEmpty()) {
 			changeMoveDir(route.get(0));
 		}

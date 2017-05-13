@@ -98,7 +98,7 @@ public class GameLoop {
 				}
 			} else if (timeLeft < 0) {
 				overTime += (-timeLeft);
-				for (int extraUpdates = 5; extraUpdates > 0 && overTime > period; overTime -= period, --extraUpdates) {
+				for (int extraUpdates = 3; extraUpdates > 0 && overTime > period; overTime -= period, --extraUpdates) {
 					updateTask.run();
 					if (log) {
 						out.println(format("Extra Update time: %10.2f millis", updateTask.getUsedTime() / 1000000f));

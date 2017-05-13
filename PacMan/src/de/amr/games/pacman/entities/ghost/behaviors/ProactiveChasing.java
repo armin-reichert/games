@@ -22,11 +22,11 @@ public class ProactiveChasing extends State {
 	private void chase() {
 		for (int tiles = maxLookAhead; tiles >= 0; --tiles) {
 			Tile target = pacMan.currentTile();
-			target.translate(tiles * ghost.board.topology.dx(pacMan.moveDir),
-					tiles * ghost.board.topology.dy(pacMan.moveDir));
+			target.translate(tiles * ghost.board.topology.dx(pacMan.getMoveDir()),
+					tiles * ghost.board.topology.dy(pacMan.getMoveDir()));
 			if (ghost.board.isTileValid(target) && !ghost.board.contains(target, TileContent.GhostHouse)
 					&& ghost.canEnter(target)) {
-				ghost.enterRoute(target);
+				ghost.followRoute(target);
 				return;
 			}
 		}

@@ -30,10 +30,10 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public final Board board;
 	public final Tile home;
-	public int moveDir;
-	public int nextMoveDir;
-	public float speed;
-	public PacManUI theme;
+	protected int moveDir;
+	protected int nextMoveDir;
+	protected float speed;
+	protected PacManUI theme;
 
 	public PacManGameEntity(Board board, Tile home) {
 		this.board = Objects.requireNonNull(board);
@@ -41,6 +41,30 @@ public abstract class PacManGameEntity extends GameEntity {
 		placeAt(home);
 		moveDir = nextMoveDir = Top4.E;
 		speed = 0;
+	}
+
+	public int getMoveDir() {
+		return moveDir;
+	}
+
+	public void setMoveDir(int moveDir) {
+		this.moveDir = moveDir;
+	}
+
+	public int getNextMoveDir() {
+		return nextMoveDir;
+	}
+
+	public void setNextMoveDir(int nextMoveDir) {
+		this.nextMoveDir = nextMoveDir;
+	}
+
+	public float getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(float speed) {
+		this.speed = speed;
 	}
 
 	@Override

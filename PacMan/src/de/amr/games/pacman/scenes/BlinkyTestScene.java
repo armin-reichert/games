@@ -46,16 +46,17 @@ public class BlinkyTestScene extends Scene<PacManGame> {
 		board = new Board(Game.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(board, PlayScene.PACMAN_HOME);
-		pacMan.speed = Game.getPacManSpeed(1);
+		pacMan.setSpeed(Game.getPacManSpeed(1));
 		pacMan.setTheme(Game.selectedTheme());
 
-		blinky = new Ghost("Blinky", board, PlayScene.BLINKY_HOME);
-		blinky.control.state(Chasing).update = state -> blinky.enterRoute(pacMan.currentTile());
+		blinky = new Ghost(board, PlayScene.BLINKY_HOME);
+		blinky.control.state(Chasing).update = state -> blinky.followRoute(pacMan.currentTile());
 		blinky.stateAfterFrightened = () -> GhostState.Chasing;
-		blinky.color = Color.RED;
+		blinky.setColor(Color.RED);
+		blinky.setName("Blinky");
 		blinky.setTheme(theme);
 		blinky.setAnimated(true);
-		blinky.speed = Game.getGhostSpeedNormal(1);
+		blinky.setSpeed(Game.getGhostSpeedNormal(1));
 
 		pacMan.control.changeTo(PacManState.Eating);
 		blinky.control.changeTo(GhostState.Chasing);

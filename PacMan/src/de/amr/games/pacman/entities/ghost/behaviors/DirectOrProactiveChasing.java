@@ -23,8 +23,8 @@ public class DirectOrProactiveChasing extends State {
 	}
 
 	private void chase() {
-		Tile middle = new Tile(pacMan.getRow() + 2 * chasingGhost.board.topology.dy(pacMan.moveDir),
-				pacMan.getCol() + 2 * chasingGhost.board.topology.dx(pacMan.moveDir));
+		Tile middle = new Tile(pacMan.getRow() + 2 * chasingGhost.board.topology.dy(pacMan.getMoveDir()),
+				pacMan.getCol() + 2 * chasingGhost.board.topology.dx(pacMan.getMoveDir()));
 		Tile helperGhostTile = helperGhost.currentTile();
 		int dx = middle.getCol() - helperGhostTile.getCol();
 		int dy = middle.getRow() - helperGhostTile.getRow();
@@ -33,12 +33,12 @@ public class DirectOrProactiveChasing extends State {
 			chasingGhost.route = chasingGhost.board.shortestRoute(chasingGhost.currentTile(), targetTile);
 			if (!chasingGhost.route.isEmpty()) {
 				int chaseDir = chasingGhost.route.get(0);
-				if (chaseDir == chasingGhost.board.topology.inv(chasingGhost.moveDir)) {
+				if (chaseDir == chasingGhost.board.topology.inv(chasingGhost.getMoveDir())) {
 					chasingGhost.move();
 					return;
 				}
 				if (chasingGhost.canMoveTowards(chaseDir)) {
-					chasingGhost.followRoute();
+					chasingGhost.moveAlongRoute();
 					return;
 				}
 			}

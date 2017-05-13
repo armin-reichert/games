@@ -72,9 +72,10 @@ public class TestScene extends Scene<PacManGame> {
 			}
 		};
 		Game.getShell().getCanvas().addMouseListener(clickHandler);
-		ghost = new Ghost("Pinky", board, new Tile(4, 1));
+		ghost = new Ghost(board, new Tile(4, 1));
+		ghost.setName("Pinky");
 		ghost.setTheme(theme);
-		ghost.speed = Game.getGhostSpeedNormal(1);
+		ghost.setSpeed(Game.getGhostSpeedNormal(1));
 		reset();
 	};
 
@@ -94,7 +95,7 @@ public class TestScene extends Scene<PacManGame> {
 		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;
 			ghost.setAnimated(true);
-			ghost.enterRoute(targetTile);
+			ghost.followRoute(targetTile);
 		} else {
 			ghostRunning = false;
 			ghost.setAnimated(false);
