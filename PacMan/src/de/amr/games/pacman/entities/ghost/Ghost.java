@@ -28,9 +28,9 @@ import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacManGameEntity;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
+import de.amr.games.pacman.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
 
@@ -41,7 +41,6 @@ public class Ghost extends PacManGameEntity {
 
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateAfterFrightened;
-	public List<Integer> route;
 	private Color color;
 	private GhostMessage message;
 
@@ -63,8 +62,6 @@ public class Ghost extends PacManGameEntity {
 		setAnimated(false);
 		control.changeTo(Waiting);
 	}
-
-	// --- State machine ---
 
 	@Override
 	public void update() {
@@ -180,22 +177,6 @@ public class Ghost extends PacManGameEntity {
 		}
 	}
 
-	// --- Navigation ---
-
-	public void followRoute(Tile target) {
-		route = board.shortestRoute(currentTile(), target);
-		moveAlongRoute();
-	}
-
-	public void moveAlongRoute() {
-		if (!route.isEmpty()) {
-			changeMoveDir(route.get(0));
-		}
-		move();
-	}
-
-	// --- predicates
-
 	public boolean insideGhostHouse() {
 		return board.contains(currentTile(), GhostHouse);
 	}
@@ -251,7 +232,7 @@ public class Ghost extends PacManGameEntity {
 		g.setStroke(new BasicStroke(1f));
 		Tile tile = currentTile();
 		if (control.inState(Scattering)) {
-			GhostLoopingAroundWalls state = (GhostLoopingAroundWalls) control.state();
+			LoopAroundWalls state = (LoopAroundWalls) control.state();
 			if (state.hasLoopStarted()) {
 				tile = new Tile(state.getLoopStart());
 			}

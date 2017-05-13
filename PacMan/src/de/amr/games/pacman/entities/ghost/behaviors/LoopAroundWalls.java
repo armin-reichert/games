@@ -3,25 +3,24 @@ package de.amr.games.pacman.entities.ghost.behaviors;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
-import de.amr.games.pacman.entities.ghost.Ghost;
+import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.fsm.State;
 
 /**
- * A ghost behavior that lets the specified ghost walk to the start tile (e.g. a corner tile) and
- * then lets it run around the walls in that corner.
+ * A state that lets the specified entity walk to the start tile (e.g. a corner tile) and then run
+ * around the walls in that corner.
  * 
  * @author Armin Reichert
- *
  */
-public class GhostLoopingAroundWalls extends State {
+public class LoopAroundWalls extends State {
 
 	private final Tile loopStart;
 	private boolean loopStarted;
 	private int routeIndex;
 
 	/**
-	 * @param ghost
-	 *          the ghost to be controlled
+	 * @param entity
+	 *          the entity to be controlled
 	 * @param loopStartRow
 	 *          the start row of the loop
 	 * @param loopStartCol
@@ -31,7 +30,8 @@ public class GhostLoopingAroundWalls extends State {
 	 * @param clockwise
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
-	public GhostLoopingAroundWalls(Ghost ghost, int loopStartRow, int loopStartCol, int loopStartDir, boolean clockwise) {
+	public LoopAroundWalls(PacManGameEntity entity, int loopStartRow, int loopStartCol, int loopStartDir,
+			boolean clockwise) {
 
 		this.loopStart = new Tile(loopStartRow, loopStartCol);
 
@@ -39,35 +39,35 @@ public class GhostLoopingAroundWalls extends State {
 		entry = state -> {
 			loopStarted = false;
 			routeIndex = 0;
-			ghost.route.clear();
-			ghost.adjustOnTile();
+			entity.getRoute().clear();
+			entity.adjustOnTile();
 		};
 
 		// update action
 		update = state -> {
 			if (loopStarted) {
 				// move along computed loop route
-				ghost.move();
-				if (ghost.isExactlyOverTile()) {
+				entity.move();
+				if (entity.isExactlyOverTile()) {
 					// check if direction should be changed
-					int dir = ghost.route.get(routeIndex < ghost.route.size() ? routeIndex : 0);
-					ghost.changeMoveDir(dir);
-					routeIndex = (routeIndex + 1) == ghost.route.size() ? 0 : routeIndex + 1;
+					int dir = entity.getRoute().get(routeIndex < entity.getRoute().size() ? routeIndex : 0);
+					entity.changeMoveDir(dir);
+					routeIndex = (routeIndex + 1) == entity.getRoute().size() ? 0 : routeIndex + 1;
 				}
-			} else if (ghost.isExactlyOverTile(loopStartRow, loopStartCol)) {
+			} else if (entity.isExactlyOverTile(loopStartRow, loopStartCol)) {
 				// loop start tile reached for the first time, start looping
 				loopStarted = true;
-				ghost.setMoveDir(loopStartDir);
-				ghost.setNextMoveDir(loopStartDir);
-				computePathAroundWalls(ghost, loopStartDir, clockwise);
+				entity.setMoveDir(loopStartDir);
+				entity.setNextMoveDir(loopStartDir);
+				computePathAroundWalls(entity, loopStartDir, clockwise);
 			} else {
-				ghost.followRoute(loopStart);
+				entity.followRoute(loopStart);
 			}
 		};
 
 		// exit action
 		exit = state -> {
-			ghost.route.clear();
+			entity.getRoute().clear();
 		};
 	}
 
@@ -75,17 +75,17 @@ public class GhostLoopingAroundWalls extends State {
 	 * Computes the route around the walls when the ghost starts at the start tile and moves clockwise
 	 * or counter-clockwise
 	 * 
-	 * @param ghost
-	 *          the ghost to be controlled
+	 * @param entity
+	 *          the entity to be controlled
 	 * @param dir_forward
 	 *          the initial forward direction
 	 * @param clockwise
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
-	private void computePathAroundWalls(Ghost ghost, int dir_forward, boolean clockwise) {
-		final Board board = ghost.getBoard();
+	private void computePathAroundWalls(PacManGameEntity entity, int dir_forward, boolean clockwise) {
+		final Board board = entity.getBoard();
 		Tile current = loopStart;
-		ghost.route.clear();
+		entity.getRoute().clear();
 		do {
 			int dir_turn = clockwise ? board.topology.right(dir_forward) : board.topology.left(dir_forward);
 			int dir_turn_inv = board.topology.inv(dir_turn);
@@ -96,20 +96,20 @@ public class GhostLoopingAroundWalls extends State {
 				// can move ahead
 				if (board.contains(current_around_corner, TileContent.Wall)) {
 					// no corner in turn direction ahead, move forward
-					ghost.route.add(dir_forward);
+					entity.getRoute().add(dir_forward);
 					current = current_ahead;
 					if (current.equals(loopStart)) {
 						break;
 					}
 				} else {
 					// corner is ahead, move around corner
-					ghost.route.add(dir_forward);
+					entity.getRoute().add(dir_forward);
 					current = current_ahead;
 					if (current.equals(loopStart)) {
 						break;
 					}
 					dir_forward = dir_turn;
-					ghost.route.add(dir_forward);
+					entity.getRoute().add(dir_forward);
 					current = current_around_corner;
 					if (current.equals(loopStart)) {
 						break;
@@ -118,7 +118,7 @@ public class GhostLoopingAroundWalls extends State {
 			} else if (!board.contains(current_antiturn, TileContent.Wall)) {
 				// turn against loop direction
 				dir_forward = board.topology.inv(dir_turn);
-				ghost.route.add(dir_forward);
+				entity.getRoute().add(dir_forward);
 				current = current_antiturn;
 				if (current.equals(loopStart)) {
 					break;

@@ -13,6 +13,7 @@ import static java.lang.Math.round;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.List;
 import java.util.Objects;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -29,6 +30,7 @@ import de.amr.games.pacman.ui.PacManUI;
 public abstract class PacManGameEntity extends GameEntity {
 
 	protected final Board board;
+	protected List<Integer> route;
 	protected Tile home;
 	protected int moveDir;
 	protected int nextMoveDir;
@@ -45,6 +47,26 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public Board getBoard() {
 		return board;
+	}
+
+	public List<Integer> getRoute() {
+		return route;
+	}
+
+	public void followRoute(Tile target) {
+		route = board.shortestRoute(currentTile(), target);
+		moveAlongRoute();
+	}
+
+	public void moveAlongRoute() {
+		if (!route.isEmpty()) {
+			changeMoveDir(route.get(0));
+		}
+		move();
+	}
+
+	public void setRoute(List<Integer> route) {
+		this.route = route;
 	}
 
 	public Tile getHome() {

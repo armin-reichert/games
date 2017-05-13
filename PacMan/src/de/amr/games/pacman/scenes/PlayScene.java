@@ -64,7 +64,7 @@ import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacManState;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
-import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
+import de.amr.games.pacman.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
 import de.amr.games.pacman.fsm.StateMachine;
@@ -622,7 +622,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// loop around block at right upper corner of maze:
-		blinky.control.state(Scattering, new GhostLoopingAroundWalls(blinky, 4, 26, S, true));
+		blinky.control.state(Scattering, new LoopAroundWalls(blinky, 4, 26, S, true));
 
 		// target Pac-Man's current position:
 		blinky.control.state(Chasing).update = state -> {
@@ -641,7 +641,7 @@ public class PlayScene extends Scene<PacManGame> {
 		inky.control.state(Waiting).update = state -> inky.moveBackAndForth();
 
 		// loop around block at right lower corner of maze:
-		inky.control.state(Scattering, new GhostLoopingAroundWalls(inky, 32, 26, W, true));
+		inky.control.state(Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
 
 		// target tile in front of Pac-Man or target Pac-Man directly:
 		inky.control.state(Chasing, new DirectOrProactiveChasing(inky, blinky, pacMan));
@@ -658,7 +658,7 @@ public class PlayScene extends Scene<PacManGame> {
 		pinky.control.state(Waiting).update = state -> pinky.moveBackAndForth();
 
 		// loop around block at right upper corner of maze:
-		pinky.control.state(Scattering, new GhostLoopingAroundWalls(pinky, 4, 1, S, false));
+		pinky.control.state(Scattering, new LoopAroundWalls(pinky, 4, 1, S, false));
 
 		// target tile which is 4 tiles ahead of Pac-Man's current position:
 		pinky.control.state(Chasing, new TargetAtTileAheadOfPacMan(pinky, pacMan, 4));
@@ -675,7 +675,7 @@ public class PlayScene extends Scene<PacManGame> {
 		clyde.control.state(Waiting).update = state -> clyde.moveBackAndForth();
 
 		// loop around block at left lower corner of maze:
-		clyde.control.state(Scattering, new GhostLoopingAroundWalls(clyde, 32, 1, E, false));
+		clyde.control.state(Scattering, new LoopAroundWalls(clyde, 32, 1, E, false));
 
 		// target Pac-Man's position if more than 8 tiles away, otherwise move randomly:
 		clyde.control.state(Chasing).update = state -> {
