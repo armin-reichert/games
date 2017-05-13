@@ -1,5 +1,6 @@
 package de.amr.games.pacman.entities.ghost.behaviors;
 
+import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.ghost.Ghost;
@@ -82,17 +83,18 @@ public class GhostLoopingAroundWalls extends State {
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
 	private void computePathAroundWalls(Ghost ghost, int dir_forward, boolean clockwise) {
-		ghost.route.clear();
+		final Board board = ghost.getBoard();
 		Tile current = loopStart;
+		ghost.route.clear();
 		do {
-			int dir_turn = clockwise ? ghost.board.topology.right(dir_forward) : ghost.board.topology.left(dir_forward);
-			int dir_turn_inv = ghost.board.topology.inv(dir_turn);
+			int dir_turn = clockwise ? board.topology.right(dir_forward) : board.topology.left(dir_forward);
+			int dir_turn_inv = board.topology.inv(dir_turn);
 			Tile current_antiturn = current.neighbor(dir_turn_inv);
 			Tile current_ahead = current.neighbor(dir_forward);
 			Tile current_around_corner = current_ahead.neighbor(dir_turn);
-			if (!ghost.board.contains(current_ahead, TileContent.Wall)) {
+			if (!board.contains(current_ahead, TileContent.Wall)) {
 				// can move ahead
-				if (ghost.board.contains(current_around_corner, TileContent.Wall)) {
+				if (board.contains(current_around_corner, TileContent.Wall)) {
 					// no corner in turn direction ahead, move forward
 					ghost.route.add(dir_forward);
 					current = current_ahead;
@@ -113,9 +115,9 @@ public class GhostLoopingAroundWalls extends State {
 						break;
 					}
 				}
-			} else if (!ghost.board.contains(current_antiturn, TileContent.Wall)) {
+			} else if (!board.contains(current_antiturn, TileContent.Wall)) {
 				// turn against loop direction
-				dir_forward = ghost.board.topology.inv(dir_turn);
+				dir_forward = board.topology.inv(dir_turn);
 				ghost.route.add(dir_forward);
 				current = current_antiturn;
 				if (current.equals(loopStart)) {

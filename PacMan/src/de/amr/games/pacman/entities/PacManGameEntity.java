@@ -28,8 +28,8 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public abstract class PacManGameEntity extends GameEntity {
 
-	public final Board board;
-	public final Tile home;
+	protected final Board board;
+	protected Tile home;
 	protected int moveDir;
 	protected int nextMoveDir;
 	protected float speed;
@@ -41,6 +41,14 @@ public abstract class PacManGameEntity extends GameEntity {
 		placeAt(home);
 		moveDir = nextMoveDir = Top4.E;
 		speed = 0;
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	public Tile getHome() {
+		return home;
 	}
 
 	public int getMoveDir() {

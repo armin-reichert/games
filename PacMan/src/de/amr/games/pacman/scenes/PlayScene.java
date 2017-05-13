@@ -66,7 +66,7 @@ import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostLoopingAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
-import de.amr.games.pacman.entities.ghost.behaviors.ProactiveChasing;
+import de.amr.games.pacman.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
 import de.amr.games.pacman.fsm.StateMachine;
 import de.amr.games.pacman.ui.PacManUI;
 
@@ -403,7 +403,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// mark home positions of ghosts
 			ghosts.forEach(ghost -> {
 				g.setColor(ghost.getColor());
-				g.fillRect(ghost.home.getCol() * TILE_SIZE, ghost.home.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				g.fillRect(ghost.getHome().getCol() * TILE_SIZE, ghost.getHome().getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 			});
 		}
 
@@ -592,7 +592,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// "dead" state:
 
 			ghost.control.state(Dead).update = state -> {
-				ghost.followRoute(ghost.home);
+				ghost.followRoute(ghost.getHome());
 				if (ghost.isAtHome()) {
 					ghost.control.changeTo(Recovering);
 				}
@@ -617,7 +617,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait just before ghost house:
 		blinky.control.state(Waiting).entry = state -> {
-			blinky.placeAt(blinky.home);
+			blinky.placeAt(blinky.getHome());
 			blinky.setMoveDir(W);
 		};
 
@@ -633,7 +633,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait inside ghost house:
 		inky.control.state(Waiting).entry = state -> {
-			inky.placeAt(inky.home);
+			inky.placeAt(inky.getHome());
 			inky.setMoveDir(N);
 		};
 
@@ -650,7 +650,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait inside ghost house:
 		pinky.control.state(Waiting).entry = state -> {
-			pinky.placeAt(pinky.home);
+			pinky.placeAt(pinky.getHome());
 			pinky.setMoveDir(S);
 		};
 
@@ -661,13 +661,13 @@ public class PlayScene extends Scene<PacManGame> {
 		pinky.control.state(Scattering, new GhostLoopingAroundWalls(pinky, 4, 1, S, false));
 
 		// target tile which is 4 tiles ahead of Pac-Man's current position:
-		pinky.control.state(Chasing, new ProactiveChasing(pinky, pacMan, 4));
+		pinky.control.state(Chasing, new TargetAtTileAheadOfPacMan(pinky, pacMan, 4));
 
 		// "Clyde", the yellow ghost
 
 		// wait inside ghost house:
 		clyde.control.state(Waiting).entry = state -> {
-			clyde.placeAt(clyde.home);
+			clyde.placeAt(clyde.getHome());
 			clyde.setMoveDir(N);
 		};
 
