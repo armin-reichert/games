@@ -33,7 +33,7 @@ public class ApplicationSettings {
 	}
 
 	public boolean getBool(String key) {
-		return (Boolean) get(key);
+		return settings.containsKey(key) ? (Boolean) get(key) : false;
 	}
 
 	public int getInt(String key) {

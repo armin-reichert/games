@@ -30,7 +30,6 @@ import de.amr.games.pacman.data.TileContent;
 import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostState;
-import de.amr.games.pacman.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.fsm.State;
 import de.amr.games.pacman.fsm.StateMachine;
 
@@ -204,6 +203,8 @@ public class Ghost extends PacManGameEntity {
 		super.draw(g);
 		if (Game.settings.getBool("drawInternals")) {
 			drawState(g);
+		}
+		if (Game.settings.getBool("drawRoute")) {
 			drawRoute(g);
 		}
 	}
@@ -222,21 +223,12 @@ public class Ghost extends PacManGameEntity {
 	}
 
 	private void drawRoute(Graphics2D g) {
-		if (control.inState(Frightened) || control.inState(Waiting)) {
-			return;
-		}
 		if (route.isEmpty()) {
 			return;
 		}
 		g.setColor(color);
 		g.setStroke(new BasicStroke(1f));
 		Tile tile = currentTile();
-		if (control.inState(Scattering)) {
-			LoopAroundWalls state = (LoopAroundWalls) control.state();
-			if (state.hasLoopStarted()) {
-				tile = new Tile(state.getLoopStart());
-			}
-		}
 		int offset = TILE_SIZE / 2;
 		for (int dir : route) {
 			Tile nextTile = tile.neighbor(dir);

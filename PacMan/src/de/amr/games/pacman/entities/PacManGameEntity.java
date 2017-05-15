@@ -13,6 +13,7 @@ import static java.lang.Math.round;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +41,7 @@ public abstract class PacManGameEntity extends GameEntity {
 	public PacManGameEntity(Board board, Tile home) {
 		this.board = Objects.requireNonNull(board);
 		this.home = Objects.requireNonNull(home);
+		route = new ArrayList<>();
 		placeAt(home);
 		moveDir = nextMoveDir = Top4.E;
 		speed = 0;
@@ -60,7 +62,10 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public void moveAlongRoute() {
 		if (!route.isEmpty()) {
-			changeMoveDir(route.get(0));
+			boolean changedDir = changeMoveDir(route.get(0));
+			if (changedDir) {
+				route.remove(0);
+			}
 		}
 		move();
 	}
@@ -136,13 +141,17 @@ public abstract class PacManGameEntity extends GameEntity {
 		return row == getRow() && col == getCol();
 	}
 
-	public boolean isExactlyOverTile(int row, int col) {
-		int tolerance = 1;
-		return Math.abs(tr.getX() - col * TILE_SIZE) <= tolerance && Math.abs(tr.getY() - row * TILE_SIZE) <= tolerance;
+	public boolean isExactlyOverTile(Tile tile) {
+		return isExactlyOverTile(tile.getRow(), tile.getCol());
 	}
 
 	public boolean isExactlyOverTile() {
 		return isExactlyOverTile(getRow(), getCol());
+	}
+
+	public boolean isExactlyOverTile(int row, int col) {
+		int tolerance = 1;
+		return Math.abs(tr.getX() - col * TILE_SIZE) <= tolerance && Math.abs(tr.getY() - row * TILE_SIZE) <= tolerance;
 	}
 
 	public boolean canMoveTowards(int dir) {
@@ -212,13 +221,14 @@ public abstract class PacManGameEntity extends GameEntity {
 		return true;
 	}
 
-	public void changeMoveDir(int dir) {
+	public boolean changeMoveDir(int dir) {
 		nextMoveDir = dir;
 		boolean turn90 = (dir == board.topology.left(moveDir) || dir == board.topology.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
-			return;
+			return false;
 		}
 		moveDir = nextMoveDir;
+		return true;
 	}
 
 	// -- user interface
@@ -239,11 +249,7 @@ public abstract class PacManGameEntity extends GameEntity {
 		g.translate(margin, margin);
 
 		if (Game.settings.getBool("drawGrid")) {
-			if (isExactlyOverTile(getRow(), getCol())) {
-				drawCollisionBox(g, Color.GREEN);
-			} else {
-				drawCollisionBox(g, Color.RED);
-			}
+			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
 		}
 	}
 }

@@ -16,7 +16,6 @@ public class LoopAroundWalls extends State {
 
 	private final Tile loopStart;
 	private boolean loopStarted;
-	private int routeIndex;
 
 	/**
 	 * @param entity
@@ -38,28 +37,19 @@ public class LoopAroundWalls extends State {
 		// entry action
 		entry = state -> {
 			loopStarted = false;
-			routeIndex = 0;
 			entity.getRoute().clear();
 			entity.adjustOnTile();
 		};
 
 		// update action
 		update = state -> {
-			if (loopStarted) {
-				// move along computed loop route
-				entity.move();
-				if (entity.isExactlyOverTile()) {
-					// check if direction should be changed
-					int dir = entity.getRoute().get(routeIndex < entity.getRoute().size() ? routeIndex : 0);
-					entity.changeMoveDir(dir);
-					routeIndex = (routeIndex + 1) == entity.getRoute().size() ? 0 : routeIndex + 1;
-				}
-			} else if (entity.isExactlyOverTile(loopStartRow, loopStartCol)) {
-				// loop start tile reached for the first time, start looping
-				loopStarted = true;
-				entity.setMoveDir(loopStartDir);
-				entity.setNextMoveDir(loopStartDir);
+			if (entity.isExactlyOverTile(loopStart)) {
 				computePathAroundWalls(entity, loopStartDir, clockwise);
+				entity.setMoveDir(loopStartDir);
+				loopStarted = true;
+			}
+			if (loopStarted) {
+				entity.moveAlongRoute();
 			} else {
 				entity.followRoute(loopStart);
 			}
@@ -127,20 +117,5 @@ public class LoopAroundWalls extends State {
 				throw new IllegalStateException("Got stuck while computing path around walls");
 			}
 		} while (true);
-	}
-
-	/**
-	 * 
-	 * @return the start tile of the loop
-	 */
-	public Tile getLoopStart() {
-		return new Tile(loopStart);
-	}
-
-	/**
-	 * @return if the looping has started
-	 */
-	public boolean hasLoopStarted() {
-		return loopStarted;
 	}
 }

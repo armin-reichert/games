@@ -21,7 +21,8 @@ import de.amr.games.pacman.data.BonusSymbol;
 import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.scenes.BlinkyTestScene;
 import de.amr.games.pacman.scenes.PlayScene;
-import de.amr.games.pacman.scenes.TestScene;
+import de.amr.games.pacman.scenes.RoutingTestScene;
+import de.amr.games.pacman.scenes.ScatteringTestScene;
 import de.amr.games.pacman.ui.ClassicUI;
 import de.amr.games.pacman.ui.ModernUI;
 import de.amr.games.pacman.ui.PacManUI;
@@ -85,15 +86,18 @@ public class PacManGame extends Application {
 	public static final int WAIT_TICKS_ON_EATING_PELLET = 1;
 	public static final int WAIT_TICKS_ON_EATING_ENERGIZER = 3;
 
+	private float baseSpeed;
 	private int themeIndex;
 
 	@Override
 	protected void init() {
+		baseSpeed = 8 * TILE_SIZE / settings.fps;
 		views.add(new PlayScene());
-		views.add(new TestScene());
+		views.add(new RoutingTestScene());
 		views.add(new BlinkyTestScene());
-		views.show(PlayScene.class);
-		// views.show(TestScene.class);
+		views.add(new ScatteringTestScene());
+//		 views.show(PlayScene.class);
+		views.show(ScatteringTestScene.class);
 	}
 
 	private List<PacManUI> themes() {
@@ -116,10 +120,6 @@ public class PacManGame extends Application {
 		selectedTheme().getEnergizer().setAnimated(false);
 	}
 
-	private float getBaseSpeed() {
-		return TILE_SIZE * 8 / settings.fps;
-	}
-
 	public BonusSymbol getBonusSymbol(int level) {
 		return (BonusSymbol) LEVELS[level][0];
 	}
@@ -129,27 +129,27 @@ public class PacManGame extends Application {
 	}
 
 	public float getPacManSpeed(int level) {
-		return getBaseSpeed() * (Float) LEVELS[level][2];
+		return baseSpeed * (Float) LEVELS[level][2];
 	}
 
 	public float getGhostSpeedNormal(int level) {
-		return getBaseSpeed() * (Float) LEVELS[level][4];
+		return baseSpeed * (Float) LEVELS[level][4];
 	}
 
 	public float getGhostSpeedInTunnel(int level) {
-		return getBaseSpeed() * (Float) LEVELS[level][5];
+		return baseSpeed * (Float) LEVELS[level][5];
 	}
 
 	public float getGhostSpeedInHouse() {
-		return getGhostSpeedNormal(1) / 2;
+		return baseSpeed / 2;
 	}
 
 	public float getPacManAttackingSpeed(int level) {
-		return getBaseSpeed() * (Float) LEVELS[level][10];
+		return baseSpeed * (Float) LEVELS[level][10];
 	}
 
 	public float getGhostSpeedWhenFrightened(int level) {
-		return getBaseSpeed() * (Float) LEVELS[level][12];
+		return baseSpeed * (Float) LEVELS[level][12];
 	}
 
 	public int getGhostFrightenedDuration(int level) {

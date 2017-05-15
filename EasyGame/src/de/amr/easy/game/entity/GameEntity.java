@@ -33,7 +33,7 @@ public abstract class GameEntity implements View {
 	protected void drawCollisionBox(Graphics2D g, Color color) {
 		Rectangle box = getCollisionBox();
 		g.setColor(color);
-		g.drawRect(box.x, box.y, box.width, box.height);
+		g.fillRect(box.x, box.y, box.width, box.height);
 	}
 
 	public Sprite currentSprite() {

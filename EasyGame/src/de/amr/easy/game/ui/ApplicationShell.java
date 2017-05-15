@@ -106,7 +106,8 @@ public class ApplicationShell implements PropertyChangeListener {
 						view.draw(g);
 					}
 				} catch (Exception x) {
-					// Log.info("Exception occured when rendering current view");
+					 x.printStackTrace(System.err);
+					 Log.info("Exception occured when rendering current view");
 				} finally {
 					if (g != null) {
 						g.dispose();

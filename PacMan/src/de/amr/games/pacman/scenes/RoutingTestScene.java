@@ -30,7 +30,7 @@ import de.amr.games.pacman.ui.PacManUI;
  * @author Armin Reichert
  *
  */
-public class TestScene extends Scene<PacManGame> {
+public class RoutingTestScene extends Scene<PacManGame> {
 
 	private PacManUI theme;
 	private Board board;
@@ -41,7 +41,7 @@ public class TestScene extends Scene<PacManGame> {
 	private boolean ghostRunning;
 	private MouseListener clickHandler;
 
-	public TestScene() {
+	public RoutingTestScene() {
 		super(Game);
 	}
 
