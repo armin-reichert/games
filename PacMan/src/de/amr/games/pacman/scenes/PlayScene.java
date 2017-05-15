@@ -31,12 +31,11 @@ import static de.amr.games.pacman.scenes.DrawUtil.drawGridLines;
 import static de.amr.games.pacman.scenes.DrawUtil.drawSprite;
 import static de.amr.games.pacman.scenes.DrawUtil.drawText;
 import static de.amr.games.pacman.scenes.DrawUtil.drawTextCentered;
-import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.SPRITE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_ENTER;
 import static java.awt.event.KeyEvent.VK_SPACE;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
@@ -46,6 +45,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Sound;
@@ -64,11 +64,11 @@ import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacManState;
 import de.amr.games.pacman.entities.ghost.Ghost;
 import de.amr.games.pacman.entities.ghost.behaviors.DirectOrProactiveChasing;
-import de.amr.games.pacman.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.GhostMessage;
+import de.amr.games.pacman.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
 import de.amr.games.pacman.fsm.StateMachine;
-import de.amr.games.pacman.ui.PacManUI;
+import de.amr.games.pacman.ui.PacManTheme;
 
 /**
  * The play scene of the Pac-Man game.
@@ -152,7 +152,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(GhostAttackState.Scattering).entry = state -> {
 				trace();
 				state.setDuration(getScatteringDurationFrames());
-				ghosts.forEach(ghost -> {
+				Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> {
 					ghost.receive(GhostMessage.StartScattering);
 				});
 			};
@@ -161,7 +161,7 @@ public class PlayScene extends Scene<PacManGame> {
 				if (state.isTerminated()) {
 					changeTo(GhostAttackState.Attacking);
 				} else {
-					ghosts.forEach(this::updateGhostSpeed);
+					Stream.of(inky,pinky,blinky,clyde).forEach(this::updateGhostSpeed);
 					Game.entities.all().forEach(GameEntity::update);
 				}
 			};
@@ -169,7 +169,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(GhostAttackState.Attacking).entry = state -> {
 				trace();
 				state.setDuration(getAttackingDurationFrames());
-				ghosts.forEach(ghost -> {
+				Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> {
 					ghost.receive(GhostMessage.StartChasing);
 				});
 				Game.assets.sound("sfx/waza.mp3").loop();
@@ -179,7 +179,7 @@ public class PlayScene extends Scene<PacManGame> {
 				if (state.isTerminated()) {
 					changeTo(GhostAttackState.Over);
 				} else {
-					ghosts.forEach(this::updateGhostSpeed);
+					Stream.of(inky,pinky,blinky,clyde).forEach(this::updateGhostSpeed);
 					Game.entities.all().forEach(GameEntity::update);
 				}
 			};
@@ -211,7 +211,6 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints = 0;
 				Game.entities.removeAll(GameEntity.class);
 				createPacManAndGhosts();
-				Game.applyTheme();
 				level = 1;
 				initLevel();
 			};
@@ -225,7 +224,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// Ready
 
 			state(PlayState.Ready).entry = state -> {
-				ghosts.forEach(ghost -> {
+				Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> {
 					ghost.setAnimated(true);
 					ghost.setSpeed(Game.getGhostSpeedInHouse());
 				});
@@ -253,9 +252,9 @@ public class PlayScene extends Scene<PacManGame> {
 			// Playing
 
 			state(PlayState.Playing).entry = state -> {
-				Game.selectedTheme().getEnergizer().setAnimated(true);
+				Game.selectedTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.setSpeed(Game.getPacManSpeed(level));
-				ghosts.forEach(ghost -> ghost.setSpeed(Game.getGhostSpeedNormal(level)));
+				Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> ghost.setSpeed(Game.getGhostSpeedNormal(level)));
 				pacMan.control.changeTo(PacManState.Eating);
 				attackControl.changeTo(GhostAttackState.Starting);
 				Game.assets.sound("sfx/eating.mp3").loop();
@@ -287,7 +286,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(PlayState.Crashing).entry = state -> {
 				Game.assets.sounds().forEach(Sound::stop);
 				Game.assets.sound("sfx/die.mp3").play();
-				Game.selectedTheme().getEnergizer().setAnimated(false);
+				Game.selectedTheme().getEnergizerSprite().setAnimated(false);
 				setBonusEnabled(false);
 				attackControl.changeTo(GhostAttackState.Over);
 				pacMan.control.changeTo(PacManState.Dying);
@@ -302,7 +301,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(PlayState.Crashing).exit = state -> {
 				pacMan.init();
-				ghosts.forEach(Ghost::init);
+				Stream.of(inky,pinky,blinky,clyde).forEach(Ghost::init);
 			};
 
 			// GameOver
@@ -331,7 +330,6 @@ public class PlayScene extends Scene<PacManGame> {
 	// Entities
 	private PacMan pacMan;
 	private Ghost blinky, inky, pinky, clyde;
-	private List<Ghost> ghosts;
 
 	// Scene-specific data
 	private Board board;
@@ -364,6 +362,8 @@ public class PlayScene extends Scene<PacManGame> {
 			Game.settings.set("drawInternals", !Game.settings.getBool("drawInternals"));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_G)) {
 			Game.settings.set("drawGrid", !Game.settings.getBool("drawGrid"));
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_R)) {
+			Game.settings.set("drawRoute", !Game.settings.getBool("drawRoute"));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_L)) {
 			lives += 1;
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_B)) {
@@ -380,18 +380,18 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		final PacManUI theme = Game.selectedTheme();
+		final PacManTheme theme = Game.selectedTheme();
 
 		// Board & content
-		drawSprite(g, 3, 0, theme.getBoard());
+		drawSprite(g, 3, 0, theme.getBoardSprite());
 		range(4, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {
-				drawSprite(g, row, col, theme.getPellet());
+				drawSprite(g, row, col, theme.getPelletSprite());
 			} else if (board.contains(row, col, Energizer)) {
-				drawSprite(g, row, col, theme.getEnergizer());
+				drawSprite(g, row, col, theme.getEnergizerSprite());
 			} else if (board.contains(row, col, Bonus)) {
 				BonusSymbol symbol = Game.getBonusSymbol(level);
-				drawSprite(g, row - .5f, col, theme.getBonus(symbol));
+				drawSprite(g, row - .5f, col, theme.getBonusSprite(symbol));
 			}
 		}));
 
@@ -401,7 +401,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 		if (Game.settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
-			ghosts.forEach(ghost -> {
+			Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> {
 				g.setColor(ghost.getColor());
 				g.fillRect(ghost.getHome().getCol() * TILE_SIZE, ghost.getHome().getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 			});
@@ -410,7 +410,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Entities
 		pacMan.draw(g);
 		if (!playControl.inState(PlayState.Crashing)) {
-			ghosts.forEach(ghost -> ghost.draw(g));
+			Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> ghost.draw(g));
 		}
 
 		// HUD
@@ -447,12 +447,12 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Lives score
-		range(0, lives).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLife()));
+		range(0, lives).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLifeSprite()));
 
 		// Bonus score
 		int col = NUM_COLS - 2;
 		for (BonusSymbol bonus : bonusCollection) {
-			drawSprite(g, NUM_ROWS - 2, col, theme.getBonus(bonus));
+			drawSprite(g, NUM_ROWS - 2, col, theme.getBonusSprite(bonus));
 			col -= 2;
 		}
 
@@ -547,11 +547,9 @@ public class PlayScene extends Scene<PacManGame> {
 		clyde.setName("Clyde");
 		clyde.setColor(Color.ORANGE);
 
-		ghosts = asList(blinky, inky, pinky, clyde);
-
 		// Define common ghost behavior:
 
-		ghosts.forEach(ghost -> {
+		Stream.of(inky,pinky,blinky,clyde).forEach(ghost -> {
 
 			ghost.control.state(Waiting).entry = state -> {
 				state.setDuration(getGhostWaitingDuration(ghost));

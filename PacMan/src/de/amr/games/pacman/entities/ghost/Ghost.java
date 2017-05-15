@@ -11,7 +11,7 @@ import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Frightened
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.entities.ghost.behaviors.GhostState.Waiting;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 import static java.util.Collections.emptyList;
 
 import java.awt.BasicStroke;
@@ -119,28 +119,28 @@ public class Ghost extends PacManGameEntity {
 	@Override
 	public Sprite currentSprite() {
 		if (insideGhostHouse()) {
-			return getTheme().getGhostNormal(getName(), moveDir);
+			return getTheme().getGhostNormalSprite(getName(), moveDir);
 		}
 		if (control.inState(Frightened)) {
-			return /* pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : */getTheme().getGhostFrightened();
+			return /* pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : */getTheme().getGhostFrightenedSprite();
 		}
 		if (control.inState(Recovering)) {
-			return getTheme().getGhostRecovering();
+			return getTheme().getGhostRecoveringSprite();
 		}
 		if (control.inState(Dead)) {
-			return getTheme().getGhostDead(moveDir);
+			return getTheme().getGhostDeadSprite(moveDir);
 		}
-		return getTheme().getGhostNormal(getName(), moveDir);
+		return getTheme().getGhostNormalSprite(getName(), moveDir);
 	}
 
 	@Override
 	public void setAnimated(boolean animated) {
 		board.topology.dirs().forEach(dir -> {
-			getTheme().getGhostNormal(getName(), dir).setAnimated(animated);
-			getTheme().getGhostDead(dir).setAnimated(animated);
+			getTheme().getGhostNormalSprite(getName(), dir).setAnimated(animated);
+			getTheme().getGhostDeadSprite(dir).setAnimated(animated);
 		});
-		getTheme().getGhostFrightened().setAnimated(animated);
-		getTheme().getGhostRecovering().setAnimated(animated);
+		getTheme().getGhostFrightenedSprite().setAnimated(animated);
+		getTheme().getGhostRecoveringSprite().setAnimated(animated);
 	}
 
 	// -- Movement

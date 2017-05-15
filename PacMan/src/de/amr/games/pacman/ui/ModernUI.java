@@ -28,7 +28,7 @@ import de.amr.games.pacman.data.BonusSymbol;
  * @author Armin Reichert
  *
  */
-public class ModernUI extends PacManUI {
+public class ModernUI extends PacManTheme {
 
 	private final Sprite board;
 	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
@@ -113,62 +113,62 @@ public class ModernUI extends PacManUI {
 	}
 
 	@Override
-	public Sprite getBoard() {
+	public Sprite getBoardSprite() {
 		return board;
 	}
 
 	@Override
-	public Sprite getPacManStanding(int dir) {
+	public Sprite getPacManStandingSprite(int dir) {
 		return pacManStanding;
 	}
 
 	@Override
-	public Sprite getPacManRunning(int dir) {
+	public Sprite getPacManRunningSprite(int dir) {
 		return pacManRunning.get(dir);
 	}
 
 	@Override
-	public Sprite getPacManDying() {
+	public Sprite getPacManDyingSprite() {
 		return null;
 	}
 
 	@Override
-	public Sprite getGhostNormal(String ghostName, int dir) {
+	public Sprite getGhostNormalSprite(String ghostName, int dir) {
 		return ghostNormal.get(ghostName).get(dir);
 	}
 
 	@Override
-	public Sprite getGhostFrightened() {
+	public Sprite getGhostFrightenedSprite() {
 		return ghostFrightened;
 	}
 
 	@Override
-	public Sprite getGhostRecovering() {
+	public Sprite getGhostRecoveringSprite() {
 		return ghostRecovering;
 	}
 
 	@Override
-	public Sprite getGhostDead(int dir) {
+	public Sprite getGhostDeadSprite(int dir) {
 		return ghostDead;
 	}
 
 	@Override
-	public Sprite getEnergizer() {
+	public Sprite getEnergizerSprite() {
 		return energizer;
 	}
 
 	@Override
-	public Sprite getPellet() {
+	public Sprite getPelletSprite() {
 		return pill;
 	}
 
 	@Override
-	public Sprite getLife() {
+	public Sprite getLifeSprite() {
 		return life;
 	}
 
 	@Override
-	public Sprite getBonus(BonusSymbol symbol) {
+	public Sprite getBonusSprite(BonusSymbol symbol) {
 		return bonusSymbols.get(symbol);
 	}
 

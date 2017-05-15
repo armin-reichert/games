@@ -13,12 +13,11 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.BonusSymbol;
 
 /**
- * Base class of the different Pac-Man UI themes.
+ * Base class for Pac-Man themes.
  * 
  * @author Armin Reichert
- *
  */
-public abstract class PacManUI {
+public abstract class PacManTheme {
 
 	/** Pixel size of a tile. */
 	public static int TILE_SIZE = 8 * 2;
@@ -77,40 +76,40 @@ public abstract class PacManUI {
 	}
 
 	/** Returns the board as a "sprite". */
-	public abstract Sprite getBoard();
+	public abstract Sprite getBoardSprite();
 
 	/** Returns the sprite for Pac-Man when standing and looking into the given direction. */
-	public abstract Sprite getPacManStanding(int dir);
+	public abstract Sprite getPacManStandingSprite(int dir);
 
 	/** Returns the sprite for Pac-Man when running into given direction. */
-	public abstract Sprite getPacManRunning(int dir);
+	public abstract Sprite getPacManRunningSprite(int dir);
 
 	/** Returns the sprite for Pac-Man when dying. */
-	public abstract Sprite getPacManDying();
+	public abstract Sprite getPacManDyingSprite();
 
 	/** Returns the sprite for the specified ghost when looking into the given direction. */
-	public abstract Sprite getGhostNormal(String ghostName, int dir);
+	public abstract Sprite getGhostNormalSprite(String ghostName, int dir);
 
 	/** Returns the sprite for a frightened ghost. */
-	public abstract Sprite getGhostFrightened();
+	public abstract Sprite getGhostFrightenedSprite();
 
 	/** Returns the sprite for a recovering ghost. */
-	public abstract Sprite getGhostRecovering();
+	public abstract Sprite getGhostRecoveringSprite();
 
 	/** Returns the sprite for a dead ghost when looking into the given direction. */
-	public abstract Sprite getGhostDead(int dir);
+	public abstract Sprite getGhostDeadSprite(int dir);
 
 	/** Returns the sprite for an energizer pellet. */
-	public abstract Sprite getEnergizer();
+	public abstract Sprite getEnergizerSprite();
 
 	/** Returns the sprite for a pellet. */
-	public abstract Sprite getPellet();
+	public abstract Sprite getPelletSprite();
 
 	/** Returns the sprite for a single life in the life counter. */
-	public abstract Sprite getLife();
+	public abstract Sprite getLifeSprite();
 
 	/** Returns the sprite for the specified bonus symbol. */
-	public abstract Sprite getBonus(BonusSymbol symbol);
+	public abstract Sprite getBonusSprite(BonusSymbol symbol);
 
 	/** Returns the font for drawing texts inside the board. */
 	public abstract Font getTextFont();

@@ -55,7 +55,6 @@ public class ScatteringTestScene extends Scene<PacManGame> {
 		ghosts[3].control.state(Scattering, new LoopAroundWalls(ghosts[3], 32, 1, E, false));
 
 		Stream.of(ghosts).forEach(ghost -> {
-			ghost.setTheme(Game.selectedTheme());
 			ghost.setSpeed(Game.getGhostSpeedNormal(1));
 			ghost.setAnimated(true);
 			ghost.control.changeTo(GhostState.Scattering);
@@ -69,7 +68,7 @@ public class ScatteringTestScene extends Scene<PacManGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, Game.selectedTheme().getBoard());
+		drawSprite(g, 3, 0, Game.selectedTheme().getBoardSprite());
 		Stream.of(ghosts).forEach(ghost -> ghost.draw(g));
 	}
 }

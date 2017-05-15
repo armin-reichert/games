@@ -10,7 +10,7 @@ import static de.amr.games.pacman.entities.PacManState.Dying;
 import static de.amr.games.pacman.entities.PacManState.Eating;
 import static de.amr.games.pacman.entities.PacManState.Frightening;
 import static de.amr.games.pacman.entities.PacManState.Waiting;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -114,9 +114,9 @@ public class PacMan extends PacManGameEntity {
 		};
 
 		control.state(Dying).entry = state -> {
-			if (getTheme().getPacManDying() != null) {
-				getTheme().getPacManDying().resetAnimation();
-				getTheme().getPacManDying().setAnimated(true);
+			if (getTheme().getPacManDyingSprite() != null) {
+				getTheme().getPacManDyingSprite().resetAnimation();
+				getTheme().getPacManDyingSprite().setAnimated(true);
 			}
 		};
 	}
@@ -143,13 +143,13 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.inState(Dying) && getTheme().getPacManDying() != null) {
-			return getTheme().getPacManDying();
+		if (control.inState(Dying) && getTheme().getPacManDyingSprite() != null) {
+			return getTheme().getPacManDyingSprite();
 		}
 		if (control.inState(Waiting)) {
-			return getTheme().getPacManStanding(moveDir);
+			return getTheme().getPacManStandingSprite(moveDir);
 		}
-		Sprite runningSprite = getTheme().getPacManRunning(moveDir);
+		Sprite runningSprite = getTheme().getPacManRunningSprite(moveDir);
 		runningSprite.setAnimated(couldMove);
 		return runningSprite;
 	}
@@ -157,7 +157,7 @@ public class PacMan extends PacManGameEntity {
 	@Override
 	public void setAnimated(boolean animated) {
 		board.topology.dirs().forEach(dir -> {
-			getTheme().getPacManRunning(dir).setAnimated(animated);
+			getTheme().getPacManRunningSprite(dir).setAnimated(animated);
 		});
 	}
 

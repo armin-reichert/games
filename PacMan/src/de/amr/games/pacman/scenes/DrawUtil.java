@@ -2,7 +2,7 @@ package de.amr.games.pacman.scenes;
 
 import static de.amr.games.pacman.data.Board.NUM_COLS;
 import static de.amr.games.pacman.data.Board.NUM_ROWS;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,7 +15,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
-import de.amr.games.pacman.ui.PacManUI;
+import de.amr.games.pacman.ui.PacManTheme;
 
 public class DrawUtil {
 
@@ -23,7 +23,7 @@ public class DrawUtil {
 
 	private static Image getGridImage(int width, int height) {
 		if (gridLines == null) {
-			gridLines = PacManUI.createTransparentImage(width, height);
+			gridLines = PacManTheme.createTransparentImage(width, height);
 			Graphics g = gridLines.getGraphics();
 			g.setColor(new Color(200, 200, 200, 100));
 			for (int col = 1, x = TILE_SIZE; col < NUM_COLS; ++col, x += TILE_SIZE) {

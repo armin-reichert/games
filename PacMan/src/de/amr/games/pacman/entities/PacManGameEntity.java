@@ -6,8 +6,8 @@ import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.PacManGame.Game;
 import static de.amr.games.pacman.data.Board.NUM_COLS;
-import static de.amr.games.pacman.ui.PacManUI.SPRITE_SIZE;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.SPRITE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 import static java.lang.Math.round;
 
 import java.awt.Color;
@@ -23,7 +23,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.data.TileContent;
-import de.amr.games.pacman.ui.PacManUI;
+import de.amr.games.pacman.ui.PacManTheme;
 
 /**
  * Base class for Pac-Man and ghosts.
@@ -36,7 +36,6 @@ public abstract class PacManGameEntity extends GameEntity {
 	protected int moveDir;
 	protected int nextMoveDir;
 	protected float speed;
-	protected PacManUI theme;
 
 	public PacManGameEntity(Board board, Tile home) {
 		this.board = Objects.requireNonNull(board);
@@ -233,12 +232,8 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	// -- user interface
 
-	public PacManUI getTheme() {
-		return theme;
-	}
-
-	public void setTheme(PacManUI theme) {
-		this.theme = theme;
+	public PacManTheme getTheme() {
+		return Game.selectedTheme();
 	}
 
 	@Override
@@ -249,7 +244,7 @@ public abstract class PacManGameEntity extends GameEntity {
 		g.translate(margin, margin);
 
 		if (Game.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
+			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.GRAY);
 		}
 	}
 }

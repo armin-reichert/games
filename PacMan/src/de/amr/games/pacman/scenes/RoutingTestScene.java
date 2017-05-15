@@ -6,7 +6,7 @@ import static de.amr.games.pacman.scenes.DrawUtil.drawGridLines;
 import static de.amr.games.pacman.scenes.DrawUtil.drawRoute;
 import static de.amr.games.pacman.scenes.DrawUtil.drawRouteMap;
 import static de.amr.games.pacman.scenes.DrawUtil.drawSprite;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -22,7 +22,7 @@ import de.amr.games.pacman.PacManGame;
 import de.amr.games.pacman.data.Board;
 import de.amr.games.pacman.data.Tile;
 import de.amr.games.pacman.entities.ghost.Ghost;
-import de.amr.games.pacman.ui.PacManUI;
+import de.amr.games.pacman.ui.PacManTheme;
 
 /**
  * A scene for interactive testing of ghost routing through the maze.
@@ -32,7 +32,7 @@ import de.amr.games.pacman.ui.PacManUI;
  */
 public class RoutingTestScene extends Scene<PacManGame> {
 
-	private PacManUI theme;
+	private PacManTheme theme;
 	private Board board;
 	private Ghost ghost;
 	private Tile startTile;
@@ -47,7 +47,6 @@ public class RoutingTestScene extends Scene<PacManGame> {
 
 	@Override
 	public void init() {
-		theme = Game.selectedTheme();
 		board = new Board(Game.assets.text("board.txt").split("\n"));
 		clickHandler = new MouseAdapter() {
 
@@ -74,7 +73,6 @@ public class RoutingTestScene extends Scene<PacManGame> {
 		Game.getShell().getCanvas().addMouseListener(clickHandler);
 		ghost = new Ghost(board, new Tile(4, 1));
 		ghost.setName("Pinky");
-		ghost.setTheme(theme);
 		ghost.setSpeed(Game.getGhostSpeedNormal(1));
 		reset();
 	};
@@ -104,7 +102,7 @@ public class RoutingTestScene extends Scene<PacManGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, theme.getBoard());
+		drawSprite(g, 3, 0, theme.getBoardSprite());
 		ghost.draw(g);
 		g.setColor(Color.GREEN);
 		g.fillRect(startTile.getCol() * TILE_SIZE, startTile.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);

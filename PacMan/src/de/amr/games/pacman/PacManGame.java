@@ -10,7 +10,7 @@ import static de.amr.games.pacman.data.BonusSymbol.Grapes;
 import static de.amr.games.pacman.data.BonusSymbol.Key;
 import static de.amr.games.pacman.data.BonusSymbol.Peach;
 import static de.amr.games.pacman.data.BonusSymbol.Strawberry;
-import static de.amr.games.pacman.ui.PacManUI.TILE_SIZE;
+import static de.amr.games.pacman.ui.PacManTheme.TILE_SIZE;
 import static java.util.Arrays.asList;
 
 import java.util.List;
@@ -18,14 +18,13 @@ import java.util.List;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.data.BonusSymbol;
-import de.amr.games.pacman.entities.PacManGameEntity;
 import de.amr.games.pacman.scenes.BlinkyTestScene;
 import de.amr.games.pacman.scenes.PlayScene;
 import de.amr.games.pacman.scenes.RoutingTestScene;
 import de.amr.games.pacman.scenes.ScatteringTestScene;
 import de.amr.games.pacman.ui.ClassicUI;
 import de.amr.games.pacman.ui.ModernUI;
-import de.amr.games.pacman.ui.PacManUI;
+import de.amr.games.pacman.ui.PacManTheme;
 
 /**
  * The Pac-Man game application.
@@ -46,7 +45,7 @@ public class PacManGame extends Application {
 		Game.settings.set("themes", asList(new ClassicUI(), new ModernUI()));
 		Game.settings.set("drawInternals", false);
 		Game.settings.set("drawGrid", false);
-		Game.settings.set("testMode", false);
+		Game.settings.set("drawRoute", false);
 		Game.gameLoop.log = false;
 		Game.gameLoop.setTargetFrameRate(60);
 		launch(Game);
@@ -96,15 +95,16 @@ public class PacManGame extends Application {
 		views.add(new RoutingTestScene());
 		views.add(new BlinkyTestScene());
 		views.add(new ScatteringTestScene());
-//		 views.show(PlayScene.class);
-		views.show(ScatteringTestScene.class);
+//		views.show(PlayScene.class);
+		// views.show(ScatteringTestScene.class);
+		views.show(BlinkyTestScene.class);
 	}
 
-	private List<PacManUI> themes() {
+	private List<PacManTheme> themes() {
 		return settings.get("themes");
 	}
 
-	public PacManUI selectedTheme() {
+	public PacManTheme selectedTheme() {
 		return themes().get(themeIndex);
 	}
 
@@ -112,12 +112,7 @@ public class PacManGame extends Application {
 		if (++themeIndex == themes().size()) {
 			themeIndex = 0;
 		}
-		applyTheme();
-	}
-
-	public void applyTheme() {
-		entities.allOf(PacManGameEntity.class).forEach(e -> e.setTheme(selectedTheme()));
-		selectedTheme().getEnergizer().setAnimated(false);
+		selectedTheme().getEnergizerSprite().setAnimated(false);
 	}
 
 	public BonusSymbol getBonusSymbol(int level) {
