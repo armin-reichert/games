@@ -9,7 +9,7 @@ import de.amr.easy.game.view.View;
 
 public abstract class Scene<App extends Application> implements View {
 
-	private final App app;
+	protected final App app;
 	private Image bgImage;
 	private Color bgColor;
 
