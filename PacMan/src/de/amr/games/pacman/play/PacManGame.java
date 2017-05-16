@@ -17,9 +17,8 @@ import de.amr.games.pacman.core.app.AbstractPacManApp;
  */
 public class PacManGame extends AbstractPacManApp {
 
-	public static final PacManGame Game = new PacManGame();
-
 	public static void main(String... args) {
+		PacManGame Game = new PacManGame();
 		Game.settings.title = "Armin's Pac-Man";
 		Game.settings.width = NUM_COLS * TILE_SIZE;
 		Game.settings.height = NUM_ROWS * TILE_SIZE;
@@ -34,7 +33,7 @@ public class PacManGame extends AbstractPacManApp {
 	@Override
 	protected void init() {
 		super.init();
-		views.add(new PlayScene());
+		views.add(new PlayScene(this));
 		views.show(PlayScene.class);
 	}
 }

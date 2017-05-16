@@ -6,7 +6,6 @@ import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.Board.NUM_COLS;
 import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
-import static de.amr.games.pacman.play.PacManGame.Game;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.BonusSymbol;
@@ -30,6 +30,7 @@ import de.amr.games.pacman.core.board.BonusSymbol;
  */
 public class ModernTheme extends PacManTheme {
 
+	private final Assets assets;
 	private final Sprite board;
 	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
 	private final Sprite pacManStanding;
@@ -50,13 +51,14 @@ public class ModernTheme extends PacManTheme {
 	}
 
 	private Image $(int row, int col) {
-		BufferedImage sheet = Game.assets.image("chompersprites.png");
+		BufferedImage sheet = assets.image("chompersprites.png");
 		return $(sheet, row, col);
 	}
 
-	public ModernTheme() {
+	public ModernTheme(Assets assets) {
 
-		BufferedImage sheet = Game.assets.image("pacman_original.png");
+		this.assets = assets;
+		BufferedImage sheet = assets.image("pacman_original.png");
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248)).scale(NUM_COLS * TILE_SIZE, (NUM_ROWS - 5) * TILE_SIZE);
 
 		int size = TILE_SIZE * 15 / 10;
@@ -99,7 +101,7 @@ public class ModernTheme extends PacManTheme {
 		ghostDead.createAnimation(AnimationMode.CYCLIC, ghostFrame);
 
 		life = new Sprite($(2, 11)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		BufferedImage sheet2 = Game.assets.image("" + "chompermazetiles.png");
+		BufferedImage sheet2 = assets.image("" + "chompermazetiles.png");
 
 		energizer = new Sprite($(sheet2, 2, 7), $(sheet2, 2, 8)).scale(TILE_SIZE, TILE_SIZE);
 		energizer.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
@@ -107,8 +109,8 @@ public class ModernTheme extends PacManTheme {
 		pill = new Sprite($(sheet2, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
 
 		// Text display
-		Game.assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
-		textFont = Game.assets.font("textFont");
+		assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		textFont = assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
 

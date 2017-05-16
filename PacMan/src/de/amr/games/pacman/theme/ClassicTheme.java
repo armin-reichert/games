@@ -8,7 +8,6 @@ import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.Board.NUM_COLS;
 import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
-import static de.amr.games.pacman.play.PacManGame.Game;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -22,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.BonusSymbol;
@@ -34,6 +34,7 @@ import de.amr.games.pacman.core.board.BonusSymbol;
  */
 public class ClassicTheme extends PacManTheme {
 
+	private final Assets assets;
 	private final Sprite board;
 	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
 	private final Sprite pacManStanding;
@@ -50,7 +51,7 @@ public class ClassicTheme extends PacManTheme {
 	private final Color hudColor;
 
 	private Image $(int row, int col) {
-		BufferedImage sheet = Game.assets.image("pacman_original.png");
+		BufferedImage sheet = assets.image("pacman_original.png");
 		return sheet.getSubimage(456 + col * 16, row * 16, 16, 16);
 	}
 
@@ -74,8 +75,9 @@ public class ClassicTheme extends PacManTheme {
 		return new Sprite(pellet);
 	}
 
-	public ClassicTheme() {
-		BufferedImage sheet = Game.assets.image("pacman_original.png");
+	public ClassicTheme(Assets assets) {
+		this.assets = assets;
+		BufferedImage sheet = assets.image("pacman_original.png");
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248));
 		board.scale(TILE_SIZE * NUM_COLS, TILE_SIZE * (NUM_ROWS - 5));
 
@@ -143,8 +145,8 @@ public class ClassicTheme extends PacManTheme {
 		life.scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		// Text display
-		Game.assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
-		textFont = Game.assets.font("textFont");
+		assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		textFont = assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
 

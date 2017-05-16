@@ -21,7 +21,7 @@ public abstract class AbstractPacManApp extends Application {
 
 	@Override
 	protected void init() {
-		themes = asList(new ClassicTheme(), new ModernTheme());
+		themes = asList(new ClassicTheme(assets), new ModernTheme(assets));
 	}
 
 	public PacManTheme selectedTheme() {
