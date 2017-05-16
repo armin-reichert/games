@@ -1,24 +1,27 @@
 package de.amr.games.pacman.test;
 
+import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.Board.NUM_COLS;
 import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
+import static de.amr.games.pacman.core.entities.PacManState.Eating;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
+import static de.amr.games.pacman.play.PlayScene.BLINKY_HOME;
+import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Random;
 
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
-import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
-import de.amr.games.pacman.play.PlayScene;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
@@ -31,6 +34,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 	private Board board;
 	private PacMan pacMan;
 	private Ghost blinky;
+	private Random rand = new Random();
 
 	public BlinkyTestScene(BlinkyTestApp app) {
 		super(app);
@@ -38,30 +42,37 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	@Override
 	public void init() {
-		app.settings.set("drawInternals", true);
-		app.settings.title = "Blinky Test";
-
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board, PlayScene.PACMAN_HOME);
+		pacMan = new PacMan(app, board, PACMAN_HOME);
 		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
 
-		blinky = new Ghost(app, board, PlayScene.BLINKY_HOME);
+		blinky = new Ghost(app, board, BLINKY_HOME);
 		blinky.control.state(Chasing).update = state -> blinky.followRoute(pacMan.currentTile());
-		blinky.stateAfterFrightened = () -> GhostState.Chasing;
+		blinky.stateAfterFrightened = () -> Chasing;
 		blinky.setColor(Color.RED);
 		blinky.setName("Blinky");
 		blinky.setAnimated(true);
 		blinky.setSpeed(pacMan.getSpeed() * .9f);
 
-		pacMan.control.changeTo(PacManState.Eating);
-		blinky.control.changeTo(GhostState.Chasing);
+		pacMan.control.changeTo(Eating);
+		blinky.control.changeTo(Chasing);
 	};
 
 	@Override
 	public void update() {
 		pacMan.update();
 		blinky.update();
+		if (pacMan.currentTile().equals(blinky.currentTile())) {
+			pacMan.placeAt(PACMAN_HOME);
+			int dir = rand.nextBoolean() ? E : W;
+			pacMan.setMoveDir(dir);
+			pacMan.setNextMoveDir(dir);
+			blinky.placeAt(BLINKY_HOME);
+			dir = rand.nextBoolean() ? W : E;
+			blinky.setMoveDir(dir); // TODO without this, ghost might get stuck
+			blinky.setNextMoveDir(dir);
+		}
 	}
 
 	@Override
