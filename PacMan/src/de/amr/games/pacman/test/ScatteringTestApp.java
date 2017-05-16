@@ -8,7 +8,7 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Pac-Man application tests.
+ * Tests scattering behavior of ghosts.
  * 
  * @author Armin Reichert
  */
@@ -23,8 +23,6 @@ public class ScatteringTestApp extends AbstractPacManApp {
 		app.settings.fullScreenOnStart = false;
 		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
 		app.settings.set("drawInternals", true);
-		app.settings.set("drawGrid", true);
-		app.settings.set("drawRoute", true);
 		app.gameLoop.log = false;
 		app.gameLoop.setTargetFrameRate(60);
 		launch(app);

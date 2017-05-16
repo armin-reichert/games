@@ -77,15 +77,15 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
 	public static final Tile BONUS_TILE = new Tile(20f, 13f);
 
-	// app parameters
+	// values
 	public static final int POINTS_FOR_PELLET = 10;
 	public static final int POINTS_FOR_ENERGIZER = 50;
-	public static final int BONUS1_REMAINING_PELLETS = 170;
-	public static final int BONUS2_REMAINING_PELLETS = 70;
-	public static final int EXTRA_LIFE_SCORE = 10000;
-	public static final int FIRST_GHOST_POINTS = 200;
-	public static final int WAIT_TICKS_ON_EATING_PELLET = 1;
-	public static final int WAIT_TICKS_ON_EATING_ENERGIZER = 3;
+	public static final int BONUS1_PELLETS_LEFT = 170;
+	public static final int BONUS2_PELLETS_LEFT = 70;
+	public static final int SCORE_FOR_EXTRALIFE = 10000;
+	public static final int POINTS_FOR_KILLING_FIRST_GHOST = 200;
+	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
+	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
 
 	// State machine for controlling the ghost attacks
 
@@ -126,7 +126,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		private void trace() {
-			Application.Log.info(format("Level %d, wave %d: enter state %s for %d seconds", level, attackWave, stateID(),
+			Log.info(format("Level %d, wave %d: enter state %s for %d seconds", level, attackWave, stateID(),
 					app.gameLoop.framesToSec(state().getDuration())));
 		}
 
@@ -485,18 +485,18 @@ public class PlayScene extends Scene<PacManGame> {
 			app.assets.sound("sfx/eat-pill.mp3").play();
 			score(POINTS_FOR_PELLET);
 			long pelletCount = board.count(Pellet);
-			if (pelletCount == BONUS1_REMAINING_PELLETS || pelletCount == BONUS2_REMAINING_PELLETS) {
+			if (pelletCount == BONUS1_PELLETS_LEFT || pelletCount == BONUS2_PELLETS_LEFT) {
 				setBonusEnabled(true);
 			}
-			pacMan.freeze(WAIT_TICKS_ON_EATING_PELLET);
+			pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
 			board.setContent(tile, None);
 		};
 
 		pacMan.onEnergizerFound = tile -> {
 			app.assets.sound("sfx/eat-pill.mp3").play();
 			score(POINTS_FOR_ENERGIZER);
-			nextGhostPoints = FIRST_GHOST_POINTS;
-			pacMan.freeze(WAIT_TICKS_ON_EATING_ENERGIZER);
+			nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
+			pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 			pacMan.startAttacking(app.gameLoop.secToFrames(levels.getGhostFrightenedDuration(level)),
 					levels.getPacManAttackingSpeed(level));
 			board.setContent(tile, None);
@@ -716,7 +716,7 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private void score(int points) {
-		if (score < EXTRA_LIFE_SCORE && EXTRA_LIFE_SCORE <= score + points) {
+		if (score < SCORE_FOR_EXTRALIFE && SCORE_FOR_EXTRALIFE <= score + points) {
 			++lives;
 			app.assets.sound("sfx/extra-life.mp3").play();
 		}
@@ -744,5 +744,4 @@ public class PlayScene extends Scene<PacManGame> {
 		FlashText.show(app, String.valueOf(object), app.selectedTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
 				Color.YELLOW, app.gameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
-
 }

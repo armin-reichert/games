@@ -18,16 +18,16 @@ import de.amr.games.pacman.core.app.AbstractPacManApp;
 public class PacManGame extends AbstractPacManApp {
 
 	public static void main(String... args) {
-		PacManGame Game = new PacManGame();
-		Game.settings.title = "Armin's Pac-Man";
-		Game.settings.width = NUM_COLS * TILE_SIZE;
-		Game.settings.height = NUM_ROWS * TILE_SIZE;
-		Game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / Game.settings.height : 1;
-		Game.settings.fullScreenOnStart = false;
-		Game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
-		Game.gameLoop.log = false;
-		Game.gameLoop.setTargetFrameRate(60);
-		launch(Game);
+		PacManGame game = new PacManGame();
+		game.settings.title = "Armin's Pac-Man";
+		game.settings.width = NUM_COLS * TILE_SIZE;
+		game.settings.height = NUM_ROWS * TILE_SIZE;
+		game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / game.settings.height : 1;
+		game.settings.fullScreenOnStart = false;
+		game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
+		game.gameLoop.log = false;
+		game.gameLoop.setTargetFrameRate(60);
+		launch(game);
 	}
 
 	@Override
