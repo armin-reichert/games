@@ -8,7 +8,7 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Pac-Man application tests.
+ * Test application for routing through the maze.
  * 
  * @author Armin Reichert
  */
@@ -24,7 +24,7 @@ public class RoutingTestApp extends AbstractPacManApp {
 		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
 		app.settings.set("drawInternals", true);
 		app.settings.set("drawGrid", true);
-		app.settings.set("drawRoute", true);
+		app.settings.set("drawRoute", false);
 		app.gameLoop.log = false;
 		app.gameLoop.setTargetFrameRate(60);
 		launch(app);

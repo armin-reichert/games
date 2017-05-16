@@ -26,7 +26,6 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
  * A scene for interactive testing of ghost routing through the maze.
  * 
  * @author Armin Reichert
- *
  */
 public class RoutingTestScene extends Scene<RoutingTestApp> {
 
@@ -37,6 +36,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 	private List<Integer> route;
 	private boolean ghostRunning;
 	private MouseListener clickHandler;
+	private Tile clickedTile;
 
 	public RoutingTestScene(RoutingTestApp app) {
 		super(app);
@@ -49,22 +49,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Tile clickedTile = new Tile(e.getY() / TILE_SIZE, e.getX() / TILE_SIZE);
-				if (ghostRunning) {
-					route = board.shortestRoute(startTile, clickedTile);
-					if (!route.isEmpty()) {
-						ghost.placeAt(startTile);
-						targetTile = clickedTile;
-						Log.info("New target tile: " + targetTile);
-					}
-				} else {
-					route = board.shortestRoute(targetTile, clickedTile);
-					if (!route.isEmpty()) {
-						startTile = targetTile;
-						targetTile = clickedTile;
-						Log.info("New target tile: " + targetTile);
-					}
-				}
+				clickedTile = new Tile(e.getY() / TILE_SIZE, e.getX() / TILE_SIZE);
 			}
 		};
 		app.getShell().getCanvas().addMouseListener(clickHandler);
@@ -74,6 +59,27 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		ghost.control.changeTo(GhostState.Chasing);
 		reset();
 	};
+
+	private void handleTileClicked() {
+		if (clickedTile != null) {
+			if (ghostRunning) {
+				route = board.shortestRoute(startTile, clickedTile);
+				if (!route.isEmpty()) {
+					ghost.placeAt(startTile);
+					targetTile = clickedTile;
+					Log.info("New target tile: " + targetTile);
+				}
+			} else {
+				route = board.shortestRoute(targetTile, clickedTile);
+				if (!route.isEmpty()) {
+					startTile = targetTile;
+					targetTile = clickedTile;
+					Log.info("New target tile: " + targetTile);
+				}
+			}
+			clickedTile = null;
+		}
+	}
 
 	private void reset() {
 		startTile = new Tile(4, 1);
@@ -86,6 +92,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	@Override
 	public void update() {
+		handleTileClicked();
 		if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
 			reset();
 		} else if (!ghost.currentTile().equals(targetTile)) {
