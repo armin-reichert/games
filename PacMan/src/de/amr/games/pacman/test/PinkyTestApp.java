@@ -6,6 +6,7 @@ import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
+import de.amr.games.pacman.theme.ModernTheme;
 
 /**
  * Tests Pinky's behavior.
@@ -29,7 +30,7 @@ public class PinkyTestApp extends AbstractPacManApp {
 	@Override
 	protected void init() {
 		super.init();
-		selectNextTheme();
+		setTheme(ModernTheme.class);
 		views.add(new PinkyTestScene(this));
 		views.show(PinkyTestScene.class);
 	}

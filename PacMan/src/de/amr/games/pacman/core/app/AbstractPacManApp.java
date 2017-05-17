@@ -23,6 +23,15 @@ public abstract class AbstractPacManApp extends Application {
 	protected void init() {
 		themes = asList(new ClassicTheme(assets), new ModernTheme(assets));
 	}
+	
+	public void setTheme(Class<? extends PacManTheme> themeClass) {
+		if (themeClass == ModernTheme.class) {
+			themeIndex = 1;
+		} else if (themeClass == ClassicTheme.class) {
+			themeIndex = 0;
+		} else throw new IllegalArgumentException("Unknown theme class: " + themeClass.getName());
+		
+	}
 
 	public PacManTheme getTheme() {
 		return themes.get(themeIndex);
