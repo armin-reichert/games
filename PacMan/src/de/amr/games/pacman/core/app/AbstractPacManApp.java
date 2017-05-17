@@ -24,7 +24,7 @@ public abstract class AbstractPacManApp extends Application {
 		themes = asList(new ClassicTheme(assets), new ModernTheme(assets));
 	}
 
-	public PacManTheme selectedTheme() {
+	public PacManTheme getTheme() {
 		return themes.get(themeIndex);
 	}
 
@@ -32,6 +32,6 @@ public abstract class AbstractPacManApp extends Application {
 		if (++themeIndex == themes.size()) {
 			themeIndex = 0;
 		}
-		selectedTheme().getEnergizerSprite().setAnimated(false);
+		getTheme().getEnergizerSprite().setAnimated(false);
 	}
 }

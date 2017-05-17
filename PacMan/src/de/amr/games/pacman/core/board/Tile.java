@@ -26,9 +26,10 @@ public class Tile extends Point2D.Float {
 		y = other.y;
 	}
 
-	public void translate(float dx, float dy) {
+	public Tile translate(float dx, float dy) {
 		x += dx;
 		y += dy;
+		return this;
 	}
 	
 	public Tile neighbor(int dir) {

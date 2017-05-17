@@ -8,6 +8,7 @@ import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.entities.PacManState.Eating;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
+import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
@@ -48,11 +49,10 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan = new PacMan(app, board, PACMAN_HOME);
 		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
 
-		pinky = new Ghost(app, board, GHOST_HOUSE_ENTRY);
+		pinky = new Ghost(app, board, "Pinky", GHOST_HOUSE_ENTRY);
 		pinky.control.state(Chasing, new TargetAtTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateAfterFrightened = () -> Chasing;
 		pinky.setColor(Color.PINK);
-		pinky.setName("Pinky");
 		pinky.setAnimated(true);
 		pinky.setSpeed(pacMan.getSpeed() * .9f);
 
@@ -78,7 +78,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		PacManTheme theme = app.selectedTheme();
+		PacManTheme theme = app.getTheme();
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		range(4, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {
@@ -87,6 +87,9 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 				drawSprite(g, row, col, theme.getEnergizerSprite());
 			}
 		}));
+		if (app.settings.getBool("drawGrid")) {
+			drawGridLines(g, getWidth(), getHeight());
+		}
 		pacMan.draw(g);
 		pinky.draw(g);
 	}

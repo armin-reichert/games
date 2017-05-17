@@ -53,8 +53,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 			}
 		};
 		app.getShell().getCanvas().addMouseListener(clickHandler);
-		ghost = new Ghost(app, board, new Tile(4, 1));
-		ghost.setName("Pinky");
+		ghost = new Ghost(app, board, "Pinky", new Tile(4, 1));
 		ghost.setSpeed(8 * TILE_SIZE / app.settings.fps);
 		ghost.control.changeTo(GhostState.Chasing);
 		reset();
@@ -98,7 +97,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;
 			ghost.setAnimated(true);
-			ghost.followRoute(targetTile);
+			ghost.followRouteTo(targetTile);
 		} else {
 			ghostRunning = false;
 			ghost.setAnimated(false);
@@ -107,7 +106,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, app.selectedTheme().getBoardSprite());
+		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
 		ghost.draw(g);
 		g.setColor(Color.GREEN);
 		g.fillRect(startTile.getCol() * TILE_SIZE, startTile.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);

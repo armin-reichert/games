@@ -8,15 +8,15 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Pinky behavior test app.
+ * The Inky behavior test app.
  * 
  * @author Armin Reichert
  */
-public class PinkyTestApp extends AbstractPacManApp {
+public class InkyTestApp extends AbstractPacManApp {
 
 	public static void main(String... args) {
-		PinkyTestApp app = new PinkyTestApp();
-		app.settings.title = "Pinky behaviour test";
+		InkyTestApp app = new InkyTestApp();
+		app.settings.title = "Inky behaviour test";
 		app.settings.width = NUM_COLS * TILE_SIZE;
 		app.settings.height = NUM_ROWS * TILE_SIZE;
 		app.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / app.settings.height : 1;
@@ -33,8 +33,7 @@ public class PinkyTestApp extends AbstractPacManApp {
 	@Override
 	protected void init() {
 		super.init();
-		selectNextTheme();
-		views.add(new PinkyTestScene(this));
-		views.show(PinkyTestScene.class);
+		views.add(new InkyTestScene(this));
+		views.show(InkyTestScene.class);
 	}
 }

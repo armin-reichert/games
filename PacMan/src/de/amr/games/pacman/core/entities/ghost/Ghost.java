@@ -3,7 +3,6 @@ package de.amr.games.pacman.core.entities.ghost;
 import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
-import static de.amr.games.pacman.core.board.TileContent.Wormhole;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frightened;
@@ -18,16 +17,14 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
-import de.amr.games.pacman.core.entities.PacManGameEntity;
+import de.amr.games.pacman.core.entities.PacManEntity;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.statemachine.State;
@@ -36,7 +33,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
 /**
  * A ghost.
  */
-public class Ghost extends PacManGameEntity {
+public class Ghost extends PacManEntity {
 
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateAfterFrightened;
@@ -48,10 +45,12 @@ public class Ghost extends PacManGameEntity {
 		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(AbstractPacManApp app, Board board, Tile home) {
+	public Ghost(AbstractPacManApp app, Board board, String name, Tile home) {
 		super(app, board, home);
+		setName(name);
 		this.color = Color.WHITE;
-		control = new StateMachine<>("Ghost", new EnumMap<>(GhostState.class));
+		control = new StateMachine<>("Ghost " + name, new EnumMap<>(GhostState.class));
+		stateAfterFrightened = () -> control.stateID();
 	}
 
 	@Override
@@ -119,63 +118,32 @@ public class Ghost extends PacManGameEntity {
 	@Override
 	public Sprite currentSprite() {
 		if (insideGhostHouse()) {
-			return getTheme().getGhostNormalSprite(getName(), moveDir);
+			return app.getTheme().getGhostNormalSprite(getName(), moveDir);
 		}
 		if (control.inState(Frightened)) {
-			return /* pacMan.isFrighteningEnding() ? getTheme().getGhostRecovering() : */getTheme()
+			return /* pacMan.isFrighteningEnding() ? app.getTheme().getGhostRecovering() : */app.getTheme()
 					.getGhostFrightenedSprite();
 		}
 		if (control.inState(Recovering)) {
-			return getTheme().getGhostRecoveringSprite();
+			return app.getTheme().getGhostRecoveringSprite();
 		}
 		if (control.inState(Dead)) {
-			return getTheme().getGhostDeadSprite(moveDir);
+			return app.getTheme().getGhostDeadSprite(moveDir);
 		}
-		return getTheme().getGhostNormalSprite(getName(), moveDir);
+		return app.getTheme().getGhostNormalSprite(getName(), moveDir);
 	}
 
 	@Override
 	public void setAnimated(boolean animated) {
 		board.topology.dirs().forEach(dir -> {
-			getTheme().getGhostNormalSprite(getName(), dir).setAnimated(animated);
-			getTheme().getGhostDeadSprite(dir).setAnimated(animated);
+			app.getTheme().getGhostNormalSprite(getName(), dir).setAnimated(animated);
+			app.getTheme().getGhostDeadSprite(dir).setAnimated(animated);
 		});
-		getTheme().getGhostFrightenedSprite().setAnimated(animated);
-		getTheme().getGhostRecoveringSprite().setAnimated(animated);
+		app.getTheme().getGhostFrightenedSprite().setAnimated(animated);
+		app.getTheme().getGhostRecoveringSprite().setAnimated(animated);
 	}
 
 	// -- Movement
-
-	public void moveBackAndForth() {
-		if (!move()) {
-			changeMoveDir(board.topology.inv(moveDir));
-		}
-	}
-
-	public void moveRandomly() {
-		move();
-		if (!isExactlyOverTile()) {
-			return;
-		}
-		List<Integer> dirsPermuted = board.topology.dirsPermuted().boxed().collect(Collectors.toList());
-		for (int dir : dirsPermuted) {
-			Tile targetTile = currentTile().neighbor(dir);
-			if (targetTile.getCol() < 0) {
-				continue; // TODO
-			}
-			if (board.contains(targetTile, Wormhole)) {
-				moveDir = board.topology.inv(moveDir);
-				return;
-			}
-			if (dir == board.topology.inv(moveDir)) {
-				return;
-			}
-			if (canEnter(targetTile)) {
-				changeMoveDir(dir);
-				break;
-			}
-		}
-	}
 
 	public boolean insideGhostHouse() {
 		return board.contains(currentTile(), GhostHouse);

@@ -4,8 +4,7 @@ import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.entities.PacMan;
-import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.PacManEntity;
 import de.amr.games.pacman.core.statemachine.State;
 
 /**
@@ -16,15 +15,15 @@ import de.amr.games.pacman.core.statemachine.State;
  */
 public class TargetAtTileAheadOfPacMan extends State {
 
-	public TargetAtTileAheadOfPacMan(Ghost hunter, PacMan pacMan, int numTilesAhead) {
-		final Board board = hunter.getBoard();
-		final int dir = pacMan.getMoveDir();
+	public TargetAtTileAheadOfPacMan(PacManEntity chaser, PacManEntity target, int numTilesAhead) {
 		update = state -> {
+			Board board = chaser.getBoard();
+			int dir = target.getMoveDir();
 			for (int numTiles = numTilesAhead; numTiles >= 0; --numTiles) {
-				Tile target = pacMan.currentTile();
-				target.translate(numTiles * board.topology.dx(dir), numTiles * board.topology.dy(dir));
-				if (board.isTileValid(target) && !board.contains(target, GhostHouse) && hunter.canEnter(target)) {
-					hunter.followRoute(target);
+				Tile targetTile = target.currentTile().translate(numTiles * board.topology.dx(dir),
+						numTiles * board.topology.dy(dir));
+				if (board.isTileValid(targetTile) && !board.contains(targetTile, GhostHouse) && chaser.canEnter(targetTile)) {
+					chaser.followRouteTo(targetTile);
 					return;
 				}
 			}

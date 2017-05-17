@@ -9,7 +9,7 @@ import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.entities.PacManState.Eating;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
-import static de.amr.games.pacman.play.PlayScene.BLINKY_HOME;
+import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.util.stream.IntStream.range;
@@ -22,21 +22,23 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
- * A scene for testing Blinky.
+ * A scene for testing Inky chasing Pac-Man together with Blinky.
  * 
  * @author Armin Reichert
  */
-public class BlinkyTestScene extends Scene<BlinkyTestApp> {
+public class InkyTestScene extends Scene<InkyTestApp> {
 
 	private Board board;
 	private PacMan pacMan;
 	private Ghost blinky;
+	private Ghost inky;
 	private Random rand = new Random();
 
-	public BlinkyTestScene(BlinkyTestApp app) {
+	public InkyTestScene(InkyTestApp app) {
 		super(app);
 	}
 
@@ -47,30 +49,48 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		pacMan = new PacMan(app, board, PACMAN_HOME);
 		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
 
-		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
-		blinky.control.state(Chasing).update = state -> blinky.followRouteTo(pacMan.currentTile());
+		blinky = new Ghost(app, board, "Blinky", GHOST_HOUSE_ENTRY);
+		// blinky.control.state(Chasing).update = state -> blinky.followRoute(pacMan.currentTile());
+		blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.stateAfterFrightened = () -> Chasing;
-		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
+		blinky.setColor(Color.RED);
 		blinky.setSpeed(pacMan.getSpeed() * .9f);
+		blinky.setMoveDir(E);
+
+		inky = new Ghost(app, board, "Inky", GHOST_HOUSE_ENTRY);
+		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
+		inky.stateAfterFrightened = () -> Chasing;
+		inky.setAnimated(true);
+		inky.setColor(new Color(64, 224, 208));
+		inky.setSpeed(pacMan.getSpeed() * .9f);
 
 		pacMan.control.changeTo(Eating);
 		blinky.control.changeTo(Chasing);
+		inky.control.changeTo(Chasing);
 	};
 
 	@Override
 	public void update() {
 		pacMan.update();
 		blinky.update();
-		if (pacMan.currentTile().equals(blinky.currentTile())) {
+		inky.update();
+		if (pacMan.currentTile().equals(inky.currentTile()) || pacMan.currentTile().equals(blinky.currentTile())) {
 			pacMan.placeAt(PACMAN_HOME);
 			int dir = rand.nextBoolean() ? E : W;
 			pacMan.setMoveDir(dir);
 			pacMan.setNextMoveDir(dir);
-			blinky.placeAt(BLINKY_HOME);
+
+			blinky.placeAt(GHOST_HOUSE_ENTRY);
 			dir = rand.nextBoolean() ? W : E;
 			blinky.setMoveDir(dir); // TODO without this, ghost might get stuck
 			blinky.setNextMoveDir(dir);
+
+			inky.placeAt(GHOST_HOUSE_ENTRY);
+			dir = rand.nextBoolean() ? W : E;
+			inky.setMoveDir(dir); // TODO without this, ghost might get stuck
+			inky.setNextMoveDir(dir);
+
 		}
 	}
 
@@ -87,5 +107,6 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		}));
 		pacMan.draw(g);
 		blinky.draw(g);
+		inky.draw(g);
 	}
 }

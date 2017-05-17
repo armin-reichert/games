@@ -51,9 +51,10 @@ import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.core.entities.PacManEntity;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.DirectOrProactiveChasing;
+import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.core.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
@@ -253,7 +254,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// Playing
 
 			state(PlayState.Playing).entry = state -> {
-				app.selectedTheme().getEnergizerSprite().setAnimated(true);
+				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.setSpeed(levels.getPacManSpeed(level));
 				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.setSpeed(levels.getGhostSpeedNormal(level)));
 				pacMan.control.changeTo(PacManState.Eating);
@@ -287,7 +288,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(PlayState.Crashing).entry = state -> {
 				app.assets.sounds().forEach(Sound::stop);
 				app.assets.sound("sfx/die.mp3").play();
-				app.selectedTheme().getEnergizerSprite().setAnimated(false);
+				app.getTheme().getEnergizerSprite().setAnimated(false);
 				setBonusEnabled(false);
 				attackControl.changeTo(GhostAttackState.Over);
 				pacMan.control.changeTo(PacManState.Dying);
@@ -383,7 +384,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		final PacManTheme theme = app.selectedTheme();
+		final PacManTheme theme = app.getTheme();
 
 		// Board & content
 		drawSprite(g, 3, 0, theme.getBoardSprite());
@@ -535,20 +536,16 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Create the ghosts:
 
-		blinky = new Ghost(app, board, BLINKY_HOME);
-		blinky.setName("Blinky");
+		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
 		blinky.setColor(Color.RED);
 
-		inky = new Ghost(app, board, INKY_HOME);
-		inky.setName("Inky");
+		inky = new Ghost(app, board, "Inky", INKY_HOME);
 		inky.setColor(new Color(64, 224, 208));
 
-		pinky = new Ghost(app, board, PINKY_HOME);
-		pinky.setName("Pinky");
+		pinky = new Ghost(app, board, "Pinky", PINKY_HOME);
 		pinky.setColor(Color.PINK);
 
-		clyde = new Ghost(app, board, CLYDE_HOME);
-		clyde.setName("Clyde");
+		clyde = new Ghost(app, board, "Clyde", CLYDE_HOME);
 		clyde.setColor(Color.ORANGE);
 
 		// Define common ghost behavior:
@@ -594,7 +591,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// "dead" state:
 
 			ghost.control.state(Dead).update = state -> {
-				ghost.followRoute(ghost.getHome());
+				ghost.followRouteTo(ghost.getHome());
 				if (ghost.isAtHome()) {
 					ghost.control.changeTo(Recovering);
 				}
@@ -628,7 +625,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// target Pac-Man's current position:
 		blinky.control.state(Chasing).update = state -> {
-			blinky.followRoute(pacMan.currentTile());
+			blinky.followRouteTo(pacMan.currentTile());
 		};
 
 		// "Inky", the blue ghost
@@ -640,13 +637,13 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// bounce when waiting:
-		inky.control.state(Waiting).update = state -> inky.moveBackAndForth();
+		inky.control.state(Waiting).update = state -> inky.bounce();
 
 		// loop around block at right lower corner of maze:
 		inky.control.state(Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
 
 		// target tile in front of Pac-Man or target Pac-Man directly:
-		inky.control.state(Chasing, new DirectOrProactiveChasing(inky, blinky, pacMan));
+		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 
 		// "Pinky", the pink ghost
 
@@ -657,7 +654,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// bounce when waiting:
-		pinky.control.state(Waiting).update = state -> pinky.moveBackAndForth();
+		pinky.control.state(Waiting).update = state -> pinky.bounce();
 
 		// loop around block at right upper corner of maze:
 		pinky.control.state(Scattering, new LoopAroundWalls(pinky, 4, 1, S, false));
@@ -674,7 +671,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// bounce when waiting:
-		clyde.control.state(Waiting).update = state -> clyde.moveBackAndForth();
+		clyde.control.state(Waiting).update = state -> clyde.bounce();
 
 		// loop around block at left lower corner of maze:
 		clyde.control.state(Scattering, new LoopAroundWalls(clyde, 32, 1, E, false));
@@ -682,9 +679,9 @@ public class PlayScene extends Scene<PacManGame> {
 		// target Pac-Man's position if more than 8 tiles away, otherwise move randomly:
 		clyde.control.state(Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
-				clyde.followRoute(GHOST_HOUSE_ENTRY);
+				clyde.followRouteTo(GHOST_HOUSE_ENTRY);
 			} else if (clyde.currentTile().distance(pacMan.currentTile()) > 8) {
-				clyde.followRoute(pacMan.currentTile());
+				clyde.followRouteTo(pacMan.currentTile());
 			} else {
 				clyde.moveRandomly();
 			}
@@ -697,11 +694,11 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.add(blinky, inky, pinky, clyde);
 	}
 
-	private int getGhostRecoveringDuration(Ghost ghost) {
+	private int getGhostRecoveringDuration(PacManEntity ghost) {
 		return app.gameLoop.secToFrames(2);
 	}
 
-	private int getGhostWaitingDuration(Ghost ghost) {
+	private int getGhostWaitingDuration(PacManEntity ghost) {
 		float seconds = 0;
 		if (ghost == blinky) {
 			seconds = 0;
@@ -741,7 +738,7 @@ public class PlayScene extends Scene<PacManGame> {
 		if (x > getWidth() - 3 * TILE_SIZE) {
 			x -= 3 * TILE_SIZE;
 		}
-		FlashText.show(app, String.valueOf(object), app.selectedTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
+		FlashText.show(app, String.valueOf(object), app.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
 				Color.YELLOW, app.gameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 }

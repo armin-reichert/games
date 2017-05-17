@@ -37,7 +37,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  * 
  * @author Armin Reichert
  */
-public class PacMan extends PacManGameEntity {
+public class PacMan extends PacManEntity {
 
 	public final StateMachine<PacManState> control;
 
@@ -114,9 +114,9 @@ public class PacMan extends PacManGameEntity {
 		};
 
 		control.state(Dying).entry = state -> {
-			if (getTheme().getPacManDyingSprite() != null) {
-				getTheme().getPacManDyingSprite().resetAnimation();
-				getTheme().getPacManDyingSprite().setAnimated(true);
+			if (app.getTheme().getPacManDyingSprite() != null) {
+				app.getTheme().getPacManDyingSprite().resetAnimation();
+				app.getTheme().getPacManDyingSprite().setAnimated(true);
 			}
 		};
 	}
@@ -143,13 +143,13 @@ public class PacMan extends PacManGameEntity {
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.inState(Dying) && getTheme().getPacManDyingSprite() != null) {
-			return getTheme().getPacManDyingSprite();
+		if (control.inState(Dying) && app.getTheme().getPacManDyingSprite() != null) {
+			return app.getTheme().getPacManDyingSprite();
 		}
 		if (control.inState(Waiting)) {
-			return getTheme().getPacManStandingSprite(moveDir);
+			return app.getTheme().getPacManStandingSprite(moveDir);
 		}
-		Sprite runningSprite = getTheme().getPacManRunningSprite(moveDir);
+		Sprite runningSprite = app.getTheme().getPacManRunningSprite(moveDir);
 		runningSprite.setAnimated(couldMove);
 		return runningSprite;
 	}
@@ -157,7 +157,7 @@ public class PacMan extends PacManGameEntity {
 	@Override
 	public void setAnimated(boolean animated) {
 		board.topology.dirs().forEach(dir -> {
-			getTheme().getPacManRunningSprite(dir).setAnimated(animated);
+			app.getTheme().getPacManRunningSprite(dir).setAnimated(animated);
 		});
 	}
 

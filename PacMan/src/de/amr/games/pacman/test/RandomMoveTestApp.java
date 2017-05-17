@@ -8,24 +8,19 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Pinky behavior test app.
+ * Tests random movement inside the maze.
  * 
  * @author Armin Reichert
  */
-public class PinkyTestApp extends AbstractPacManApp {
+public class RandomMoveTestApp extends AbstractPacManApp {
 
 	public static void main(String... args) {
-		PinkyTestApp app = new PinkyTestApp();
-		app.settings.title = "Pinky behaviour test";
+		RandomMoveTestApp app = new RandomMoveTestApp();
+		app.settings.title = "Random movement test";
 		app.settings.width = NUM_COLS * TILE_SIZE;
 		app.settings.height = NUM_ROWS * TILE_SIZE;
 		app.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / app.settings.height : 1;
-		app.settings.fullScreenOnStart = false;
 		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
-		app.settings.set("drawInternals", true);
-		app.settings.set("drawGrid", true);
-		app.settings.set("drawRoute", true);
-		app.gameLoop.log = false;
 		app.gameLoop.setTargetFrameRate(60);
 		launch(app);
 	}
@@ -33,8 +28,7 @@ public class PinkyTestApp extends AbstractPacManApp {
 	@Override
 	protected void init() {
 		super.init();
-		selectNextTheme();
-		views.add(new PinkyTestScene(this));
-		views.show(PinkyTestScene.class);
+		views.add(new RandomMoveTestScene(this));
+		views.show(RandomMoveTestScene.class);
 	}
 }

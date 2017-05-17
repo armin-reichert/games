@@ -5,8 +5,10 @@ import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.Board.NUM_COLS;
+import static de.amr.games.pacman.core.board.TileContent.Wormhole;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
+import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
 import java.awt.Color;
@@ -15,6 +17,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
@@ -23,60 +26,44 @@ import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
-import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * Base class for Pac-Man and ghosts.
  */
-public abstract class PacManGameEntity extends GameEntity {
+public abstract class PacManEntity extends GameEntity {
 
 	protected final AbstractPacManApp app;
 	protected final Board board;
+	protected final Tile home;
 	protected List<Integer> route;
-	protected Tile home;
 	protected int moveDir;
 	protected int nextMoveDir;
 	protected float speed;
 
-	public PacManGameEntity(AbstractPacManApp app, Board board, Tile home) {
-		this.app = app;
+	public PacManEntity(AbstractPacManApp app, Board board, Tile home) {
+		this.app = Objects.requireNonNull(app);
 		this.board = Objects.requireNonNull(board);
 		this.home = Objects.requireNonNull(home);
 		route = new ArrayList<>();
-		placeAt(home);
-		moveDir = nextMoveDir = Top4.E;
+		moveDir = nextMoveDir = E;
 		speed = 0;
+		placeAt(home);
 	}
 
 	public Board getBoard() {
 		return board;
 	}
 
+	public Tile getHome() {
+		return home;
+	}
+
 	public List<Integer> getRoute() {
 		return route;
 	}
 
-	public void followRoute(Tile target) {
-		route = board.shortestRoute(currentTile(), target);
-		moveAlongRoute();
-	}
-
-	public void moveAlongRoute() {
-		if (!route.isEmpty()) {
-			boolean changedDir = changeMoveDir(route.get(0));
-			if (changedDir) {
-				route.remove(0);
-			}
-		}
-		move();
-	}
-
 	public void setRoute(List<Integer> route) {
 		this.route = route;
-	}
-
-	public Tile getHome() {
-		return home;
 	}
 
 	public int getMoveDir() {
@@ -152,11 +139,21 @@ public abstract class PacManGameEntity extends GameEntity {
 
 	public boolean isExactlyOverTile(int row, int col) {
 		int tolerance = 1;
-		return Math.abs(tr.getX() - col * TILE_SIZE) <= tolerance && Math.abs(tr.getY() - row * TILE_SIZE) <= tolerance;
+		return abs(tr.getX() - col * TILE_SIZE) <= tolerance && abs(tr.getY() - row * TILE_SIZE) <= tolerance;
 	}
 
 	public boolean canMoveTowards(int dir) {
 		return canEnter(currentTile().neighbor(dir));
+	}
+
+	public boolean changeMoveDir(int dir) {
+		nextMoveDir = dir;
+		boolean turn90 = (dir == board.topology.left(moveDir) || dir == board.topology.right(moveDir));
+		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
+			return false;
+		}
+		moveDir = nextMoveDir;
+		return true;
 	}
 
 	public abstract boolean canEnter(Tile pos);
@@ -222,21 +219,53 @@ public abstract class PacManGameEntity extends GameEntity {
 		return true;
 	}
 
-	public boolean changeMoveDir(int dir) {
-		nextMoveDir = dir;
-		boolean turn90 = (dir == board.topology.left(moveDir) || dir == board.topology.right(moveDir));
-		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
-			return false;
+	public void moveRandomly() {
+		move();
+		if (!isExactlyOverTile()) {
+			return;
 		}
-		moveDir = nextMoveDir;
-		return true;
+		List<Integer> dirsPermuted = board.topology.dirsPermuted().boxed().collect(Collectors.toList());
+		for (int dir : dirsPermuted) {
+			Tile targetTile = currentTile().neighbor(dir);
+			if (!board.isTileValid(targetTile)) {
+				continue; // TODO
+			}
+			if (board.contains(targetTile, Wormhole)) {
+				moveDir = board.topology.inv(moveDir);
+				return;
+			}
+			if (dir == board.topology.inv(moveDir)) {
+				return;
+			}
+			if (canEnter(targetTile)) {
+				changeMoveDir(dir);
+				break;
+			}
+		}
+	}
+
+	public void moveAlongRoute() {
+		if (!route.isEmpty()) {
+			boolean changedDir = changeMoveDir(route.get(0));
+			if (changedDir) {
+				route.remove(0);
+			}
+		}
+		move();
+	}
+
+	public void followRouteTo(Tile target) {
+		route = board.shortestRoute(currentTile(), target);
+		moveAlongRoute();
+	}
+
+	public void bounce() {
+		if (!move()) {
+			changeMoveDir(board.topology.inv(moveDir));
+		}
 	}
 
 	// -- user interface
-
-	public PacManTheme getTheme() {
-		return app.selectedTheme();
-	}
 
 	@Override
 	public void draw(Graphics2D g) {
@@ -244,9 +273,8 @@ public abstract class PacManGameEntity extends GameEntity {
 		g.translate(-margin, -margin);
 		super.draw(g);
 		g.translate(margin, margin);
-
 		if (app.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.GRAY);
+			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
 		}
 	}
 }
