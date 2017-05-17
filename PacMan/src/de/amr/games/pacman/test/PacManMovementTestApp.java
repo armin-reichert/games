@@ -8,15 +8,15 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Blinky behavior test app.
+ * The PacMan movement test app.
  * 
  * @author Armin Reichert
  */
-public class BlinkyTestApp extends AbstractPacManApp {
+public class PacManMovementTestApp extends AbstractPacManApp {
 
 	public static void main(String... args) {
-		BlinkyTestApp app = new BlinkyTestApp();
-		app.settings.title = "Blinky behaviour test";
+		PacManMovementTestApp app = new PacManMovementTestApp();
+		app.settings.title = "Pac-Man movement test";
 		app.settings.width = NUM_COLS * TILE_SIZE;
 		app.settings.height = NUM_ROWS * TILE_SIZE;
 		app.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / app.settings.height : 1;
@@ -33,7 +33,7 @@ public class BlinkyTestApp extends AbstractPacManApp {
 	@Override
 	protected void init() {
 		super.init();
-		views.add(new BlinkyTestScene(this));
-		views.show(BlinkyTestScene.class);
+		views.add(new PacManMovementTestScene(this));
+		views.show(PacManMovementTestScene.class);
 	}
 }
