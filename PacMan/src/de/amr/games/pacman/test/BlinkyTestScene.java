@@ -25,7 +25,7 @@ import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
- * A scene for testing Blinky.
+ * Tests Blinky's behavior.
  * 
  * @author Armin Reichert
  */
@@ -49,7 +49,6 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
 		blinky.control.state(Chasing).update = state -> blinky.followRouteTo(pacMan.currentTile());
-		blinky.stateAfterFrightened = () -> Chasing;
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
 		blinky.setSpeed(pacMan.getSpeed() * .9f);

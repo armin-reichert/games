@@ -19,14 +19,10 @@ public class RoutingTestApp extends AbstractPacManApp {
 		app.settings.title = "Pac-Man routing test app";
 		app.settings.width = NUM_COLS * TILE_SIZE;
 		app.settings.height = NUM_ROWS * TILE_SIZE;
-		app.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / app.settings.height : 1;
-		app.settings.fullScreenOnStart = false;
 		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
 		app.settings.set("drawInternals", true);
 		app.settings.set("drawGrid", true);
 		app.settings.set("drawRoute", false);
-		app.gameLoop.log = false;
-		app.gameLoop.setTargetFrameRate(60);
 		launch(app);
 	}
 

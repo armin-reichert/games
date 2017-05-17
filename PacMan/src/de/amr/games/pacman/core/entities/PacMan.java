@@ -5,6 +5,11 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
+import static de.amr.games.pacman.core.board.TileContent.Bonus;
+import static de.amr.games.pacman.core.board.TileContent.Door;
+import static de.amr.games.pacman.core.board.TileContent.Energizer;
+import static de.amr.games.pacman.core.board.TileContent.Pellet;
+import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.PacManState.Dying;
 import static de.amr.games.pacman.core.entities.PacManState.Eating;
 import static de.amr.games.pacman.core.entities.PacManState.Frightening;
@@ -93,7 +98,7 @@ public class PacMan extends PacManEntity {
 		};
 
 		control.state(Eating).update = state -> {
-			exploreMaze();
+			moveAndEat();
 		};
 
 		control.state(Frightening).entry = state -> {
@@ -102,7 +107,7 @@ public class PacMan extends PacManEntity {
 		};
 
 		control.state(Frightening).update = state -> {
-			exploreMaze();
+			moveAndEat();
 			if (state.isTerminated()) {
 				control.changeTo(Eating);
 			}
@@ -178,17 +183,15 @@ public class PacMan extends PacManEntity {
 
 	@Override
 	public boolean canEnter(Tile tile) {
-		return board.isTileValid(tile) && !board.contains(tile, TileContent.Wall)
-				&& !board.contains(tile, TileContent.Door);
+		return board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
 	}
 
-	private void exploreMaze() {
-		changeMoveDir(computeMoveDir());
+	private void moveAndEat() {
+		changeMoveDir(computeNextMoveDir());
 		couldMove = move();
-		final Tile currentTile = currentTile();
-		board.getContent(currentTile, TileContent.Pellet).ifPresent(onPelletFound);
-		board.getContent(currentTile, TileContent.Energizer).ifPresent(onEnergizerFound);
-		board.getContent(currentTile, TileContent.Bonus).ifPresent(onBonusFound);
+		board.getContent(currentTile(), Pellet).ifPresent(onPelletFound);
+		board.getContent(currentTile(), Energizer).ifPresent(onEnergizerFound);
+		board.getContent(currentTile(), Bonus).ifPresent(onBonusFound);
 		/*@formatter:off*/
 		app.entities.allOf(Ghost.class)
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())
@@ -196,7 +199,7 @@ public class PacMan extends PacManEntity {
 		/*@formatter:on*/
 	}
 
-	private int computeMoveDir() {
+	private int computeNextMoveDir() {
 		if (Keyboard.down(VK_LEFT)) {
 			return W;
 		}

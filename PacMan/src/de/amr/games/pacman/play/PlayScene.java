@@ -127,7 +127,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		private void trace() {
-			Log.info(format("Level %d, wave %d: enter state %s for %d seconds", level, attackWave, stateID(),
+			Log.info(format("Level %d, wave %d: Entered state %s, duration: %d seconds", level, attackWave, stateID(),
 					app.gameLoop.framesToSec(state().getDuration())));
 		}
 
@@ -152,11 +152,11 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(GhostAttackState.Scattering).entry = state -> {
-				trace();
 				state.setDuration(getScatteringDurationFrames());
 				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
 					ghost.receive(GhostMessage.StartScattering);
 				});
+				trace();
 			};
 
 			state(GhostAttackState.Scattering).update = state -> {
@@ -169,12 +169,12 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(GhostAttackState.Attacking).entry = state -> {
-				trace();
 				state.setDuration(getAttackingDurationFrames());
 				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
 					ghost.receive(GhostMessage.StartChasing);
 				});
 				app.assets.sound("sfx/waza.mp3").loop();
+				trace();
 			};
 
 			state(GhostAttackState.Attacking).update = state -> {
@@ -444,7 +444,7 @@ public class PlayScene extends Scene<PacManGame> {
 			g.setColor(Color.RED);
 			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE for new game");
 			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "app Over!");
+			drawTextCentered(g, getWidth(), 21f, "Game Over!");
 			break;
 		default:
 			break;

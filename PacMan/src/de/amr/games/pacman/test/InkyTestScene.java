@@ -17,7 +17,9 @@ import static java.util.stream.IntStream.range;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
+import java.util.stream.Stream;
 
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -47,12 +49,22 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
+		pacMan.setSpeed(4 * TILE_SIZE / app.settings.fps);
+		pacMan.onGhostMet = ghost -> {
+			ghost.placeAt(GHOST_HOUSE_ENTRY);
+			int dir = rand.nextBoolean() ? W : E;
+			ghost.setMoveDir(dir); // TODO without this, ghost might get stuck
+			ghost.setNextMoveDir(dir);
+
+			pacMan.placeAt(PACMAN_HOME);
+			dir = rand.nextBoolean() ? E : W;
+			pacMan.setMoveDir(dir);
+			pacMan.setNextMoveDir(dir);
+		};
 
 		blinky = new Ghost(app, board, "Blinky", GHOST_HOUSE_ENTRY);
-		// blinky.control.state(Chasing).update = state -> blinky.followRoute(pacMan.currentTile());
-		blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
-		blinky.stateAfterFrightened = () -> Chasing;
+		blinky.control.state(Chasing).update = state -> blinky.followRouteTo(pacMan.currentTile());
+		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);
 		blinky.setSpeed(pacMan.getSpeed() * .9f);
@@ -60,11 +72,11 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		inky = new Ghost(app, board, "Inky", GHOST_HOUSE_ENTRY);
 		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
-		inky.stateAfterFrightened = () -> Chasing;
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
 		inky.setSpeed(pacMan.getSpeed() * .9f);
 
+		app.entities.add(pacMan, blinky, inky);
 		pacMan.control.changeTo(Eating);
 		blinky.control.changeTo(Chasing);
 		inky.control.changeTo(Chasing);
@@ -72,26 +84,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 	@Override
 	public void update() {
-		pacMan.update();
-		blinky.update();
-		inky.update();
-		if (pacMan.currentTile().equals(inky.currentTile()) || pacMan.currentTile().equals(blinky.currentTile())) {
-			pacMan.placeAt(PACMAN_HOME);
-			int dir = rand.nextBoolean() ? E : W;
-			pacMan.setMoveDir(dir);
-			pacMan.setNextMoveDir(dir);
-
-			blinky.placeAt(GHOST_HOUSE_ENTRY);
-			dir = rand.nextBoolean() ? W : E;
-			blinky.setMoveDir(dir); // TODO without this, ghost might get stuck
-			blinky.setNextMoveDir(dir);
-
-			inky.placeAt(GHOST_HOUSE_ENTRY);
-			dir = rand.nextBoolean() ? W : E;
-			inky.setMoveDir(dir); // TODO without this, ghost might get stuck
-			inky.setNextMoveDir(dir);
-
-		}
+		Stream.of(pacMan, blinky, inky).forEach(GameEntity::update);
 	}
 
 	@Override
@@ -105,8 +98,6 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 				drawSprite(g, row, col, theme.getEnergizerSprite());
 			}
 		}));
-		pacMan.draw(g);
-		blinky.draw(g);
-		inky.draw(g);
+		Stream.of(pacMan, blinky, inky).forEach(entity -> entity.draw(g));
 	}
 }

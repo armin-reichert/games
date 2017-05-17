@@ -8,7 +8,7 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Inky behavior test app.
+ * Tests Inky's behavior.
  * 
  * @author Armin Reichert
  */
@@ -19,14 +19,10 @@ public class InkyTestApp extends AbstractPacManApp {
 		app.settings.title = "Inky behaviour test";
 		app.settings.width = NUM_COLS * TILE_SIZE;
 		app.settings.height = NUM_ROWS * TILE_SIZE;
-		app.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / app.settings.height : 1;
-		app.settings.fullScreenOnStart = false;
 		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
 		app.settings.set("drawInternals", true);
 		app.settings.set("drawGrid", true);
 		app.settings.set("drawRoute", true);
-		app.gameLoop.log = false;
-		app.gameLoop.setTargetFrameRate(60);
 		launch(app);
 	}
 
