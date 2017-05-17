@@ -9,11 +9,10 @@ import static de.amr.games.pacman.core.board.TileContent.Wormhole;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.lang.Math.abs;
-import static java.lang.Math.round;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,9 +27,9 @@ import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 
 /**
- * Base class for Pac-Man and ghosts.
+ * Base class for entities which move on the board..
  */
-public abstract class PacManEntity extends GameEntity {
+public abstract class BoardMover extends GameEntity {
 
 	protected final AbstractPacManApp app;
 	protected final Board board;
@@ -40,7 +39,7 @@ public abstract class PacManEntity extends GameEntity {
 	protected int nextMoveDir;
 	protected float speed;
 
-	public PacManEntity(AbstractPacManApp app, Board board, Tile home) {
+	public BoardMover(AbstractPacManApp app, Board board, Tile home) {
 		this.app = Objects.requireNonNull(app);
 		this.board = Objects.requireNonNull(board);
 		this.home = Objects.requireNonNull(home);
@@ -101,7 +100,7 @@ public abstract class PacManEntity extends GameEntity {
 	}
 
 	public boolean isAtHome() {
-		Rectangle homeArea = new Rectangle(round(home.x * TILE_SIZE), round(home.y * TILE_SIZE), TILE_SIZE, TILE_SIZE);
+		Rectangle2D homeArea = new Rectangle2D.Float(home.x * TILE_SIZE, home.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		return getCollisionBox().intersects(homeArea);
 	}
 
@@ -125,19 +124,15 @@ public abstract class PacManEntity extends GameEntity {
 		placeAt(currentTile());
 	}
 
-	public boolean isOverTile(int row, int col) {
-		return row == getRow() && col == getCol();
-	}
-
 	public boolean isExactlyOverTile(Tile tile) {
-		return isExactlyOverTile(tile.getRow(), tile.getCol());
+		return isExactlyOver(tile.getRow(), tile.getCol());
 	}
 
-	public boolean isExactlyOverTile() {
-		return isExactlyOverTile(getRow(), getCol());
+	private boolean isExactlyOverTile() {
+		return isExactlyOver(getRow(), getCol());
 	}
 
-	public boolean isExactlyOverTile(int row, int col) {
+	private boolean isExactlyOver(int row, int col) {
 		int tolerance = 1;
 		return abs(tr.getX() - col * TILE_SIZE) <= tolerance && abs(tr.getY() - row * TILE_SIZE) <= tolerance;
 	}
@@ -232,10 +227,10 @@ public abstract class PacManEntity extends GameEntity {
 			}
 			if (board.contains(targetTile, Wormhole)) {
 				moveDir = board.topology.inv(moveDir);
-				return;
+				break;
 			}
 			if (dir == board.topology.inv(moveDir)) {
-				return;
+				break;
 			}
 			if (canEnter(targetTile)) {
 				changeMoveDir(dir);
@@ -246,8 +241,7 @@ public abstract class PacManEntity extends GameEntity {
 
 	public void moveAlongRoute() {
 		if (!route.isEmpty()) {
-			boolean changedDir = changeMoveDir(route.get(0));
-			if (changedDir) {
+			if (changeMoveDir(route.get(0))) {
 				route.remove(0);
 			}
 		}

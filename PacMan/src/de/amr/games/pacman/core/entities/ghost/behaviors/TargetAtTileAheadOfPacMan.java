@@ -4,7 +4,7 @@ import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.entities.PacManEntity;
+import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.statemachine.State;
 
 /**
@@ -15,7 +15,7 @@ import de.amr.games.pacman.core.statemachine.State;
  */
 public class TargetAtTileAheadOfPacMan extends State {
 
-	public TargetAtTileAheadOfPacMan(PacManEntity chaser, PacManEntity target, int numTilesAhead) {
+	public TargetAtTileAheadOfPacMan(BoardMover chaser, BoardMover target, int numTilesAhead) {
 		update = state -> {
 			Board board = chaser.getBoard();
 			int dir = target.getMoveDir();

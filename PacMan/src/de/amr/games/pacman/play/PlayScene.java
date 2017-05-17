@@ -39,7 +39,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.FlashText;
 import de.amr.easy.game.entity.GameEntity;
@@ -51,7 +50,6 @@ import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.PacMan;
-import de.amr.games.pacman.core.entities.PacManEntity;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
@@ -116,19 +114,19 @@ public class PlayScene extends Scene<PacManGame> {
 			int colCount = SCATTERING_DURATION_SECONDS[0].length;
 			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
 			int col = attackWave <= colCount ? attackWave - 1 : colCount - 1;
-			return app.gameLoop.secToFrames(SCATTERING_DURATION_SECONDS[row][col]);
+			return app.motor.secToFrames(SCATTERING_DURATION_SECONDS[row][col]);
 		}
 
 		private int getAttackingDurationFrames() {
 			int colCount = ATTACKING_DURATION_SECONDS[0].length;
 			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
 			int col = attackWave <= colCount ? attackWave - 1 : colCount - 1;
-			return app.gameLoop.secToFrames(ATTACKING_DURATION_SECONDS[row][col]);
+			return app.motor.secToFrames(ATTACKING_DURATION_SECONDS[row][col]);
 		}
 
 		private void trace() {
 			Log.info(format("Level %d, wave %d: Entered state %s, duration: %d seconds", level, attackWave, stateID(),
-					app.gameLoop.framesToSec(state().getDuration())));
+					app.motor.framesToSec(state().getDuration())));
 		}
 
 		private void updateGhostSpeed(Ghost ghost) {
@@ -314,7 +312,7 @@ public class PlayScene extends Scene<PacManGame> {
 					highscore.load();
 				}
 				app.entities.all().forEach(entity -> entity.setAnimated(false));
-				Application.Log.info("app over.");
+				Log.info("Game over.");
 			};
 
 			state(PlayState.GameOver).update = state -> {
@@ -382,93 +380,6 @@ public class PlayScene extends Scene<PacManGame> {
 		playControl.update();
 	}
 
-	@Override
-	public void draw(Graphics2D g) {
-		final PacManTheme theme = app.getTheme();
-
-		// Board & content
-		drawSprite(g, 3, 0, theme.getBoardSprite());
-		range(4, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
-			if (board.contains(row, col, Pellet)) {
-				drawSprite(g, row, col, theme.getPelletSprite());
-			} else if (board.contains(row, col, Energizer)) {
-				drawSprite(g, row, col, theme.getEnergizerSprite());
-			} else if (board.contains(row, col, Bonus)) {
-				BonusSymbol symbol = levels.getBonusSymbol(level);
-				drawSprite(g, row - .5f, col, theme.getBonusSprite(symbol));
-			}
-		}));
-
-		// Grid lines & internal state
-		if (app.settings.getBool("drawGrid")) {
-			drawGridLines(g, getWidth(), getHeight());
-		}
-		if (app.settings.getBool("drawInternals")) {
-			// mark home positions of ghosts
-			Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
-				g.setColor(ghost.getColor());
-				g.fillRect(ghost.getHome().getCol() * TILE_SIZE, ghost.getHome().getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-			});
-		}
-
-		// Entities
-		pacMan.draw(g);
-		if (!playControl.inState(PlayState.Crashing)) {
-			Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.draw(g));
-		}
-
-		// HUD
-		g.setColor(Color.LIGHT_GRAY);
-		g.setFont(theme.getTextFont());
-		drawText(g, 1, 1, "SCORE");
-		drawText(g, 1, 8, "HIGH");
-		drawText(g, 1, 12, "SCORE");
-		g.setColor(theme.getHUDColor());
-		drawText(g, 2, 1, format("%02d", score));
-		drawText(g, 2, 8, format("%02d   L%d", highscore.getPoints(), highscore.getLevel()));
-		drawText(g, 2, 20, "Level " + level);
-
-		// Status messages
-		switch (playControl.stateID()) {
-		case Ready:
-			g.setColor(Color.RED);
-			drawTextCentered(g, getWidth(), 9.5f, "Press ENTER to start");
-			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "Ready!");
-			break;
-		case StartingLevel:
-			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "Level " + level);
-			break;
-		case GameOver:
-			g.setColor(Color.RED);
-			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE for new game");
-			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "Game Over!");
-			break;
-		default:
-			break;
-		}
-
-		// Lives score
-		range(0, lives).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLifeSprite()));
-
-		// Bonus score
-		int col = NUM_COLS - 2;
-		for (BonusSymbol bonus : bonusCollection) {
-			drawSprite(g, NUM_ROWS - 2, col, theme.getBonusSprite(bonus));
-			col -= 2;
-		}
-
-		// Play state
-		if (app.settings.getBool("drawInternals")) {
-			drawTextCentered(g, getWidth(), 33, playControl.stateID().name());
-		}
-
-		// Flash texts
-		app.entities.allOf(FlashText.class).forEach(text -> text.draw(g));
-	}
-
 	private void initLevel() {
 		attackWave = 1;
 		bonusTimeRemaining = 0;
@@ -498,7 +409,7 @@ public class PlayScene extends Scene<PacManGame> {
 			score(POINTS_FOR_ENERGIZER);
 			nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 			pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-			pacMan.startAttacking(app.gameLoop.secToFrames(levels.getGhostFrightenedDuration(level)),
+			pacMan.startAttacking(app.motor.secToFrames(levels.getGhostFrightenedDuration(level)),
 					levels.getPacManAttackingSpeed(level));
 			board.setContent(tile, None);
 		};
@@ -694,22 +605,23 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.add(blinky, inky, pinky, clyde);
 	}
 
-	private int getGhostRecoveringDuration(PacManEntity ghost) {
-		return app.gameLoop.secToFrames(2);
+	// TODO implement this correctly
+	private int getGhostRecoveringDuration(Ghost ghost) {
+		return app.motor.secToFrames(2);
 	}
 
-	private int getGhostWaitingDuration(PacManEntity ghost) {
+	private int getGhostWaitingDuration(Ghost ghost) {
 		float seconds = 0;
 		if (ghost == blinky) {
 			seconds = 0;
 		} else if (ghost == clyde) {
 			seconds = 1.5f;
 		} else if (ghost == inky) {
-			seconds = 10;
+			seconds = 2.5f;
 		} else if (ghost == pinky) {
 			seconds = 0.5f;
 		}
-		return app.gameLoop.secToFrames(seconds);
+		return app.motor.secToFrames(seconds);
 	}
 
 	private void score(int points) {
@@ -727,7 +639,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private void setBonusEnabled(boolean enabled) {
 		if (enabled) {
 			board.setContent(BONUS_TILE, Bonus);
-			bonusTimeRemaining = app.gameLoop.secToFrames(9 + (float) Math.random());
+			bonusTimeRemaining = app.motor.secToFrames(9 + (float) Math.random());
 		} else {
 			board.setContent(BONUS_TILE, None);
 			bonusTimeRemaining = 0;
@@ -739,6 +651,93 @@ public class PlayScene extends Scene<PacManGame> {
 			x -= 3 * TILE_SIZE;
 		}
 		FlashText.show(app, String.valueOf(object), app.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
-				Color.YELLOW, app.gameLoop.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+				Color.YELLOW, app.motor.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		final PacManTheme theme = app.getTheme();
+
+		// Board & content
+		drawSprite(g, 3, 0, theme.getBoardSprite());
+		range(4, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
+			if (board.contains(row, col, Pellet)) {
+				drawSprite(g, row, col, theme.getPelletSprite());
+			} else if (board.contains(row, col, Energizer)) {
+				drawSprite(g, row, col, theme.getEnergizerSprite());
+			} else if (board.contains(row, col, Bonus)) {
+				BonusSymbol symbol = levels.getBonusSymbol(level);
+				drawSprite(g, row - .5f, col, theme.getBonusSprite(symbol));
+			}
+		}));
+
+		// Grid lines & internal state
+		if (app.settings.getBool("drawGrid")) {
+			drawGridLines(g, getWidth(), getHeight());
+		}
+		if (app.settings.getBool("drawInternals")) {
+			// mark home positions of ghosts
+			Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
+				g.setColor(ghost.getColor());
+				g.fillRect(ghost.getHome().getCol() * TILE_SIZE, ghost.getHome().getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+			});
+		}
+
+		// Entities
+		pacMan.draw(g);
+		if (!playControl.inState(PlayState.Crashing)) {
+			Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.draw(g));
+		}
+
+		// HUD
+		g.setColor(Color.LIGHT_GRAY);
+		g.setFont(theme.getTextFont());
+		drawText(g, 1, 1, "SCORE");
+		drawText(g, 1, 8, "HIGH");
+		drawText(g, 1, 12, "SCORE");
+		g.setColor(theme.getHUDColor());
+		drawText(g, 2, 1, format("%02d", score));
+		drawText(g, 2, 8, format("%02d   L%d", highscore.getPoints(), highscore.getLevel()));
+		drawText(g, 2, 20, "Level " + level);
+
+		// Status messages
+		switch (playControl.stateID()) {
+		case Ready:
+			g.setColor(Color.RED);
+			drawTextCentered(g, getWidth(), 9.5f, "Press ENTER to start");
+			g.setColor(theme.getHUDColor());
+			drawTextCentered(g, getWidth(), 21f, "Ready!");
+			break;
+		case StartingLevel:
+			g.setColor(theme.getHUDColor());
+			drawTextCentered(g, getWidth(), 21f, "Level " + level);
+			break;
+		case GameOver:
+			g.setColor(Color.RED);
+			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE for new game");
+			g.setColor(theme.getHUDColor());
+			drawTextCentered(g, getWidth(), 21f, "Game Over!");
+			break;
+		default:
+			break;
+		}
+
+		// Lives score
+		range(0, lives).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLifeSprite()));
+
+		// Bonus score
+		int col = NUM_COLS - 2;
+		for (BonusSymbol bonus : bonusCollection) {
+			drawSprite(g, NUM_ROWS - 2, col, theme.getBonusSprite(bonus));
+			col -= 2;
+		}
+
+		// Play state
+		if (app.settings.getBool("drawInternals")) {
+			drawTextCentered(g, getWidth(), 33, playControl.stateID().name());
+		}
+
+		// Flash texts
+		app.entities.allOf(FlashText.class).forEach(text -> text.draw(g));
 	}
 }

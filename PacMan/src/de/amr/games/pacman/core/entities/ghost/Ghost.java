@@ -24,7 +24,7 @@ import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
-import de.amr.games.pacman.core.entities.PacManEntity;
+import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.statemachine.State;
@@ -33,7 +33,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
 /**
  * A ghost.
  */
-public class Ghost extends PacManEntity {
+public class Ghost extends BoardMover {
 
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateAfterFrightened;

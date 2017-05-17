@@ -97,7 +97,7 @@ public class ClassicTheme extends PacManTheme {
 		for (int dir = 0; dir < dirs.size(); ++dir) {
 			Sprite sprite = new Sprite($(0, 2), $(dir, 1), $(dir, 0));
 			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-			sprite.createAnimation(BACK_AND_FORTH, 80);
+			sprite.createAnimation(BACK_AND_FORTH, 60);
 			pacManRunning.put(dirs.get(dir), sprite);
 		}
 

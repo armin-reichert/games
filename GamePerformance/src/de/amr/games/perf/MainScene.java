@@ -18,7 +18,7 @@ public class MainScene extends Scene<GamePerformanceApp> {
 	@Override
 	public void init() {
 		fpsValues = new int[getWidth()];
-		getApp().gameLoop.addFPSListener(e -> {
+		getApp().motor.addFPSListener(e -> {
 			if ("fps".equals(e.getPropertyName())) {
 				fpsValues[sampleIndex++] = (Integer) e.getNewValue();
 				if (sampleIndex * stepX >= getWidth()) {

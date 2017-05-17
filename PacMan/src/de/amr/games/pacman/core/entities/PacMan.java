@@ -42,7 +42,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  * 
  * @author Armin Reichert
  */
-public class PacMan extends PacManEntity {
+public class PacMan extends BoardMover {
 
 	public final StateMachine<PacManState> control;
 

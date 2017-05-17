@@ -46,12 +46,24 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
 		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
+		pacMan.onGhostMet = ghost -> {
+			pacMan.placeAt(PACMAN_HOME);
+			int dir = rand.nextBoolean() ? E : W;
+			pacMan.setMoveDir(dir);
+			pacMan.setNextMoveDir(dir);
+			ghost.placeAt(BLINKY_HOME);
+			dir = rand.nextBoolean() ? W : E;
+			ghost.setMoveDir(dir); // TODO without this, ghost might get stuck
+			ghost.setNextMoveDir(dir);
+		};
 
 		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
 		blinky.control.state(Chasing).update = state -> blinky.followRouteTo(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
 		blinky.setSpeed(pacMan.getSpeed() * .9f);
+		
+		app.entities.add(pacMan, blinky); // needed for onGhostMet event handler!
 
 		pacMan.control.changeTo(Eating);
 		blinky.control.changeTo(Chasing);
@@ -59,18 +71,11 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	@Override
 	public void update() {
+		if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
+			board.resetContent();
+		}
 		pacMan.update();
 		blinky.update();
-		if (pacMan.currentTile().equals(blinky.currentTile())) {
-			pacMan.placeAt(PACMAN_HOME);
-			int dir = rand.nextBoolean() ? E : W;
-			pacMan.setMoveDir(dir);
-			pacMan.setNextMoveDir(dir);
-			blinky.placeAt(BLINKY_HOME);
-			dir = rand.nextBoolean() ? W : E;
-			blinky.setMoveDir(dir); // TODO without this, ghost might get stuck
-			blinky.setNextMoveDir(dir);
-		}
 	}
 
 	@Override

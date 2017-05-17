@@ -25,8 +25,8 @@ public class PacManGame extends AbstractPacManApp {
 		game.settings.scale = args.length > 0 ? Float.valueOf(args[0]) / game.settings.height : 1;
 		game.settings.fullScreenOnStart = false;
 		game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
-		game.gameLoop.log = false;
-		game.gameLoop.setTargetFrameRate(60);
+		game.motor.log = false;
+		game.motor.setTargetFrameRate(60);
 		launch(game);
 	}
 

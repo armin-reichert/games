@@ -2,7 +2,7 @@ package de.amr.games.pacman.core.entities.ghost.behaviors;
 
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.entities.PacManEntity;
+import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.statemachine.State;
 
 /**
@@ -10,7 +10,7 @@ import de.amr.games.pacman.core.statemachine.State;
  */
 public class ChaseWithPartner extends State {
 
-	public ChaseWithPartner(PacManEntity chaser, PacManEntity partner, PacManEntity target) {
+	public ChaseWithPartner(BoardMover chaser, BoardMover partner, BoardMover target) {
 		update = state -> {
 			Board board = chaser.getBoard();
 			Tile middle = new Tile(target.getRow() + 2 * board.topology.dy(target.getMoveDir()),

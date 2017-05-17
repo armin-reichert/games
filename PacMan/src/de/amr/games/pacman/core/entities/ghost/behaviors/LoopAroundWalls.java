@@ -3,7 +3,7 @@ package de.amr.games.pacman.core.entities.ghost.behaviors;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
-import de.amr.games.pacman.core.entities.PacManEntity;
+import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.statemachine.State;
 
 /**
@@ -29,7 +29,7 @@ public class LoopAroundWalls extends State {
 	 * @param clockwise
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
-	public LoopAroundWalls(PacManEntity entity, int loopStartRow, int loopStartCol, int loopStartDir,
+	public LoopAroundWalls(BoardMover entity, int loopStartRow, int loopStartCol, int loopStartDir,
 			boolean clockwise) {
 
 		this.loopStart = new Tile(loopStartRow, loopStartCol);
@@ -72,7 +72,7 @@ public class LoopAroundWalls extends State {
 	 * @param clockwise
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
-	private void computePathAroundWalls(PacManEntity entity, int dir_forward, boolean clockwise) {
+	private void computePathAroundWalls(BoardMover entity, int dir_forward, boolean clockwise) {
 		final Board board = entity.getBoard();
 		Tile current = loopStart;
 		entity.getRoute().clear();

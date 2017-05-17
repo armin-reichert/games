@@ -7,7 +7,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.beans.PropertyChangeListener;
 
-public class GameLoop {
+public class Motor {
 
 	public boolean log = false;
 
@@ -19,7 +19,7 @@ public class GameLoop {
 	private Thread thread;
 	private volatile boolean running;
 
-	public GameLoop(Runnable updateTask, Runnable renderTask) {
+	public Motor(Runnable updateTask, Runnable renderTask) {
 		this.updateTask = new Task(updateTask, "ups", SECONDS.toNanos(1));
 		this.renderTask = new Task(renderTask, "fps", SECONDS.toNanos(1));
 		setTargetFrameRate(60);

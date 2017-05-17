@@ -15,7 +15,7 @@ import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.KeyboardHandler;
-import de.amr.easy.game.timing.GameLoop;
+import de.amr.easy.game.timing.Motor;
 import de.amr.easy.game.ui.ApplicationShell;
 import de.amr.easy.game.view.DefaultView;
 import de.amr.easy.game.view.View;
@@ -35,7 +35,7 @@ public abstract class Application {
 
 	public final ViewManager views = new ViewManager();
 
-	public final GameLoop gameLoop;
+	public final Motor motor;
 
 	private boolean paused;
 	private ApplicationShell shell;
@@ -55,8 +55,8 @@ public abstract class Application {
 	}
 
 	protected Application() {
-		gameLoop = new GameLoop(this::update, this::render);
-		gameLoop.setTargetFrameRate(settings.fps);
+		motor = new Motor(this::update, this::render);
+		motor.setTargetFrameRate(settings.fps);
 		defaultView = new DefaultView(this);
 		Log.info("Application " + getClass().getSimpleName() + " created.");
 	}
@@ -68,12 +68,12 @@ public abstract class Application {
 		init();
 		Log.info("Application Assets:\n" + assets.overview());
 		Log.info("Application initialized.");
-		gameLoop.start();
+		motor.start();
 		Log.info("Application started.");
 	}
 
 	public final void stop() {
-		gameLoop.stop();
+		motor.stop();
 		Log.info("Application stopped.");
 	}
 

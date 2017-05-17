@@ -14,6 +14,6 @@ public class GamePerformanceApp extends Application {
 	protected void init() {
 		views.add(new MainScene(this));
 		views.show(MainScene.class);
-		gameLoop.log = false;
+		motor.log = false;
 	}
 }
