@@ -34,7 +34,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
+		pacMan.setSpeed(8f * TILE_SIZE / app.settings.fps);
 		pacMan.control.changeTo(Eating);
 	};
 

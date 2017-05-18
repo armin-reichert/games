@@ -61,7 +61,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		};
 
 		blinky = new Ghost(app, board, "Blinky", GHOST_HOUSE_ENTRY);
-		blinky.control.state(Chasing).update = state -> blinky.followRouteTo(pacMan.currentTile());
+		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);

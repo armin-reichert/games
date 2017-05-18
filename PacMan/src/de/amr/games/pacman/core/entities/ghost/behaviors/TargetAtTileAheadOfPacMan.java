@@ -23,7 +23,7 @@ public class TargetAtTileAheadOfPacMan extends State {
 				Tile targetTile = target.currentTile().translate(numTiles * board.topology.dx(dir),
 						numTiles * board.topology.dy(dir));
 				if (board.isTileValid(targetTile) && !board.contains(targetTile, GhostHouse) && chaser.canEnter(targetTile)) {
-					chaser.followRouteTo(targetTile);
+					chaser.follow(targetTile);
 					return;
 				}
 			}

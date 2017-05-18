@@ -3,6 +3,7 @@ package de.amr.games.pacman.core.entities.ghost;
 import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
+import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frightened;
@@ -10,6 +11,7 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recov
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
 import java.awt.BasicStroke;
@@ -23,7 +25,6 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
@@ -42,7 +43,7 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public String toString() {
-		return String.format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
+		return format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
 	public Ghost(AbstractPacManApp app, Board board, String name, Tile home) {
@@ -150,17 +151,21 @@ public class Ghost extends BoardMover {
 	}
 
 	@Override
-	public boolean canEnter(Tile targetTile) {
-		if (board.contains(targetTile, Door)) {
-			if (control.inState(Dead))
-				return true; // eyes can pass through door
-			if (control.inState(Waiting))
-				return false; // while waiting door is closed
-
-			// when inside ghost house or already in door, ghost can walk through
-			return insideGhostHouse() || board.contains(currentTile(), Door);
-		} else if (board.contains(targetTile, TileContent.Wall)) {
+	public boolean canEnter(Tile tile) {
+		if (board.contains(tile, Wall)) {
 			return false;
+		}
+		if (board.contains(tile, Door)) {
+			if (control.inState(Dead)) {
+				// dead ghost (eyes) can pass through door
+				return true;
+			} else if (control.inState(Waiting)) {
+				// while waiting inside ghost house, ghost cannot pass through door
+				return false;
+			} else {
+				// when inside ghost house or already in door, ghost can walk through
+				return insideGhostHouse() || board.contains(currentTile(), Door);
+			}
 		}
 		return true;
 	}
@@ -197,8 +202,8 @@ public class Ghost extends BoardMover {
 		}
 		g.setColor(color);
 		g.setStroke(new BasicStroke(1f));
-		Tile tile = currentTile();
 		int offset = TILE_SIZE / 2;
+		Tile tile = currentTile();
 		for (int dir : route) {
 			Tile nextTile = tile.neighbor(dir);
 			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,

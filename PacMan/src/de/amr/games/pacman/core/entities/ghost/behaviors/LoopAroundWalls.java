@@ -51,7 +51,7 @@ public class LoopAroundWalls extends State {
 			if (loopStarted) {
 				entity.moveAlongRoute();
 			} else {
-				entity.followRouteTo(loopStart);
+				entity.follow(loopStart);
 			}
 		};
 

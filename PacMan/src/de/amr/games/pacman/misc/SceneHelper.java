@@ -7,13 +7,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
-import de.amr.games.pacman.theme.PacManTheme;
 
 public class SceneHelper {
 
@@ -21,7 +21,7 @@ public class SceneHelper {
 
 	private static Image getGridImage(int width, int height) {
 		if (gridLines == null) {
-			gridLines = PacManTheme.createTransparentImage(width, height);
+			gridLines = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 			Graphics g = gridLines.getGraphics();
 			g.setColor(new Color(200, 200, 200, 100));
 			int numCols = width / TILE_SIZE, numRows = height / TILE_SIZE;

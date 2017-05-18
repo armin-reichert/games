@@ -246,9 +246,9 @@ public abstract class BoardMover extends GameEntity {
 		move();
 	}
 
-	public void followRouteTo(Tile target) {
-		route = board.shortestRoute(currentTile(), target);
+	public void follow(Tile target) {
 		moveAlongRoute();
+		route = board.shortestRoute(currentTile(), target);
 	}
 
 	public void bounce() {

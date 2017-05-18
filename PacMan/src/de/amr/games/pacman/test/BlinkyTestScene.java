@@ -6,6 +6,7 @@ import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.entities.PacManState.Eating;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
+import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.BLINKY_HOME;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
@@ -56,7 +57,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		};
 
 		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
-		blinky.control.state(Chasing).update = state -> blinky.followRouteTo(pacMan.currentTile());
+		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
 		blinky.setSpeed(pacMan.getSpeed() * .9f);
@@ -87,6 +88,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 				drawSprite(g, row, col, theme.getEnergizerSprite());
 			}
 		}));
+		drawGridLines(g, getWidth(), getHeight());
 		pacMan.draw(g);
 		blinky.draw(g);
 	}

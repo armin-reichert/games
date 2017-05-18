@@ -500,7 +500,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// "dead" state:
 
 			ghost.control.state(Dead).update = state -> {
-				ghost.followRouteTo(ghost.getHome());
+				ghost.follow(ghost.getHome());
 				if (ghost.isAtHome()) {
 					ghost.control.changeTo(Recovering);
 				}
@@ -534,7 +534,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// target Pac-Man's current position:
 		blinky.control.state(Chasing).update = state -> {
-			blinky.followRouteTo(pacMan.currentTile());
+			blinky.follow(pacMan.currentTile());
 		};
 
 		// "Inky", the blue ghost
@@ -588,9 +588,9 @@ public class PlayScene extends Scene<PacManGame> {
 		// target Pac-Man's position if more than 8 tiles away, otherwise move randomly:
 		clyde.control.state(Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
-				clyde.followRouteTo(GHOST_HOUSE_ENTRY);
+				clyde.follow(GHOST_HOUSE_ENTRY);
 			} else if (clyde.currentTile().distance(pacMan.currentTile()) > 8) {
-				clyde.followRouteTo(pacMan.currentTile());
+				clyde.follow(pacMan.currentTile());
 			} else {
 				clyde.moveRandomly();
 			}

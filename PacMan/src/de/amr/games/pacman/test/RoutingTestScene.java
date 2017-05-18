@@ -97,7 +97,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;
 			ghost.setAnimated(true);
-			ghost.followRouteTo(targetTile);
+			ghost.follow(targetTile);
 		} else {
 			ghostRunning = false;
 			ghost.setAnimated(false);
