@@ -1,7 +1,5 @@
 package de.amr.games.pacman.misc;
 
-import static de.amr.games.pacman.core.board.Board.NUM_COLS;
-import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
@@ -26,10 +24,11 @@ public class SceneHelper {
 			gridLines = PacManTheme.createTransparentImage(width, height);
 			Graphics g = gridLines.getGraphics();
 			g.setColor(new Color(200, 200, 200, 100));
-			for (int col = 1, x = TILE_SIZE; col < NUM_COLS; ++col, x += TILE_SIZE) {
+			int numCols = width / TILE_SIZE, numRows = height / TILE_SIZE;
+			for (int col = 1, x = TILE_SIZE; col < numCols; ++col, x += TILE_SIZE) {
 				g.drawLine(x, 0, x, height);
 			}
-			for (int row = 1, y = TILE_SIZE; row < NUM_ROWS; ++row, y += TILE_SIZE) {
+			for (int row = 1, y = TILE_SIZE; row < numRows; ++row, y += TILE_SIZE) {
 				g.drawLine(0, y, width, y);
 			}
 		}

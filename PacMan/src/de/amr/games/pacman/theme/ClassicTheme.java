@@ -6,8 +6,6 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
-import static de.amr.games.pacman.core.board.Board.NUM_COLS;
-import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -33,7 +31,7 @@ import de.amr.games.pacman.core.board.BonusSymbol;
  *
  */
 public class ClassicTheme extends PacManTheme {
-
+	
 	private final Assets assets;
 	private final Sprite board;
 	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
@@ -79,7 +77,7 @@ public class ClassicTheme extends PacManTheme {
 		this.assets = assets;
 		BufferedImage sheet = assets.image("pacman_original.png");
 		board = new Sprite(sheet.getSubimage(228, 0, 224, 248));
-		board.scale(TILE_SIZE * NUM_COLS, TILE_SIZE * (NUM_ROWS - 5));
+		board.scale(TILE_SIZE * 28, TILE_SIZE * (36 - 5));
 
 		for (BonusSymbol symbol : BonusSymbol.values()) {
 			Sprite sprite = new Sprite(sheet.getSubimage(488 + symbol.ordinal() * 16, 48, 16, 16));

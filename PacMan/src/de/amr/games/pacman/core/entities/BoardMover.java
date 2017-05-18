@@ -4,7 +4,6 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
-import static de.amr.games.pacman.core.board.Board.NUM_COLS;
 import static de.amr.games.pacman.core.board.TileContent.Wormhole;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
@@ -24,7 +23,6 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.board.TileContent;
 
 /**
  * Base class for entities which move on the board..
@@ -151,7 +149,7 @@ public abstract class BoardMover extends GameEntity {
 		return true;
 	}
 
-	public abstract boolean canEnter(Tile pos);
+	public abstract boolean canEnter(Tile tile);
 
 	/**
 	 * Moves entity in current move direction.
@@ -170,12 +168,12 @@ public abstract class BoardMover extends GameEntity {
 			return false;
 		}
 		// check if "worm hole"-tile has been entered
-		if (board.contains(newTile, TileContent.Wormhole)) {
+		if (board.contains(newTile, Wormhole)) {
 			int col = newTile.getCol();
-			if (col == 0 && moveDir == Top4.W) {
+			if (col == 0 && moveDir == W) {
 				// fall off left edge -> appear at right edge
-				tr.setX((NUM_COLS - 1) * TILE_SIZE - getWidth());
-			} else if (col == NUM_COLS - 1 && moveDir == Top4.E) {
+				tr.setX((board.numCols - 1) * TILE_SIZE - getWidth());
+			} else if (col == board.numCols - 1 && moveDir == Top4.E) {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}

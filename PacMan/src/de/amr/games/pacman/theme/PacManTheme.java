@@ -1,12 +1,12 @@
 package de.amr.games.pacman.theme;
 
 import static de.amr.easy.game.sprite.AnimationMode.CYCLIC;
-import static de.amr.games.pacman.core.board.Board.NUM_COLS;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.sprite.Sprite;
@@ -53,7 +53,7 @@ public abstract class PacManTheme {
 	protected Sprite createTextSprite(String text, float fontSize, Color color, int blinkTime) {
 
 		// create temporary image for computing the text width
-		Image img = createOpaqueImage(TILE_SIZE * NUM_COLS, (int) fontSize);
+		Image img = createOpaqueImage(Toolkit.getDefaultToolkit().getScreenSize().width, (int) fontSize);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.setColor(color);
 		g.setFont(getTextFont().deriveFont(fontSize));

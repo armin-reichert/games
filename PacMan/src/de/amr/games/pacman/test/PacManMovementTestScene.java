@@ -1,7 +1,5 @@
 package de.amr.games.pacman.test;
 
-import static de.amr.games.pacman.core.board.Board.NUM_COLS;
-import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.entities.PacManState.Eating;
@@ -52,7 +50,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	public void draw(Graphics2D g) {
 		PacManTheme theme = app.getTheme();
 		drawSprite(g, 3, 0, theme.getBoardSprite());
-		range(4, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
+		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {
 				drawSprite(g, row, col, theme.getPelletSprite());
 			} else if (board.contains(row, col, Energizer)) {

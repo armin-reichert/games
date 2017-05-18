@@ -82,7 +82,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	private void reset() {
 		startTile = new Tile(4, 1);
-		targetTile = new Tile(Board.NUM_ROWS - 4, Board.NUM_COLS - 2);
+		targetTile = new Tile(board.numRows - 4, board.numCols - 2);
 		route = board.shortestRoute(startTile, targetTile);
 		ghost.placeAt(startTile);
 		ghostRunning = false;

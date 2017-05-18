@@ -21,14 +21,11 @@ import de.amr.easy.grid.impl.Top4;
  */
 public class Board {
 
-	public static final int NUM_ROWS = 36;
-	public static final int NUM_COLS = 28;
-
+	public final int numRows;
+	public final int numCols;
 	public final Topology topology;
-
-	private final String[] boardRows;
-
 	public final Grid<Character, Integer> graph;
+	private final String[] boardRows;
 
 	/**
 	 * Initializes the board from the specified textual data.
@@ -38,9 +35,11 @@ public class Board {
 	 */
 	public Board(String[] boardRows) {
 		this.boardRows = boardRows;
+		numRows = boardRows.length;
+		numCols = boardRows[0].length();
 		// create orthogonal grid graph from board data
 		topology = new Top4();
-		graph = new Grid<>(NUM_COLS, NUM_ROWS, None.toChar(), false);
+		graph = new Grid<>(numCols, numRows, None.toChar(), false);
 		graph.setTopology(topology);
 		resetContent();
 		/*@formatter:off*/
@@ -78,7 +77,7 @@ public class Board {
 	 */
 	public boolean isTileValid(Tile tile) {
 		int row = tile.getRow(), col = tile.getCol();
-		return row >= 0 && row < NUM_ROWS && col >= 0 && col < NUM_COLS;
+		return row >= 0 && row < numRows && col >= 0 && col < numCols;
 	}
 
 	/**

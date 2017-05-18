@@ -5,8 +5,6 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
-import static de.amr.games.pacman.core.board.Board.NUM_COLS;
-import static de.amr.games.pacman.core.board.Board.NUM_ROWS;
 import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
@@ -660,7 +658,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Board & content
 		drawSprite(g, 3, 0, theme.getBoardSprite());
-		range(4, NUM_ROWS - 3).forEach(row -> range(0, NUM_COLS).forEach(col -> {
+		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {
 				drawSprite(g, row, col, theme.getPelletSprite());
 			} else if (board.contains(row, col, Energizer)) {
@@ -723,12 +721,12 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Lives score
-		range(0, lives).forEach(i -> drawSprite(g, NUM_ROWS - 2, 2 * (i + 1), theme.getLifeSprite()));
+		range(0, lives).forEach(i -> drawSprite(g, board.numRows - 2, 2 * (i + 1), theme.getLifeSprite()));
 
 		// Bonus score
-		int col = NUM_COLS - 2;
+		int col = board.numCols - 2;
 		for (BonusSymbol bonus : bonusCollection) {
-			drawSprite(g, NUM_ROWS - 2, col, theme.getBonusSprite(bonus));
+			drawSprite(g, board.numRows - 2, col, theme.getBonusSprite(bonus));
 			col -= 2;
 		}
 
