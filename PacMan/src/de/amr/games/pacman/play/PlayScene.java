@@ -11,6 +11,7 @@ import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.board.TileContent.Tunnel;
+import static de.amr.games.pacman.core.entities.PacManState.Frightening;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frightened;
@@ -375,8 +376,15 @@ public class PlayScene extends Scene<PacManGame> {
 	private void createPacManAndGhosts() {
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		
-		pacMan.speed = () -> levels.getPacManSpeed(level);
+
+		pacMan.speed = () -> {
+			switch (pacMan.control.stateID()) {
+			case Frightening:
+				return levels.getPacManFrighteningSpeed(level);
+			default:
+				return levels.getPacManSpeed(level);
+			}
+		};
 
 		pacMan.onPelletFound = tile -> {
 			app.assets.sound("sfx/eat-pill.mp3").play();
@@ -394,8 +402,8 @@ public class PlayScene extends Scene<PacManGame> {
 			score(POINTS_FOR_ENERGIZER);
 			nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 			pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-			pacMan.startAttacking(app.motor.secToFrames(levels.getGhostFrightenedDuration(level)),
-					levels.getPacManAttackingSpeed(level));
+			pacMan.control.state(Frightening).setDuration(app.motor.secToFrames(levels.getGhostFrightenedDuration(level)));
+			pacMan.control.changeTo(Frightening);
 			board.setContent(tile, None);
 		};
 
@@ -405,8 +413,8 @@ public class PlayScene extends Scene<PacManGame> {
 			score(points);
 			bonusCollection.add(levels.getBonusSymbol(level));
 			showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
-			board.setContent(tile, None);
 			setBonusEnabled(false);
+			board.setContent(tile, None);
 		};
 
 		pacMan.onGhostMet = ghost -> {
@@ -449,7 +457,7 @@ public class PlayScene extends Scene<PacManGame> {
 		Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
 
 			ghost.speed = () -> getGhostSpeed(ghost);
-			
+
 			ghost.control.state(Waiting).entry = state -> {
 				state.setDuration(getGhostWaitingDuration(ghost));
 			};
@@ -583,7 +591,7 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.add(pacMan);
 		app.entities.add(blinky, inky, pinky, clyde);
 	}
-	
+
 	private float getGhostSpeed(Ghost ghost) {
 		TileContent content = board.getContent(ghost.currentTile());
 		if (content == Tunnel) {

@@ -74,7 +74,7 @@ public class PacManGameLevels {
 		return baseSpeed / 2;
 	}
 
-	public float getPacManAttackingSpeed(int level) {
+	public float getPacManFrighteningSpeed(int level) {
 		return baseSpeed * (Float) LEVEL_DATA[level][10];
 	}
 

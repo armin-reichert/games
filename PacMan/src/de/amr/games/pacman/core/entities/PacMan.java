@@ -170,12 +170,6 @@ public class PacMan extends BoardMover {
 		this.freezeTimer = frames;
 	}
 
-	public void startAttacking(int frames, float speed) {
-		this.speed = () -> speed;
-		control.state(Frightening).setDuration(frames);
-		control.changeTo(Frightening);
-	}
-
 	public boolean isFrighteningEnding() {
 		return control.inState(Frightening)
 				&& control.state(Frightening).getTimer() < control.state(Frightening).getDuration() / 4;
