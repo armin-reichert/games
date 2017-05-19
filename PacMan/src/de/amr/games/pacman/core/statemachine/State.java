@@ -1,6 +1,5 @@
 package de.amr.games.pacman.core.statemachine;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
@@ -19,25 +18,21 @@ public class State {
 	/** The action performed when exiting this state. */
 	public Consumer<State> exit;
 
-	/** The condition denoting when this state is terminated. */
-	public BooleanSupplier isTerminated;
-
 	/** The duration until this state terminates. */
 	private int duration;
 
-	private int timer;
+	/** Ticks remaining until time-out */
+	private int remaining;
 
 	public State() {
-		isTerminated = () -> false;
 		duration = FOREVER;
-		timer = FOREVER;
+		remaining = FOREVER;
 	}
 
 	void doEntry() {
 		if (entry != null) {
 			entry.accept(this);
 		}
-		resetTimer();
 	}
 
 	void doExit() {
@@ -47,31 +42,27 @@ public class State {
 	}
 
 	void doUpdate() {
+		if (remaining > 0) {
+			--remaining;
+		}
 		if (update != null) {
 			update.accept(this);
-		}
-		if (timer > 0) {
-			--timer;
 		}
 	}
 
 	public void terminate() {
-		timer = 0;
+		remaining = 0;
 	}
 
 	public boolean isTerminated() {
-		return isTerminated.getAsBoolean() || timer == 0;
+		return remaining == 0;
 	}
 
 	public void setDuration(int frames) {
 		if (frames < 0 && frames != FOREVER) {
 			throw new IllegalStateException();
 		}
-		timer = duration = frames;
-	}
-
-	public void resetTimer() {
-		timer = duration;
+		remaining = duration = frames;
 	}
 
 	public int getDuration() {
@@ -79,6 +70,6 @@ public class State {
 	}
 
 	public int getTimer() {
-		return timer;
+		return remaining;
 	}
 }
