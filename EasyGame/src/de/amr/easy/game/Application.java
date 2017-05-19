@@ -56,7 +56,7 @@ public abstract class Application {
 
 	protected Application() {
 		motor = new Motor(this::update, this::render);
-		motor.setTargetFrameRate(settings.fps);
+		motor.setFrequency(60);
 		defaultView = new DefaultView(this);
 		Log.info("Application " + getClass().getSimpleName() + " created.");
 	}

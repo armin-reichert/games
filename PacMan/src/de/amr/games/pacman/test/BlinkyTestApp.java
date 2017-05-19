@@ -19,7 +19,7 @@ public class BlinkyTestApp extends AbstractPacManApp {
 		app.settings.set("drawInternals", true);
 		app.settings.set("drawGrid", true);
 		app.settings.set("drawRoute", true);
-		app.motor.setTargetFrameRate(60);
+		app.motor.setFrequency(60);
 		launch(app);
 	}
 

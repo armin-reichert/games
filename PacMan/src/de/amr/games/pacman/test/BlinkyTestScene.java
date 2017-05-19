@@ -44,7 +44,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.settings.fps);
+		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onGhostMet = ghost -> {
 			pacMan.placeAt(PACMAN_HOME);
 			int dir = rand.nextBoolean() ? E : W;

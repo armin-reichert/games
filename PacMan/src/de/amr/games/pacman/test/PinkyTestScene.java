@@ -45,7 +45,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.settings.fps);
+		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 
 		pinky = new Ghost(app, board, "Pinky", GHOST_HOUSE_ENTRY);
 		pinky.control.state(Chasing, new TargetAtTileAheadOfPacMan(pinky, pacMan, 4));

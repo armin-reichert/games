@@ -9,7 +9,6 @@ import de.amr.easy.game.ui.FullScreen;
 public class ApplicationSettings {
 
 	public String title = "My Application!";
-	public int fps = 60;
 	public int width = 600;
 	public int height = 400;
 	public float scale = 1f;

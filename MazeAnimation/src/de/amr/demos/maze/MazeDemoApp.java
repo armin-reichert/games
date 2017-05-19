@@ -20,8 +20,8 @@ public class MazeDemoApp extends Application {
 		// App.Settings.fullscreen = FullScreen.Mode(1280, 800, 32);
 		App.settings.width = 640;
 		App.settings.height = 640;
-		App.settings.fps = 30;
 		App.settings.set("cellSize", 4);
+		App.motor.setFrequency(30);
 		launch(App);
 	}
 

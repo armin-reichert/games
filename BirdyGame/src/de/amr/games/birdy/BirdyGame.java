@@ -18,7 +18,6 @@ public class BirdyGame extends Application {
 	public static final BirdyGame Game = new BirdyGame();
 
 	public static void main(String[] args) {
-		Game.settings.fps = 60;
 		Game.settings.title = "Zwick, das listige Vögelchen";
 		Game.settings.width = 640;
 		Game.settings.height = 480;

@@ -333,7 +333,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void init() {
-		levels = new PacManGameLevels(8 * TILE_SIZE / app.settings.fps);
+		levels = new PacManGameLevels(8 * TILE_SIZE / app.motor.getFrequency());
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusCollection = new ArrayList<>();

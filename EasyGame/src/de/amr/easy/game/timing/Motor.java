@@ -13,7 +13,7 @@ public class Motor {
 
 	private final Task renderTask;
 	private final Task updateTask;
-	private int targetFPS;
+	private int frequency;
 	private long updateCount;
 	private long period;
 	private Thread thread;
@@ -22,16 +22,16 @@ public class Motor {
 	public Motor(Runnable updateTask, Runnable renderTask) {
 		this.updateTask = new Task(updateTask, "ups", SECONDS.toNanos(1));
 		this.renderTask = new Task(renderTask, "fps", SECONDS.toNanos(1));
-		setTargetFrameRate(60);
+		setFrequency(60);
 	}
 
-	public void setTargetFrameRate(int fps) {
-		this.targetFPS = fps;
+	public void setFrequency(int fps) {
+		this.frequency = fps;
 		period = fps > 0 ? SECONDS.toNanos(1) / fps : Integer.MAX_VALUE;
 	}
 
-	public int getTargetFrameRate() {
-		return targetFPS;
+	public int getFrequency() {
+		return frequency;
 	}
 
 	public long getUpdateCount() {
@@ -39,18 +39,18 @@ public class Motor {
 	}
 
 	public int secToFrames(float seconds) {
-		return Math.round(getTargetFrameRate() * seconds);
+		return Math.round(getFrequency() * seconds);
 	}
 
 	public int framesToSec(int frames) {
-		return frames / getTargetFrameRate();
+		return frames / getFrequency();
 	}
 
-	public synchronized void addFPSListener(PropertyChangeListener observer) {
+	public synchronized void addRenderListener(PropertyChangeListener observer) {
 		renderTask.addListener(observer);
 	}
 
-	public synchronized void addUPSListener(PropertyChangeListener observer) {
+	public synchronized void addUpdateListener(PropertyChangeListener observer) {
 		updateTask.addListener(observer);
 	}
 

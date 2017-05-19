@@ -47,7 +47,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.settings.fps);
+		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onGhostMet = ghost -> {
 			ghost.placeAt(GHOST_HOUSE_ENTRY);
 			int dir = rand.nextBoolean() ? W : E;
