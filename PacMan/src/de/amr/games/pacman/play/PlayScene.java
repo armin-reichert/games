@@ -185,6 +185,11 @@ public class PlayScene extends Scene<PacManGame> {
 			state(GhostAttackState.Over).entry = state -> {
 				app.assets.sound("sfx/waza.mp3").stop();
 			};
+			
+			state(GhostAttackState.Over).update = state -> {
+				++attackWave;
+				changeTo(GhostAttackState.Starting);
+			};
 		}
 	}
 
@@ -259,18 +264,16 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(PlayState.Playing).update = state -> {
+				if (isBonusEnabled() && --bonusTimeRemaining <= 0) {
+					setBonusEnabled(false);
+				}
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					attackControl.changeTo(GhostAttackState.Over);
 					++level;
 					initLevel();
 					changeTo(PlayState.StartingLevel);
-				} else if (attackControl.inState(GhostAttackState.Over)) {
-					attackControl.changeTo(GhostAttackState.Starting, newState -> ++attackWave);
 				} else {
 					attackControl.update();
-				}
-				if (isBonusEnabled() && --bonusTimeRemaining <= 0) {
-					setBonusEnabled(false);
 				}
 			};
 
