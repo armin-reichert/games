@@ -51,7 +51,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 		ghosts[3].control.state(Scattering, new LoopAroundWalls(ghosts[3], 32, 1, E, false));
 
 		Stream.of(ghosts).forEach(ghost -> {
-			ghost.setSpeed(8 * TILE_SIZE / app.settings.fps);
+			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.settings.fps);
 			ghost.setAnimated(true);
 			ghost.control.changeTo(GhostState.Scattering);
 		});

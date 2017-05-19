@@ -62,7 +62,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)], getRandomTile());
 		ghost.control.state(Scattering).update = state -> ghost.moveRandomly();
 		ghost.setAnimated(true);
-		ghost.setSpeed(8 * TILE_SIZE / app.settings.fps * (0.5f + rand.nextFloat()));
+		ghost.speed = () -> Math.round(8f * TILE_SIZE / app.settings.fps) * (0.5f + rand.nextFloat());
 		ghost.control.changeTo(Scattering);
 		return ghost;
 	}

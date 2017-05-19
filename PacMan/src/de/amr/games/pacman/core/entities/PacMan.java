@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.EnumMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -51,7 +52,7 @@ public class PacMan extends BoardMover {
 	public Consumer<Tile> onBonusFound;
 	public Consumer<Ghost> onGhostMet;
 
-	private float speedBeforeBecomingFrightening;
+	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
 	private boolean couldMove;
 
@@ -87,7 +88,6 @@ public class PacMan extends BoardMover {
 		control.state(Waiting).entry = state -> {
 			couldMove = false;
 			freezeTimer = 0;
-			speed = 0;
 			moveDir = W;
 			nextMoveDir = W;
 			placeAt(home);
@@ -102,7 +102,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Frightening).entry = state -> {
-			speedBeforeBecomingFrightening = this.speed;
+			speedBeforeFrightening = speed;
 			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.receive(GhostMessage.StartBeingFrightened));
 		};
 
@@ -114,7 +114,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Frightening).exit = state -> {
-			speed = speedBeforeBecomingFrightening;
+			speed = speedBeforeFrightening;
 			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.receive(GhostMessage.EndBeingFrightened));
 		};
 
@@ -171,7 +171,7 @@ public class PacMan extends BoardMover {
 	}
 
 	public void startAttacking(int frames, float speed) {
-		this.speed = speed;
+		this.speed = () -> speed;
 		control.state(Frightening).setDuration(frames);
 		control.changeTo(Frightening);
 	}

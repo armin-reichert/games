@@ -15,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -35,7 +36,7 @@ public abstract class BoardMover extends GameEntity {
 	protected List<Integer> route;
 	protected int moveDir;
 	protected int nextMoveDir;
-	protected float speed;
+	public Supplier<Float> speed;
 
 	public BoardMover(AbstractPacManApp app, Board board, Tile home) {
 		this.app = Objects.requireNonNull(app);
@@ -43,7 +44,7 @@ public abstract class BoardMover extends GameEntity {
 		this.home = Objects.requireNonNull(home);
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;
-		speed = 0;
+		speed = () -> 0f;
 		placeAt(home);
 	}
 
@@ -77,14 +78,6 @@ public abstract class BoardMover extends GameEntity {
 
 	public void setNextMoveDir(int nextMoveDir) {
 		this.nextMoveDir = nextMoveDir;
-	}
-
-	public float getSpeed() {
-		return speed;
-	}
-
-	public void setSpeed(float speed) {
-		this.speed = speed;
 	}
 
 	@Override
@@ -159,7 +152,7 @@ public abstract class BoardMover extends GameEntity {
 	public boolean move() {
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(board.topology.dx(moveDir), board.topology.dy(moveDir)).times(speed));
+		tr.setVel(new Vector2(board.topology.dx(moveDir), board.topology.dy(moveDir)).times(speed.get()));
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();

@@ -127,19 +127,6 @@ public class PlayScene extends Scene<PacManGame> {
 					app.motor.framesToSec(state().getDuration())));
 		}
 
-		private void updateGhostSpeed(Ghost ghost) {
-			TileContent content = board.getContent(ghost.currentTile());
-			if (content == Tunnel) {
-				ghost.setSpeed(levels.getGhostSpeedInTunnel(level));
-			} else if (content == GhostHouse) {
-				ghost.setSpeed(levels.getGhostSpeedInHouse());
-			} else if (ghost.control.inState(Frightened)) {
-				ghost.setSpeed(levels.getGhostSpeedWhenFrightened(level));
-			} else {
-				ghost.setSpeed(levels.getGhostSpeedNormal(level));
-			}
-		}
-
 		public GhostAttackControl() {
 			super("GhostAttack", new EnumMap<>(GhostAttackState.class));
 
@@ -159,7 +146,6 @@ public class PlayScene extends Scene<PacManGame> {
 				if (state.isTerminated()) {
 					changeTo(GhostAttackState.Attacking);
 				} else {
-					Stream.of(inky, pinky, blinky, clyde).forEach(this::updateGhostSpeed);
 					app.entities.all().forEach(GameEntity::update);
 				}
 			};
@@ -177,7 +163,6 @@ public class PlayScene extends Scene<PacManGame> {
 				if (state.isTerminated()) {
 					changeTo(GhostAttackState.Over);
 				} else {
-					Stream.of(inky, pinky, blinky, clyde).forEach(this::updateGhostSpeed);
 					app.entities.all().forEach(GameEntity::update);
 				}
 			};
@@ -185,7 +170,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(GhostAttackState.Over).entry = state -> {
 				app.assets.sound("sfx/waza.mp3").stop();
 			};
-			
+
 			state(GhostAttackState.Over).update = state -> {
 				++attackWave;
 				changeTo(GhostAttackState.Starting);
@@ -229,7 +214,6 @@ public class PlayScene extends Scene<PacManGame> {
 			state(PlayState.Ready).entry = state -> {
 				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
 					ghost.setAnimated(true);
-					ghost.setSpeed(levels.getGhostSpeedInHouse());
 				});
 			};
 
@@ -256,8 +240,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(PlayState.Playing).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
-				pacMan.setSpeed(levels.getPacManSpeed(level));
-				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.setSpeed(levels.getGhostSpeedNormal(level)));
 				pacMan.control.changeTo(PacManState.Eating);
 				attackControl.changeTo(GhostAttackState.Starting);
 				app.assets.sound("sfx/eating.mp3").loop();
@@ -393,6 +375,8 @@ public class PlayScene extends Scene<PacManGame> {
 	private void createPacManAndGhosts() {
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
+		
+		pacMan.speed = () -> levels.getPacManSpeed(level);
 
 		pacMan.onPelletFound = tile -> {
 			app.assets.sound("sfx/eat-pill.mp3").play();
@@ -464,6 +448,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 		Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
 
+			ghost.speed = () -> getGhostSpeed(ghost);
+			
 			ghost.control.state(Waiting).entry = state -> {
 				state.setDuration(getGhostWaitingDuration(ghost));
 			};
@@ -488,16 +474,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 			// "frightened" state:
 
-			ghost.control.state(Frightened).entry = state -> {
-				ghost.setSpeed(levels.getGhostSpeedWhenFrightened(level));
-			};
-
 			ghost.control.state(Frightened).update = state -> {
 				ghost.moveRandomly();
-			};
-
-			ghost.control.state(Frightened).exit = state -> {
-				ghost.setSpeed(levels.getGhostSpeedNormal(level));
 			};
 
 			// "dead" state:
@@ -604,6 +582,19 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.removeAll(Ghost.class);
 		app.entities.add(pacMan);
 		app.entities.add(blinky, inky, pinky, clyde);
+	}
+	
+	private float getGhostSpeed(Ghost ghost) {
+		TileContent content = board.getContent(ghost.currentTile());
+		if (content == Tunnel) {
+			return levels.getGhostSpeedInTunnel(level);
+		} else if (content == GhostHouse) {
+			return levels.getGhostSpeedInHouse();
+		} else if (ghost.control.inState(Frightened)) {
+			return levels.getGhostSpeedWhenFrightened(level);
+		} else {
+			return levels.getGhostSpeedNormal(level);
+		}
 	}
 
 	// TODO implement this correctly

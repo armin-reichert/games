@@ -38,6 +38,7 @@ public class Ghost extends BoardMover {
 
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateAfterFrightened;
+
 	private Color color;
 	private GhostMessage message;
 

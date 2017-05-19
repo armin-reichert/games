@@ -44,7 +44,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.setSpeed(8 * TILE_SIZE / app.settings.fps);
+		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.settings.fps);
 		pacMan.onGhostMet = ghost -> {
 			pacMan.placeAt(PACMAN_HOME);
 			int dir = rand.nextBoolean() ? E : W;
@@ -60,7 +60,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
-		blinky.setSpeed(pacMan.getSpeed() * .9f);
+		blinky.speed = () -> pacMan.speed.get() * .9f;
 
 		app.entities.add(pacMan, blinky); // needed for onGhostMet event handler!
 

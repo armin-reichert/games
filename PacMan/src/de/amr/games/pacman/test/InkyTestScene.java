@@ -47,7 +47,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, PACMAN_HOME);
-		pacMan.setSpeed(4 * TILE_SIZE / app.settings.fps);
+		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.settings.fps);
 		pacMan.onGhostMet = ghost -> {
 			ghost.placeAt(GHOST_HOUSE_ENTRY);
 			int dir = rand.nextBoolean() ? W : E;
@@ -65,14 +65,14 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);
-		blinky.setSpeed(pacMan.getSpeed() * .9f);
+		blinky.speed = () -> pacMan.speed.get() * .9f;
 		blinky.setMoveDir(E);
 
 		inky = new Ghost(app, board, "Inky", GHOST_HOUSE_ENTRY);
 		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
-		inky.setSpeed(pacMan.getSpeed() * .9f);
+		inky.speed = () -> pacMan.speed.get() * .9f;
 
 		app.entities.add(pacMan, blinky, inky);
 		pacMan.control.changeTo(Eating);
