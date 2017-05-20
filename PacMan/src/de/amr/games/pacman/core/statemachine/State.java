@@ -69,7 +69,7 @@ public class State {
 		return duration;
 	}
 
-	public int getTimer() {
+	public int getRemaining() {
 		return remaining;
 	}
 }

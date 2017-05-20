@@ -7,6 +7,7 @@ import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frightened;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
@@ -60,7 +61,8 @@ public class Ghost extends BoardMover {
 		message = null;
 		route = emptyList();
 		setAnimated(false);
-		control.changeTo(Waiting);
+		placeAt(getHome());
+		control.changeTo(Initialized);
 	}
 
 	@Override
@@ -191,7 +193,7 @@ public class Ghost extends BoardMover {
 		StringBuilder text = new StringBuilder();
 		text.append(getName()).append(" (").append(control.stateID());
 		if (state.getDuration() != State.FOREVER) {
-			text.append(state.getTimer()).append("|").append(state.getDuration());
+			text.append(state.getRemaining()).append("|").append(state.getDuration());
 		}
 		text.append(")");
 		g.drawString(text.toString(), tr.getX(), tr.getY() - 10);

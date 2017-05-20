@@ -172,7 +172,7 @@ public class PacMan extends BoardMover {
 
 	public boolean isFrighteningEnding() {
 		return control.inState(Frightening)
-				&& control.state(Frightening).getTimer() < control.state(Frightening).getDuration() / 4;
+				&& control.state(Frightening).getRemaining() < control.state(Frightening).getDuration() / 4;
 	}
 
 	@Override
@@ -221,7 +221,7 @@ public class PacMan extends BoardMover {
 			StringBuilder text = new StringBuilder();
 			text.append(getName()).append(" (").append(control.stateID());
 			if (state.getDuration() != State.FOREVER) {
-				text.append(":").append(state.getTimer()).append("|").append(state.getDuration());
+				text.append(":").append(state.getRemaining()).append("|").append(state.getDuration());
 			}
 			text.append(")");
 			g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
