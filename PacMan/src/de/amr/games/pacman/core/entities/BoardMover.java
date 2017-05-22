@@ -9,6 +9,7 @@ import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.lang.Math.abs;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -261,5 +262,23 @@ public abstract class BoardMover extends GameEntity {
 		if (app.settings.getBool("drawGrid")) {
 			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
 		}
+	}
+
+	public void drawRoute(Graphics2D g, Color color) {
+		if (route.isEmpty()) {
+			return;
+		}
+		g.setColor(color);
+		g.setStroke(new BasicStroke(1f));
+		int offset = TILE_SIZE / 2;
+		Tile tile = currentTile();
+		for (int dir : route) {
+			Tile nextTile = tile.neighbor(dir);
+			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
+					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
+			tile = nextTile;
+		}
+		g.fillRect(tile.getCol() * TILE_SIZE + TILE_SIZE / 4, tile.getRow() * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 2,
+				TILE_SIZE / 2);
 	}
 }

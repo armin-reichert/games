@@ -1,6 +1,5 @@
 package de.amr.games.pacman.core.entities.ghost;
 
-import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
@@ -15,7 +14,6 @@ import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -27,7 +25,6 @@ import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
@@ -41,7 +38,6 @@ public class Ghost extends BoardMover {
 	public Supplier<GhostState> stateAfterFrightened;
 
 	private Color color;
-	private GhostMessage message;
 
 	@Override
 	public String toString() {
@@ -58,7 +54,6 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public void init() {
-		message = null;
 		route = emptyList();
 		setAnimated(false);
 		placeAt(getHome());
@@ -68,45 +63,41 @@ public class Ghost extends BoardMover {
 	@Override
 	public void update() {
 		control.update();
-		if (!control.state().isTerminated()) {
+	}
+
+	// Events
+
+	public void startScattering() {
+		if (control.inState(Frightened, Dead)) {
 			return;
 		}
-		if (message != null) {
-			processMessage();
-		}
+		control.changeTo(Scattering);
 	}
 
-	public void receive(GhostMessage message) {
-		this.message = message;
-		if (!control.inState(Dead, Recovering)) {
-			control.state().terminate();
+	public void startChasing() {
+		if (control.inState(Frightened, Dead)) {
+			return;
 		}
+		control.changeTo(Chasing);
 	}
 
-	private void processMessage() {
-		Log.info(getName() + " handles message: " + message);
-		switch (message) {
-		case StartChasing:
-			if (control.stateID() != Frightened) {
-				control.changeTo(Chasing);
-			}
-			break;
-		case StartScattering:
-			if (control.stateID() != Frightened) {
-				control.changeTo(Scattering);
-			}
-			break;
-		case StartBeingFrightened:
-			control.changeTo(Frightened);
-			break;
-		case EndBeingFrightened:
-			control.changeTo(stateAfterFrightened.get());
-			break;
-		case Die:
-			control.changeTo(Dead);
-			break;
+	public void startFrightened(int frames) {
+		if (control.inState(Dead)) {
+			return;
 		}
-		message = null;
+		control.state(Frightened).setDuration(frames);
+		control.changeTo(Frightened);
+	}
+
+	public void stopFrightened() {
+		if (control.inState(Dead)) {
+			return;
+		}
+		control.changeTo(stateAfterFrightened.get());
+	}
+
+	public void killed() {
+		control.changeTo(Dead);
 	}
 
 	// --- Look ---
@@ -125,8 +116,10 @@ public class Ghost extends BoardMover {
 			return app.getTheme().getGhostNormalSprite(getName(), moveDir);
 		}
 		if (control.inState(Frightened)) {
-			return /* pacMan.isFrighteningEnding() ? app.getTheme().getGhostRecovering() : */app.getTheme()
-					.getGhostFrightenedSprite();
+			if (control.state().getRemaining() < control.state().getDuration() / 3) {
+				return app.getTheme().getGhostRecoveringSprite();
+			}
+			return app.getTheme().getGhostFrightenedSprite();
 		}
 		if (control.inState(Recovering)) {
 			return app.getTheme().getGhostRecoveringSprite();
@@ -182,7 +175,7 @@ public class Ghost extends BoardMover {
 			drawState(g);
 		}
 		if (app.settings.getBool("drawRoute")) {
-			drawRoute(g);
+			drawRoute(g, color);
 		}
 	}
 
@@ -199,21 +192,4 @@ public class Ghost extends BoardMover {
 		g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
 	}
 
-	private void drawRoute(Graphics2D g) {
-		if (route.isEmpty()) {
-			return;
-		}
-		g.setColor(color);
-		g.setStroke(new BasicStroke(1f));
-		int offset = TILE_SIZE / 2;
-		Tile tile = currentTile();
-		for (int dir : route) {
-			Tile nextTile = tile.neighbor(dir);
-			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
-					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
-			tile = nextTile;
-		}
-		g.fillRect(tile.getCol() * TILE_SIZE + TILE_SIZE / 4, tile.getRow() * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 2,
-				TILE_SIZE / 2);
-	}
 }

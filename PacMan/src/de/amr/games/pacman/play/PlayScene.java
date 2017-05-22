@@ -44,7 +44,6 @@ import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.core.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
@@ -78,23 +77,18 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
 	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
 
-	// State machine for controlling the ghost attacks
-
-	public enum GhostAttackState {
-		Ready, Scattering, Attacking
+	public enum GhostAttackWaveState {
+		Initialized, Scattering, Chasing
 	}
 
-	private class GhostAttackControl extends StateMachine<GhostAttackState> {
+	/**
+	 * State machine for controlling the ghost attacks.
+	 */
+	private class GhostAttackWaveControl extends StateMachine<GhostAttackWaveState> {
 
-		private final int[][] ATTACKING_DURATION_SECONDS = {
-			/*@formatter:off*/
-			{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
-			{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
-			{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5-
-			/*@formatter:on*/
-		};
+		private int wave;
 
-		private final int[][] SCATTERING_DURATION_SECONDS = {
+		private final int[][] SCATTERING_SECONDS = {
 			/*@formatter:off*/
 			{ 7, 7, 5, 5, 0 }, 	// level 1
 			{ 7, 7, 5, 0, 0 }, 	// level 2-4
@@ -102,79 +96,76 @@ public class PlayScene extends Scene<PacManGame> {
 			/*@formatter:on*/
 		};
 
-		private int getScatteringDurationFrames() {
-			int colCount = SCATTERING_DURATION_SECONDS[0].length;
-			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-			int col = attackWave <= colCount ? attackWave - 1 : colCount - 1;
-			return app.motor.secToFrames(SCATTERING_DURATION_SECONDS[row][col]);
-		}
+		private final int[][] CHASING_SECONDS = {
+			/*@formatter:off*/
+			{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
+			{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
+			{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5-
+			/*@formatter:on*/
+		};
 
-		private int getAttackingDurationFrames() {
-			int colCount = ATTACKING_DURATION_SECONDS[0].length;
+		private int getFrames(int[][] phase) {
+			int n = phase[0].length;
 			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-			int col = attackWave <= colCount ? attackWave - 1 : colCount - 1;
-			return app.motor.secToFrames(ATTACKING_DURATION_SECONDS[row][col]);
+			int col = wave <= n ? wave - 1 : n - 1;
+			return app.motor.secToFrames(phase[row][col]);
 		}
 
 		private void trace() {
-			Log.info(format("Level %d, wave %d: Entered state %s, duration: %d seconds", level, attackWave, stateID(),
+			Log.info(format("Level %d, wave %d: Entered state '%s', duration: %d seconds", level, wave, stateID(),
 					app.motor.framesToSec(state().getDuration())));
 		}
 
-		public GhostAttackControl() {
-			super("GhostAttack", new EnumMap<>(GhostAttackState.class));
+		public GhostAttackWaveControl() {
+			super("GhostAttackWave", new EnumMap<>(GhostAttackWaveState.class));
 
-
-			state(GhostAttackState.Ready).entry = state -> {
-				app.assets.sound("sfx/waza.mp3").stop();
+			state(GhostAttackWaveState.Initialized).entry = state -> {
+				wave = 1;
 			};
 
-			state(GhostAttackState.Ready).update = state -> {
-				changeTo(GhostAttackState.Scattering);
-			};
-			
-			state(GhostAttackState.Scattering).entry = state -> {
-				state.setDuration(getScatteringDurationFrames());
-				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
-					ghost.receive(GhostMessage.StartScattering);
-				});
+			state(GhostAttackWaveState.Scattering).entry = state -> {
+				state.setDuration(getFrames(SCATTERING_SECONDS));
+				Stream.of(inky, pinky, blinky, clyde).forEach(Ghost::startScattering);
 				trace();
 			};
 
-			state(GhostAttackState.Scattering).update = state -> {
+			state(GhostAttackWaveState.Scattering).update = state -> {
 				if (state.isTerminated()) {
-					changeTo(GhostAttackState.Attacking);
+					changeTo(GhostAttackWaveState.Chasing);
 				} else {
 					app.entities.all().forEach(GameEntity::update);
 				}
 			};
 
-			state(GhostAttackState.Attacking).entry = state -> {
-				state.setDuration(getAttackingDurationFrames());
-				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
-					ghost.receive(GhostMessage.StartChasing);
-				});
+			state(GhostAttackWaveState.Chasing).entry = state -> {
+				state.setDuration(getFrames(CHASING_SECONDS));
+				Stream.of(inky, pinky, blinky, clyde).forEach(Ghost::startChasing);
 				app.assets.sound("sfx/waza.mp3").loop();
 				trace();
 			};
 
-			state(GhostAttackState.Attacking).update = state -> {
+			state(GhostAttackWaveState.Chasing).update = state -> {
 				if (state.isTerminated()) {
-					++attackWave;
-					changeTo(GhostAttackState.Scattering);
+					changeTo(GhostAttackWaveState.Scattering);
 				} else {
 					app.entities.all().forEach(GameEntity::update);
 				}
 			};
+
+			state(GhostAttackWaveState.Chasing).exit = state -> {
+				app.assets.sound("sfx/waza.mp3").stop();
+				++wave;
+			};
 		}
 	}
-
-	// State machine for controlling the game play
 
 	public enum PlayState {
 		Initializing, Ready, StartingLevel, Playing, Crashing, GameOver
 	}
 
+	/**
+	 * State machine for controlling the game play
+	 */
 	private class PlayControl extends StateMachine<PlayState> {
 
 		public PlayControl() {
@@ -192,6 +183,7 @@ public class PlayScene extends Scene<PacManGame> {
 				createPacManAndGhosts();
 				level = 1;
 				initLevel();
+				attackControl.changeTo(GhostAttackWaveState.Initialized);
 			};
 
 			state(PlayState.Initializing).update = state -> {
@@ -203,7 +195,6 @@ public class PlayScene extends Scene<PacManGame> {
 			// Ready
 
 			state(PlayState.Ready).entry = state -> {
-				attackControl.changeTo(GhostAttackState.Ready);
 				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
 					ghost.control.changeTo(GhostState.Waiting);
 				});
@@ -231,18 +222,18 @@ public class PlayScene extends Scene<PacManGame> {
 			// Playing
 
 			state(PlayState.Playing).entry = state -> {
+				app.assets.sound("sfx/eating.mp3").loop();
 				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Eating);
-				attackControl.changeTo(GhostAttackState.Scattering);
-				app.assets.sound("sfx/eating.mp3").loop();
+				attackControl.changeTo(GhostAttackWaveState.Scattering);
 			};
 
 			state(PlayState.Playing).update = state -> {
-				if (isBonusEnabled() && --bonusTimeRemaining <= 0) {
+				if (isBonusEnabled() && bonusTimeRemaining-- == 0) {
 					setBonusEnabled(false);
 				}
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-					attackControl.changeTo(GhostAttackState.Ready);
+					attackControl.changeTo(GhostAttackWaveState.Initialized);
 					++level;
 					initLevel();
 					Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.control.changeTo(GhostState.Waiting));
@@ -264,7 +255,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.assets.sound("sfx/die.mp3").play();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
 				setBonusEnabled(false);
-				attackControl.changeTo(GhostAttackState.Ready);
+				attackControl.changeTo(GhostAttackWaveState.Initialized);
 				pacMan.control.changeTo(PacManState.Dying);
 				Log.info("PacMan died, lives remaining: " + lives);
 			};
@@ -304,7 +295,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	// State machines
 	private final StateMachine<PlayState> playControl = new PlayControl();
-	private final StateMachine<GhostAttackState> attackControl = new GhostAttackControl();
+	private final StateMachine<GhostAttackWaveState> attackControl = new GhostAttackWaveControl();
 
 	// Entities
 	private PacMan pacMan;
@@ -314,7 +305,6 @@ public class PlayScene extends Scene<PacManGame> {
 	private Board board;
 	private PacManGameLevels levels;
 	private int level;
-	private int attackWave;
 	private int lives;
 	private int score;
 	private Highscore highscore;
@@ -360,7 +350,6 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private void initLevel() {
-		attackWave = 1;
 		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
 		board.resetContent();
@@ -397,7 +386,8 @@ public class PlayScene extends Scene<PacManGame> {
 			score(POINTS_FOR_ENERGIZER);
 			nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 			pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-			pacMan.control.state(Frightening).setDuration(app.motor.secToFrames(levels.getGhostFrightenedDuration(level)));
+			int seconds = levels.getGhostFrightenedDuration(level);
+			pacMan.control.state(Frightening).setDuration(app.motor.secToFrames(seconds));
 			pacMan.control.changeTo(Frightening);
 			board.setContent(tile, None);
 		};
@@ -425,7 +415,7 @@ public class PlayScene extends Scene<PacManGame> {
 					score(12000);
 				}
 				nextGhostPoints *= 2;
-				ghost.receive(GhostMessage.Die);
+				ghost.killed();
 			} else {
 				Log.info(ghost.getName() + " kills Pac-Man.");
 				--lives;
@@ -456,15 +446,15 @@ public class PlayScene extends Scene<PacManGame> {
 			// if leaving ghost house and Pac-Man is frightening, then become frightened:
 			ghost.control.state(GhostState.Waiting).exit = state -> {
 				if (pacMan.control.inState(PacManState.Frightening)) {
-					ghost.receive(GhostMessage.StartBeingFrightened);
+					ghost.startFrightened(pacMan.control.state().getRemaining());
 				}
 			};
 
 			// define ghost state after end of frightening or recovering:
 			ghost.stateAfterFrightened = () -> {
-				if (attackControl.inState(GhostAttackState.Attacking)) {
+				if (attackControl.inState(GhostAttackWaveState.Chasing)) {
 					return GhostState.Chasing;
-				} else if (attackControl.inState(GhostAttackState.Scattering)) {
+				} else if (attackControl.inState(GhostAttackWaveState.Scattering)) {
 					return GhostState.Scattering;
 				} else {
 					return ghost.control.stateID();
@@ -515,9 +505,9 @@ public class PlayScene extends Scene<PacManGame> {
 		// bounce when waiting:
 		blinky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackState.Scattering)) {
+				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
 					blinky.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackState.Attacking)) {
+				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
 					blinky.control.changeTo(GhostState.Chasing);
 				}
 			}
@@ -544,9 +534,9 @@ public class PlayScene extends Scene<PacManGame> {
 		// bounce when waiting:
 		inky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackState.Scattering)) {
+				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
 					inky.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackState.Attacking)) {
+				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
 					inky.control.changeTo(GhostState.Chasing);
 				}
 			} else {
@@ -573,9 +563,9 @@ public class PlayScene extends Scene<PacManGame> {
 		// bounce when waiting:
 		pinky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackState.Scattering)) {
+				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
 					pinky.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackState.Attacking)) {
+				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
 					pinky.control.changeTo(GhostState.Chasing);
 				}
 			} else {
@@ -602,9 +592,9 @@ public class PlayScene extends Scene<PacManGame> {
 		// bounce when waiting:
 		clyde.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackState.Scattering)) {
+				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
 					clyde.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackState.Attacking)) {
+				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
 					clyde.control.changeTo(GhostState.Chasing);
 				}
 			} else {

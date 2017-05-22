@@ -34,7 +34,6 @@ import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostMessage;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 
@@ -103,7 +102,7 @@ public class PacMan extends BoardMover {
 
 		control.state(Frightening).entry = state -> {
 			speedBeforeFrightening = speed;
-			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.receive(GhostMessage.StartBeingFrightened));
+			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.startFrightened(state.getDuration()));
 		};
 
 		control.state(Frightening).update = state -> {
@@ -115,7 +114,7 @@ public class PacMan extends BoardMover {
 
 		control.state(Frightening).exit = state -> {
 			speed = speedBeforeFrightening;
-			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.receive(GhostMessage.EndBeingFrightened));
+			app.entities.allOf(Ghost.class).forEach(Ghost::stopFrightened);
 		};
 
 		control.state(Dying).entry = state -> {
