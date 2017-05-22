@@ -23,7 +23,7 @@ public class PacManGame extends AbstractPacManApp {
 		game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
 		game.motor.log = false;
 		game.motor.setFrequency(60);
-		game.settings.set("drawInternals", true);
+		game.settings.set("drawInternals", false);
 		launch(game);
 	}
 

@@ -184,10 +184,12 @@ public class PlayScene extends Scene<PacManGame> {
 				level = 1;
 				initLevel();
 				attackControl.changeTo(GhostAttackWaveState.Initialized);
+				app.getTheme().getEnergizerSprite().setAnimated(false);
 			};
 
 			state(PlayState.Initializing).update = state -> {
 				if (!app.assets.sound("sfx/insert-coin.mp3").isRunning()) {
+					app.getTheme().getEnergizerSprite().setAnimated(true);
 					changeTo(PlayState.Ready);
 				}
 			};
@@ -345,16 +347,19 @@ public class PlayScene extends Scene<PacManGame> {
 			board.tilesWithContent(Energizer).forEach(tile -> board.setContent(tile, None));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_T)) {
 			app.selectNextTheme();
+		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_K)) {
+			Stream.of(inky, pinky, blinky, clyde).forEach(Ghost::killed);
 		}
 		playControl.update();
 	}
 
 	private void initLevel() {
-		bonusTimeRemaining = 0;
 		ghostsEatenAtLevel = 0;
 		board.resetContent();
+		setBonusEnabled(false);
 		app.entities.all().forEach(GameEntity::init);
-		Log.info(format("Level %d: %d pellets and %d energizers.", level, board.count(Pellet), board.count(Energizer)));
+		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
+				board.count(Energizer)));
 	}
 
 	private void createPacManAndGhosts() {
@@ -496,7 +501,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait just before ghost house:
 		blinky.control.state(GhostState.Waiting).entry = state -> {
-			state.setDuration(getGhostWaitingDuration(blinky));
 			blinky.placeAt(blinky.getHome());
 			blinky.setMoveDir(W);
 			blinky.setAnimated(true);
@@ -525,7 +529,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait inside ghost house:
 		inky.control.state(GhostState.Waiting).entry = state -> {
-			state.setDuration(getGhostWaitingDuration(inky));
 			inky.placeAt(inky.getHome());
 			inky.setMoveDir(Top4.N);
 			inky.setAnimated(true);
@@ -554,7 +557,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait inside ghost house:
 		pinky.control.state(GhostState.Waiting).entry = state -> {
-			state.setDuration(getGhostWaitingDuration(pinky));
 			pinky.placeAt(pinky.getHome());
 			pinky.setMoveDir(Top4.S);
 			pinky.setAnimated(true);
@@ -583,7 +585,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// wait inside ghost house:
 		clyde.control.state(GhostState.Waiting).entry = state -> {
-			state.setDuration(getGhostWaitingDuration(clyde));
 			clyde.placeAt(clyde.getHome());
 			clyde.setMoveDir(Top4.N);
 			clyde.setAnimated(true);
@@ -641,36 +642,23 @@ public class PlayScene extends Scene<PacManGame> {
 		return app.motor.secToFrames(2);
 	}
 
-	private int getGhostWaitingDuration(Ghost ghost) {
-		float seconds = 5;
-		if (ghost == blinky) {
-			seconds += 0;
-		} else if (ghost == clyde) {
-			seconds += 1.5f;
-		} else if (ghost == inky) {
-			seconds += 2.5f;
-		} else if (ghost == pinky) {
-			seconds += 0.5f;
-		}
-		return app.motor.secToFrames(seconds);
-	}
-
 	private void score(int points) {
-		if (score < SCORE_FOR_EXTRALIFE && SCORE_FOR_EXTRALIFE <= score + points) {
-			++lives;
+		int newScore = score + points;
+		if (score < SCORE_FOR_EXTRALIFE && newScore >= SCORE_FOR_EXTRALIFE) {
 			app.assets.sound("sfx/extra-life.mp3").play();
+			++lives;
 		}
-		score += points;
+		score = newScore;
 	}
 
 	private boolean isBonusEnabled() {
-		return board.getContent(BONUS_TILE) == Bonus;
+		return bonusTimeRemaining > 0;
 	}
 
 	private void setBonusEnabled(boolean enabled) {
 		if (enabled) {
 			board.setContent(BONUS_TILE, Bonus);
-			bonusTimeRemaining = app.motor.secToFrames(9 + (float) Math.random());
+			bonusTimeRemaining = app.motor.secToFrames(9);
 		} else {
 			board.setContent(BONUS_TILE, None);
 			bonusTimeRemaining = 0;
