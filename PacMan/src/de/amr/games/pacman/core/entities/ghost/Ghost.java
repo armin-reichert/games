@@ -68,14 +68,14 @@ public class Ghost extends BoardMover {
 	// Events
 
 	public void startScattering() {
-		if (control.inState(Frightened, Dead)) {
+		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
 			return;
 		}
 		control.changeTo(Scattering);
 	}
 
 	public void startChasing() {
-		if (control.inState(Frightened, Dead)) {
+		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
 			return;
 		}
 		control.changeTo(Chasing);

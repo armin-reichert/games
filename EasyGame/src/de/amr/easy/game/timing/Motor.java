@@ -38,12 +38,12 @@ public class Motor {
 		return updateCount;
 	}
 
-	public int secToFrames(float seconds) {
+	public int toFrames(float seconds) {
 		return Math.round(getFrequency() * seconds);
 	}
 
-	public int framesToSec(int frames) {
-		return frames / getFrequency();
+	public float toSeconds(int frames) {
+		return (float) frames / getFrequency();
 	}
 
 	public synchronized void addRenderListener(PropertyChangeListener observer) {

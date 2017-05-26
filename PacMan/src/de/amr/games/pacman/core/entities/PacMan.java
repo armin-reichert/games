@@ -101,6 +101,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Frightening).entry = state -> {
+			app.assets.sound("sfx/waza.mp3").loop();
 			speedBeforeFrightening = speed;
 			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.startFrightened(state.getDuration()));
 		};
@@ -113,6 +114,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Frightening).exit = state -> {
+			app.assets.sound("sfx/waza.mp3").stop();
 			speed = speedBeforeFrightening;
 			app.entities.allOf(Ghost.class).forEach(Ghost::stopFrightened);
 		};

@@ -13,9 +13,14 @@ import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawText;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
+import static de.amr.games.pacman.play.PlayState.Crashing;
+import static de.amr.games.pacman.play.PlayState.GameOver;
+import static de.amr.games.pacman.play.PlayState.Initializing;
+import static de.amr.games.pacman.play.PlayState.Playing;
+import static de.amr.games.pacman.play.PlayState.Ready;
+import static de.amr.games.pacman.play.PlayState.StartingLevel;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
-import static java.awt.event.KeyEvent.VK_ENTER;
 import static java.awt.event.KeyEvent.VK_SPACE;
 import static java.lang.String.format;
 import static java.util.stream.IntStream.range;
@@ -27,6 +32,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Sound;
@@ -77,103 +84,18 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
 	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
 
-	public enum GhostAttackWaveState {
-		Initialized, Scattering, Chasing
-	}
-
 	/**
-	 * State machine for controlling the ghost attacks.
-	 */
-	private class GhostAttackWaveControl extends StateMachine<GhostAttackWaveState> {
-
-		private int wave;
-
-		private final int[][] SCATTERING_SECONDS = {
-			/*@formatter:off*/
-			{ 7, 7, 5, 5, 0 }, 	// level 1
-			{ 7, 7, 5, 0, 0 }, 	// level 2-4
-			{ 5, 5, 5, 0, 0 }   // level 5-
-			/*@formatter:on*/
-		};
-
-		private final int[][] CHASING_SECONDS = {
-			/*@formatter:off*/
-			{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
-			{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
-			{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5-
-			/*@formatter:on*/
-		};
-
-		private int getFrames(int[][] phase) {
-			int n = phase[0].length;
-			int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-			int col = wave <= n ? wave - 1 : n - 1;
-			return app.motor.secToFrames(phase[row][col]);
-		}
-
-		private void trace() {
-			Log.info(format("Level %d, wave %d: Entered state '%s', duration: %d seconds", level, wave, stateID(),
-					app.motor.framesToSec(state().getDuration())));
-		}
-
-		public GhostAttackWaveControl() {
-			super("GhostAttackWave", new EnumMap<>(GhostAttackWaveState.class));
-
-			state(GhostAttackWaveState.Initialized).entry = state -> {
-				wave = 1;
-			};
-
-			state(GhostAttackWaveState.Scattering).entry = state -> {
-				state.setDuration(getFrames(SCATTERING_SECONDS));
-				Stream.of(inky, pinky, blinky, clyde).forEach(Ghost::startScattering);
-				trace();
-			};
-
-			state(GhostAttackWaveState.Scattering).update = state -> {
-				if (state.isTerminated()) {
-					changeTo(GhostAttackWaveState.Chasing);
-				} else {
-					app.entities.all().forEach(GameEntity::update);
-				}
-			};
-
-			state(GhostAttackWaveState.Chasing).entry = state -> {
-				state.setDuration(getFrames(CHASING_SECONDS));
-				Stream.of(inky, pinky, blinky, clyde).forEach(Ghost::startChasing);
-				app.assets.sound("sfx/waza.mp3").loop();
-				trace();
-			};
-
-			state(GhostAttackWaveState.Chasing).update = state -> {
-				if (state.isTerminated()) {
-					changeTo(GhostAttackWaveState.Scattering);
-				} else {
-					app.entities.all().forEach(GameEntity::update);
-				}
-			};
-
-			state(GhostAttackWaveState.Chasing).exit = state -> {
-				app.assets.sound("sfx/waza.mp3").stop();
-				++wave;
-			};
-		}
-	}
-
-	public enum PlayState {
-		Initializing, Ready, StartingLevel, Playing, Crashing, GameOver
-	}
-
-	/**
-	 * State machine for controlling the game play
+	 * State machine which controls the game play.
 	 */
 	private class PlayControl extends StateMachine<PlayState> {
 
 		public PlayControl() {
+
 			super("Play control", new EnumMap<>(PlayState.class));
 
 			// Initializing
 
-			state(PlayState.Initializing).entry = state -> {
+			state(Initializing).entry = state -> {
 				app.assets.sound("sfx/insert-coin.mp3").play();
 				lives = 3;
 				score = 0;
@@ -181,104 +103,100 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints = 0;
 				app.entities.removeAll(GameEntity.class);
 				createPacManAndGhosts();
+				createAttackControl();
 				level = 1;
 				initLevel();
-				attackControl.changeTo(GhostAttackWaveState.Initialized);
 				app.getTheme().getEnergizerSprite().setAnimated(false);
 			};
 
-			state(PlayState.Initializing).update = state -> {
+			state(Initializing).update = state -> {
 				if (!app.assets.sound("sfx/insert-coin.mp3").isRunning()) {
-					app.getTheme().getEnergizerSprite().setAnimated(true);
-					changeTo(PlayState.Ready);
+					changeTo(Ready);
 				}
 			};
 
 			// Ready
 
-			state(PlayState.Ready).entry = state -> {
-				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
-					ghost.control.changeTo(GhostState.Waiting);
-				});
+			state(Ready).entry = state -> {
+				app.getTheme().getEnergizerSprite().setAnimated(true);
+				attackControl.init(level);
 			};
 
-			state(PlayState.Ready).update = state -> {
-				if (Keyboard.pressedOnce(VK_ENTER)) {
-					changeTo(PlayState.StartingLevel);
+			state(Ready).update = state -> {
+				if (Keyboard.pressedOnce(VK_SPACE)) {
+					changeTo(StartingLevel);
 				}
 			};
 
 			// StartingLevel
 
-			state(PlayState.StartingLevel).entry = state -> {
+			state(StartingLevel).entry = state -> {
 				app.assets.sound("sfx/ready.mp3").play();
 			};
 
-			state(PlayState.StartingLevel).update = state -> {
+			state(StartingLevel).update = state -> {
 				app.entities.all().forEach(GameEntity::update);
 				if (!app.assets.sound("sfx/ready.mp3").isRunning()) {
-					changeTo(PlayState.Playing);
+					changeTo(Playing);
 				}
 			};
 
 			// Playing
 
-			state(PlayState.Playing).entry = state -> {
-				app.assets.sound("sfx/eating.mp3").loop();
+			state(Playing).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Eating);
-				attackControl.changeTo(GhostAttackWaveState.Scattering);
+				ghosts.get().forEach(ghost -> ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingTime(ghost)));
+				attackControl.start();
 			};
 
-			state(PlayState.Playing).update = state -> {
+			state(Playing).update = state -> {
+				attackControl.update();
+				app.entities.all().forEach(GameEntity::update);
 				if (isBonusEnabled() && bonusTimeRemaining-- == 0) {
 					setBonusEnabled(false);
 				}
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-					attackControl.changeTo(GhostAttackWaveState.Initialized);
 					++level;
 					initLevel();
-					Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.control.changeTo(GhostState.Waiting));
-					changeTo(PlayState.StartingLevel);
-				} else {
-					attackControl.update();
+					attackControl.init(level);
+					changeTo(StartingLevel);
 				}
 			};
 
-			state(PlayState.Playing).exit = state -> {
-				app.assets.sound("sfx/eating.mp3").stop();
+			state(Playing).exit = state -> {
 				app.entities.removeAll(FlashText.class);
 			};
 
 			// Crashing
 
-			state(PlayState.Crashing).entry = state -> {
+			state(Crashing).entry = state -> {
 				app.assets.sounds().forEach(Sound::stop);
 				app.assets.sound("sfx/die.mp3").play();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
 				setBonusEnabled(false);
-				attackControl.changeTo(GhostAttackWaveState.Initialized);
 				pacMan.control.changeTo(PacManState.Dying);
 				Log.info("PacMan died, lives remaining: " + lives);
 			};
 
-			state(PlayState.Crashing).update = state -> {
+			state(Crashing).update = state -> {
 				if (!app.assets.sound("sfx/die.mp3").isRunning()) {
-					changeTo(lives > 0 ? PlayState.Playing : PlayState.GameOver);
+					changeTo(lives > 0 ? Playing : GameOver);
 				}
 			};
 
-			state(PlayState.Crashing).exit = state -> {
+			state(Crashing).exit = state -> {
 				pacMan.init();
-				Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
+				ghosts.get().forEach(ghost -> {
 					ghost.init();
 					ghost.setAnimated(true);
 				});
+				attackControl.init(level);
 			};
 
 			// GameOver
 
-			state(PlayState.GameOver).entry = state -> {
+			state(GameOver).entry = state -> {
 				if (score > highscore.getPoints()) {
 					highscore.save(score, level);
 					highscore.load();
@@ -287,21 +205,22 @@ public class PlayScene extends Scene<PacManGame> {
 				Log.info("Game over.");
 			};
 
-			state(PlayState.GameOver).update = state -> {
+			state(GameOver).update = state -> {
 				if (Keyboard.pressedOnce(VK_SPACE)) {
-					changeTo(PlayState.Initializing);
+					changeTo(Initializing);
 				}
 			};
 		}
 	}
 
 	// State machines
-	private final StateMachine<PlayState> playControl = new PlayControl();
-	private final StateMachine<GhostAttackWaveState> attackControl = new GhostAttackWaveControl();
+	private StateMachine<PlayState> playControl;
+	private GhostAttackTimer attackControl;
 
 	// Entities
 	private PacMan pacMan;
 	private Ghost blinky, inky, pinky, clyde;
+	private Supplier<Stream<Ghost>> ghosts = () -> Stream.of(blinky, inky, pinky, clyde);
 
 	// Scene-specific data
 	private Board board;
@@ -315,6 +234,8 @@ public class PlayScene extends Scene<PacManGame> {
 	private int nextGhostPoints;
 	private int ghostsEatenAtLevel;
 
+	private final Random rand = new Random();
+
 	public PlayScene(PacManGame app) {
 		super(app);
 	}
@@ -325,6 +246,7 @@ public class PlayScene extends Scene<PacManGame> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusCollection = new ArrayList<>();
+		playControl = new PlayControl();
 		playControl.changeTo(PlayState.Initializing);
 	}
 
@@ -348,7 +270,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_T)) {
 			app.selectNextTheme();
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_K)) {
-			Stream.of(inky, pinky, blinky, clyde).forEach(Ghost::killed);
+			ghosts.get().forEach(Ghost::killed);
 		}
 		playControl.update();
 	}
@@ -392,7 +314,7 @@ public class PlayScene extends Scene<PacManGame> {
 			nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 			pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 			int seconds = levels.getGhostFrightenedDuration(level);
-			pacMan.control.state(Frightening).setDuration(app.motor.secToFrames(seconds));
+			pacMan.control.state(Frightening).setDuration(app.motor.toFrames(seconds));
 			pacMan.control.changeTo(Frightening);
 			board.setContent(tile, None);
 		};
@@ -444,24 +366,32 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Define common ghost behavior:
 
-		Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
+		ghosts.get().forEach(ghost -> {
 
 			ghost.speed = () -> getGhostSpeed(ghost);
 
-			// if leaving ghost house and Pac-Man is frightening, then become frightened:
-			ghost.control.state(GhostState.Waiting).exit = state -> {
-				if (pacMan.control.inState(PacManState.Frightening)) {
-					ghost.startFrightened(pacMan.control.state().getRemaining());
+			ghost.control.state(GhostState.Waiting).update = state -> {
+				if (state.isTerminated()) {
+					switch (attackControl.currentState()) {
+					case Scattering:
+						ghost.startScattering();
+						break;
+					case Chasing:
+						ghost.startChasing();
+						break;
+					default:
+						break;
+					}
 				}
 			};
 
-			// define ghost state after end of frightening or recovering:
 			ghost.stateAfterFrightened = () -> {
-				if (attackControl.inState(GhostAttackWaveState.Chasing)) {
-					return GhostState.Chasing;
-				} else if (attackControl.inState(GhostAttackWaveState.Scattering)) {
+				switch (attackControl.currentState()) {
+				case Scattering:
 					return GhostState.Scattering;
-				} else {
+				case Chasing:
+					return GhostState.Chasing;
+				default:
 					return ghost.control.stateID();
 				}
 			};
@@ -506,17 +436,6 @@ public class PlayScene extends Scene<PacManGame> {
 			blinky.setAnimated(true);
 		};
 
-		// bounce when waiting:
-		blinky.control.state(GhostState.Waiting).update = state -> {
-			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
-					blinky.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
-					blinky.control.changeTo(GhostState.Chasing);
-				}
-			}
-		};
-
 		// loop around block at right upper corner of maze:
 		blinky.control.state(GhostState.Scattering, new LoopAroundWalls(blinky, 4, 26, Top4.S, true));
 
@@ -534,13 +453,18 @@ public class PlayScene extends Scene<PacManGame> {
 			inky.setAnimated(true);
 		};
 
-		// bounce when waiting:
+		// bounce while waiting:
 		inky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
-					inky.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
-					inky.control.changeTo(GhostState.Chasing);
+				switch (attackControl.currentState()) {
+				case Scattering:
+					inky.startScattering();
+					break;
+				case Chasing:
+					inky.startChasing();
+					break;
+				default:
+					break;
 				}
 			} else {
 				inky.bounce();
@@ -562,13 +486,18 @@ public class PlayScene extends Scene<PacManGame> {
 			pinky.setAnimated(true);
 		};
 
-		// bounce when waiting:
+		// bounce while waiting:
 		pinky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
-					pinky.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
-					pinky.control.changeTo(GhostState.Chasing);
+				switch (attackControl.currentState()) {
+				case Scattering:
+					pinky.startScattering();
+					break;
+				case Chasing:
+					pinky.startChasing();
+					break;
+				default:
+					break;
 				}
 			} else {
 				pinky.bounce();
@@ -593,10 +522,15 @@ public class PlayScene extends Scene<PacManGame> {
 		// bounce when waiting:
 		clyde.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				if (attackControl.inState(GhostAttackWaveState.Scattering)) {
-					clyde.control.changeTo(GhostState.Scattering);
-				} else if (attackControl.inState(GhostAttackWaveState.Chasing)) {
-					clyde.control.changeTo(GhostState.Chasing);
+				switch (attackControl.currentState()) {
+				case Scattering:
+					clyde.startScattering();
+					break;
+				case Chasing:
+					clyde.startChasing();
+					break;
+				default:
+					break;
 				}
 			} else {
 				clyde.bounce();
@@ -622,6 +556,34 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.removeAll(Ghost.class);
 		app.entities.add(pacMan);
 		app.entities.add(blinky, inky, pinky, clyde);
+
+	}
+
+	private void createAttackControl() {
+		attackControl = new GhostAttackTimer(app);
+		attackControl.trace = true;
+
+		attackControl.onPhaseStart = phase -> {
+			if (phase == GhostAttackState.Initialized) {
+				ghosts.get().forEach(ghost -> {
+					ghost.control.changeTo(GhostState.Waiting);
+				});
+			} else if (phase == GhostAttackState.Scattering) {
+				ghosts.get().forEach(Ghost::startScattering);
+				app.assets.sound("sfx/siren.mp3").loop();
+			} else if (phase == GhostAttackState.Chasing) {
+				app.assets.sound("sfx/siren.mp3").loop();
+				ghosts.get().forEach(Ghost::startChasing);
+			}
+		};
+
+		attackControl.onPhaseEnd = phase -> {
+			if (phase == GhostAttackState.Scattering) {
+				app.assets.sound("sfx/siren.mp3").stop();
+			} else if (phase == GhostAttackState.Chasing) {
+				app.assets.sound("sfx/siren.mp3").stop();
+			}
+		};
 	}
 
 	private float getGhostSpeed(Ghost ghost) {
@@ -637,9 +599,15 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	// TODO implement this correctly
+	private int getGhostWaitingTime(Ghost ghost) {
+		if ("Blinky".equals(ghost.getName())) {
+			return 0;
+		}
+		return app.motor.toFrames(1 + rand.nextInt(2));
+	}
+
 	private int getGhostRecoveringDuration(Ghost ghost) {
-		return app.motor.secToFrames(2);
+		return app.motor.toFrames(rand.nextInt(4));
 	}
 
 	private void score(int points) {
@@ -658,7 +626,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private void setBonusEnabled(boolean enabled) {
 		if (enabled) {
 			board.setContent(BONUS_TILE, Bonus);
-			bonusTimeRemaining = app.motor.secToFrames(9);
+			bonusTimeRemaining = app.motor.toFrames(9);
 		} else {
 			board.setContent(BONUS_TILE, None);
 			bonusTimeRemaining = 0;
@@ -670,7 +638,7 @@ public class PlayScene extends Scene<PacManGame> {
 			x -= 3 * TILE_SIZE;
 		}
 		FlashText.show(app, String.valueOf(object), app.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
-				Color.YELLOW, app.motor.secToFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+				Color.YELLOW, app.motor.toFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
 	@Override
@@ -696,7 +664,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 		if (app.settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
-			Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> {
+			ghosts.get().forEach(ghost -> {
 				g.setColor(ghost.getColor());
 				float x = ghost.getHome().x * TILE_SIZE, y = ghost.getHome().y * TILE_SIZE;
 				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
@@ -706,7 +674,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Entities
 		pacMan.draw(g);
 		if (!playControl.inState(PlayState.Crashing)) {
-			Stream.of(inky, pinky, blinky, clyde).forEach(ghost -> ghost.draw(g));
+			ghosts.get().forEach(ghost -> ghost.draw(g));
 		}
 
 		// HUD
@@ -724,7 +692,7 @@ public class PlayScene extends Scene<PacManGame> {
 		switch (playControl.stateID()) {
 		case Ready:
 			g.setColor(Color.RED);
-			drawTextCentered(g, getWidth(), 9.5f, "Press ENTER to start");
+			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE to start");
 			g.setColor(theme.getHUDColor());
 			drawTextCentered(g, getWidth(), 21f, "Ready!");
 			break;
@@ -754,7 +722,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Play state
 		if (app.settings.getBool("drawInternals")) {
-			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + attackControl.stateID());
+			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + attackControl.currentState());
 		}
 
 		// Flash texts

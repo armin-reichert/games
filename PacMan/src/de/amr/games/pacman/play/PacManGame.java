@@ -1,7 +1,5 @@
 package de.amr.games.pacman.play;
 
-import java.awt.Toolkit;
-
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
@@ -20,11 +18,7 @@ public class PacManGame extends AbstractPacManApp {
 		game.settings.title = "Armin's Pac-Man";
 		game.settings.width = 448;
 		game.settings.height = 576;
-		game.settings.scale = 0.9f * Toolkit.getDefaultToolkit().getScreenSize().height / game.settings.height;
-		game.settings.fullScreenOnStart = false;
-		game.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
-		game.motor.log = false;
-		game.motor.setFrequency(60);
+		game.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		game.settings.set("drawInternals", false);
 		launch(game);
 	}
