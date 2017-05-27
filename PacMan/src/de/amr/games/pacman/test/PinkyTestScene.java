@@ -21,7 +21,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
+import de.amr.games.pacman.core.entities.ghost.behaviors.FollowTileAheadOfPacMan;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
@@ -48,8 +48,8 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 
 		pinky = new Ghost(app, board, "Pinky", GHOST_HOUSE_ENTRY);
-		pinky.control.state(Chasing, new TargetAtTileAheadOfPacMan(pinky, pacMan, 4));
-		pinky.stateAfterFrightened = () -> Chasing;
+		pinky.control.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
+		pinky.stateToRestore = () -> Chasing;
 		pinky.setColor(Color.PINK);
 		pinky.setAnimated(true);
 		pinky.speed = () -> .9f * pacMan.speed.get();

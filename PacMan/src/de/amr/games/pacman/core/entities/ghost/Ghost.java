@@ -35,7 +35,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
 public class Ghost extends BoardMover {
 
 	public final StateMachine<GhostState> control;
-	public Supplier<GhostState> stateAfterFrightened;
+	public Supplier<GhostState> stateToRestore;
 
 	private Color color;
 
@@ -49,7 +49,7 @@ public class Ghost extends BoardMover {
 		setName(name);
 		this.color = Color.WHITE;
 		control = new StateMachine<>("Ghost " + name, new EnumMap<>(GhostState.class));
-		stateAfterFrightened = () -> control.stateID();
+		stateToRestore = () -> control.stateID();
 	}
 
 	@Override
@@ -64,24 +64,28 @@ public class Ghost extends BoardMover {
 	public void update() {
 		control.update();
 	}
+	
+	public void setWaitingTime(int frames) {
+		control.state(Waiting).setDuration(frames);
+	}
 
 	// Events
 
-	public void startScattering() {
+	public void beginScattering() {
 		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
 			return;
 		}
 		control.changeTo(Scattering);
 	}
 
-	public void startChasing() {
+	public void beginChasing() {
 		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
 			return;
 		}
 		control.changeTo(Chasing);
 	}
 
-	public void startFrightened(int frames) {
+	public void beginBeingFrightened(int frames) {
 		if (control.inState(Dead)) {
 			return;
 		}
@@ -89,11 +93,11 @@ public class Ghost extends BoardMover {
 		control.changeTo(Frightened);
 	}
 
-	public void stopFrightened() {
+	public void endBeingFrightened() {
 		if (control.inState(Dead)) {
 			return;
 		}
-		control.changeTo(stateAfterFrightened.get());
+		control.changeTo(stateToRestore.get());
 	}
 
 	public void killed() {

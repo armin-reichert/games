@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.util.EnumMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -54,6 +55,10 @@ public class PacMan extends BoardMover {
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
 	private boolean couldMove;
+	
+	private Stream<Ghost> ghosts() {
+		return app.entities.allOf(Ghost.class);
+	}
 
 	public PacMan(AbstractPacManApp app, Board board, Tile home) {
 		super(app, board, home);
@@ -103,7 +108,7 @@ public class PacMan extends BoardMover {
 		control.state(Frightening).entry = state -> {
 			app.assets.sound("sfx/waza.mp3").loop();
 			speedBeforeFrightening = speed;
-			app.entities.allOf(Ghost.class).forEach(ghost -> ghost.startFrightened(state.getDuration()));
+			ghosts().forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
 		};
 
 		control.state(Frightening).update = state -> {
@@ -116,7 +121,7 @@ public class PacMan extends BoardMover {
 		control.state(Frightening).exit = state -> {
 			app.assets.sound("sfx/waza.mp3").stop();
 			speed = speedBeforeFrightening;
-			app.entities.allOf(Ghost.class).forEach(Ghost::stopFrightened);
+			ghosts().forEach(Ghost::endBeingFrightened);
 		};
 
 		control.state(Dying).entry = state -> {
@@ -188,7 +193,7 @@ public class PacMan extends BoardMover {
 		board.getContent(currentTile(), Energizer).ifPresent(onEnergizerFound);
 		board.getContent(currentTile(), Bonus).ifPresent(onBonusFound);
 		/*@formatter:off*/
-		app.entities.allOf(Ghost.class)
+		ghosts()
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())
 			.forEach(onGhostMet);
 		/*@formatter:on*/

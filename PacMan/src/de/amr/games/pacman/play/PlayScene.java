@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Sound;
@@ -51,9 +50,9 @@ import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
+import de.amr.games.pacman.core.entities.ghost.behaviors.FollowTileAheadOfPacMan;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
-import de.amr.games.pacman.core.entities.ghost.behaviors.TargetAtTileAheadOfPacMan;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 import de.amr.games.pacman.misc.Highscore;
 import de.amr.games.pacman.theme.PacManTheme;
@@ -74,7 +73,7 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
 	public static final Tile BONUS_TILE = new Tile(20f, 13f);
 
-	// values
+	// Game parameters
 	public static final int POINTS_FOR_PELLET = 10;
 	public static final int POINTS_FOR_ENERGIZER = 50;
 	public static final int BONUS1_PELLETS_LEFT = 170;
@@ -83,6 +82,32 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final int POINTS_FOR_KILLING_FIRST_GHOST = 200;
 	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
 	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
+
+	// Game control
+	private StateMachine<PlayState> playControl;
+	private GhostAttackTimer ghostAttackTimer;
+
+	// Entities
+	private PacMan pacMan;
+	private Ghost blinky, inky, pinky, clyde;
+
+	private Stream<Ghost> ghosts() {
+		return Stream.of(blinky, inky, pinky, clyde);
+	}
+
+	// Scene-specific data
+	private Board board;
+	private PacManGameLevels levels;
+	private int level;
+	private int lives;
+	private int score;
+	private Highscore highscore;
+	private List<BonusSymbol> bonusCollection;
+	private int bonusTimeRemaining;
+	private int nextGhostPoints;
+	private int ghostsEatenAtLevel;
+
+	private final Random rand = new Random();
 
 	/**
 	 * State machine which controls the game play.
@@ -103,7 +128,7 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints = 0;
 				app.entities.removeAll(GameEntity.class);
 				createPacManAndGhosts();
-				createAttackControl();
+				createGhostAttackTimer();
 				level = 1;
 				initLevel();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
@@ -119,7 +144,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Ready).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
-				attackControl.init(level);
+				ghostAttackTimer.init(level);
 			};
 
 			state(Ready).update = state -> {
@@ -146,12 +171,12 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Playing).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Eating);
-				ghosts.get().forEach(ghost -> ghost.control.state(GhostState.Waiting).setDuration(getGhostWaitingTime(ghost)));
-				attackControl.start();
+				ghosts().forEach(ghost -> ghost.setWaitingTime(getGhostWaitingTime(ghost)));
+				ghostAttackTimer.start();
 			};
 
 			state(Playing).update = state -> {
-				attackControl.update();
+				ghostAttackTimer.update();
 				app.entities.all().forEach(GameEntity::update);
 				if (isBonusEnabled() && bonusTimeRemaining-- == 0) {
 					setBonusEnabled(false);
@@ -159,7 +184,7 @@ public class PlayScene extends Scene<PacManGame> {
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					++level;
 					initLevel();
-					attackControl.init(level);
+					ghostAttackTimer.init(level);
 					changeTo(StartingLevel);
 				}
 			};
@@ -187,11 +212,11 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Crashing).exit = state -> {
 				pacMan.init();
-				ghosts.get().forEach(ghost -> {
+				ghosts().forEach(ghost -> {
 					ghost.init();
 					ghost.setAnimated(true);
 				});
-				attackControl.init(level);
+				ghostAttackTimer.init(level);
 			};
 
 			// GameOver
@@ -212,29 +237,6 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 		}
 	}
-
-	// State machines
-	private StateMachine<PlayState> playControl;
-	private GhostAttackTimer attackControl;
-
-	// Entities
-	private PacMan pacMan;
-	private Ghost blinky, inky, pinky, clyde;
-	private Supplier<Stream<Ghost>> ghosts = () -> Stream.of(blinky, inky, pinky, clyde);
-
-	// Scene-specific data
-	private Board board;
-	private PacManGameLevels levels;
-	private int level;
-	private int lives;
-	private int score;
-	private Highscore highscore;
-	private List<BonusSymbol> bonusCollection;
-	private int bonusTimeRemaining;
-	private int nextGhostPoints;
-	private int ghostsEatenAtLevel;
-
-	private final Random rand = new Random();
 
 	public PlayScene(PacManGame app) {
 		super(app);
@@ -270,7 +272,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_T)) {
 			app.selectNextTheme();
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_K)) {
-			ghosts.get().forEach(Ghost::killed);
+			ghosts().forEach(Ghost::killed);
 		}
 		playControl.update();
 	}
@@ -366,18 +368,18 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Define common ghost behavior:
 
-		ghosts.get().forEach(ghost -> {
+		ghosts().forEach(ghost -> {
 
 			ghost.speed = () -> getGhostSpeed(ghost);
 
 			ghost.control.state(GhostState.Waiting).update = state -> {
 				if (state.isTerminated()) {
-					switch (attackControl.currentState()) {
+					switch (ghostAttackTimer.state()) {
 					case Scattering:
-						ghost.startScattering();
+						ghost.beginScattering();
 						break;
 					case Chasing:
-						ghost.startChasing();
+						ghost.beginChasing();
 						break;
 					default:
 						break;
@@ -385,8 +387,9 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			ghost.stateAfterFrightened = () -> {
-				switch (attackControl.currentState()) {
+			// When "frightened" state ends, go into chasing or scattering state:
+			ghost.stateToRestore = () -> {
+				switch (ghostAttackTimer.state()) {
 				case Scattering:
 					return GhostState.Scattering;
 				case Chasing:
@@ -396,14 +399,12 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			// "frightened" state:
-
+			// When in "frightened" state, move randomly:
 			ghost.control.state(GhostState.Frightened).update = state -> {
 				ghost.moveRandomly();
 			};
 
-			// "dead" state:
-
+			// When "dead", return to home location. Then recover.
 			ghost.control.state(GhostState.Dead).update = state -> {
 				ghost.follow(ghost.getHome());
 				if (ghost.isAtHome()) {
@@ -411,57 +412,58 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			// "recovering" state:
-
+			// After "recovering", start scattering or chasing:
 			ghost.control.state(GhostState.Recovering).entry = state -> {
 				state.setDuration(getGhostRecoveringDuration(ghost));
 			};
 
 			ghost.control.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
-					ghost.control.changeTo(ghost.stateAfterFrightened.get());
+					ghost.control.changeTo(ghost.stateToRestore.get());
 					ghost.setAnimated(true);
 				}
 			};
 		});
 
-		// Define individual ghost behavior:
+		/*
+		 * "Blinky", the red ghost.
+		 */
 
-		// "Blinky", the red ghost
-
-		// wait just before ghost house:
+		// Blinky waits just before ghost house:
 		blinky.control.state(GhostState.Waiting).entry = state -> {
 			blinky.placeAt(blinky.getHome());
 			blinky.setMoveDir(W);
 			blinky.setAnimated(true);
 		};
 
-		// loop around block at right upper corner of maze:
+		// Blinky loops around the walls at the right upper corner of the maze:
 		blinky.control.state(GhostState.Scattering, new LoopAroundWalls(blinky, 4, 26, Top4.S, true));
 
-		// target Pac-Man's current position:
+		// Blinky directly follows Pac-Man:
 		blinky.control.state(GhostState.Chasing).update = state -> {
 			blinky.follow(pacMan.currentTile());
 		};
 
-		// "Inky", the blue ghost
+		/*
+		 * "Inky", the blue ghost.
+		 */
 
-		// wait inside ghost house:
+		// Inky waits inside the ghost house:
 		inky.control.state(GhostState.Waiting).entry = state -> {
 			inky.placeAt(inky.getHome());
 			inky.setMoveDir(Top4.N);
 			inky.setAnimated(true);
 		};
 
-		// bounce while waiting:
+		// Inky bounces while waiting. When waiting is over, he starts scattering or chasing.
 		inky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				switch (attackControl.currentState()) {
+				switch (ghostAttackTimer.state()) {
 				case Scattering:
-					inky.startScattering();
+					inky.beginScattering();
 					break;
 				case Chasing:
-					inky.startChasing();
+					inky.beginChasing();
 					break;
 				default:
 					break;
@@ -471,30 +473,32 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// loop around block at right lower corner of maze:
+		// Inky loops around the walls at the lower right corner of the maze:
 		inky.control.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
 
-		// target tile in front of Pac-Man or target Pac-Man directly:
+		// Inky chases together with Blinky.
 		inky.control.state(GhostState.Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 
-		// "Pinky", the pink ghost
+		/*
+		 * "Pinky", the pink ghost.
+		 */
 
-		// wait inside ghost house:
+		// Pinky waits inside the ghost house:
 		pinky.control.state(GhostState.Waiting).entry = state -> {
 			pinky.placeAt(pinky.getHome());
 			pinky.setMoveDir(Top4.S);
 			pinky.setAnimated(true);
 		};
 
-		// bounce while waiting:
+		// Pinky bounce while waiting. When waiting is over, he starts scattering or chasing.
 		pinky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				switch (attackControl.currentState()) {
+				switch (ghostAttackTimer.state()) {
 				case Scattering:
-					pinky.startScattering();
+					pinky.beginScattering();
 					break;
 				case Chasing:
-					pinky.startChasing();
+					pinky.beginChasing();
 					break;
 				default:
 					break;
@@ -504,30 +508,32 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// loop around block at right upper corner of maze:
+		// Pinky loops around the walls at the upper right corner of the maze:
 		pinky.control.state(GhostState.Scattering, new LoopAroundWalls(pinky, 4, 1, Top4.S, false));
 
-		// target tile which is 4 tiles ahead of Pac-Man's current position:
-		pinky.control.state(GhostState.Chasing, new TargetAtTileAheadOfPacMan(pinky, pacMan, 4));
+		// Pinky follows the position 4 tiles ahead of Pac-Man:
+		pinky.control.state(GhostState.Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 
-		// "Clyde", the yellow ghost
+		/*
+		 * "Clyde", the yellow ghost.
+		 */
 
-		// wait inside ghost house:
+		// Clyde waits inside ghost house:
 		clyde.control.state(GhostState.Waiting).entry = state -> {
 			clyde.placeAt(clyde.getHome());
 			clyde.setMoveDir(Top4.N);
 			clyde.setAnimated(true);
 		};
 
-		// bounce when waiting:
+		// Clyde bounces while waiting. When waiting is over, he starts scattering or chasing.
 		clyde.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				switch (attackControl.currentState()) {
+				switch (ghostAttackTimer.state()) {
 				case Scattering:
-					clyde.startScattering();
+					clyde.beginScattering();
 					break;
 				case Chasing:
-					clyde.startChasing();
+					clyde.beginChasing();
 					break;
 				default:
 					break;
@@ -537,10 +543,11 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// loop around block at left lower corner of maze:
+		// Clyde loops around the walls at the left lower corner of the maze:
 		clyde.control.state(GhostState.Scattering, new LoopAroundWalls(clyde, 32, 1, Top4.E, false));
 
-		// target Pac-Man's position if more than 8 tiles away, otherwise move randomly:
+		// Clyde follows Pac-Man's position if he is more than 8 tiles away, otherwise he moves
+		// randomly:
 		clyde.control.state(GhostState.Chasing).update = state -> {
 			if (clyde.insideGhostHouse()) {
 				clyde.follow(GHOST_HOUSE_ENTRY);
@@ -551,33 +558,32 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		// add all to entity collection
+		// Update entity collection
 		app.entities.removeAll(PacMan.class);
 		app.entities.removeAll(Ghost.class);
 		app.entities.add(pacMan);
 		app.entities.add(blinky, inky, pinky, clyde);
-
 	}
 
-	private void createAttackControl() {
-		attackControl = new GhostAttackTimer(app);
-		attackControl.trace = true;
+	private void createGhostAttackTimer() {
+		ghostAttackTimer = new GhostAttackTimer(app);
+		ghostAttackTimer.trace = true;
 
-		attackControl.onPhaseStart = phase -> {
+		ghostAttackTimer.onPhaseStart = phase -> {
 			if (phase == GhostAttackState.Initialized) {
-				ghosts.get().forEach(ghost -> {
+				ghosts().forEach(ghost -> {
 					ghost.control.changeTo(GhostState.Waiting);
 				});
 			} else if (phase == GhostAttackState.Scattering) {
-				ghosts.get().forEach(Ghost::startScattering);
+				ghosts().forEach(Ghost::beginScattering);
 				app.assets.sound("sfx/siren.mp3").loop();
 			} else if (phase == GhostAttackState.Chasing) {
 				app.assets.sound("sfx/siren.mp3").loop();
-				ghosts.get().forEach(Ghost::startChasing);
+				ghosts().forEach(Ghost::beginChasing);
 			}
 		};
 
-		attackControl.onPhaseEnd = phase -> {
+		ghostAttackTimer.onPhaseEnd = phase -> {
 			if (phase == GhostAttackState.Scattering) {
 				app.assets.sound("sfx/siren.mp3").stop();
 			} else if (phase == GhostAttackState.Chasing) {
@@ -664,7 +670,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 		if (app.settings.getBool("drawInternals")) {
 			// mark home positions of ghosts
-			ghosts.get().forEach(ghost -> {
+			ghosts().forEach(ghost -> {
 				g.setColor(ghost.getColor());
 				float x = ghost.getHome().x * TILE_SIZE, y = ghost.getHome().y * TILE_SIZE;
 				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
@@ -674,7 +680,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Entities
 		pacMan.draw(g);
 		if (!playControl.inState(PlayState.Crashing)) {
-			ghosts.get().forEach(ghost -> ghost.draw(g));
+			ghosts().forEach(ghost -> ghost.draw(g));
 		}
 
 		// HUD
@@ -722,7 +728,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Play state
 		if (app.settings.getBool("drawInternals")) {
-			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + attackControl.currentState());
+			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
 		}
 
 		// Flash texts

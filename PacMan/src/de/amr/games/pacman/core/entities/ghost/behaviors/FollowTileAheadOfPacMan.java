@@ -13,9 +13,9 @@ import de.amr.games.pacman.core.statemachine.State;
  * 
  * @author Armin Reichert
  */
-public class TargetAtTileAheadOfPacMan extends State {
+public class FollowTileAheadOfPacMan extends State {
 
-	public TargetAtTileAheadOfPacMan(BoardMover chaser, BoardMover target, int numTilesAhead) {
+	public FollowTileAheadOfPacMan(BoardMover chaser, BoardMover target, int numTilesAhead) {
 		update = state -> {
 			Board board = chaser.getBoard();
 			int dir = target.getMoveDir();

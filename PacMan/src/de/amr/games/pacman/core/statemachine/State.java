@@ -7,7 +7,7 @@ import java.util.function.Consumer;
  */
 public class State {
 
-	public static final int FOREVER = -1;
+	public static final int FOREVER = Integer.MAX_VALUE;
 
 	/** The action performed when entering this state. */
 	public Consumer<State> entry;

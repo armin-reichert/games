@@ -15,6 +15,22 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class GhostAttackTimer {
 
+	private static final int[][] SCATTERING_TIME = {
+		/*@formatter:off*/
+		{ 7, 7, 5, 5, 0 }, 	// level 1
+		{ 7, 7, 5, 0, 0 }, 	// level 2-4
+		{ 5, 5, 5, 0, 0 }   // level 5...
+		/*@formatter:on*/
+	};
+
+	private static final int[][] CHASING_TIME = {
+		/*@formatter:off*/
+		{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
+		{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
+		{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5...
+		/*@formatter:on*/
+	};
+
 	public Consumer<GhostAttackState> onPhaseStart;
 	public Consumer<GhostAttackState> onPhaseEnd;
 
@@ -25,26 +41,10 @@ public class GhostAttackTimer {
 	private int level;
 	private int wave;
 
-	private final int[][] SCATTERING_SECONDS = {
-		/*@formatter:off*/
-		{ 7, 7, 5, 5, 0 }, 	// level 1
-		{ 7, 7, 5, 0, 0 }, 	// level 2-4
-		{ 5, 5, 5, 0, 0 }   // level 5...
-		/*@formatter:on*/
-	};
-
-	private final int[][] CHASING_SECONDS = {
-		/*@formatter:off*/
-		{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
-		{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
-		{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5...
-		/*@formatter:on*/
-	};
-
-	private int getPhaseDuration(int[][] seconds) {
+	private int getPhaseDuration(int[][] timeTable) {
 		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-		int n = seconds[0].length, col = wave <= n ? wave - 1 : n - 1;
-		return app.motor.toFrames(seconds[row][col]);
+		int n = timeTable[0].length, col = wave <= n ? wave - 1 : n - 1;
+		return app.motor.toFrames(timeTable[row][col]);
 	}
 
 	public void init(int level) {
@@ -65,7 +65,7 @@ public class GhostAttackTimer {
 		fsm.update();
 	}
 
-	public GhostAttackState currentState() {
+	public GhostAttackState state() {
 		return fsm.stateID();
 	}
 
@@ -84,18 +84,18 @@ public class GhostAttackTimer {
 		fsm.state(Initialized).entry = state -> {
 			wave = 1;
 			onPhaseStart.accept(fsm.stateID());
-			traceStart();
+			traceEntry();
 		};
 
 		fsm.state(Initialized).exit = state -> {
 			onPhaseEnd.accept(fsm.stateID());
-			traceEnd();
+			traceExit();
 		};
 
 		fsm.state(Scattering).entry = state -> {
-			state.setDuration(getPhaseDuration(SCATTERING_SECONDS));
+			state.setDuration(getPhaseDuration(SCATTERING_TIME));
 			onPhaseStart.accept(fsm.stateID());
-			traceStart();
+			traceEntry();
 		};
 
 		fsm.state(Scattering).update = state -> {
@@ -106,13 +106,13 @@ public class GhostAttackTimer {
 
 		fsm.state(Scattering).exit = state -> {
 			onPhaseEnd.accept(fsm.stateID());
-			traceEnd();
+			traceExit();
 		};
 
 		fsm.state(Chasing).entry = state -> {
-			state.setDuration(getPhaseDuration(CHASING_SECONDS));
+			state.setDuration(getPhaseDuration(CHASING_TIME));
 			onPhaseStart.accept(fsm.stateID());
-			traceStart();
+			traceEntry();
 		};
 
 		fsm.state(Chasing).update = state -> {
@@ -123,19 +123,19 @@ public class GhostAttackTimer {
 
 		fsm.state(Chasing).exit = state -> {
 			onPhaseEnd.accept(fsm.stateID());
-			traceEnd();
+			traceExit();
 			++wave;
 		};
 	}
 
-	private void traceStart() {
+	private void traceEntry() {
 		if (trace) {
-			Application.Log.info(String.format("Start of phase '%s' (%f seconds)", fsm.stateID(),
+			Application.Log.info(String.format("Start of phase '%s' (%.2f seconds)", fsm.stateID(),
 					app.motor.toSeconds(fsm.state().getDuration())));
 		}
 	}
 
-	private void traceEnd() {
+	private void traceExit() {
 		if (trace) {
 			Application.Log.info(String.format("End of phase '%s'", fsm.stateID()));
 		}
