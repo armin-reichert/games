@@ -19,9 +19,9 @@ import de.amr.games.pacman.core.board.BonusSymbol;
  * 
  * @author Armin Reichert
  */
-public class PacManGameLevels {
+public class LevelData {
 
-	private static final Object[][] LEVEL_DATA = {
+	private static final Object[][] DATA = {
 		/*@formatter:off*/
 		{},
 		{ Cherries, 		100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
@@ -46,28 +46,28 @@ public class PacManGameLevels {
 
 	private float baseSpeed;
 
-	public PacManGameLevels(float baseSpeed) {
+	public LevelData(float baseSpeed) {
 		this.baseSpeed = baseSpeed;
 	}
 
 	public BonusSymbol getBonusSymbol(int level) {
-		return (BonusSymbol) LEVEL_DATA[level][0];
+		return (BonusSymbol) DATA[level][0];
 	}
 
 	public int getBonusValue(int level) {
-		return (Integer) LEVEL_DATA[level][1];
+		return (Integer) DATA[level][1];
 	}
 
 	public float getPacManSpeed(int level) {
-		return baseSpeed * (Float) LEVEL_DATA[level][2];
+		return baseSpeed * (Float) DATA[level][2];
 	}
 
 	public float getGhostSpeedNormal(int level) {
-		return baseSpeed * (Float) LEVEL_DATA[level][4];
+		return baseSpeed * (Float) DATA[level][4];
 	}
 
 	public float getGhostSpeedInTunnel(int level) {
-		return baseSpeed * (Float) LEVEL_DATA[level][5];
+		return baseSpeed * (Float) DATA[level][5];
 	}
 
 	public float getGhostSpeedInHouse() {
@@ -75,14 +75,14 @@ public class PacManGameLevels {
 	}
 
 	public float getPacManFrighteningSpeed(int level) {
-		return baseSpeed * (Float) LEVEL_DATA[level][10];
+		return baseSpeed * (Float) DATA[level][10];
 	}
 
 	public float getGhostSpeedWhenFrightened(int level) {
-		return baseSpeed * (Float) LEVEL_DATA[level][12];
+		return baseSpeed * (Float) DATA[level][12];
 	}
 
 	public int getGhostFrightenedDuration(int level) {
-		return (Integer) LEVEL_DATA[level][13];
+		return (Integer) DATA[level][13];
 	}
 }

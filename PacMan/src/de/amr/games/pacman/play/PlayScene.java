@@ -84,8 +84,9 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
 
 	// Game control
-	private StateMachine<PlayState> playControl;
+	private final StateMachine<PlayState> playControl;
 	private GhostAttackTimer ghostAttackTimer;
+	private final Random rand = new Random();
 
 	// Entities
 	private PacMan pacMan;
@@ -96,18 +97,16 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	// Scene-specific data
-	private Board board;
-	private PacManGameLevels levels;
+	private final LevelData levels;
+	private final Board board;
+	private final Highscore highscore;
+	private final List<BonusSymbol> bonusList;
 	private int level;
 	private int lives;
 	private int score;
-	private Highscore highscore;
-	private List<BonusSymbol> bonusCollection;
 	private int bonusTimeRemaining;
 	private int nextGhostPoints;
 	private int ghostsEatenAtLevel;
-
-	private final Random rand = new Random();
 
 	/**
 	 * State machine which controls the game play.
@@ -121,17 +120,15 @@ public class PlayScene extends Scene<PacManGame> {
 			// Initializing
 
 			state(Initializing).entry = state -> {
-				app.assets.sound("sfx/insert-coin.mp3").play();
 				lives = 3;
 				score = 0;
-				bonusCollection.clear();
-				nextGhostPoints = 0;
-				app.entities.removeAll(GameEntity.class);
+				bonusList.clear();
 				createPacManAndGhosts();
 				createGhostAttackTimer();
 				level = 1;
 				initLevel();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
+				app.assets.sound("sfx/insert-coin.mp3").play();
 			};
 
 			state(Initializing).update = state -> {
@@ -169,6 +166,12 @@ public class PlayScene extends Scene<PacManGame> {
 			// Playing
 
 			state(Playing).entry = state -> {
+				pacMan.init();
+				ghosts().forEach(ghost -> {
+					ghost.init();
+					ghost.setAnimated(true);
+				});
+				ghostAttackTimer.init(level);
 				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Eating);
 				ghosts().forEach(ghost -> ghost.setWaitingTime(getGhostWaitingTime(ghost)));
@@ -210,15 +213,6 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			state(Crashing).exit = state -> {
-				pacMan.init();
-				ghosts().forEach(ghost -> {
-					ghost.init();
-					ghost.setAnimated(true);
-				});
-				ghostAttackTimer.init(level);
-			};
-
 			// GameOver
 
 			state(GameOver).entry = state -> {
@@ -235,20 +229,24 @@ public class PlayScene extends Scene<PacManGame> {
 					changeTo(Initializing);
 				}
 			};
+			
+			state(GameOver).exit = state -> {
+				app.entities.removeAll(GameEntity.class);
+			};
 		}
 	}
 
 	public PlayScene(PacManGame app) {
 		super(app);
+		playControl = new PlayControl();
+		levels = new LevelData(8 * TILE_SIZE / app.motor.getFrequency());
+		board = new Board(app.assets.text("board.txt").split("\n"));
+		highscore = new Highscore("pacman-hiscore.txt");
+		bonusList = new ArrayList<>();
 	}
 
 	@Override
 	public void init() {
-		levels = new PacManGameLevels(8 * TILE_SIZE / app.motor.getFrequency());
-		board = new Board(app.assets.text("board.txt").split("\n"));
-		highscore = new Highscore("pacman-hiscore.txt");
-		bonusCollection = new ArrayList<>();
-		playControl = new PlayControl();
 		playControl.changeTo(PlayState.Initializing);
 	}
 
@@ -264,7 +262,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_L)) {
 			lives += 1;
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_B)) {
-			bonusCollection.add(levels.getBonusSymbol(level));
+			bonusList.add(levels.getBonusSymbol(level));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_P)) {
 			board.tilesWithContent(Pellet).forEach(tile -> board.setContent(tile, None));
 		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_E)) {
@@ -325,7 +323,7 @@ public class PlayScene extends Scene<PacManGame> {
 			app.assets.sound("sfx/eat-fruit.mp3").play();
 			int points = levels.getBonusValue(level);
 			score(points);
-			bonusCollection.add(levels.getBonusSymbol(level));
+			bonusList.add(levels.getBonusSymbol(level));
 			showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
 			setBonusEnabled(false);
 			board.setContent(tile, None);
@@ -373,17 +371,18 @@ public class PlayScene extends Scene<PacManGame> {
 			ghost.speed = () -> getGhostSpeed(ghost);
 
 			ghost.control.state(GhostState.Waiting).update = state -> {
-				if (state.isTerminated()) {
-					switch (ghostAttackTimer.state()) {
-					case Scattering:
-						ghost.beginScattering();
-						break;
-					case Chasing:
-						ghost.beginChasing();
-						break;
-					default:
-						break;
-					}
+				if (!state.isTerminated()) {
+					return;
+				}
+				switch (ghostAttackTimer.state()) {
+				case Scattering:
+					ghost.beginScattering();
+					break;
+				case Chasing:
+					ghost.beginChasing();
+					break;
+				default:
+					break;
 				}
 			};
 
@@ -457,19 +456,19 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Inky bounces while waiting. When waiting is over, he starts scattering or chasing.
 		inky.control.state(GhostState.Waiting).update = state -> {
-			if (state.isTerminated()) {
-				switch (ghostAttackTimer.state()) {
-				case Scattering:
-					inky.beginScattering();
-					break;
-				case Chasing:
-					inky.beginChasing();
-					break;
-				default:
-					break;
-				}
-			} else {
+			if (!state.isTerminated()) {
 				inky.bounce();
+				return;
+			}
+			switch (ghostAttackTimer.state()) {
+			case Scattering:
+				inky.beginScattering();
+				break;
+			case Chasing:
+				inky.beginChasing();
+				break;
+			default:
+				break;
 			}
 		};
 
@@ -484,7 +483,9 @@ public class PlayScene extends Scene<PacManGame> {
 		 */
 
 		// Pinky waits inside the ghost house:
-		pinky.control.state(GhostState.Waiting).entry = state -> {
+		pinky.control.state(GhostState.Waiting).entry = state ->
+
+		{
 			pinky.placeAt(pinky.getHome());
 			pinky.setMoveDir(Top4.S);
 			pinky.setAnimated(true);
@@ -492,19 +493,19 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Pinky bounce while waiting. When waiting is over, he starts scattering or chasing.
 		pinky.control.state(GhostState.Waiting).update = state -> {
-			if (state.isTerminated()) {
-				switch (ghostAttackTimer.state()) {
-				case Scattering:
-					pinky.beginScattering();
-					break;
-				case Chasing:
-					pinky.beginChasing();
-					break;
-				default:
-					break;
-				}
-			} else {
+			if (!state.isTerminated()) {
 				pinky.bounce();
+				return;
+			}
+			switch (ghostAttackTimer.state()) {
+			case Scattering:
+				pinky.beginScattering();
+				break;
+			case Chasing:
+				pinky.beginChasing();
+				break;
+			default:
+				break;
 			}
 		};
 
@@ -527,19 +528,19 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Clyde bounces while waiting. When waiting is over, he starts scattering or chasing.
 		clyde.control.state(GhostState.Waiting).update = state -> {
-			if (state.isTerminated()) {
-				switch (ghostAttackTimer.state()) {
-				case Scattering:
-					clyde.beginScattering();
-					break;
-				case Chasing:
-					clyde.beginChasing();
-					break;
-				default:
-					break;
-				}
-			} else {
+			if (!state.isTerminated()) {
 				clyde.bounce();
+				return;
+			}
+			switch (ghostAttackTimer.state()) {
+			case Scattering:
+				clyde.beginScattering();
+				break;
+			case Chasing:
+				clyde.beginChasing();
+				break;
+			default:
+				break;
 			}
 		};
 
@@ -721,7 +722,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Bonus score
 		int col = board.numCols - 2;
-		for (BonusSymbol bonus : bonusCollection) {
+		for (BonusSymbol bonus : bonusList) {
 			drawSprite(g, board.numRows - 2, col, theme.getBonusSprite(bonus));
 			col -= 2;
 		}
