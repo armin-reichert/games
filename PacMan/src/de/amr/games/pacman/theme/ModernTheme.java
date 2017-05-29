@@ -21,90 +21,92 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.BonusSymbol;
 
 /**
- * A Pac-Man UI with smoother sprites.
+ * A Pac-Man theme with smoother sprites.
  * 
  * @author Armin Reichert
- *
  */
 public class ModernTheme extends PacManTheme {
 
-	private final Assets assets;
-	private final Sprite board;
-	private final Map<Integer, Sprite> pacManRunning = new HashMap<>();
-	private final Sprite pacManStanding;
-	private final Map<String, Map<Integer, Sprite>> ghostNormal = new HashMap<>();
-	private final Sprite ghostFrightened;
-	private final Sprite ghostRecovering;
-	private final Sprite ghostDead;
-	private final Map<BonusSymbol, Sprite> bonusSymbols = new EnumMap<>(BonusSymbol.class);
-	private final Sprite energizer;
-	private final Sprite pill;
-	private final Sprite life;
+	private final BufferedImage originalSheet;
+	private final BufferedImage modernSpriteSheet;
+	private final BufferedImage modernTileSheet;
+	private final Sprite boardSprite;
+	private final Map<Integer, Sprite> pacManRunningSprites = new HashMap<>();
+	private final Sprite pacManStandingSprite;
+	private final Map<String, Map<Integer, Sprite>> ghostNormalSprites = new HashMap<>();
+	private final Sprite ghostFrightenedSprite;
+	private final Sprite ghostRecoveringSprite;
+	private final Sprite ghostDeadSprite;
+	private final Map<BonusSymbol, Sprite> bonusSymbolSprites = new EnumMap<>(BonusSymbol.class);
+	private final Sprite energizerSprite;
+	private final Sprite pillSprite;
+	private final Sprite lifeSprite;
 	private final Font textFont;
 	private final Color hudColor;
 
-	private Image $(BufferedImage sheet, int row, int col) {
+	private Image tile(BufferedImage sheet, int row, int col) {
 		return sheet.getSubimage(col * 32, row * 32, 32, 32).getScaledInstance(SPRITE_SIZE, SPRITE_SIZE,
 				Image.SCALE_SMOOTH);
 	}
 
-	private Image $(int row, int col) {
-		BufferedImage sheet = assets.image("chompersprites.png");
-		return $(sheet, row, col);
+	private Image tile(int row, int col) {
+		return tile(modernSpriteSheet, row, col);
 	}
 
 	public ModernTheme(Assets assets) {
 
-		this.assets = assets;
-		BufferedImage sheet = assets.image("pacman_original.png");
-		board = new Sprite(sheet.getSubimage(228, 0, 224, 248)).scale(28 * TILE_SIZE, (36 - 5) * TILE_SIZE);
+		originalSheet = assets.image("pacman_original.png");
+		modernSpriteSheet = assets.image("chompersprites.png");
+		modernTileSheet = assets.image("chompermazetiles.png");
+
+		boardSprite = new Sprite(originalSheet.getSubimage(228, 0, 224, 248)).scale(28 * TILE_SIZE, (36 - 5) * TILE_SIZE);
 
 		int size = TILE_SIZE * 15 / 10;
 		for (BonusSymbol symbol : BonusSymbol.values()) {
-			bonusSymbols.put(symbol,
-					new Sprite(sheet.getSubimage(488 + symbol.ordinal() * 16, 48, 16, 16)).scale(size, size));
+			bonusSymbolSprites.put(symbol,
+					new Sprite(originalSheet.getSubimage(488 + symbol.ordinal() * 16, 48, 16, 16)).scale(size, size));
 		}
 
 		List<Integer> dirs = Arrays.asList(E, S, W, N);
 		List<String> ghostNames = Arrays.asList("Blinky", "Clyde", "Pinky", "Stinky", "Inky");
 
-		pacManStanding = new Sprite($(2, 11));
+		pacManStandingSprite = new Sprite(tile(2, 11));
 
 		for (int dir = 0; dir < dirs.size(); ++dir) {
-			Sprite sprite = new Sprite($(dir, 11), $(dir, 10));
+			Sprite sprite = new Sprite(tile(dir, 11), tile(dir, 10));
 			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 			sprite.createAnimation(AnimationMode.CYCLIC, 100);
-			pacManRunning.put(dirs.get(dir), sprite);
+			pacManRunningSprites.put(dirs.get(dir), sprite);
 		}
 
 		int ghostFrame = 333;
 
 		for (int ghost = 0; ghost < ghostNames.size(); ghost++) {
-			ghostNormal.put(ghostNames.get(ghost), new HashMap<>());
+			ghostNormalSprites.put(ghostNames.get(ghost), new HashMap<>());
 			for (int dir = 0; dir < dirs.size(); ++dir) {
-				Sprite sprite = new Sprite($(dir, 2 * ghost), $(dir, 2 * ghost + 1));
+				Sprite sprite = new Sprite(tile(dir, 2 * ghost), tile(dir, 2 * ghost + 1));
 				sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 				sprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
-				ghostNormal.get(ghostNames.get(ghost)).put(dirs.get(dir), sprite);
+				ghostNormalSprites.get(ghostNames.get(ghost)).put(dirs.get(dir), sprite);
 			}
 		}
 
-		ghostFrightened = new Sprite($(0, 12), $(0, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostFrightened.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+		ghostFrightenedSprite = new Sprite(tile(0, 12), tile(0, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
+		ghostFrightenedSprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
 
-		ghostRecovering = new Sprite($(0, 12), $(1, 12), $(0, 13), $(1, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostRecovering.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+		ghostRecoveringSprite = new Sprite(tile(0, 12), tile(1, 12), tile(0, 13), tile(1, 13)).scale(SPRITE_SIZE,
+				SPRITE_SIZE);
+		ghostRecoveringSprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
 
-		ghostDead = new Sprite($(2, 12), $(2, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostDead.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+		ghostDeadSprite = new Sprite(tile(2, 12), tile(2, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
+		ghostDeadSprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
 
-		life = new Sprite($(2, 11)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		BufferedImage sheet2 = assets.image("" + "chompermazetiles.png");
+		lifeSprite = new Sprite(tile(2, 11)).scale(SPRITE_SIZE, SPRITE_SIZE);
 
-		energizer = new Sprite($(sheet2, 2, 7), $(sheet2, 2, 8)).scale(TILE_SIZE, TILE_SIZE);
-		energizer.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
+		energizerSprite = new Sprite(tile(modernTileSheet, 2, 7), tile(modernTileSheet, 2, 8)).scale(TILE_SIZE, TILE_SIZE);
+		energizerSprite.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
 
-		pill = new Sprite($(sheet2, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
+		pillSprite = new Sprite(tile(modernTileSheet, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
 
 		// Text display
 		assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
@@ -114,17 +116,17 @@ public class ModernTheme extends PacManTheme {
 
 	@Override
 	public Sprite getBoardSprite() {
-		return board;
+		return boardSprite;
 	}
 
 	@Override
 	public Sprite getPacManStandingSprite(int dir) {
-		return pacManStanding;
+		return pacManStandingSprite;
 	}
 
 	@Override
 	public Sprite getPacManRunningSprite(int dir) {
-		return pacManRunning.get(dir);
+		return pacManRunningSprites.get(dir);
 	}
 
 	@Override
@@ -134,42 +136,42 @@ public class ModernTheme extends PacManTheme {
 
 	@Override
 	public Sprite getGhostNormalSprite(String ghostName, int dir) {
-		return ghostNormal.get(ghostName).get(dir);
+		return ghostNormalSprites.get(ghostName).get(dir);
 	}
 
 	@Override
 	public Sprite getGhostFrightenedSprite() {
-		return ghostFrightened;
+		return ghostFrightenedSprite;
 	}
 
 	@Override
 	public Sprite getGhostRecoveringSprite() {
-		return ghostRecovering;
+		return ghostRecoveringSprite;
 	}
 
 	@Override
 	public Sprite getGhostDeadSprite(int dir) {
-		return ghostDead;
+		return ghostDeadSprite;
 	}
 
 	@Override
 	public Sprite getEnergizerSprite() {
-		return energizer;
+		return energizerSprite;
 	}
 
 	@Override
 	public Sprite getPelletSprite() {
-		return pill;
+		return pillSprite;
 	}
 
 	@Override
 	public Sprite getLifeSprite() {
-		return life;
+		return lifeSprite;
 	}
 
 	@Override
 	public Sprite getBonusSprite(BonusSymbol symbol) {
-		return bonusSymbols.get(symbol);
+		return bonusSymbolSprites.get(symbol);
 	}
 
 	@Override
