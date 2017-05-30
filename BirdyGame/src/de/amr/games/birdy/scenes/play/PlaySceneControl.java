@@ -85,7 +85,7 @@ public class PlaySceneControl extends FSM<PlaySceneState, GameEvent> {
 				.entering(() -> {
 					scene.stopScrolling();
 				})
-				.into(StartingNewGame).when(() -> Keyboard.pressedOnce(KeyEvent.VK_SPACE))
+				.into(StartingNewGame).when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 				.keep().on(BirdTouchedGround).act(() -> PLAYING_MUSIC.stop())
 				.keep().on(BirdTouchedPipe)
 				.keep().on(BirdLeftPassage)

@@ -90,7 +90,7 @@ public abstract class Application {
 
 	private void update() {
 		KeyboardHandler.poll();
-		if (Keyboard.down(VK_CONTROL) && Keyboard.pressedOnce(PAUSE_TOGGLE_KEY)) {
+		if (Keyboard.keyDown(VK_CONTROL) && Keyboard.keyPressedOnce(PAUSE_TOGGLE_KEY)) {
 			pause(!paused);
 		}
 		if (!paused) {

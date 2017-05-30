@@ -49,7 +49,7 @@ public class Menu extends Scene<MazeDemoApp> {
 	@Override
 	public void update() {
 		for (MenuEntry entry : entries) {
-			if (Keyboard.pressedOnce(entry.key) && entry.action != null) {
+			if (Keyboard.keyPressedOnce(entry.key) && entry.action != null) {
 				entry.action.run();
 			}
 		}

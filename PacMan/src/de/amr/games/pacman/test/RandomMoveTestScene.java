@@ -38,7 +38,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_SPACE)) {
 			createGhosts();
 		}
 		Stream.of(ghosts).forEach(Ghost::update);

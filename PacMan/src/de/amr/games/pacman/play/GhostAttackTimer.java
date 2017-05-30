@@ -15,7 +15,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class GhostAttackTimer {
 
-	private static final int[][] SCATTERING_TIME = {
+	private static final int[][] SCATTERING_TIMES = {
 		/*@formatter:off*/
 		{ 7, 7, 5, 5, 0 }, 	// level 1
 		{ 7, 7, 5, 0, 0 }, 	// level 2-4
@@ -23,7 +23,7 @@ public class GhostAttackTimer {
 		/*@formatter:on*/
 	};
 
-	private static final int[][] CHASING_TIME = {
+	private static final int[][] CHASING_TIMES = {
 		/*@formatter:off*/
 		{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
 		{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
@@ -41,17 +41,15 @@ public class GhostAttackTimer {
 	private int level;
 	private int wave;
 
-	private int getPhaseDuration(int[][] timeTable) {
+	private int getPhaseDuration(int[][] times) {
 		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
-		int n = timeTable[0].length, col = wave <= n ? wave - 1 : n - 1;
-		return app.motor.toFrames(timeTable[row][col]);
+		int n = times[0].length, col = wave <= n ? wave - 1 : n - 1;
+		return app.motor.toFrames(times[row][col]);
 	}
 
-	public void init(int level) {
-		if (!fsm.inState(Initialized)) {
-			this.level = level;
-			fsm.changeTo(Initialized);
-		}
+	public void setLevel(int level) {
+		this.level = level;
+		fsm.changeTo(Initialized);
 	}
 
 	public void start() {
@@ -93,7 +91,7 @@ public class GhostAttackTimer {
 		};
 
 		fsm.state(Scattering).entry = state -> {
-			state.setDuration(getPhaseDuration(SCATTERING_TIME));
+			state.setDuration(getPhaseDuration(SCATTERING_TIMES));
 			onPhaseStart.accept(fsm.stateID());
 			traceEntry();
 		};
@@ -110,7 +108,7 @@ public class GhostAttackTimer {
 		};
 
 		fsm.state(Chasing).entry = state -> {
-			state.setDuration(getPhaseDuration(CHASING_TIME));
+			state.setDuration(getPhaseDuration(CHASING_TIMES));
 			onPhaseStart.accept(fsm.stateID());
 			traceEntry();
 		};

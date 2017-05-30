@@ -28,10 +28,10 @@ public class Paddle extends GameEntity {
 
 	@Override
 	public void update() {
-		if (Keyboard.down(paddleUpKey)) {
+		if (Keyboard.keyDown(paddleUpKey)) {
 			tr.setVelY(-PADDLE_SPEED);
 		}
-		if (Keyboard.down(paddleDownKey)) {
+		if (Keyboard.keyDown(paddleDownKey)) {
 			tr.setVelY(PADDLE_SPEED);
 		}
 		moveAndStopAtBorder();

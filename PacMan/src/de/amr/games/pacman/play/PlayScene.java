@@ -1,6 +1,7 @@
 package de.amr.games.pacman.play;
 
 import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
@@ -21,14 +22,22 @@ import static de.amr.games.pacman.play.PlayState.Ready;
 import static de.amr.games.pacman.play.PlayState.StartingLevel;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_E;
+import static java.awt.event.KeyEvent.VK_G;
+import static java.awt.event.KeyEvent.VK_I;
+import static java.awt.event.KeyEvent.VK_K;
+import static java.awt.event.KeyEvent.VK_L;
+import static java.awt.event.KeyEvent.VK_P;
+import static java.awt.event.KeyEvent.VK_R;
 import static java.awt.event.KeyEvent.VK_SPACE;
+import static java.awt.event.KeyEvent.VK_T;
 import static java.lang.String.format;
 import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -85,7 +94,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	// Game control
 	private final StateMachine<PlayState> playControl;
-	private GhostAttackTimer ghostAttackTimer;
+	private final GhostAttackTimer ghostAttackTimer;
 	private final Random rand = new Random();
 
 	// Entities
@@ -124,9 +133,8 @@ public class PlayScene extends Scene<PacManGame> {
 				score = 0;
 				bonusList.clear();
 				createPacManAndGhosts();
-				createGhostAttackTimer();
 				level = 1;
-				initLevel();
+				resetLevel();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
 			};
@@ -141,11 +149,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Ready).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
-				ghostAttackTimer.init(level);
 			};
 
 			state(Ready).update = state -> {
-				if (Keyboard.pressedOnce(VK_SPACE)) {
+				if (Keyboard.keyPressedOnce(VK_SPACE)) {
 					changeTo(StartingLevel);
 				}
 			};
@@ -153,6 +160,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// StartingLevel
 
 			state(StartingLevel).entry = state -> {
+				ghostAttackTimer.setLevel(level);
 				app.assets.sound("sfx/ready.mp3").play();
 			};
 
@@ -171,10 +179,10 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.init();
 					ghost.setAnimated(true);
 				});
-				ghostAttackTimer.init(level);
+				ghostAttackTimer.setLevel(level);
 				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Eating);
-				ghosts().forEach(ghost -> ghost.setWaitingTime(getGhostWaitingTime(ghost)));
+				ghosts().forEach(ghost -> ghost.setWaitingTime(getGhostWaitingDuration(ghost)));
 				ghostAttackTimer.start();
 			};
 
@@ -186,8 +194,8 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 					++level;
-					initLevel();
-					ghostAttackTimer.init(level);
+					resetLevel();
+					ghostAttackTimer.setLevel(level);
 					changeTo(StartingLevel);
 				}
 			};
@@ -225,11 +233,11 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(GameOver).update = state -> {
-				if (Keyboard.pressedOnce(VK_SPACE)) {
+				if (Keyboard.keyPressedOnce(VK_SPACE)) {
 					changeTo(Initializing);
 				}
 			};
-			
+
 			state(GameOver).exit = state -> {
 				app.entities.removeAll(GameEntity.class);
 			};
@@ -239,10 +247,36 @@ public class PlayScene extends Scene<PacManGame> {
 	public PlayScene(PacManGame app) {
 		super(app);
 		playControl = new PlayControl();
+		ghostAttackTimer = new GhostAttackTimer(app);
+		configureGhostAttackTimer(app);
 		levels = new LevelData(8 * TILE_SIZE / app.motor.getFrequency());
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusList = new ArrayList<>();
+	}
+
+	private void configureGhostAttackTimer(PacManGame app) {
+		ghostAttackTimer.trace = true;
+		ghostAttackTimer.onPhaseStart = phase -> {
+			if (phase == GhostAttackState.Initialized) {
+				ghosts().forEach(ghost -> {
+					ghost.control.changeTo(GhostState.Waiting);
+				});
+			} else if (phase == GhostAttackState.Scattering) {
+				ghosts().forEach(Ghost::beginScattering);
+				app.assets.sound("sfx/siren.mp3").loop();
+			} else if (phase == GhostAttackState.Chasing) {
+				app.assets.sound("sfx/siren.mp3").loop();
+				ghosts().forEach(Ghost::beginChasing);
+			}
+		};
+		ghostAttackTimer.onPhaseEnd = phase -> {
+			if (phase == GhostAttackState.Scattering) {
+				app.assets.sound("sfx/siren.mp3").stop();
+			} else if (phase == GhostAttackState.Chasing) {
+				app.assets.sound("sfx/siren.mp3").stop();
+			}
+		};
 	}
 
 	@Override
@@ -252,34 +286,36 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void update() {
-		// cheats and debug keys
-		if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_I)) {
-			app.settings.set("drawInternals", !app.settings.getBool("drawInternals"));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_G)) {
-			app.settings.set("drawGrid", !app.settings.getBool("drawGrid"));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_R)) {
-			app.settings.set("drawRoute", !app.settings.getBool("drawRoute"));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_L)) {
-			lives += 1;
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_B)) {
-			bonusList.add(levels.getBonusSymbol(level));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_P)) {
-			board.tilesWithContent(Pellet).forEach(tile -> board.setContent(tile, None));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_E)) {
-			board.tilesWithContent(Energizer).forEach(tile -> board.setContent(tile, None));
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_T)) {
-			app.selectNextTheme();
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ALT, KeyEvent.VK_K)) {
-			ghosts().forEach(Ghost::killed);
-		}
+		handleInput();
 		playControl.update();
 	}
 
-	private void initLevel() {
+	private void handleInput() {
+		if (keyPressedOnce(VK_ALT, VK_I)) {
+			app.settings.set("drawInternals", !app.settings.getBool("drawInternals"));
+		} else if (keyPressedOnce(VK_ALT, VK_G)) {
+			app.settings.set("drawGrid", !app.settings.getBool("drawGrid"));
+		} else if (keyPressedOnce(VK_ALT, VK_R)) {
+			app.settings.set("drawRoute", !app.settings.getBool("drawRoute"));
+		} else if (keyPressedOnce(VK_ALT, VK_L)) {
+			lives += 1;
+		} else if (keyPressedOnce(VK_ALT, VK_P)) {
+			board.tilesWithContent(Pellet).forEach(tile -> board.setContent(tile, None));
+		} else if (keyPressedOnce(VK_ALT, VK_E)) {
+			board.tilesWithContent(Energizer).forEach(tile -> board.setContent(tile, None));
+		} else if (keyPressedOnce(VK_ALT, VK_T)) {
+			app.selectNextTheme();
+		} else if (keyPressedOnce(VK_ALT, VK_K)) {
+			ghosts().forEach(Ghost::killed);
+		}
+	}
+
+	private void resetLevel() {
 		ghostsEatenAtLevel = 0;
 		board.resetContent();
 		setBonusEnabled(false);
 		app.entities.all().forEach(GameEntity::init);
+		ghostAttackTimer.setLevel(level);
 		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
 				board.count(Energizer)));
 	}
@@ -566,33 +602,6 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.add(blinky, inky, pinky, clyde);
 	}
 
-	private void createGhostAttackTimer() {
-		ghostAttackTimer = new GhostAttackTimer(app);
-		ghostAttackTimer.trace = true;
-
-		ghostAttackTimer.onPhaseStart = phase -> {
-			if (phase == GhostAttackState.Initialized) {
-				ghosts().forEach(ghost -> {
-					ghost.control.changeTo(GhostState.Waiting);
-				});
-			} else if (phase == GhostAttackState.Scattering) {
-				ghosts().forEach(Ghost::beginScattering);
-				app.assets.sound("sfx/siren.mp3").loop();
-			} else if (phase == GhostAttackState.Chasing) {
-				app.assets.sound("sfx/siren.mp3").loop();
-				ghosts().forEach(Ghost::beginChasing);
-			}
-		};
-
-		ghostAttackTimer.onPhaseEnd = phase -> {
-			if (phase == GhostAttackState.Scattering) {
-				app.assets.sound("sfx/siren.mp3").stop();
-			} else if (phase == GhostAttackState.Chasing) {
-				app.assets.sound("sfx/siren.mp3").stop();
-			}
-		};
-	}
-
 	private float getGhostSpeed(Ghost ghost) {
 		TileContent content = board.getContent(ghost.currentTile());
 		if (content == Tunnel) {
@@ -606,11 +615,11 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	private int getGhostWaitingTime(Ghost ghost) {
+	private int getGhostWaitingDuration(Ghost ghost) {
 		if ("Blinky".equals(ghost.getName())) {
 			return 0;
 		}
-		return app.motor.toFrames(1 + rand.nextInt(2));
+		return app.motor.toFrames(2 + rand.nextInt(3));
 	}
 
 	private int getGhostRecoveringDuration(Ghost ghost) {
@@ -665,19 +674,6 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		}));
 
-		// Grid lines & internal state
-		if (app.settings.getBool("drawGrid")) {
-			drawGridLines(g, getWidth(), getHeight());
-		}
-		if (app.settings.getBool("drawInternals")) {
-			// mark home positions of ghosts
-			ghosts().forEach(ghost -> {
-				g.setColor(ghost.getColor());
-				float x = ghost.getHome().x * TILE_SIZE, y = ghost.getHome().y * TILE_SIZE;
-				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
-			});
-		}
-
 		// Entities
 		pacMan.draw(g);
 		if (!playControl.inState(PlayState.Crashing)) {
@@ -717,19 +713,31 @@ public class PlayScene extends Scene<PacManGame> {
 			break;
 		}
 
-		// Lives score
+		// Lives
 		range(0, lives).forEach(i -> drawSprite(g, board.numRows - 2, 2 * (i + 1), theme.getLifeSprite()));
 
-		// Bonus score
+		// Boni
 		int col = board.numCols - 2;
 		for (BonusSymbol bonus : bonusList) {
 			drawSprite(g, board.numRows - 2, col, theme.getBonusSprite(bonus));
 			col -= 2;
 		}
 
-		// Play state
+		// Grid lines
+		if (app.settings.getBool("drawGrid")) {
+			drawGridLines(g, getWidth(), getHeight());
+		}
+		
+		// Internals
 		if (app.settings.getBool("drawInternals")) {
+			// play state
 			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
+			// home positions of ghosts
+			ghosts().forEach(ghost -> {
+				g.setColor(ghost.getColor());
+				float x = ghost.getHome().x * TILE_SIZE, y = ghost.getHome().y * TILE_SIZE;
+				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
+			});
 		}
 
 		// Flash texts

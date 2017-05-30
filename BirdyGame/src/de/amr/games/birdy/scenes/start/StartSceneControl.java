@@ -41,7 +41,7 @@ public class StartSceneControl extends FSM<StartSceneState, GameEvent> {
 			.state(Waiting)
 				.entering(scene::reset)
 				.keep().act(scene::keepBirdInAir)
-				.into(Ready).when(() -> Keyboard.down(JUMP_KEY))
+				.into(Ready).when(() -> Keyboard.keyDown(JUMP_KEY))
 				.into(Over).on(BirdTouchedGround)
 			.end()
 			
@@ -49,12 +49,12 @@ public class StartSceneControl extends FSM<StartSceneState, GameEvent> {
 				.entering(() -> {	scene.showReadyText(); ready321.restart(); })
 				.keep().act(ready321::update)
 				.into(Over).on(BirdTouchedGround).act(scene::showTitleText)
-				.into(StartPlaying).when(() -> Keyboard.down(JUMP_KEY) || ready321.isComplete())
+				.into(StartPlaying).when(() -> Keyboard.keyDown(JUMP_KEY) || ready321.isComplete())
 			.end()
 			
 			.state(Over)
 				.entering(scene::stopScrolling)
-				.into(Waiting).when(() -> Keyboard.pressedOnce(VK_SPACE))
+				.into(Waiting).when(() -> Keyboard.keyPressedOnce(VK_SPACE))
 				.keep()
 			.end()
 			

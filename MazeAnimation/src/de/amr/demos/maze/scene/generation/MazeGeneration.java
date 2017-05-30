@@ -75,13 +75,13 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(KeyEvent.VK_CONTROL) && Keyboard.pressedOnce(KeyEvent.VK_C)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
 			App.views.show(MazeGeneration.class);
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_PLUS)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_PLUS)) {
 			animation.faster(1);
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_MINUS)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_MINUS)) {
 			animation.slower(1);
 		}
 		if (aborted) {

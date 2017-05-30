@@ -92,7 +92,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 	@Override
 	public void update() {
 		handleTileClicked();
-		if (Keyboard.pressedOnce(KeyEvent.VK_SPACE)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_SPACE)) {
 			reset();
 		} else if (!ghost.currentTile().equals(targetTile)) {
 			ghostRunning = true;

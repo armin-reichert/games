@@ -66,7 +66,7 @@ public class PlayScene extends Scene<PongGame> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(VK_CONTROL, VK_C)) {
+		if (Keyboard.keyPressedOnce(VK_CONTROL, VK_C)) {
 			Game.views.show(Menu.class);
 		}
 		control.run(PlaySceneEvent.Tick);

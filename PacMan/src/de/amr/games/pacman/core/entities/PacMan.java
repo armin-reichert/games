@@ -200,16 +200,16 @@ public class PacMan extends BoardMover {
 	}
 
 	private int computeNextMoveDir() {
-		if (Keyboard.down(VK_LEFT)) {
+		if (Keyboard.keyDown(VK_LEFT)) {
 			return W;
 		}
-		if (Keyboard.down(VK_RIGHT)) {
+		if (Keyboard.keyDown(VK_RIGHT)) {
 			return E;
 		}
-		if (Keyboard.down(VK_UP)) {
+		if (Keyboard.keyDown(VK_UP)) {
 			return N;
 		}
-		if (Keyboard.down(VK_DOWN)) {
+		if (Keyboard.keyDown(VK_DOWN)) {
 			return S;
 		}
 		return nextMoveDir;

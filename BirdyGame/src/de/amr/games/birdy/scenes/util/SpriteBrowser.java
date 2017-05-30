@@ -37,11 +37,11 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(KeyEvent.VK_RIGHT)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
 			index = index + 1 == spriteNames.size() ? 0 : index + 1;
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_LEFT)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
 			index = index == 0 ? spriteNames.size() - 1 : index - 1;
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_X)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_X)) {
 			Game.views.show(StartScene.class);
 		}
 	}

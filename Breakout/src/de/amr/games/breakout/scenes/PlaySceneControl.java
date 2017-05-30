@@ -37,7 +37,7 @@ public class PlaySceneControl extends FSM<PlayState, PlayEvent> {
 			
 			.state(Initial)
 				.entering(scene::reset)
-				.into(Playing).when(() -> Keyboard.pressedOnce(VK_SPACE))
+				.into(Playing).when(() -> Keyboard.keyPressedOnce(VK_SPACE))
 				.keep()
 			.end()
 			
@@ -54,7 +54,7 @@ public class PlaySceneControl extends FSM<PlayState, PlayEvent> {
 			
 			.state(BallOut)
 				.entering(() -> {	scene.resetBat();	scene.resetBall(); })
-				.into(Playing).when(() -> Keyboard.pressedOnce(VK_SPACE))
+				.into(Playing).when(() -> Keyboard.keyPressedOnce(VK_SPACE))
 				.keep()
 			.end()
 		.endFSM();

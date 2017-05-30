@@ -43,15 +43,15 @@ public class Menu extends Scene<PongGame> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(KeyEvent.VK_DOWN)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
 			PlayMode[] values = PlayMode.values();
 			int current = getApp().getPlayMode().ordinal();
 			getApp().setPlayMode(current == values.length - 1 ? values[0] : values[current + 1]);
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_UP)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
 			PlayMode[] values = PlayMode.values();
 			int current = getApp().getPlayMode().ordinal();
 			getApp().setPlayMode(current == 0 ? values[values.length - 1] : values[current - 1]);
-		} else if (Keyboard.pressedOnce(KeyEvent.VK_ENTER)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
 			Game.views.show(PlayScene.class);
 		}
 	}

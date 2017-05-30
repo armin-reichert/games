@@ -33,7 +33,7 @@ public class DiashowScreen extends Scene<Diashow> {
 
 	@Override
 	public void update() {
-		if (Keyboard.pressedOnce(KEY_NEXT)) {
+		if (Keyboard.keyPressedOnce(KEY_NEXT)) {
 			current = current < nImages - 1 ? current + 1 : 0;
 			System.out.println("NEXT pressed once");
 		}

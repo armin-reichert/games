@@ -37,7 +37,7 @@ public class FlightControl extends FSM<FlightState, GameEvent> {
 			.state(Flying)
 				.entering(bird::lookFlying)
 				.keep().act(bird::fly)
-				.keep().when(() -> Keyboard.down(JUMP_KEY)).act(bird::jump)
+				.keep().when(() -> Keyboard.keyDown(JUMP_KEY)).act(bird::jump)
 				.into(OnGround).on(BirdTouchedGround)
 				.into(Crashing).on(BirdCrashed)
 				.into(Crashing).on(BirdLeftWorld)
