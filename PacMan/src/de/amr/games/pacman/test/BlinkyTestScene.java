@@ -8,7 +8,6 @@ import static de.amr.games.pacman.core.entities.PacManState.Eating;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
-import static de.amr.games.pacman.play.PlayScene.BLINKY_HOME;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
@@ -45,7 +44,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board, PACMAN_HOME);
+		pacMan = new PacMan(app, board);
+		pacMan.placeAt(PACMAN_HOME);
 
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 
@@ -68,10 +68,11 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			}
 		};
 
-		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
+		blinky = new Ghost(app, board, "Blinky");
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
+		blinky.placeAt(new Tile(4, 1));
 		blinky.speed = () -> pacMan.speed.get();
 
 		app.entities.add(pacMan, blinky); // needed for onGhostMet event handler!

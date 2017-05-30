@@ -46,7 +46,9 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board, PACMAN_HOME);
+		pacMan = new PacMan(app, board);
+		pacMan.placeAt(PACMAN_HOME);
+		
 		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onGhostMet = ghost -> {
 			ghost.placeAt(GHOST_HOUSE_ENTRY);
@@ -60,19 +62,21 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 			pacMan.setNextMoveDir(dir);
 		};
 
-		blinky = new Ghost(app, board, "Blinky", GHOST_HOUSE_ENTRY);
+		blinky = new Ghost(app, board, "Blinky");
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);
 		blinky.speed = () -> pacMan.speed.get() * .9f;
+		blinky.placeAt(GHOST_HOUSE_ENTRY);
 		blinky.setMoveDir(E);
 
-		inky = new Ghost(app, board, "Inky", GHOST_HOUSE_ENTRY);
+		inky = new Ghost(app, board, "Inky");
 		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
 		inky.speed = () -> pacMan.speed.get() * .9f;
+		inky.placeAt(GHOST_HOUSE_ENTRY);
 
 		app.entities.add(pacMan, blinky, inky);
 		pacMan.control.changeTo(Eating);

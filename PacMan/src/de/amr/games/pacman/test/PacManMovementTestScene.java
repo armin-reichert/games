@@ -33,7 +33,8 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
-		pacMan = new PacMan(app, board, PACMAN_HOME);
+		pacMan = new PacMan(app, board);
+		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.control.changeTo(Eating);
 	};

@@ -63,8 +63,8 @@ public class PacMan extends BoardMover {
 		return app.entities.allOf(Ghost.class);
 	}
 
-	public PacMan(AbstractPacManApp app, Board board, Tile home) {
-		super(board, home);
+	public PacMan(AbstractPacManApp app, Board board) {
+		super(board);
 		this.app = app;
 		setName("Pac-Man");
 
@@ -98,7 +98,6 @@ public class PacMan extends BoardMover {
 			freezeTimer = 0;
 			moveDir = W;
 			nextMoveDir = W;
-			placeAt(home);
 		};
 
 		control.state(Eating).entry = state -> {
@@ -143,7 +142,6 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void init() {
-		placeAt(home);
 		control.changeTo(Waiting);
 	}
 

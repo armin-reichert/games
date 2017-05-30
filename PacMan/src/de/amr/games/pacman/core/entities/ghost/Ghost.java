@@ -46,8 +46,8 @@ public class Ghost extends BoardMover {
 		return format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
 	}
 
-	public Ghost(AbstractPacManApp app, Board board, String name, Tile home) {
-		super(board, home);
+	public Ghost(AbstractPacManApp app, Board board, String name) {
+		super(board);
 		this.app = app;
 		setName(name);
 		color = Color.WHITE;
@@ -59,7 +59,6 @@ public class Ghost extends BoardMover {
 	public void init() {
 		route = emptyList();
 		setAnimated(false);
-		placeAt(getHome());
 		control.changeTo(Initialized);
 	}
 

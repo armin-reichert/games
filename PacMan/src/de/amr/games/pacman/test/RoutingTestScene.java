@@ -53,8 +53,9 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 			}
 		};
 		app.getShell().getCanvas().addMouseListener(clickHandler);
-		ghost = new Ghost(app, board, "Pinky", new Tile(4, 1));
+		ghost = new Ghost(app, board, "Pinky");
 		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
+		ghost.placeAt(new Tile(4, 1));
 		ghost.control.changeTo(GhostState.Chasing);
 		reset();
 	};

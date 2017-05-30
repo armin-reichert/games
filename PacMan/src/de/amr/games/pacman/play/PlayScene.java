@@ -2,7 +2,6 @@ package de.amr.games.pacman.play;
 
 import static de.amr.easy.game.Application.Log;
 import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
-import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
@@ -175,8 +174,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Playing).entry = state -> {
 				pacMan.init();
+				pacMan.placeAt(PACMAN_HOME);
 				ghosts().forEach(ghost -> {
 					ghost.init();
+					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.setAnimated(true);
 				});
 				ghostAttackTimer.setLevel(level);
@@ -322,7 +323,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void createPacManAndGhosts() {
 
-		pacMan = new PacMan(app, board, PACMAN_HOME);
+		pacMan = new PacMan(app, board);
+		pacMan.placeAt(PACMAN_HOME);
 
 		pacMan.speed = () -> {
 			switch (pacMan.control.stateID()) {
@@ -388,16 +390,16 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Create the ghosts:
 
-		blinky = new Ghost(app, board, "Blinky", BLINKY_HOME);
+		blinky = new Ghost(app, board, "Blinky");
 		blinky.setColor(Color.RED);
 
-		inky = new Ghost(app, board, "Inky", INKY_HOME);
+		inky = new Ghost(app, board, "Inky");
 		inky.setColor(new Color(64, 224, 208));
 
-		pinky = new Ghost(app, board, "Pinky", PINKY_HOME);
+		pinky = new Ghost(app, board, "Pinky");
 		pinky.setColor(Color.PINK);
 
-		clyde = new Ghost(app, board, "Clyde", CLYDE_HOME);
+		clyde = new Ghost(app, board, "Clyde");
 		clyde.setColor(Color.ORANGE);
 
 		// Define common ghost behavior:
@@ -441,8 +443,9 @@ public class PlayScene extends Scene<PacManGame> {
 
 			// When "dead", return to home location. Then recover.
 			ghost.control.state(GhostState.Dead).update = state -> {
-				ghost.follow(ghost.getHome());
-				if (ghost.isAtHome()) {
+				Tile homeTile = getGhostHomeTile(ghost);
+				ghost.follow(homeTile);
+				if (ghost.currentTile().equals(homeTile)) {
 					ghost.control.changeTo(GhostState.Recovering);
 				}
 			};
@@ -466,8 +469,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Blinky waits just before ghost house:
 		blinky.control.state(GhostState.Waiting).entry = state -> {
-			blinky.placeAt(blinky.getHome());
-			blinky.setMoveDir(W);
+			blinky.placeAt(BLINKY_HOME);
+			blinky.setMoveDir(Top4.W);
 			blinky.setAnimated(true);
 		};
 
@@ -485,7 +488,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Inky waits inside the ghost house:
 		inky.control.state(GhostState.Waiting).entry = state -> {
-			inky.placeAt(inky.getHome());
+			inky.placeAt(INKY_HOME);
 			inky.setMoveDir(Top4.N);
 			inky.setAnimated(true);
 		};
@@ -509,7 +512,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Inky loops around the walls at the lower right corner of the maze:
-		inky.control.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
+		inky.control.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, Top4.W, true));
 
 		// Inky chases together with Blinky.
 		inky.control.state(GhostState.Chasing, new ChaseWithPartner(inky, blinky, pacMan));
@@ -522,7 +525,7 @@ public class PlayScene extends Scene<PacManGame> {
 		pinky.control.state(GhostState.Waiting).entry = state ->
 
 		{
-			pinky.placeAt(pinky.getHome());
+			pinky.placeAt(PINKY_HOME);
 			pinky.setMoveDir(Top4.S);
 			pinky.setAnimated(true);
 		};
@@ -557,7 +560,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Clyde waits inside ghost house:
 		clyde.control.state(GhostState.Waiting).entry = state -> {
-			clyde.placeAt(clyde.getHome());
+			clyde.placeAt(CLYDE_HOME);
 			clyde.setMoveDir(Top4.N);
 			clyde.setAnimated(true);
 		};
@@ -612,6 +615,21 @@ public class PlayScene extends Scene<PacManGame> {
 			return levels.getGhostSpeedWhenFrightened(level);
 		} else {
 			return levels.getGhostSpeedNormal(level);
+		}
+	}
+
+	private Tile getGhostHomeTile(Ghost ghost) {
+		switch (ghost.getName()) {
+		case "Blinky":
+			return BLINKY_HOME;
+		case "Pinky":
+			return PINKY_HOME;
+		case "Inky":
+			return INKY_HOME;
+		case "Clyde":
+			return CLYDE_HOME;
+		default:
+			return GHOST_HOUSE_ENTRY;
 		}
 	}
 
@@ -735,7 +753,8 @@ public class PlayScene extends Scene<PacManGame> {
 			// home positions of ghosts
 			ghosts().forEach(ghost -> {
 				g.setColor(ghost.getColor());
-				float x = ghost.getHome().x * TILE_SIZE, y = ghost.getHome().y * TILE_SIZE;
+				Tile homeTile = getGhostHomeTile(ghost);
+				float x = homeTile.x * TILE_SIZE, y = homeTile.y * TILE_SIZE;
 				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
 			});
 		}

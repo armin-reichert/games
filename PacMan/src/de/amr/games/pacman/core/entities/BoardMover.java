@@ -12,7 +12,6 @@ import static java.lang.Math.abs;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,29 +28,22 @@ import de.amr.games.pacman.core.board.Tile;
  * Base class for entities which move on the board.
  */
 public abstract class BoardMover extends GameEntity {
-	
+
 	protected final Board board;
-	protected final Tile home;
 	protected List<Integer> route;
 	protected int moveDir;
 	protected int nextMoveDir;
 	public Supplier<Float> speed;
 
-	public BoardMover(Board board, Tile home) {
+	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
-		this.home = Objects.requireNonNull(home);
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;
 		speed = () -> 0f;
-		placeAt(home);
 	}
 
 	public Board getBoard() {
 		return board;
-	}
-
-	public Tile getHome() {
-		return home;
 	}
 
 	public List<Integer> getRoute() {
@@ -86,11 +78,6 @@ public abstract class BoardMover extends GameEntity {
 	@Override
 	public int getHeight() {
 		return TILE_SIZE;
-	}
-
-	public boolean isAtHome() {
-		Rectangle2D homeArea = new Rectangle2D.Float(home.x * TILE_SIZE, home.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-		return getCollisionBox().intersects(homeArea);
 	}
 
 	public int getCol() {

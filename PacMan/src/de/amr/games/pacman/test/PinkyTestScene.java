@@ -44,15 +44,17 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board, PACMAN_HOME);
+		pacMan = new PacMan(app, board);
+		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 
-		pinky = new Ghost(app, board, "Pinky", GHOST_HOUSE_ENTRY);
+		pinky = new Ghost(app, board, "Pinky");
 		pinky.control.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;
 		pinky.setColor(Color.PINK);
 		pinky.setAnimated(true);
 		pinky.speed = () -> .9f * pacMan.speed.get();
+		pinky.placeAt(GHOST_HOUSE_ENTRY);
 
 		pacMan.control.changeTo(Eating);
 		pinky.control.changeTo(Chasing);
