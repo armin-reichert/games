@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
@@ -55,7 +56,7 @@ public class PacMan extends BoardMover {
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
 	private boolean couldMove;
-	
+
 	private Stream<Ghost> ghosts() {
 		return app.entities.allOf(Ghost.class);
 	}
@@ -167,7 +168,7 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		board.topology.dirs().forEach(dir -> {
+		Top4.INSTANCE.dirs().forEach(dir -> {
 			app.getTheme().getPacManRunningSprite(dir).setAnimated(animated);
 		});
 	}

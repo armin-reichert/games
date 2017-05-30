@@ -1,5 +1,6 @@
 package de.amr.games.pacman.core.entities.ghost.behaviors;
 
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
@@ -13,8 +14,8 @@ public class ChaseWithPartner extends State {
 	public ChaseWithPartner(BoardMover chaser, BoardMover partner, BoardMover target) {
 		update = state -> {
 			Board board = chaser.getBoard();
-			Tile middle = new Tile(target.getRow() + 2 * board.topology.dy(target.getMoveDir()),
-					target.getCol() + 2 * board.topology.dx(target.getMoveDir()));
+			Tile middle = new Tile(target.getRow() + 2 * Top4.INSTANCE.dy(target.getMoveDir()),
+					target.getCol() + 2 * Top4.INSTANCE.dx(target.getMoveDir()));
 			Tile partnerTile = partner.currentTile();
 			int dx = middle.getCol() - partnerTile.getCol();
 			int dy = middle.getRow() - partnerTile.getRow();
@@ -23,7 +24,7 @@ public class ChaseWithPartner extends State {
 				chaser.setRoute(board.shortestRoute(chaser.currentTile(), targetTile));
 				if (!chaser.getRoute().isEmpty()) {
 					int chaseDir = chaser.getRoute().get(0);
-					if (chaseDir == board.topology.inv(chaser.getMoveDir())) {
+					if (chaseDir == Top4.INSTANCE.inv(chaser.getMoveDir())) {
 						chaser.move();
 						return;
 					}

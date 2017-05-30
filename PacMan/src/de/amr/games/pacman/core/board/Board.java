@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.PathFinder;
-import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Grid;
 import de.amr.easy.grid.impl.Top4;
 
@@ -23,7 +22,6 @@ public class Board {
 
 	public final int numRows;
 	public final int numCols;
-	public final Topology topology;
 	public final Grid<Character, Integer> graph;
 	private final String[] boardRows;
 
@@ -38,15 +36,14 @@ public class Board {
 		numRows = boardRows.length;
 		numCols = boardRows[0].length();
 		// create orthogonal grid graph from board data
-		topology = new Top4();
 		graph = new Grid<>(numCols, numRows, None.toChar(), false);
-		graph.setTopology(topology);
+		graph.setTopology(Top4.INSTANCE);
 		resetContent();
 		/*@formatter:off*/
 		graph.vertexStream()
 			.filter(tile -> graph.get(tile) != Wall.toChar())
 			.forEach(tile -> {
-				topology.dirs().forEach(dir -> {
+				Top4.INSTANCE.dirs().forEach(dir -> {
 					graph.neighbor(tile, dir).ifPresent(neighbor -> {
 						if (graph.get(neighbor) != Wall.toChar()	&& !graph.adjacent(tile, neighbor)) {
 							graph.addEdge(tile, neighbor);

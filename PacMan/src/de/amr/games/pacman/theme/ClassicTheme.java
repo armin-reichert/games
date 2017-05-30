@@ -74,7 +74,7 @@ public class ClassicTheme extends PacManTheme {
 
 	public ClassicTheme(Assets assets) {
 		sheet = assets.image("pacman_original.png");
-		
+
 		boardSprite = new Sprite(sheet.getSubimage(228, 0, 224, 248));
 		boardSprite.scale(TILE_SIZE * 28, TILE_SIZE * 31);
 

@@ -21,6 +21,7 @@ import java.util.EnumMap;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
@@ -64,7 +65,7 @@ public class Ghost extends BoardMover {
 	public void update() {
 		control.update();
 	}
-	
+
 	public void setWaitingTime(int frames) {
 		control.state(Waiting).setDuration(frames);
 	}
@@ -136,7 +137,7 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		board.topology.dirs().forEach(dir -> {
+		Top4.INSTANCE.dirs().forEach(dir -> {
 			app.getTheme().getGhostNormalSprite(getName(), dir).setAnimated(animated);
 			app.getTheme().getGhostDeadSprite(dir).setAnimated(animated);
 		});

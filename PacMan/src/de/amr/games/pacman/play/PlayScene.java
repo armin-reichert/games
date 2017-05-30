@@ -727,7 +727,7 @@ public class PlayScene extends Scene<PacManGame> {
 		if (app.settings.getBool("drawGrid")) {
 			drawGridLines(g, getWidth(), getHeight());
 		}
-		
+
 		// Internals
 		if (app.settings.getBool("drawInternals")) {
 			// play state

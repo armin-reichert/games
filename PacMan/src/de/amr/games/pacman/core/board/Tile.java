@@ -13,8 +13,6 @@ import de.amr.easy.grid.impl.Top4;
  * @author Armin Reichert
  */
 public class Tile extends Point2D.Float {
-	
-	private static final Top4 top4 = new Top4();
 
 	public Tile(float row, float col) {
 		x = col;
@@ -31,9 +29,9 @@ public class Tile extends Point2D.Float {
 		y += dy;
 		return this;
 	}
-	
+
 	public Tile neighbor(int dir) {
-		return new Tile(y + top4.dy(dir), x + top4.dx(dir));
+		return new Tile(y + Top4.INSTANCE.dy(dir), x + Top4.INSTANCE.dx(dir));
 	}
 
 	public int getRow() {

@@ -2,6 +2,7 @@ package de.amr.games.pacman.core.entities.ghost.behaviors;
 
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
@@ -20,8 +21,8 @@ public class FollowTileAheadOfPacMan extends State {
 			Board board = chaser.getBoard();
 			int dir = target.getMoveDir();
 			for (int numTiles = numTilesAhead; numTiles >= 0; --numTiles) {
-				Tile targetTile = target.currentTile().translate(numTiles * board.topology.dx(dir),
-						numTiles * board.topology.dy(dir));
+				Tile targetTile = target.currentTile().translate(numTiles * Top4.INSTANCE.dx(dir),
+						numTiles * Top4.INSTANCE.dy(dir));
 				if (board.isTileValid(targetTile) && !board.contains(targetTile, GhostHouse) && chaser.canEnter(targetTile)) {
 					chaser.follow(targetTile);
 					return;

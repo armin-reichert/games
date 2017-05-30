@@ -18,6 +18,7 @@ import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
@@ -91,5 +92,10 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		drawGridLines(g, getWidth(), getHeight());
 		pacMan.draw(g);
 		blinky.draw(g);
+	}
+
+	private void computePacManMove() {
+		Top4.INSTANCE.dirs().forEach(dir -> {
+		});
 	}
 }

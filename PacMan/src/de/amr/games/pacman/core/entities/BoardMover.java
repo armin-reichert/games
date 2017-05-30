@@ -135,7 +135,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public boolean changeMoveDir(int dir) {
 		nextMoveDir = dir;
-		boolean turn90 = (dir == board.topology.left(moveDir) || dir == board.topology.right(moveDir));
+		boolean turn90 = (dir == Top4.INSTANCE.left(moveDir) || dir == Top4.INSTANCE.right(moveDir));
 		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
 			return false;
 		}
@@ -153,7 +153,7 @@ public abstract class BoardMover extends GameEntity {
 	public boolean move() {
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(board.topology.dx(moveDir), board.topology.dy(moveDir)).times(speed.get()));
+		tr.setVel(new Vector2(Top4.INSTANCE.dx(moveDir), Top4.INSTANCE.dy(moveDir)).times(speed.get()));
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();
@@ -211,17 +211,17 @@ public abstract class BoardMover extends GameEntity {
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		List<Integer> dirsPermuted = board.topology.dirsPermuted().boxed().collect(Collectors.toList());
+		List<Integer> dirsPermuted = Top4.INSTANCE.dirsPermuted().boxed().collect(Collectors.toList());
 		for (int dir : dirsPermuted) {
 			Tile targetTile = currentTile().neighbor(dir);
 			if (!board.isTileValid(targetTile)) {
 				continue; // TODO
 			}
 			if (board.contains(targetTile, Wormhole)) {
-				moveDir = board.topology.inv(moveDir);
+				moveDir = Top4.INSTANCE.inv(moveDir);
 				break;
 			}
-			if (dir == board.topology.inv(moveDir)) {
+			if (dir == Top4.INSTANCE.inv(moveDir)) {
 				break;
 			}
 			if (canEnter(targetTile)) {
@@ -247,7 +247,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public void bounce() {
 		if (!move()) {
-			changeMoveDir(board.topology.inv(moveDir));
+			changeMoveDir(Top4.INSTANCE.inv(moveDir));
 		}
 	}
 
