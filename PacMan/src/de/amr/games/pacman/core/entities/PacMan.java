@@ -55,7 +55,7 @@ public class PacMan extends BoardMover {
 
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
-	private boolean couldMove;
+	public boolean couldMove; //TODO
 
 	private Stream<Ghost> ghosts() {
 		return app.entities.allOf(Ghost.class);
@@ -187,7 +187,7 @@ public class PacMan extends BoardMover {
 		return board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
 	}
 
-	private void moveAndEat() {
+	public void moveAndEat() {
 		changeMoveDir(computeNextMoveDir());
 		couldMove = move();
 		board.getContent(currentTile(), Pellet).ifPresent(onPelletFound);

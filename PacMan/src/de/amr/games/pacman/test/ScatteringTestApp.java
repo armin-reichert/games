@@ -15,7 +15,7 @@ public class ScatteringTestApp extends AbstractPacManApp {
 		app.settings.title = "Ghost scattering test app";
 		app.settings.width = 448;
 		app.settings.height = 576;
-		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
+		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		app.settings.set("drawInternals", true);
 		launch(app);
 	}

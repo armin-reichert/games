@@ -15,7 +15,7 @@ public class BlinkyTestApp extends AbstractPacManApp {
 		app.settings.title = "Blinky behaviour test";
 		app.settings.width = 448;
 		app.settings.height = 576;
-		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 16);
+		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
 		app.settings.set("drawInternals", true);
 		app.settings.set("drawGrid", true);
 		app.settings.set("drawRoute", true);
