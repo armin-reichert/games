@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
@@ -195,20 +194,19 @@ public abstract class BoardMover extends GameEntity {
 		if (!isExactlyOverTile()) {
 			return;
 		}
-		List<Integer> dirsPermuted = Top4.INSTANCE.dirsPermuted().boxed().collect(Collectors.toList());
-		for (int dir : dirsPermuted) {
-			Tile targetTile = currentTile().neighbor(dir);
-			if (!board.isTileValid(targetTile)) {
+		for (int dir : Top4.INSTANCE.dirsPermuted().toArray()) {
+			Tile neighborTile = currentTile().neighbor(dir);
+			if (!board.isTileValid(neighborTile)) {
 				continue; // TODO
 			}
-			if (board.contains(targetTile, Wormhole)) {
+			if (board.contains(neighborTile, Wormhole)) {
 				moveDir = Top4.INSTANCE.inv(moveDir);
 				break;
 			}
 			if (dir == Top4.INSTANCE.inv(moveDir)) {
 				break;
 			}
-			if (canEnter(targetTile)) {
+			if (canEnter(neighborTile)) {
 				changeMoveDir(dir);
 				break;
 			}

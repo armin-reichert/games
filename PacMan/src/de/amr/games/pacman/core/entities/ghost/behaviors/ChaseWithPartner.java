@@ -3,8 +3,10 @@ package de.amr.games.pacman.core.entities.ghost.behaviors;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
+import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.statemachine.State;
+import de.amr.games.pacman.play.PlayScene;
 
 /**
  * @author Armin Reichert
@@ -14,6 +16,10 @@ public class ChaseWithPartner extends State {
 	public ChaseWithPartner(BoardMover chaser, BoardMover partner, BoardMover target) {
 		update = state -> {
 			Board board = chaser.getBoard();
+			if (board.contains(chaser.currentTile(), TileContent.GhostHouse)) {
+				chaser.follow(PlayScene.GHOST_HOUSE_ENTRY);
+				return;
+			}
 			Tile middle = new Tile(target.getRow() + 2 * Top4.INSTANCE.dy(target.getMoveDir()),
 					target.getCol() + 2 * Top4.INSTANCE.dx(target.getMoveDir()));
 			Tile partnerTile = partner.currentTile();

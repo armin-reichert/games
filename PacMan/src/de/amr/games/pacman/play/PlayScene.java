@@ -74,10 +74,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 	// Prominent board locations
 	public static final Tile PACMAN_HOME = new Tile(26, 13.5f);
-	public static final Tile BLINKY_HOME = new Tile(14, 13.5f);
-	public static final Tile INKY_HOME = new Tile(17.5f, 11.5f);
-	public static final Tile PINKY_HOME = new Tile(17.5f, 13.5f);
-	public static final Tile CLYDE_HOME = new Tile(17.5f, 15.5f);
+	public static final Tile BLINKY_HOME = new Tile(14, 13.f);
+	public static final Tile INKY_HOME = new Tile(17f, 11f);
+	public static final Tile PINKY_HOME = new Tile(17f, 13f);
+	public static final Tile CLYDE_HOME = new Tile(17f, 15f);
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
 	public static final Tile BONUS_TILE = new Tile(20f, 13f);
 
@@ -445,7 +445,8 @@ public class PlayScene extends Scene<PacManGame> {
 			ghost.control.state(GhostState.Dead).update = state -> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
-				if (ghost.currentTile().equals(homeTile)) {
+				if (ghost.getRow() == homeTile.getRow() && ghost.getCol() == homeTile.getCol()) {
+					ghost.adjustOnTile();
 					ghost.control.changeTo(GhostState.Recovering);
 				}
 			};
@@ -457,8 +458,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 			ghost.control.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
-					ghost.control.changeTo(ghost.stateToRestore.get());
 					ghost.setAnimated(true);
+					ghost.control.changeTo(ghost.stateToRestore.get());
 				}
 			};
 		});
@@ -641,7 +642,7 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private int getGhostRecoveringDuration(Ghost ghost) {
-		return app.motor.toFrames(rand.nextInt(4));
+		return app.motor.toFrames(1 + rand.nextInt(2));
 	}
 
 	private void score(int points) {
