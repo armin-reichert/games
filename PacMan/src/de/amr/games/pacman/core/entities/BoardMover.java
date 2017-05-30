@@ -22,16 +22,14 @@ import java.util.stream.Collectors;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 
 /**
- * Base class for entities which move on the board..
+ * Base class for entities which move on the board.
  */
 public abstract class BoardMover extends GameEntity {
-
-	protected final AbstractPacManApp app;
+	
 	protected final Board board;
 	protected final Tile home;
 	protected List<Integer> route;
@@ -39,8 +37,7 @@ public abstract class BoardMover extends GameEntity {
 	protected int nextMoveDir;
 	public Supplier<Float> speed;
 
-	public BoardMover(AbstractPacManApp app, Board board, Tile home) {
-		this.app = Objects.requireNonNull(app);
+	public BoardMover(Board board, Tile home) {
 		this.board = Objects.requireNonNull(board);
 		this.home = Objects.requireNonNull(home);
 		route = new ArrayList<>();
@@ -120,11 +117,11 @@ public abstract class BoardMover extends GameEntity {
 		return isExactlyOver(tile.getRow(), tile.getCol());
 	}
 
-	private boolean isExactlyOverTile() {
+	protected boolean isExactlyOverTile() {
 		return isExactlyOver(getRow(), getCol());
 	}
 
-	private boolean isExactlyOver(int row, int col) {
+	protected boolean isExactlyOver(int row, int col) {
 		int tolerance = 1;
 		return abs(tr.getX() - col * TILE_SIZE) <= tolerance && abs(tr.getY() - row * TILE_SIZE) <= tolerance;
 	}
@@ -259,9 +256,6 @@ public abstract class BoardMover extends GameEntity {
 		g.translate(-margin, -margin);
 		super.draw(g);
 		g.translate(margin, margin);
-		if (app.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
-		}
 	}
 
 	public void drawRoute(Graphics2D g, Color color) {

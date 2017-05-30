@@ -38,6 +38,7 @@ public class Ghost extends BoardMover {
 	public final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateToRestore;
 
+	private final AbstractPacManApp app;
 	private Color color;
 
 	@Override
@@ -46,9 +47,10 @@ public class Ghost extends BoardMover {
 	}
 
 	public Ghost(AbstractPacManApp app, Board board, String name, Tile home) {
-		super(app, board, home);
+		super(board, home);
+		this.app = app;
 		setName(name);
-		this.color = Color.WHITE;
+		color = Color.WHITE;
 		control = new StateMachine<>("Ghost " + name, new EnumMap<>(GhostState.class));
 		stateToRestore = () -> control.stateID();
 	}
@@ -181,6 +183,9 @@ public class Ghost extends BoardMover {
 		}
 		if (app.settings.getBool("drawRoute")) {
 			drawRoute(g, color);
+		}
+		if (app.settings.getBool("drawGrid")) {
+			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
 		}
 	}
 

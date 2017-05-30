@@ -46,6 +46,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class PacMan extends BoardMover {
 
+	private final AbstractPacManApp app;
 	public final StateMachine<PacManState> control;
 
 	public Consumer<Tile> onPelletFound;
@@ -55,14 +56,16 @@ public class PacMan extends BoardMover {
 
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
-	public boolean couldMove; //TODO
+
+	public boolean couldMove; // TODO
 
 	private Stream<Ghost> ghosts() {
 		return app.entities.allOf(Ghost.class);
 	}
 
 	public PacMan(AbstractPacManApp app, Board board, Tile home) {
-		super(app, board, home);
+		super(board, home);
+		this.app = app;
 		setName("Pac-Man");
 
 		// default event handlers
@@ -232,6 +235,9 @@ public class PacMan extends BoardMover {
 			}
 			text.append(")");
 			g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
+		}
+		if (app.settings.getBool("drawGrid")) {
+			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
 		}
 	}
 }
