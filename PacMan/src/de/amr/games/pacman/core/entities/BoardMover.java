@@ -145,8 +145,8 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	/**
-	 * Try to move entity in current move direction. If entity can be moved, set
-	 * <code>couldMove</code> to <code>true</code>.
+	 * Try to move entity in current move direction. If entity could not be moved, set
+	 * <code>stuck</code> to <code>true</code>.
 	 */
 	public void move() {
 
@@ -156,7 +156,7 @@ public abstract class BoardMover extends GameEntity {
 		tr.setVel(velocity);
 		tr.move();
 
-		// check if new tile position is allowed
+		// check if new tile can be entered
 		Tile newTile = currentTile();
 		if (!canEnterTile.apply(newTile)) {
 			tr.moveTo(oldPosition); // undo move
@@ -164,13 +164,13 @@ public abstract class BoardMover extends GameEntity {
 			return;
 		}
 
-		// check if "worm hole"-tile has been entered
+		// handle "worm hole"
 		if (board.contains(newTile, Wormhole)) {
 			int col = newTile.getCol();
 			if (col == 0 && moveDir == W) {
 				// fall off left edge -> appear at right edge
 				tr.setX((board.numCols - 1) * TILE_SIZE - getWidth());
-			} else if (col == board.numCols - 1 && moveDir == Top4.E) {
+			} else if (col == board.numCols - 1 && moveDir == E) {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}
@@ -178,15 +178,12 @@ public abstract class BoardMover extends GameEntity {
 			return;
 		}
 
-		// adjust position if entity touches disallowed neighbor tile
+		// adjust position if entity touches an inaccessible neighbor tile
 		Tile neighborTile = newTile.neighbor(moveDir);
-		boolean forbidden = !canEnterTile.apply(neighborTile);
-
-		if (!forbidden) {
-			stuck = false;
+		stuck = !canEnterTile.apply(neighborTile);
+		if (!stuck) {
 			return;
 		}
-
 		int row = newTile.getRow(), col = newTile.getCol();
 		switch (moveDir) {
 		case E:
@@ -210,7 +207,6 @@ public abstract class BoardMover extends GameEntity {
 			}
 			break;
 		}
-		stuck = true;
 	}
 
 	public void moveRandomly() {

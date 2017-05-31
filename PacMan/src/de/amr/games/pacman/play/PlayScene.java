@@ -286,7 +286,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	@Override
 	public void init() {
-		playControl.changeTo(PlayState.Initializing);
+		playControl.changeTo(Initializing);
 	}
 
 	@Override
@@ -526,9 +526,7 @@ public class PlayScene extends Scene<PacManGame> {
 		 */
 
 		// Pinky waits inside the ghost house:
-		pinky.state(GhostState.Waiting).entry = state ->
-
-		{
+		pinky.state(GhostState.Waiting).entry = state -> {
 			pinky.placeAt(PINKY_HOME);
 			pinky.setMoveDir(S);
 			pinky.setAnimated(true);
