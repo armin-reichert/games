@@ -120,6 +120,6 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		if (maxDistDir != Top4.INSTANCE.inv(pacMan.getMoveDir())) {
 			pacMan.turnTo(maxDistDir);
 		}
-		pacMan.couldMove = pacMan.move();
+		pacMan.move();
 	}
 }

@@ -34,6 +34,7 @@ public abstract class BoardMover extends GameEntity {
 	protected List<Integer> route;
 	protected int moveDir;
 	protected int nextMoveDir;
+	protected boolean couldMove;
 	public Supplier<Float> speed;
 	public Function<Tile, Boolean> canEnterTile;
 
@@ -41,6 +42,7 @@ public abstract class BoardMover extends GameEntity {
 		this.board = Objects.requireNonNull(board);
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;
+		couldMove = false;
 		speed = () -> 0f;
 		canEnterTile = tile -> !board.contains(tile, TileContent.Wall);
 	}
@@ -71,6 +73,10 @@ public abstract class BoardMover extends GameEntity {
 
 	public void setNextMoveDir(int nextMoveDir) {
 		this.nextMoveDir = nextMoveDir;
+	}
+	
+	public boolean couldMove() {
+		return couldMove;
 	}
 
 	@Override
@@ -138,7 +144,7 @@ public abstract class BoardMover extends GameEntity {
 	 * 
 	 * @return <code>true</code> iff entity can move
 	 */
-	public boolean move() {
+	public void move() {
 		// simulate move
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
 		tr.setVel(new Vector2(Top4.INSTANCE.dx(moveDir), Top4.INSTANCE.dy(moveDir)).times(speed.get()));
@@ -147,7 +153,8 @@ public abstract class BoardMover extends GameEntity {
 		Tile newTile = currentTile();
 		if (!canEnterTile.apply(newTile)) {
 			tr.moveTo(oldPosition); // undo move
-			return false;
+			couldMove = false;
+			return;
 		}
 		// check if "worm hole"-tile has been entered
 		if (board.contains(newTile, Wormhole)) {
@@ -159,7 +166,8 @@ public abstract class BoardMover extends GameEntity {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}
-			return true;
+			couldMove = true;
+			return;
 		}
 		// adjust position if entity touches disallowed neighbor tile
 		int row = newTile.getRow(), col = newTile.getCol();
@@ -169,29 +177,34 @@ public abstract class BoardMover extends GameEntity {
 		case E:
 			if (forbidden && tr.getX() + TILE_SIZE >= (col + 1) * TILE_SIZE) {
 				tr.setX(col * TILE_SIZE);
-				return false;
+				couldMove = false;
+				return;
 			}
 			break;
 		case W:
 			if (forbidden && tr.getX() < col * TILE_SIZE) {
 				tr.setX(col * TILE_SIZE);
-				return false;
+				couldMove = false;
+				return;
 			}
 			break;
 		case N:
 			if (forbidden && tr.getY() < row * TILE_SIZE) {
 				tr.setY(row * TILE_SIZE);
-				return false;
+				couldMove = false;
+				return;
 			}
 			break;
 		case S:
 			if (forbidden && tr.getY() + TILE_SIZE >= (row + 1) * TILE_SIZE) {
 				tr.setY(row * TILE_SIZE);
-				return false;
+				couldMove = false;
+				return;
 			}
 			break;
 		}
-		return true;
+		couldMove = true;
+		return;
 	}
 
 	public void moveRandomly() {
@@ -233,7 +246,8 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	public void bounce() {
-		if (!move()) {
+		move();
+		if (!couldMove) {
 			turnTo(Top4.INSTANCE.inv(moveDir));
 		}
 	}

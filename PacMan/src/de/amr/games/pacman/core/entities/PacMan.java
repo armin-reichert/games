@@ -59,7 +59,6 @@ public class PacMan extends BoardMover {
 	private List<Ghost> enemies;
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
-	public boolean couldMove; // TODO
 
 	public PacMan(AbstractPacManApp app, Board board) {
 		super(board);
@@ -192,7 +191,7 @@ public class PacMan extends BoardMover {
 
 	public void moveAndEat() {
 		turnTo(computeNextMoveDir());
-		couldMove = move();
+		move();
 		board.getContent(currentTile(), Pellet).ifPresent(onPelletFound);
 		board.getContent(currentTile(), Energizer).ifPresent(onEnergizerFound);
 		board.getContent(currentTile(), Bonus).ifPresent(onBonusFound);
