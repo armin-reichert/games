@@ -74,7 +74,7 @@ public class LevelData {
 		return baseSpeed / 2;
 	}
 
-	public float getPacManFrighteningSpeed(int level) {
+	public float getPacManPowerWalkingSpeed(int level) {
 		return baseSpeed * (Float) DATA[level][10];
 	}
 

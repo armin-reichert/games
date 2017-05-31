@@ -4,7 +4,7 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
-import static de.amr.games.pacman.core.entities.PacManState.Eating;
+import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
@@ -63,7 +63,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan.setEnemies(pinky);
 		reset();
 		
-		pacMan.control.changeTo(Eating);
+		pacMan.control.changeTo(Walking);
 		pinky.control.changeTo(Chasing);
 	};
 	

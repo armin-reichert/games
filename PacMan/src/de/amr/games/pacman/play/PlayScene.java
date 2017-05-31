@@ -8,7 +8,7 @@ import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.board.TileContent.Tunnel;
-import static de.amr.games.pacman.core.entities.PacManState.Empowered;
+import static de.amr.games.pacman.core.entities.PacManState.PowerWalking;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawText;
@@ -174,14 +174,18 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Playing).entry = state -> {
 				pacMan.init();
 				pacMan.placeAt(PACMAN_HOME);
+				pacMan.speed = () -> pacMan.control.stateID() == PacManState.PowerWalking
+						? levels.getPacManPowerWalkingSpeed(level) : levels.getPacManSpeed(level);
+
 				ghosts().forEach(ghost -> {
 					ghost.init();
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.setAnimated(true);
+					ghost.setWaitingTime(getGhostWaitingDuration(ghost));
 				});
+				
 				app.getTheme().getEnergizerSprite().setAnimated(true);
-				pacMan.control.changeTo(PacManState.Eating);
-				ghosts().forEach(ghost -> ghost.setWaitingTime(getGhostWaitingDuration(ghost)));
+				pacMan.control.changeTo(PacManState.Walking);
 				ghostAttackTimer.start();
 			};
 
@@ -325,15 +329,6 @@ public class PlayScene extends Scene<PacManGame> {
 		pacMan = new PacMan(app, board);
 		pacMan.placeAt(PACMAN_HOME);
 
-		pacMan.speed = () -> {
-			switch (pacMan.control.stateID()) {
-			case Empowered:
-				return levels.getPacManFrighteningSpeed(level);
-			default:
-				return levels.getPacManSpeed(level);
-			}
-		};
-
 		pacMan.onContentFound = content -> {
 			Tile tile = pacMan.currentTile();
 			switch (content) {
@@ -353,8 +348,8 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 				int seconds = levels.getGhostFrightenedDuration(level);
-				pacMan.control.state(Empowered).setDuration(app.motor.toFrames(seconds));
-				pacMan.control.changeTo(Empowered);
+				pacMan.control.state(PowerWalking).setDuration(app.motor.toFrames(seconds));
+				pacMan.control.changeTo(PowerWalking);
 				board.setContent(tile, None);
 				break;
 			case Bonus:
@@ -375,7 +370,7 @@ public class PlayScene extends Scene<PacManGame> {
 			if (ghost.control.inState(GhostState.Dead, GhostState.Recovering)) {
 				return;
 			}
-			if (pacMan.control.inState(PacManState.Empowered)) {
+			if (pacMan.control.inState(PacManState.PowerWalking)) {
 				Log.info("Pac-Man kills " + ghost.getName());
 				app.assets.sound("sfx/eat-ghost.mp3").play();
 				score(nextGhostPoints);
@@ -450,7 +445,7 @@ public class PlayScene extends Scene<PacManGame> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
 				if (ghost.getRow() == homeTile.getRow() && ghost.getCol() == homeTile.getCol()) {
-					ghost.adjustOnTile();
+					ghost.adjust();
 					ghost.control.changeTo(GhostState.Recovering);
 				}
 			};

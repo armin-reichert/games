@@ -40,11 +40,15 @@ public abstract class BoardMover extends GameEntity {
 
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
+	}
+	
+	@Override
+	public void init() {
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;
 		couldMove = false;
 		speed = () -> 0f;
-		canEnterTile = tile -> !board.contains(tile, TileContent.Wall);
+		canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, TileContent.Wall);
 	}
 
 	public Board getBoard() {
@@ -74,7 +78,7 @@ public abstract class BoardMover extends GameEntity {
 	public void setNextMoveDir(int nextMoveDir) {
 		this.nextMoveDir = nextMoveDir;
 	}
-	
+
 	public boolean couldMove() {
 		return couldMove;
 	}
@@ -105,7 +109,7 @@ public abstract class BoardMover extends GameEntity {
 		tr.moveTo(tile.x * TILE_SIZE, tile.y * TILE_SIZE);
 	}
 
-	public void adjustOnTile() {
+	public void adjust() {
 		placeAt(currentTile());
 	}
 
@@ -122,13 +126,13 @@ public abstract class BoardMover extends GameEntity {
 		return abs(tr.getX() - col * TILE_SIZE) <= tolerance && abs(tr.getY() - row * TILE_SIZE) <= tolerance;
 	}
 
-	public boolean canMoveTowards(int dir) {
+	public boolean canEnterTileTowards(int dir) {
 		return canEnterTile.apply(currentTile().neighbor(dir));
 	}
 
 	public boolean turnTo(int dir) {
 		nextMoveDir = dir;
-		if (!canMoveTowards(dir)) {
+		if (!canEnterTileTowards(dir)) {
 			return false;
 		}
 		boolean turnLeftOrRight = (dir == Top4.INSTANCE.left(moveDir) || dir == Top4.INSTANCE.right(moveDir));
@@ -140,22 +144,26 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	/**
-	 * Moves entity in current move direction.
-	 * 
-	 * @return <code>true</code> iff entity can move
+	 * Try to move entity in current move direction. If entity can be moved, set
+	 * <code>couldMove</code> to <code>true</code>.
 	 */
 	public void move() {
-		// simulate move
+		
+		// move pixel-wise
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		tr.setVel(new Vector2(Top4.INSTANCE.dx(moveDir), Top4.INSTANCE.dy(moveDir)).times(speed.get()));
+		Vector2 velocity = new Vector2(Top4.INSTANCE.dx(moveDir), Top4.INSTANCE.dy(moveDir)).times(speed.get());
+		tr.setVel(velocity);
 		tr.move();
-		// check if move would touch disallowed tile
+		
+		// check if new tile position is allowed
 		Tile newTile = currentTile();
 		if (!canEnterTile.apply(newTile)) {
 			tr.moveTo(oldPosition); // undo move
+			adjust();
 			couldMove = false;
 			return;
 		}
+		
 		// check if "worm hole"-tile has been entered
 		if (board.contains(newTile, Wormhole)) {
 			int col = newTile.getCol();

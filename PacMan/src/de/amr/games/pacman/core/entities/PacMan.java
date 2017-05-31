@@ -8,9 +8,9 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.PacManState.Dying;
-import static de.amr.games.pacman.core.entities.PacManState.Eating;
-import static de.amr.games.pacman.core.entities.PacManState.Empowered;
-import static de.amr.games.pacman.core.entities.PacManState.Waiting;
+import static de.amr.games.pacman.core.entities.PacManState.Walking;
+import static de.amr.games.pacman.core.entities.PacManState.PowerWalking;
+import static de.amr.games.pacman.core.entities.PacManState.Initialized;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
@@ -81,35 +81,28 @@ public class PacMan extends BoardMover {
 
 		control = new StateMachine<>("Pac-Man", new EnumMap<>(PacManState.class));
 
-		control.state(Waiting).entry = state -> {
-			couldMove = false;
-			freezeTimer = 0;
-			moveDir = W;
-			nextMoveDir = W;
-		};
-
-		control.state(Eating).entry = state -> {
+		control.state(Walking).entry = state -> {
 			setAnimated(true);
 		};
 
-		control.state(Eating).update = state -> {
-			exploreMaze();
+		control.state(Walking).update = state -> {
+			walk();
 		};
 
-		control.state(Empowered).entry = state -> {
+		control.state(PowerWalking).entry = state -> {
 			app.assets.sound("sfx/waza.mp3").loop();
 			speedBeforeFrightening = speed;
 			enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
 		};
 
-		control.state(Empowered).update = state -> {
-			exploreMaze();
+		control.state(PowerWalking).update = state -> {
+			walk();
 			if (state.isTerminated()) {
-				control.changeTo(Eating);
+				control.changeTo(Walking);
 			}
 		};
 
-		control.state(Empowered).exit = state -> {
+		control.state(PowerWalking).exit = state -> {
 			app.assets.sound("sfx/waza.mp3").stop();
 			speed = speedBeforeFrightening;
 			enemies.forEach(Ghost::endBeingFrightened);
@@ -130,7 +123,11 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void init() {
-		control.changeTo(Waiting);
+		super.init();
+		freezeTimer = 0;
+		moveDir = W;
+		nextMoveDir = W;
+		control.changeTo(Initialized);
 	}
 
 	@Override
@@ -147,7 +144,7 @@ public class PacMan extends BoardMover {
 		if (control.inState(Dying) && app.getTheme().getPacManDyingSprite() != null) {
 			return app.getTheme().getPacManDyingSprite();
 		}
-		if (control.inState(Waiting)) {
+		if (control.inState(Initialized)) {
 			return app.getTheme().getPacManStandingSprite(moveDir);
 		}
 		Sprite runningSprite = app.getTheme().getPacManRunningSprite(moveDir);
@@ -171,15 +168,18 @@ public class PacMan extends BoardMover {
 	}
 
 	public boolean isFrighteningEnding() {
-		return control.inState(Empowered)
-				&& control.state(Empowered).getRemaining() < control.state(Empowered).getDuration() / 4;
+		return control.inState(PowerWalking)
+				&& control.state(PowerWalking).getRemaining() < control.state(PowerWalking).getDuration() / 4;
 	}
 
-	public void exploreMaze() {
-		turnTo(computeNextMoveDir());
+	public void walk() {
 		move();
-		onContentFound.accept(board.getContent(currentTile()));
+		TileContent content = board.getContent(currentTile());
+		if (content != TileContent.None) {
+			onContentFound.accept(content);
+		}
 		enemies.stream().filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow()).forEach(onGhostMet);
+		turnTo(computeNextMoveDir());
 	}
 
 	private int computeNextMoveDir() {

@@ -38,7 +38,7 @@ public class LoopAroundWalls extends State {
 		entry = state -> {
 			loopStarted = false;
 			entity.getRoute().clear();
-			entity.adjustOnTile();
+			entity.adjust();
 		};
 
 		// update action

@@ -34,7 +34,7 @@ public class ChaseWithPartner extends State {
 						chaser.move();
 						return;
 					}
-					if (chaser.canMoveTowards(chaseDir)) {
+					if (chaser.canEnterTileTowards(chaseDir)) {
 						chaser.moveAlongRoute();
 						return;
 					}

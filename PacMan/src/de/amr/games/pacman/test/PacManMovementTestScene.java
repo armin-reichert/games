@@ -2,7 +2,7 @@ package de.amr.games.pacman.test;
 
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
-import static de.amr.games.pacman.core.entities.PacManState.Eating;
+import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
@@ -34,9 +34,10 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		pacMan = new PacMan(app, board);
+		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.control.changeTo(Eating);
+		pacMan.control.changeTo(Walking);
 	};
 
 	@Override

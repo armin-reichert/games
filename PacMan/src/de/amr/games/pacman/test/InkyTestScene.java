@@ -4,7 +4,7 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
-import static de.amr.games.pacman.core.entities.PacManState.Eating;
+import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
@@ -79,7 +79,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		inky.placeAt(GHOST_HOUSE_ENTRY);
 
 		app.entities.add(pacMan, blinky, inky);
-		pacMan.control.changeTo(Eating);
+		pacMan.control.changeTo(Walking);
 		blinky.control.changeTo(Chasing);
 		inky.control.changeTo(Chasing);
 	};
