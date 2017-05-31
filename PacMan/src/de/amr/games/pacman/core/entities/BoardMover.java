@@ -215,24 +215,14 @@ public abstract class BoardMover extends GameEntity {
 
 	public void moveRandomly() {
 		move();
-		if (!isExactlyOverTile()) {
-			return;
-		}
-		for (int dir : Top4.INSTANCE.dirsPermuted().toArray()) {
-			Tile neighborTile = currentTile().neighbor(dir);
-			if (!board.isTileValid(neighborTile)) {
-				continue; // TODO
-			}
-			if (board.contains(neighborTile, Wormhole)) {
-				moveDir = Top4.INSTANCE.inv(moveDir);
-				break;
-			}
-			if (dir == Top4.INSTANCE.inv(moveDir)) {
-				break;
-			}
-			if (canEnterTile.apply(neighborTile)) {
-				turnTo(dir);
-				break;
+		if (isExactlyOverTile()) {
+			for (int dir : Top4.INSTANCE.dirsPermuted().toArray()) {
+				if (dir != Top4.INSTANCE.inv(moveDir)) {
+					Tile neighborTile = currentTile().neighbor(dir);
+					if (canEnterTile.apply(neighborTile)) {
+						turnTo(dir);
+					}
+				}
 			}
 		}
 	}

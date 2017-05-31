@@ -72,13 +72,13 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class PlayScene extends Scene<PacManGame> {
 
 	// Prominent board locations
-	public static final Tile PACMAN_HOME = new Tile(26, 13.5f);
-	public static final Tile BLINKY_HOME = new Tile(14, 13.f);
-	public static final Tile INKY_HOME = new Tile(17f, 11f);
-	public static final Tile PINKY_HOME = new Tile(17f, 13f);
-	public static final Tile CLYDE_HOME = new Tile(17f, 15f);
+	public static final Tile PACMAN_HOME = new Tile(26, 13);
+	public static final Tile BLINKY_HOME = new Tile(14, 13);
+	public static final Tile INKY_HOME = new Tile(17, 11);
+	public static final Tile PINKY_HOME = new Tile(17, 13);
+	public static final Tile CLYDE_HOME = new Tile(17, 15);
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
-	public static final Tile BONUS_TILE = new Tile(20f, 13f);
+	public static final Tile BONUS_TILE = new Tile(20, 13);
 
 	// Game parameters
 	public static final int POINTS_FOR_PELLET = 10;
@@ -147,6 +147,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Ready).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
+				ghosts().forEach(ghost -> ghost.setAnimated(true));
 			};
 
 			state(Ready).update = state -> {
@@ -159,6 +160,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(StartingLevel).entry = state -> {
 				app.assets.sound("sfx/ready.mp3").play();
+				ghosts().forEach(Ghost::beginWaiting);
 			};
 
 			state(StartingLevel).update = state -> {
@@ -179,8 +181,8 @@ public class PlayScene extends Scene<PacManGame> {
 				ghosts().forEach(ghost -> {
 					ghost.init();
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.setAnimated(true);
 					ghost.setWaitingTime(getGhostWaitingDuration(ghost));
+					ghost.beginWaiting();
 				});
 
 				app.getTheme().getEnergizerSprite().setAnimated(true);
@@ -404,22 +406,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 			ghost.speed = () -> getGhostSpeed(ghost);
 
-			ghost.state(GhostState.Waiting).update = state -> {
-				if (!state.isTerminated()) {
-					return;
-				}
-				switch (ghostAttackTimer.state()) {
-				case Scattering:
-					ghost.beginScattering();
-					break;
-				case Chasing:
-					ghost.beginChasing();
-					break;
-				default:
-					break;
-				}
-			};
-
 			// When "frightened" state ends, go into chasing or scattering state:
 			ghost.stateToRestore = () -> {
 				switch (ghostAttackTimer.state()) {
@@ -437,7 +423,7 @@ public class PlayScene extends Scene<PacManGame> {
 				ghost.moveRandomly();
 			};
 
-			// When "dead", return to home location. Then recover.
+			// When "dead", return to home location. Then recover:
 			ghost.state(GhostState.Dead).update = state -> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
@@ -469,6 +455,24 @@ public class PlayScene extends Scene<PacManGame> {
 			blinky.placeAt(BLINKY_HOME);
 			blinky.setMoveDir(Top4.W);
 			blinky.setAnimated(true);
+		};
+
+		// Blinky stands still at the ghost house entry. When waiting is over, he starts scattering or
+		// chasing.
+		blinky.state(GhostState.Waiting).update = state -> {
+			if (!state.isTerminated()) {
+				return;
+			}
+			switch (ghostAttackTimer.state()) {
+			case Scattering:
+				blinky.beginScattering();
+				break;
+			case Chasing:
+				blinky.beginChasing();
+				break;
+			default:
+				break;
+			}
 		};
 
 		// Blinky loops around the walls at the right upper corner of the maze:

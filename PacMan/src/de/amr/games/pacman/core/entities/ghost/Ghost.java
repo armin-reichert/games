@@ -104,6 +104,7 @@ public class Ghost extends BoardMover {
 	// Events
 	
 	public void beginWaiting() {
+		setAnimated(true);
 		control.changeTo(Waiting);
 	}
 

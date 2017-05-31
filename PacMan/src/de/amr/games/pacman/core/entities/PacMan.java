@@ -25,8 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -47,19 +47,16 @@ public class PacMan extends BoardMover {
 
 	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onEnemyContact;
-	
+
 	private final AbstractPacManApp app;
 	private final StateMachine<PacManState> control;
 	private List<Ghost> enemies;
-	private Supplier<Float> speedBeforePowerWalking;
 	private int freezeTimer;
 
 	public PacMan(AbstractPacManApp app, Board board) {
 		super(board);
-		
-		this.app = app;
+		this.app = Objects.requireNonNull(app);
 		setName("Pac-Man");
-
 		enemies = Collections.emptyList();
 
 		onContentFound = content -> {
@@ -101,7 +98,6 @@ public class PacMan extends BoardMover {
 
 		control.state(PowerWalking).entry = state -> {
 			app.assets.sound("sfx/waza.mp3").loop();
-			speedBeforePowerWalking = speed;
 			enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
 		};
 
@@ -115,7 +111,6 @@ public class PacMan extends BoardMover {
 
 		control.state(PowerWalking).exit = state -> {
 			app.assets.sound("sfx/waza.mp3").stop();
-			speed = speedBeforePowerWalking;
 			enemies.forEach(Ghost::endBeingFrightened);
 		};
 

@@ -1,6 +1,7 @@
 package de.amr.games.pacman.test;
 
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
+import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
@@ -47,6 +48,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 	@Override
 	public void draw(Graphics2D g) {
 		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
+		drawGridLines(g, getWidth(), getHeight());
 		Stream.of(ghosts).forEach(ghost -> ghost.draw(g));
 	}
 
