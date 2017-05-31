@@ -4,7 +4,6 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
-import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
@@ -46,14 +45,15 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board);
+		pacMan.init();
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
-
 		pacMan.onGhostMet = ghost -> {
 			app.assets.sound("sfx/die.mp3").play();
 			pause(2);
 		};
-		
+
 		pinky = new Ghost(app, board, "Pinky");
+		pinky.init();
 		pinky.control.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;
 		pinky.setColor(Color.PINK);
@@ -62,11 +62,11 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 		pacMan.setEnemies(pinky);
 		reset();
-		
-		pacMan.control.changeTo(Walking);
+
+		pacMan.startWalking();
 		pinky.control.changeTo(Chasing);
 	};
-	
+
 	private void reset() {
 		pacMan.placeAt(PACMAN_HOME);
 		int dir = rand.nextBoolean() ? E : W;
@@ -78,7 +78,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pinky.setMoveDir(dir); // TODO without this, ghost might get stuck
 		pinky.setNextMoveDir(dir);
 	}
-	
+
 	private void pause(int seconds) {
 		pauseTimer = app.motor.toFrames(seconds);
 	}

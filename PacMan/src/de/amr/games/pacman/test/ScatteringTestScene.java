@@ -56,6 +56,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 		Stream.of(ghosts).forEach(ghost -> {
 			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
+			ghost.init();
 			ghost.setAnimated(true);
 			ghost.control.changeTo(GhostState.Scattering);
 		});

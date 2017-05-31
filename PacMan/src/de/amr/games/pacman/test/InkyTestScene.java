@@ -4,7 +4,6 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
-import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
@@ -47,8 +46,9 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board);
+		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
-		
+
 		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onGhostMet = ghost -> {
 			ghost.placeAt(GHOST_HOUSE_ENTRY);
@@ -63,6 +63,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		};
 
 		blinky = new Ghost(app, board, "Blinky");
+		blinky.init();
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
@@ -72,6 +73,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		blinky.setMoveDir(E);
 
 		inky = new Ghost(app, board, "Inky");
+		inky.init();
 		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
@@ -79,7 +81,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		inky.placeAt(GHOST_HOUSE_ENTRY);
 
 		app.entities.add(pacMan, blinky, inky);
-		pacMan.control.changeTo(Walking);
+		pacMan.startWalking();
 		blinky.control.changeTo(Chasing);
 		inky.control.changeTo(Chasing);
 	};

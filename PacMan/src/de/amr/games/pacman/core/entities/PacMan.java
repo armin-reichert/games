@@ -45,7 +45,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class PacMan extends BoardMover {
 
-	public final StateMachine<PacManState> control;
+	private final StateMachine<PacManState> control;
 
 	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onGhostMet;
@@ -86,6 +86,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Walking).update = state -> {
+			handleInput();
 			walk();
 		};
 
@@ -96,6 +97,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(PowerWalking).update = state -> {
+			handleInput();
 			walk();
 			if (state.isTerminated()) {
 				control.changeTo(Walking);
@@ -115,7 +117,7 @@ public class PacMan extends BoardMover {
 			}
 		};
 	}
-
+	
 	@Override
 	public String toString() {
 		return String.format("Pacman[row=%d,col=%d]", getRow(), getCol());
@@ -139,6 +141,29 @@ public class PacMan extends BoardMover {
 		control.update();
 	}
 
+	public PacManState state() {
+		return control.stateID();
+	}
+	
+	public State state(PacManState stateID) {
+		return control.state(stateID);
+	}
+	
+	// Events
+	
+	public void killed() {
+		control.changeTo(Dying);
+	}
+	
+	public void startPowerWalking(int seconds) {
+		control.state(PowerWalking).setDuration(app.motor.toFrames(seconds));
+		control.changeTo(PowerWalking);
+	}
+	
+	public void startWalking() {
+		control.changeTo(Walking);
+	}
+	
 	@Override
 	public Sprite currentSprite() {
 		if (control.inState(Dying) && app.getTheme().getPacManDyingSprite() != null) {
@@ -179,23 +204,22 @@ public class PacMan extends BoardMover {
 			onContentFound.accept(content);
 		}
 		enemies.stream().filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow()).forEach(onGhostMet);
-		turnTo(computeNextMoveDir());
+		turnTo(nextMoveDir);
 	}
 
-	private int computeNextMoveDir() {
+	private void handleInput() {
 		if (Keyboard.keyDown(VK_LEFT)) {
-			return W;
+			nextMoveDir = W;
 		}
 		if (Keyboard.keyDown(VK_RIGHT)) {
-			return E;
+			nextMoveDir = E;
 		}
 		if (Keyboard.keyDown(VK_UP)) {
-			return N;
+			nextMoveDir = N;
 		}
 		if (Keyboard.keyDown(VK_DOWN)) {
-			return S;
+			nextMoveDir = S;
 		}
-		return nextMoveDir;
 	}
 
 	// -- drawing

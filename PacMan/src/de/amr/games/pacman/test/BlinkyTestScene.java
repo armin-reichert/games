@@ -4,7 +4,6 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
-import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
@@ -45,6 +44,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board);
+		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
@@ -60,7 +60,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			ghost.setNextMoveDir(dir);
 		};
 
-		pacMan.control.state(PacManState.Walking).update = state -> {
+		pacMan.state(PacManState.Walking).update = state -> {
 			if (pacMan.currentTile().equals(blinky.currentTile())) {
 				pacMan.onGhostMet.accept(blinky);
 			} else {
@@ -69,6 +69,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		};
 
 		blinky = new Ghost(app, board, "Blinky");
+		blinky.init();
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
@@ -77,7 +78,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		pacMan.setEnemies(blinky);
 
-		pacMan.control.changeTo(Walking);
+		pacMan.startWalking();
 		blinky.control.changeTo(Chasing);
 	};
 
