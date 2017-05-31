@@ -35,7 +35,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class Ghost extends BoardMover {
 
-	public final StateMachine<GhostState> control;
+	private final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateToRestore;
 
 	private final AbstractPacManApp app;
@@ -65,7 +65,7 @@ public class Ghost extends BoardMover {
 					// while waiting inside ghost house, ghost cannot pass through door
 					return false;
 				} else {
-					// when inside ghost house or already in door, ghost can walk through
+					// when inside ghost house or already inside door, ghost can pass through door
 					return insideGhostHouse() || board.contains(currentTile(), Door);
 				}
 			}
@@ -88,8 +88,24 @@ public class Ghost extends BoardMover {
 	public void setWaitingTime(int frames) {
 		control.state(Waiting).setDuration(frames);
 	}
+	
+	public GhostState state() {
+		return control.stateID();
+	}
+	
+	public State state(GhostState stateID) {
+		return control.state(stateID);
+	}
+	
+	public State state(GhostState stateID, State state) {
+		return control.state(stateID, state);
+	}
 
 	// Events
+	
+	public void beginWaiting() {
+		control.changeTo(Waiting);
+	}
 
 	public void beginScattering() {
 		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
@@ -119,9 +135,17 @@ public class Ghost extends BoardMover {
 		}
 		control.changeTo(stateToRestore.get());
 	}
+	
+	public void beginRecovering() {
+		control.changeTo(Recovering);
+	}
 
 	public void killed() {
 		control.changeTo(Dead);
+	}
+	
+	public void restoreState() {
+		control.changeTo(stateToRestore.get());
 	}
 
 	// --- Look ---

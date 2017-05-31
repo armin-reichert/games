@@ -20,7 +20,6 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 
 /**
  * A scene for interactive testing of ghost routing through the maze.
@@ -57,7 +56,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		ghost.init();
 		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		ghost.placeAt(new Tile(4, 1));
-		ghost.control.changeTo(GhostState.Chasing);
+		ghost.beginChasing();
 		reset();
 	};
 

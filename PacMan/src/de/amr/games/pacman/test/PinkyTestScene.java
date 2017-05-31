@@ -54,7 +54,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 		pinky = new Ghost(app, board, "Pinky");
 		pinky.init();
-		pinky.control.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
+		pinky.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;
 		pinky.setColor(Color.PINK);
 		pinky.setAnimated(true);
@@ -63,8 +63,8 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan.setEnemies(pinky);
 		reset();
 
-		pacMan.startWalking();
-		pinky.control.changeTo(Chasing);
+		pacMan.beginWalking();
+		pinky.beginChasing();
 	};
 
 	private void reset() {

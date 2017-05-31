@@ -36,7 +36,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.startWalking();
+		pacMan.beginWalking();
 	};
 
 	@Override

@@ -64,7 +64,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		blinky = new Ghost(app, board, "Blinky");
 		blinky.init();
-		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
+		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);
@@ -74,16 +74,16 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		inky = new Ghost(app, board, "Inky");
 		inky.init();
-		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
+		inky.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
 		inky.speed = () -> pacMan.speed.get() * .9f;
 		inky.placeAt(GHOST_HOUSE_ENTRY);
 
 		app.entities.add(pacMan, blinky, inky);
-		pacMan.startWalking();
-		blinky.control.changeTo(Chasing);
-		inky.control.changeTo(Chasing);
+		pacMan.beginWalking();
+		blinky.beginChasing();
+		inky.beginChasing();
 	};
 
 	@Override

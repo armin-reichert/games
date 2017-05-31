@@ -162,12 +162,12 @@ public class PacMan extends BoardMover {
 		control.changeTo(Dying);
 	}
 
-	public void startPowerWalking(int seconds) {
+	public void beginPowerWalking(int seconds) {
 		control.state(PowerWalking).setDuration(app.motor.toFrames(seconds));
 		control.changeTo(PowerWalking);
 	}
 
-	public void startWalking() {
+	public void beginWalking() {
 		control.changeTo(Walking);
 	}
 

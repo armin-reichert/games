@@ -70,7 +70,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		blinky = new Ghost(app, board, "Blinky");
 		blinky.init();
-		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
+		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
 		blinky.placeAt(new Tile(4, 1));
@@ -78,8 +78,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		pacMan.setEnemies(blinky);
 
-		pacMan.startWalking();
-		blinky.control.changeTo(Chasing);
+		pacMan.beginWalking();
+		blinky.beginChasing();
 	};
 
 	@Override
