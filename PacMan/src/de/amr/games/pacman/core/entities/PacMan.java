@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -50,9 +51,7 @@ public class PacMan extends BoardMover {
 
 	public final StateMachine<PacManState> control;
 
-	public Consumer<Tile> onPelletFound;
-	public Consumer<Tile> onEnergizerFound;
-	public Consumer<Tile> onBonusFound;
+	public BiConsumer<Tile, TileContent> onContentFound;
 	public Consumer<Ghost> onGhostMet;
 
 	private final AbstractPacManApp app;
@@ -72,18 +71,8 @@ public class PacMan extends BoardMover {
 
 		// default event handlers
 
-		onPelletFound = tile -> {
-			Log.info("PacMan eats pellet at tile " + tile);
-			board.setContent(tile, TileContent.None);
-		};
-
-		onEnergizerFound = tile -> {
-			Log.info("PacMan eats energizer at tile " + tile);
-			board.setContent(tile, TileContent.None);
-		};
-
-		onBonusFound = tile -> {
-			Log.info("PacMan eats bonus ");
+		onContentFound = (tile, content) -> {
+			Log.info("PacMan found " + content + " at tile " + tile);
 			board.setContent(tile, TileContent.None);
 		};
 
@@ -192,9 +181,9 @@ public class PacMan extends BoardMover {
 	public void moveAndEat() {
 		turnTo(computeNextMoveDir());
 		move();
-		board.getContent(currentTile(), Pellet).ifPresent(onPelletFound);
-		board.getContent(currentTile(), Energizer).ifPresent(onEnergizerFound);
-		board.getContent(currentTile(), Bonus).ifPresent(onBonusFound);
+		Tile tile = currentTile();
+		TileContent content = board.getContent(tile);
+		onContentFound.accept(tile, content);
 		/*@formatter:off*/
 		enemies.stream()
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())

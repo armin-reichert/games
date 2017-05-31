@@ -335,36 +335,40 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		pacMan.onPelletFound = tile -> {
-			app.assets.sound("sfx/eat-pill.mp3").play();
-			score(POINTS_FOR_PELLET);
-			long pelletCount = board.count(Pellet);
-			if (pelletCount == BONUS1_PELLETS_LEFT || pelletCount == BONUS2_PELLETS_LEFT) {
-				setBonusEnabled(true);
+		pacMan.onContentFound = (tile, content) -> {
+			switch (content) {
+			case Pellet:
+				app.assets.sound("sfx/eat-pill.mp3").play();
+				score(POINTS_FOR_PELLET);
+				long pelletCount = board.count(Pellet);
+				if (pelletCount == BONUS1_PELLETS_LEFT || pelletCount == BONUS2_PELLETS_LEFT) {
+					setBonusEnabled(true);
+				}
+				pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
+				board.setContent(tile, None);
+				break;
+			case Energizer:
+				app.assets.sound("sfx/eat-pill.mp3").play();
+				score(POINTS_FOR_ENERGIZER);
+				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
+				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
+				int seconds = levels.getGhostFrightenedDuration(level);
+				pacMan.control.state(Frightening).setDuration(app.motor.toFrames(seconds));
+				pacMan.control.changeTo(Frightening);
+				board.setContent(tile, None);
+				break;
+			case Bonus:
+				app.assets.sound("sfx/eat-fruit.mp3").play();
+				int points = levels.getBonusValue(level);
+				score(points);
+				bonusList.add(levels.getBonusSymbol(level));
+				showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
+				setBonusEnabled(false);
+				board.setContent(tile, None);
+				break;
+			default:
+				break;
 			}
-			pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
-			board.setContent(tile, None);
-		};
-
-		pacMan.onEnergizerFound = tile -> {
-			app.assets.sound("sfx/eat-pill.mp3").play();
-			score(POINTS_FOR_ENERGIZER);
-			nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
-			pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-			int seconds = levels.getGhostFrightenedDuration(level);
-			pacMan.control.state(Frightening).setDuration(app.motor.toFrames(seconds));
-			pacMan.control.changeTo(Frightening);
-			board.setContent(tile, None);
-		};
-
-		pacMan.onBonusFound = tile -> {
-			app.assets.sound("sfx/eat-fruit.mp3").play();
-			int points = levels.getBonusValue(level);
-			score(points);
-			bonusList.add(levels.getBonusSymbol(level));
-			showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
-			setBonusEnabled(false);
-			board.setContent(tile, None);
 		};
 
 		pacMan.onGhostMet = ghost -> {
