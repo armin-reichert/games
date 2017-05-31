@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -48,7 +47,7 @@ public class PacMan extends BoardMover {
 
 	public final StateMachine<PacManState> control;
 
-	public BiConsumer<Tile, TileContent> onContentFound;
+	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onGhostMet;
 
 	private final AbstractPacManApp app;
@@ -68,7 +67,8 @@ public class PacMan extends BoardMover {
 
 		// default event handlers
 
-		onContentFound = (tile, content) -> {
+		onContentFound = content -> {
+			Tile tile = currentTile();
 			Log.info("PacMan found " + content + " at tile " + tile);
 			board.setContent(tile, TileContent.None);
 		};
@@ -93,7 +93,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Eating).update = state -> {
-			moveAndEat();
+			exploreMaze();
 		};
 
 		control.state(Empowered).entry = state -> {
@@ -103,7 +103,7 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Empowered).update = state -> {
-			moveAndEat();
+			exploreMaze();
 			if (state.isTerminated()) {
 				control.changeTo(Eating);
 			}
@@ -175,17 +175,11 @@ public class PacMan extends BoardMover {
 				&& control.state(Empowered).getRemaining() < control.state(Empowered).getDuration() / 4;
 	}
 
-	public void moveAndEat() {
+	public void exploreMaze() {
 		turnTo(computeNextMoveDir());
 		move();
-		Tile tile = currentTile();
-		TileContent content = board.getContent(tile);
-		onContentFound.accept(tile, content);
-		/*@formatter:off*/
-		enemies.stream()
-			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())
-			.forEach(onGhostMet);
-		/*@formatter:on*/
+		onContentFound.accept(board.getContent(currentTile()));
+		enemies.stream().filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow()).forEach(onGhostMet);
 	}
 
 	private int computeNextMoveDir() {

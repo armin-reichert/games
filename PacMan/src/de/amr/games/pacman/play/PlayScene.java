@@ -334,7 +334,8 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		pacMan.onContentFound = (tile, content) -> {
+		pacMan.onContentFound = content -> {
+			Tile tile = pacMan.currentTile();
 			switch (content) {
 			case Pellet:
 				app.assets.sound("sfx/eat-pill.mp3").play();
