@@ -13,6 +13,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -23,7 +24,6 @@ import de.amr.easy.game.math.Vector2;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.board.TileContent;
 
 /**
  * Base class for entities which move on the board.
@@ -40,6 +40,8 @@ public abstract class BoardMover extends GameEntity {
 
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
+		route = Collections.emptyList();
+		canEnterTile = tile -> board.isTileValid(tile);
 	}
 
 	@Override
@@ -48,7 +50,6 @@ public abstract class BoardMover extends GameEntity {
 		moveDir = nextMoveDir = E;
 		couldMove = false;
 		speed = () -> 0f;
-		canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, TileContent.Wall);
 	}
 
 	public Board getBoard() {
