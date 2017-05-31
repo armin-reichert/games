@@ -21,11 +21,10 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import de.amr.easy.game.input.Keyboard;
@@ -50,14 +49,14 @@ public class PacMan extends BoardMover {
 
 	private final AbstractPacManApp app;
 	private final StateMachine<PacManState> control;
-	private List<Ghost> enemies;
+	private final Set<Ghost> enemies;
 	private int freezeTimer;
 
 	public PacMan(AbstractPacManApp app, Board board) {
 		super(board);
 		this.app = Objects.requireNonNull(app);
 		setName("Pac-Man");
-		enemies = Collections.emptyList();
+		enemies = new HashSet<>();
 
 		onContentFound = content -> {
 			switch (content) {
@@ -144,6 +143,10 @@ public class PacMan extends BoardMover {
 		}
 		control.update();
 	}
+	
+	public Set<Ghost> enemies() {
+		return enemies;
+	}
 
 	public PacManState state() {
 		return control.stateID();
@@ -175,7 +178,7 @@ public class PacMan extends BoardMover {
 			return app.getTheme().getPacManStandingSprite(moveDir);
 		}
 		Sprite runningSprite = app.getTheme().getPacManRunningSprite(moveDir);
-		runningSprite.setAnimated(couldMove);
+		runningSprite.setAnimated(!stuck);
 		return runningSprite;
 	}
 
@@ -184,10 +187,6 @@ public class PacMan extends BoardMover {
 		Top4.INSTANCE.dirs().forEach(dir -> {
 			app.getTheme().getPacManRunningSprite(dir).setAnimated(animated);
 		});
-	}
-
-	public void setEnemies(Ghost... enemies) {
-		this.enemies = Arrays.asList(enemies);
 	}
 
 	public void freeze(int frames) {

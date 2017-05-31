@@ -2,6 +2,10 @@ package de.amr.games.pacman.play;
 
 import static de.amr.easy.game.Application.Log;
 import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
+import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.N;
+import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
@@ -48,7 +52,6 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.Tile;
@@ -72,13 +75,13 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class PlayScene extends Scene<PacManGame> {
 
 	// Prominent board locations
-	public static final Tile PACMAN_HOME = new Tile(26, 13);
-	public static final Tile BLINKY_HOME = new Tile(14, 13);
+	public static final Tile PACMAN_HOME = new Tile(26, 13.5f);
+	public static final Tile BLINKY_HOME = new Tile(14, 13.5f);
 	public static final Tile INKY_HOME = new Tile(17, 11);
 	public static final Tile PINKY_HOME = new Tile(17, 13);
 	public static final Tile CLYDE_HOME = new Tile(17, 15);
-	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
-	public static final Tile BONUS_TILE = new Tile(20, 13);
+	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13.5f);
+	public static final Tile BONUS_TILE = new Tile(20, 13.5f);
 
 	// Game parameters
 	public static final int POINTS_FOR_PELLET = 10;
@@ -328,7 +331,6 @@ public class PlayScene extends Scene<PacManGame> {
 	private void createPacManAndGhosts() {
 
 		pacMan = new PacMan(app, board);
-		pacMan.placeAt(PACMAN_HOME);
 
 		pacMan.onContentFound = content -> {
 			Tile tile = pacMan.currentTile();
@@ -336,20 +338,22 @@ public class PlayScene extends Scene<PacManGame> {
 			case Pellet:
 				app.assets.sound("sfx/eat-pill.mp3").play();
 				score(POINTS_FOR_PELLET);
-				long pelletCount = board.count(Pellet);
-				if (pelletCount == BONUS1_PELLETS_LEFT || pelletCount == BONUS2_PELLETS_LEFT) {
+				board.setContent(tile, None);
+				if (board.count(Pellet) == BONUS1_PELLETS_LEFT || board.count(Pellet) == BONUS2_PELLETS_LEFT) {
 					setBonusEnabled(true);
 				}
 				pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
-				board.setContent(tile, None);
 				break;
 			case Energizer:
 				app.assets.sound("sfx/eat-pill.mp3").play();
-				score(POINTS_FOR_ENERGIZER);
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
+				score(POINTS_FOR_ENERGIZER);
+				board.setContent(tile, None);
+				if (board.count(Pellet) == BONUS1_PELLETS_LEFT || board.count(Pellet) == BONUS2_PELLETS_LEFT) {
+					setBonusEnabled(true);
+				}
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 				pacMan.beginPowerWalking(levels.getGhostFrightenedDuration(level));
-				board.setContent(tile, None);
 				break;
 			case Bonus:
 				app.assets.sound("sfx/eat-fruit.mp3").play();
@@ -358,7 +362,6 @@ public class PlayScene extends Scene<PacManGame> {
 				bonusList.add(levels.getBonusSymbol(level));
 				showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
 				setBonusEnabled(false);
-				board.setContent(tile, None);
 				break;
 			default:
 				break;
@@ -453,7 +456,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Blinky waits just before ghost house:
 		blinky.state(GhostState.Waiting).entry = state -> {
 			blinky.placeAt(BLINKY_HOME);
-			blinky.setMoveDir(Top4.W);
+			blinky.setMoveDir(W);
 			blinky.setAnimated(true);
 		};
 
@@ -476,7 +479,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Blinky loops around the walls at the right upper corner of the maze:
-		blinky.state(GhostState.Scattering, new LoopAroundWalls(blinky, 4, 26, Top4.S, true));
+		blinky.state(GhostState.Scattering, new LoopAroundWalls(blinky, 4, 26, S, true));
 
 		// Blinky directly follows Pac-Man:
 		blinky.state(GhostState.Chasing).update = state -> {
@@ -490,7 +493,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Inky waits inside the ghost house:
 		inky.state(GhostState.Waiting).entry = state -> {
 			inky.placeAt(INKY_HOME);
-			inky.setMoveDir(Top4.N);
+			inky.setMoveDir(N);
 			inky.setAnimated(true);
 		};
 
@@ -513,7 +516,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Inky loops around the walls at the lower right corner of the maze:
-		inky.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, Top4.W, true));
+		inky.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
 
 		// Inky chases together with Blinky.
 		inky.state(GhostState.Chasing, new ChaseWithPartner(inky, blinky, pacMan));
@@ -527,7 +530,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		{
 			pinky.placeAt(PINKY_HOME);
-			pinky.setMoveDir(Top4.S);
+			pinky.setMoveDir(S);
 			pinky.setAnimated(true);
 		};
 
@@ -550,7 +553,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Pinky loops around the walls at the upper right corner of the maze:
-		pinky.state(GhostState.Scattering, new LoopAroundWalls(pinky, 4, 1, Top4.S, false));
+		pinky.state(GhostState.Scattering, new LoopAroundWalls(pinky, 4, 1, S, false));
 
 		// Pinky follows the position 4 tiles ahead of Pac-Man:
 		pinky.state(GhostState.Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
@@ -562,7 +565,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Clyde waits inside ghost house:
 		clyde.state(GhostState.Waiting).entry = state -> {
 			clyde.placeAt(CLYDE_HOME);
-			clyde.setMoveDir(Top4.N);
+			clyde.setMoveDir(N);
 			clyde.setAnimated(true);
 		};
 
@@ -585,7 +588,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Clyde loops around the walls at the left lower corner of the maze:
-		clyde.state(GhostState.Scattering, new LoopAroundWalls(clyde, 32, 1, Top4.E, false));
+		clyde.state(GhostState.Scattering, new LoopAroundWalls(clyde, 32, 1, E, false));
 
 		// Clyde follows Pac-Man's position if he is more than 8 tiles away, otherwise he moves
 		// randomly:
@@ -599,13 +602,11 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		pacMan.setEnemies(blinky, inky, pinky, clyde);
-
-		// Update entity collection
 		app.entities.removeAll(PacMan.class);
 		app.entities.removeAll(Ghost.class);
-		app.entities.add(pacMan);
-		app.entities.add(blinky, inky, pinky, clyde);
+		app.entities.add(pacMan, blinky, inky, pinky, clyde);
+
+		ghosts().forEach(ghost -> pacMan.enemies().add(ghost));
 	}
 
 	private float getGhostSpeed(Ghost ghost) {

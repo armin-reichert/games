@@ -76,7 +76,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.placeAt(new Tile(4, 1));
 		blinky.speed = () -> pacMan.speed.get();
 
-		pacMan.setEnemies(blinky);
+		pacMan.enemies().add(blinky);
 
 		pacMan.beginWalking();
 		blinky.beginChasing();

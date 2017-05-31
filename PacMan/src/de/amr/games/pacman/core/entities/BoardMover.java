@@ -13,7 +13,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -30,17 +29,18 @@ import de.amr.games.pacman.core.board.Tile;
  */
 public abstract class BoardMover extends GameEntity {
 
+	public Supplier<Float> speed;
+
+	public Function<Tile, Boolean> canEnterTile;
+
 	protected final Board board;
 	protected List<Integer> route;
 	protected int moveDir;
 	protected int nextMoveDir;
-	protected boolean couldMove;
-	public Supplier<Float> speed;
-	public Function<Tile, Boolean> canEnterTile;
+	protected boolean stuck;
 
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
-		route = Collections.emptyList();
 		canEnterTile = tile -> board.isTileValid(tile);
 	}
 
@@ -48,7 +48,7 @@ public abstract class BoardMover extends GameEntity {
 	public void init() {
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;
-		couldMove = false;
+		stuck = true;
 		speed = () -> 0f;
 	}
 
@@ -80,8 +80,8 @@ public abstract class BoardMover extends GameEntity {
 		this.nextMoveDir = nextMoveDir;
 	}
 
-	public boolean couldMove() {
-		return couldMove;
+	public boolean isStuck() {
+		return stuck;
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public abstract class BoardMover extends GameEntity {
 		Tile newTile = currentTile();
 		if (!canEnterTile.apply(newTile)) {
 			tr.moveTo(oldPosition); // undo move
-			couldMove = false;
+			stuck = true;
 			return;
 		}
 
@@ -174,7 +174,7 @@ public abstract class BoardMover extends GameEntity {
 				// fall off right edge -> appear at left edge
 				tr.setX(0);
 			}
-			couldMove = true;
+			stuck = false;
 			return;
 		}
 
@@ -183,7 +183,7 @@ public abstract class BoardMover extends GameEntity {
 		boolean forbidden = !canEnterTile.apply(neighborTile);
 
 		if (!forbidden) {
-			couldMove = true;
+			stuck = false;
 			return;
 		}
 
@@ -210,7 +210,7 @@ public abstract class BoardMover extends GameEntity {
 			}
 			break;
 		}
-		couldMove = false;
+		stuck = true;
 	}
 
 	public void moveRandomly() {
@@ -243,7 +243,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public void bounce() {
 		move();
-		if (!couldMove) {
+		if (stuck) {
 			turnTo(Top4.INSTANCE.inv(moveDir));
 		}
 	}

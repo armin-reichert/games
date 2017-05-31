@@ -60,7 +60,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pinky.setAnimated(true);
 		pinky.speed = () -> .9f * pacMan.speed.get();
 
-		pacMan.setEnemies(pinky);
+		pacMan.enemies().add(pinky);
 		reset();
 
 		pacMan.beginWalking();
