@@ -35,6 +35,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 	private PacMan pacMan;
 	private Ghost pinky;
 	private Random rand = new Random();
+	private int pauseTimer;
 
 	public PinkyTestScene(PinkyTestApp app) {
 		super(app);
@@ -45,35 +46,54 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board);
-		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 
+		pacMan.onGhostMet = ghost -> {
+			app.assets.sound("sfx/die.mp3").play();
+			pause(2);
+		};
+		
 		pinky = new Ghost(app, board, "Pinky");
 		pinky.control.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;
 		pinky.setColor(Color.PINK);
 		pinky.setAnimated(true);
 		pinky.speed = () -> .9f * pacMan.speed.get();
-		pinky.placeAt(GHOST_HOUSE_ENTRY);
 
+		pacMan.setEnemies(pinky);
+		reset();
+		
 		pacMan.control.changeTo(Eating);
 		pinky.control.changeTo(Chasing);
 	};
+	
+	private void reset() {
+		pacMan.placeAt(PACMAN_HOME);
+		int dir = rand.nextBoolean() ? E : W;
+		pacMan.setMoveDir(dir);
+		pacMan.setNextMoveDir(dir);
+
+		pinky.placeAt(GHOST_HOUSE_ENTRY);
+		dir = rand.nextBoolean() ? W : E;
+		pinky.setMoveDir(dir); // TODO without this, ghost might get stuck
+		pinky.setNextMoveDir(dir);
+	}
+	
+	private void pause(int seconds) {
+		pauseTimer = app.motor.toFrames(seconds);
+	}
 
 	@Override
 	public void update() {
+		if (pauseTimer > 0) {
+			--pauseTimer;
+			if (pauseTimer == 0) {
+				reset();
+			}
+			return;
+		}
 		pacMan.update();
 		pinky.update();
-		if (pacMan.currentTile().equals(pinky.currentTile())) {
-			pacMan.placeAt(PACMAN_HOME);
-			int dir = rand.nextBoolean() ? E : W;
-			pacMan.setMoveDir(dir);
-			pacMan.setNextMoveDir(dir);
-			pinky.placeAt(GHOST_HOUSE_ENTRY);
-			dir = rand.nextBoolean() ? W : E;
-			pinky.setMoveDir(dir); // TODO without this, ghost might get stuck
-			pinky.setNextMoveDir(dir);
-		}
 	}
 
 	@Override

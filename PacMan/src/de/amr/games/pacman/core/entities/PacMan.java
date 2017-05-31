@@ -23,10 +23,12 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -46,7 +48,6 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class PacMan extends BoardMover {
 
-	private final AbstractPacManApp app;
 	public final StateMachine<PacManState> control;
 
 	public Consumer<Tile> onPelletFound;
@@ -54,19 +55,21 @@ public class PacMan extends BoardMover {
 	public Consumer<Tile> onBonusFound;
 	public Consumer<Ghost> onGhostMet;
 
+	private final AbstractPacManApp app;
+	private List<Ghost> enemies;
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
-
 	public boolean couldMove; // TODO
-
-	private Stream<Ghost> ghosts() {
-		return app.entities.allOf(Ghost.class);
-	}
 
 	public PacMan(AbstractPacManApp app, Board board) {
 		super(board);
-		this.app = app;
 		setName("Pac-Man");
+
+		this.app = app;
+		enemies = Collections.emptyList();
+		
+		// default tile access
+		canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
 
 		// default event handlers
 
@@ -111,7 +114,7 @@ public class PacMan extends BoardMover {
 		control.state(Frightening).entry = state -> {
 			app.assets.sound("sfx/waza.mp3").loop();
 			speedBeforeFrightening = speed;
-			ghosts().forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
+			enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
 		};
 
 		control.state(Frightening).update = state -> {
@@ -124,7 +127,7 @@ public class PacMan extends BoardMover {
 		control.state(Frightening).exit = state -> {
 			app.assets.sound("sfx/waza.mp3").stop();
 			speed = speedBeforeFrightening;
-			ghosts().forEach(Ghost::endBeingFrightened);
+			enemies.forEach(Ghost::endBeingFrightened);
 		};
 
 		control.state(Dying).entry = state -> {
@@ -174,6 +177,10 @@ public class PacMan extends BoardMover {
 		});
 	}
 
+	public void setEnemies(Ghost... enemies) {
+		this.enemies = Arrays.asList(enemies);
+	}
+
 	public void freeze(int frames) {
 		this.freezeTimer = frames;
 	}
@@ -183,19 +190,14 @@ public class PacMan extends BoardMover {
 				&& control.state(Frightening).getRemaining() < control.state(Frightening).getDuration() / 4;
 	}
 
-	@Override
-	public boolean canEnter(Tile tile) {
-		return board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
-	}
-
 	public void moveAndEat() {
-		changeMoveDir(computeNextMoveDir());
+		turnTo(computeNextMoveDir());
 		couldMove = move();
 		board.getContent(currentTile(), Pellet).ifPresent(onPelletFound);
 		board.getContent(currentTile(), Energizer).ifPresent(onEnergizerFound);
 		board.getContent(currentTile(), Bonus).ifPresent(onBonusFound);
 		/*@formatter:off*/
-		ghosts()
+		enemies.stream()
 			.filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow())
 			.forEach(onGhostMet);
 		/*@formatter:on*/

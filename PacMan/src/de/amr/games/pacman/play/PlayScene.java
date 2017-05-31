@@ -599,6 +599,8 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
+		pacMan.setEnemies(blinky, inky, pinky, clyde);
+
 		// Update entity collection
 		app.entities.removeAll(PacMan.class);
 		app.entities.removeAll(Ghost.class);

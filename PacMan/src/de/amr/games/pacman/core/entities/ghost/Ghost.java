@@ -53,6 +53,24 @@ public class Ghost extends BoardMover {
 		color = Color.WHITE;
 		control = new StateMachine<>("Ghost " + name, new EnumMap<>(GhostState.class));
 		stateToRestore = () -> control.stateID();
+		canEnterTile = (Tile tile) -> {
+			if (board.contains(tile, Wall)) {
+				return false;
+			}
+			if (board.contains(tile, Door)) {
+				if (control.inState(Dead)) {
+					// dead ghost (eyes) can pass through door
+					return true;
+				} else if (control.inState(Waiting)) {
+					// while waiting inside ghost house, ghost cannot pass through door
+					return false;
+				} else {
+					// when inside ghost house or already in door, ghost can walk through
+					return insideGhostHouse() || board.contains(currentTile(), Door);
+				}
+			}
+			return true;
+		};
 	}
 
 	@Override
@@ -150,26 +168,6 @@ public class Ghost extends BoardMover {
 
 	public boolean insideGhostHouse() {
 		return board.contains(currentTile(), GhostHouse);
-	}
-
-	@Override
-	public boolean canEnter(Tile tile) {
-		if (board.contains(tile, Wall)) {
-			return false;
-		}
-		if (board.contains(tile, Door)) {
-			if (control.inState(Dead)) {
-				// dead ghost (eyes) can pass through door
-				return true;
-			} else if (control.inState(Waiting)) {
-				// while waiting inside ghost house, ghost cannot pass through door
-				return false;
-			} else {
-				// when inside ghost house or already in door, ghost can walk through
-				return insideGhostHouse() || board.contains(currentTile(), Door);
-			}
-		}
-		return true;
 	}
 
 	// --- Drawing ---

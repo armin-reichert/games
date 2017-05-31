@@ -29,7 +29,8 @@ public class FollowTileAheadOfPacMan extends State {
 			for (int numTiles = numTilesAhead; numTiles >= 0; --numTiles) {
 				Tile targetTile = target.currentTile().translate(numTiles * Top4.INSTANCE.dx(dir),
 						numTiles * Top4.INSTANCE.dy(dir));
-				if (board.isTileValid(targetTile) && !board.contains(targetTile, GhostHouse) && chaser.canEnter(targetTile)) {
+				if (board.isTileValid(targetTile) && !board.contains(targetTile, GhostHouse)
+						&& chaser.canEnterTile.apply(targetTile)) {
 					chaser.follow(targetTile);
 					return;
 				}

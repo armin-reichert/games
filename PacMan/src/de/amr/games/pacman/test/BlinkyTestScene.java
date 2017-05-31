@@ -75,7 +75,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.placeAt(new Tile(4, 1));
 		blinky.speed = () -> pacMan.speed.get();
 
-		app.entities.add(pacMan, blinky); // needed for onGhostMet event handler!
+		pacMan.setEnemies(blinky);
 
 		pacMan.control.changeTo(Eating);
 		blinky.control.changeTo(Chasing);
@@ -107,7 +107,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		int[] dirsPermuted = Top4.INSTANCE.dirsPermuted().toArray();
 		for (int dir = 0; dir < 4; ++dir) {
 			Tile tile = pacManTile.neighbor(dirsPermuted[dir]);
-			if (!pacMan.canEnter(tile)) {
+			if (!pacMan.canEnterTile.apply(tile)) {
 				continue;
 			}
 			double distance = board.shortestRoute(tile, blinkyTile).size();
@@ -118,7 +118,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			}
 		}
 		if (maxDistDir != Top4.INSTANCE.inv(pacMan.getMoveDir())) {
-			pacMan.changeMoveDir(maxDistDir);
+			pacMan.turnTo(maxDistDir);
 		}
 		pacMan.couldMove = pacMan.move();
 	}

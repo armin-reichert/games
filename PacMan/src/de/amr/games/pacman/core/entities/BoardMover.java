@@ -15,6 +15,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -22,6 +23,7 @@ import de.amr.easy.game.math.Vector2;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
+import de.amr.games.pacman.core.board.TileContent;
 
 /**
  * Base class for entities which move on the board.
@@ -33,12 +35,14 @@ public abstract class BoardMover extends GameEntity {
 	protected int moveDir;
 	protected int nextMoveDir;
 	public Supplier<Float> speed;
+	public Function<Tile, Boolean> canEnterTile;
 
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;
 		speed = () -> 0f;
+		canEnterTile = tile -> !board.contains(tile, TileContent.Wall);
 	}
 
 	public Board getBoard() {
@@ -113,20 +117,21 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	public boolean canMoveTowards(int dir) {
-		return canEnter(currentTile().neighbor(dir));
+		return canEnterTile.apply(currentTile().neighbor(dir));
 	}
 
-	public boolean changeMoveDir(int dir) {
+	public boolean turnTo(int dir) {
 		nextMoveDir = dir;
-		boolean turn90 = (dir == Top4.INSTANCE.left(moveDir) || dir == Top4.INSTANCE.right(moveDir));
-		if (!canMoveTowards(dir) || turn90 && !isExactlyOverTile()) {
+		if (!canMoveTowards(dir)) {
+			return false;
+		}
+		boolean turnLeftOrRight = (dir == Top4.INSTANCE.left(moveDir) || dir == Top4.INSTANCE.right(moveDir));
+		if (turnLeftOrRight && !isExactlyOverTile()) {
 			return false;
 		}
 		moveDir = nextMoveDir;
 		return true;
 	}
-
-	public abstract boolean canEnter(Tile tile);
 
 	/**
 	 * Moves entity in current move direction.
@@ -140,7 +145,7 @@ public abstract class BoardMover extends GameEntity {
 		tr.move();
 		// check if move would touch disallowed tile
 		Tile newTile = currentTile();
-		if (!canEnter(newTile)) {
+		if (!canEnterTile.apply(newTile)) {
 			tr.moveTo(oldPosition); // undo move
 			return false;
 		}
@@ -159,7 +164,7 @@ public abstract class BoardMover extends GameEntity {
 		// adjust position if entity touches disallowed neighbor tile
 		int row = newTile.getRow(), col = newTile.getCol();
 		Tile neighborTile = newTile.neighbor(moveDir);
-		boolean forbidden = !canEnter(neighborTile);
+		boolean forbidden = !canEnterTile.apply(neighborTile);
 		switch (moveDir) {
 		case E:
 			if (forbidden && tr.getX() + TILE_SIZE >= (col + 1) * TILE_SIZE) {
@@ -206,8 +211,8 @@ public abstract class BoardMover extends GameEntity {
 			if (dir == Top4.INSTANCE.inv(moveDir)) {
 				break;
 			}
-			if (canEnter(neighborTile)) {
-				changeMoveDir(dir);
+			if (canEnterTile.apply(neighborTile)) {
+				turnTo(dir);
 				break;
 			}
 		}
@@ -215,7 +220,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public void moveAlongRoute() {
 		if (!route.isEmpty()) {
-			if (changeMoveDir(route.get(0))) {
+			if (turnTo(route.get(0))) {
 				route.remove(0);
 			}
 		}
@@ -229,7 +234,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public void bounce() {
 		if (!move()) {
-			changeMoveDir(Top4.INSTANCE.inv(moveDir));
+			turnTo(Top4.INSTANCE.inv(moveDir));
 		}
 	}
 
