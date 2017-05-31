@@ -47,7 +47,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan = new PacMan(app, board);
 		pacMan.init();
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.onGhostMet = ghost -> {
+		pacMan.onEnemyContact = ghost -> {
 			app.assets.sound("sfx/die.mp3").play();
 			pause(2);
 		};

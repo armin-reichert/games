@@ -363,7 +363,7 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
-		pacMan.onGhostMet = ghost -> {
+		pacMan.onEnemyContact = ghost -> {
 			if (ghost.control.inState(GhostState.Dead, GhostState.Recovering)) {
 				return;
 			}

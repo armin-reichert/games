@@ -8,9 +8,9 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.PacManState.Dying;
-import static de.amr.games.pacman.core.entities.PacManState.Walking;
-import static de.amr.games.pacman.core.entities.PacManState.PowerWalking;
 import static de.amr.games.pacman.core.entities.PacManState.Initialized;
+import static de.amr.games.pacman.core.entities.PacManState.PowerWalking;
+import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
@@ -45,27 +45,21 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class PacMan extends BoardMover {
 
+	private final AbstractPacManApp app;
 	private final StateMachine<PacManState> control;
 
 	public Consumer<TileContent> onContentFound;
-	public Consumer<Ghost> onGhostMet;
+	public Consumer<Ghost> onEnemyContact;
 
-	private final AbstractPacManApp app;
 	private List<Ghost> enemies;
 	private Supplier<Float> speedBeforeFrightening;
 	private int freezeTimer;
 
 	public PacMan(AbstractPacManApp app, Board board) {
 		super(board);
-		setName("Pac-Man");
-
 		this.app = app;
+		setName("Pac-Man");
 		enemies = Collections.emptyList();
-
-		// default tile access
-		canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
-
-		// default event handlers
 
 		onContentFound = content -> {
 			Tile tile = currentTile();
@@ -73,7 +67,7 @@ public class PacMan extends BoardMover {
 			board.setContent(tile, TileContent.None);
 		};
 
-		onGhostMet = ghost -> {
+		onEnemyContact = ghost -> {
 			Log.info("PacMan meets ghost " + ghost);
 		};
 
@@ -117,7 +111,7 @@ public class PacMan extends BoardMover {
 			}
 		};
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("Pacman[row=%d,col=%d]", getRow(), getCol());
@@ -126,6 +120,7 @@ public class PacMan extends BoardMover {
 	@Override
 	public void init() {
 		super.init();
+		canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
 		freezeTimer = 0;
 		moveDir = W;
 		nextMoveDir = W;
@@ -144,26 +139,26 @@ public class PacMan extends BoardMover {
 	public PacManState state() {
 		return control.stateID();
 	}
-	
+
 	public State state(PacManState stateID) {
 		return control.state(stateID);
 	}
-	
+
 	// Events
-	
+
 	public void killed() {
 		control.changeTo(Dying);
 	}
-	
+
 	public void startPowerWalking(int seconds) {
 		control.state(PowerWalking).setDuration(app.motor.toFrames(seconds));
 		control.changeTo(PowerWalking);
 	}
-	
+
 	public void startWalking() {
 		control.changeTo(Walking);
 	}
-	
+
 	@Override
 	public Sprite currentSprite() {
 		if (control.inState(Dying) && app.getTheme().getPacManDyingSprite() != null) {
@@ -203,7 +198,7 @@ public class PacMan extends BoardMover {
 		if (content != TileContent.None) {
 			onContentFound.accept(content);
 		}
-		enemies.stream().filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow()).forEach(onGhostMet);
+		enemies.stream().filter(ghost -> ghost.getCol() == getCol() && ghost.getRow() == getRow()).forEach(onEnemyContact);
 		turnTo(nextMoveDir);
 	}
 

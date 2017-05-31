@@ -50,7 +50,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		pacMan.placeAt(PACMAN_HOME);
 
 		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.onGhostMet = ghost -> {
+		pacMan.onEnemyContact = ghost -> {
 			ghost.placeAt(GHOST_HOUSE_ENTRY);
 			int dir = rand.nextBoolean() ? W : E;
 			ghost.setMoveDir(dir); // TODO without this, ghost might get stuck

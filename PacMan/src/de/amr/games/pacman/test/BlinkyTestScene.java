@@ -49,7 +49,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 
-		pacMan.onGhostMet = ghost -> {
+		pacMan.onEnemyContact = ghost -> {
 			pacMan.placeAt(PACMAN_HOME);
 			int dir = rand.nextBoolean() ? E : W;
 			pacMan.setMoveDir(dir);
@@ -62,7 +62,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		pacMan.state(PacManState.Walking).update = state -> {
 			if (pacMan.currentTile().equals(blinky.currentTile())) {
-				pacMan.onGhostMet.accept(blinky);
+				pacMan.onEnemyContact.accept(blinky);
 			} else {
 				escapeBlinky();
 			}

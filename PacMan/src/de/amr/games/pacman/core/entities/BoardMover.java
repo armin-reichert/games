@@ -41,7 +41,7 @@ public abstract class BoardMover extends GameEntity {
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
 	}
-	
+
 	@Override
 	public void init() {
 		route = new ArrayList<>();
@@ -148,22 +148,21 @@ public abstract class BoardMover extends GameEntity {
 	 * <code>couldMove</code> to <code>true</code>.
 	 */
 	public void move() {
-		
+
 		// move pixel-wise
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
 		Vector2 velocity = new Vector2(Top4.INSTANCE.dx(moveDir), Top4.INSTANCE.dy(moveDir)).times(speed.get());
 		tr.setVel(velocity);
 		tr.move();
-		
+
 		// check if new tile position is allowed
 		Tile newTile = currentTile();
 		if (!canEnterTile.apply(newTile)) {
 			tr.moveTo(oldPosition); // undo move
-			adjust();
 			couldMove = false;
 			return;
 		}
-		
+
 		// check if "worm hole"-tile has been entered
 		if (board.contains(newTile, Wormhole)) {
 			int col = newTile.getCol();
@@ -177,42 +176,40 @@ public abstract class BoardMover extends GameEntity {
 			couldMove = true;
 			return;
 		}
+
 		// adjust position if entity touches disallowed neighbor tile
-		int row = newTile.getRow(), col = newTile.getCol();
 		Tile neighborTile = newTile.neighbor(moveDir);
 		boolean forbidden = !canEnterTile.apply(neighborTile);
+
+		if (!forbidden) {
+			couldMove = true;
+			return;
+		}
+
+		int row = newTile.getRow(), col = newTile.getCol();
 		switch (moveDir) {
 		case E:
-			if (forbidden && tr.getX() + TILE_SIZE >= (col + 1) * TILE_SIZE) {
+			if (tr.getX() + TILE_SIZE >= (col + 1) * TILE_SIZE) {
 				tr.setX(col * TILE_SIZE);
-				couldMove = false;
-				return;
 			}
 			break;
 		case W:
-			if (forbidden && tr.getX() < col * TILE_SIZE) {
+			if (tr.getX() < col * TILE_SIZE) {
 				tr.setX(col * TILE_SIZE);
-				couldMove = false;
-				return;
 			}
 			break;
 		case N:
-			if (forbidden && tr.getY() < row * TILE_SIZE) {
+			if (tr.getY() < row * TILE_SIZE) {
 				tr.setY(row * TILE_SIZE);
-				couldMove = false;
-				return;
 			}
 			break;
 		case S:
-			if (forbidden && tr.getY() + TILE_SIZE >= (row + 1) * TILE_SIZE) {
+			if (tr.getY() + TILE_SIZE >= (row + 1) * TILE_SIZE) {
 				tr.setY(row * TILE_SIZE);
-				couldMove = false;
-				return;
 			}
 			break;
 		}
-		couldMove = true;
-		return;
+		couldMove = false;
 	}
 
 	public void moveRandomly() {
