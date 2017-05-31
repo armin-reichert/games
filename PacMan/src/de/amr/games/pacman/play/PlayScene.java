@@ -8,7 +8,7 @@ import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.board.TileContent.Tunnel;
-import static de.amr.games.pacman.core.entities.PacManState.Frightening;
+import static de.amr.games.pacman.core.entities.PacManState.Empowered;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawText;
@@ -128,12 +128,12 @@ public class PlayScene extends Scene<PacManGame> {
 			// Initializing
 
 			state(Initializing).entry = state -> {
+				level = 0;
 				lives = 3;
 				score = 0;
 				bonusList.clear();
 				createPacManAndGhosts();
-				level = 1;
-				resetLevel();
+				nextLevel();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
 			};
@@ -159,7 +159,6 @@ public class PlayScene extends Scene<PacManGame> {
 			// StartingLevel
 
 			state(StartingLevel).entry = state -> {
-				ghostAttackTimer.setLevel(level);
 				app.assets.sound("sfx/ready.mp3").play();
 			};
 
@@ -180,7 +179,6 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.setAnimated(true);
 				});
-				ghostAttackTimer.setLevel(level);
 				app.getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.control.changeTo(PacManState.Eating);
 				ghosts().forEach(ghost -> ghost.setWaitingTime(getGhostWaitingDuration(ghost)));
@@ -194,9 +192,7 @@ public class PlayScene extends Scene<PacManGame> {
 					setBonusEnabled(false);
 				}
 				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-					++level;
-					resetLevel();
-					ghostAttackTimer.setLevel(level);
+					nextLevel();
 					changeTo(StartingLevel);
 				}
 			};
@@ -311,12 +307,15 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 	}
 
-	private void resetLevel() {
+	private void nextLevel() {
+		++level;
 		ghostsEatenAtLevel = 0;
 		board.resetContent();
 		setBonusEnabled(false);
-		app.entities.all().forEach(GameEntity::init);
 		ghostAttackTimer.setLevel(level);
+		ghostAttackTimer.init();
+		app.entities.all().forEach(GameEntity::init);
+		pacMan.placeAt(PACMAN_HOME);
 		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
 				board.count(Energizer)));
 	}
@@ -328,7 +327,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		pacMan.speed = () -> {
 			switch (pacMan.control.stateID()) {
-			case Frightening:
+			case Empowered:
 				return levels.getPacManFrighteningSpeed(level);
 			default:
 				return levels.getPacManSpeed(level);
@@ -353,8 +352,8 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 				int seconds = levels.getGhostFrightenedDuration(level);
-				pacMan.control.state(Frightening).setDuration(app.motor.toFrames(seconds));
-				pacMan.control.changeTo(Frightening);
+				pacMan.control.state(Empowered).setDuration(app.motor.toFrames(seconds));
+				pacMan.control.changeTo(Empowered);
 				board.setContent(tile, None);
 				break;
 			case Bonus:
@@ -372,10 +371,10 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		pacMan.onGhostMet = ghost -> {
-			if (ghost.control.inState(GhostState.Dead, GhostState.Waiting, GhostState.Recovering)) {
+			if (ghost.control.inState(GhostState.Dead, GhostState.Recovering)) {
 				return;
 			}
-			if (pacMan.control.inState(PacManState.Frightening)) {
+			if (pacMan.control.inState(PacManState.Empowered)) {
 				Log.info("Pac-Man kills " + ghost.getName());
 				app.assets.sound("sfx/eat-ghost.mp3").play();
 				score(nextGhostPoints);

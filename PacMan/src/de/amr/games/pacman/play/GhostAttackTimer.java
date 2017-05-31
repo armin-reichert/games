@@ -49,12 +49,15 @@ public class GhostAttackTimer {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+	
+	public void init() {
 		fsm.changeTo(Initialized);
 	}
 
 	public void start() {
 		if (!fsm.inState(Initialized)) {
-			throw new IllegalStateException("Attack control FSM not initialized");
+			init();
 		}
 		fsm.changeTo(Scattering);
 	}

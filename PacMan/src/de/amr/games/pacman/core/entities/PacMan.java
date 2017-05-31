@@ -5,14 +5,11 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
-import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Door;
-import static de.amr.games.pacman.core.board.TileContent.Energizer;
-import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.PacManState.Dying;
 import static de.amr.games.pacman.core.entities.PacManState.Eating;
-import static de.amr.games.pacman.core.entities.PacManState.Frightening;
+import static de.amr.games.pacman.core.entities.PacManState.Empowered;
 import static de.amr.games.pacman.core.entities.PacManState.Waiting;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
@@ -65,7 +62,7 @@ public class PacMan extends BoardMover {
 
 		this.app = app;
 		enemies = Collections.emptyList();
-		
+
 		// default tile access
 		canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall) && !board.contains(tile, Door);
 
@@ -99,20 +96,20 @@ public class PacMan extends BoardMover {
 			moveAndEat();
 		};
 
-		control.state(Frightening).entry = state -> {
+		control.state(Empowered).entry = state -> {
 			app.assets.sound("sfx/waza.mp3").loop();
 			speedBeforeFrightening = speed;
 			enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
 		};
 
-		control.state(Frightening).update = state -> {
+		control.state(Empowered).update = state -> {
 			moveAndEat();
 			if (state.isTerminated()) {
 				control.changeTo(Eating);
 			}
 		};
 
-		control.state(Frightening).exit = state -> {
+		control.state(Empowered).exit = state -> {
 			app.assets.sound("sfx/waza.mp3").stop();
 			speed = speedBeforeFrightening;
 			enemies.forEach(Ghost::endBeingFrightened);
@@ -174,8 +171,8 @@ public class PacMan extends BoardMover {
 	}
 
 	public boolean isFrighteningEnding() {
-		return control.inState(Frightening)
-				&& control.state(Frightening).getRemaining() < control.state(Frightening).getDuration() / 4;
+		return control.inState(Empowered)
+				&& control.state(Empowered).getRemaining() < control.state(Empowered).getDuration() / 4;
 	}
 
 	public void moveAndEat() {
