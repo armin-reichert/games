@@ -218,9 +218,9 @@ public abstract class BoardMover extends GameEntity {
 		if (isExactlyOverTile()) {
 			for (int dir : Top4.INSTANCE.dirsPermuted().toArray()) {
 				if (dir != Top4.INSTANCE.inv(moveDir)) {
-					Tile neighborTile = currentTile().neighbor(dir);
-					if (canEnterTile.apply(neighborTile)) {
+					if (canEnterTile.apply(currentTile().neighbor(dir))) {
 						turnTo(dir);
+						break;
 					}
 				}
 			}
