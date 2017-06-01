@@ -213,11 +213,9 @@ public abstract class BoardMover extends GameEntity {
 		move();
 		if (isExactlyOverTile()) {
 			for (int dir : Top4.INSTANCE.dirsPermuted().toArray()) {
-				if (dir != Top4.INSTANCE.inv(moveDir)) {
-					if (canEnterTile.apply(currentTile().neighbor(dir))) {
-						turnTo(dir);
-						break;
-					}
+				if (dir != Top4.INSTANCE.inv(moveDir) && canEnterTileTowards(dir)) {
+					turnTo(dir);
+					break;
 				}
 			}
 		}
@@ -228,8 +226,8 @@ public abstract class BoardMover extends GameEntity {
 			if (turnTo(route.get(0))) {
 				route.remove(0);
 			}
+			move();
 		}
-		move();
 	}
 
 	public void follow(Tile target) {
