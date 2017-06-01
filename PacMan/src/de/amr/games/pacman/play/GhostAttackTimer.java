@@ -5,9 +5,10 @@ import static de.amr.games.pacman.play.GhostAttackState.Initialized;
 import static de.amr.games.pacman.play.GhostAttackState.Scattering;
 
 import java.util.EnumMap;
-import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
+import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 
 /**
@@ -31,10 +32,7 @@ public class GhostAttackTimer {
 		/*@formatter:on*/
 	};
 
-	public Consumer<GhostAttackState> onPhaseStart;
-	public Consumer<GhostAttackState> onPhaseEnd;
-
-	public boolean trace;
+	public boolean trace = true;
 
 	private final StateMachine<GhostAttackState> fsm;
 	private final Application app;
@@ -50,7 +48,7 @@ public class GhostAttackTimer {
 	public void setLevel(int level) {
 		this.level = level;
 	}
-	
+
 	public void init() {
 		fsm.changeTo(Initialized);
 	}
@@ -70,32 +68,26 @@ public class GhostAttackTimer {
 		return fsm.stateID();
 	}
 
-	public GhostAttackTimer(Application app) {
+	public GhostAttackTimer(Application app, Ghost... ghosts) {
 
 		this.app = app;
-
-		onPhaseStart = state -> {
-		};
-
-		onPhaseEnd = state -> {
-		};
 
 		fsm = new StateMachine<>("GhostAttackTimer", new EnumMap<>(GhostAttackState.class));
 
 		fsm.state(Initialized).entry = state -> {
 			wave = 1;
-			onPhaseStart.accept(fsm.stateID());
+			Stream.of(ghosts).forEach(Ghost::beginWaiting);
 			traceEntry();
 		};
 
 		fsm.state(Initialized).exit = state -> {
-			onPhaseEnd.accept(fsm.stateID());
 			traceExit();
 		};
 
 		fsm.state(Scattering).entry = state -> {
 			state.setDuration(getPhaseDuration(SCATTERING_TIMES));
-			onPhaseStart.accept(fsm.stateID());
+			Stream.of(ghosts).forEach(Ghost::beginScattering);
+			app.assets.sound("sfx/siren.mp3").loop();
 			traceEntry();
 		};
 
@@ -106,13 +98,14 @@ public class GhostAttackTimer {
 		};
 
 		fsm.state(Scattering).exit = state -> {
-			onPhaseEnd.accept(fsm.stateID());
+			app.assets.sound("sfx/siren.mp3").stop();
 			traceExit();
 		};
 
 		fsm.state(Chasing).entry = state -> {
 			state.setDuration(getPhaseDuration(CHASING_TIMES));
-			onPhaseStart.accept(fsm.stateID());
+			Stream.of(ghosts).forEach(Ghost::beginChasing);
+			app.assets.sound("sfx/siren.mp3").loop();
 			traceEntry();
 		};
 
@@ -123,7 +116,7 @@ public class GhostAttackTimer {
 		};
 
 		fsm.state(Chasing).exit = state -> {
-			onPhaseEnd.accept(fsm.stateID());
+			app.assets.sound("sfx/siren.mp3").stop();
 			traceExit();
 			++wave;
 		};

@@ -95,7 +95,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	// Game control
 	private final StateMachine<PlayState> playControl;
-	private final GhostAttackTimer ghostAttackTimer;
+	private GhostAttackTimer ghostAttackTimer;
 	private final Random rand = new Random();
 
 	// Entities
@@ -252,36 +252,10 @@ public class PlayScene extends Scene<PacManGame> {
 	public PlayScene(PacManGame app) {
 		super(app);
 		playControl = new PlayControl();
-		ghostAttackTimer = new GhostAttackTimer(app);
-		configureGhostAttackTimer(app);
 		levels = new LevelData(8 * TILE_SIZE / app.motor.getFrequency());
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusList = new ArrayList<>();
-	}
-
-	private void configureGhostAttackTimer(PacManGame app) {
-		ghostAttackTimer.trace = true;
-		ghostAttackTimer.onPhaseStart = phase -> {
-			if (phase == GhostAttackState.Initialized) {
-				ghosts().forEach(ghost -> {
-					ghost.beginWaiting();
-				});
-			} else if (phase == GhostAttackState.Scattering) {
-				ghosts().forEach(Ghost::beginScattering);
-				app.assets.sound("sfx/siren.mp3").loop();
-			} else if (phase == GhostAttackState.Chasing) {
-				app.assets.sound("sfx/siren.mp3").loop();
-				ghosts().forEach(Ghost::beginChasing);
-			}
-		};
-		ghostAttackTimer.onPhaseEnd = phase -> {
-			if (phase == GhostAttackState.Scattering) {
-				app.assets.sound("sfx/siren.mp3").stop();
-			} else if (phase == GhostAttackState.Chasing) {
-				app.assets.sound("sfx/siren.mp3").stop();
-			}
-		};
 	}
 
 	@Override
@@ -569,6 +543,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 		pacMan.enemies().clear();
 		ghosts().forEach(ghost -> pacMan.enemies().add(ghost));
+
+		ghostAttackTimer = new GhostAttackTimer(app, blinky, inky, pinky, clyde);
 	}
 
 	private float getGhostSpeed(Ghost ghost) {
