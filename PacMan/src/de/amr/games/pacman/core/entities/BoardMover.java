@@ -222,11 +222,11 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	public void moveAlongRoute() {
+		move();
 		if (!route.isEmpty()) {
 			if (turnTo(route.get(0))) {
 				route.remove(0);
 			}
-			move();
 		}
 	}
 
