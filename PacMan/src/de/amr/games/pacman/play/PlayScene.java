@@ -409,6 +409,24 @@ public class PlayScene extends Scene<PacManGame> {
 
 			ghost.speed = () -> getGhostSpeed(ghost);
 
+			// While waiting, bounce. After waiting, return to state given by attack control.
+			ghost.state(GhostState.Waiting).update = state -> {
+				if (!state.isTerminated()) {
+					ghost.bounce();
+					return;
+				}
+				switch (ghostAttackTimer.state()) {
+				case Scattering:
+					ghost.beginScattering();
+					break;
+				case Chasing:
+					ghost.beginChasing();
+					break;
+				default:
+					break;
+				}
+			};
+
 			// When "frightened" state ends, go into chasing or scattering state:
 			ghost.stateToRestore = () -> {
 				switch (ghostAttackTimer.state()) {
@@ -460,8 +478,7 @@ public class PlayScene extends Scene<PacManGame> {
 			blinky.setAnimated(true);
 		};
 
-		// Blinky stands still at the ghost house entry. When waiting is over, he starts scattering or
-		// chasing.
+		// Blinky doesn't bounce while waiting. Then he acts as given by attack control.
 		blinky.state(GhostState.Waiting).update = state -> {
 			if (!state.isTerminated()) {
 				return;
@@ -497,24 +514,6 @@ public class PlayScene extends Scene<PacManGame> {
 			inky.setAnimated(true);
 		};
 
-		// Inky bounces while waiting. When waiting is over, he starts scattering or chasing.
-		inky.state(GhostState.Waiting).update = state -> {
-			if (!state.isTerminated()) {
-				inky.bounce();
-				return;
-			}
-			switch (ghostAttackTimer.state()) {
-			case Scattering:
-				inky.beginScattering();
-				break;
-			case Chasing:
-				inky.beginChasing();
-				break;
-			default:
-				break;
-			}
-		};
-
 		// Inky loops around the walls at the lower right corner of the maze:
 		inky.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
 
@@ -532,24 +531,6 @@ public class PlayScene extends Scene<PacManGame> {
 			pinky.setAnimated(true);
 		};
 
-		// Pinky bounce while waiting. When waiting is over, he starts scattering or chasing.
-		pinky.state(GhostState.Waiting).update = state -> {
-			if (!state.isTerminated()) {
-				pinky.bounce();
-				return;
-			}
-			switch (ghostAttackTimer.state()) {
-			case Scattering:
-				pinky.beginScattering();
-				break;
-			case Chasing:
-				pinky.beginChasing();
-				break;
-			default:
-				break;
-			}
-		};
-
 		// Pinky loops around the walls at the upper right corner of the maze:
 		pinky.state(GhostState.Scattering, new LoopAroundWalls(pinky, 4, 1, S, false));
 
@@ -565,24 +546,6 @@ public class PlayScene extends Scene<PacManGame> {
 			clyde.placeAt(CLYDE_HOME);
 			clyde.setMoveDir(N);
 			clyde.setAnimated(true);
-		};
-
-		// Clyde bounces while waiting. When waiting is over, he starts scattering or chasing.
-		clyde.state(GhostState.Waiting).update = state -> {
-			if (!state.isTerminated()) {
-				clyde.bounce();
-				return;
-			}
-			switch (ghostAttackTimer.state()) {
-			case Scattering:
-				clyde.beginScattering();
-				break;
-			case Chasing:
-				clyde.beginChasing();
-				break;
-			default:
-				break;
-			}
 		};
 
 		// Clyde loops around the walls at the left lower corner of the maze:
