@@ -567,6 +567,7 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.removeAll(Ghost.class);
 		app.entities.add(pacMan, blinky, inky, pinky, clyde);
 
+		pacMan.enemies().clear();
 		ghosts().forEach(ghost -> pacMan.enemies().add(ghost));
 	}
 
