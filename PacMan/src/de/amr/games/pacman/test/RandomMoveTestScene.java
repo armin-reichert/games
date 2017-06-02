@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
@@ -42,6 +43,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_SPACE)) {
 			createGhosts();
 		}
+		checkCollisions();
 		Stream.of(ghosts).forEach(Ghost::update);
 	}
 
@@ -59,13 +61,25 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 		}
 	}
 
+	private void checkCollisions() {
+		for (int i = 0; i < ghosts.length; ++i) {
+			for (int j = i; j < ghosts.length; ++j) {
+				if (ghosts[i].currentTile().equals(ghosts[j].currentTile())
+						&& !ghosts[i].getName().equals(ghosts[j].getName())) {
+					ghosts[i].setMoveDir(Top4.INSTANCE.inv(ghosts[i].getMoveDir()));
+					ghosts[j].setMoveDir(Top4.INSTANCE.inv(ghosts[j].getMoveDir()));
+				}
+			}
+		}
+	}
+
 	private Ghost createRandomGhost() {
 		String names[] = { "Pinky", "Inky", "Blinky", "Clyde" };
 		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)]);
 		ghost.init();
 		ghost.state(Scattering).update = state -> ghost.moveRandomly();
 		ghost.setAnimated(true);
-		ghost.speed = () -> Math.round(8f * TILE_SIZE / app.motor.getFrequency()) * (0.5f + rand.nextFloat());
+		ghost.speed = () -> 1f + rand.nextFloat();
 		ghost.placeAt(getRandomTile());
 		ghost.beginScattering();
 		return ghost;

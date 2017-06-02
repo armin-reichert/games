@@ -8,7 +8,6 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasi
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
-import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -98,7 +97,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		pacMan.draw(g);
 		blinky.draw(g);
 	}
-
+	
 	private void escapeBlinky() {
 		Tile pacManTile = pacMan.currentTile();
 		Tile blinkyTile = blinky.currentTile();
