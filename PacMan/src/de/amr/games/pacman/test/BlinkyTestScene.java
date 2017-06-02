@@ -46,8 +46,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		pacMan = new PacMan(app, board);
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
-
-		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
+		pacMan.speed = () -> 2f;
 
 		pacMan.onEnemyContact = ghost -> {
 			pacMan.placeAt(PACMAN_HOME);
