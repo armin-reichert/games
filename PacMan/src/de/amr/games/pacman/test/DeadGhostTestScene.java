@@ -1,5 +1,6 @@
 package de.amr.games.pacman.test;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
@@ -61,6 +62,10 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> implements View 
 	public void draw(Graphics2D g) {
 		SceneHelper.drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
 		SceneHelper.drawGridLines(g, getWidth(), getHeight());
+		g.setColor(Color.WHITE);
+		if (ghost.state() == GhostState.Scattering) {
+			SceneHelper.drawTextCentered(g, getWidth(), 17, "Press 'k' to kill ghost");
+		}
 		ghost.draw(g);
 	}
 
