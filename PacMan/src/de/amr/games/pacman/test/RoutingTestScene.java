@@ -1,6 +1,7 @@
 package de.amr.games.pacman.test;
 
 import static de.amr.easy.game.Application.Log;
+import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawRoute;
 import static de.amr.games.pacman.misc.SceneHelper.drawRouteMap;
@@ -19,6 +20,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
+import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 
 /**
@@ -55,6 +57,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		ghost = new Ghost(app, board, "Pinky");
 		ghost.init();
 		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
+		ghost.canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall);
 		ghost.placeAt(new Tile(4, 1));
 		ghost.beginChasing();
 		reset();
