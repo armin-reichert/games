@@ -4,7 +4,7 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
- * The Blinky behavior test app.
+ * The dead ghost test app.
  * 
  * @author Armin Reichert
  */
