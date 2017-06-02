@@ -20,7 +20,6 @@ import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * Tests Blinky's behavior.
@@ -71,8 +70,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
-		blinky.placeAt(new Tile(4, 1));
-		blinky.speed = () -> pacMan.speed.get();
+		blinky.placeAt(4, 1);
+		blinky.speed = () -> pacMan.speed.get() * 1.1f;
 
 		pacMan.enemies().add(blinky);
 
@@ -91,34 +90,41 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		PacManTheme theme = app.getTheme();
-		drawSprite(g, 3, 0, theme.getBoardSprite());
+		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
 		drawGridLines(g, getWidth(), getHeight());
 		pacMan.draw(g);
 		blinky.draw(g);
 	}
-	
+
 	private void escapeBlinky() {
-		Tile pacManTile = pacMan.currentTile();
-		Tile blinkyTile = blinky.currentTile();
-		double maxDistance = -1;
-		int maxDistDir = -1;
-		int[] dirsPermuted = Top4.INSTANCE.dirsPermuted().toArray();
-		for (int dir = 0; dir < 4; ++dir) {
-			Tile tile = pacManTile.neighbor(dirsPermuted[dir]);
-			if (!pacMan.canEnterTile.apply(tile)) {
-				continue;
-			}
-			double distance = board.shortestRoute(tile, blinkyTile).size();
-			if (distance > maxDistance) {
-				maxDistance = distance;
-				maxDistDir = dir;
-				// Application.Log.info("New move direction: " + Top4.INSTANCE.getName(dir));
-			}
-		}
-		if (maxDistDir != Top4.INSTANCE.inv(pacMan.getMoveDir())) {
-			pacMan.turnTo(maxDistDir);
-		}
 		pacMan.move();
+		Tile pacManTile = pacMan.currentTile();
+		
+		if (!pacMan.isExactlyOverTile(pacManTile)) {
+			return;
+		}
+		
+		int dir = pacMan.getMoveDir();
+		int max = -1;
+		for (int i = 0; i < 4; ++i) {
+			Tile neighbor = pacManTile.neighbor(i);
+			if (pacMan.canEnterTile.apply(neighbor)) {
+				int dist = board.shortestRoute(blinky.currentTile(), neighbor).size();
+				if (dist > max) {
+					max = dist;
+					dir = i;
+				}
+			}
+		}
+		if (dir != Top4.INSTANCE.inv(pacMan.getMoveDir())) {
+			pacMan.setMoveDir(dir);
+		} else {
+			for (int i = 0; i < 4; ++i) {
+				Tile neighbor = pacManTile.neighbor(i);
+				if (i != dir && pacMan.canEnterTile.apply(neighbor)) {
+					pacMan.setMoveDir(i);
+				}
+			}
+		}
 	}
 }

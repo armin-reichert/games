@@ -109,6 +109,10 @@ public abstract class BoardMover extends GameEntity {
 	public void placeAt(Tile tile) {
 		tr.moveTo(tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
 	}
+	
+	public void placeAt(int row, int col) {
+		tr.moveTo(col * TILE_SIZE, row * TILE_SIZE);
+	}
 
 	public void adjust() {
 		placeAt(currentTile());
