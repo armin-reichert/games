@@ -32,6 +32,9 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> implements View 
 		ghost.placeAt(new Tile(4, 4));
 		ghost.speed = () -> 2f;
 		ghost.state(GhostState.Scattering).update = state -> {
+			if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
+				ghost.killed();
+			}
 			ghost.moveRandomly();
 		};
 		ghost.state(GhostState.Recovering).update = state -> {
@@ -51,9 +54,6 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> implements View 
 
 	@Override
 	public void update() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-			ghost.killed();
-		}
 		ghost.update();
 	}
 
