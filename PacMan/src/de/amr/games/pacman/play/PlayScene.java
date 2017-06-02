@@ -75,13 +75,13 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class PlayScene extends Scene<PacManGame> {
 
 	// Prominent board locations
-	public static final Tile PACMAN_HOME = new Tile(26, 13.5f);
-	public static final Tile BLINKY_HOME = new Tile(14, 13.5f);
+	public static final Tile PACMAN_HOME = new Tile(26, 13);
+	public static final Tile BLINKY_HOME = new Tile(14, 13);
 	public static final Tile INKY_HOME = new Tile(17, 11);
 	public static final Tile PINKY_HOME = new Tile(17, 13);
 	public static final Tile CLYDE_HOME = new Tile(17, 15);
-	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13.5f);
-	public static final Tile BONUS_TILE = new Tile(20, 13.5f);
+	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
+	public static final Tile BONUS_TILE = new Tile(20, 13);
 
 	// Game parameters
 	public static final int POINTS_FOR_PELLET = 10;
@@ -704,7 +704,7 @@ public class PlayScene extends Scene<PacManGame> {
 			ghosts().forEach(ghost -> {
 				g.setColor(ghost.getColor());
 				Tile homeTile = getGhostHomeTile(ghost);
-				float x = homeTile.x * TILE_SIZE, y = homeTile.y * TILE_SIZE;
+				float x = homeTile.getCol() * TILE_SIZE, y = homeTile.getRow() * TILE_SIZE;
 				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
 			});
 		}
