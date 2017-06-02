@@ -156,7 +156,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Ready).entry = state -> {
 				app.getTheme().getEnergizerSprite().setAnimated(true);
-				ghosts().forEach(ghost -> ghost.setAnimated(true));
+				ghosts().forEach(ghost -> {
+					ghost.setAnimated(true);
+					ghost.speed = () -> getGhostSpeed(ghost);
+				});
 			};
 
 			state(Ready).update = state -> {
@@ -189,6 +192,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 				ghosts().forEach(ghost -> {
 					ghost.init();
+					ghost.speed = () -> getGhostSpeed(ghost);
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.setWaitingTime(getGhostWaitingDuration(ghost));
 					ghost.beginWaiting();
@@ -387,8 +391,6 @@ public class PlayScene extends Scene<PacManGame> {
 
 		ghosts().forEach(ghost -> {
 
-			ghost.speed = () -> getGhostSpeed(ghost);
-
 			// While waiting, bounce. After waiting, return to state given by attack control.
 			ghost.state(GhostState.Waiting).update = state -> {
 				if (!state.isTerminated()) {
@@ -407,7 +409,7 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			// When "frightened" state ends, go into chasing or scattering state:
+			// What state to return to after frightening ends:
 			ghost.stateToRestore = () -> {
 				switch (ghostAttackTimer.state()) {
 				case Scattering:

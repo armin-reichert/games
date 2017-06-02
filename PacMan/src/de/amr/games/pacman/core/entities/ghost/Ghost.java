@@ -12,7 +12,6 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scatt
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -76,7 +75,7 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public void init() {
-		route = emptyList();
+		super.init();
 		setAnimated(false);
 		control.changeTo(Initialized);
 	}
