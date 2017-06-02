@@ -5,6 +5,7 @@ import static de.amr.games.pacman.play.GhostAttackState.Initialized;
 import static de.amr.games.pacman.play.GhostAttackState.Scattering;
 
 import java.util.EnumMap;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
@@ -32,8 +33,6 @@ public class GhostAttackTimer {
 		/*@formatter:on*/
 	};
 
-	public boolean trace = true;
-
 	private final StateMachine<GhostAttackState> fsm;
 	private final Application app;
 	private int level;
@@ -45,6 +44,10 @@ public class GhostAttackTimer {
 		return app.motor.toFrames(times[row][col]);
 	}
 
+	public void setLogger(Logger logger) {
+		fsm.setLogger(logger, app.motor.getFrequency());
+	}
+	
 	public void setLevel(int level) {
 		this.level = level;
 	}
@@ -77,18 +80,12 @@ public class GhostAttackTimer {
 		fsm.state(Initialized).entry = state -> {
 			wave = 1;
 			Stream.of(ghosts).forEach(Ghost::beginWaiting);
-			traceEntry();
-		};
-
-		fsm.state(Initialized).exit = state -> {
-			traceExit();
 		};
 
 		fsm.state(Scattering).entry = state -> {
 			state.setDuration(getPhaseDuration(SCATTERING_TIMES));
 			Stream.of(ghosts).forEach(Ghost::beginScattering);
 			app.assets.sound("sfx/siren.mp3").loop();
-			traceEntry();
 		};
 
 		fsm.state(Scattering).update = state -> {
@@ -99,14 +96,12 @@ public class GhostAttackTimer {
 
 		fsm.state(Scattering).exit = state -> {
 			app.assets.sound("sfx/siren.mp3").stop();
-			traceExit();
 		};
 
 		fsm.state(Chasing).entry = state -> {
 			state.setDuration(getPhaseDuration(CHASING_TIMES));
 			Stream.of(ghosts).forEach(Ghost::beginChasing);
 			app.assets.sound("sfx/siren.mp3").loop();
-			traceEntry();
 		};
 
 		fsm.state(Chasing).update = state -> {
@@ -117,21 +112,7 @@ public class GhostAttackTimer {
 
 		fsm.state(Chasing).exit = state -> {
 			app.assets.sound("sfx/siren.mp3").stop();
-			traceExit();
 			++wave;
 		};
-	}
-
-	private void traceEntry() {
-		if (trace) {
-			Application.Log.info(String.format("Start of phase '%s' (%.2f seconds)", fsm.stateID(),
-					app.motor.toSeconds(fsm.state().getDuration())));
-		}
-	}
-
-	private void traceExit() {
-		if (trace) {
-			Application.Log.info(String.format("End of phase '%s'", fsm.stateID()));
-		}
 	}
 }

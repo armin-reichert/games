@@ -1,9 +1,10 @@
 package de.amr.games.pacman.core.statemachine;
 
-import static de.amr.easy.game.Application.Log;
+import static java.lang.String.format;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 /**
  * A finite state machine.
@@ -16,9 +17,11 @@ public class StateMachine<StateID> {
 	private final String description;
 	private final Map<StateID, State> statesByID;
 	private StateID currentStateID;
+	private Logger logger;
+	private int fps;
 
 	public StateMachine(Map<StateID, State> stateMap) {
-		this("", stateMap);
+		this("Anon state machine", stateMap);
 	}
 
 	public StateMachine(String description, Map<StateID, State> stateMap) {
@@ -67,18 +70,52 @@ public class StateMachine<StateID> {
 		if (currentStateID == stateID) {
 			return;
 		}
-		Log.info("FSM(" + description + "): " + currentStateID + " -> " + stateID);
+		traceStateChange(currentStateID, stateID);
 		if (currentStateID != null) {
 			state().doExit();
+			traceExit();
 		}
 		currentStateID = stateID;
 		if (action != null) {
 			action.accept(state());
 		}
+		traceEntry();
 		state().doEntry();
 	}
 
 	public void changeTo(StateID stateID) {
 		changeTo(stateID, null);
+	}
+
+	// Tracing
+
+	public void setLogger(Logger logger, int fps) {
+		this.logger = logger;
+		this.fps = fps;
+	}
+
+	private void traceStateChange(StateID oldState, StateID newState) {
+		if (logger != null) {
+			logger.info(format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
+		}
+
+	}
+
+	private void traceEntry() {
+		if (logger != null) {
+			if (state().getDuration() != State.FOREVER) {
+				float seconds = (float) state().getDuration() / fps;
+				logger.info(format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(), seconds,
+						state().getDuration()));
+			} else {
+				logger.info(format("FSM(%s) enters state '%s'", description, stateID()));
+			}
+		}
+	}
+
+	private void traceExit() {
+		if (logger != null) {
+			logger.info(format("FSM(%s) exits state '%s'", description, stateID()));
+		}
 	}
 }

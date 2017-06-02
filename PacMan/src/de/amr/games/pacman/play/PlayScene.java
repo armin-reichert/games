@@ -138,6 +138,12 @@ public class PlayScene extends Scene<PacManGame> {
 				nextLevel();
 				app.getTheme().getEnergizerSprite().setAnimated(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
+
+				// Tracing
+				setLogger(Log, app.motor.getFrequency());
+				ghostAttackTimer.setLogger(Log);
+				pacMan.setLogger(Log);
+				ghosts().forEach(ghost -> ghost.setLogger(Log));
 			};
 
 			state(Initializing).update = state -> {

@@ -19,6 +19,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.EnumMap;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
@@ -85,24 +86,28 @@ public class Ghost extends BoardMover {
 		control.update();
 	}
 
+	public void setLogger(Logger logger) {
+		control.setLogger(logger, app.motor.getFrequency());
+	}
+
 	public void setWaitingTime(int frames) {
 		control.state(Waiting).setDuration(frames);
 	}
-	
+
 	public GhostState state() {
 		return control.stateID();
 	}
-	
+
 	public State state(GhostState stateID) {
 		return control.state(stateID);
 	}
-	
+
 	public State state(GhostState stateID, State state) {
 		return control.state(stateID, state);
 	}
 
 	// Events
-	
+
 	public void beginWaiting() {
 		setAnimated(true);
 		control.changeTo(Waiting);
@@ -136,7 +141,7 @@ public class Ghost extends BoardMover {
 		}
 		control.changeTo(stateToRestore.get());
 	}
-	
+
 	public void beginRecovering() {
 		control.changeTo(Recovering);
 	}
@@ -144,7 +149,7 @@ public class Ghost extends BoardMover {
 	public void killed() {
 		control.changeTo(Dead);
 	}
-	
+
 	public void restoreState() {
 		control.changeTo(stateToRestore.get());
 	}

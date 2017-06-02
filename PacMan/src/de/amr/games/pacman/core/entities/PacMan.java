@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -154,6 +155,10 @@ public class PacMan extends BoardMover {
 
 	public State state(PacManState stateID) {
 		return control.state(stateID);
+	}
+	
+	public void setLogger(Logger logger) {
+		control.setLogger(logger, app.motor.getFrequency());
 	}
 
 	public void killed() {
