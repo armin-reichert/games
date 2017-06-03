@@ -12,7 +12,6 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recov
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
-import static java.lang.String.format;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -24,7 +23,6 @@ import java.util.logging.Logger;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
-import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.statemachine.State;
@@ -32,42 +30,40 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
 
 /**
  * A ghost.
+ * 
+ * @author Armin Reichert
  */
 public class Ghost extends BoardMover {
 
-	private final StateMachine<GhostState> control;
 	public Supplier<GhostState> stateToRestore;
 
+	private final StateMachine<GhostState> control;
 	private final AbstractPacManApp app;
 	private Color color;
-
-	@Override
-	public String toString() {
-		return format("Ghost[name=%s,row=%d, col=%d]", getName(), getRow(), getCol());
-	}
 
 	public Ghost(AbstractPacManApp app, Board board, String name) {
 		super(board);
 		this.app = app;
 		setName(name);
 		color = Color.WHITE;
-		control = new StateMachine<>("Ghost " + name, new EnumMap<>(GhostState.class));
+		control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
 		stateToRestore = () -> control.stateID();
-		canEnterTile = (Tile tile) -> {
+		canEnterTile = tile -> {
+			if (!board.isTileValid(tile)) {
+				return false;
+			}
 			if (board.contains(tile, Wall)) {
 				return false;
 			}
 			if (board.contains(tile, Door)) {
 				if (control.inState(Dead)) {
-					// dead ghost (eyes) can pass through door
-					return true;
-				} else if (control.inState(Waiting)) {
-					// while waiting inside ghost house, ghost cannot pass through door
-					return false;
-				} else {
-					// when inside ghost house or already inside door, ghost can pass through door
-					return insideGhostHouse() || board.contains(currentTile(), Door);
+					return true; // dead ghost (eyes) can pass through door
 				}
+				if (control.inState(Waiting)) {
+					return false; // while waiting inside ghost house, ghost cannot pass through door
+				}
+				// when inside ghost house or already inside door, ghost can pass through door
+				return insideGhostHouse() || board.contains(currentTile(), Door);
 			}
 			return true;
 		};
@@ -211,7 +207,7 @@ public class Ghost extends BoardMover {
 			drawRoute(g, color);
 		}
 		if (app.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
+			drawCollisionBox(g, isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
 		}
 	}
 

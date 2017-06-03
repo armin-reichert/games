@@ -9,6 +9,7 @@ import static de.amr.games.pacman.core.board.TileContent.Wormhole;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.lang.Math.abs;
+import static java.lang.String.format;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -25,12 +26,13 @@ import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 
 /**
- * Base class for entities which move on the board.
+ * Base class for entities which can move on the tiled board.
+ * 
+ * @author Armin Reichert
  */
 public abstract class BoardMover extends GameEntity {
 
 	public Supplier<Float> speed;
-
 	public Function<Tile, Boolean> canEnterTile;
 
 	protected final Board board;
@@ -42,6 +44,11 @@ public abstract class BoardMover extends GameEntity {
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
 		canEnterTile = tile -> board.isTileValid(tile);
+	}
+
+	@Override
+	public String toString() {
+		return format("%s[name=%s,row=%d, col=%d]", getClass().getSimpleName(), getName(), getRow(), getCol());
 	}
 
 	@Override
@@ -122,7 +129,7 @@ public abstract class BoardMover extends GameEntity {
 		return isExactlyOver(tile.getRow(), tile.getCol());
 	}
 
-	protected boolean isExactlyOverTile() {
+	protected boolean isAdjusted() {
 		return isExactlyOver(getRow(), getCol());
 	}
 
@@ -141,7 +148,7 @@ public abstract class BoardMover extends GameEntity {
 			return false;
 		}
 		boolean turnLeftOrRight = (dir == Top4.left(moveDir) || dir == Top4.right(moveDir));
-		if (turnLeftOrRight && !isExactlyOverTile()) {
+		if (turnLeftOrRight && !isAdjusted()) {
 			return false;
 		}
 		moveDir = nextMoveDir;
@@ -175,10 +182,9 @@ public abstract class BoardMover extends GameEntity {
 		if (stuck) {
 			/*@formatter:off*/
 			if (moveDir == E && tr.getX() >= col * TILE_SIZE
-			||  moveDir == W && tr.getX() <  col * TILE_SIZE
-			||  moveDir == N && tr.getY() <  row * TILE_SIZE
-			||  moveDir == S && tr.getY() >= row * TILE_SIZE)
-			{
+			 || moveDir == W && tr.getX() <  col * TILE_SIZE
+			 || moveDir == N && tr.getY() <  row * TILE_SIZE
+			 || moveDir == S && tr.getY() >= row * TILE_SIZE) {
 				placeAt(row, col);
 			}
 			/*@formatter:on*/
@@ -187,7 +193,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public void moveRandomly() {
 		move();
-		if (isExactlyOverTile()) {
+		if (isAdjusted()) {
 			for (int dir : Top4.dirsPermuted().toArray()) {
 				if (dir != Top4.inv(moveDir) && canEnterTileTowards(dir)) {
 					turnTo(dir);
@@ -235,14 +241,14 @@ public abstract class BoardMover extends GameEntity {
 		g.setColor(color);
 		g.setStroke(new BasicStroke(1f));
 		int offset = TILE_SIZE / 2;
-		Tile tile = currentTile();
+		Tile current = currentTile();
 		for (int dir : route) {
-			Tile nextTile = tile.neighbor(dir);
-			g.drawLine(tile.getCol() * TILE_SIZE + offset, tile.getRow() * TILE_SIZE + offset,
-					nextTile.getCol() * TILE_SIZE + offset, nextTile.getRow() * TILE_SIZE + offset);
-			tile = nextTile;
+			Tile next = current.neighbor(dir);
+			g.drawLine(current.getCol() * TILE_SIZE + offset, current.getRow() * TILE_SIZE + offset,
+					next.getCol() * TILE_SIZE + offset, next.getRow() * TILE_SIZE + offset);
+			current = next;
 		}
-		g.fillRect(tile.getCol() * TILE_SIZE + TILE_SIZE / 4, tile.getRow() * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 2,
-				TILE_SIZE / 2);
+		int size = TILE_SIZE / 2;
+		g.fillRect(current.getCol() * TILE_SIZE + size / 2, current.getRow() * TILE_SIZE + size / 2, size, size);
 	}
 }

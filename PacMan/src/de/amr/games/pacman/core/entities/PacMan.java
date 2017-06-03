@@ -64,7 +64,7 @@ public class PacMan extends BoardMover {
 			case Bonus:
 			case Energizer:
 			case Pellet:
-				Log.info(getName() + " ate " + content + " at " + currentTile());
+				Log.info(getName() + " eats " + content + " at " + currentTile());
 				board.setContent(currentTile(), None);
 				break;
 			case GhostHouse:
@@ -72,20 +72,20 @@ public class PacMan extends BoardMover {
 			case Tunnel:
 			case Wall:
 			case Wormhole:
-				Log.info("PacMan visited " + content + " at " + currentTile());
+				Log.info("PacMan visits " + content + " at " + currentTile());
 				break;
 			default:
 				break;
 			}
 		};
 
-		onEnemyContact = enemy -> Log.info("PacMan met enemy " + enemy.getName() + " at " + currentTile());
+		onEnemyContact = enemy -> Log.info("PacMan meets enemy '" + enemy.getName() + "' at " + currentTile());
 
 		canEnterTile = tile -> board.isTileValid(tile) && !(board.contains(tile, Wall) || board.contains(tile, Door));
 
 		// state machine
 
-		control = new StateMachine<>("Pac-Man", new EnumMap<>(PacManState.class));
+		control = new StateMachine<>(getName(), new EnumMap<>(PacManState.class));
 
 		control.state(Walking).entry = state -> {
 			setAnimated(true);
@@ -123,11 +123,6 @@ public class PacMan extends BoardMover {
 	}
 
 	@Override
-	public String toString() {
-		return String.format("Pacman at %s", currentTile());
-	}
-
-	@Override
 	public void init() {
 		super.init();
 		freezeTimer = 0;
@@ -144,7 +139,7 @@ public class PacMan extends BoardMover {
 		}
 		control.update();
 	}
-	
+
 	public Set<Ghost> enemies() {
 		return enemies;
 	}
@@ -156,7 +151,7 @@ public class PacMan extends BoardMover {
 	public State state(PacManState stateID) {
 		return control.state(stateID);
 	}
-	
+
 	public void setLogger(Logger logger) {
 		control.setLogger(logger, app.motor.getFrequency());
 	}
@@ -244,7 +239,7 @@ public class PacMan extends BoardMover {
 			g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
 		}
 		if (app.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isExactlyOverTile() ? Color.GREEN : Color.LIGHT_GRAY);
+			drawCollisionBox(g, isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
 		}
 	}
 }
