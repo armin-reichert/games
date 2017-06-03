@@ -109,7 +109,7 @@ public abstract class BoardMover extends GameEntity {
 	public void placeAt(Tile tile) {
 		tr.moveTo(tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
 	}
-	
+
 	public void placeAt(int row, int col) {
 		tr.moveTo(col * TILE_SIZE, row * TILE_SIZE);
 	}
@@ -149,67 +149,39 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	/**
-	 * Try to move entity in current move direction. If entity could not be moved, set
-	 * <code>stuck</code> to <code>true</code>.
+	 * Moves entity in current move direction. Store if entity could be moved.
 	 */
 	public void move() {
-
-		// move pixel-wise
-		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
 		Vector2 velocity = new Vector2(Top4.dx(moveDir), Top4.dy(moveDir)).times(speed.get());
 		tr.setVel(velocity);
 		tr.move();
 
-		// check if new tile can be entered
-		Tile newTile = currentTile();
-		if (!canEnterTile.apply(newTile)) {
-			tr.moveTo(oldPosition); // undo move
-			stuck = true;
-			return;
-		}
+		Tile tile = currentTile();
+		int row = tile.getRow(), col = tile.getCol();
 
 		// handle "worm hole"
-		if (board.contains(newTile, Wormhole)) {
-			int col = newTile.getCol();
+		if (board.contains(tile, Wormhole)) {
 			if (col == 0 && moveDir == W) {
-				// fall off left edge -> appear at right edge
-				tr.setX((board.numCols - 1) * TILE_SIZE - getWidth());
+				placeAt(row, board.numCols - 1);
 			} else if (col == board.numCols - 1 && moveDir == E) {
-				// fall off right edge -> appear at left edge
-				tr.setX(0);
+				placeAt(row, 0);
 			}
 			stuck = false;
 			return;
 		}
 
-		// adjust position if entity touches an inaccessible neighbor tile
-		Tile neighborTile = newTile.neighbor(moveDir);
-		stuck = !canEnterTile.apply(neighborTile);
-		if (!stuck) {
-			return;
-		}
-		int row = newTile.getRow(), col = newTile.getCol();
-		switch (moveDir) {
-		case E:
-			if (tr.getX() + TILE_SIZE >= (col + 1) * TILE_SIZE) {
-				tr.setX(col * TILE_SIZE);
+		stuck = !canEnterTile.apply(tile.neighbor(moveDir));
+		// adjust position if stuck and reaching into inaccessible neighbor tile
+		if (stuck) {
+			/*@formatter:off*/
+			if (moveDir == E && tr.getX() >= col * TILE_SIZE
+			||  moveDir == W && tr.getX() <  col * TILE_SIZE
+			||  moveDir == N && tr.getY() <  row * TILE_SIZE
+			||  moveDir == S && tr.getY() >= row * TILE_SIZE)
+			{
+				placeAt(row, col);
 			}
-			break;
-		case W:
-			if (tr.getX() < col * TILE_SIZE) {
-				tr.setX(col * TILE_SIZE);
-			}
-			break;
-		case N:
-			if (tr.getY() < row * TILE_SIZE) {
-				tr.setY(row * TILE_SIZE);
-			}
-			break;
-		case S:
-			if (tr.getY() + TILE_SIZE >= (row + 1) * TILE_SIZE) {
-				tr.setY(row * TILE_SIZE);
-			}
-			break;
+			/*@formatter:on*/
 		}
 	}
 
