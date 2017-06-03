@@ -1,6 +1,7 @@
 package de.amr.games.pacman.test;
 
 import static de.amr.easy.grid.impl.Top4.E;
+import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
@@ -14,7 +15,6 @@ import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.game.scene.Scene;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -116,7 +116,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 				}
 			}
 		}
-		if (dir != Top4.INSTANCE.inv(pacMan.getMoveDir())) {
+		if (dir != Top4.inv(pacMan.getMoveDir())) {
 			pacMan.setMoveDir(dir);
 		} else {
 			for (int i = 0; i < 4; ++i) {

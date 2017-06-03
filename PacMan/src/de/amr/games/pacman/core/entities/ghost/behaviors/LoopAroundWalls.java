@@ -1,6 +1,7 @@
 package de.amr.games.pacman.core.entities.ghost.behaviors;
 
-import de.amr.easy.grid.impl.Top4;
+import static de.amr.easy.grid.impl.Top4.Top4;
+
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
@@ -77,8 +78,8 @@ public class LoopAroundWalls extends State {
 		Tile current = loopStart;
 		entity.getRoute().clear();
 		do {
-			int dir_turn = clockwise ? Top4.INSTANCE.right(dir_forward) : Top4.INSTANCE.left(dir_forward);
-			int dir_turn_inv = Top4.INSTANCE.inv(dir_turn);
+			int dir_turn = clockwise ? Top4.right(dir_forward) : Top4.left(dir_forward);
+			int dir_turn_inv = Top4.inv(dir_turn);
 			Tile current_antiturn = current.neighbor(dir_turn_inv);
 			Tile current_ahead = current.neighbor(dir_forward);
 			Tile current_around_corner = current_ahead.neighbor(dir_turn);
@@ -107,7 +108,7 @@ public class LoopAroundWalls extends State {
 				}
 			} else if (!board.contains(current_antiturn, TileContent.Wall)) {
 				// turn against loop direction
-				dir_forward = Top4.INSTANCE.inv(dir_turn);
+				dir_forward = Top4.inv(dir_turn);
 				entity.getRoute().add(dir_forward);
 				current = current_antiturn;
 				if (current.equals(loopStart)) {

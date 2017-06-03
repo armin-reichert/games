@@ -1,5 +1,6 @@
 package de.amr.games.pacman.test;
 
+import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
@@ -11,7 +12,6 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
@@ -65,8 +65,8 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 			for (int j = i; j < ghosts.length; ++j) {
 				if (ghosts[i].currentTile().equals(ghosts[j].currentTile())
 						&& !ghosts[i].getName().equals(ghosts[j].getName())) {
-					ghosts[i].setMoveDir(Top4.INSTANCE.inv(ghosts[i].getMoveDir()));
-					ghosts[j].setMoveDir(Top4.INSTANCE.inv(ghosts[j].getMoveDir()));
+					ghosts[i].setMoveDir(Top4.inv(ghosts[i].getMoveDir()));
+					ghosts[j].setMoveDir(Top4.inv(ghosts[j].getMoveDir()));
 				}
 			}
 		}

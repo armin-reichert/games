@@ -1,6 +1,7 @@
 package de.amr.games.pacman.core.entities.ghost.behaviors;
 
-import de.amr.easy.grid.impl.Top4;
+import static de.amr.easy.grid.impl.Top4.Top4;
+
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
@@ -20,8 +21,8 @@ public class ChaseWithPartner extends State {
 				chaser.follow(PlayScene.GHOST_HOUSE_ENTRY);
 				return;
 			}
-			Tile middle = new Tile(target.getRow() + 2 * Top4.INSTANCE.dy(target.getMoveDir()),
-					target.getCol() + 2 * Top4.INSTANCE.dx(target.getMoveDir()));
+			Tile middle = new Tile(target.getRow() + 2 * Top4.dy(target.getMoveDir()),
+					target.getCol() + 2 * Top4.dx(target.getMoveDir()));
 			Tile partnerTile = partner.currentTile();
 			int dx = middle.getCol() - partnerTile.getCol();
 			int dy = middle.getRow() - partnerTile.getRow();
@@ -30,7 +31,7 @@ public class ChaseWithPartner extends State {
 				chaser.setRoute(board.shortestRoute(chaser.currentTile(), targetTile));
 				if (!chaser.getRoute().isEmpty()) {
 					int chaseDir = chaser.getRoute().get(0);
-					if (chaseDir == Top4.INSTANCE.inv(chaser.getMoveDir())) {
+					if (chaseDir == Top4.inv(chaser.getMoveDir())) {
 						chaser.move();
 						return;
 					}

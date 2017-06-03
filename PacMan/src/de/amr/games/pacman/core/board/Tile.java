@@ -1,6 +1,6 @@
 package de.amr.games.pacman.core.board;
 
-import de.amr.easy.grid.impl.Top4;
+import static de.amr.easy.grid.impl.Top4.Top4;
 
 /**
  * A tile of the board.
@@ -29,7 +29,7 @@ public class Tile {
 	}
 
 	public Tile neighbor(int dir) {
-		return new Tile(row + Top4.INSTANCE.dy(dir), col + Top4.INSTANCE.dx(dir));
+		return new Tile(row + Top4.dy(dir), col + Top4.dx(dir));
 	}
 
 	public int getRow() {

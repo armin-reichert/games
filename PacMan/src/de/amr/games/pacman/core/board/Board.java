@@ -1,5 +1,6 @@
 package de.amr.games.pacman.core.board;
 
+import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 
@@ -11,7 +12,6 @@ import java.util.stream.Stream;
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.PathFinder;
 import de.amr.easy.grid.impl.Grid;
-import de.amr.easy.grid.impl.Top4;
 
 /**
  * The board of the Pac-Man game.
@@ -37,13 +37,13 @@ public class Board {
 		numCols = boardRows[0].length();
 		// create orthogonal grid graph from board data
 		graph = new Grid<>(numCols, numRows, None.toChar(), false);
-		graph.setTopology(Top4.INSTANCE);
+		graph.setTopology(Top4);
 		resetContent();
 		/*@formatter:off*/
 		graph.vertexStream()
 			.filter(tile -> graph.get(tile) != Wall.toChar())
 			.forEach(tile -> {
-				Top4.INSTANCE.dirs().forEach(dir -> {
+				Top4.dirs().forEach(dir -> {
 					graph.neighbor(tile, dir).ifPresent(neighbor -> {
 						if (graph.get(neighbor) != Wall.toChar()	&& !graph.adjacent(tile, neighbor)) {
 							graph.addEdge(tile, neighbor);

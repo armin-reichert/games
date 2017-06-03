@@ -4,6 +4,7 @@ import static de.amr.easy.game.Application.Log;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.None;
@@ -30,7 +31,6 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.TileContent;
@@ -189,7 +189,7 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void setAnimated(boolean animated) {
-		Top4.INSTANCE.dirs().forEach(dir -> {
+		Top4.dirs().forEach(dir -> {
 			app.getTheme().getPacManRunningSprite(dir).setAnimated(animated);
 		});
 	}

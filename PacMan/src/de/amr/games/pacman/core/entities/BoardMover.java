@@ -3,6 +3,7 @@ package de.amr.games.pacman.core.entities;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
+import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Wormhole;
 import static de.amr.games.pacman.theme.PacManTheme.SPRITE_SIZE;
@@ -20,7 +21,6 @@ import java.util.function.Supplier;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 
@@ -140,7 +140,7 @@ public abstract class BoardMover extends GameEntity {
 		if (!canEnterTileTowards(dir)) {
 			return false;
 		}
-		boolean turnLeftOrRight = (dir == Top4.INSTANCE.left(moveDir) || dir == Top4.INSTANCE.right(moveDir));
+		boolean turnLeftOrRight = (dir == Top4.left(moveDir) || dir == Top4.right(moveDir));
 		if (turnLeftOrRight && !isExactlyOverTile()) {
 			return false;
 		}
@@ -156,7 +156,7 @@ public abstract class BoardMover extends GameEntity {
 
 		// move pixel-wise
 		Vector2 oldPosition = new Vector2(tr.getX(), tr.getY());
-		Vector2 velocity = new Vector2(Top4.INSTANCE.dx(moveDir), Top4.INSTANCE.dy(moveDir)).times(speed.get());
+		Vector2 velocity = new Vector2(Top4.dx(moveDir), Top4.dy(moveDir)).times(speed.get());
 		tr.setVel(velocity);
 		tr.move();
 
@@ -216,8 +216,8 @@ public abstract class BoardMover extends GameEntity {
 	public void moveRandomly() {
 		move();
 		if (isExactlyOverTile()) {
-			for (int dir : Top4.INSTANCE.dirsPermuted().toArray()) {
-				if (dir != Top4.INSTANCE.inv(moveDir) && canEnterTileTowards(dir)) {
+			for (int dir : Top4.dirsPermuted().toArray()) {
+				if (dir != Top4.inv(moveDir) && canEnterTileTowards(dir)) {
 					turnTo(dir);
 					break;
 				}
@@ -242,7 +242,7 @@ public abstract class BoardMover extends GameEntity {
 	public void bounce() {
 		move();
 		if (stuck) {
-			turnTo(Top4.INSTANCE.inv(moveDir));
+			turnTo(Top4.inv(moveDir));
 		}
 	}
 

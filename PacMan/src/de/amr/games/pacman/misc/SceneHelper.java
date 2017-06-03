@@ -1,5 +1,6 @@
 package de.amr.games.pacman.misc;
 
+import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
@@ -11,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
@@ -74,7 +74,7 @@ public class SceneHelper {
 	public static void drawRoute(Graphics2D g, Board board, Tile start, List<Integer> route) {
 		Tile from = start, to = null;
 		for (Integer dir : route) {
-			int dx = Top4.INSTANCE.dx(dir), dy = Top4.INSTANCE.dy(dir);
+			int dx = Top4.dx(dir), dy = Top4.dy(dir);
 			to = new Tile(from);
 			to.translate(dx, dy);
 			int offset = TILE_SIZE / 4;
