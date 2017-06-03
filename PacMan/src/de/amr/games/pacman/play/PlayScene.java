@@ -420,6 +420,9 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.bounce();
 					return;
 				}
+				if (pacMan.state() == PacManState.PowerWalking) {
+					ghost.beginBeingFrightened(pacMan.getRemainingTime());
+				}
 				switch (ghostAttackTimer.state()) {
 				case Scattering:
 					ghost.beginScattering();
@@ -727,8 +730,8 @@ public class PlayScene extends Scene<PacManGame> {
 			ghosts().forEach(ghost -> {
 				g.setColor(ghost.getColor());
 				Tile homeTile = getGhostHomeTile(ghost);
-				float x = homeTile.getCol() * TILE_SIZE, y = homeTile.getRow() * TILE_SIZE;
-				g.fillRect((int) x, (int) y, TILE_SIZE, TILE_SIZE);
+				g.fillRect(homeTile.getCol() * TILE_SIZE + TILE_SIZE / 2, homeTile.getRow() * TILE_SIZE + TILE_SIZE / 2,
+						TILE_SIZE, TILE_SIZE);
 			});
 		}
 

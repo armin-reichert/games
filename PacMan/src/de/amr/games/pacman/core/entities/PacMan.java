@@ -147,6 +147,10 @@ public class PacMan extends BoardMover {
 	public PacManState state() {
 		return control.stateID();
 	}
+	
+	public int getRemainingTime() {
+		return control.state().getRemaining();
+	}
 
 	public State state(PacManState stateID) {
 		return control.state(stateID);
