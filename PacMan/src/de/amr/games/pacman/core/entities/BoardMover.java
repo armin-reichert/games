@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -34,6 +35,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public Supplier<Float> speed;
 	public Function<Tile, Boolean> canEnterTile;
+	public IntSupplier xOffset;
 
 	protected final Board board;
 	protected List<Integer> route;
@@ -44,6 +46,7 @@ public abstract class BoardMover extends GameEntity {
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
 		canEnterTile = tile -> board.isTileValid(tile);
+		xOffset = () -> 0;
 	}
 
 	@Override

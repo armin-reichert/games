@@ -225,7 +225,9 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void draw(Graphics2D g) {
+		g.translate(xOffset.getAsInt(), 0);
 		super.draw(g);
+		g.translate(-xOffset.getAsInt(), 0);
 		if (app.settings.getBool("drawInternals")) {
 			g.setColor(Color.WHITE);
 			g.setFont(new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10));

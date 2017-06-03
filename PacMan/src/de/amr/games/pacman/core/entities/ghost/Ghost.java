@@ -36,7 +36,6 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
 public class Ghost extends BoardMover {
 
 	public Supplier<GhostState> stateToRestore;
-
 	private final StateMachine<GhostState> control;
 	private final AbstractPacManApp app;
 	private Color color;
@@ -199,7 +198,9 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public void draw(Graphics2D g) {
+		g.translate(xOffset.getAsInt(), 0);
 		super.draw(g);
+		g.translate(-xOffset.getAsInt(), 0);
 		if (app.settings.getBool("drawInternals")) {
 			drawState(g);
 		}

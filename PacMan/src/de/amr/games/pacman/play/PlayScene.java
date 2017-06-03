@@ -373,6 +373,14 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 		};
 
+		pacMan.xOffset = () -> {
+			int offset = 0;
+			if (pacMan.state() == PacManState.Initialized && pacMan.currentTile().equals(PACMAN_HOME)) {
+				offset = TILE_SIZE / 2;
+			}
+			return offset;
+		};
+
 		// Create the ghosts:
 
 		blinky = new Ghost(app, board, "Blinky");
@@ -390,6 +398,21 @@ public class PlayScene extends Scene<PacManGame> {
 		// Define common ghost behavior:
 
 		ghosts().forEach(ghost -> {
+
+			// When in ghost house or at ghost house door, render half a tile to the right:
+			ghost.xOffset = () -> {
+				int offset = 0;
+				Tile current = ghost.currentTile();
+				if (board.contains(current, GhostHouse)) {
+					offset = TILE_SIZE / 2;
+				}
+				if (current.equals(GHOST_HOUSE_ENTRY)
+						&& (ghost.state() == GhostState.Initialized || ghost.state() == GhostState.Waiting
+								|| ghost.state() == GhostState.Recovering || ghost.state() == GhostState.Dead)) {
+					offset = TILE_SIZE / 2;
+				}
+				return offset;
+			};
 
 			// While waiting, bounce. After waiting, return to state given by attack control.
 			ghost.state(GhostState.Waiting).update = state -> {
