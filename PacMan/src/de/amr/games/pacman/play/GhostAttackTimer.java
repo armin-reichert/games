@@ -79,7 +79,6 @@ public class GhostAttackTimer {
 
 		fsm.state(Initialized).entry = state -> {
 			wave = 1;
-			Stream.of(ghosts).forEach(Ghost::beginWaiting);
 		};
 
 		fsm.state(Scattering).entry = state -> {

@@ -63,6 +63,7 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.core.entities.ghost.behaviors.FollowTileAheadOfPacMan;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
+import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 import de.amr.games.pacman.misc.Highscore;
 import de.amr.games.pacman.theme.PacManTheme;
@@ -135,6 +136,11 @@ public class PlayScene extends Scene<PacManGame> {
 				score = 0;
 				bonusList.clear();
 				createPacManAndGhosts();
+				ghosts().forEach(ghost -> {
+					ghost.init();
+					ghost.speed = () -> 0f;
+					ghost.placeAt(getGhostHomeTile(ghost));
+				});
 				nextLevel();
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
@@ -157,8 +163,8 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Ready).entry = state -> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
 				ghosts().forEach(ghost -> {
-					ghost.setAnimated(true);
 					ghost.speed = () -> getGhostSpeed(ghost);
+					ghost.beginWaiting(State.FOREVER);
 				});
 			};
 
@@ -172,7 +178,10 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(StartingLevel).entry = state -> {
 				app.assets.sound("sfx/ready.mp3").play();
-				ghosts().forEach(Ghost::beginWaiting);
+				ghosts().forEach(ghost -> {
+					ghost.placeAt(getGhostHomeTile(ghost));
+					ghost.beginWaiting(State.FOREVER);
+				});
 			};
 
 			state(StartingLevel).update = state -> {
@@ -191,11 +200,8 @@ public class PlayScene extends Scene<PacManGame> {
 						: levels.getPacManSpeed(level);
 
 				ghosts().forEach(ghost -> {
-					ghost.init();
-					ghost.speed = () -> getGhostSpeed(ghost);
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.setWaitingTime(getGhostWaitingDuration(ghost));
-					ghost.beginWaiting();
+					ghost.beginWaiting(getGhostWaitingDuration(ghost));
 				});
 
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
@@ -231,6 +237,7 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(Crashing).update = state -> {
+				pacMan.update();
 				if (!app.assets.sound("sfx/die.mp3").isRunning()) {
 					changeTo(lives > 0 ? Playing : GameOver);
 				}
@@ -306,7 +313,7 @@ public class PlayScene extends Scene<PacManGame> {
 		setBonusEnabled(false);
 		ghostAttackTimer.setLevel(level);
 		ghostAttackTimer.init();
-		app.entities.all().forEach(GameEntity::init);
+		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
 				board.count(Energizer)));

@@ -87,10 +87,6 @@ public class Ghost extends BoardMover {
 		control.setLogger(logger, app.motor.getFrequency());
 	}
 
-	public void setWaitingTime(int frames) {
-		control.state(Waiting).setDuration(frames);
-	}
-
 	public GhostState state() {
 		return control.stateID();
 	}
@@ -105,8 +101,9 @@ public class Ghost extends BoardMover {
 
 	// Events
 
-	public void beginWaiting() {
+	public void beginWaiting(int frames) {
 		setAnimated(true);
+		control.state(Waiting).setDuration(frames);
 		control.changeTo(Waiting);
 	}
 
@@ -163,20 +160,18 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public Sprite currentSprite() {
-		if (insideGhostHouse()) {
-			return theme.get().getGhostNormalSprite(getName(), moveDir);
-		}
-		if (control.inState(Frightened)) {
-			if (control.state().getRemaining() < control.state().getDuration() / 3) {
-				return theme.get().getGhostRecoveringSprite();
-			}
-			return theme.get().getGhostFrightenedSprite();
+		if (control.inState(Dead)) {
+			return theme.get().getGhostDeadSprite(moveDir);
 		}
 		if (control.inState(Recovering)) {
 			return theme.get().getGhostRecoveringSprite();
 		}
-		if (control.inState(Dead)) {
-			return theme.get().getGhostDeadSprite(moveDir);
+		if (insideGhostHouse()) {
+			return theme.get().getGhostNormalSprite(getName(), moveDir);
+		}
+		if (control.inState(Frightened)) {
+			return control.state().getRemaining() < control.state().getDuration() / 3 ? theme.get().getGhostRecoveringSprite()
+					: theme.get().getGhostFrightenedSprite();
 		}
 		return theme.get().getGhostNormalSprite(getName(), moveDir);
 	}
@@ -190,8 +185,6 @@ public class Ghost extends BoardMover {
 		theme.get().getGhostFrightenedSprite().setAnimated(animated);
 		theme.get().getGhostRecoveringSprite().setAnimated(animated);
 	}
-
-	// -- Movement
 
 	public boolean insideGhostHouse() {
 		return board.contains(currentTile(), GhostHouse);
@@ -222,10 +215,9 @@ public class Ghost extends BoardMover {
 		StringBuilder text = new StringBuilder();
 		text.append(getName()).append(" (").append(control.stateID());
 		if (state.getDuration() != State.FOREVER) {
-			text.append(state.getRemaining()).append("|").append(state.getDuration());
+			text.append(":" + state.getRemaining()).append("|").append(state.getDuration());
 		}
 		text.append(")");
 		g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
 	}
-
 }
