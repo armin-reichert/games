@@ -1,14 +1,14 @@
 package de.amr.games.pacman.test;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
  * The dead ghost test app.
  * 
  * @author Armin Reichert
  */
-public class DeadGhostTestApp extends AbstractPacManApp {
+public class DeadGhostTestApp extends Application {
 
 	public static void main(String... args) {
 		DeadGhostTestApp app = new DeadGhostTestApp();
@@ -25,7 +25,6 @@ public class DeadGhostTestApp extends AbstractPacManApp {
 
 	@Override
 	protected void init() {
-		super.init();
 		views.add(new DeadGhostTestScene(this));
 		views.show(DeadGhostTestScene.class);
 	}

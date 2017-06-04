@@ -1,14 +1,14 @@
 package de.amr.games.pacman.test;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
  * Test application for routing through the maze.
  * 
  * @author Armin Reichert
  */
-public class RoutingTestApp extends AbstractPacManApp {
+public class RoutingTestApp extends Application {
 
 	public static void main(String... args) {
 		RoutingTestApp app = new RoutingTestApp();
@@ -24,7 +24,6 @@ public class RoutingTestApp extends AbstractPacManApp {
 
 	@Override
 	protected void init() {
-		super.init();
 		views.add(new RoutingTestScene(this));
 		views.show(RoutingTestScene.class);
 	}

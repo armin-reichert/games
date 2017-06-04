@@ -1,14 +1,14 @@
 package de.amr.games.pacman.test;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
  * Tests Inky's behavior.
  * 
  * @author Armin Reichert
  */
-public class InkyTestApp extends AbstractPacManApp {
+public class InkyTestApp extends Application {
 
 	public static void main(String... args) {
 		InkyTestApp app = new InkyTestApp();
@@ -24,7 +24,6 @@ public class InkyTestApp extends AbstractPacManApp {
 
 	@Override
 	protected void init() {
-		super.init();
 		views.add(new InkyTestScene(this));
 		views.show(InkyTestScene.class);
 	}

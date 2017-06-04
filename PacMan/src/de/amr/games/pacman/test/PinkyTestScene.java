@@ -21,6 +21,7 @@ import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.FollowTileAheadOfPacMan;
+import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
@@ -30,14 +31,16 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class PinkyTestScene extends Scene<PinkyTestApp> {
 
+	private final PacManTheme theme;
+	private final Random rand = new Random();
 	private Board board;
 	private PacMan pacMan;
 	private Ghost pinky;
-	private Random rand = new Random();
 	private int pauseTimer;
 
 	public PinkyTestScene(PinkyTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
@@ -46,6 +49,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 		pacMan = new PacMan(app, board);
 		pacMan.init();
+		pacMan.theme = () -> theme;
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onEnemyContact = ghost -> {
 			app.assets.sound("sfx/die.mp3").play();
@@ -53,6 +57,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		};
 
 		pinky = new Ghost(app, board, "Pinky");
+		pinky.theme = () -> theme;
 		pinky.init();
 		pinky.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;
@@ -98,7 +103,6 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		PacManTheme theme = app.getTheme();
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {

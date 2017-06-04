@@ -1,14 +1,14 @@
 package de.amr.games.pacman.test;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
  * Tests scattering behavior of ghosts.
  * 
  * @author Armin Reichert
  */
-public class ScatteringTestApp extends AbstractPacManApp {
+public class ScatteringTestApp extends Application {
 
 	public static void main(String... args) {
 		ScatteringTestApp app = new ScatteringTestApp();
@@ -22,7 +22,6 @@ public class ScatteringTestApp extends AbstractPacManApp {
 
 	@Override
 	protected void init() {
-		super.init();
 		views.add(new ScatteringTestScene(this));
 		views.show(ScatteringTestScene.class);
 	}

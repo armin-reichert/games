@@ -16,6 +16,8 @@ import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.play.PlayScene;
+import de.amr.games.pacman.theme.ClassicTheme;
+import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * 
@@ -23,12 +25,14 @@ import de.amr.games.pacman.play.PlayScene;
  */
 public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
-	private Random rand = new Random();
+	private final PacManTheme theme;
+	private final Random rand = new Random();
 	private Board board;
 	private Ghost[] ghosts;
 
 	public RandomMoveTestScene(RandomMoveTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
@@ -48,7 +52,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
+		drawSprite(g, 3, 0, theme.getBoardSprite());
 		drawGridLines(g, getWidth(), getHeight());
 		Stream.of(ghosts).forEach(ghost -> ghost.draw(g));
 	}
@@ -75,6 +79,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 	private Ghost createRandomGhost() {
 		String names[] = { "Pinky", "Inky", "Blinky", "Clyde" };
 		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)]);
+		ghost.theme = () -> theme;
 		ghost.init();
 		ghost.state(Scattering).update = state -> ghost.moveRandomly();
 		ghost.setAnimated(true);

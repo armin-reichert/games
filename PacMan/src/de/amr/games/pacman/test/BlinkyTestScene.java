@@ -20,6 +20,8 @@ import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.theme.ClassicTheme;
+import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * Tests Blinky's behavior.
@@ -28,13 +30,15 @@ import de.amr.games.pacman.core.entities.ghost.Ghost;
  */
 public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
+	private final Random rand = new Random();
+	private final PacManTheme theme;
 	private Board board;
 	private PacMan pacMan;
 	private Ghost blinky;
-	private final Random rand = new Random();
 
 	public BlinkyTestScene(BlinkyTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
@@ -42,6 +46,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board);
+		pacMan.theme = () -> theme;
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> 2f;
@@ -66,6 +71,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		};
 
 		blinky = new Ghost(app, board, "Blinky");
+		blinky.theme = () -> theme;
 		blinky.init();
 		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
@@ -90,7 +96,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
+		drawSprite(g, 3, 0, theme.getBoardSprite());
 		drawGridLines(g, getWidth(), getHeight());
 		pacMan.draw(g);
 		blinky.draw(g);
@@ -99,11 +105,11 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 	private void escapeBlinky() {
 		pacMan.move();
 		Tile pacManTile = pacMan.currentTile();
-		
+
 		if (!pacMan.isExactlyOverTile(pacManTile)) {
 			return;
 		}
-		
+
 		int dir = pacMan.getMoveDir();
 		int max = -1;
 		for (int i = 0; i < 4; ++i) {

@@ -20,13 +20,14 @@ import java.util.EnumMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
+import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * A ghost.
@@ -35,12 +36,13 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class Ghost extends BoardMover {
 
+	public Supplier<PacManTheme> theme;
 	public Supplier<GhostState> stateToRestore;
 	private final StateMachine<GhostState> control;
-	private final AbstractPacManApp app;
+	private final Application app;
 	private Color color;
 
-	public Ghost(AbstractPacManApp app, Board board, String name) {
+	public Ghost(Application app, Board board, String name) {
 		super(board);
 		this.app = app;
 		setName(name);
@@ -161,31 +163,31 @@ public class Ghost extends BoardMover {
 	@Override
 	public Sprite currentSprite() {
 		if (insideGhostHouse()) {
-			return app.getTheme().getGhostNormalSprite(getName(), moveDir);
+			return theme.get().getGhostNormalSprite(getName(), moveDir);
 		}
 		if (control.inState(Frightened)) {
 			if (control.state().getRemaining() < control.state().getDuration() / 3) {
-				return app.getTheme().getGhostRecoveringSprite();
+				return theme.get().getGhostRecoveringSprite();
 			}
-			return app.getTheme().getGhostFrightenedSprite();
+			return theme.get().getGhostFrightenedSprite();
 		}
 		if (control.inState(Recovering)) {
-			return app.getTheme().getGhostRecoveringSprite();
+			return theme.get().getGhostRecoveringSprite();
 		}
 		if (control.inState(Dead)) {
-			return app.getTheme().getGhostDeadSprite(moveDir);
+			return theme.get().getGhostDeadSprite(moveDir);
 		}
-		return app.getTheme().getGhostNormalSprite(getName(), moveDir);
+		return theme.get().getGhostNormalSprite(getName(), moveDir);
 	}
 
 	@Override
 	public void setAnimated(boolean animated) {
 		Top4.dirs().forEach(dir -> {
-			app.getTheme().getGhostNormalSprite(getName(), dir).setAnimated(animated);
-			app.getTheme().getGhostDeadSprite(dir).setAnimated(animated);
+			theme.get().getGhostNormalSprite(getName(), dir).setAnimated(animated);
+			theme.get().getGhostDeadSprite(dir).setAnimated(animated);
 		});
-		app.getTheme().getGhostFrightenedSprite().setAnimated(animated);
-		app.getTheme().getGhostRecoveringSprite().setAnimated(animated);
+		theme.get().getGhostFrightenedSprite().setAnimated(animated);
+		theme.get().getGhostRecoveringSprite().setAnimated(animated);
 	}
 
 	// -- Movement

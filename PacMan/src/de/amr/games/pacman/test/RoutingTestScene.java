@@ -21,6 +21,8 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.theme.ClassicTheme;
+import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * A scene for interactive testing of ghost routing through the maze.
@@ -29,6 +31,7 @@ import de.amr.games.pacman.core.entities.ghost.Ghost;
  */
 public class RoutingTestScene extends Scene<RoutingTestApp> {
 
+	private final PacManTheme theme;
 	private Board board;
 	private Ghost ghost;
 	private Tile startTile;
@@ -40,11 +43,13 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	public RoutingTestScene(RoutingTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
+		
 		clickHandler = new MouseAdapter() {
 
 			@Override
@@ -53,7 +58,9 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 			}
 		};
 		app.getShell().getCanvas().addMouseListener(clickHandler);
+		
 		ghost = new Ghost(app, board, "Pinky");
+		ghost.theme = () -> theme;
 		ghost.init();
 		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		ghost.canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall);
@@ -109,7 +116,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
+		drawSprite(g, 3, 0, theme.getBoardSprite());
 		ghost.draw(g);
 		g.setColor(Color.GREEN);
 		g.fillRect(startTile.getCol() * TILE_SIZE, startTile.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);

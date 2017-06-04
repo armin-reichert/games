@@ -1,15 +1,14 @@
 package de.amr.games.pacman.test;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
-import de.amr.games.pacman.theme.ModernTheme;
 
 /**
  * Tests Pinky's behavior.
  * 
  * @author Armin Reichert
  */
-public class PinkyTestApp extends AbstractPacManApp {
+public class PinkyTestApp extends Application {
 
 	public static void main(String... args) {
 		PinkyTestApp app = new PinkyTestApp();
@@ -25,8 +24,6 @@ public class PinkyTestApp extends AbstractPacManApp {
 
 	@Override
 	protected void init() {
-		super.init();
-		setTheme(ModernTheme.class);
 		views.add(new PinkyTestScene(this));
 		views.show(PinkyTestScene.class);
 	}

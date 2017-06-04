@@ -27,16 +27,18 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
+import de.amr.games.pacman.theme.PacManTheme;
 
 /**
  * The Pac-Man.
@@ -45,15 +47,16 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class PacMan extends BoardMover {
 
+	public Supplier<PacManTheme> theme;
 	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onEnemyContact;
 
-	private final AbstractPacManApp app;
+	private final Application app;
 	private final StateMachine<PacManState> control;
 	private final Set<Ghost> enemies;
 	private int freezeTimer;
 
-	public PacMan(AbstractPacManApp app, Board board) {
+	public PacMan(Application app, Board board) {
 		super(board);
 		this.app = Objects.requireNonNull(app);
 		setName("Pac-Man");
@@ -115,9 +118,9 @@ public class PacMan extends BoardMover {
 		};
 
 		control.state(Dying).entry = state -> {
-			if (app.getTheme().getPacManDyingSprite() != null) {
-				app.getTheme().getPacManDyingSprite().resetAnimation();
-				app.getTheme().getPacManDyingSprite().setAnimated(true);
+			if (theme.get().getPacManDyingSprite() != null) {
+				theme.get().getPacManDyingSprite().resetAnimation();
+				theme.get().getPacManDyingSprite().setAnimated(true);
 			}
 		};
 	}
@@ -147,7 +150,7 @@ public class PacMan extends BoardMover {
 	public PacManState state() {
 		return control.stateID();
 	}
-	
+
 	public int getRemainingTime() {
 		return control.state().getRemaining();
 	}
@@ -175,13 +178,13 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.inState(Dying) && app.getTheme().getPacManDyingSprite() != null) {
-			return app.getTheme().getPacManDyingSprite();
+		if (control.inState(Dying) && theme.get().getPacManDyingSprite() != null) {
+			return theme.get().getPacManDyingSprite();
 		}
 		if (control.inState(Initialized)) {
-			return app.getTheme().getPacManStandingSprite(moveDir);
+			return theme.get().getPacManStandingSprite(moveDir);
 		}
-		Sprite runningSprite = app.getTheme().getPacManRunningSprite(moveDir);
+		Sprite runningSprite = theme.get().getPacManRunningSprite(moveDir);
 		runningSprite.setAnimated(!stuck);
 		return runningSprite;
 	}
@@ -189,7 +192,7 @@ public class PacMan extends BoardMover {
 	@Override
 	public void setAnimated(boolean animated) {
 		Top4.dirs().forEach(dir -> {
-			app.getTheme().getPacManRunningSprite(dir).setAnimated(animated);
+			theme.get().getPacManRunningSprite(dir).setAnimated(animated);
 		});
 	}
 

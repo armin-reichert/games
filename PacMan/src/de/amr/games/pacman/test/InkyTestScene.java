@@ -22,6 +22,7 @@ import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
+import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
@@ -31,14 +32,16 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class InkyTestScene extends Scene<InkyTestApp> {
 
+	private final PacManTheme theme;
+	private Random rand = new Random();
 	private Board board;
 	private PacMan pacMan;
 	private Ghost blinky;
 	private Ghost inky;
-	private Random rand = new Random();
 
 	public InkyTestScene(InkyTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
@@ -46,6 +49,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board);
+		pacMan.theme = () -> theme;
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 
@@ -63,6 +67,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		};
 
 		blinky = new Ghost(app, board, "Blinky");
+		blinky.theme = () -> theme;
 		blinky.init();
 		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
@@ -73,6 +78,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		blinky.setMoveDir(E);
 
 		inky = new Ghost(app, board, "Inky");
+		inky.theme = () -> theme;
 		inky.init();
 		inky.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);
@@ -93,7 +99,6 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		PacManTheme theme = app.getTheme();
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {

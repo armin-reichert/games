@@ -13,6 +13,7 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
@@ -22,17 +23,21 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
+	private final PacManTheme theme;
 	private Board board;
 	private PacMan pacMan;
 
 	public PacManMovementTestScene(PacManMovementTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
+
 		pacMan = new PacMan(app, board);
+		pacMan.theme = () -> theme;
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());
@@ -49,7 +54,6 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		PacManTheme theme = app.getTheme();
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {

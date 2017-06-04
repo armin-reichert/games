@@ -1,14 +1,14 @@
 package de.amr.games.pacman.test;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pacman.core.app.AbstractPacManApp;
 
 /**
  * The Blinky behavior test app.
  * 
  * @author Armin Reichert
  */
-public class BlinkyTestApp extends AbstractPacManApp {
+public class BlinkyTestApp extends Application {
 
 	public static void main(String... args) {
 		BlinkyTestApp app = new BlinkyTestApp();
@@ -25,7 +25,6 @@ public class BlinkyTestApp extends AbstractPacManApp {
 
 	@Override
 	protected void init() {
-		super.init();
 		views.add(new BlinkyTestScene(this));
 		views.show(BlinkyTestScene.class);
 	}

@@ -17,20 +17,26 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.theme.ClassicTheme;
+import de.amr.games.pacman.theme.PacManTheme;
 
 public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
+	private final PacManTheme theme;
 	private Board board;
 	private Ghost ghost;
 
 	public DeadGhostTestScene(DeadGhostTestApp app) {
 		super(app);
+		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
+		
 		ghost = new Ghost(app, board, "Blinky");
+		ghost.theme = () -> theme;
 		ghost.init();
 		ghost.setLogger(Application.Log);
 		ghost.placeAt(4, 4);
@@ -63,7 +69,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, app.getTheme().getBoardSprite());
+		drawSprite(g, 3, 0, theme.getBoardSprite());
 		drawGridLines(g, getWidth(), getHeight());
 		g.setColor(Color.WHITE);
 		if (ghost.state() == Scattering) {

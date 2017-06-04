@@ -136,7 +136,7 @@ public class PlayScene extends Scene<PacManGame> {
 				bonusList.clear();
 				createPacManAndGhosts();
 				nextLevel();
-				app.getTheme().getEnergizerSprite().setAnimated(false);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
 
 				// Tracing
@@ -155,7 +155,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// Ready
 
 			state(Ready).entry = state -> {
-				app.getTheme().getEnergizerSprite().setAnimated(true);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
 				ghosts().forEach(ghost -> {
 					ghost.setAnimated(true);
 					ghost.speed = () -> getGhostSpeed(ghost);
@@ -198,7 +198,7 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.beginWaiting();
 				});
 
-				app.getTheme().getEnergizerSprite().setAnimated(true);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
 				pacMan.beginWalking();
 				ghostAttackTimer.start();
 			};
@@ -224,7 +224,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Crashing).entry = state -> {
 				app.assets.sounds().forEach(Sound::stop);
 				app.assets.sound("sfx/die.mp3").play();
-				app.getTheme().getEnergizerSprite().setAnimated(false);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				setBonusEnabled(false);
 				pacMan.killed();
 				Log.info("PacMan killed, lives remaining: " + lives);
@@ -293,7 +293,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (keyPressedOnce(VK_ALT, VK_E)) {
 			board.tilesWithContent(Energizer).forEach(tile -> board.setContent(tile, None));
 		} else if (keyPressedOnce(VK_ALT, VK_T)) {
-			app.selectNextTheme();
+			app.getThemeManager().selectNextTheme();
 		} else if (keyPressedOnce(VK_ALT, VK_K)) {
 			ghosts().forEach(Ghost::killed);
 		}
@@ -315,6 +315,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private void createPacManAndGhosts() {
 
 		pacMan = new PacMan(app, board);
+		pacMan.theme = () -> app.getThemeManager().getTheme();
 
 		pacMan.onContentFound = content -> {
 			Tile tile = pacMan.currentTile();
@@ -384,15 +385,19 @@ public class PlayScene extends Scene<PacManGame> {
 		// Create the ghosts:
 
 		blinky = new Ghost(app, board, "Blinky");
+		blinky.theme = () -> app.getThemeManager().getTheme();
 		blinky.setColor(Color.RED);
 
 		inky = new Ghost(app, board, "Inky");
+		inky.theme = () -> app.getThemeManager().getTheme();
 		inky.setColor(new Color(64, 224, 208));
 
 		pinky = new Ghost(app, board, "Pinky");
+		pinky.theme = () -> app.getThemeManager().getTheme();
 		pinky.setColor(Color.PINK);
 
 		clyde = new Ghost(app, board, "Clyde");
+		clyde.theme = () -> app.getThemeManager().getTheme();
 		clyde.setColor(Color.ORANGE);
 
 		// Define common ghost behavior:
@@ -647,13 +652,15 @@ public class PlayScene extends Scene<PacManGame> {
 		if (x > getWidth() - 3 * TILE_SIZE) {
 			x -= 3 * TILE_SIZE;
 		}
-		FlashText.show(app, String.valueOf(object), app.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE),
-				Color.YELLOW, app.motor.toFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+		FlashText.show(app, String.valueOf(object),
+				app.getThemeManager().getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE), Color.YELLOW,
+				app.motor.toFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		final PacManTheme theme = app.getTheme();
+
+		final PacManTheme theme = app.getThemeManager().getTheme();
 
 		// Board & content
 		drawSprite(g, 3, 0, theme.getBoardSprite());
