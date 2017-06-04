@@ -49,7 +49,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
-		
+
 		clickHandler = new MouseAdapter() {
 
 			@Override
@@ -58,9 +58,8 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 			}
 		};
 		app.getShell().getCanvas().addMouseListener(clickHandler);
-		
-		ghost = new Ghost(app, board, "Pinky");
-		ghost.theme = () -> theme;
+
+		ghost = new Ghost(app, board, "Pinky", () -> theme);
 		ghost.init();
 		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		ghost.canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall);

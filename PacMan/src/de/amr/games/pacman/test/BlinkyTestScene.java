@@ -45,8 +45,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board);
-		pacMan.theme = () -> theme;
+		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> 2f;
@@ -70,8 +69,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			}
 		};
 
-		blinky = new Ghost(app, board, "Blinky");
-		blinky.theme = () -> theme;
+		blinky = new Ghost(app, board, "Blinky", () -> theme);
 		blinky.init();
 		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);

@@ -41,23 +41,19 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		ghosts[0] = new Ghost(app, board, "Blinky");
-		ghosts[0].theme = () -> theme;
+		ghosts[0] = new Ghost(app, board, "Blinky", () -> theme);
 		ghosts[0].placeAt(BLINKY_HOME);
 		ghosts[0].state(Scattering, new LoopAroundWalls(ghosts[0], 4, 26, S, true));
 
-		ghosts[1] = new Ghost(app, board, "Inky");
-		ghosts[1].theme = () -> theme;
+		ghosts[1] = new Ghost(app, board, "Inky", () -> theme);
 		ghosts[1].placeAt(INKY_HOME);
 		ghosts[1].state(Scattering, new LoopAroundWalls(ghosts[1], 32, 26, W, true));
 
-		ghosts[2] = new Ghost(app, board, "Pinky");
-		ghosts[2].theme = () -> theme;
+		ghosts[2] = new Ghost(app, board, "Pinky", () -> theme);
 		ghosts[2].placeAt(PINKY_HOME);
 		ghosts[2].state(Scattering, new LoopAroundWalls(ghosts[2], 4, 1, S, false));
 
-		ghosts[3] = new Ghost(app, board, "Clyde");
-		ghosts[3].theme = () -> theme;
+		ghosts[3] = new Ghost(app, board, "Clyde", () -> theme);
 		ghosts[3].placeAt(CLYDE_HOME);
 		ghosts[3].state(Scattering, new LoopAroundWalls(ghosts[3], 32, 1, E, false));
 

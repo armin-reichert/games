@@ -48,8 +48,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board);
-		pacMan.theme = () -> theme;
+		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 
@@ -66,8 +65,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 			pacMan.setNextMoveDir(dir);
 		};
 
-		blinky = new Ghost(app, board, "Blinky");
-		blinky.theme = () -> theme;
+		blinky = new Ghost(app, board, "Blinky", () -> theme);
 		blinky.init();
 		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
@@ -77,8 +75,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		blinky.placeAt(GHOST_HOUSE_ENTRY);
 		blinky.setMoveDir(E);
 
-		inky = new Ghost(app, board, "Inky");
-		inky.theme = () -> theme;
+		inky = new Ghost(app, board, "Inky", () -> theme);
 		inky.init();
 		inky.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);

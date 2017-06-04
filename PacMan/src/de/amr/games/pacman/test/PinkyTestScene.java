@@ -47,17 +47,15 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board);
+		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
-		pacMan.theme = () -> theme;
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onEnemyContact = ghost -> {
 			app.assets.sound("sfx/die.mp3").play();
 			pause(2);
 		};
 
-		pinky = new Ghost(app, board, "Pinky");
-		pinky.theme = () -> theme;
+		pinky = new Ghost(app, board, "Pinky", () -> theme);
 		pinky.init();
 		pinky.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;

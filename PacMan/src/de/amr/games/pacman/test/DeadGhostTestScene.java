@@ -35,8 +35,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		
-		ghost = new Ghost(app, board, "Blinky");
-		ghost.theme = () -> theme;
+		ghost = new Ghost(app, board, "Blinky", () -> theme);
 		ghost.init();
 		ghost.setLogger(Application.Log);
 		ghost.placeAt(4, 4);

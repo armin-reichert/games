@@ -36,8 +36,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board);
-		pacMan.theme = () -> theme;
+		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());

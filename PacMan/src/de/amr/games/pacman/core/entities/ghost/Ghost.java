@@ -36,15 +36,16 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class Ghost extends BoardMover {
 
-	public Supplier<PacManTheme> theme;
 	public Supplier<GhostState> stateToRestore;
-	private final StateMachine<GhostState> control;
 	private final Application app;
+	private final Supplier<PacManTheme> theme;
+	private final StateMachine<GhostState> control;
 	private Color color;
 
-	public Ghost(Application app, Board board, String name) {
+	public Ghost(Application app, Board board, String name, Supplier<PacManTheme> theme) {
 		super(board);
 		this.app = app;
+		this.theme = theme;
 		setName(name);
 		color = Color.WHITE;
 		control = new StateMachine<>(name, new EnumMap<>(GhostState.class));

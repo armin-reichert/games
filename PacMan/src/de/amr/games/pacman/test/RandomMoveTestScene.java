@@ -78,8 +78,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
 	private Ghost createRandomGhost() {
 		String names[] = { "Pinky", "Inky", "Blinky", "Clyde" };
-		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)]);
-		ghost.theme = () -> theme;
+		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)], () -> theme);
 		ghost.init();
 		ghost.state(Scattering).update = state -> ghost.moveRandomly();
 		ghost.setAnimated(true);

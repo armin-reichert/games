@@ -47,18 +47,19 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class PacMan extends BoardMover {
 
-	public Supplier<PacManTheme> theme;
 	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onEnemyContact;
 
 	private final Application app;
+	private final Supplier<PacManTheme> theme;
 	private final StateMachine<PacManState> control;
 	private final Set<Ghost> enemies;
 	private int freezeTimer;
 
-	public PacMan(Application app, Board board) {
+	public PacMan(Application app, Board board, Supplier<PacManTheme> theme) {
 		super(board);
 		this.app = Objects.requireNonNull(app);
+		this.theme = theme;
 		setName("Pac-Man");
 		enemies = new HashSet<>();
 

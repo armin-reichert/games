@@ -314,8 +314,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void createPacManAndGhosts() {
 
-		pacMan = new PacMan(app, board);
-		pacMan.theme = () -> app.getThemeManager().getTheme();
+		pacMan = new PacMan(app, board, () -> app.getThemeManager().getTheme());
 
 		pacMan.onContentFound = content -> {
 			Tile tile = pacMan.currentTile();
@@ -384,20 +383,16 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Create the ghosts:
 
-		blinky = new Ghost(app, board, "Blinky");
-		blinky.theme = () -> app.getThemeManager().getTheme();
+		blinky = new Ghost(app, board, "Blinky", () -> app.getThemeManager().getTheme());
 		blinky.setColor(Color.RED);
 
-		inky = new Ghost(app, board, "Inky");
-		inky.theme = () -> app.getThemeManager().getTheme();
+		inky = new Ghost(app, board, "Inky", () -> app.getThemeManager().getTheme());
 		inky.setColor(new Color(64, 224, 208));
 
-		pinky = new Ghost(app, board, "Pinky");
-		pinky.theme = () -> app.getThemeManager().getTheme();
+		pinky = new Ghost(app, board, "Pinky", () -> app.getThemeManager().getTheme());
 		pinky.setColor(Color.PINK);
 
-		clyde = new Ghost(app, board, "Clyde");
-		clyde.theme = () -> app.getThemeManager().getTheme();
+		clyde = new Ghost(app, board, "Clyde", () -> app.getThemeManager().getTheme());
 		clyde.setColor(Color.ORANGE);
 
 		// Define common ghost behavior:
