@@ -123,6 +123,13 @@ public class PlayScene extends Scene<PacManGame> {
 	 * State machine which controls the game play.
 	 */
 	private class PlayControl extends StateMachine<PlayState> {
+		
+		private void configureTracing() {
+			setLogger(Log, app.motor.getFrequency());
+//			ghostAttackTimer.setLogger(Log);
+//			pacMan.setLogger(Log);
+//			ghosts().forEach(ghost -> ghost.setLogger(Log));
+		}
 
 		public PlayControl() {
 
@@ -145,18 +152,10 @@ public class PlayScene extends Scene<PacManGame> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
 
-				// Tracing
-				setLogger(Log, app.motor.getFrequency());
-				ghostAttackTimer.setLogger(Log);
-				pacMan.setLogger(Log);
-				ghosts().forEach(ghost -> ghost.setLogger(Log));
+				configureTracing();
 			};
 
-			state(Initializing).update = state -> {
-				if (!app.assets.sound("sfx/insert-coin.mp3").isRunning()) {
-					changeTo(Ready);
-				}
-			};
+			change(Initializing, Ready, () -> !app.assets.sound("sfx/insert-coin.mp3").isRunning());
 
 			// Ready
 
@@ -168,11 +167,7 @@ public class PlayScene extends Scene<PacManGame> {
 				});
 			};
 
-			state(Ready).update = state -> {
-				if (Keyboard.keyPressedOnce(VK_SPACE)) {
-					changeTo(StartingLevel);
-				}
-			};
+			change(Ready, StartingLevel, () -> Keyboard.keyPressedOnce(VK_SPACE));
 
 			// StartingLevel
 
@@ -186,10 +181,9 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(StartingLevel).update = state -> {
 				app.entities.all().forEach(GameEntity::update);
-				if (!app.assets.sound("sfx/ready.mp3").isRunning()) {
-					changeTo(Playing);
-				}
 			};
+
+			change(StartingLevel, Playing, () -> !app.assets.sound("sfx/ready.mp3").isRunning());
 
 			// Playing
 
@@ -215,15 +209,14 @@ public class PlayScene extends Scene<PacManGame> {
 				if (isBonusEnabled() && bonusTimeRemaining-- == 0) {
 					setBonusEnabled(false);
 				}
-				if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-					nextLevel();
-					changeTo(StartingLevel);
-				}
 			};
 
 			state(Playing).exit = state -> {
 				app.entities.removeAll(FlashText.class);
 			};
+
+			change(Playing, StartingLevel, () -> board.count(Pellet) == 0 && board.count(Energizer) == 0,
+					state -> nextLevel());
 
 			// Crashing
 
@@ -238,10 +231,11 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Crashing).update = state -> {
 				pacMan.update();
-				if (!app.assets.sound("sfx/die.mp3").isRunning()) {
-					changeTo(lives > 0 ? Playing : GameOver);
-				}
 			};
+
+			change(Crashing, Playing, () -> !app.assets.sound("sfx/die.mp3").isRunning() && lives > 0);
+
+			change(Crashing, GameOver, () -> !app.assets.sound("sfx/die.mp3").isRunning() && lives == 0);
 
 			// GameOver
 
@@ -254,15 +248,8 @@ public class PlayScene extends Scene<PacManGame> {
 				Log.info("Game over.");
 			};
 
-			state(GameOver).update = state -> {
-				if (Keyboard.keyPressedOnce(VK_SPACE)) {
-					changeTo(Initializing);
-				}
-			};
-
-			state(GameOver).exit = state -> {
-				app.entities.removeAll(GameEntity.class);
-			};
+			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE),
+					state -> app.entities.removeAll(GameEntity.class));
 		}
 	}
 
@@ -376,7 +363,7 @@ public class PlayScene extends Scene<PacManGame> {
 			} else {
 				Log.info(ghost.getName() + " kills Pac-Man.");
 				--lives;
-				playControl.changeTo(PlayState.Crashing);
+				playControl.changeTo(PlayState.Crashing); // TODO
 			}
 		};
 

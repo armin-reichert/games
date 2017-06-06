@@ -179,15 +179,14 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.inState(Dying) && theme.get().getPacManDyingSprite() != null) {
-			return theme.get().getPacManDyingSprite();
+		if (control.inState(Dying)) {
+			return theme.get().getPacManDyingSprite() != null ? theme.get().getPacManDyingSprite()
+					: theme.get().getPacManStandingSprite(moveDir);
 		}
-		if (control.inState(Initialized)) {
+		if (control.inState(Initialized) || stuck) {
 			return theme.get().getPacManStandingSprite(moveDir);
 		}
-		Sprite runningSprite = theme.get().getPacManRunningSprite(moveDir);
-		runningSprite.setAnimated(!stuck);
-		return runningSprite;
+		return theme.get().getPacManRunningSprite(moveDir);
 	}
 
 	@Override

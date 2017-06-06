@@ -2,7 +2,11 @@ package de.amr.games.pacman.core.statemachine;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -16,6 +20,7 @@ public class StateMachine<StateID> {
 
 	private final String description;
 	private final Map<StateID, State> statesByID;
+	private final Map<StateID, List<StateTransition<StateID>>> transitions;
 	private StateID currentStateID;
 	private Logger logger;
 	private int fps;
@@ -27,6 +32,7 @@ public class StateMachine<StateID> {
 	public StateMachine(String description, Map<StateID, State> stateMap) {
 		this.description = description;
 		this.statesByID = stateMap;
+		this.transitions = new HashMap<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -49,7 +55,13 @@ public class StateMachine<StateID> {
 
 	public State state(StateID stateID) {
 		if (!statesByID.containsKey(stateID)) {
-			statesByID.put(stateID, new State());
+			State state = new State();
+			statesByID.put(stateID, state);
+			if (transitions.containsKey(stateID)) {
+				transitions.get(stateID).clear();
+			} else {
+				transitions.put(stateID, new ArrayList<>());
+			}
 		}
 		return statesByID.get(stateID);
 	}
@@ -59,14 +71,37 @@ public class StateMachine<StateID> {
 			throw new IllegalStateException("State with ID '" + stateID + "' already exists");
 		}
 		statesByID.put(stateID, state);
+		if (transitions.containsKey(stateID)) {
+			transitions.get(stateID).clear();
+		} else {
+			transitions.put(stateID, new ArrayList<>());
+		}
 		return state;
 	}
 
 	public void update() {
-		state().doUpdate();
+		StateTransition<StateID> transition = findMatchingTransition();
+		if (transition != null) {
+			changeTo(transition.newState, transition.action);
+		} else {
+			state().doUpdate();
+		}
 	}
 
-	public void changeTo(StateID stateID, Consumer<State> action) {
+	public void change(StateID from, StateID to, BooleanSupplier condition) {
+		change(from, to, condition, null);
+	};
+	
+	public void change(StateID from, StateID to, BooleanSupplier condition, Consumer<State> action) {
+		StateTransition<StateID> transition = new StateTransition<>();
+		transition.oldState = from;
+		transition.newState = to;
+		transition.condition = condition;
+		transition.action = action;
+		transitions.get(from).add(transition);
+	}
+
+	void changeTo(StateID stateID, Consumer<State> action) {
 		if (currentStateID == stateID) {
 			return;
 		}
@@ -85,6 +120,15 @@ public class StateMachine<StateID> {
 
 	public void changeTo(StateID stateID) {
 		changeTo(stateID, null);
+	}
+
+	private StateTransition<StateID> findMatchingTransition() {
+		for (StateTransition<StateID> transition : transitions.get(currentStateID)) {
+			if (transition.condition.getAsBoolean()) {
+				return transition;
+			}
+		}
+		return null;
 	}
 
 	// Tracing
