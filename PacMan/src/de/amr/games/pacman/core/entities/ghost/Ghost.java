@@ -1,9 +1,7 @@
 package de.amr.games.pacman.core.entities.ghost;
 
 import static de.amr.easy.grid.impl.Top4.Top4;
-import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
-import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frightened;
@@ -36,38 +34,38 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class Ghost extends BoardMover {
 
-	public Supplier<GhostState> stateToRestore;
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
 	private final StateMachine<GhostState> control;
+
+	public Supplier<GhostState> stateToRestore;
+
 	private Color color;
 
 	public Ghost(Application app, Board board, String name, Supplier<PacManTheme> theme) {
 		super(board);
+		setName(name);
+
 		this.app = app;
 		this.theme = theme;
-		setName(name);
+		this.control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
+
 		color = Color.WHITE;
-		control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
+
 		stateToRestore = () -> control.stateID();
+
 		canEnterTile = tile -> {
 			if (!board.isTileValid(tile)) {
 				return false;
 			}
-			if (board.contains(tile, Wall)) {
+			switch (board.getContent(tile)) {
+			case Wall:
 				return false;
+			case Door:
+				return control.inState(Dead) || insideGhostHouse() && control.inState(Scattering, Chasing);
+			default:
+				return true;
 			}
-			if (board.contains(tile, Door)) {
-				if (control.inState(Dead)) {
-					return true; // dead ghost (eyes) can pass through door
-				}
-				if (control.inState(Waiting)) {
-					return false; // while waiting inside ghost house, ghost cannot pass through door
-				}
-				// when inside ghost house or already inside door, ghost can pass through door
-				return insideGhostHouse() || board.contains(currentTile(), Door);
-			}
-			return true;
 		};
 	}
 

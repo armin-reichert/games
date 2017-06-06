@@ -144,7 +144,6 @@ public class PlayScene extends Scene<PacManGame> {
 				bonusList.clear();
 				createPacManAndGhosts();
 				ghosts().forEach(ghost -> {
-					ghost.init();
 					ghost.speed = () -> 0f;
 					ghost.placeAt(getGhostHomeTile(ghost));
 				});
@@ -389,9 +388,11 @@ public class PlayScene extends Scene<PacManGame> {
 		clyde = new Ghost(app, board, "Clyde", () -> app.getThemeManager().getTheme());
 		clyde.setColor(Color.ORANGE);
 
-		// Define common ghost behavior:
+		// Define common ghost properties and behavior:
 
 		ghosts().forEach(ghost -> {
+			
+			ghost.setAnimated(false);
 
 			// When in ghost house or at ghost house door, render half a tile to the right:
 			ghost.xOffset = () -> {

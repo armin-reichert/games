@@ -33,11 +33,12 @@ import de.amr.games.pacman.core.board.Tile;
  */
 public abstract class BoardMover extends GameEntity {
 
+	protected final Board board;
+	
 	public Supplier<Float> speed;
 	public Function<Tile, Boolean> canEnterTile;
 	public IntSupplier xOffset;
 
-	protected final Board board;
 	protected List<Integer> route;
 	protected int moveDir;
 	protected int nextMoveDir;
@@ -47,6 +48,10 @@ public abstract class BoardMover extends GameEntity {
 		this.board = Objects.requireNonNull(board);
 		canEnterTile = tile -> board.isTileValid(tile);
 		xOffset = () -> 0;
+		route = new ArrayList<>();
+		moveDir = nextMoveDir = E;
+		stuck = true;
+		speed = () -> 0f;
 	}
 
 	@Override
