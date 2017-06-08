@@ -60,7 +60,7 @@ import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
-import de.amr.games.pacman.core.entities.ghost.behaviors.FollowTileAheadOfPacMan;
+import de.amr.games.pacman.core.entities.ghost.behaviors.AmbushPacMan;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.core.statemachine.State;
@@ -123,12 +123,12 @@ public class PlayScene extends Scene<PacManGame> {
 	 * State machine which controls the game play.
 	 */
 	private class PlayControl extends StateMachine<PlayState> {
-		
+
 		private void configureTracing() {
 			setLogger(Log, app.motor.getFrequency());
-//			ghostAttackTimer.setLogger(Log);
-//			pacMan.setLogger(Log);
-//			ghosts().forEach(ghost -> ghost.setLogger(Log));
+			// ghostAttackTimer.setLogger(Log);
+			// pacMan.setLogger(Log);
+			// ghosts().forEach(ghost -> ghost.setLogger(Log));
 		}
 
 		public PlayControl() {
@@ -189,8 +189,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Playing).entry = state -> {
 				pacMan.init();
 				pacMan.placeAt(PACMAN_HOME);
-				pacMan.speed = () -> pacMan.state() == PacManState.PowerWalking ? levels.getPacManPowerWalkingSpeed(level)
-						: levels.getPacManSpeed(level);
+				pacMan.speed = () -> getPacManSpeed();
 
 				ghosts().forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
@@ -203,11 +202,11 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(Playing).update = state -> {
-				ghostAttackTimer.update();
-				app.entities.all().forEach(GameEntity::update);
 				if (isBonusEnabled() && bonusTimeRemaining-- == 0) {
 					setBonusEnabled(false);
 				}
+				ghostAttackTimer.update();
+				app.entities.all().forEach(GameEntity::update);
 			};
 
 			state(Playing).exit = state -> {
@@ -391,7 +390,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Define common ghost properties and behavior:
 
 		ghosts().forEach(ghost -> {
-			
+
 			ghost.setAnimated(false);
 
 			// When in ghost house or at ghost house door, render half a tile to the right:
@@ -538,7 +537,7 @@ public class PlayScene extends Scene<PacManGame> {
 		pinky.state(GhostState.Scattering, new LoopAroundWalls(pinky, 4, 1, S, false));
 
 		// Pinky follows the position 4 tiles ahead of Pac-Man:
-		pinky.state(GhostState.Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
+		pinky.state(GhostState.Chasing, new AmbushPacMan(pinky, pacMan, 4));
 
 		/*
 		 * "Clyde", the yellow ghost.
@@ -576,6 +575,11 @@ public class PlayScene extends Scene<PacManGame> {
 		ghostAttackTimer = new GhostAttackTimer(app, blinky, inky, pinky, clyde);
 	}
 
+	private float getPacManSpeed() {
+		return pacMan.state() == PacManState.PowerWalking ? levels.getPacManPowerWalkingSpeed(level)
+				: levels.getPacManSpeed(level);
+	}
+
 	private float getGhostSpeed(Ghost ghost) {
 		TileContent content = board.getContent(ghost.currentTile());
 		if (content == Tunnel) {
@@ -605,10 +609,16 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	private int getGhostWaitingDuration(Ghost ghost) {
-		if ("Blinky".equals(ghost.getName())) {
+		switch (ghost.getName()) {
+		case "Blinky":
 			return 0;
+		case "Pinky":
+			return 0;
+		case "Inky":
+		case "Clyde":
+		default:
+			return app.motor.toFrames(2 + rand.nextInt(3));
 		}
-		return app.motor.toFrames(2 + rand.nextInt(3));
 	}
 
 	private int getGhostRecoveringDuration(Ghost ghost) {

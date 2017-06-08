@@ -2,6 +2,7 @@ package de.amr.games.pacman.core.board;
 
 import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.games.pacman.core.board.TileContent.None;
+import static de.amr.games.pacman.core.board.TileContent.Outside;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public class Board {
 	 */
 	public boolean isTileValid(Tile tile) {
 		int row = tile.getRow(), col = tile.getCol();
-		return row >= 0 && row < numRows && col >= 0 && col < numCols;
+		return row >= 0 && row < numRows && col >= 0 && col < numCols && getOriginalContent(row, col) != Outside.toChar();
 	}
 
 	/**

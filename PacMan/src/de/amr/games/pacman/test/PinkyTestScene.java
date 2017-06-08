@@ -20,7 +20,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.FollowTileAheadOfPacMan;
+import de.amr.games.pacman.core.entities.ghost.behaviors.AmbushPacMan;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -57,7 +57,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 		pinky = new Ghost(app, board, "Pinky", () -> theme);
 		pinky.init();
-		pinky.state(Chasing, new FollowTileAheadOfPacMan(pinky, pacMan, 4));
+		pinky.state(Chasing, new AmbushPacMan(pinky, pacMan, 4));
 		pinky.stateToRestore = () -> Chasing;
 		pinky.setColor(Color.PINK);
 		pinky.setAnimated(true);

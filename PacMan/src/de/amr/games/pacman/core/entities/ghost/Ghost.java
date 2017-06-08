@@ -131,10 +131,13 @@ public class Ghost extends BoardMover {
 		if (control.inState(Dead)) {
 			return;
 		}
-		control.changeTo(stateToRestore.get());
+		restoreState();
 	}
 
 	public void beginRecovering() {
+		if (control.stateID() != Dead) {
+			throw new IllegalStateException("Attempt to recover when not dead");
+		}
 		control.changeTo(Recovering);
 	}
 
