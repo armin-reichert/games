@@ -42,9 +42,10 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.FlashText;
@@ -59,8 +60,8 @@ import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.core.entities.ghost.behaviors.AmbushPacMan;
+import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
 import de.amr.games.pacman.core.statemachine.State;
@@ -101,11 +102,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	// Entities
 	private PacMan pacMan;
-	private Ghost blinky, inky, pinky, clyde;
-
-	private Stream<Ghost> ghosts() {
-		return Stream.of(blinky, inky, pinky, clyde);
-	}
+	private Set<Ghost> ghosts;
 
 	// Scene-specific data
 	private final LevelData levels;
@@ -128,7 +125,7 @@ public class PlayScene extends Scene<PacManGame> {
 			setLogger(Log, app.motor.getFrequency());
 			// ghostAttackTimer.setLogger(Log);
 			// pacMan.setLogger(Log);
-			// ghosts().forEach(ghost -> ghost.setLogger(Log));
+			// ghosts.forEach(ghost -> ghost.setLogger(Log));
 		}
 
 		public PlayControl() {
@@ -143,7 +140,7 @@ public class PlayScene extends Scene<PacManGame> {
 				score = 0;
 				bonusList.clear();
 				createPacManAndGhosts();
-				ghosts().forEach(ghost -> {
+				ghosts.forEach(ghost -> {
 					ghost.speed = () -> 0f;
 					ghost.placeAt(getGhostHomeTile(ghost));
 				});
@@ -160,7 +157,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Ready).entry = state -> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
-				ghosts().forEach(ghost -> {
+				ghosts.forEach(ghost -> {
 					ghost.speed = () -> getGhostSpeed(ghost);
 					ghost.beginWaiting(State.FOREVER);
 				});
@@ -172,7 +169,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(StartingLevel).entry = state -> {
 				app.assets.sound("sfx/ready.mp3").play();
-				ghosts().forEach(ghost -> {
+				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.beginWaiting(State.FOREVER);
 				});
@@ -191,7 +188,7 @@ public class PlayScene extends Scene<PacManGame> {
 				pacMan.placeAt(PACMAN_HOME);
 				pacMan.speed = () -> getPacManSpeed();
 
-				ghosts().forEach(ghost -> {
+				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.beginWaiting(getGhostWaitingDuration(ghost));
 				});
@@ -287,7 +284,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (keyPressedOnce(VK_ALT, VK_T)) {
 			app.getThemeManager().selectNextTheme();
 		} else if (keyPressedOnce(VK_ALT, VK_K)) {
-			ghosts().forEach(Ghost::killed);
+			ghosts.forEach(Ghost::killed);
 		}
 	}
 
@@ -375,21 +372,27 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Create the ghosts:
 
-		blinky = new Ghost(app, board, "Blinky", () -> app.getThemeManager().getTheme());
+		ghosts = new HashSet<>();
+
+		Ghost blinky = new Ghost(app, board, "Blinky", () -> app.getThemeManager().getTheme());
 		blinky.setColor(Color.RED);
+		ghosts.add(blinky);
 
-		inky = new Ghost(app, board, "Inky", () -> app.getThemeManager().getTheme());
+		Ghost inky = new Ghost(app, board, "Inky", () -> app.getThemeManager().getTheme());
 		inky.setColor(new Color(64, 224, 208));
+		ghosts.add(inky);
 
-		pinky = new Ghost(app, board, "Pinky", () -> app.getThemeManager().getTheme());
+		Ghost pinky = new Ghost(app, board, "Pinky", () -> app.getThemeManager().getTheme());
 		pinky.setColor(Color.PINK);
+		ghosts.add(pinky);
 
-		clyde = new Ghost(app, board, "Clyde", () -> app.getThemeManager().getTheme());
+		Ghost clyde = new Ghost(app, board, "Clyde", () -> app.getThemeManager().getTheme());
 		clyde.setColor(Color.ORANGE);
+		ghosts.add(clyde);
 
 		// Define common ghost properties and behavior:
 
-		ghosts().forEach(ghost -> {
+		ghosts.forEach(ghost -> {
 
 			ghost.setAnimated(false);
 
@@ -570,7 +573,7 @@ public class PlayScene extends Scene<PacManGame> {
 		app.entities.add(pacMan, blinky, inky, pinky, clyde);
 
 		pacMan.enemies().clear();
-		ghosts().forEach(ghost -> pacMan.enemies().add(ghost));
+		ghosts.forEach(ghost -> pacMan.enemies().add(ghost));
 
 		ghostAttackTimer = new GhostAttackTimer(app, blinky, inky, pinky, clyde);
 	}
@@ -678,7 +681,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Entities
 		pacMan.draw(g);
 		if (!playControl.inState(PlayState.Crashing)) {
-			ghosts().forEach(ghost -> ghost.draw(g));
+			ghosts.forEach(ghost -> ghost.draw(g));
 		}
 
 		// HUD
@@ -734,7 +737,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// play state
 			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
 			// home positions of ghosts
-			ghosts().forEach(ghost -> {
+			ghosts.forEach(ghost -> {
 				g.setColor(ghost.getColor());
 				Tile homeTile = getGhostHomeTile(ghost);
 				g.fillRect(homeTile.getCol() * TILE_SIZE + TILE_SIZE / 2, homeTile.getRow() * TILE_SIZE + TILE_SIZE / 2,
