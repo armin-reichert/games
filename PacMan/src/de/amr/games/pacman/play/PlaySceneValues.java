@@ -8,20 +8,31 @@ import static de.amr.games.pacman.core.board.BonusSymbol.Grapes;
 import static de.amr.games.pacman.core.board.BonusSymbol.Key;
 import static de.amr.games.pacman.core.board.BonusSymbol.Peach;
 import static de.amr.games.pacman.core.board.BonusSymbol.Strawberry;
+import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
+import static de.amr.games.pacman.core.board.TileContent.Tunnel;
 
+import java.util.Random;
+
+import de.amr.easy.game.timing.Motor;
+import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.BonusSymbol;
+import de.amr.games.pacman.core.board.TileContent;
+import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.core.entities.PacManState;
+import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 
 /**
- * Provides level-specific data.
+ * Parameters for playing.
  * 
  * @see <a href="http://www.gamasutra.com/view/feature/3938/the_pacman_dossier.php">The Pac-Man
  *      Dossier</a>.
  * 
  * @author Armin Reichert
  */
-public class LevelData {
+public class PlaySceneValues {
 
-	private static final Object[][] DATA = {
+	private static final Object[][] LEVELS = {
 		/*@formatter:off*/
 		{},
 		{ Cherries, 		100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
@@ -44,30 +55,36 @@ public class LevelData {
 		/*@formatter:on*/
 	};
 
-	private float baseSpeed;
+	private final Random rand = new Random();
+	private final Board board;
+	private final Motor motor;
+	private final float baseSpeed;
 
-	public LevelData(float baseSpeed) {
-		this.baseSpeed = baseSpeed;
+	public PlaySceneValues(Board board, Motor motor, float pixelsPerSecond) {
+		this.board = board;
+		this.motor = motor;
+		this.baseSpeed = pixelsPerSecond / motor.getFrequency();
 	}
 
 	public BonusSymbol getBonusSymbol(int level) {
-		return (BonusSymbol) DATA[level][0];
+		return (BonusSymbol) LEVELS[level][0];
 	}
 
 	public int getBonusValue(int level) {
-		return (Integer) DATA[level][1];
+		return (Integer) LEVELS[level][1];
 	}
 
-	public float getPacManSpeed(int level) {
-		return baseSpeed * (Float) DATA[level][2];
+	public float getPacManSpeed(PacMan pacMan, int level) {
+		float speed = baseSpeed * (Float) LEVELS[level][2];
+		return pacMan.state() == PacManState.PowerWalking ? getPacManPowerWalkingSpeed(level) : speed;
 	}
 
 	public float getGhostSpeedNormal(int level) {
-		return baseSpeed * (Float) DATA[level][4];
+		return baseSpeed * (Float) LEVELS[level][4];
 	}
 
 	public float getGhostSpeedInTunnel(int level) {
-		return baseSpeed * (Float) DATA[level][5];
+		return baseSpeed * (Float) LEVELS[level][5];
 	}
 
 	public float getGhostSpeedInHouse() {
@@ -75,14 +92,44 @@ public class LevelData {
 	}
 
 	public float getPacManPowerWalkingSpeed(int level) {
-		return baseSpeed * (Float) DATA[level][10];
+		return baseSpeed * (Float) LEVELS[level][10];
 	}
 
 	public float getGhostSpeedWhenFrightened(int level) {
-		return baseSpeed * (Float) DATA[level][12];
+		return baseSpeed * (Float) LEVELS[level][12];
 	}
 
 	public int getGhostFrightenedDuration(int level) {
-		return (Integer) DATA[level][13];
+		return (Integer) LEVELS[level][13];
+	}
+
+	public float getGhostSpeed(Ghost ghost, int level) {
+		TileContent content = board.getContent(ghost.currentTile());
+		if (content == Tunnel) {
+			return getGhostSpeedInTunnel(level);
+		} else if (content == GhostHouse) {
+			return getGhostSpeedInHouse();
+		} else if (ghost.state() == GhostState.Frightened) {
+			return getGhostSpeedWhenFrightened(level);
+		} else {
+			return getGhostSpeedNormal(level);
+		}
+	}
+
+	public int getGhostWaitingDuration(Ghost ghost) {
+		switch (ghost.getName()) {
+		case "Blinky":
+			return 0;
+		case "Pinky":
+			return 0;
+		case "Inky":
+		case "Clyde":
+		default:
+			return motor.toFrames(2 + rand.nextInt(3));
+		}
+	}
+
+	public int getGhostRecoveringDuration(Ghost ghost) {
+		return motor.toFrames(1 + rand.nextInt(2));
 	}
 }
