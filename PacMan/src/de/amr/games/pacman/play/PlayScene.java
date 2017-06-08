@@ -455,15 +455,11 @@ public class PlayScene extends Scene<PacManGame> {
 				ghost.follow(homeTile);
 				if (ghost.getRow() == homeTile.getRow() && ghost.getCol() == homeTile.getCol()) {
 					ghost.adjust();
-					ghost.beginRecovering();
+					ghost.beginRecovering(getGhostRecoveringDuration(ghost));
 				}
 			};
 
-			// After "recovering", start scattering or chasing:
-			ghost.state(GhostState.Recovering).entry = state -> {
-				state.setDuration(getGhostRecoveringDuration(ghost));
-			};
-
+			// After "recovering", continue depending on attack state:
 			ghost.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
 					ghost.setAnimated(true);

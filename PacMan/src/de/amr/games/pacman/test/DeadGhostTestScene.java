@@ -7,6 +7,7 @@ import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
 import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
+import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -34,12 +35,13 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
-		
+
 		ghost = new Ghost(app, board, "Blinky", () -> theme);
 		ghost.init();
 		ghost.setLogger(Application.Log);
 		ghost.placeAt(4, 4);
 		ghost.speed = () -> 2f;
+		ghost.xOffset = () -> ghost.state() == Recovering ? TILE_SIZE / 2 : 0;
 		ghost.state(Scattering).update = state -> {
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
 				ghost.killed();
@@ -54,8 +56,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 		ghost.state(Dead).update = state -> {
 			ghost.follow(GHOST_HOUSE_ENTRY);
 			if (ghost.isExactlyOverTile(GHOST_HOUSE_ENTRY)) {
-				ghost.state(Recovering).setDuration(60);
-				ghost.beginRecovering();
+				ghost.beginRecovering(120);
 			}
 		};
 		ghost.beginScattering();
