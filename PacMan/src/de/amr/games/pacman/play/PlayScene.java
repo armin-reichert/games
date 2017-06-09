@@ -15,6 +15,14 @@ import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawText;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
+import static de.amr.games.pacman.play.PlaySceneValues.BONUS1_PELLETS_LEFT;
+import static de.amr.games.pacman.play.PlaySceneValues.BONUS2_PELLETS_LEFT;
+import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_ENERGIZER;
+import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_KILLING_FIRST_GHOST;
+import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_PELLET;
+import static de.amr.games.pacman.play.PlaySceneValues.SCORE_FOR_EXTRALIFE;
+import static de.amr.games.pacman.play.PlaySceneValues.WAIT_TICKS_AFTER_ENERGIZER_EATEN;
+import static de.amr.games.pacman.play.PlaySceneValues.WAIT_TICKS_AFTER_PELLET_EATEN;
 import static de.amr.games.pacman.play.PlayState.Crashing;
 import static de.amr.games.pacman.play.PlayState.GameOver;
 import static de.amr.games.pacman.play.PlayState.Initializing;
@@ -54,6 +62,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.Tile;
+import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
@@ -81,16 +90,6 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final Tile CLYDE_HOME = new Tile(17, 15);
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
 	public static final Tile BONUS_TILE = new Tile(20, 13);
-
-	// Game parameters
-	public static final int POINTS_FOR_PELLET = 10;
-	public static final int POINTS_FOR_ENERGIZER = 50;
-	public static final int BONUS1_PELLETS_LEFT = 170;
-	public static final int BONUS2_PELLETS_LEFT = 70;
-	public static final int SCORE_FOR_EXTRALIFE = 10000;
-	public static final int POINTS_FOR_KILLING_FIRST_GHOST = 200;
-	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
-	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
 
 	// Game control
 	private final StateMachine<PlayState> playControl;
@@ -136,7 +135,9 @@ public class PlayScene extends Scene<PacManGame> {
 				score = 0;
 				bonusList.clear();
 				createPacManAndGhosts();
+				pacMan.placeAt(PACMAN_HOME);
 				ghosts.forEach(ghost -> {
+					ghost.init();
 					ghost.speed = () -> 0f;
 					ghost.placeAt(getGhostHomeTile(ghost));
 				});
@@ -165,6 +166,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(StartingLevel).entry = state -> {
 				app.assets.sound("sfx/ready.mp3").play();
+				pacMan.init();
+				pacMan.placeAt(PACMAN_HOME);
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.beginWaiting(State.FOREVER);
@@ -220,9 +223,7 @@ public class PlayScene extends Scene<PacManGame> {
 				Log.info("PacMan killed, lives remaining: " + lives);
 			};
 
-			state(Crashing).update = state -> {
-				pacMan.update();
-			};
+			state(Crashing).update = state -> pacMan.update();
 
 			change(Crashing, Playing, () -> !app.assets.sound("sfx/die.mp3").isRunning() && lives > 0);
 
@@ -291,8 +292,6 @@ public class PlayScene extends Scene<PacManGame> {
 		setBonusEnabled(false);
 		ghostAttackTimer.setLevel(level);
 		ghostAttackTimer.init();
-		pacMan.init();
-		pacMan.placeAt(PACMAN_HOME);
 		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
 				board.count(Energizer)));
 	}
@@ -300,6 +299,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private void createPacManAndGhosts() {
 
 		pacMan = new PacMan(app, board, () -> app.getThemeManager().getTheme());
+		pacMan.init();
 
 		pacMan.onContentFound = content -> {
 			Tile tile = pacMan.currentTile();
@@ -408,31 +408,35 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			// Define which state ghost should change to after recovering or frightened:
-			ghost.stateToRestore = () -> {
+			ghost.restoreState = () -> {
 				switch (ghostAttackTimer.state()) {
 				case Scattering:
-					return GhostState.Scattering;
+					ghost.beginScattering();
+					break;
 				case Chasing:
-					return GhostState.Chasing;
+					ghost.beginChasing();
 				default:
-					return ghost.state();
+					break;
 				}
 			};
 
 			// While waiting, bounce. After waiting, return to state given by attack control.
 			ghost.state(GhostState.Waiting).update = state -> {
-				if (!state.isTerminated()) {
+				if (state.isTerminated()) {
+					ghost.restoreState.run();
+				} else {
 					ghost.bounce();
-					return;
 				}
-				if (pacMan.state() == PacManState.PowerWalking) {
-					ghost.beginBeingFrightened(pacMan.getRemainingTime());
-				}
-				ghost.restoreState();
 			};
 
 			// When in "frightened" state, move randomly:
-			ghost.state(GhostState.Frightened).update = state -> ghost.moveRandomly();
+			ghost.state(GhostState.Frightened).update = state -> {
+				if (state.isTerminated()) {
+					ghost.restoreState.run();
+				} else {
+					ghost.moveRandomly();
+				}
+			};
 
 			// When "dead", return to home location. Then recover:
 			ghost.state(GhostState.Dead).update = state -> {
@@ -446,7 +450,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// After "recovering", continue depending on attack state:
 			ghost.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
-					ghost.restoreState();
+					ghost.restoreState.run();
 				}
 			};
 		});
@@ -465,7 +469,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Blinky doesn't bounce while waiting. Then he acts as given by attack control.
 		blinky.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				blinky.restoreState();
+				blinky.restoreState.run();
 			}
 		};
 
@@ -593,91 +597,100 @@ public class PlayScene extends Scene<PacManGame> {
 	}
 
 	@Override
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D pen) {
 
 		final PacManTheme theme = app.getThemeManager().getTheme();
 
 		// Board & content
-		drawSprite(g, 3, 0, theme.getBoardSprite());
-		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
-			if (board.contains(row, col, Pellet)) {
-				drawSprite(g, row, col, theme.getPelletSprite());
-			} else if (board.contains(row, col, Energizer)) {
-				drawSprite(g, row, col, theme.getEnergizerSprite());
-			} else if (board.contains(row, col, Bonus)) {
+		drawSprite(pen, 3, 0, theme.getBoardSprite());
+		int firstMazeRow = 4;
+		int lastMazeRow = board.numRows - 3;
+		range(firstMazeRow, lastMazeRow).forEach(row -> range(0, board.numCols).forEach(col -> {
+			TileContent content = board.getContent(row, col);
+			switch (content) {
+			case Pellet:
+				drawSprite(pen, row, col, theme.getPelletSprite());
+				break;
+			case Energizer:
+				drawSprite(pen, row, col, theme.getEnergizerSprite());
+				break;
+			case Bonus:
 				BonusSymbol symbol = values.getBonusSymbol(level);
-				drawSprite(g, row - .5f, col, theme.getBonusSprite(symbol));
+				drawSprite(pen, row - .5f, col, theme.getBonusSprite(symbol));
+				break;
+			default:
+				break;
 			}
 		}));
 
 		// Entities
-		pacMan.draw(g);
+		pacMan.draw(pen);
 		if (!playControl.inState(PlayState.Crashing)) {
-			ghosts.forEach(ghost -> ghost.draw(g));
+			ghosts.forEach(ghost -> ghost.draw(pen));
 		}
 
 		// HUD
-		g.setColor(Color.LIGHT_GRAY);
-		g.setFont(theme.getTextFont());
-		drawText(g, 1, 1, "SCORE");
-		drawText(g, 1, 8, "HIGH");
-		drawText(g, 1, 12, "SCORE");
-		g.setColor(theme.getHUDColor());
-		drawText(g, 2, 1, format("%02d", score));
-		drawText(g, 2, 8, format("%02d   L%d", highscore.getPoints(), highscore.getLevel()));
-		drawText(g, 2, 20, "Level " + level);
+		pen.setColor(Color.LIGHT_GRAY);
+		pen.setFont(theme.getTextFont());
+		drawText(pen, 1, 1, "SCORE");
+		drawText(pen, 1, 8, "HIGH");
+		drawText(pen, 1, 12, "SCORE");
+		pen.setColor(theme.getHUDColor());
+		drawText(pen, 2, 1, format("%02d", score));
+		drawText(pen, 2, 8, format("%02d   L%d", highscore.getPoints(), highscore.getLevel()));
+		drawText(pen, 2, 20, "Level " + level);
 
 		// Status messages
 		switch (playControl.stateID()) {
 		case Ready:
-			g.setColor(Color.RED);
-			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE to start");
-			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "Ready!");
+			pen.setColor(Color.RED);
+			drawTextCentered(pen, getWidth(), 9.5f, "Press SPACE to start");
+			pen.setColor(theme.getHUDColor());
+			drawTextCentered(pen, getWidth(), 21f, "Ready!");
 			break;
 		case StartingLevel:
-			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "Level " + level);
+			pen.setColor(theme.getHUDColor());
+			drawTextCentered(pen, getWidth(), 21f, "Level " + level);
 			break;
 		case GameOver:
-			g.setColor(Color.RED);
-			drawTextCentered(g, getWidth(), 9.5f, "Press SPACE for new game");
-			g.setColor(theme.getHUDColor());
-			drawTextCentered(g, getWidth(), 21f, "Game Over!");
+			pen.setColor(Color.RED);
+			drawTextCentered(pen, getWidth(), 9.5f, "Press SPACE for new game");
+			pen.setColor(theme.getHUDColor());
+			drawTextCentered(pen, getWidth(), 21f, "Game Over!");
 			break;
 		default:
 			break;
 		}
 
 		// Lives
-		range(0, lives).forEach(i -> drawSprite(g, board.numRows - 2, 2 * (i + 1), theme.getLifeSprite()));
+		range(0, lives).forEach(i -> drawSprite(pen, board.numRows - 2, 2 * (i + 1), theme.getLifeSprite()));
 
 		// Boni
 		int col = board.numCols - 2;
 		for (BonusSymbol bonus : bonusList) {
-			drawSprite(g, board.numRows - 2, col, theme.getBonusSprite(bonus));
+			drawSprite(pen, board.numRows - 2, col, theme.getBonusSprite(bonus));
 			col -= 2;
 		}
 
 		// Grid lines
 		if (app.settings.getBool("drawGrid")) {
-			drawGridLines(g, getWidth(), getHeight());
+			drawGridLines(pen, getWidth(), getHeight());
 		}
 
 		// Internals
 		if (app.settings.getBool("drawInternals")) {
-			// play state
-			drawTextCentered(g, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
-			// home positions of ghosts
+			// play state and ghost attack state
+			drawTextCentered(pen, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
+			// mark home positions of ghosts
 			ghosts.forEach(ghost -> {
-				g.setColor(ghost.getColor());
+				pen.setColor(ghost.getColor());
 				Tile homeTile = getGhostHomeTile(ghost);
-				g.fillRect(homeTile.getCol() * TILE_SIZE + TILE_SIZE / 2, homeTile.getRow() * TILE_SIZE + TILE_SIZE / 2,
+				pen.fillRect(homeTile.getCol() * TILE_SIZE + TILE_SIZE / 2, homeTile.getRow() * TILE_SIZE + TILE_SIZE / 2,
 						TILE_SIZE, TILE_SIZE);
 			});
 		}
 
 		// Flash texts
-		app.entities.allOf(FlashText.class).forEach(text -> text.draw(g));
+		app.entities.allOf(FlashText.class).forEach(text -> text.draw(pen));
 	}
 }

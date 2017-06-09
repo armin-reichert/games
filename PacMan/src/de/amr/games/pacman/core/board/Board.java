@@ -141,7 +141,20 @@ public class Board {
 	 * @return the tile content
 	 */
 	public TileContent getContent(Tile tile) {
-		return TileContent.valueOf(graph.get(graph.cell(tile.getCol(), tile.getRow())));
+		return getContent(tile.getRow(), tile.getCol());
+	}
+
+	/**
+	 * Returns the content at the specified tile position.
+	 * 
+	 * @param row
+	 *          a row
+	 * @param col
+	 *          a col
+	 * @return the tile content
+	 */
+	public TileContent getContent(int row, int col) {
+		return TileContent.valueOf(graph.get(graph.cell(col, row)));
 	}
 
 	/**

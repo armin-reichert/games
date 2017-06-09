@@ -37,10 +37,9 @@ public class Ghost extends BoardMover {
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
 	private final StateMachine<GhostState> control;
-
-	public Supplier<GhostState> stateToRestore;
-
 	private Color color;
+
+	public Runnable restoreState;
 
 	public Ghost(Application app, Board board, String name, Supplier<PacManTheme> theme) {
 		super(board);
@@ -52,7 +51,8 @@ public class Ghost extends BoardMover {
 
 		color = Color.WHITE;
 
-		stateToRestore = () -> control.stateID();
+		restoreState = () -> {
+		};
 
 		canEnterTile = tile -> {
 			if (!board.isTileValid(tile)) {
@@ -106,14 +106,14 @@ public class Ghost extends BoardMover {
 	}
 
 	public void beginScattering() {
-		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
+		if (control.inState(Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
 			return;
 		}
 		control.changeTo(Scattering);
 	}
 
 	public void beginChasing() {
-		if (control.inState(Frightened, Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
+		if (control.inState(Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
 			return;
 		}
 		control.changeTo(Chasing);
@@ -131,7 +131,7 @@ public class Ghost extends BoardMover {
 		if (control.inState(Dead)) {
 			return;
 		}
-		restoreState();
+		restoreState.run();
 	}
 
 	public void beginRecovering(int frames) {
@@ -144,10 +144,6 @@ public class Ghost extends BoardMover {
 
 	public void killed() {
 		control.changeTo(Dead);
-	}
-
-	public void restoreState() {
-		control.changeTo(stateToRestore.get());
 	}
 
 	// --- Look ---

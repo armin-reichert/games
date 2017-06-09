@@ -32,6 +32,15 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
  */
 public class PlaySceneValues {
 
+	public static final int POINTS_FOR_PELLET = 10;
+	public static final int POINTS_FOR_ENERGIZER = 50;
+	public static final int BONUS1_PELLETS_LEFT = 170;
+	public static final int BONUS2_PELLETS_LEFT = 70;
+	public static final int SCORE_FOR_EXTRALIFE = 10000;
+	public static final int POINTS_FOR_KILLING_FIRST_GHOST = 200;
+	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
+	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
+
 	private static final Object[][] LEVELS = {
 		/*@formatter:off*/
 		{},

@@ -50,6 +50,9 @@ public class StateMachine<StateID> {
 	}
 
 	public State state() {
+		if (currentStateID == null) {
+			throw new IllegalStateException("State machine '" + description + "' not initialized");
+		}
 		return state(currentStateID);
 	}
 
