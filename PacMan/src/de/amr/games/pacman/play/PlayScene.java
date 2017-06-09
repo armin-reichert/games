@@ -198,8 +198,8 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			state(Playing).update = state -> {
-				if (isBonusEnabled() && bonusTimeRemaining-- == 0) {
-					setBonusEnabled(false);
+				if (bonusTimeRemaining == 1) {
+					removeBonus();
 				}
 				ghostAttackTimer.update();
 				app.entities.all().forEach(GameEntity::update);
@@ -218,7 +218,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.assets.sounds().forEach(Sound::stop);
 				app.assets.sound("sfx/die.mp3").play();
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
-				setBonusEnabled(false);
+				removeBonus();
 				pacMan.killed();
 				Log.info("PacMan killed, lives remaining: " + lives);
 			};
@@ -289,7 +289,7 @@ public class PlayScene extends Scene<PacManGame> {
 		++level;
 		ghostsEatenAtLevel = 0;
 		board.resetContent();
-		setBonusEnabled(false);
+		removeBonus();
 		ghostAttackTimer.setLevel(level);
 		ghostAttackTimer.init();
 		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
@@ -305,24 +305,20 @@ public class PlayScene extends Scene<PacManGame> {
 			Tile tile = pacMan.currentTile();
 			switch (content) {
 			case Pellet:
-				app.assets.sound("sfx/eat-pill.mp3").play();
-				score(POINTS_FOR_PELLET);
 				board.setContent(tile, None);
-				if (board.count(Pellet) == BONUS1_PELLETS_LEFT || board.count(Pellet) == BONUS2_PELLETS_LEFT) {
-					setBonusEnabled(true);
-				}
+				score(POINTS_FOR_PELLET);
+				checkForBonus();
 				pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
+				app.assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Energizer:
-				app.assets.sound("sfx/eat-pill.mp3").play();
-				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
-				score(POINTS_FOR_ENERGIZER);
 				board.setContent(tile, None);
-				if (board.count(Pellet) == BONUS1_PELLETS_LEFT || board.count(Pellet) == BONUS2_PELLETS_LEFT) {
-					setBonusEnabled(true);
-				}
+				score(POINTS_FOR_ENERGIZER);
+				checkForBonus();
+				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 				pacMan.beginPowerWalking(values.getGhostFrightenedDuration(level));
+				app.assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Bonus:
 				app.assets.sound("sfx/eat-fruit.mp3").play();
@@ -330,7 +326,7 @@ public class PlayScene extends Scene<PacManGame> {
 				score(points);
 				bonusList.add(values.getBonusSymbol(level));
 				showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
-				setBonusEnabled(false);
+				removeBonus();
 				break;
 			default:
 				break;
@@ -573,18 +569,17 @@ public class PlayScene extends Scene<PacManGame> {
 		score = newScore;
 	}
 
-	private boolean isBonusEnabled() {
-		return bonusTimeRemaining > 0;
-	}
-
-	private void setBonusEnabled(boolean enabled) {
-		if (enabled) {
+	private void checkForBonus() {
+		long pelletsLeft = board.count(Pellet);
+		if (pelletsLeft == BONUS1_PELLETS_LEFT || pelletsLeft == BONUS2_PELLETS_LEFT) {
 			board.setContent(BONUS_TILE, Bonus);
 			bonusTimeRemaining = app.motor.toFrames(9);
-		} else {
-			board.setContent(BONUS_TILE, None);
-			bonusTimeRemaining = 0;
 		}
+	}
+
+	private void removeBonus() {
+		board.setContent(BONUS_TILE, None);
+		bonusTimeRemaining = 0;
 	}
 
 	private void showFlashText(Object object, float x, float y) {
