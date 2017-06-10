@@ -11,13 +11,18 @@ import static de.amr.games.pacman.play.PlayScene.INKY_HOME;
 import static de.amr.games.pacman.play.PlayScene.PINKY_HOME;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
+import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
+import de.amr.games.pacman.misc.SceneHelper;
+import de.amr.games.pacman.play.PlayScene;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -30,7 +35,8 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 	private final PacManTheme theme;
 	private Board board;
-	private final Ghost[] ghosts = new Ghost[4];
+	private final List<Ghost> ghosts = new ArrayList<>();
+	private final LoopAroundWalls[] ghostMoveStrategy = new LoopAroundWalls[4];
 
 	public ScatteringTestScene(ScatteringTestApp app) {
 		super(app);
@@ -41,23 +47,39 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		ghosts[0] = new Ghost(app, board, "Blinky", () -> theme);
-		ghosts[0].placeAt(BLINKY_HOME);
-		ghosts[0].state(Scattering, new LoopAroundWalls(ghosts[0], 4, 26, S, true));
+		{
+			Ghost ghost;
 
-		ghosts[1] = new Ghost(app, board, "Inky", () -> theme);
-		ghosts[1].placeAt(INKY_HOME);
-		ghosts[1].state(Scattering, new LoopAroundWalls(ghosts[1], 32, 26, W, true));
+			ghost = new Ghost(app, board, "Blinky", () -> theme);
+			ghost.setColor(Color.RED);
+			ghost.placeAt(BLINKY_HOME);
+			ghostMoveStrategy[0] = new LoopAroundWalls(ghost, PlayScene.RIGHT_UPPER_CORNER, S, true);
+			ghost.state(Scattering, ghostMoveStrategy[0]);
+			ghosts.add(ghost);
 
-		ghosts[2] = new Ghost(app, board, "Pinky", () -> theme);
-		ghosts[2].placeAt(PINKY_HOME);
-		ghosts[2].state(Scattering, new LoopAroundWalls(ghosts[2], 4, 1, S, false));
+			ghost = new Ghost(app, board, "Inky", () -> theme);
+			ghost.setColor(new Color(64, 224, 208));
+			ghost.placeAt(INKY_HOME);
+			ghostMoveStrategy[1] = new LoopAroundWalls(ghost, PlayScene.RIGHT_LOWER_CORNER, W, true);
+			ghost.state(Scattering, ghostMoveStrategy[1]);
+			ghosts.add(ghost);
 
-		ghosts[3] = new Ghost(app, board, "Clyde", () -> theme);
-		ghosts[3].placeAt(CLYDE_HOME);
-		ghosts[3].state(Scattering, new LoopAroundWalls(ghosts[3], 32, 1, E, false));
+			ghost = new Ghost(app, board, "Pinky", () -> theme);
+			ghost.setColor(Color.PINK);
+			ghost.placeAt(PINKY_HOME);
+			ghostMoveStrategy[2] = new LoopAroundWalls(ghost, PlayScene.LEFT_UPPER_CORNER, S, false);
+			ghost.state(Scattering, ghostMoveStrategy[2]);
+			ghosts.add(ghost);
 
-		Stream.of(ghosts).forEach(ghost -> {
+			ghost = new Ghost(app, board, "Clyde", () -> theme);
+			ghost.setColor(Color.ORANGE);
+			ghost.placeAt(CLYDE_HOME);
+			ghostMoveStrategy[3] = new LoopAroundWalls(ghost, PlayScene.LEFT_LOWER_CORNER, E, false);
+			ghost.state(Scattering, ghostMoveStrategy[3]);
+			ghosts.add(ghost);
+		}
+
+		ghosts.forEach(ghost -> {
 			ghost.init();
 			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 			ghost.setAnimated(true);
@@ -67,12 +89,36 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 	@Override
 	public void update() {
-		Stream.of(ghosts).forEach(Ghost::update);
+		ghosts.forEach(Ghost::update);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		drawSprite(g, 3, 0, theme.getBoardSprite());
-		Stream.of(ghosts).forEach(ghost -> ghost.draw(g));
+		ghosts.forEach(ghost -> ghost.draw(g));
+		for (LoopAroundWalls law : ghostMoveStrategy) {
+			Ghost ghost = (Ghost) law.getMover();
+			if (!law.isLooping()) {
+				g.setColor(ghost.getColor());
+				SceneHelper.drawRoute(g, board, ghost.currentTile(), ghost.getRoute());
+			} else {
+				List<Tile> routeTiles = law.getLoopTiles();
+				Tile prev = null;
+				for (Tile tile : routeTiles) {
+					if (prev != null) {
+						int offset = TILE_SIZE / 4;
+						int x1 = prev.getCol() * TILE_SIZE + offset;
+						int y1 = prev.getRow() * TILE_SIZE + offset;
+						int x2 = tile.getCol() * TILE_SIZE + offset;
+						int y2 = tile.getRow() * TILE_SIZE + offset;
+						g.setColor(ghost.getColor());
+//						g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
+						g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);
+//						g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);
+					}
+					prev = tile;
+				}
+			}
+		}
 	}
 }

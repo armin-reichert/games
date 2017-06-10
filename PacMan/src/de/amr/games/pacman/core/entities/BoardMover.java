@@ -133,7 +133,7 @@ public abstract class BoardMover extends GameEntity {
 		placeAt(currentTile());
 	}
 
-	public boolean isExactlyOverTile(Tile tile) {
+	public boolean isExactlyOver(Tile tile) {
 		return isExactlyOver(tile.getRow(), tile.getCol());
 	}
 

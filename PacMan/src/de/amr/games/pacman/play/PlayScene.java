@@ -8,7 +8,6 @@ import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
-import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
@@ -90,6 +89,10 @@ public class PlayScene extends Scene<PacManGame> {
 	public static final Tile CLYDE_HOME = new Tile(17, 15);
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
 	public static final Tile BONUS_TILE = new Tile(20, 13);
+	public static final Tile LEFT_UPPER_CORNER = new Tile(4, 1);
+	public static final Tile RIGHT_UPPER_CORNER = new Tile(4, 26);
+	public static final Tile LEFT_LOWER_CORNER = new Tile(32, 1);
+	public static final Tile RIGHT_LOWER_CORNER = new Tile(32, 26);
 
 	// Game control
 	private final StateMachine<PlayState> playControl;
@@ -388,14 +391,12 @@ public class PlayScene extends Scene<PacManGame> {
 
 			ghost.setAnimated(false);
 
-			// When in ghost house or at ghost house door, render half a tile to the right:
+			// When in ghost house or at ghost house door, ghosts should appear half a tile to the right:
 			ghost.xOffset = () -> {
 				int offset = 0;
-				Tile current = ghost.currentTile();
-				if (board.contains(current, GhostHouse)) {
+				if (ghost.insideGhostHouse()) {
 					offset = TILE_SIZE / 2;
-				}
-				if (current.equals(GHOST_HOUSE_ENTRY)
+				} else if (ghost.currentTile().equals(GHOST_HOUSE_ENTRY)
 						&& (ghost.state() == GhostState.Initialized || ghost.state() == GhostState.Waiting
 								|| ghost.state() == GhostState.Recovering || ghost.state() == GhostState.Dead)) {
 					offset = TILE_SIZE / 2;
@@ -403,20 +404,16 @@ public class PlayScene extends Scene<PacManGame> {
 				return offset;
 			};
 
-			// Define which state ghost should change to after recovering or frightened:
+			// Define which state the ghost should change to after recovering or frightened:
 			ghost.restoreState = () -> {
-				switch (ghostAttackTimer.state()) {
-				case Scattering:
+				if (ghostAttackTimer.state() == GhostAttackState.Scattering) {
 					ghost.beginScattering();
-					break;
-				case Chasing:
+				} else if (ghostAttackTimer.state() == GhostAttackState.Chasing) {
 					ghost.beginChasing();
-				default:
-					break;
 				}
 			};
 
-			// While waiting, bounce. After waiting, return to state given by attack control.
+			// While waiting, ghosts bounce. Afterwards, they return to the current attack state.
 			ghost.state(GhostState.Waiting).update = state -> {
 				if (state.isTerminated()) {
 					ghost.restoreState.run();
@@ -425,7 +422,7 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			// When in "frightened" state, move randomly:
+			// When in "frightened" state, ghosts move randomly:
 			ghost.state(GhostState.Frightened).update = state -> {
 				if (state.isTerminated()) {
 					ghost.restoreState.run();
@@ -434,16 +431,16 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			// When "dead", return to home location. Then recover:
+			// When "dead", ghosts return to their home tile, then they start recovering:
 			ghost.state(GhostState.Dead).update = state -> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
-				if (ghost.isExactlyOverTile(homeTile)) {
+				if (ghost.isExactlyOver(homeTile)) {
 					ghost.beginRecovering(values.getGhostRecoveringDuration(ghost));
 				}
 			};
 
-			// After "recovering", continue depending on attack state:
+			// After "recovering", ghosts switch to the current attack state:
 			ghost.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
 					ghost.restoreState.run();
@@ -451,18 +448,16 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 		});
 
-		/*
-		 * "Blinky", the red ghost.
-		 */
+		// --- "Blinky", the red ghost.
 
-		// Blinky waits just before ghost house:
+		// Blinky waits just before the ghost house looking to the west:
 		blinky.state(GhostState.Waiting).entry = state -> {
 			blinky.placeAt(BLINKY_HOME);
 			blinky.setMoveDir(W);
 			blinky.setAnimated(true);
 		};
 
-		// Blinky doesn't bounce while waiting. Then he acts as given by attack control.
+		// Blinky doesn't bounce while waiting:
 		blinky.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
 				blinky.restoreState.run();
@@ -470,7 +465,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Blinky loops around the walls at the right upper corner of the maze:
-		blinky.state(GhostState.Scattering, new LoopAroundWalls(blinky, 4, 26, S, true));
+		blinky.state(GhostState.Scattering, new LoopAroundWalls(blinky, RIGHT_UPPER_CORNER, S, true));
 
 		// Blinky directly follows Pac-Man:
 		blinky.state(GhostState.Chasing).update = state -> blinky.follow(pacMan.currentTile());
@@ -486,8 +481,8 @@ public class PlayScene extends Scene<PacManGame> {
 			inky.setAnimated(true);
 		};
 
-		// Inky loops around the walls at the lower right corner of the maze:
-		inky.state(GhostState.Scattering, new LoopAroundWalls(inky, 32, 26, W, true));
+		// Inky loops around the walls at the right corner of the maze:
+		inky.state(GhostState.Scattering, new LoopAroundWalls(inky, RIGHT_LOWER_CORNER, W, true));
 
 		// Inky chases together with Blinky.
 		inky.state(GhostState.Chasing, new ChaseWithPartner(inky, blinky, pacMan));
@@ -503,8 +498,8 @@ public class PlayScene extends Scene<PacManGame> {
 			pinky.setAnimated(true);
 		};
 
-		// Pinky loops around the walls at the upper right corner of the maze:
-		pinky.state(GhostState.Scattering, new LoopAroundWalls(pinky, 4, 1, S, false));
+		// Pinky loops around the walls at the left upper corner of the maze:
+		pinky.state(GhostState.Scattering, new LoopAroundWalls(pinky, LEFT_UPPER_CORNER, S, false));
 
 		// Pinky follows the position 4 tiles ahead of Pac-Man:
 		pinky.state(GhostState.Chasing, new AmbushPacMan(pinky, pacMan, 4));
@@ -521,7 +516,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Clyde loops around the walls at the left lower corner of the maze:
-		clyde.state(GhostState.Scattering, new LoopAroundWalls(clyde, 32, 1, E, false));
+		clyde.state(GhostState.Scattering, new LoopAroundWalls(clyde, LEFT_LOWER_CORNER, E, false));
 
 		// Clyde follows Pac-Man's position if he is more than 8 tiles away, otherwise he moves
 		// randomly:

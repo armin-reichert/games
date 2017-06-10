@@ -55,7 +55,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 		};
 		ghost.state(Dead).update = state -> {
 			ghost.follow(GHOST_HOUSE_ENTRY);
-			if (ghost.isExactlyOverTile(GHOST_HOUSE_ENTRY)) {
+			if (ghost.isExactlyOver(GHOST_HOUSE_ENTRY)) {
 				ghost.beginRecovering(120);
 			}
 		};

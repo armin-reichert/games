@@ -2,6 +2,9 @@ package de.amr.games.pacman.core.entities.ghost.behaviors;
 
 import static de.amr.easy.grid.impl.Top4.Top4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
@@ -16,50 +19,79 @@ import de.amr.games.pacman.core.statemachine.State;
  */
 public class LoopAroundWalls extends State {
 
+	private final BoardMover mover;
 	private final Tile loopStart;
-	private boolean loopStarted;
+	private final int loopStartDir;
+	private boolean looping;
+	private List<Integer> loopRoute;
+	private List<Tile> loopTiles;
 
 	/**
-	 * @param entity
-	 *          the entity to be controlled
-	 * @param loopStartRow
-	 *          the start row of the loop
-	 * @param loopStartCol
-	 *          the start column of the loop
+	 * @param mover
+	 *          the entity to be moved
+	 * @param loopStart
+	 *          the start tile of the loop
 	 * @param loopStartDir
 	 *          the start direction of the loop
 	 * @param clockwise
 	 *          if the ghost should walk clockwise or counter-clockwise
 	 */
-	public LoopAroundWalls(BoardMover entity, int loopStartRow, int loopStartCol, int loopStartDir, boolean clockwise) {
+	public LoopAroundWalls(BoardMover mover, Tile loopStart, int loopStartDir, boolean clockwise) {
 
-		this.loopStart = new Tile(loopStartRow, loopStartCol);
+		this.mover = mover;
+		this.loopStart = loopStart;
+		this.loopStartDir = loopStartDir;
 
 		// entry action
 		entry = state -> {
-			loopStarted = false;
-			entity.getRoute().clear();
-			entity.adjust();
+			looping = false;
+			mover.getRoute().clear();
+			mover.adjust();
 		};
 
 		// update action
 		update = state -> {
-			if (entity.isExactlyOverTile(loopStart)) {
-				computePathAroundWalls(entity, loopStartDir, clockwise);
-				entity.setMoveDir(loopStartDir);
-				loopStarted = true;
+			if (mover.isExactlyOver(loopStart)) {
+				computePathAroundWalls(mover, loopStartDir, clockwise);
+				mover.setRoute(loopRoute);
+				mover.setMoveDir(loopStartDir);
+				looping = true;
 			}
-			if (loopStarted) {
-				entity.moveAlongRoute();
+			if (looping) {
+				mover.moveAlongRoute();
 			} else {
-				entity.follow(loopStart);
+				mover.follow(loopStart);
 			}
 		};
 
 		// exit action
 		exit = state -> {
-			entity.getRoute().clear();
+			mover.getRoute().clear();
 		};
+	}
+
+	public BoardMover getMover() {
+		return mover;
+	}
+
+	public Tile getLoopStart() {
+		return loopStart;
+	}
+
+	public int getLoopStartDir() {
+		return loopStartDir;
+	}
+
+	public List<Integer> getLoopRoute() {
+		return loopRoute;
+	}
+
+	public List<Tile> getLoopTiles() {
+		return loopTiles;
+	}
+
+	public boolean isLooping() {
+		return looping;
 	}
 
 	/**
@@ -76,7 +108,7 @@ public class LoopAroundWalls extends State {
 	private void computePathAroundWalls(BoardMover entity, int dir_forward, boolean clockwise) {
 		final Board board = entity.getBoard();
 		Tile current = loopStart;
-		entity.getRoute().clear();
+		loopRoute = new ArrayList<>();
 		do {
 			int dir_turn = clockwise ? Top4.right(dir_forward) : Top4.left(dir_forward);
 			int dir_turn_inv = Top4.inv(dir_turn);
@@ -87,20 +119,20 @@ public class LoopAroundWalls extends State {
 				// can move ahead
 				if (board.contains(current_around_corner, TileContent.Wall)) {
 					// no corner in turn direction ahead, move forward
-					entity.getRoute().add(dir_forward);
+					loopRoute.add(dir_forward);
 					current = current_ahead;
 					if (current.equals(loopStart)) {
 						break;
 					}
 				} else {
 					// corner is ahead, move around corner
-					entity.getRoute().add(dir_forward);
+					loopRoute.add(dir_forward);
 					current = current_ahead;
 					if (current.equals(loopStart)) {
 						break;
 					}
 					dir_forward = dir_turn;
-					entity.getRoute().add(dir_forward);
+					loopRoute.add(dir_forward);
 					current = current_around_corner;
 					if (current.equals(loopStart)) {
 						break;
@@ -109,7 +141,7 @@ public class LoopAroundWalls extends State {
 			} else if (!board.contains(current_antiturn, TileContent.Wall)) {
 				// turn against loop direction
 				dir_forward = Top4.inv(dir_turn);
-				entity.getRoute().add(dir_forward);
+				loopRoute.add(dir_forward);
 				current = current_antiturn;
 				if (current.equals(loopStart)) {
 					break;
@@ -118,5 +150,15 @@ public class LoopAroundWalls extends State {
 				throw new IllegalStateException("Got stuck while computing path around walls");
 			}
 		} while (true);
+
+		// create route as tile list
+		loopTiles = new ArrayList<>();
+		current = loopStart;
+		loopTiles.add(current);
+		for (int dir : loopRoute) {
+			Tile next = new Tile(current).translate(Top4.dx(dir), Top4.dy(dir));
+			loopTiles.add(next);
+			current = next;
+		}
 	}
 }

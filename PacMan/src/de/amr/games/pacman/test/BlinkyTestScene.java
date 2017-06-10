@@ -104,7 +104,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		pacMan.move();
 		Tile pacManTile = pacMan.currentTile();
 
-		if (!pacMan.isExactlyOverTile(pacManTile)) {
+		if (!pacMan.isExactlyOver(pacManTile)) {
 			return;
 		}
 
