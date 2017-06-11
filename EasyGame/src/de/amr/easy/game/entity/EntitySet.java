@@ -38,6 +38,10 @@ public class EntitySet {
 		Objects.requireNonNull(type);
 		entitySet.removeIf((e) -> type.isAssignableFrom(e.getClass()));
 	}
+	
+	public void removeAll() {
+		entitySet.clear();
+	}
 
 	public <E extends GameEntity> E findAny(Class<E> type) {
 		Objects.requireNonNull(type);

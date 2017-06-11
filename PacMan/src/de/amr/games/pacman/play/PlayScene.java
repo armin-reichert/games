@@ -16,9 +16,11 @@ import static de.amr.games.pacman.misc.SceneHelper.drawText;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
 import static de.amr.games.pacman.play.PlaySceneValues.BONUS1_PELLETS_LEFT;
 import static de.amr.games.pacman.play.PlaySceneValues.BONUS2_PELLETS_LEFT;
+import static de.amr.games.pacman.play.PlaySceneValues.CHASING_TIMES;
 import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_ENERGIZER;
 import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_KILLING_FIRST_GHOST;
 import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_PELLET;
+import static de.amr.games.pacman.play.PlaySceneValues.SCATTERING_TIMES;
 import static de.amr.games.pacman.play.PlaySceneValues.SCORE_FOR_EXTRALIFE;
 import static de.amr.games.pacman.play.PlaySceneValues.WAIT_TICKS_AFTER_ENERGIZER_EATEN;
 import static de.amr.games.pacman.play.PlaySceneValues.WAIT_TICKS_AFTER_PELLET_EATEN;
@@ -153,7 +155,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			change(Initializing, Ready, () -> !app.assets.sound("sfx/insert-coin.mp3").isRunning());
 
-			// Ready
+			// Ready to rumble
 
 			state(Ready).entry = state -> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
@@ -168,18 +170,16 @@ public class PlayScene extends Scene<PacManGame> {
 			// StartingLevel
 
 			state(StartingLevel).entry = state -> {
-				app.assets.sound("sfx/ready.mp3").play();
 				pacMan.init();
 				pacMan.placeAt(PACMAN_HOME);
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.beginWaiting(State.FOREVER);
 				});
+				app.assets.sound("sfx/ready.mp3").play();
 			};
 
-			state(StartingLevel).update = state -> {
-				app.entities.all().forEach(GameEntity::update);
-			};
+			state(StartingLevel).update = state -> app.entities.all().forEach(GameEntity::update);
 
 			change(StartingLevel, Playing, () -> !app.assets.sound("sfx/ready.mp3").isRunning());
 
@@ -235,16 +235,12 @@ public class PlayScene extends Scene<PacManGame> {
 			// GameOver
 
 			state(GameOver).entry = state -> {
-				if (score > highscore.getPoints()) {
-					highscore.save(score, level);
-					highscore.load();
-				}
+				checkHighscore();
 				app.entities.all().forEach(entity -> entity.setAnimated(false));
 				Log.info("Game over.");
 			};
 
-			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE),
-					state -> app.entities.removeAll(GameEntity.class));
+			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE), state -> app.entities.removeAll());
 		}
 	}
 
@@ -295,8 +291,7 @@ public class PlayScene extends Scene<PacManGame> {
 		removeBonus();
 		ghostAttackTimer.setLevel(level);
 		ghostAttackTimer.init();
-		Log.info(format("Level %d initialized: %d pellets and %d energizers.", level, board.count(Pellet),
-				board.count(Energizer)));
+		Log.info(format("Level %d: %d pellets, %d energizers.", level, board.count(Pellet), board.count(Energizer)));
 	}
 
 	private void createPacManAndGhosts() {
@@ -310,14 +305,12 @@ public class PlayScene extends Scene<PacManGame> {
 			case Pellet:
 				board.setContent(tile, None);
 				score(POINTS_FOR_PELLET);
-				checkForBonus();
 				pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
 				app.assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Energizer:
 				board.setContent(tile, None);
 				score(POINTS_FOR_ENERGIZER);
-				checkForBonus();
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 				pacMan.beginPowerWalking(values.getGhostFrightenedDuration(level));
@@ -537,7 +530,7 @@ public class PlayScene extends Scene<PacManGame> {
 		pacMan.enemies().clear();
 		ghosts.forEach(ghost -> pacMan.enemies().add(ghost));
 
-		ghostAttackTimer = new GhostAttackTimer(app, blinky, inky, pinky, clyde);
+		ghostAttackTimer = new GhostAttackTimer(app, ghosts, SCATTERING_TIMES, CHASING_TIMES);
 	}
 
 	private Tile getGhostHomeTile(Ghost ghost) {
@@ -557,18 +550,24 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void score(int points) {
 		int newScore = score + points;
+		// check for extra life
 		if (score < SCORE_FOR_EXTRALIFE && newScore >= SCORE_FOR_EXTRALIFE) {
 			app.assets.sound("sfx/extra-life.mp3").play();
 			++lives;
 		}
 		score = newScore;
-	}
-
-	private void checkForBonus() {
+		// check for bonus
 		long pelletsLeft = board.count(Pellet);
 		if (pelletsLeft == BONUS1_PELLETS_LEFT || pelletsLeft == BONUS2_PELLETS_LEFT) {
 			board.setContent(BONUS_TILE, Bonus);
 			bonusTimeRemaining = app.motor.toFrames(9);
+		}
+	}
+
+	private void checkHighscore() {
+		if (score > highscore.getPoints()) {
+			highscore.save(score, level);
+			highscore.load();
 		}
 	}
 

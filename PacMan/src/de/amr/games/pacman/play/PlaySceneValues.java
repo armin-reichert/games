@@ -64,6 +64,22 @@ public class PlaySceneValues {
 		/*@formatter:on*/
 	};
 
+	static final int[][] SCATTERING_TIMES = {
+		/*@formatter:off*/
+		{ 7, 7, 5, 5, 0 }, 	// level 1
+		{ 7, 7, 5, 0, 0 }, 	// level 2-4
+		{ 5, 5, 5, 0, 0 }   // level 5...
+		/*@formatter:on*/
+	};
+
+	static final int[][] CHASING_TIMES = {
+		/*@formatter:off*/
+		{ 20, 20, 20, 	Integer.MAX_VALUE },  // level 1 
+		{ 20, 20, 1033, Integer.MAX_VALUE },	// level 2-4
+		{ 20, 20, 1037, Integer.MAX_VALUE } 	// level 5...
+		/*@formatter:on*/
+	};
+
 	private final Random rand = new Random();
 	private final Board board;
 	private final Motor motor;
