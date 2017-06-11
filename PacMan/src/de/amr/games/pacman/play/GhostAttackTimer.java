@@ -32,7 +32,6 @@ public class GhostAttackTimer {
 	}
 
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {
-
 		this.motor = app.motor;
 
 		fsm = new StateMachine<>("GhostAttackTimer", new EnumMap<>(GhostAttackState.class));
@@ -41,6 +40,7 @@ public class GhostAttackTimer {
 			++wave;
 			state.setDuration(computeFrames(scatteringSeconds));
 			ghosts.forEach(Ghost::beginScattering);
+			app.assets.sound("sfx/siren.mp3").stop();
 			app.assets.sound("sfx/siren.mp3").loop();
 		};
 
@@ -52,8 +52,6 @@ public class GhostAttackTimer {
 		};
 
 		fsm.changeOnStateTimeout(Chasing, Scattering);
-
-		fsm.state(Chasing).exit = state -> app.assets.sound("sfx/siren.mp3").stop();
 	}
 
 	public void init() {
