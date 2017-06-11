@@ -103,6 +103,10 @@ public class StateMachine<StateID> {
 		transition.action = action;
 		transitions.get(from).add(transition);
 	}
+	
+	public void changeOnStateTimeout(StateID from, StateID to) {
+		change(from, to, () -> state(from).isTerminated());
+	}
 
 	void changeTo(StateID stateID, Consumer<State> action) {
 		if (currentStateID == stateID) {
