@@ -14,16 +14,16 @@ import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawText;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
-import static de.amr.games.pacman.play.PlaySceneValues.BONUS1_PELLETS_LEFT;
-import static de.amr.games.pacman.play.PlaySceneValues.BONUS2_PELLETS_LEFT;
-import static de.amr.games.pacman.play.PlaySceneValues.CHASING_TIMES;
-import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_ENERGIZER;
-import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_KILLING_FIRST_GHOST;
-import static de.amr.games.pacman.play.PlaySceneValues.POINTS_FOR_PELLET;
-import static de.amr.games.pacman.play.PlaySceneValues.SCATTERING_TIMES;
-import static de.amr.games.pacman.play.PlaySceneValues.SCORE_FOR_EXTRALIFE;
-import static de.amr.games.pacman.play.PlaySceneValues.WAIT_TICKS_AFTER_ENERGIZER_EATEN;
-import static de.amr.games.pacman.play.PlaySceneValues.WAIT_TICKS_AFTER_PELLET_EATEN;
+import static de.amr.games.pacman.play.PlaySceneModel.BONUS1_PELLETS_LEFT;
+import static de.amr.games.pacman.play.PlaySceneModel.BONUS2_PELLETS_LEFT;
+import static de.amr.games.pacman.play.PlaySceneModel.CHASING_TIMES;
+import static de.amr.games.pacman.play.PlaySceneModel.POINTS_FOR_ENERGIZER;
+import static de.amr.games.pacman.play.PlaySceneModel.POINTS_FOR_KILLING_FIRST_GHOST;
+import static de.amr.games.pacman.play.PlaySceneModel.POINTS_FOR_PELLET;
+import static de.amr.games.pacman.play.PlaySceneModel.SCATTERING_TIMES;
+import static de.amr.games.pacman.play.PlaySceneModel.SCORE_FOR_EXTRALIFE;
+import static de.amr.games.pacman.play.PlaySceneModel.WAIT_TICKS_AFTER_ENERGIZER_EATEN;
+import static de.amr.games.pacman.play.PlaySceneModel.WAIT_TICKS_AFTER_PELLET_EATEN;
 import static de.amr.games.pacman.play.PlayState.Crashing;
 import static de.amr.games.pacman.play.PlayState.GameOver;
 import static de.amr.games.pacman.play.PlayState.Initializing;
@@ -105,7 +105,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private Set<Ghost> ghosts;
 
 	// Scene-specific data
-	private final PlaySceneValues values;
+	private final PlaySceneModel model;
 	private final Board board;
 	private final Highscore highscore;
 	private final List<BonusSymbol> bonusList;
@@ -160,7 +160,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Ready).entry = state -> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
 				ghosts.forEach(ghost -> {
-					ghost.speed = () -> values.getGhostSpeed(ghost, level);
+					ghost.speed = () -> model.getGhostSpeed(ghost, level);
 					ghost.beginWaiting(State.FOREVER);
 				});
 			};
@@ -188,11 +188,11 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Playing).entry = state -> {
 				pacMan.init();
 				pacMan.placeAt(PACMAN_HOME);
-				pacMan.speed = () -> values.getPacManSpeed(pacMan, level);
+				pacMan.speed = () -> model.getPacManSpeed(pacMan, level);
 
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.beginWaiting(values.getGhostWaitingDuration(ghost));
+					ghost.beginWaiting(model.getGhostWaitingDuration(ghost));
 				});
 
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
@@ -248,7 +248,7 @@ public class PlayScene extends Scene<PacManGame> {
 		super(app);
 		playControl = new PlayControl();
 		board = new Board(app.assets.text("board.txt").split("\n"));
-		values = new PlaySceneValues(board, app.motor, 8 * TILE_SIZE);
+		model = new PlaySceneModel(board, app.motor, 8 * TILE_SIZE);
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusList = new ArrayList<>();
 	}
@@ -313,14 +313,14 @@ public class PlayScene extends Scene<PacManGame> {
 				score(POINTS_FOR_ENERGIZER);
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-				pacMan.beginPowerWalking(values.getGhostFrightenedDuration(level));
+				pacMan.beginPowerWalking(model.getGhostFrightenedDuration(level));
 				app.assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Bonus:
 				app.assets.sound("sfx/eat-fruit.mp3").play();
-				int points = values.getBonusValue(level);
+				int points = model.getBonusValue(level);
 				score(points);
-				bonusList.add(values.getBonusSymbol(level));
+				bonusList.add(model.getBonusSymbol(level));
 				showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
 				removeBonus();
 				break;
@@ -429,7 +429,7 @@ public class PlayScene extends Scene<PacManGame> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
 				if (ghost.isExactlyOver(homeTile)) {
-					ghost.beginRecovering(values.getGhostRecoveringDuration(ghost));
+					ghost.beginRecovering(model.getGhostRecoveringDuration(ghost));
 				}
 			};
 
@@ -604,7 +604,7 @@ public class PlayScene extends Scene<PacManGame> {
 				drawSprite(pen, row, col, theme.getEnergizerSprite());
 				break;
 			case Bonus:
-				BonusSymbol symbol = values.getBonusSymbol(level);
+				BonusSymbol symbol = model.getBonusSymbol(level);
 				drawSprite(pen, row - .5f, col, theme.getBonusSprite(symbol));
 				break;
 			default:

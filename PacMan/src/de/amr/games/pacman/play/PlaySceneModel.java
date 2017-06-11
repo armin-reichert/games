@@ -23,14 +23,14 @@ import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 
 /**
- * Parameters for playing.
+ * Data model for the play scene.
  * 
  * @see <a href="http://www.gamasutra.com/view/feature/3938/the_pacman_dossier.php">The Pac-Man
  *      Dossier</a>.
  * 
  * @author Armin Reichert
  */
-public class PlaySceneValues {
+public class PlaySceneModel {
 
 	public static final int POINTS_FOR_PELLET = 10;
 	public static final int POINTS_FOR_ENERGIZER = 50;
@@ -41,7 +41,7 @@ public class PlaySceneValues {
 	public static final int WAIT_TICKS_AFTER_PELLET_EATEN = 1;
 	public static final int WAIT_TICKS_AFTER_ENERGIZER_EATEN = 3;
 
-	private static final Object[][] LEVELS = {
+	private static final Object[][] LEVEL_DATA = {
 		/*@formatter:off*/
 		{},
 		{ Cherries, 		100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
@@ -85,31 +85,31 @@ public class PlaySceneValues {
 	private final Motor motor;
 	private final float baseSpeed;
 
-	public PlaySceneValues(Board board, Motor motor, float pixelsPerSecond) {
+	public PlaySceneModel(Board board, Motor motor, float pixelsPerSecond) {
 		this.board = board;
 		this.motor = motor;
 		this.baseSpeed = pixelsPerSecond / motor.getFrequency();
 	}
 
 	public BonusSymbol getBonusSymbol(int level) {
-		return (BonusSymbol) LEVELS[level][0];
+		return (BonusSymbol) LEVEL_DATA[level][0];
 	}
 
 	public int getBonusValue(int level) {
-		return (Integer) LEVELS[level][1];
+		return (Integer) LEVEL_DATA[level][1];
 	}
 
 	public float getPacManSpeed(PacMan pacMan, int level) {
-		float speed = baseSpeed * (Float) LEVELS[level][2];
+		float speed = baseSpeed * (Float) LEVEL_DATA[level][2];
 		return pacMan.state() == PacManState.PowerWalking ? getPacManPowerWalkingSpeed(level) : speed;
 	}
 
 	public float getGhostSpeedNormal(int level) {
-		return baseSpeed * (Float) LEVELS[level][4];
+		return baseSpeed * (Float) LEVEL_DATA[level][4];
 	}
 
 	public float getGhostSpeedInTunnel(int level) {
-		return baseSpeed * (Float) LEVELS[level][5];
+		return baseSpeed * (Float) LEVEL_DATA[level][5];
 	}
 
 	public float getGhostSpeedInHouse() {
@@ -117,15 +117,15 @@ public class PlaySceneValues {
 	}
 
 	public float getPacManPowerWalkingSpeed(int level) {
-		return baseSpeed * (Float) LEVELS[level][10];
+		return baseSpeed * (Float) LEVEL_DATA[level][10];
 	}
 
 	public float getGhostSpeedWhenFrightened(int level) {
-		return baseSpeed * (Float) LEVELS[level][12];
+		return baseSpeed * (Float) LEVEL_DATA[level][12];
 	}
 
 	public int getGhostFrightenedDuration(int level) {
-		return (Integer) LEVELS[level][13];
+		return (Integer) LEVEL_DATA[level][13];
 	}
 
 	public float getGhostSpeed(Ghost ghost, int level) {
