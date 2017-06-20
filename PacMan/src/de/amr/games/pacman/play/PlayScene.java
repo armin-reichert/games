@@ -414,7 +414,7 @@ public class PlayScene extends Scene<PacManGame> {
 				ghost.setAnimated(true);
 			});
 
-			// While waiting, ghosts bounce. Afterwards, they return to the current attack state.
+			// While waiting, ghosts bounce. Afterwards, they return to the current attack state:
 			ghost.control.state(GhostState.Waiting).update = state -> {
 				if (state.isTerminated()) {
 					ghost.restoreState.run();
@@ -422,6 +422,14 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.bounce();
 				}
 			};
+
+			// when scattering starts, enter scattering state:
+			ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Waiting, GhostState.Scattering);
+			ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Chasing, GhostState.Scattering);
+
+			// when chasing starts, enter chasing state:
+			ghost.control.changeOnInput(GhostEvent.ChasingStarts, GhostState.Waiting, GhostState.Chasing);
+			ghost.control.changeOnInput(GhostEvent.ChasingStarts, GhostState.Scattering, GhostState.Chasing);
 
 			// When Pac-Man gets empowered, become frightened for the same duration
 			ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, GhostState.Scattering, GhostState.Frightened,
