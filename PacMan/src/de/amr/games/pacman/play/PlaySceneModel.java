@@ -101,7 +101,7 @@ public class PlaySceneModel {
 
 	public float getPacManSpeed(PacMan pacMan, int level) {
 		float speed = baseSpeed * (Float) LEVEL_DATA[level][2];
-		return pacMan.state() == PacManState.PowerWalking ? getPacManPowerWalkingSpeed(level) : speed;
+		return pacMan.control.is(PacManState.PowerWalking) ? getPacManPowerWalkingSpeed(level) : speed;
 	}
 
 	public float getGhostSpeedNormal(int level) {
@@ -134,7 +134,7 @@ public class PlaySceneModel {
 			return getGhostSpeedInTunnel(level);
 		} else if (content == GhostHouse) {
 			return getGhostSpeedInHouse();
-		} else if (ghost.state() == GhostState.Frightened) {
+		} else if (ghost.control.stateID() == GhostState.Frightened) {
 			return getGhostSpeedWhenFrightened(level);
 		} else {
 			return getGhostSpeedNormal(level);

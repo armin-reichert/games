@@ -35,7 +35,6 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	@Override
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
-
 		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);

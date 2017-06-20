@@ -4,11 +4,16 @@ import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.S;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
+import static de.amr.games.pacman.misc.SceneHelper.drawRoute;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.BLINKY_HOME;
 import static de.amr.games.pacman.play.PlayScene.CLYDE_HOME;
 import static de.amr.games.pacman.play.PlayScene.INKY_HOME;
+import static de.amr.games.pacman.play.PlayScene.LEFT_LOWER_CORNER;
+import static de.amr.games.pacman.play.PlayScene.LEFT_UPPER_CORNER;
 import static de.amr.games.pacman.play.PlayScene.PINKY_HOME;
+import static de.amr.games.pacman.play.PlayScene.RIGHT_LOWER_CORNER;
+import static de.amr.games.pacman.play.PlayScene.RIGHT_UPPER_CORNER;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
@@ -16,13 +21,14 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
-import de.amr.games.pacman.misc.SceneHelper;
-import de.amr.games.pacman.play.PlayScene;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -34,57 +40,37 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 	private final PacManTheme theme;
-	private Board board;
+	private final Board board;
 	private final List<Ghost> ghosts = new ArrayList<>();
-	private final LoopAroundWalls[] ghostMoveStrategy = new LoopAroundWalls[4];
 
 	public ScatteringTestScene(ScatteringTestApp app) {
 		super(app);
 		theme = new ClassicTheme(app.assets);
+		board = new Board(app.assets.text("board.txt").split("\n"));
 	}
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt").split("\n"));
-
-		{
-			Ghost ghost;
-
-			ghost = new Ghost(app, board, "Blinky", () -> theme);
-			ghost.setColor(Color.RED);
-			ghost.placeAt(BLINKY_HOME);
-			ghostMoveStrategy[0] = new LoopAroundWalls(ghost, PlayScene.RIGHT_UPPER_CORNER, S, true);
-			ghost.state(Scattering, ghostMoveStrategy[0]);
-			ghosts.add(ghost);
-
-			ghost = new Ghost(app, board, "Inky", () -> theme);
-			ghost.setColor(new Color(64, 224, 208));
-			ghost.placeAt(INKY_HOME);
-			ghostMoveStrategy[1] = new LoopAroundWalls(ghost, PlayScene.RIGHT_LOWER_CORNER, W, true);
-			ghost.state(Scattering, ghostMoveStrategy[1]);
-			ghosts.add(ghost);
-
-			ghost = new Ghost(app, board, "Pinky", () -> theme);
-			ghost.setColor(Color.PINK);
-			ghost.placeAt(PINKY_HOME);
-			ghostMoveStrategy[2] = new LoopAroundWalls(ghost, PlayScene.LEFT_UPPER_CORNER, S, false);
-			ghost.state(Scattering, ghostMoveStrategy[2]);
-			ghosts.add(ghost);
-
-			ghost = new Ghost(app, board, "Clyde", () -> theme);
-			ghost.setColor(Color.ORANGE);
-			ghost.placeAt(CLYDE_HOME);
-			ghostMoveStrategy[3] = new LoopAroundWalls(ghost, PlayScene.LEFT_LOWER_CORNER, E, false);
-			ghost.state(Scattering, ghostMoveStrategy[3]);
-			ghosts.add(ghost);
-		}
-
+		addGhost("Blinky", Color.RED, BLINKY_HOME, RIGHT_UPPER_CORNER, S, true);
+		addGhost("Inky", new Color(64, 224, 208), INKY_HOME, RIGHT_LOWER_CORNER, W, true);
+		addGhost("Pinky", Color.PINK, PINKY_HOME, LEFT_UPPER_CORNER, S, false);
+		addGhost("Clyde", Color.ORANGE, CLYDE_HOME, LEFT_LOWER_CORNER, E, false);
 		ghosts.forEach(ghost -> {
 			ghost.init();
 			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 			ghost.setAnimated(true);
 			ghost.beginScattering();
 		});
+	}
+
+	private void addGhost(String name, Color color, Tile home, Tile loopStart, int loopStartDir, boolean clockwise) {
+		Ghost ghost = new Ghost(app, board, name, () -> theme);
+		ghost.setColor(color);
+		ghost.placeAt(home);
+		ghost.control.state(Scattering, new LoopAroundWalls(ghost, loopStart, loopStartDir, clockwise));
+		ghost.control.setLogger(Application.Log, app.motor.getFrequency());
+		ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Initialized, GhostState.Scattering);
+		ghosts.add(ghost);
 	}
 
 	@Override
@@ -95,12 +81,12 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 	@Override
 	public void draw(Graphics2D g) {
 		drawSprite(g, 3, 0, theme.getBoardSprite());
-		ghosts.forEach(ghost -> ghost.draw(g));
-		for (LoopAroundWalls law : ghostMoveStrategy) {
-			Ghost ghost = (Ghost) law.getMover();
+		ghosts.forEach(ghost -> {
+			ghost.draw(g);
+			LoopAroundWalls law = (LoopAroundWalls) ghost.control.state(GhostState.Scattering);
 			if (!law.isLooping()) {
 				g.setColor(ghost.getColor());
-				SceneHelper.drawRoute(g, board, ghost.currentTile(), ghost.getRoute());
+				drawRoute(g, board, ghost.currentTile(), ghost.getRoute());
 			} else {
 				List<Tile> routeTiles = law.getLoopTiles();
 				Tile prev = null;
@@ -112,13 +98,13 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 						int x2 = tile.getCol() * TILE_SIZE + offset;
 						int y2 = tile.getRow() * TILE_SIZE + offset;
 						g.setColor(ghost.getColor());
-//						g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
+						// g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
 						g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);
-//						g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);
+						// g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);
 					}
 					prev = tile;
 				}
 			}
-		}
+		});
 	}
 }

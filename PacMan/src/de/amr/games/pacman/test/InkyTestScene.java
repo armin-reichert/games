@@ -5,6 +5,8 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
@@ -13,15 +15,18 @@ import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -67,26 +72,31 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		blinky = new Ghost(app, board, "Blinky", () -> theme);
 		blinky.init();
-		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
-		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);
 		blinky.speed = () -> pacMan.speed.get() * .9f;
 		blinky.placeAt(GHOST_HOUSE_ENTRY);
 		blinky.setMoveDir(E);
 
+		blinky.control.change(Initialized, Waiting, () -> true);
+		blinky.control.change(Waiting, Chasing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
+		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
+
 		inky = new Ghost(app, board, "Inky", () -> theme);
 		inky.init();
-		inky.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
 		inky.speed = () -> pacMan.speed.get() * .9f;
 		inky.placeAt(GHOST_HOUSE_ENTRY);
 
+		inky.control.change(Initialized, GhostState.Waiting, () -> true);
+		inky.control.change(Waiting, Chasing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
+
 		app.entities.add(pacMan, blinky, inky);
+
 		pacMan.beginWalking();
-		blinky.beginChasing();
-		inky.beginChasing();
 	};
 
 	@Override

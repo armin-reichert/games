@@ -36,6 +36,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 import de.amr.games.pacman.theme.PacManTheme;
@@ -52,7 +53,7 @@ public class PacMan extends BoardMover {
 
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
-	private final StateMachine<PacManState> control;
+	public final StateMachine<PacManState, PacManEvent> control;
 	private final Set<Ghost> enemies;
 	private int freezeTimer;
 
@@ -89,34 +90,38 @@ public class PacMan extends BoardMover {
 
 		// state machine
 
-		control = new StateMachine<>(getName(), new EnumMap<>(PacManState.class));
+		control = new StateMachine<>(getName(), new EnumMap<>(PacManState.class), Initialized);
+		
+		control.changeOnInput(PacManEvent.WalkingStarts, Initialized, Walking);
 
 		control.state(Walking).entry = state -> {
 			setAnimated(true);
 		};
 
 		control.state(Walking).update = state -> {
-			checkKeyboard();
+			requestMoveDirection();
 			walk();
 		};
+		
+		control.changeOnInput(PacManEvent.Killed, Walking, Dying);
 
 		control.state(PowerWalking).entry = state -> {
 			app.assets.sound("sfx/waza.mp3").loop();
-			enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
+			// enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
+			enemies.forEach(enemy -> enemy.control.feed(GhostEvent.PacManAttackStarts));
 		};
 
 		control.state(PowerWalking).update = state -> {
-			checkKeyboard();
+			requestMoveDirection();
 			walk();
-			if (state.isTerminated()) {
-				control.changeTo(Walking);
-			}
 		};
 
 		control.state(PowerWalking).exit = state -> {
 			app.assets.sound("sfx/waza.mp3").stop();
 			enemies.forEach(Ghost::endBeingFrightened);
 		};
+
+		control.changeOnTimeout(PowerWalking, Walking);
 
 		control.state(Dying).entry = state -> {
 			if (theme.get().getPacManDyingSprite() != null) {
@@ -132,7 +137,7 @@ public class PacMan extends BoardMover {
 		freezeTimer = 0;
 		moveDir = W;
 		nextMoveDir = W;
-		control.changeTo(Initialized);
+		control.init();
 	}
 
 	@Override
@@ -148,42 +153,29 @@ public class PacMan extends BoardMover {
 		return enemies;
 	}
 
-	public PacManState state() {
-		return control.stateID();
-	}
-
-	public int getRemainingTime() {
-		return control.state().getRemaining();
-	}
-
-	public State state(PacManState stateID) {
-		return control.state(stateID);
-	}
-
 	public void setLogger(Logger logger) {
 		control.setLogger(logger, app.motor.getFrequency());
 	}
 
 	public void killed() {
-		control.changeTo(Dying);
+		control.feed(PacManEvent.Killed);
 	}
 
 	public void beginPowerWalking(int seconds) {
-		control.state(PowerWalking).setDuration(app.motor.toFrames(seconds));
-		control.changeTo(PowerWalking);
+		control.feed(PacManEvent.PowerWalkingStarts);
 	}
 
 	public void beginWalking() {
-		control.changeTo(Walking);
+		control.feed(PacManEvent.WalkingStarts);
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.inState(Dying)) {
+		if (control.is(Dying)) {
 			return theme.get().getPacManDyingSprite() != null ? theme.get().getPacManDyingSprite()
 					: theme.get().getPacManStandingSprite(moveDir);
 		}
-		if (control.inState(Initialized) || stuck) {
+		if (control.is(Initialized) || stuck) {
 			return theme.get().getPacManStandingSprite(moveDir);
 		}
 		return theme.get().getPacManRunningSprite(moveDir);
@@ -201,7 +193,7 @@ public class PacMan extends BoardMover {
 	}
 
 	public boolean isPowerWalkingEnding() {
-		return control.inState(PowerWalking)
+		return control.is(PowerWalking)
 				&& control.state(PowerWalking).getRemaining() < control.state(PowerWalking).getDuration() / 4;
 	}
 
@@ -215,7 +207,7 @@ public class PacMan extends BoardMover {
 		turnTo(nextMoveDir);
 	}
 
-	private void checkKeyboard() {
+	private void requestMoveDirection() {
 		if (Keyboard.keyDown(VK_LEFT)) {
 			nextMoveDir = W;
 		}

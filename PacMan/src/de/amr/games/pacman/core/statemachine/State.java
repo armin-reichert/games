@@ -25,8 +25,7 @@ public class State {
 	private int remaining;
 
 	public State() {
-		duration = FOREVER;
-		remaining = FOREVER;
+		duration = remaining = FOREVER;
 	}
 
 	void doEntry() {

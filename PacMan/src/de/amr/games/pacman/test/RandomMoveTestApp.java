@@ -16,6 +16,7 @@ public class RandomMoveTestApp extends Application {
 		app.settings.width = 448;
 		app.settings.height = 576;
 		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		app.settings.set("drawInternals", true);
 		launch(app);
 	}
 

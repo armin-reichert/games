@@ -1,6 +1,7 @@
 package de.amr.games.pacman.test;
 
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
@@ -18,6 +19,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -38,28 +40,35 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
 		ghost = new Ghost(app, board, "Blinky", () -> theme);
 		ghost.init();
+
 		ghost.setLogger(Application.Log);
 		ghost.placeAt(4, 4);
 		ghost.speed = () -> 2f;
-		ghost.xOffset = () -> ghost.state() == Recovering ? TILE_SIZE / 2 : 0;
-		ghost.state(Scattering).update = state -> {
+		ghost.xOffset = () -> ghost.control.stateID() == Recovering ? TILE_SIZE / 2 : 0;
+
+		ghost.control.change(Initialized, Scattering, () -> true);
+
+		ghost.control.state(Scattering).update = state -> {
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-				ghost.killed();
+				ghost.kill();
 			}
 			ghost.moveRandomly();
 		};
-		ghost.state(Recovering).update = state -> {
-			if (state.isTerminated()) {
-				ghost.beginScattering();
-			}
-		};
-		ghost.state(Dead).update = state -> {
+
+		ghost.control.changeOnInput(GhostEvent.Dies, Scattering, Dead);
+
+		ghost.control.changeOnTimeout(Recovering, Scattering);
+
+		ghost.control.state(Dead).update = state -> {
 			ghost.follow(GHOST_HOUSE_ENTRY);
 			if (ghost.isExactlyOver(GHOST_HOUSE_ENTRY)) {
-				ghost.beginRecovering(120);
+				ghost.beginRecovering();
 			}
 		};
-		ghost.beginScattering();
+		
+		ghost.control.changeOnInput(GhostEvent.RecoveringStarts, Dead, Recovering, state -> {
+			ghost.control.state(Recovering).setDuration(120);
+		});
 	}
 
 	@Override
@@ -71,10 +80,10 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 	public void draw(Graphics2D g) {
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		drawGridLines(g, getWidth(), getHeight());
+		ghost.draw(g);
 		g.setColor(Color.WHITE);
-		if (ghost.state() == Scattering) {
+		if (ghost.control.stateID() == Scattering) {
 			drawTextCentered(g, getWidth(), 17, "Press 'k' to kill ghost");
 		}
-		ghost.draw(g);
 	}
 }

@@ -20,7 +20,7 @@ import de.amr.games.pacman.core.statemachine.StateMachine;
  */
 public class GhostAttackTimer {
 
-	private final StateMachine<GhostAttackState> fsm;
+	private final StateMachine<GhostAttackState,String> fsm;
 	private final Motor motor;
 	private int level;
 	private int wave;
@@ -34,7 +34,9 @@ public class GhostAttackTimer {
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {
 		this.motor = app.motor;
 
-		fsm = new StateMachine<>("GhostAttackTimer", new EnumMap<>(GhostAttackState.class));
+		fsm = new StateMachine<>("GhostAttackTimer", new EnumMap<>(GhostAttackState.class), Initialized);
+		
+		fsm.change(Initialized, Scattering, () -> true);
 
 		fsm.state(Scattering).entry = state -> {
 			++wave;
@@ -44,26 +46,19 @@ public class GhostAttackTimer {
 			app.assets.sound("sfx/siren.mp3").loop();
 		};
 
-		fsm.changeOnStateTimeout(Scattering, Chasing);
+		fsm.changeOnTimeout(Scattering, Chasing);
 
 		fsm.state(Chasing).entry = state -> {
 			state.setDuration(computeFrames(chasingSeconds));
 			ghosts.forEach(Ghost::beginChasing);
 		};
 
-		fsm.changeOnStateTimeout(Chasing, Scattering);
+		fsm.changeOnTimeout(Chasing, Scattering);
 	}
 
 	public void init() {
 		wave = 0;
-		fsm.changeTo(Initialized);
-	}
-
-	public void start() {
-		if (!fsm.inState(Initialized)) {
-			init();
-		}
-		fsm.changeTo(Scattering);
+		fsm.init();
 	}
 
 	public void update() {

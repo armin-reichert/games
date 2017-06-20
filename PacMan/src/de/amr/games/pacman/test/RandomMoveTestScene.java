@@ -1,6 +1,7 @@
 package de.amr.games.pacman.test;
 
 import static de.amr.easy.grid.impl.Top4.Top4;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
@@ -20,6 +21,7 @@ import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**
+ * Random ghost movement test app.
  * 
  * @author Armin Reichert
  */
@@ -57,11 +59,36 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 		Stream.of(ghosts).forEach(ghost -> ghost.draw(g));
 	}
 
+	private Tile getRandomTile() {
+		Tile home = PlayScene.GHOST_HOUSE_ENTRY;
+		while (true) {
+			int row = rand.nextInt(board.numRows), col = rand.nextInt(board.numCols);
+			Tile tile = new Tile(row, col);
+			if (!board.shortestRoute(home, tile).isEmpty()) {
+				return tile;
+			}
+		}
+	}
+
 	private void createGhosts() {
 		ghosts = new Ghost[5 + rand.nextInt(15)];
 		for (int i = 0; i < ghosts.length; ++i) {
 			ghosts[i] = createRandomGhost();
 		}
+	}
+
+	private Ghost createRandomGhost() {
+		String names[] = { "Pinky", "Inky", "Blinky", "Clyde" };
+		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)], () -> theme);
+		ghost.init();
+		ghost.setAnimated(true);
+		ghost.speed = () -> 1f + rand.nextFloat();
+		ghost.placeAt(getRandomTile());
+
+		ghost.control.change(Initialized, Scattering, () -> true);
+		ghost.control.state(Scattering).update = state -> ghost.moveRandomly();
+
+		return ghost;
 	}
 
 	private void checkCollisions() {
@@ -72,29 +99,6 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 					ghosts[i].setMoveDir(Top4.inv(ghosts[i].getMoveDir()));
 					ghosts[j].setMoveDir(Top4.inv(ghosts[j].getMoveDir()));
 				}
-			}
-		}
-	}
-
-	private Ghost createRandomGhost() {
-		String names[] = { "Pinky", "Inky", "Blinky", "Clyde" };
-		Ghost ghost = new Ghost(app, board, names[rand.nextInt(names.length)], () -> theme);
-		ghost.init();
-		ghost.state(Scattering).update = state -> ghost.moveRandomly();
-		ghost.setAnimated(true);
-		ghost.speed = () -> 1f + rand.nextFloat();
-		ghost.placeAt(getRandomTile());
-		ghost.beginScattering();
-		return ghost;
-	}
-
-	private Tile getRandomTile() {
-		Tile home = PlayScene.GHOST_HOUSE_ENTRY;
-		while (true) {
-			int row = rand.nextInt(board.numRows), col = rand.nextInt(board.numCols);
-			Tile tile = new Tile(row, col);
-			if (!board.shortestRoute(home, tile).isEmpty()) {
-				return tile;
 			}
 		}
 	}

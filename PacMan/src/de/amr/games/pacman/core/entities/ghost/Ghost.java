@@ -8,7 +8,6 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frigh
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
-import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
 import java.awt.Color;
@@ -22,6 +21,7 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.BoardMover;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
@@ -36,7 +36,7 @@ public class Ghost extends BoardMover {
 
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
-	private final StateMachine<GhostState> control;
+	public final StateMachine<GhostState, GhostEvent> control;
 	private Color color;
 
 	public Runnable restoreState;
@@ -47,7 +47,8 @@ public class Ghost extends BoardMover {
 
 		this.app = app;
 		this.theme = theme;
-		this.control = new StateMachine<>(name, new EnumMap<>(GhostState.class));
+
+		this.control = new StateMachine<>(name, new EnumMap<>(GhostState.class), Initialized);
 
 		color = Color.WHITE;
 
@@ -62,7 +63,7 @@ public class Ghost extends BoardMover {
 			case Wall:
 				return false;
 			case Door:
-				return control.inState(Dead) || insideGhostHouse() && control.inState(Scattering, Chasing);
+				return control.is(Dead) || insideGhostHouse() && control.is(Scattering, Chasing);
 			default:
 				return true;
 			}
@@ -73,7 +74,7 @@ public class Ghost extends BoardMover {
 	public void init() {
 		super.init();
 		setAnimated(false);
-		control.changeTo(Initialized);
+		control.init();
 	}
 
 	@Override
@@ -85,65 +86,30 @@ public class Ghost extends BoardMover {
 		control.setLogger(logger, app.motor.getFrequency());
 	}
 
-	public GhostState state() {
-		return control.stateID();
-	}
-
-	public State state(GhostState stateID) {
-		return control.state(stateID);
-	}
-
-	public State state(GhostState stateID, State state) {
-		return control.state(stateID, state);
-	}
-
 	// Events
 
-	public void beginWaiting(int frames) {
-		setAnimated(true);
-		control.state(Waiting).setDuration(frames);
-		control.changeTo(Waiting);
+	public void beginWaiting() {
+		control.feed(GhostEvent.WaitingStarts);
 	}
 
 	public void beginScattering() {
-		if (control.inState(Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
-			return;
-		}
-		control.changeTo(Scattering);
+		control.feed(GhostEvent.ScatteringStarts);
 	}
 
 	public void beginChasing() {
-		if (control.inState(Dead) || control.inState(Waiting) && !control.state().isTerminated()) {
-			return;
-		}
-		control.changeTo(Chasing);
-	}
-
-	public void beginBeingFrightened(int frames) {
-		if (control.inState(Dead)) {
-			return;
-		}
-		control.state(Frightened).setDuration(frames);
-		control.changeTo(Frightened);
+		control.feed(GhostEvent.ChasingStarts);
 	}
 
 	public void endBeingFrightened() {
-		if (control.inState(Dead)) {
-			return;
-		}
 		restoreState.run();
 	}
 
-	public void beginRecovering(int frames) {
-		if (control.stateID() != Dead) {
-			throw new IllegalStateException("Attempt to recover when not dead");
-		}
-		control.state(Recovering).setDuration(frames);
-		control.changeTo(Recovering);
+	public void beginRecovering() {
+		control.feed(GhostEvent.RecoveringStarts);
 	}
 
-	public void killed() {
-		control.changeTo(Dead);
+	public void kill() {
+		control.feed(GhostEvent.Dies);
 	}
 
 	// --- Look ---
@@ -158,16 +124,16 @@ public class Ghost extends BoardMover {
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.inState(Dead)) {
+		if (control.is(Dead)) {
 			return theme.get().getGhostDeadSprite(moveDir);
 		}
-		if (control.inState(Recovering)) {
+		if (control.is(Recovering)) {
 			return theme.get().getGhostRecoveringSprite();
 		}
 		if (insideGhostHouse()) {
 			return theme.get().getGhostNormalSprite(getName(), moveDir);
 		}
-		if (control.inState(Frightened)) {
+		if (control.is(Frightened)) {
 			return control.state().getRemaining() < control.state().getDuration() / 3 ? theme.get().getGhostRecoveringSprite()
 					: theme.get().getGhostFrightenedSprite();
 		}

@@ -3,9 +3,12 @@ package de.amr.games.pacman.core.statemachine;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -15,28 +18,51 @@ import java.util.logging.Logger;
  *
  * @param <StateID>
  *          type for identifying states, for example an enumeration type
+ * @param <Input>
+ *          type for inputs / events
  */
-public class StateMachine<StateID> {
+public class StateMachine<StateID, Input> {
 
 	private final String description;
 	private final Map<StateID, State> statesByID;
-	private final Map<StateID, List<StateTransition<StateID>>> transitions;
+	private final Map<StateID, List<Transition<StateID>>> transitionsByStateID;
+	private final StateID initialStateID;
 	private StateID currentStateID;
-	private Logger logger;
+	private Deque<Input> inputQ = new LinkedList<>();
+	private Optional<Logger> logger;
 	private int fps;
 
-	public StateMachine(Map<StateID, State> stateMap) {
-		this("Anon state machine", stateMap);
+	public StateMachine(Map<StateID, State> statesByID, StateID initialStateID) {
+		this("Anon state machine", statesByID, initialStateID);
 	}
 
-	public StateMachine(String description, Map<StateID, State> stateMap) {
+	public StateMachine(String description, Map<StateID, State> statesByID, StateID initialStateID) {
 		this.description = description;
-		this.statesByID = stateMap;
-		this.transitions = new HashMap<>();
+		this.statesByID = statesByID;
+		this.initialStateID = initialStateID;
+		this.transitionsByStateID = new HashMap<>();
+		this.logger = Optional.empty();
+	}
+
+	public Logger getLogger() {
+		return logger.get();
+	}
+
+	public void setLogger(Logger logger, int fps) {
+		this.logger = Optional.of(logger);
+		this.fps = fps;
+	}
+
+	public void init() {
+		enterState(initialStateID, null);
+	}
+
+	public void feed(Input event) {
+		inputQ.add(event);
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean inState(StateID... stateIDs) {
+	public boolean is(StateID... stateIDs) {
 		for (StateID stateID : stateIDs) {
 			if (currentStateID == stateID) {
 				return true;
@@ -60,11 +86,6 @@ public class StateMachine<StateID> {
 		if (!statesByID.containsKey(stateID)) {
 			State state = new State();
 			statesByID.put(stateID, state);
-			if (transitions.containsKey(stateID)) {
-				transitions.get(stateID).clear();
-			} else {
-				transitions.put(stateID, new ArrayList<>());
-			}
 		}
 		return statesByID.get(stateID);
 	}
@@ -74,99 +95,103 @@ public class StateMachine<StateID> {
 			throw new IllegalStateException("State with ID '" + stateID + "' already exists");
 		}
 		statesByID.put(stateID, state);
-		if (transitions.containsKey(stateID)) {
-			transitions.get(stateID).clear();
-		} else {
-			transitions.put(stateID, new ArrayList<>());
-		}
 		return state;
 	}
 
 	public void update() {
-		StateTransition<StateID> transition = findMatchingTransition();
-		if (transition != null) {
-			changeTo(transition.newState, transition.action);
+		if (!inputQ.isEmpty()) {
+			logger.ifPresent(log -> log.info(format("FSM(%s) processes event '%s'", description, inputQ.peek())));
+			step();
+			inputQ.poll();
+		} else {
+			step();
+		}
+	}
+
+	private void step() {
+		Optional<Transition<StateID>> match = getOutgoingTransitions(currentStateID).stream()
+				.filter(transition -> transition.condition.getAsBoolean()).findFirst();
+		if (match.isPresent()) {
+			enterState(match.get().newState, match.get().action);
 		} else {
 			state().doUpdate();
 		}
 	}
 
-	public void change(StateID from, StateID to, BooleanSupplier condition) {
-		change(from, to, condition, null);
-	};
-	
-	public void change(StateID from, StateID to, BooleanSupplier condition, Consumer<State> action) {
-		StateTransition<StateID> transition = new StateTransition<>();
-		transition.oldState = from;
-		transition.newState = to;
-		transition.condition = condition;
-		transition.action = action;
-		transitions.get(from).add(transition);
-	}
-	
-	public void changeOnStateTimeout(StateID from, StateID to) {
-		change(from, to, () -> state(from).isTerminated());
-	}
-
-	void changeTo(StateID stateID, Consumer<State> action) {
-		if (currentStateID == stateID) {
+	private void enterState(StateID newStateID, Consumer<State> action) {
+		if (currentStateID == newStateID) {
 			return;
 		}
-		traceStateChange(currentStateID, stateID);
+		traceStateChange(currentStateID, newStateID);
 		if (currentStateID != null) {
 			state().doExit();
-			traceExit();
+			traceStateExit();
 		}
-		currentStateID = stateID;
+		currentStateID = newStateID;
 		if (action != null) {
 			action.accept(state());
 		}
-		traceEntry();
+		traceStateEntry();
 		state().doEntry();
 	}
 
-	public void changeTo(StateID stateID) {
-		changeTo(stateID, null);
-	}
-
-	private StateTransition<StateID> findMatchingTransition() {
-		for (StateTransition<StateID> transition : transitions.get(currentStateID)) {
-			if (transition.condition.getAsBoolean()) {
-				return transition;
-			}
+	private List<Transition<StateID>> getOutgoingTransitions(StateID stateID) {
+		if (!transitionsByStateID.containsKey(stateID)) {
+			transitionsByStateID.put(stateID, new ArrayList<>(3));
 		}
-		return null;
+		return transitionsByStateID.get(stateID);
 	}
 
 	// Tracing
 
-	public void setLogger(Logger logger, int fps) {
-		this.logger = logger;
-		this.fps = fps;
+	private void traceStateEntry() {
+		logger.ifPresent(log -> {
+			if (state().getDuration() != State.FOREVER) {
+				float seconds = (float) state().getDuration() / fps;
+				log.info(format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(), seconds,
+						state().getDuration()));
+			} else {
+				log.info(format("FSM(%s) enters state '%s'", description, stateID()));
+			}
+		});
 	}
 
 	private void traceStateChange(StateID oldState, StateID newState) {
-		if (logger != null) {
-			logger.info(format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
-		}
-
+		logger.ifPresent(log -> log.info(format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState)));
 	}
 
-	private void traceEntry() {
-		if (logger != null) {
-			if (state().getDuration() != State.FOREVER) {
-				float seconds = (float) state().getDuration() / fps;
-				logger.info(format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(), seconds,
-						state().getDuration()));
-			} else {
-				logger.info(format("FSM(%s) enters state '%s'", description, stateID()));
-			}
-		}
+	private void traceStateExit() {
+		logger.ifPresent(log -> log.info(format("FSM(%s) exits state '%s'", description, stateID())));
 	}
 
-	private void traceExit() {
-		if (logger != null) {
-			logger.info(format("FSM(%s) exits state '%s'", description, stateID()));
-		}
+	// methods for specifying state graph
+
+	public void change(StateID from, StateID to, BooleanSupplier condition) {
+		change(from, to, condition, null);
+	};
+
+	public void changeOnTimeout(StateID from, StateID to) {
+		changeOnTimeout(from, to, null);
+	}
+
+	public void changeOnTimeout(StateID from, StateID to, Consumer<State> action) {
+		change(from, to, () -> state(from).isTerminated(), action);
+	}
+
+	public void changeOnInput(Input input, StateID from, StateID to) {
+		change(from, to, () -> input.equals(inputQ.peek()));
+	}
+
+	public void changeOnInput(Input input, StateID from, StateID to, Consumer<State> action) {
+		change(from, to, () -> input.equals(inputQ.peek()), action);
+	}
+
+	public void change(StateID from, StateID to, BooleanSupplier condition, Consumer<State> action) {
+		Transition<StateID> transition = new Transition<>();
+		transition.oldState = from;
+		transition.newState = to;
+		transition.condition = condition;
+		transition.action = action;
+		getOutgoingTransitions(from).add(transition);
 	}
 }

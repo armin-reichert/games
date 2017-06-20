@@ -6,6 +6,7 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
@@ -20,6 +21,7 @@ import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -61,7 +63,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			ghost.setNextMoveDir(dir);
 		};
 
-		pacMan.state(PacManState.Walking).update = state -> {
+		pacMan.control.state(PacManState.Walking).update = state -> {
 			if (pacMan.currentTile().equals(blinky.currentTile())) {
 				pacMan.onEnemyContact.accept(blinky);
 			} else {
@@ -71,11 +73,14 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		blinky = new Ghost(app, board, "Blinky", () -> theme);
 		blinky.init();
-		blinky.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
 		blinky.placeAt(4, 1);
 		blinky.speed = () -> pacMan.speed.get() * 1.1f;
+
+		blinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
+
+		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 
 		pacMan.enemies().add(blinky);
 

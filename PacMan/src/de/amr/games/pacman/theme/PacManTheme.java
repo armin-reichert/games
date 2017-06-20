@@ -20,10 +20,10 @@ import de.amr.games.pacman.core.board.BonusSymbol;
 public abstract class PacManTheme {
 
 	/** Pixel size of a tile. */
-	public static int TILE_SIZE = 16;
+	public static final int TILE_SIZE = 16;
 
 	/** Pixel size of sprite images. */
-	public static int SPRITE_SIZE = 32;
+	public static final int SPRITE_SIZE = 32;
 
 	/** A 1x1 opaque image. */
 	public static final Image EmptyImage = createOpaqueImage(1, 1);
