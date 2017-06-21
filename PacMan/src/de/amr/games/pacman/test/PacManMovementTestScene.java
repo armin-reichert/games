@@ -2,6 +2,9 @@ package de.amr.games.pacman.test;
 
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
+import static de.amr.games.pacman.core.entities.PacManEvent.StartWalking;
+import static de.amr.games.pacman.core.entities.PacManState.Initialized;
+import static de.amr.games.pacman.core.entities.PacManState.Peaceful;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.play.PlayScene.PACMAN_HOME;
@@ -13,7 +16,6 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
-import de.amr.games.pacman.core.entities.PacManEvent;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -37,10 +39,13 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	public void init() {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 		pacMan = new PacMan(app, board, () -> theme);
+		pacMan.control.changeOnInput(StartWalking, Initialized, Peaceful);
+		pacMan.control.state(Peaceful).update = state -> pacMan.walk();
+
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.handleEvent(PacManEvent.StartWalking);
+		pacMan.handleEvent(StartWalking);
 	};
 
 	@Override

@@ -369,7 +369,7 @@ public class PlayScene extends Scene<PacManGame> {
 			return offset;
 		};
 
-		// Define Pac-Man control
+		// Define Pac-Man's behavior
 
 		// Initialized
 		pacMan.control.changeOnInput(StartWalking, Initialized, Peaceful);
@@ -383,13 +383,13 @@ public class PlayScene extends Scene<PacManGame> {
 		// Aggressive
 		pacMan.control.state(Aggressive).entry = state -> {
 			state.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level)));
-			app.assets.sound("sfx/waza.mp3").loop();
 			pacMan.enemies().forEach(ghost -> ghost.control.addInput(GhostEvent.PacManAttackStarts));
+			app.assets.sound("sfx/waza.mp3").loop();
 		};
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
 		pacMan.control.state(Aggressive).exit = state -> {
+			pacMan.enemies().forEach(ghost -> ghost.resume.run());
 			app.assets.sound("sfx/waza.mp3").stop();
-			pacMan.enemies().forEach(ghost -> ghost.restoreState.run());
 		};
 		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
 
@@ -440,8 +440,8 @@ public class PlayScene extends Scene<PacManGame> {
 				return offset;
 			};
 
-			// Define which state the ghost should change to after recovering or frightened:
-			ghost.restoreState = () -> {
+			// Define which state the ghost should resume after recovering or being frightened:
+			ghost.resume = () -> {
 				if (ghostAttackTimer.state() == GhostAttackState.Scattering) {
 					ghost.handleEvent(GhostEvent.ScatteringStarts);
 				} else if (ghostAttackTimer.state() == GhostAttackState.Chasing) {
@@ -449,7 +449,7 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
-			// Start waiting when notified:
+			// Start waiting on event:
 			ghost.control.changeOnInput(GhostEvent.WaitingStarts, GhostState.Initialized, GhostState.Waiting, state -> {
 				ghost.control.state(GhostState.Waiting).setDuration(model.getGhostWaitingDuration(ghost));
 				ghost.setAnimated(true);
@@ -458,7 +458,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// While waiting, ghosts bounce. Afterwards, they return to the current attack state:
 			ghost.control.state(GhostState.Waiting).update = state -> {
 				if (state.isTerminated()) {
-					ghost.restoreState.run();
+					ghost.resume.run();
 				} else {
 					ghost.bounce();
 				}
@@ -481,7 +481,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// When in "frightened" state, ghosts move randomly:
 			ghost.control.state(GhostState.Frightened).update = state -> {
 				if (state.isTerminated()) {
-					ghost.restoreState.run();
+					ghost.resume.run();
 				} else {
 					ghost.moveRandomly();
 				}
@@ -518,7 +518,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// After "recovering" ends, switch back to current attack state:
 			ghost.control.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
-					ghost.restoreState.run();
+					ghost.resume.run();
 				}
 			};
 
@@ -542,7 +542,7 @@ public class PlayScene extends Scene<PacManGame> {
 		// Blinky doesn't bounce while waiting:
 		blinky.control.state(GhostState.Waiting).update = state -> {
 			if (state.isTerminated()) {
-				blinky.restoreState.run();
+				blinky.resume.run();
 			}
 		};
 

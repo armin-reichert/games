@@ -36,7 +36,7 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class Ghost extends BoardMover {
 
 	public final StateMachine<GhostState, GhostEvent> control;
-	public Runnable restoreState;
+	public Runnable resume;
 
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
@@ -49,7 +49,7 @@ public class Ghost extends BoardMover {
 		this.theme = theme;
 		this.control = new StateMachine<>(name, new EnumMap<>(GhostState.class), Initialized);
 		color = Color.WHITE;
-		restoreState = () -> {
+		resume = () -> {
 		};
 		canEnterTile = this::defaultCanEnterTileCondition;
 	}

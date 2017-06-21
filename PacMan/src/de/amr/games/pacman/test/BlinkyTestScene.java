@@ -49,10 +49,15 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		board = new Board(app.assets.text("board.txt").split("\n"));
 
 		pacMan = new PacMan(app, board, () -> theme);
-		pacMan.init();
-		pacMan.placeAt(PACMAN_HOME);
-		pacMan.speed = () -> 2f;
-
+		pacMan.control.changeOnInput(PacManEvent.StartWalking, PacManState.Initialized, PacManState.Peaceful);
+		pacMan.control.state(PacManState.Peaceful).update = state -> {
+			if (pacMan.currentTile().equals(blinky.currentTile())) {
+				pacMan.onEnemyContact.accept(blinky);
+			} else {
+				escapeBlinky();
+			}
+		};
+		
 		pacMan.onEnemyContact = ghost -> {
 			pacMan.placeAt(PACMAN_HOME);
 			int dir = rand.nextBoolean() ? E : W;
@@ -64,27 +69,22 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			ghost.setNextMoveDir(dir);
 		};
 
-		pacMan.control.state(PacManState.Peaceful).update = state -> {
-			if (pacMan.currentTile().equals(blinky.currentTile())) {
-				pacMan.onEnemyContact.accept(blinky);
-			} else {
-				escapeBlinky();
-			}
-		};
-
+		
 		blinky = new Ghost(app, board, "Blinky", () -> theme);
+		blinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
+		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
+
+		pacMan.init();
+		pacMan.placeAt(PACMAN_HOME);
+		pacMan.speed = () -> 2f;
+		pacMan.enemies().add(blinky);
+
 		blinky.init();
 		blinky.setColor(Color.RED);
 		blinky.setAnimated(true);
 		blinky.placeAt(4, 1);
 		blinky.speed = () -> pacMan.speed.get() * 1.1f;
-
-		blinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
-
-		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
-
-		pacMan.enemies().add(blinky);
-
+		
 		pacMan.handleEvent(PacManEvent.StartWalking);
 		blinky.handleEvent(GhostEvent.ChasingStarts);
 	};
