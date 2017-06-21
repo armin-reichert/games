@@ -224,7 +224,7 @@ public class PlayScene extends Scene<PacManGame> {
 			changeOnInput(PlaySceneInput.PacManCrashed, Playing, Crashing);
 
 			change(Playing, StartingLevel, () -> board.count(Pellet) == 0 && board.count(Energizer) == 0,
-					state -> nextLevel());
+					(oldState, newState) -> nextLevel());
 
 			// Crashing
 
@@ -251,7 +251,8 @@ public class PlayScene extends Scene<PacManGame> {
 				Log.info("Game over.");
 			};
 
-			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE), state -> app.entities.removeAll());
+			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE),
+					(oldState, newState) -> app.entities.removeAll());
 		}
 	}
 
@@ -450,10 +451,11 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			// Start waiting on event:
-			ghost.control.changeOnInput(GhostEvent.WaitingStarts, GhostState.Initialized, GhostState.Waiting, state -> {
-				ghost.control.state(GhostState.Waiting).setDuration(model.getGhostWaitingDuration(ghost));
-				ghost.setAnimated(true);
-			});
+			ghost.control.changeOnInput(GhostEvent.WaitingStarts, GhostState.Initialized, GhostState.Waiting,
+					(oldState, newState) -> {
+						newState.setDuration(model.getGhostWaitingDuration(ghost));
+						ghost.setAnimated(true);
+					});
 
 			// While waiting, ghosts bounce. Afterwards, they return to the current attack state:
 			ghost.control.state(GhostState.Waiting).update = state -> {
@@ -475,7 +477,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// When Pac-Man gets empowered, become frightened for the same duration
 			Stream.of(GhostState.Waiting, GhostState.Scattering, GhostState.Chasing).forEach(ghostState -> {
 				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened,
-						newState -> newState.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level))));
+						(oldState, newState) -> newState.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level))));
 			});
 
 			// When in "frightened" state, ghosts move randomly:

@@ -1,12 +1,12 @@
 package de.amr.games.pacman.core.statemachine;
 
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 
-public class Transition<StateID> {
+class Transition<StateID> {
 
 	BooleanSupplier condition;
-	Consumer<State> action;
+	BiConsumer<State, State> action;
 	StateID oldState;
 	StateID newState;
 }

@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -54,7 +54,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	public void init() {
-		enterState(initialStateID, null);
+		currentStateID = initialStateID;
+		state().doEntry();
 	}
 
 	public void addInput(Input input) {
@@ -118,7 +119,7 @@ public class StateMachine<StateID, Input> {
 		}
 	}
 
-	private void enterState(StateID newStateID, Consumer<State> action) {
+	private void enterState(StateID newStateID, BiConsumer<State, State> action) {
 		if (currentStateID == newStateID) {
 			return;
 		}
@@ -127,9 +128,10 @@ public class StateMachine<StateID, Input> {
 			state().doExit();
 			traceStateExit();
 		}
+		State prevState = state(currentStateID);
 		currentStateID = newStateID;
 		if (action != null) {
-			action.accept(state());
+			action.accept(prevState, state());
 		}
 		traceStateEntry();
 		state().doEntry();
@@ -174,7 +176,7 @@ public class StateMachine<StateID, Input> {
 		changeOnTimeout(from, to, null);
 	}
 
-	public void changeOnTimeout(StateID from, StateID to, Consumer<State> action) {
+	public void changeOnTimeout(StateID from, StateID to, BiConsumer<State, State> action) {
 		change(from, to, () -> state(from).isTerminated(), action);
 	}
 
@@ -185,12 +187,12 @@ public class StateMachine<StateID, Input> {
 	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition) {
 		change(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()));
 	}
-	
-	public void changeOnInput(Input input, StateID from, StateID to, Consumer<State> action) {
+
+	public void changeOnInput(Input input, StateID from, StateID to, BiConsumer<State, State> action) {
 		change(from, to, () -> input.equals(inputQ.peek()), action);
 	}
 
-	public void change(StateID from, StateID to, BooleanSupplier condition, Consumer<State> action) {
+	public void change(StateID from, StateID to, BooleanSupplier condition, BiConsumer<State, State> action) {
 		Transition<StateID> transition = new Transition<>();
 		transition.oldState = from;
 		transition.newState = to;

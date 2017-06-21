@@ -66,8 +66,8 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 			}
 		};
 
-		ghost.control.changeOnInput(GhostEvent.RecoveringStarts, Dead, Recovering, state -> {
-			ghost.control.state(Recovering).setDuration(120);
+		ghost.control.changeOnInput(GhostEvent.RecoveringStarts, Dead, Recovering, (oldState, newState) -> {
+			newState.setDuration(120);
 		});
 	}
 
