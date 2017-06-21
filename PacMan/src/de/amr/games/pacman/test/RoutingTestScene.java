@@ -21,6 +21,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -64,7 +65,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		ghost.canEnterTile = tile -> board.isTileValid(tile) && !board.contains(tile, Wall);
 		ghost.placeAt(4, 1);
-		ghost.beginChasing();
+		ghost.handleEvent(GhostEvent.ChasingStarts);
 		reset();
 	};
 

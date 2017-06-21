@@ -13,6 +13,7 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.core.entities.PacManEvent;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -39,7 +40,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> (float) Math.floor(8f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.beginWalking();
+		pacMan.handleEvent(PacManEvent.StartWalking);
 	};
 
 	@Override

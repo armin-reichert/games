@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.Board;
+import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
@@ -34,40 +35,37 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class Ghost extends BoardMover {
 
+	public final StateMachine<GhostState, GhostEvent> control;
+	public Runnable restoreState;
+
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
-	public final StateMachine<GhostState, GhostEvent> control;
 	private Color color;
-
-	public Runnable restoreState;
 
 	public Ghost(Application app, Board board, String name, Supplier<PacManTheme> theme) {
 		super(board);
 		setName(name);
-
 		this.app = app;
 		this.theme = theme;
-
 		this.control = new StateMachine<>(name, new EnumMap<>(GhostState.class), Initialized);
-
 		color = Color.WHITE;
-
 		restoreState = () -> {
 		};
+		canEnterTile = this::defaultCanEnterTileCondition;
+	}
 
-		canEnterTile = tile -> {
-			if (!board.isTileValid(tile)) {
-				return false;
-			}
-			switch (board.getContent(tile)) {
-			case Wall:
-				return false;
-			case Door:
-				return control.is(Dead) || insideGhostHouse() && control.is(Scattering, Chasing);
-			default:
-				return true;
-			}
-		};
+	private boolean defaultCanEnterTileCondition(Tile tile) {
+		if (!board.isTileValid(tile)) {
+			return false;
+		}
+		switch (board.getContent(tile)) {
+		case Wall:
+			return false;
+		case Door:
+			return control.is(Dead) || insideGhostHouse() && control.is(Scattering, Chasing);
+		default:
+			return true;
+		}
 	}
 
 	@Override
@@ -86,30 +84,8 @@ public class Ghost extends BoardMover {
 		control.setLogger(logger, app.motor.getFrequency());
 	}
 
-	// Events
-
-	public void beginWaiting() {
-		control.feed(GhostEvent.WaitingStarts);
-	}
-
-	public void beginScattering() {
-		control.feed(GhostEvent.ScatteringStarts);
-	}
-
-	public void beginChasing() {
-		control.feed(GhostEvent.ChasingStarts);
-	}
-
-	public void endBeingFrightened() {
-		restoreState.run();
-	}
-
-	public void beginRecovering() {
-		control.feed(GhostEvent.RecoveringStarts);
-	}
-
-	public void kill() {
-		control.feed(GhostEvent.Dies);
+	public void handleEvent(GhostEvent event) {
+		control.addInput(event);
 	}
 
 	// --- Look ---

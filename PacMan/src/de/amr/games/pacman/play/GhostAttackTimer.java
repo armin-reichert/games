@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.timing.Motor;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
+import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 
 /**
@@ -41,7 +42,7 @@ public class GhostAttackTimer {
 		fsm.state(Scattering).entry = state -> {
 			++wave;
 			state.setDuration(computeFrames(scatteringSeconds));
-			ghosts.forEach(Ghost::beginScattering);
+			ghosts.forEach(ghost -> ghost.handleEvent(GhostEvent.ScatteringStarts));
 			app.assets.sound("sfx/siren.mp3").stop();
 			app.assets.sound("sfx/siren.mp3").loop();
 		};
@@ -50,7 +51,7 @@ public class GhostAttackTimer {
 
 		fsm.state(Chasing).entry = state -> {
 			state.setDuration(computeFrames(chasingSeconds));
-			ghosts.forEach(Ghost::beginChasing);
+			ghosts.forEach(ghost -> ghost.handleEvent(GhostEvent.ChasingStarts));
 		};
 
 		fsm.changeOnTimeout(Chasing, Scattering);

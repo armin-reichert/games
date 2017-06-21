@@ -101,7 +101,7 @@ public class PlaySceneModel {
 
 	public float getPacManSpeed(PacMan pacMan, int level) {
 		float speed = baseSpeed * (Float) LEVEL_DATA[level][2];
-		return pacMan.control.is(PacManState.PowerWalking) ? getPacManPowerWalkingSpeed(level) : speed;
+		return pacMan.control.is(PacManState.Aggressive) ? getPacManPowerWalkingSpeed(level) : speed;
 	}
 
 	public float getGhostSpeedNormal(int level) {
@@ -124,7 +124,7 @@ public class PlaySceneModel {
 		return baseSpeed * (Float) LEVEL_DATA[level][12];
 	}
 
-	public int getGhostFrightenedDuration(int level) {
+	public int getPacManAggressiveSeconds(int level) {
 		return (Integer) LEVEL_DATA[level][13];
 	}
 

@@ -6,5 +6,5 @@ package de.amr.games.pacman.core.entities;
  * @author Armin Reichert
  */
 public enum PacManState {
-	Initialized, Walking, PowerWalking, Dying;
+	Initialized, Peaceful, Aggressive, Dying;
 }

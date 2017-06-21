@@ -10,6 +10,13 @@ import static de.amr.games.pacman.core.board.TileContent.Bonus;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
+import static de.amr.games.pacman.core.entities.PacManEvent.GotDrugs;
+import static de.amr.games.pacman.core.entities.PacManEvent.Killed;
+import static de.amr.games.pacman.core.entities.PacManEvent.StartWalking;
+import static de.amr.games.pacman.core.entities.PacManState.Aggressive;
+import static de.amr.games.pacman.core.entities.PacManState.Dying;
+import static de.amr.games.pacman.core.entities.PacManState.Initialized;
+import static de.amr.games.pacman.core.entities.PacManState.Peaceful;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawText;
@@ -53,6 +60,7 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.FlashText;
@@ -65,6 +73,7 @@ import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.core.entities.PacManEvent;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.AmbushPacMan;
@@ -161,7 +170,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
 				ghosts.forEach(ghost -> {
 					ghost.speed = () -> model.getGhostSpeed(ghost, level);
-					ghost.beginWaiting();
+					ghost.handleEvent(GhostEvent.WaitingStarts);
 				});
 			};
 
@@ -174,7 +183,7 @@ public class PlayScene extends Scene<PacManGame> {
 				pacMan.placeAt(PACMAN_HOME);
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.beginWaiting();
+					ghost.handleEvent(GhostEvent.WaitingStarts);
 				});
 				app.assets.sound("sfx/ready.mp3").play();
 			};
@@ -189,11 +198,11 @@ public class PlayScene extends Scene<PacManGame> {
 				pacMan.init();
 				pacMan.placeAt(PACMAN_HOME);
 				pacMan.speed = () -> model.getPacManSpeed(pacMan, level);
-				pacMan.beginWalking();
+				pacMan.handleEvent(PacManEvent.StartWalking);
 
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.beginWaiting();
+					ghost.handleEvent(GhostEvent.WaitingStarts);
 				});
 
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
@@ -224,7 +233,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.assets.sound("sfx/die.mp3").play();
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				removeBonus();
-				pacMan.killed();
+				pacMan.handleEvent(PacManEvent.Killed);
 				Log.info("PacMan killed, lives remaining: " + lives);
 			};
 
@@ -282,7 +291,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (keyPressedOnce(VK_ALT, VK_T)) {
 			app.getThemeManager().selectNextTheme();
 		} else if (keyPressedOnce(VK_ALT, VK_K)) {
-			ghosts.forEach(Ghost::kill);
+			ghosts.forEach(ghost -> ghost.handleEvent(GhostEvent.Killed));
 		}
 	}
 
@@ -315,7 +324,7 @@ public class PlayScene extends Scene<PacManGame> {
 				score(POINTS_FOR_ENERGIZER);
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-				pacMan.beginPowerWalking(model.getGhostFrightenedDuration(level));
+				pacMan.handleEvent(PacManEvent.GotDrugs);
 				app.assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Bonus:
@@ -332,10 +341,10 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		pacMan.onEnemyContact = ghost -> {
-			if (ghost.control.stateID() == GhostState.Dead || ghost.control.stateID() == GhostState.Recovering) {
+			if (ghost.control.is(GhostState.Dead, GhostState.Recovering)) {
 				return;
 			}
-			if (pacMan.control.is(PacManState.PowerWalking)) {
+			if (pacMan.control.is(PacManState.Aggressive)) {
 				Log.info("Pac-Man kills " + ghost.getName());
 				app.assets.sound("sfx/eat-ghost.mp3").play();
 				score(nextGhostPoints);
@@ -344,11 +353,11 @@ public class PlayScene extends Scene<PacManGame> {
 					score(12000);
 				}
 				nextGhostPoints *= 2;
-				ghost.kill();
+				ghost.handleEvent(GhostEvent.Killed);
 			} else {
 				Log.info(ghost.getName() + " kills Pac-Man.");
 				--lives;
-				playControl.feed(PlaySceneInput.PacManCrashed);
+				playControl.addInput(PlaySceneInput.PacManCrashed);
 			}
 		};
 
@@ -358,6 +367,39 @@ public class PlayScene extends Scene<PacManGame> {
 				offset = TILE_SIZE / 2;
 			}
 			return offset;
+		};
+
+		// Define Pac-Man control
+
+		// Initialized
+		pacMan.control.changeOnInput(StartWalking, Initialized, Peaceful);
+
+		// Peaceful
+		pacMan.control.state(Peaceful).entry = state -> pacMan.setAnimated(true);
+		pacMan.control.state(Peaceful).update = state -> pacMan.walk();
+		pacMan.control.changeOnInput(GotDrugs, Peaceful, Aggressive);
+		pacMan.control.changeOnInput(Killed, Peaceful, Dying);
+
+		// Aggressive
+		pacMan.control.state(Aggressive).entry = state -> {
+			state.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level)));
+			app.assets.sound("sfx/waza.mp3").loop();
+			pacMan.enemies().forEach(ghost -> ghost.control.addInput(GhostEvent.PacManAttackStarts));
+		};
+		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
+		pacMan.control.state(Aggressive).exit = state -> {
+			app.assets.sound("sfx/waza.mp3").stop();
+			pacMan.enemies().forEach(ghost -> ghost.restoreState.run());
+		};
+		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
+
+		// Dying
+		pacMan.control.state(Dying).entry = state -> {
+			PacManTheme theme = app.getThemeManager().getTheme();
+			if (theme.getPacManDyingSprite() != null) {
+				theme.getPacManDyingSprite().resetAnimation();
+				theme.getPacManDyingSprite().setAnimated(true);
+			}
 		};
 
 		// Create the ghosts:
@@ -392,8 +434,7 @@ public class PlayScene extends Scene<PacManGame> {
 				if (ghost.insideGhostHouse()) {
 					offset = TILE_SIZE / 2;
 				} else if (ghost.currentTile().equals(GHOST_HOUSE_ENTRY)
-						&& (ghost.control.stateID() == GhostState.Initialized || ghost.control.stateID() == GhostState.Waiting
-								|| ghost.control.stateID() == GhostState.Recovering || ghost.control.stateID() == GhostState.Dead)) {
+						&& ghost.control.is(GhostState.Initialized, GhostState.Waiting, GhostState.Recovering, GhostState.Dead)) {
 					offset = TILE_SIZE / 2;
 				}
 				return offset;
@@ -402,9 +443,9 @@ public class PlayScene extends Scene<PacManGame> {
 			// Define which state the ghost should change to after recovering or frightened:
 			ghost.restoreState = () -> {
 				if (ghostAttackTimer.state() == GhostAttackState.Scattering) {
-					ghost.beginScattering();
+					ghost.handleEvent(GhostEvent.ScatteringStarts);
 				} else if (ghostAttackTimer.state() == GhostAttackState.Chasing) {
-					ghost.beginChasing();
+					ghost.handleEvent(GhostEvent.ChasingStarts);
 				}
 			};
 
@@ -432,9 +473,10 @@ public class PlayScene extends Scene<PacManGame> {
 			ghost.control.changeOnInput(GhostEvent.ChasingStarts, GhostState.Scattering, GhostState.Chasing);
 
 			// When Pac-Man gets empowered, become frightened for the same duration
-			ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, GhostState.Scattering, GhostState.Frightened,
-					state -> ghost.control.state(GhostState.Frightened)
-							.setDuration(app.motor.toFrames(model.getGhostFrightenedDuration(level))));
+			Stream.of(GhostState.Waiting, GhostState.Scattering, GhostState.Chasing).forEach(ghostState -> {
+				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened,
+						newState -> newState.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level))));
+			});
 
 			// When in "frightened" state, ghosts move randomly:
 			ghost.control.state(GhostState.Frightened).update = state -> {
@@ -445,21 +487,47 @@ public class PlayScene extends Scene<PacManGame> {
 				}
 			};
 
+			// When "frightening" is terminated, change state back:
+			ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Frightened, GhostState.Scattering,
+					() -> ghost.control.state().isTerminated());
+			ghost.control.changeOnInput(GhostEvent.ChasingStarts, GhostState.Frightened, GhostState.Chasing,
+					() -> ghost.control.state().isTerminated());
+
+			// When killed, die:
+			Stream.of(GhostState.Chasing, GhostState.Frightened, GhostState.Scattering, GhostState.Waiting).forEach(state -> {
+				ghost.control.changeOnInput(GhostEvent.Killed, state, GhostState.Dead);
+			});
+
 			// When "dead", ghosts return to their home tile, then they start recovering:
 			ghost.control.state(GhostState.Dead).update = state -> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
 				if (ghost.isExactlyOver(homeTile)) {
-					ghost.beginRecovering();
+					ghost.handleEvent(GhostEvent.RecoveringStarts);
 				}
 			};
 
-			// After "recovering", ghosts switch to the current attack state:
+			// When "dead", become recovering on event:
+			ghost.control.changeOnInput(GhostEvent.RecoveringStarts, GhostState.Dead, GhostState.Recovering);
+
+			// Set recovering timer:
+			ghost.control.state(GhostState.Recovering).entry = state -> {
+				state.setDuration(model.getGhostRecoveringDuration(ghost));
+			};
+
+			// After "recovering" ends, switch back to current attack state:
 			ghost.control.state(GhostState.Recovering).update = state -> {
 				if (state.isTerminated()) {
 					ghost.restoreState.run();
 				}
 			};
+
+			// When "recovering" is terminated, change state back
+			ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Recovering, GhostState.Scattering,
+					() -> ghost.control.state().isTerminated());
+			ghost.control.changeOnInput(GhostEvent.ChasingStarts, GhostState.Recovering, GhostState.Chasing,
+					() -> ghost.control.state().isTerminated());
+
 		});
 
 		// --- "Blinky", the red ghost.

@@ -36,11 +36,11 @@ public class GhostControl extends StateMachine<GhostState, String> {
 	public static void main(String[] args) {
 		StateMachine<GhostState, String> control = new GhostControl();
 		control.init();
-		control.feed("GameReady");
-		control.feed("ScatteringPhaseStarted");
-		control.feed("PacManAttackStarts");
-		control.feed("ChasingPhaseStarted");
-		control.feed("PacManAttackEnds");
+		control.addInput("GameReady");
+		control.addInput("ScatteringPhaseStarted");
+		control.addInput("PacManAttackStarts");
+		control.addInput("ChasingPhaseStarted");
+		control.addInput("PacManAttackEnds");
 		IntStream.rangeClosed(1, 20).forEach(i -> control.update());
 	}
 }

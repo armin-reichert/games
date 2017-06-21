@@ -24,6 +24,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.core.entities.PacManEvent;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
@@ -96,7 +97,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		app.entities.add(pacMan, blinky, inky);
 
-		pacMan.beginWalking();
+		pacMan.handleEvent(PacManEvent.StartWalking);
 	};
 
 	@Override

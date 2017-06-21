@@ -9,10 +9,9 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
+import static de.amr.games.pacman.core.entities.PacManState.Aggressive;
 import static de.amr.games.pacman.core.entities.PacManState.Dying;
 import static de.amr.games.pacman.core.entities.PacManState.Initialized;
-import static de.amr.games.pacman.core.entities.PacManState.PowerWalking;
-import static de.amr.games.pacman.core.entities.PacManState.Walking;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
@@ -34,9 +33,9 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.core.board.Board;
+import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.core.statemachine.StateMachine;
 import de.amr.games.pacman.theme.PacManTheme;
@@ -48,12 +47,13 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class PacMan extends BoardMover {
 
+	public final StateMachine<PacManState, PacManEvent> control;
+
 	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onEnemyContact;
 
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
-	public final StateMachine<PacManState, PacManEvent> control;
 	private final Set<Ghost> enemies;
 	private int freezeTimer;
 
@@ -61,74 +61,45 @@ public class PacMan extends BoardMover {
 		super(board);
 		this.app = Objects.requireNonNull(app);
 		this.theme = theme;
+		this.enemies = new HashSet<>();
 		setName("Pac-Man");
-		enemies = new HashSet<>();
-
-		onContentFound = content -> {
-			switch (content) {
-			case Bonus:
-			case Energizer:
-			case Pellet:
-				Log.info(getName() + " eats " + content + " at " + currentTile());
-				board.setContent(currentTile(), None);
-				break;
-			case GhostHouse:
-			case Door:
-			case Tunnel:
-			case Wall:
-			case Wormhole:
-				Log.info("PacMan visits " + content + " at " + currentTile());
-				break;
-			default:
-				break;
-			}
-		};
-
-		onEnemyContact = enemy -> Log.info("PacMan meets enemy '" + enemy.getName() + "' at " + currentTile());
-
-		canEnterTile = tile -> board.isTileValid(tile) && !(board.contains(tile, Wall) || board.contains(tile, Door));
-
-		// state machine
-
 		control = new StateMachine<>(getName(), new EnumMap<>(PacManState.class), Initialized);
-		
-		control.changeOnInput(PacManEvent.WalkingStarts, Initialized, Walking);
+		definePacManControl();
+		canEnterTile = this::defaultCanEnterTileCondition;
+		onContentFound = this::defaultContentFoundHandler;
+		onEnemyContact = this::defaultEnemyContactHandler;
+	}
 
-		control.state(Walking).entry = state -> {
-			setAnimated(true);
-		};
+	private void defaultEnemyContactHandler(Ghost enemy) {
+		Log.info("PacMan meets enemy '" + enemy.getName() + "' at " + currentTile());
+	}
 
-		control.state(Walking).update = state -> {
-			requestMoveDirection();
-			walk();
-		};
-		
-		control.changeOnInput(PacManEvent.Killed, Walking, Dying);
+	private boolean defaultCanEnterTileCondition(Tile tile) {
+		return board.isTileValid(tile) && !(board.contains(tile, Wall) || board.contains(tile, Door));
+	}
 
-		control.state(PowerWalking).entry = state -> {
-			app.assets.sound("sfx/waza.mp3").loop();
-			// enemies.forEach(ghost -> ghost.beginBeingFrightened(state.getDuration()));
-			enemies.forEach(enemy -> enemy.control.feed(GhostEvent.PacManAttackStarts));
-		};
+	private void defaultContentFoundHandler(TileContent content) {
+		switch (content) {
+		case Bonus:
+		case Energizer:
+		case Pellet:
+			Log.info(getName() + " eats " + content + " at " + currentTile());
+			board.setContent(currentTile(), None);
+			break;
+		case GhostHouse:
+		case Door:
+		case Tunnel:
+		case Wall:
+		case Wormhole:
+			Log.info("PacMan visits " + content + " at " + currentTile());
+			break;
+		default:
+			break;
+		}
+	}
 
-		control.state(PowerWalking).update = state -> {
-			requestMoveDirection();
-			walk();
-		};
+	private void definePacManControl() {
 
-		control.state(PowerWalking).exit = state -> {
-			app.assets.sound("sfx/waza.mp3").stop();
-			enemies.forEach(Ghost::endBeingFrightened);
-		};
-
-		control.changeOnTimeout(PowerWalking, Walking);
-
-		control.state(Dying).entry = state -> {
-			if (theme.get().getPacManDyingSprite() != null) {
-				theme.get().getPacManDyingSprite().resetAnimation();
-				theme.get().getPacManDyingSprite().setAnimated(true);
-			}
-		};
 	}
 
 	@Override
@@ -157,16 +128,8 @@ public class PacMan extends BoardMover {
 		control.setLogger(logger, app.motor.getFrequency());
 	}
 
-	public void killed() {
-		control.feed(PacManEvent.Killed);
-	}
-
-	public void beginPowerWalking(int seconds) {
-		control.feed(PacManEvent.PowerWalkingStarts);
-	}
-
-	public void beginWalking() {
-		control.feed(PacManEvent.WalkingStarts);
+	public void handleEvent(PacManEvent event) {
+		control.addInput(event);
 	}
 
 	@Override
@@ -193,11 +156,12 @@ public class PacMan extends BoardMover {
 	}
 
 	public boolean isPowerWalkingEnding() {
-		return control.is(PowerWalking)
-				&& control.state(PowerWalking).getRemaining() < control.state(PowerWalking).getDuration() / 4;
+		return control.is(Aggressive)
+				&& control.state(Aggressive).getRemaining() < control.state(Aggressive).getDuration() / 4;
 	}
 
 	public void walk() {
+		requestMoveDirection();
 		move();
 		TileContent content = board.getContent(currentTile());
 		if (content != None) {

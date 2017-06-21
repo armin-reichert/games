@@ -57,8 +57,8 @@ public class StateMachine<StateID, Input> {
 		enterState(initialStateID, null);
 	}
 
-	public void feed(Input event) {
-		inputQ.add(event);
+	public void addInput(Input input) {
+		inputQ.add(input);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -182,6 +182,10 @@ public class StateMachine<StateID, Input> {
 		change(from, to, () -> input.equals(inputQ.peek()));
 	}
 
+	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition) {
+		change(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()));
+	}
+	
 	public void changeOnInput(Input input, StateID from, StateID to, Consumer<State> action) {
 		change(from, to, () -> input.equals(inputQ.peek()), action);
 	}

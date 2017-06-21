@@ -19,6 +19,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
+import de.amr.games.pacman.core.entities.PacManEvent;
 import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
@@ -63,7 +64,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			ghost.setNextMoveDir(dir);
 		};
 
-		pacMan.control.state(PacManState.Walking).update = state -> {
+		pacMan.control.state(PacManState.Peaceful).update = state -> {
 			if (pacMan.currentTile().equals(blinky.currentTile())) {
 				pacMan.onEnemyContact.accept(blinky);
 			} else {
@@ -84,8 +85,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 		pacMan.enemies().add(blinky);
 
-		pacMan.beginWalking();
-		blinky.beginChasing();
+		pacMan.handleEvent(PacManEvent.StartWalking);
+		blinky.handleEvent(GhostEvent.ChasingStarts);
 	};
 
 	@Override

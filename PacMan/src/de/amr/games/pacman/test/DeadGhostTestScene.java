@@ -50,22 +50,22 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
 		ghost.control.state(Scattering).update = state -> {
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-				ghost.kill();
+				ghost.handleEvent(GhostEvent.Killed);
 			}
 			ghost.moveRandomly();
 		};
 
-		ghost.control.changeOnInput(GhostEvent.Dies, Scattering, Dead);
+		ghost.control.changeOnInput(GhostEvent.Killed, Scattering, Dead);
 
 		ghost.control.changeOnTimeout(Recovering, Scattering);
 
 		ghost.control.state(Dead).update = state -> {
 			ghost.follow(GHOST_HOUSE_ENTRY);
 			if (ghost.isExactlyOver(GHOST_HOUSE_ENTRY)) {
-				ghost.beginRecovering();
+				ghost.handleEvent(GhostEvent.RecoveringStarts);
 			}
 		};
-		
+
 		ghost.control.changeOnInput(GhostEvent.RecoveringStarts, Dead, Recovering, state -> {
 			ghost.control.state(Recovering).setDuration(120);
 		});
