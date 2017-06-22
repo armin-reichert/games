@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
 
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
@@ -35,29 +36,29 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	private final Random rand = new Random();
 	private final PacManTheme theme;
-	private Board board;
-	private PacMan pacMan;
-	private Ghost blinky;
+	private final Board board;
 
 	public BlinkyTestScene(BlinkyTestApp app) {
 		super(app);
+		board = new Board(app.assets.text("board.txt").split("\n"));
 		theme = new ClassicTheme(app.assets);
 	}
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board, () -> theme);
+		PacMan pacMan = new PacMan(app, board, () -> theme);
 		pacMan.control.changeOnInput(PacManEvent.StartWalking, PacManState.Initialized, PacManState.Peaceful);
 		pacMan.control.state(PacManState.Peaceful).update = state -> {
-			if (pacMan.currentTile().equals(blinky.currentTile())) {
-				pacMan.onEnemyContact.accept(blinky);
-			} else {
-				escapeBlinky();
-			}
+			pacMan.enemies().forEach(enemy -> {
+				if (pacMan.currentTile().equals(enemy.currentTile())) {
+					pacMan.onEnemyContact.accept(enemy);
+				} else {
+					escape(pacMan, enemy);
+				}
+			});
 		};
-		
+
 		pacMan.onEnemyContact = ghost -> {
 			pacMan.placeAt(PACMAN_HOME);
 			int dir = rand.nextBoolean() ? E : W;
@@ -68,12 +69,15 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			ghost.setMoveDir(dir); // TODO without this, ghost might get stuck
 			ghost.setNextMoveDir(dir);
 		};
-
 		
-		blinky = new Ghost(app, board, "Blinky", () -> theme);
+		app.entities.add(pacMan);
+
+		Ghost blinky = new Ghost(app, board, "Blinky", () -> theme);
 		blinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 
+		app.entities.add(blinky);
+		
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> 2f;
@@ -84,7 +88,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.setAnimated(true);
 		blinky.placeAt(4, 1);
 		blinky.speed = () -> pacMan.speed.get() * 1.1f;
-		
+
 		pacMan.handleEvent(PacManEvent.StartWalking);
 		blinky.handleEvent(GhostEvent.ChasingStarts);
 	};
@@ -94,19 +98,17 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 			board.resetContent();
 		}
-		pacMan.update();
-		blinky.update();
+		app.entities.all().forEach(GameEntity::update);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		drawGridLines(g, getWidth(), getHeight());
-		pacMan.draw(g);
-		blinky.draw(g);
+		app.entities.all().forEach(entity -> entity.draw(g));
 	}
 
-	private void escapeBlinky() {
+	private void escape(PacMan pacMan, Ghost enemy) {
 		pacMan.move();
 		Tile pacManTile = pacMan.currentTile();
 
@@ -119,7 +121,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		for (int i = 0; i < 4; ++i) {
 			Tile neighbor = pacManTile.neighbor(i);
 			if (pacMan.canEnterTile.apply(neighbor)) {
-				int dist = board.shortestRoute(blinky.currentTile(), neighbor).size();
+				int dist = board.shortestRoute(enemy.currentTile(), neighbor).size();
 				if (dist > max) {
 					max = dist;
 					dir = i;
