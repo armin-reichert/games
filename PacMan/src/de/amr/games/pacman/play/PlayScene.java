@@ -771,6 +771,6 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Flash texts
-		app.entities.allOf(FlashText.class).forEach(text -> text.draw(pen));
+		app.entities.filter(FlashText.class).forEach(text -> text.draw(pen));
 	}
 }

@@ -11,12 +11,12 @@ import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
 import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
+import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
@@ -44,7 +44,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 	@Override
 	public void init() {
 
-		IntStream.range(0, 3).forEach(i -> {
+		range(0, 3).forEach(i -> {
 			Ghost ghost = new Ghost(app, board, randomGhostName(), () -> theme);
 			ghost.init();
 			ghost.setLogger(Application.Log);
@@ -55,7 +55,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 			app.entities.add(ghost);
 		});
 
-		app.entities.allOf(Ghost.class).forEach(ghost -> {
+		app.entities.filter(Ghost.class).forEach(ghost -> {
 			int seconds = rand.nextInt(3) + 1;
 			ghost.control.state().setDuration(app.motor.toFrames(seconds));
 		});
@@ -119,6 +119,6 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 		drawGridLines(g, getWidth(), getHeight());
 		g.setColor(Color.WHITE);
 		drawTextCentered(g, getWidth(), 1, "Press 'k' to kill ghosts");
-		app.entities.allOf(Ghost.class).forEach(ghost -> ghost.draw(g));
+		app.entities.filter(Ghost.class).forEach(ghost -> ghost.draw(g));
 	}
 }

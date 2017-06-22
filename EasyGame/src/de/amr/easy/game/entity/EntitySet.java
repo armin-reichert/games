@@ -14,7 +14,7 @@ public class EntitySet {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <E extends GameEntity> Stream<E> allOf(Class<E> type) {
+	public <E extends GameEntity> Stream<E> filter(Class<E> type) {
 		Objects.requireNonNull(type);
 		return (Stream<E>) all().filter(e -> type.isAssignableFrom(e.getClass()));
 	}
@@ -45,12 +45,12 @@ public class EntitySet {
 
 	public <E extends GameEntity> E findAny(Class<E> type) {
 		Objects.requireNonNull(type);
-		return allOf(type).findAny().orElse(null);
+		return filter(type).findAny().orElse(null);
 	}
 
 	public <E extends GameEntity> E findByName(Class<E> type, String name) {
 		Objects.requireNonNull(name);
-		return allOf(type).filter(e -> name.equals(e.getName())).findFirst()
+		return filter(type).filter(e -> name.equals(e.getName())).findFirst()
 				.orElseThrow(IllegalArgumentException::new);
 	}
 }

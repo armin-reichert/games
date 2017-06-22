@@ -32,7 +32,7 @@ public class City extends GameEntity {
 				createStars();
 				starLifetime.restart();
 			}
-			Game.entities.allOf(Star.class).forEach(GameEntity::update);
+			Game.entities.filter(Star.class).forEach(GameEntity::update);
 			starLifetime.update();
 		}
 	}
@@ -81,7 +81,7 @@ public class City extends GameEntity {
 		for (int x = 0; x < width; x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
-		Game.entities.allOf(Star.class).forEach(e -> e.draw(g));
+		Game.entities.filter(Star.class).forEach(e -> e.draw(g));
 		g.translate(-tr.getX(), -tr.getY());
 	}
 }
