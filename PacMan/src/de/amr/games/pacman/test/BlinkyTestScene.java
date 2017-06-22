@@ -89,8 +89,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.placeAt(4, 1);
 		blinky.speed = () -> pacMan.speed.get() * 1.1f;
 
-		pacMan.handleEvent(PacManEvent.StartWalking);
-		blinky.handleEvent(GhostEvent.ChasingStarts);
+		pacMan.receiveEvent(PacManEvent.StartWalking);
+		blinky.receiveEvent(GhostEvent.ChasingStarts);
 	};
 
 	@Override

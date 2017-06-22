@@ -170,7 +170,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
 				ghosts.forEach(ghost -> {
 					ghost.speed = () -> model.getGhostSpeed(ghost, level);
-					ghost.handleEvent(GhostEvent.WaitingStarts);
+					ghost.receiveEvent(GhostEvent.WaitingStarts);
 				});
 			};
 
@@ -183,7 +183,7 @@ public class PlayScene extends Scene<PacManGame> {
 				pacMan.placeAt(PACMAN_HOME);
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.handleEvent(GhostEvent.WaitingStarts);
+					ghost.receiveEvent(GhostEvent.WaitingStarts);
 				});
 				app.assets.sound("sfx/ready.mp3").play();
 			};
@@ -198,11 +198,11 @@ public class PlayScene extends Scene<PacManGame> {
 				pacMan.init();
 				pacMan.placeAt(PACMAN_HOME);
 				pacMan.speed = () -> model.getPacManSpeed(pacMan, level);
-				pacMan.handleEvent(PacManEvent.StartWalking);
+				pacMan.receiveEvent(PacManEvent.StartWalking);
 
 				ghosts.forEach(ghost -> {
 					ghost.placeAt(getGhostHomeTile(ghost));
-					ghost.handleEvent(GhostEvent.WaitingStarts);
+					ghost.receiveEvent(GhostEvent.WaitingStarts);
 				});
 
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
@@ -233,7 +233,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.assets.sound("sfx/die.mp3").play();
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				removeBonus();
-				pacMan.handleEvent(PacManEvent.Killed);
+				pacMan.receiveEvent(PacManEvent.Killed);
 				Log.info("PacMan killed, lives remaining: " + lives);
 			};
 
@@ -292,7 +292,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (keyPressedOnce(VK_ALT, VK_T)) {
 			app.getThemeManager().selectNextTheme();
 		} else if (keyPressedOnce(VK_ALT, VK_K)) {
-			ghosts.forEach(ghost -> ghost.handleEvent(GhostEvent.Killed));
+			ghosts.forEach(ghost -> ghost.receiveEvent(GhostEvent.Killed));
 		}
 	}
 
@@ -325,7 +325,7 @@ public class PlayScene extends Scene<PacManGame> {
 				score(POINTS_FOR_ENERGIZER);
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
-				pacMan.handleEvent(PacManEvent.GotDrugs);
+				pacMan.receiveEvent(PacManEvent.GotDrugs);
 				app.assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Bonus:
@@ -354,7 +354,7 @@ public class PlayScene extends Scene<PacManGame> {
 					score(12000);
 				}
 				nextGhostPoints *= 2;
-				ghost.handleEvent(GhostEvent.Killed);
+				ghost.receiveEvent(GhostEvent.Killed);
 			} else {
 				Log.info(ghost.getName() + " kills Pac-Man.");
 				--lives;
@@ -444,9 +444,9 @@ public class PlayScene extends Scene<PacManGame> {
 			// Define which state the ghost should resume after recovering or being frightened:
 			ghost.resume = () -> {
 				if (ghostAttackTimer.state() == GhostAttackState.Scattering) {
-					ghost.handleEvent(GhostEvent.ScatteringStarts);
+					ghost.receiveEvent(GhostEvent.ScatteringStarts);
 				} else if (ghostAttackTimer.state() == GhostAttackState.Chasing) {
-					ghost.handleEvent(GhostEvent.ChasingStarts);
+					ghost.receiveEvent(GhostEvent.ChasingStarts);
 				}
 			};
 
@@ -505,7 +505,7 @@ public class PlayScene extends Scene<PacManGame> {
 				Tile homeTile = getGhostHomeTile(ghost);
 				ghost.follow(homeTile);
 				if (ghost.isExactlyOver(homeTile)) {
-					ghost.handleEvent(GhostEvent.RecoveringStarts);
+					ghost.receiveEvent(GhostEvent.RecoveringStarts);
 				}
 			};
 

@@ -59,7 +59,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 			ghost.init();
 			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 			ghost.setAnimated(true);
-			ghost.handleEvent(GhostEvent.ScatteringStarts);
+			ghost.receiveEvent(GhostEvent.ScatteringStarts);
 		});
 	}
 

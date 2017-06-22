@@ -97,7 +97,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		app.entities.add(pacMan, blinky, inky);
 
-		pacMan.handleEvent(PacManEvent.StartWalking);
+		pacMan.receiveEvent(PacManEvent.StartWalking);
 	};
 
 	@Override

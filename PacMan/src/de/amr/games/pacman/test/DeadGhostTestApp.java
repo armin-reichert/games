@@ -19,7 +19,6 @@ public class DeadGhostTestApp extends Application {
 		app.settings.set("drawInternals", true);
 		app.settings.set("drawGrid", true);
 		app.settings.set("drawRoute", true);
-		app.motor.setFrequency(60);
 		launch(app);
 	}
 

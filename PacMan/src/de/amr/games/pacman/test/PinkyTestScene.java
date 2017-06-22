@@ -53,7 +53,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
-		pacMan.onEnemyContact = ghost -> pacMan.handleEvent(PacManEvent.Killed);
+		pacMan.onEnemyContact = ghost -> pacMan.receiveEvent(PacManEvent.Killed);
 		pacMan.control.state(PacManState.Dying).entry = state -> {
 			state.setDuration(app.motor.toFrames(2));
 		};
@@ -64,7 +64,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pinky.init();
 		pinky.control.state(Chasing, new AmbushPacMan(pinky, pacMan, 4));
 		pinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
-		pinky.resume = () -> pinky.handleEvent(GhostEvent.ChasingStarts);
+		pinky.resume = () -> pinky.receiveEvent(GhostEvent.ChasingStarts);
 		pinky.setColor(Color.PINK);
 		pinky.setAnimated(true);
 		pinky.speed = () -> .9f * pacMan.speed.get();
@@ -78,13 +78,13 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		int dir = rand.nextBoolean() ? E : W;
 		pacMan.setMoveDir(dir);
 		pacMan.setNextMoveDir(dir);
-		pacMan.handleEvent(PacManEvent.StartWalking);
+		pacMan.receiveEvent(PacManEvent.StartWalking);
 
 		pinky.placeAt(GHOST_HOUSE_ENTRY);
 		dir = rand.nextBoolean() ? W : E;
 		pinky.setMoveDir(dir); // TODO without this, ghost might get stuck
 		pinky.setNextMoveDir(dir);
-		pinky.handleEvent(GhostEvent.ChasingStarts);
+		pinky.receiveEvent(GhostEvent.ChasingStarts);
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class GhostAttackTimer {
 		fsm.state(Scattering).entry = state -> {
 			++wave;
 			state.setDuration(computeFrames(scatteringSeconds));
-			ghosts.forEach(ghost -> ghost.handleEvent(GhostEvent.ScatteringStarts));
+			ghosts.forEach(ghost -> ghost.receiveEvent(GhostEvent.ScatteringStarts));
 			app.assets.sound("sfx/siren.mp3").stop();
 			app.assets.sound("sfx/siren.mp3").loop();
 		};
@@ -51,7 +51,7 @@ public class GhostAttackTimer {
 
 		fsm.state(Chasing).entry = state -> {
 			state.setDuration(computeFrames(chasingSeconds));
-			ghosts.forEach(ghost -> ghost.handleEvent(GhostEvent.ChasingStarts));
+			ghosts.forEach(ghost -> ghost.receiveEvent(GhostEvent.ChasingStarts));
 		};
 
 		fsm.changeOnTimeout(Chasing, Scattering);
