@@ -65,7 +65,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pinky.control.state(Chasing, new AmbushPacMan(pinky, pacMan, 4));
 		pinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
 		pinky.resume = () -> pinky.receiveEvent(GhostEvent.ChasingStarts);
-		pinky.setColor(Color.PINK);
+		pinky.color = Color.PINK;
 		pinky.setAnimated(true);
 		pinky.speed = () -> .9f * pacMan.speed.get();
 

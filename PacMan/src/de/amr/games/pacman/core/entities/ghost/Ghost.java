@@ -4,9 +4,7 @@ import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
-import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Frightened;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Initialized;
-import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recovering;
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 
@@ -37,10 +35,10 @@ public class Ghost extends BoardMover {
 
 	public final StateMachine<GhostState, GhostEvent> control;
 	public Runnable resume;
+	public Color color;
 
 	private final Application app;
 	private final Supplier<PacManTheme> theme;
-	private Color color;
 
 	public Ghost(Application app, Board board, String name, Supplier<PacManTheme> theme) {
 		super(board);
@@ -89,32 +87,23 @@ public class Ghost extends BoardMover {
 		control.addInput(event);
 	}
 
-	// --- Look ---
-
-	public Color getColor() {
-		return color;
-	}
-
-	public void setColor(Color color) {
-		this.color = color;
+	public boolean insideGhostHouse() {
+		return board.contains(currentTile(), GhostHouse);
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.is(Dead)) {
+		switch (control.stateID()) {
+		case Dead:
 			return theme.get().getGhostDeadSprite(moveDir);
-		}
-		if (control.is(Recovering)) {
+		case Recovering:
 			return theme.get().getGhostRecoveringSprite();
-		}
-		if (insideGhostHouse()) {
-			return theme.get().getGhostNormalSprite(getName(), moveDir);
-		}
-		if (control.is(Frightened)) {
+		case Frightened:
 			return control.state().getRemaining() < control.state().getDuration() / 3 ? theme.get().getGhostRecoveringSprite()
 					: theme.get().getGhostFrightenedSprite();
+		default:
+			return theme.get().getGhostNormalSprite(getName(), moveDir);
 		}
-		return theme.get().getGhostNormalSprite(getName(), moveDir);
 	}
 
 	@Override
@@ -126,12 +115,6 @@ public class Ghost extends BoardMover {
 		theme.get().getGhostFrightenedSprite().setAnimated(animated);
 		theme.get().getGhostRecoveringSprite().setAnimated(animated);
 	}
-
-	public boolean insideGhostHouse() {
-		return board.contains(currentTile(), GhostHouse);
-	}
-
-	// --- Drawing ---
 
 	@Override
 	public void draw(Graphics2D g) {

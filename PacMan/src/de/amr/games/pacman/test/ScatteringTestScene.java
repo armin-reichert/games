@@ -65,7 +65,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 	private void addGhost(String name, Color color, Tile home, Tile loopStart, int loopStartDir, boolean clockwise) {
 		Ghost ghost = new Ghost(app, board, name, () -> theme);
-		ghost.setColor(color);
+		ghost.color = color;
 		ghost.placeAt(home);
 		ghost.setLogger(Application.Log);
 		ghost.control.state(Scattering, new LoopAroundWalls(ghost, loopStart, loopStartDir, clockwise));
@@ -85,7 +85,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 			ghost.draw(g);
 			LoopAroundWalls law = (LoopAroundWalls) ghost.control.state(GhostState.Scattering);
 			if (!law.isLooping()) {
-				g.setColor(ghost.getColor());
+				g.setColor(ghost.color);
 				drawRoute(g, board, ghost.currentTile(), ghost.getRoute());
 			} else {
 				List<Tile> routeTiles = law.getLoopTiles();
@@ -97,7 +97,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 						int y1 = prev.row * TILE_SIZE + offset;
 						int x2 = tile.col * TILE_SIZE + offset;
 						int y2 = tile.row * TILE_SIZE + offset;
-						g.setColor(ghost.getColor());
+						g.setColor(ghost.color);
 						// g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
 						g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);
 						// g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);

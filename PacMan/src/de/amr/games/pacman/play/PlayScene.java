@@ -409,19 +409,19 @@ public class PlayScene extends Scene<PacManGame> {
 		ghosts = new HashSet<>();
 
 		Ghost blinky = new Ghost(app, board, "Blinky", () -> app.getThemeManager().getTheme());
-		blinky.setColor(Color.RED);
+		blinky.color = Color.RED;
 		ghosts.add(blinky);
 
 		Ghost inky = new Ghost(app, board, "Inky", () -> app.getThemeManager().getTheme());
-		inky.setColor(new Color(64, 224, 208));
+		inky.color = new Color(64, 224, 208);
 		ghosts.add(inky);
 
 		Ghost pinky = new Ghost(app, board, "Pinky", () -> app.getThemeManager().getTheme());
-		pinky.setColor(Color.PINK);
+		pinky.color = Color.PINK;
 		ghosts.add(pinky);
 
 		Ghost clyde = new Ghost(app, board, "Clyde", () -> app.getThemeManager().getTheme());
-		clyde.setColor(Color.ORANGE);
+		clyde.color = Color.ORANGE;
 		ghosts.add(clyde);
 
 		// Define common ghost properties and behavior:
@@ -764,7 +764,7 @@ public class PlayScene extends Scene<PacManGame> {
 			drawTextCentered(pen, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
 			// mark home positions of ghosts
 			ghosts.forEach(ghost -> {
-				pen.setColor(ghost.getColor());
+				pen.setColor(ghost.color);
 				Tile homeTile = getGhostHomeTile(ghost);
 				pen.fillRect(homeTile.col * TILE_SIZE + TILE_SIZE / 2, homeTile.row * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE,
 						TILE_SIZE);

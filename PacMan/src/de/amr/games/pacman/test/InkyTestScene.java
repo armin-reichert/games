@@ -82,7 +82,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		blinky.init();
 		blinky.setAnimated(true);
-		blinky.setColor(Color.RED);
+		blinky.color = Color.RED;
 		blinky.speed = () -> pacMan.speed.get() * .9f;
 		blinky.placeAt(GHOST_HOUSE_ENTRY);
 		blinky.setMoveDir(E);
@@ -91,7 +91,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 		inky.init();
 		inky.setAnimated(true);
-		inky.setColor(new Color(64, 224, 208));
+		inky.color = new Color(64, 224, 208);
 		inky.speed = () -> pacMan.speed.get() * .9f;
 		inky.placeAt(GHOST_HOUSE_ENTRY);
 		inky.control.state(Initialized).setDuration(app.motor.toFrames(1));

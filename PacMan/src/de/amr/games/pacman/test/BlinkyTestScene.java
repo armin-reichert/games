@@ -84,7 +84,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		pacMan.enemies().add(blinky);
 
 		blinky.init();
-		blinky.setColor(Color.RED);
+		blinky.color = Color.RED;
 		blinky.setAnimated(true);
 		blinky.placeAt(4, 1);
 		blinky.speed = () -> pacMan.speed.get() * 1.1f;
