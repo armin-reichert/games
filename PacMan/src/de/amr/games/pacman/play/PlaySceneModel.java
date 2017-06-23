@@ -150,11 +150,11 @@ public class PlaySceneModel {
 		case "Inky":
 		case "Clyde":
 		default:
-			return motor.toFrames(2 + rand.nextInt(3));
+			return motor.secToTicks(2 + rand.nextInt(3));
 		}
 	}
 
 	public int getGhostRecoveringDuration(Ghost ghost) {
-		return motor.toFrames(1 + rand.nextInt(2));
+		return motor.secToTicks(1 + rand.nextInt(2));
 	}
 }

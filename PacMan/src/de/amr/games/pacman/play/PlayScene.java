@@ -384,7 +384,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Aggressive
 		pacMan.control.state(Aggressive).entry = state -> {
-			state.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level)));
+			state.setDuration(app.motor.secToTicks(model.getPacManAggressiveSeconds(level)));
 			pacMan.enemies().forEach(ghost -> ghost.control.addInput(GhostEvent.PacManAttackStarts));
 			app.assets.sound("sfx/waza.mp3").loop();
 		};
@@ -478,7 +478,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// When Pac-Man gets empowered, become frightened for the same duration
 			Stream.of(GhostState.Waiting, GhostState.Scattering, GhostState.Chasing).forEach(ghostState -> {
 				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened,
-						(oldState, newState) -> newState.setDuration(app.motor.toFrames(model.getPacManAggressiveSeconds(level))));
+						(oldState, newState) -> newState.setDuration(app.motor.secToTicks(model.getPacManAggressiveSeconds(level))));
 			});
 
 			// When in "frightened" state, ghosts move randomly:
@@ -652,7 +652,7 @@ public class PlayScene extends Scene<PacManGame> {
 		long pelletsLeft = board.count(Pellet);
 		if (pelletsLeft == BONUS1_PELLETS_LEFT || pelletsLeft == BONUS2_PELLETS_LEFT) {
 			board.setContent(BONUS_TILE, Bonus);
-			bonusTimeRemaining = app.motor.toFrames(9);
+			bonusTimeRemaining = app.motor.secToTicks(9);
 		}
 	}
 
@@ -674,7 +674,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 		FlashText.show(app, String.valueOf(object),
 				app.getThemeManager().getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE), Color.YELLOW,
-				app.motor.toFrames(1), new Vector2(x, y), new Vector2(0, -0.2f));
+				app.motor.secToTicks(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
 	@Override

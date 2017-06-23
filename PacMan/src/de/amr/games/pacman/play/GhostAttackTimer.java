@@ -29,7 +29,7 @@ public class GhostAttackTimer {
 	private int computeFrames(int[][] times) {
 		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
 		int n = times[0].length, col = wave <= n ? wave - 1 : n - 1;
-		return motor.toFrames(times[row][col]);
+		return motor.secToTicks(times[row][col]);
 	}
 
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {

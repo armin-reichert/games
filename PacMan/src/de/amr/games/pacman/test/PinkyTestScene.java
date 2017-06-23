@@ -55,7 +55,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onEnemyContact = ghost -> pacMan.receiveEvent(PacManEvent.Killed);
 		pacMan.control.state(PacManState.Dying).entry = state -> {
-			state.setDuration(app.motor.toFrames(2));
+			state.setDuration(app.motor.secToTicks(2));
 		};
 		pacMan.control.changeOnTimeout(PacManState.Dying, PacManState.Peaceful, (oldState, newState) -> start());
 		pacMan.setLogger(Application.Log);

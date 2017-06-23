@@ -2,6 +2,7 @@ package de.amr.games.pacman.test;
 
 import static de.amr.easy.game.Application.Log;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
+import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.PacManEvent.GotDrugs;
@@ -10,6 +11,11 @@ import static de.amr.games.pacman.core.entities.PacManState.Aggressive;
 import static de.amr.games.pacman.core.entities.PacManState.Dying;
 import static de.amr.games.pacman.core.entities.PacManState.Initialized;
 import static de.amr.games.pacman.core.entities.PacManState.Peaceful;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Chasing;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Dead;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Recovering;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scattering;
+import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static java.util.stream.IntStream.range;
@@ -19,7 +25,6 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
-import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManEvent;
 import de.amr.games.pacman.core.entities.PacManState;
@@ -51,42 +56,43 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		board = new Board(app.assets.text("board.txt"));
 	}
 
-	private void resetBoard() {
-		board.loadContent();
-		board.setContent(new Tile(32, 12), TileContent.Energizer);
-		board.setContent(new Tile(32, 1), TileContent.Energizer);
-		board.setContent(new Tile(32, 26), TileContent.Energizer);
-	}
-
 	@Override
 	public void init() {
 
-		resetBoard();
+		loadBoardContent();
 
 		pacMan = new PacMan(app, board, () -> theme);
 
-		pacMan.control.changeOnInput(StartWalking, Initialized, Peaceful);
+		// Initialized
+
+		pacMan.control.changeOnInput(PacManEvent.StartWalking, Initialized, Peaceful);
+
+		// Peaceful
 
 		pacMan.control.state(Peaceful).entry = state -> pacMan.speed = this::normalSpeed;
 
 		pacMan.control.state(Peaceful).update = state -> pacMan.walk();
 
-		pacMan.control.changeOnInput(GotDrugs, Peaceful, Aggressive);
+		pacMan.control.changeOnInput(PacManEvent.GotDrugs, Peaceful, Aggressive);
 
 		pacMan.control.changeOnInput(PacManEvent.Killed, Peaceful, Dying);
 
-		pacMan.control.state(Aggressive).entry = state -> {
-			pacMan.speed = this::fastSpeed;
-			state.setDuration(3 * app.motor.getFrequency());
-		};
+		// Aggressive
 
-		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
+		pacMan.control.state(Aggressive).entry = state -> {
+			state.setDuration(app.motor.secToTicks(3));
+			pacMan.speed = this::fastSpeed;
+		};
 
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
 
+		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
+
 		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, (oldState, newState) -> {
-			newState.setDuration(3 * app.motor.getFrequency());
+			newState.setDuration(app.motor.secToTicks(3));
 		});
+
+		// Dying
 
 		pacMan.control.state(Dying).entry = state -> {
 			app.assets.sound("sfx/die.mp3").play();
@@ -100,14 +106,16 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		pacMan.control.change(Dying, Initialized, () -> !app.assets.sound("sfx/die.mp3").isRunning());
 
+		// Event handlers
+
 		pacMan.onContentFound = content -> {
 			if (content == Energizer) {
 				Log.info("Pac-Man hat Energizer gefressen auf Feld " + pacMan.currentTile());
-				board.setContent(pacMan.currentTile(), TileContent.None);
+				board.setContent(pacMan.currentTile(), None);
 				pacMan.receiveEvent(GotDrugs);
 			} else if (content == Pellet) {
 				Log.info("Pac-Man hat Pille gefressen auf Feld " + pacMan.currentTile());
-				board.setContent(pacMan.currentTile(), TileContent.None);
+				board.setContent(pacMan.currentTile(), None);
 			}
 		};
 
@@ -130,39 +138,50 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		ghost = new Ghost(app, board, "Pinky", () -> theme);
 
-		ghost.control.changeOnTimeout(GhostState.Initialized, GhostState.Chasing);
+		// Initialized
 
-		ghost.control.state(GhostState.Chasing).entry = state -> {
+		ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);
+
+		// Chasing
+
+		ghost.control.state(Chasing).entry = state -> {
+			state.setDuration(app.motor.secToTicks(5));
 			ghost.speed = this::normalSpeed;
-			state.setDuration(app.motor.toFrames(5));
 		};
 
-		ghost.control.state(GhostState.Chasing).update = state -> {
-			ghost.follow(pacMan.currentTile());
-		};
+		ghost.control.state(Chasing).update = state -> ghost.follow(pacMan.currentTile());
 
-		ghost.control.changeOnTimeout(GhostState.Chasing, GhostState.Scattering);
-		ghost.control.changeOnInput(GhostEvent.Killed, GhostState.Chasing, GhostState.Dead);
-		ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Chasing, GhostState.Scattering);
+		ghost.control.changeOnTimeout(Chasing, Scattering);
 
-		ghost.control.state(GhostState.Scattering).update = state -> {
-			ghost.follow(GHOST_HOUSE);
-		};
+		ghost.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
 
-		ghost.control.change(GhostState.Scattering, GhostState.Waiting, () -> ghost.currentTile().equals(GHOST_HOUSE));
-		ghost.control.changeOnInput(GhostEvent.ChasingStarts, GhostState.Scattering, GhostState.Chasing);
+		ghost.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
-		ghost.control.state(GhostState.Dead).update = state -> ghost.follow(GHOST_HOUSE);
+		// Scattering
 
-		ghost.control.change(GhostState.Dead, GhostState.Recovering, () -> ghost.currentTile().equals(GHOST_HOUSE));
+		ghost.control.state(Scattering).update = state -> ghost.follow(GHOST_HOUSE);
 
-		ghost.control.state(GhostState.Recovering).entry = state -> state.setDuration(app.motor.toFrames(3));
+		ghost.control.change(Scattering, Waiting, () -> ghost.currentTile().equals(GHOST_HOUSE));
 
-		ghost.control.changeOnTimeout(GhostState.Recovering, GhostState.Chasing);
+		ghost.control.changeOnInput(GhostEvent.ChasingStarts, Scattering, Chasing);
 
-		ghost.control.state(GhostState.Waiting).entry = state -> state.setDuration(app.motor.toFrames(4));
+		// Dead
 
-		ghost.control.changeOnTimeout(GhostState.Waiting, GhostState.Chasing);
+		ghost.control.state(Dead).update = state -> ghost.follow(GHOST_HOUSE);
+
+		ghost.control.change(Dead, Recovering, () -> ghost.currentTile().equals(GHOST_HOUSE));
+
+		// Recovering
+
+		ghost.control.state(Recovering).entry = state -> state.setDuration(app.motor.secToTicks(3));
+
+		ghost.control.changeOnTimeout(Recovering, Chasing);
+
+		// Waiting
+
+		ghost.control.state(Waiting).entry = state -> state.setDuration(app.motor.secToTicks(4));
+
+		ghost.control.changeOnTimeout(Waiting, Chasing);
 
 		app.entities.add(ghost);
 
@@ -170,6 +189,13 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		start();
 	};
+
+	private void loadBoardContent() {
+		board.loadContent();
+		board.setContent(new Tile(32, 12), Energizer);
+		board.setContent(new Tile(32, 1), Energizer);
+		board.setContent(new Tile(32, 26), Energizer);
+	}
 
 	private void start() {
 		pacMan.init();
@@ -179,7 +205,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		ghost.init();
 		ghost.placeAt(GHOST_HOUSE);
 		ghost.canEnterTile = tile -> board.getContent(tile) != Wall;
-		ghost.control.state().setDuration(app.motor.toFrames(3));
+		ghost.control.state().setDuration(app.motor.secToTicks(3));
 	}
 
 	private float normalSpeed() {
@@ -187,13 +213,13 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	}
 
 	private float fastSpeed() {
-		return normalSpeed() * 2;
+		return normalSpeed() * 1.5f;
 	}
 
 	@Override
 	public void update() {
 		if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-			resetBoard();
+			loadBoardContent();
 		}
 		super.update();
 	}

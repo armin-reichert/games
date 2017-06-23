@@ -10,7 +10,6 @@ import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.core.entities.PacManState.Aggressive;
-import static de.amr.games.pacman.core.entities.PacManState.Dying;
 import static de.amr.games.pacman.core.entities.PacManState.Initialized;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
@@ -64,7 +63,6 @@ public class PacMan extends BoardMover {
 		this.enemies = new HashSet<>();
 		setName("Pac-Man");
 		control = new StateMachine<>(getName(), new EnumMap<>(PacManState.class), Initialized);
-		definePacManControl();
 		canEnterTile = this::defaultCanEnterTileCondition;
 		onContentFound = this::defaultContentFoundHandler;
 		onEnemyContact = this::defaultEnemyContactHandler;
@@ -86,20 +84,10 @@ public class PacMan extends BoardMover {
 			Log.info(getName() + " eats " + content + " at " + currentTile());
 			board.setContent(currentTile(), None);
 			break;
-		case GhostHouse:
-		case Door:
-		case Tunnel:
-		case Wall:
-		case Wormhole:
+		default:
 			Log.info("PacMan visits " + content + " at " + currentTile());
 			break;
-		default:
-			break;
 		}
-	}
-
-	private void definePacManControl() {
-
 	}
 
 	@Override
@@ -135,14 +123,15 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public Sprite currentSprite() {
-		if (control.is(Dying)) {
+		switch (control.stateID()) {
+		case Dying:
 			return theme.get().getPacManDyingSprite() != null ? theme.get().getPacManDyingSprite()
 					: theme.get().getPacManStandingSprite(moveDir);
-		}
-		if (control.is(Initialized) || stuck) {
+		case Initialized:
 			return theme.get().getPacManStandingSprite(moveDir);
+		default:
+			return stuck ? theme.get().getPacManStandingSprite(moveDir) : theme.get().getPacManRunningSprite(moveDir);
 		}
-		return theme.get().getPacManRunningSprite(moveDir);
 	}
 
 	@Override
@@ -164,12 +153,12 @@ public class PacMan extends BoardMover {
 	public void walk() {
 		requestMoveDirection();
 		move();
+		turnTo(nextMoveDir);
 		TileContent content = board.getContent(currentTile());
 		if (content != None) {
 			onContentFound.accept(content);
 		}
 		enemies.stream().filter(enemy -> enemy.getCol() == getCol() && enemy.getRow() == getRow()).forEach(onEnemyContact);
-		turnTo(nextMoveDir);
 	}
 
 	private void requestMoveDirection() {
