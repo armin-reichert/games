@@ -49,7 +49,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 
 		clickHandler = new MouseAdapter() {
 
@@ -119,9 +119,9 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 		drawSprite(g, 3, 0, theme.getBoardSprite());
 		ghost.draw(g);
 		g.setColor(Color.GREEN);
-		g.fillRect(startTile.getCol() * TILE_SIZE, startTile.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+		g.fillRect(startTile.col * TILE_SIZE, startTile.row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		g.setColor(Color.YELLOW);
-		g.fillRect(targetTile.getCol() * TILE_SIZE, targetTile.getRow() * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+		g.fillRect(targetTile.col * TILE_SIZE, targetTile.row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		drawGridLines(g, app.getWidth(), app.getHeight());
 		drawRouteMap(g, board);
 		g.setColor(Color.RED);

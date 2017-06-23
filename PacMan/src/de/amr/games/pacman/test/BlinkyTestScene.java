@@ -40,7 +40,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	public BlinkyTestScene(BlinkyTestApp app) {
 		super(app);
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 		theme = new ClassicTheme(app.assets);
 	}
 

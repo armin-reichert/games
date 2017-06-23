@@ -9,8 +9,8 @@ import static de.amr.easy.grid.impl.Top4.Top4;
  */
 public class Tile {
 
-	private int row;
-	private int col;
+	public final int row;
+	public final int col;
 
 	public Tile(int row, int col) {
 		this.row = row;
@@ -22,22 +22,12 @@ public class Tile {
 		col = other.col;
 	}
 
-	public Tile translate(int dx, int dy) {
-		col += dx;
-		row += dy;
-		return this;
+	public Tile translate(int deltaRows, int deltaCols) {
+		return new Tile(row + deltaRows, col + deltaCols);
 	}
 
 	public Tile neighbor(int dir) {
 		return new Tile(row + Top4.dy(dir), col + Top4.dx(dir));
-	}
-
-	public int getRow() {
-		return row;
-	}
-
-	public int getCol() {
-		return col;
 	}
 
 	public double distance(Tile tile) {
@@ -72,6 +62,6 @@ public class Tile {
 
 	@Override
 	public String toString() {
-		return "Tile[" + row + "|" + col + "]";
+		return "Tile(" + row + "," + col + ")";
 	}
 }

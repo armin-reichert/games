@@ -39,7 +39,7 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 		createGhosts();
 	};
 

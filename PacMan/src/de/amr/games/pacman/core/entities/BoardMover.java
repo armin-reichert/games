@@ -34,7 +34,7 @@ import de.amr.games.pacman.core.board.Tile;
 public abstract class BoardMover extends GameEntity {
 
 	protected final Board board;
-	
+
 	public Supplier<Float> speed;
 	public Function<Tile, Boolean> canEnterTile;
 	public IntSupplier xOffset;
@@ -113,7 +113,8 @@ public abstract class BoardMover extends GameEntity {
 		return getCenter().roundedX() / TILE_SIZE;
 	}
 
-	public int getRow() {
+	public int getRow()
+	{
 		return getCenter().roundedY() / TILE_SIZE;
 	}
 
@@ -122,7 +123,7 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	public void placeAt(Tile tile) {
-		tr.moveTo(tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
+		tr.moveTo(tile.col * TILE_SIZE, tile.row * TILE_SIZE);
 	}
 
 	public void placeAt(int row, int col) {
@@ -134,7 +135,7 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	public boolean isExactlyOver(Tile tile) {
-		return isExactlyOver(tile.getRow(), tile.getCol());
+		return isExactlyOver(tile.row, tile.col);
 	}
 
 	protected boolean isAdjusted() {
@@ -172,7 +173,7 @@ public abstract class BoardMover extends GameEntity {
 		tr.move();
 
 		Tile tile = currentTile();
-		int row = tile.getRow(), col = tile.getCol();
+		int row = tile.row, col = tile.col;
 
 		// handle "worm hole"
 		if (board.contains(tile, Wormhole)) {
@@ -252,11 +253,11 @@ public abstract class BoardMover extends GameEntity {
 		Tile current = currentTile();
 		for (int dir : route) {
 			Tile next = current.neighbor(dir);
-			g.drawLine(current.getCol() * TILE_SIZE + offset, current.getRow() * TILE_SIZE + offset,
-					next.getCol() * TILE_SIZE + offset, next.getRow() * TILE_SIZE + offset);
+			g.drawLine(current.col * TILE_SIZE + offset, current.row * TILE_SIZE + offset, next.col * TILE_SIZE + offset,
+					next.row * TILE_SIZE + offset);
 			current = next;
 		}
 		int size = TILE_SIZE / 2;
-		g.fillRect(current.getCol() * TILE_SIZE + size / 2, current.getRow() * TILE_SIZE + size / 2, size, size);
+		g.fillRect(current.col * TILE_SIZE + size / 2, current.row * TILE_SIZE + size / 2, size, size);
 	}
 }

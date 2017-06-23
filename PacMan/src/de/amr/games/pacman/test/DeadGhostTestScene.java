@@ -37,7 +37,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 	public DeadGhostTestScene(DeadGhostTestApp app) {
 		super(app);
 		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 		rand = new Random();
 	}
 

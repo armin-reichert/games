@@ -75,13 +75,12 @@ public class SceneHelper {
 		Tile from = start, to = null;
 		for (Integer dir : route) {
 			int dx = Top4.dx(dir), dy = Top4.dy(dir);
-			to = new Tile(from);
-			to.translate(dx, dy);
+			to = new Tile(from).translate(dy, dx);
 			int offset = TILE_SIZE / 4;
-			int x1 = from.getCol() * TILE_SIZE + offset;
-			int y1 = from.getRow() * TILE_SIZE + offset;
-			int x2 = to.getCol() * TILE_SIZE + offset;
-			int y2 = to.getRow() * TILE_SIZE + offset;
+			int x1 = from.col * TILE_SIZE + offset;
+			int y1 = from.row * TILE_SIZE + offset;
+			int x2 = to.col * TILE_SIZE + offset;
+			int y2 = to.row * TILE_SIZE + offset;
 //			g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
 			g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);
 //			g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);

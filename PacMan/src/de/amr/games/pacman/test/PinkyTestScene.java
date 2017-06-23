@@ -45,7 +45,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 	public PinkyTestScene(PinkyTestApp app) {
 		super(app);
 		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 	}
 
 	@Override

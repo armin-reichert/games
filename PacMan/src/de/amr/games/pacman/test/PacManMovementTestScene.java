@@ -48,7 +48,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	public PacManMovementTestScene(PacManMovementTestApp app) {
 		super(app);
 		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 	}
 
 	private void resetBoard() {

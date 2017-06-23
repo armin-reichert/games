@@ -156,7 +156,7 @@ public class LoopAroundWalls extends State {
 		current = loopStart;
 		loopTiles.add(current);
 		for (int dir : loopRoute) {
-			Tile next = new Tile(current).translate(Top4.dx(dir), Top4.dy(dir));
+			Tile next = new Tile(current).translate(Top4.dy(dir), Top4.dx(dir));
 			loopTiles.add(next);
 			current = next;
 		}

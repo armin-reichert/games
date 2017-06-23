@@ -32,8 +32,8 @@ public class Board {
 	 * @param boardRows
 	 *          board data rows as text
 	 */
-	public Board(String[] boardRows) {
-		this.boardRows = boardRows;
+	public Board(String boardDefinition) {
+		this.boardRows = boardDefinition.split("\n");
 		numRows = boardRows.length;
 		numCols = boardRows[0].length();
 		// create orthogonal grid graph from board data
@@ -74,7 +74,7 @@ public class Board {
 	 * @return <code>true</code> if the tile is valid
 	 */
 	public boolean isTileValid(Tile tile) {
-		int row = tile.getRow(), col = tile.getCol();
+		int row = tile.row, col = tile.col;
 		return row >= 0 && row < numRows && col >= 0 && col < numCols && getOriginalContent(row, col) != Outside.toChar();
 	}
 
@@ -87,7 +87,7 @@ public class Board {
 	 *          some tile content
 	 */
 	public void setContent(Tile tile, TileContent content) {
-		Integer cell = graph.cell(tile.getCol(), tile.getRow());
+		Integer cell = graph.cell(tile.col, tile.row);
 		graph.set(cell, content.toChar());
 	}
 
@@ -101,7 +101,7 @@ public class Board {
 	 * @return <code>true</code> if the tile contains this content
 	 */
 	public boolean contains(Tile tile, TileContent content) {
-		return contains(tile.getRow(), tile.getCol(), content);
+		return contains(tile.row, tile.col, content);
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class Board {
 	 *         doesn't.
 	 */
 	public Optional<Tile> getContent(Tile tile, TileContent content) {
-		return contains(tile.getRow(), tile.getCol(), content) ? Optional.of(tile) : Optional.empty();
+		return contains(tile.row, tile.col, content) ? Optional.of(tile) : Optional.empty();
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class Board {
 	 * @return the tile content
 	 */
 	public TileContent getContent(Tile tile) {
-		return getContent(tile.getRow(), tile.getCol());
+		return getContent(tile.row, tile.col);
 	}
 
 	/**
@@ -193,8 +193,8 @@ public class Board {
 	 * @return list of directions to walk from the source tile to reach the target tile
 	 */
 	public List<Integer> shortestRoute(Tile source, Tile target) {
-		Integer sourceCell = graph.cell(source.getCol(), source.getRow());
-		Integer targetCell = graph.cell(target.getCol(), target.getRow());
+		Integer sourceCell = graph.cell(source.col, source.row);
+		Integer targetCell = graph.cell(target.col, target.row);
 		PathFinder<Integer> pathFinder = new BreadthFirstTraversal<>(graph, sourceCell);
 		pathFinder.run();
 		List<Integer> route = new ArrayList<>();

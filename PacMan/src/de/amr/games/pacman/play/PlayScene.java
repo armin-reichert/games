@@ -260,7 +260,7 @@ public class PlayScene extends Scene<PacManGame> {
 	public PlayScene(PacManGame app) {
 		super(app);
 		playControl = new PlayControl();
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 		model = new PlaySceneModel(board, app.motor, 8 * TILE_SIZE);
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusList = new ArrayList<>();
@@ -334,7 +334,7 @@ public class PlayScene extends Scene<PacManGame> {
 				int points = model.getBonusValue(level);
 				score(points);
 				bonusList.add(model.getBonusSymbol(level));
-				showFlashText(points, tile.getCol() * TILE_SIZE, tile.getRow() * TILE_SIZE);
+				showFlashText(points, tile.col * TILE_SIZE, tile.row * TILE_SIZE);
 				removeBonus();
 				break;
 			default:
@@ -766,8 +766,8 @@ public class PlayScene extends Scene<PacManGame> {
 			ghosts.forEach(ghost -> {
 				pen.setColor(ghost.getColor());
 				Tile homeTile = getGhostHomeTile(ghost);
-				pen.fillRect(homeTile.getCol() * TILE_SIZE + TILE_SIZE / 2, homeTile.getRow() * TILE_SIZE + TILE_SIZE / 2,
-						TILE_SIZE, TILE_SIZE);
+				pen.fillRect(homeTile.col * TILE_SIZE + TILE_SIZE / 2, homeTile.row * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE,
+						TILE_SIZE);
 			});
 		}
 

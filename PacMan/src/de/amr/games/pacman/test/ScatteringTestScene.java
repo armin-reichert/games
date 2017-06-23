@@ -46,7 +46,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 	public ScatteringTestScene(ScatteringTestApp app) {
 		super(app);
 		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt").split("\n"));
+		board = new Board(app.assets.text("board.txt"));
 	}
 
 	@Override
@@ -93,10 +93,10 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 				for (Tile tile : routeTiles) {
 					if (prev != null) {
 						int offset = TILE_SIZE / 4;
-						int x1 = prev.getCol() * TILE_SIZE + offset;
-						int y1 = prev.getRow() * TILE_SIZE + offset;
-						int x2 = tile.getCol() * TILE_SIZE + offset;
-						int y2 = tile.getRow() * TILE_SIZE + offset;
+						int x1 = prev.col * TILE_SIZE + offset;
+						int y1 = prev.row * TILE_SIZE + offset;
+						int x2 = tile.col * TILE_SIZE + offset;
+						int y2 = tile.row * TILE_SIZE + offset;
 						g.setColor(ghost.getColor());
 						// g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
 						g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);

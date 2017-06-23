@@ -27,7 +27,7 @@ public class AmbushPacMan extends State {
 			}
 			// find valid tile ahead of Pac-Man's current position
 			for (int n = ahead; n > 0; --n) {
-				Tile tile = hunted.currentTile().translate(n * Top4.dx(hunted.getMoveDir()), n * Top4.dy(hunted.getMoveDir()));
+				Tile tile = hunted.currentTile().translate(n * Top4.dy(hunted.getMoveDir()), n * Top4.dx(hunted.getMoveDir()));
 				if (board.isTileValid(tile) && chaser.canEnterTile.apply(tile)) {
 					chaser.follow(tile);
 					return;
