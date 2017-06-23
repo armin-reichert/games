@@ -20,6 +20,8 @@ import java.util.logging.Logger;
  *          type for identifying states, for example an enumeration type
  * @param <Input>
  *          type for inputs / events
+ * 
+ * @author Armin Reichert
  */
 public class StateMachine<StateID, Input> {
 
@@ -30,7 +32,7 @@ public class StateMachine<StateID, Input> {
 	private StateID currentStateID;
 	private Deque<Input> inputQ = new LinkedList<>();
 	private Optional<Logger> logger;
-	private int fps;
+	private int fps = 60;
 
 	public StateMachine(Map<StateID, State> statesByID, StateID initialStateID) {
 		this("Anon state machine", statesByID, initialStateID);
@@ -44,15 +46,14 @@ public class StateMachine<StateID, Input> {
 		this.logger = Optional.empty();
 	}
 
-	public Logger getLogger() {
-		return logger.get();
+	public void setLogger(Logger logger) {
+		this.logger = Optional.of(logger);
 	}
 
-	public void setLogger(Logger logger, int fps) {
-		this.logger = Optional.of(logger);
+	public void setFps(int fps) {
 		this.fps = fps;
 	}
-
+	
 	public void init() {
 		currentStateID = initialStateID;
 		state().doEntry();
@@ -121,7 +122,9 @@ public class StateMachine<StateID, Input> {
 
 	private void enterState(StateID newStateID, BiConsumer<State, State> action) {
 		if (currentStateID == newStateID) {
-			return;
+			if (action != null) {
+				action.accept(state(), state());
+			}
 		}
 		traceStateChange(currentStateID, newStateID);
 		if (currentStateID != null) {

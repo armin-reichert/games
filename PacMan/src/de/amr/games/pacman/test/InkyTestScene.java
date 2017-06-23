@@ -15,19 +15,15 @@ import static java.util.stream.IntStream.range;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.util.Random;
-import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
 import de.amr.games.pacman.core.entities.PacManEvent;
+import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
-import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -39,26 +35,20 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class InkyTestScene extends Scene<InkyTestApp> {
 
 	private final PacManTheme theme;
-	private Random rand = new Random();
-	private Board board;
-	private PacMan pacMan;
-	private Ghost blinky;
-	private Ghost inky;
+	private final Random rand = new Random();
+	private final Board board;
 
 	public InkyTestScene(InkyTestApp app) {
 		super(app);
 		theme = new ClassicTheme(app.assets);
+		board = new Board(app.assets.text("board.txt").split("\n"));
 	}
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt").split("\n"));
 
-		pacMan = new PacMan(app, board, () -> theme);
-		pacMan.init();
-		pacMan.placeAt(PACMAN_HOME);
+		PacMan pacMan = new PacMan(app, board, () -> theme);
 
-		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.motor.getFrequency());
 		pacMan.onEnemyContact = ghost -> {
 			ghost.placeAt(GHOST_HOUSE_ENTRY);
 			int dir = rand.nextBoolean() ? W : E;
@@ -71,39 +61,44 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 			pacMan.setNextMoveDir(dir);
 		};
 
-		blinky = new Ghost(app, board, "Blinky", () -> theme);
+		pacMan.control.changeOnInput(PacManEvent.StartWalking, PacManState.Initialized, PacManState.Peaceful);
+		pacMan.control.state(PacManState.Peaceful).update = state -> pacMan.walk();
+
+		Ghost blinky = new Ghost(app, board, "Blinky", () -> theme);
+		blinky.control.changeOnTimeout(Initialized, Waiting);
+		blinky.control.changeOnTimeout(Waiting, Chasing);
+		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
+
+		Ghost inky = new Ghost(app, board, "Inky", () -> theme);
+		inky.control.changeOnTimeout(Initialized, Waiting);
+		inky.control.changeOnTimeout(Waiting, Chasing);
+		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
+
+		app.entities.add(pacMan, blinky, inky);
+
+		pacMan.init();
+		pacMan.placeAt(PACMAN_HOME);
+		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.motor.getFrequency());
+
 		blinky.init();
 		blinky.setAnimated(true);
 		blinky.setColor(Color.RED);
 		blinky.speed = () -> pacMan.speed.get() * .9f;
 		blinky.placeAt(GHOST_HOUSE_ENTRY);
 		blinky.setMoveDir(E);
+		blinky.control.state(Initialized).setDuration(app.motor.toFrames(1));
+		blinky.control.state(Waiting).setDuration(app.motor.toFrames(1));
 
-		blinky.control.change(Initialized, Waiting, () -> true);
-		blinky.control.change(Waiting, Chasing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
-		// blinky.control.state(Chasing).update = state -> blinky.moveRandomly();
-
-		inky = new Ghost(app, board, "Inky", () -> theme);
 		inky.init();
 		inky.setAnimated(true);
 		inky.setColor(new Color(64, 224, 208));
 		inky.speed = () -> pacMan.speed.get() * .9f;
 		inky.placeAt(GHOST_HOUSE_ENTRY);
-
-		inky.control.change(Initialized, GhostState.Waiting, () -> true);
-		inky.control.change(Waiting, Chasing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
-
-		app.entities.add(pacMan, blinky, inky);
+		inky.control.state(Initialized).setDuration(app.motor.toFrames(1));
+		inky.control.state(Waiting).setDuration(app.motor.toFrames(1));
 
 		pacMan.receiveEvent(PacManEvent.StartWalking);
 	};
-
-	@Override
-	public void update() {
-		Stream.of(pacMan, blinky, inky).forEach(GameEntity::update);
-	}
 
 	@Override
 	public void draw(Graphics2D g) {
@@ -115,6 +110,6 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 				drawSprite(g, row, col, theme.getEnergizerSprite());
 			}
 		}));
-		Stream.of(pacMan, blinky, inky).forEach(entity -> entity.draw(g));
+		app.entities.all().forEach(entity -> entity.draw(g));
 	}
 }

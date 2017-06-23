@@ -49,19 +49,15 @@ public class State {
 		}
 	}
 
-	public void terminate() {
-		remaining = 0;
-	}
-
 	public boolean isTerminated() {
 		return remaining == 0;
 	}
 
-	public void setDuration(int frames) {
-		if (frames < 0 && frames != FOREVER) {
+	public void setDuration(int updates) {
+		if (updates < 0) {
 			throw new IllegalStateException();
 		}
-		remaining = duration = frames;
+		remaining = duration = updates;
 	}
 
 	public int getDuration() {

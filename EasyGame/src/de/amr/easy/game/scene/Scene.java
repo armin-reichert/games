@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.view.View;
 
 public abstract class Scene<App extends Application> implements View {
@@ -47,11 +48,17 @@ public abstract class Scene<App extends Application> implements View {
 	}
 
 	@Override
+	public void update() {
+		app.entities.all().forEach(GameEntity::update);
+	}
+
+	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		if (bgImage != null) {
 			g.drawImage(bgImage, 0, 0, bgImage.getWidth(null), bgImage.getHeight(null), null);
 		}
+		app.entities.all().forEach(entity -> entity.draw(g));
 	}
 }

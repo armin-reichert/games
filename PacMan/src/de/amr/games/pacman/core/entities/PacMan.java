@@ -125,7 +125,8 @@ public class PacMan extends BoardMover {
 	}
 
 	public void setLogger(Logger logger) {
-		control.setLogger(logger, app.motor.getFrequency());
+		control.setLogger(logger);
+		control.setFps(app.motor.getFrequency());
 	}
 
 	public void receiveEvent(PacManEvent event) {

@@ -71,7 +71,8 @@ public class GhostAttackTimer {
 	}
 
 	public void setLogger(Logger logger) {
-		fsm.setLogger(logger, motor.getFrequency());
+		fsm.setLogger(logger);
+		fsm.setFps(motor.getFrequency());
 	}
 
 	public void setLevel(int level) {
