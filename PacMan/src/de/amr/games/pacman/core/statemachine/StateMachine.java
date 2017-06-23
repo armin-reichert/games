@@ -88,6 +88,7 @@ public class StateMachine<StateID, Input> {
 		if (!statesByID.containsKey(stateID)) {
 			State state = new State();
 			statesByID.put(stateID, state);
+			logger.ifPresent(log -> log.info(format("Created state %s:%s ", description, stateID)));
 		}
 		return statesByID.get(stateID);
 	}

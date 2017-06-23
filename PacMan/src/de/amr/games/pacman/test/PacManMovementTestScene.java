@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
@@ -142,12 +143,14 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		inky = new Ghost(app, board, "Inky", () -> theme);
 		app.entities.add(inky);
 		pacMan.enemies().add(inky);
-		
+
 		clyde = new Ghost(app, board, "Clyde", () -> theme);
 		app.entities.add(clyde);
 		pacMan.enemies().add(clyde);
 
 		Stream.of(pinky, inky, clyde).forEach(ghost -> {
+
+			ghost.setLogger(Application.Log);
 
 			// Initialized
 			ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);
@@ -197,7 +200,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		clyde.control.changeOnTimeout(Chasing, Scattering);
 		clyde.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
 		clyde.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
-		
+
 		start();
 	};
 
@@ -222,7 +225,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 				}
 			};
 		}
-		
+
 		private Tile randomCorner() {
 			return CORNERS[new Random().nextInt(CORNERS.length)];
 		}
@@ -235,17 +238,17 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 			currentTarget = corner;
 		}
 	}
-	
+
 	private class ClydeChasingState extends State {
-		
+
 		public ClydeChasingState() {
-			
+
 			entry = state -> {
 				state.setDuration(app.motor.secToTicks(20));
 				clyde.speed = () -> getGhostSpeed(clyde);
-				
+
 			};
-			
+
 			update = state -> {
 				clyde.moveRandomly();
 			};
