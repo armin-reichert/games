@@ -58,56 +58,43 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 	@Override
 	public void init() {
-
 		loadBoardContent();
 
 		pacMan = new PacMan(app, board, () -> theme);
+		app.entities.add(pacMan);
 
 		// Initialized
-
 		pacMan.control.changeOnInput(PacManEvent.StartWalking, Initialized, Peaceful);
 
 		// Peaceful
-
 		pacMan.control.state(Peaceful).entry = state -> pacMan.speed = this::normalSpeed;
-
 		pacMan.control.state(Peaceful).update = state -> pacMan.walk();
-
 		pacMan.control.changeOnInput(PacManEvent.GotDrugs, Peaceful, Aggressive);
-
 		pacMan.control.changeOnInput(PacManEvent.Killed, Peaceful, Dying);
 
 		// Aggressive
-
 		pacMan.control.state(Aggressive).entry = state -> {
 			state.setDuration(app.motor.secToTicks(3));
 			pacMan.speed = this::fastSpeed;
 		};
-
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
-
 		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
-
 		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, (oldState, newState) -> {
 			newState.setDuration(app.motor.secToTicks(3));
 		});
 
 		// Dying
-
 		pacMan.control.state(Dying).entry = state -> {
 			app.assets.sound("sfx/die.mp3").play();
 			theme.getPacManDyingSprite().setAnimated(true);
 		};
-
 		pacMan.control.state(Dying).exit = state -> {
 			theme.getPacManDyingSprite().resetAnimation();
 			start();
 		};
-
 		pacMan.control.change(Dying, Initialized, () -> !app.assets.sound("sfx/die.mp3").isRunning());
 
 		// Event handlers
-
 		pacMan.onContentFound = content -> {
 			if (content == Energizer) {
 				Log.info("Pac-Man hat Energizer gefressen auf Feld " + pacMan.currentTile());
@@ -134,58 +121,39 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 			}
 		};
 
-		app.entities.add(pacMan);
-
 		ghost = new Ghost(app, board, "Pinky", () -> theme);
+		app.entities.add(ghost);
+		pacMan.enemies().add(ghost);
 
 		// Initialized
-
 		ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);
 
 		// Chasing
-
 		ghost.control.state(Chasing).entry = state -> {
 			state.setDuration(app.motor.secToTicks(5));
 			ghost.speed = this::normalSpeed;
 		};
-
 		ghost.control.state(Chasing).update = state -> ghost.follow(pacMan.currentTile());
-
 		ghost.control.changeOnTimeout(Chasing, Scattering);
-
 		ghost.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
-
 		ghost.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
 		// Scattering
-
 		ghost.control.state(Scattering).update = state -> ghost.follow(GHOST_HOUSE);
-
 		ghost.control.change(Scattering, Waiting, () -> ghost.currentTile().equals(GHOST_HOUSE));
-
 		ghost.control.changeOnInput(GhostEvent.ChasingStarts, Scattering, Chasing);
 
 		// Dead
-
 		ghost.control.state(Dead).update = state -> ghost.follow(GHOST_HOUSE);
-
 		ghost.control.change(Dead, Recovering, () -> ghost.currentTile().equals(GHOST_HOUSE));
 
 		// Recovering
-
 		ghost.control.state(Recovering).entry = state -> state.setDuration(app.motor.secToTicks(3));
-
 		ghost.control.changeOnTimeout(Recovering, Chasing);
 
 		// Waiting
-
 		ghost.control.state(Waiting).entry = state -> state.setDuration(app.motor.secToTicks(4));
-
 		ghost.control.changeOnTimeout(Waiting, Chasing);
-
-		app.entities.add(ghost);
-
-		pacMan.enemies().add(ghost);
 
 		start();
 	};

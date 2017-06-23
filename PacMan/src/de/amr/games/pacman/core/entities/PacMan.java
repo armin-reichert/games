@@ -9,7 +9,6 @@ import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Door;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
-import static de.amr.games.pacman.core.entities.PacManState.Aggressive;
 import static de.amr.games.pacman.core.entities.PacManState.Initialized;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.awt.event.KeyEvent.VK_DOWN;
@@ -22,7 +21,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -45,9 +43,11 @@ import de.amr.games.pacman.theme.PacManTheme;
  * @author Armin Reichert
  */
 public class PacMan extends BoardMover {
+	
+	private static final Font TEXTFONT = new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10);
 
-	public final StateMachine<PacManState, PacManEvent> control;
-
+	public StateMachine<PacManState, PacManEvent> control;
+	public Supplier<Integer> steering;
 	public Consumer<TileContent> onContentFound;
 	public Consumer<Ghost> onEnemyContact;
 
@@ -58,11 +58,12 @@ public class PacMan extends BoardMover {
 
 	public PacMan(Application app, Board board, Supplier<PacManTheme> theme) {
 		super(board);
-		this.app = Objects.requireNonNull(app);
+		this.app = app;
 		this.theme = theme;
 		this.enemies = new HashSet<>();
 		setName("Pac-Man");
-		control = new StateMachine<>(getName(), new EnumMap<>(PacManState.class), Initialized);
+		control = new StateMachine<>("Pac-Man Control", new EnumMap<>(PacManState.class), Initialized);
+		steering = this::defaultSteering;
 		canEnterTile = this::defaultCanEnterTileCondition;
 		onContentFound = this::defaultContentFoundHandler;
 		onEnemyContact = this::defaultEnemyContactHandler;
@@ -88,6 +89,22 @@ public class PacMan extends BoardMover {
 			Log.info("PacMan visits " + content + " at " + currentTile());
 			break;
 		}
+	}
+
+	private int defaultSteering() {
+		if (Keyboard.keyDown(VK_LEFT)) {
+			return W;
+		}
+		if (Keyboard.keyDown(VK_RIGHT)) {
+			return E;
+		}
+		if (Keyboard.keyDown(VK_UP)) {
+			return N;
+		}
+		if (Keyboard.keyDown(VK_DOWN)) {
+			return S;
+		}
+		return nextMoveDir;
 	}
 
 	@Override
@@ -145,13 +162,8 @@ public class PacMan extends BoardMover {
 		this.freezeTimer = frames;
 	}
 
-	public boolean isPowerWalkingEnding() {
-		return control.is(Aggressive)
-				&& control.state(Aggressive).getRemaining() < control.state(Aggressive).getDuration() / 4;
-	}
-
 	public void walk() {
-		requestMoveDirection();
+		nextMoveDir = steering.get();
 		move();
 		turnTo(nextMoveDir);
 		TileContent content = board.getContent(currentTile());
@@ -160,30 +172,16 @@ public class PacMan extends BoardMover {
 		}
 		enemies.stream().filter(enemy -> enemy.getCol() == getCol() && enemy.getRow() == getRow()).forEach(onEnemyContact);
 	}
-
-	private void requestMoveDirection() {
-		if (Keyboard.keyDown(VK_LEFT)) {
-			nextMoveDir = W;
-		}
-		if (Keyboard.keyDown(VK_RIGHT)) {
-			nextMoveDir = E;
-		}
-		if (Keyboard.keyDown(VK_UP)) {
-			nextMoveDir = N;
-		}
-		if (Keyboard.keyDown(VK_DOWN)) {
-			nextMoveDir = S;
-		}
-	}
-
+	
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(xOffset.getAsInt(), 0);
 		super.draw(g);
 		g.translate(-xOffset.getAsInt(), 0);
+
 		if (app.settings.getBool("drawInternals")) {
 			g.setColor(Color.WHITE);
-			g.setFont(new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10));
+			g.setFont(TEXTFONT);
 			State state = control.state();
 			StringBuilder text = new StringBuilder();
 			text.append(getName()).append(" (").append(control.stateID());
@@ -191,8 +189,9 @@ public class PacMan extends BoardMover {
 				text.append(":").append(state.getRemaining()).append("|").append(state.getDuration());
 			}
 			text.append(")");
-			g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
+			g.drawString(text.toString(), tr.getX(), tr.getY() - TILE_SIZE);
 		}
+		
 		if (app.settings.getBool("drawGrid")) {
 			drawCollisionBox(g, isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
 		}

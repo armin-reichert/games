@@ -33,7 +33,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class Ghost extends BoardMover {
 
-	public final StateMachine<GhostState, GhostEvent> control;
+	public StateMachine<GhostState, GhostEvent> control;
 	public Runnable resume;
 	public Color color;
 

@@ -113,8 +113,7 @@ public abstract class BoardMover extends GameEntity {
 		return getCenter().roundedX() / TILE_SIZE;
 	}
 
-	public int getRow()
-	{
+	public int getRow() {
 		return getCenter().roundedY() / TILE_SIZE;
 	}
 
