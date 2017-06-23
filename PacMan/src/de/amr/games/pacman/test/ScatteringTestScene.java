@@ -68,7 +68,7 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 		ghost.color = color;
 		ghost.placeAt(home);
 		ghost.setLogger(Application.Log);
-		ghost.control.state(Scattering, new LoopAroundWalls(ghost, loopStart, loopStartDir, clockwise));
+		ghost.control.defineState(Scattering, new LoopAroundWalls(ghost, loopStart, loopStartDir, clockwise));
 		ghost.control.changeOnInput(GhostEvent.ScatteringStarts, GhostState.Initialized, GhostState.Scattering);
 		ghosts.add(ghost);
 	}

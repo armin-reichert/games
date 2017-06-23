@@ -92,7 +92,7 @@ public class StateMachine<StateID, Input> {
 		return statesByID.get(stateID);
 	}
 
-	public State state(StateID stateID, State state) {
+	public State defineState(StateID stateID, State state) {
 		if (statesByID.containsKey(stateID)) {
 			throw new IllegalStateException("State with ID '" + stateID + "' already exists");
 		}

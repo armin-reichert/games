@@ -72,7 +72,7 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 		Ghost inky = new Ghost(app, board, "Inky", () -> theme);
 		inky.control.changeOnTimeout(Initialized, Waiting);
 		inky.control.changeOnTimeout(Waiting, Chasing);
-		inky.control.state(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
+		inky.control.defineState(Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 
 		app.entities.add(pacMan, blinky, inky);
 

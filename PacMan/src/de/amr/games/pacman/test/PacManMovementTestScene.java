@@ -18,9 +18,13 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scatt
 import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Waiting;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
+import static de.amr.games.pacman.misc.SceneHelper.drawText;
 import static java.util.stream.IntStream.range;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Random;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
@@ -43,12 +47,17 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 	static final Tile PACMAN_HOME = new Tile(26, 13);
-	static final Tile GHOST_HOUSE = new Tile(17, 15);
+	static final Tile GHOST_HOUSE_LEFT = new Tile(17, 12);
+	static final Tile GHOST_HOUSE_MIDDLE = new Tile(17, 13);
+	static final Tile GHOST_HOUSE_RIGHT = new Tile(17, 15);
 
 	private final PacManTheme theme;
 	private final Board board;
 	private PacMan pacMan;
-	private Ghost ghost;
+	private Ghost pinky;
+	private Ghost inky;
+	private Ghost clyde;
+	private int points;
 
 	public PacManMovementTestScene(PacManMovementTestApp app) {
 		super(app);
@@ -99,64 +108,159 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 			if (content == Energizer) {
 				Log.info("Pac-Man hat Energizer gefressen auf Feld " + pacMan.currentTile());
 				board.setContent(pacMan.currentTile(), None);
+				points += 50;
 				pacMan.receiveEvent(GotDrugs);
 			} else if (content == Pellet) {
 				Log.info("Pac-Man hat Pille gefressen auf Feld " + pacMan.currentTile());
 				board.setContent(pacMan.currentTile(), None);
+				points += 10;
 			}
 		};
 
 		pacMan.onEnemyContact = enemy -> {
 			if (pacMan.control.is(Aggressive)) {
-				Log.info("Pac-Man tötet" + enemy.getName());
-				enemy.receiveEvent(GhostEvent.Killed);
+				if (!enemy.control.is(GhostState.Dead)) {
+					Log.info("Pac-Man tötet" + enemy.getName());
+					points += 100;
+					enemy.receiveEvent(GhostEvent.Killed);
+				}
 			} else if (pacMan.control.is(Dying)) {
 				// nothing happens
 			} else {
 				Log.info(enemy.getName() + " tötet Pac-Man");
 				pacMan.receiveEvent(PacManEvent.Killed);
-				ghost.init();
-				ghost.placeAt(GHOST_HOUSE);
-				ghost.control.state().setDuration(State.FOREVER);
+				pinky.init();
+				pinky.placeAt(GHOST_HOUSE_LEFT);
+				pinky.control.state().setDuration(State.FOREVER);
 			}
 		};
 
-		ghost = new Ghost(app, board, "Pinky", () -> theme);
-		app.entities.add(ghost);
-		pacMan.enemies().add(ghost);
+		pinky = new Ghost(app, board, "Pinky", () -> theme);
+		app.entities.add(pinky);
+		pacMan.enemies().add(pinky);
 
-		// Initialized
-		ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);
+		inky = new Ghost(app, board, "Inky", () -> theme);
+		app.entities.add(inky);
+		pacMan.enemies().add(inky);
+		
+		clyde = new Ghost(app, board, "Clyde", () -> theme);
+		app.entities.add(clyde);
+		pacMan.enemies().add(clyde);
 
-		// Chasing
-		ghost.control.state(Chasing).entry = state -> {
-			state.setDuration(app.motor.secToTicks(5));
-			ghost.speed = this::normalSpeed;
+		Stream.of(pinky, inky, clyde).forEach(ghost -> {
+
+			// Initialized
+			ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);
+
+			// Scattering
+			ghost.control.state(Scattering).update = state -> ghost.follow(getGhostHomeTile(ghost));
+			ghost.control.change(Scattering, Waiting, () -> ghost.currentTile().equals(getGhostHomeTile(ghost)));
+			ghost.control.changeOnInput(GhostEvent.ChasingStarts, Scattering, Chasing);
+
+			// Dead
+			ghost.control.state(Dead).update = state -> ghost.follow(getGhostHomeTile(ghost));
+			ghost.control.change(Dead, Recovering, () -> ghost.currentTile().equals(getGhostHomeTile(ghost)));
+
+			// Recovering
+			ghost.control.state(Recovering).entry = state -> {
+				state.setDuration(app.motor.secToTicks(3));
+				ghost.adjust();
+			};
+			ghost.control.changeOnTimeout(Recovering, Chasing);
+
+			// Waiting
+			ghost.control.state(Waiting).entry = state -> {
+				state.setDuration(app.motor.secToTicks(2));
+				ghost.adjust();
+			};
+			ghost.control.changeOnTimeout(Waiting, Chasing);
+		});
+
+		// Chasing for Pinky
+		pinky.control.state(Chasing).entry = state -> {
+			state.setDuration(app.motor.secToTicks(10));
+			pinky.speed = () -> getGhostSpeed(pinky);
 		};
-		ghost.control.state(Chasing).update = state -> ghost.follow(pacMan.currentTile());
-		ghost.control.changeOnTimeout(Chasing, Scattering);
-		ghost.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
-		ghost.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
+		pinky.control.state(Chasing).update = state -> pinky.follow(pacMan.currentTile());
+		pinky.control.changeOnTimeout(Chasing, Scattering);
+		pinky.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
+		pinky.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
-		// Scattering
-		ghost.control.state(Scattering).update = state -> ghost.follow(GHOST_HOUSE);
-		ghost.control.change(Scattering, Waiting, () -> ghost.currentTile().equals(GHOST_HOUSE));
-		ghost.control.changeOnInput(GhostEvent.ChasingStarts, Scattering, Chasing);
+		// Chasing for Inky
+		inky.control.defineState(Chasing, new InkyChasingState());
+		inky.control.changeOnTimeout(Chasing, Scattering);
+		inky.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
+		inky.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
-		// Dead
-		ghost.control.state(Dead).update = state -> ghost.follow(GHOST_HOUSE);
-		ghost.control.change(Dead, Recovering, () -> ghost.currentTile().equals(GHOST_HOUSE));
-
-		// Recovering
-		ghost.control.state(Recovering).entry = state -> state.setDuration(app.motor.secToTicks(3));
-		ghost.control.changeOnTimeout(Recovering, Chasing);
-
-		// Waiting
-		ghost.control.state(Waiting).entry = state -> state.setDuration(app.motor.secToTicks(4));
-		ghost.control.changeOnTimeout(Waiting, Chasing);
-
+		// Chasing for Clyde
+		clyde.control.defineState(Chasing, new ClydeChasingState());
+		clyde.control.changeOnTimeout(Chasing, Scattering);
+		clyde.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
+		clyde.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
+		
 		start();
 	};
+
+	private class InkyChasingState extends State {
+
+		final Tile[] CORNERS = { new Tile(4, 1), new Tile(32, 1), new Tile(4, 26), new Tile(32, 26) };
+
+		private Tile currentTarget;
+
+		public InkyChasingState() {
+
+			entry = state -> {
+				state.setDuration(app.motor.secToTicks(20));
+				inky.speed = () -> getGhostSpeed(inky);
+				currentTarget = randomCorner();
+			};
+
+			update = state -> {
+				inky.follow(currentTarget);
+				if (inky.currentTile().equals(currentTarget)) {
+					nextTarget();
+				}
+			};
+		}
+		
+		private Tile randomCorner() {
+			return CORNERS[new Random().nextInt(CORNERS.length)];
+		}
+
+		private void nextTarget() {
+			Tile corner;
+			do {
+				corner = randomCorner();
+			} while (corner.equals(currentTarget));
+			currentTarget = corner;
+		}
+	}
+	
+	private class ClydeChasingState extends State {
+		
+		public ClydeChasingState() {
+			
+			entry = state -> {
+				state.setDuration(app.motor.secToTicks(20));
+				clyde.speed = () -> getGhostSpeed(clyde);
+				
+			};
+			
+			update = state -> {
+				clyde.moveRandomly();
+			};
+		}
+	};
+
+	private Tile getGhostHomeTile(Ghost ghost) {
+		if (ghost == pinky) {
+			return GHOST_HOUSE_LEFT;
+		}
+		if (ghost == inky) {
+			return GHOST_HOUSE_RIGHT;
+		}
+		return GHOST_HOUSE_MIDDLE;
+	}
 
 	private void loadBoardContent() {
 		board.loadContent();
@@ -170,10 +274,21 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = this::normalSpeed;
 		pacMan.receiveEvent(StartWalking);
-		ghost.init();
-		ghost.placeAt(GHOST_HOUSE);
-		ghost.canEnterTile = tile -> board.getContent(tile) != Wall;
-		ghost.control.state().setDuration(app.motor.secToTicks(3));
+
+		pinky.init();
+		pinky.placeAt(getGhostHomeTile(pinky));
+		pinky.canEnterTile = tile -> board.getContent(tile) != Wall;
+		pinky.control.state().setDuration(app.motor.secToTicks(2));
+
+		inky.init();
+		inky.placeAt(getGhostHomeTile(inky));
+		inky.canEnterTile = tile -> board.getContent(tile) != Wall;
+		inky.control.state().setDuration(app.motor.secToTicks(0));
+
+		clyde.init();
+		clyde.placeAt(getGhostHomeTile(clyde));
+		clyde.canEnterTile = tile -> board.getContent(tile) != Wall;
+		clyde.control.state().setDuration(app.motor.secToTicks(1));
 	}
 
 	private float normalSpeed() {
@@ -184,28 +299,45 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		return normalSpeed() * 1.5f;
 	}
 
+	private float getGhostSpeed(Ghost ghost) {
+		if (ghost == inky) {
+			return normalSpeed();
+		}
+		if (ghost == pinky) {
+			return normalSpeed() * 1.2f;
+		}
+		return normalSpeed();
+	}
+
 	@Override
 	public void update() {
 		if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
 			loadBoardContent();
 		}
-		super.update();
+		app.entities.filter(Ghost.class).forEach(ghost -> ghost.update());
+		pacMan.update();
 	}
 
 	@Override
-	public void draw(Graphics2D g) {
-		drawSprite(g, 3, 0, theme.getBoardSprite());
+	public void draw(Graphics2D pen) {
+		drawSprite(pen, 3, 0, theme.getBoardSprite());
 		range(4, board.numRows - 3).forEach(row -> range(0, board.numCols).forEach(col -> {
 			if (board.contains(row, col, Pellet)) {
-				drawSprite(g, row, col, theme.getPelletSprite());
+				drawSprite(pen, row, col, theme.getPelletSprite());
 			} else if (board.contains(row, col, Energizer)) {
-				drawSprite(g, row, col, theme.getEnergizerSprite());
+				drawSprite(pen, row, col, theme.getEnergizerSprite());
 			}
 		}));
-		drawGridLines(g, getWidth(), getHeight());
-		pacMan.draw(g);
+		if (app.settings.getBool("drawGrid")) {
+			drawGridLines(pen, getWidth(), getHeight());
+		}
+		pen.setColor(Color.WHITE);
+		pen.setFont(theme.getTextFont());
+		drawText(pen, 2, 1, points + " Punkte");
+
+		pacMan.draw(pen);
 		if (!pacMan.control.is(PacManState.Dying)) {
-			ghost.draw(g);
+			app.entities.filter(Ghost.class).forEach(ghost -> ghost.draw(pen));
 		}
 	}
 }

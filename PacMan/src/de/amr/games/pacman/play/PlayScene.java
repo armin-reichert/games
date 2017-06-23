@@ -550,7 +550,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Blinky loops around the walls at the right upper corner of the maze:
-		blinky.control.state(GhostState.Scattering, new LoopAroundWalls(blinky, RIGHT_UPPER_CORNER, S, true));
+		blinky.control.defineState(GhostState.Scattering, new LoopAroundWalls(blinky, RIGHT_UPPER_CORNER, S, true));
 
 		// Blinky directly follows Pac-Man:
 		blinky.control.state(GhostState.Chasing).update = state -> blinky.follow(pacMan.currentTile());
@@ -567,10 +567,10 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Inky loops around the walls at the right corner of the maze:
-		inky.control.state(GhostState.Scattering, new LoopAroundWalls(inky, RIGHT_LOWER_CORNER, W, true));
+		inky.control.defineState(GhostState.Scattering, new LoopAroundWalls(inky, RIGHT_LOWER_CORNER, W, true));
 
 		// Inky chases together with Blinky.
-		inky.control.state(GhostState.Chasing, new ChaseWithPartner(inky, blinky, pacMan));
+		inky.control.defineState(GhostState.Chasing, new ChaseWithPartner(inky, blinky, pacMan));
 
 		/*
 		 * "Pinky", the pink ghost.
@@ -584,10 +584,10 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Pinky loops around the walls at the left upper corner of the maze:
-		pinky.control.state(GhostState.Scattering, new LoopAroundWalls(pinky, LEFT_UPPER_CORNER, S, false));
+		pinky.control.defineState(GhostState.Scattering, new LoopAroundWalls(pinky, LEFT_UPPER_CORNER, S, false));
 
 		// Pinky follows the position 4 tiles ahead of Pac-Man:
-		pinky.control.state(GhostState.Chasing, new AmbushPacMan(pinky, pacMan, 4));
+		pinky.control.defineState(GhostState.Chasing, new AmbushPacMan(pinky, pacMan, 4));
 
 		/*
 		 * "Clyde", the yellow ghost.
@@ -601,7 +601,7 @@ public class PlayScene extends Scene<PacManGame> {
 		};
 
 		// Clyde loops around the walls at the left lower corner of the maze:
-		clyde.control.state(GhostState.Scattering, new LoopAroundWalls(clyde, LEFT_LOWER_CORNER, E, false));
+		clyde.control.defineState(GhostState.Scattering, new LoopAroundWalls(clyde, LEFT_LOWER_CORNER, E, false));
 
 		// Clyde follows Pac-Man's position if he is more than 8 tiles away, otherwise he moves
 		// randomly:

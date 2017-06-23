@@ -62,7 +62,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 
 		pinky = new Ghost(app, board, "Pinky", () -> theme);
 		pinky.init();
-		pinky.control.state(Chasing, new AmbushPacMan(pinky, pacMan, 4));
+		pinky.control.defineState(Chasing, new AmbushPacMan(pinky, pacMan, 4));
 		pinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
 		pinky.resume = () -> pinky.receiveEvent(GhostEvent.ChasingStarts);
 		pinky.color = Color.PINK;
