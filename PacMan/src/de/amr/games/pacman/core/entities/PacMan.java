@@ -75,7 +75,7 @@ public class PacMan extends BoardMover {
 	}
 
 	private boolean defaultCanEnterTileCondition(Tile tile) {
-		return board.isTileValid(tile) && !(board.contains(tile, Wall) || board.contains(tile, Door));
+		return board.isBoardTile(tile) && !(board.contains(tile, Wall) || board.contains(tile, Door));
 	}
 
 	private void defaultContentFoundHandler(TileContent content) {

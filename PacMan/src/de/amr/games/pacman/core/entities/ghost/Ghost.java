@@ -55,7 +55,7 @@ public class Ghost extends BoardMover {
 	}
 
 	private boolean defaultCanEnterTileCondition(Tile tile) {
-		if (!board.isTileValid(tile)) {
+		if (!board.isBoardTile(tile)) {
 			return false;
 		}
 		switch (board.getContent(tile)) {

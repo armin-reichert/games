@@ -96,7 +96,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 	@Override
 	public void update() {
 		if (board.count(Pellet) == 0 && board.count(Energizer) == 0) {
-			board.resetContent();
+			board.loadContent();
 		}
 		app.entities.all().forEach(GameEntity::update);
 	}

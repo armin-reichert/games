@@ -52,7 +52,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	}
 
 	private void resetBoard() {
-		board.resetContent();
+		board.loadContent();
 		board.setContent(new Tile(32, 12), TileContent.Energizer);
 		board.setContent(new Tile(32, 1), TileContent.Energizer);
 		board.setContent(new Tile(32, 26), TileContent.Energizer);

@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.grid.impl.Grid;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
@@ -59,13 +60,13 @@ public class SceneHelper {
 		g.setColor(Color.WHITE);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		int radius = TILE_SIZE / 2;
-		board.graph.vertexStream()
-				.filter(cell -> !board.contains(board.graph.row(cell), board.graph.col(cell), TileContent.Wall))
+		Grid<?, ?> grid = board.getGraph();
+		grid.vertexStream().filter(cell -> !board.contains(grid.row(cell), grid.col(cell), TileContent.Wall))
 				.forEach(cell -> {
-					g.fillOval(board.graph.col(cell) * TILE_SIZE + radius / 2, board.graph.row(cell) * TILE_SIZE + radius / 2,
-							radius, radius);
+					g.fillOval(grid.col(cell) * TILE_SIZE + radius / 2, grid.row(cell) * TILE_SIZE + radius / 2, radius,
+							radius);
 				});
-		board.graph.edgeStream().forEach(edge -> {
+		grid.edgeStream().forEach(edge -> {
 			Integer from = edge.either(), to = edge.other(from);
 			drawEdge(g, board, from, to);
 		});
@@ -81,19 +82,20 @@ public class SceneHelper {
 			int y1 = from.row * TILE_SIZE + offset;
 			int x2 = to.col * TILE_SIZE + offset;
 			int y2 = to.row * TILE_SIZE + offset;
-//			g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
+			// g.fillOval(x1, y1, TILE_SIZE / 2, TILE_SIZE / 2);
 			g.drawLine(x1 + offset, y1 + offset, x2 + offset, y2 + offset);
-//			g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);
+			// g.fillOval(x2, y2, TILE_SIZE / 2, TILE_SIZE / 2);
 			from = to;
 		}
 	}
 
 	private static void drawEdge(Graphics2D g, Board board, Integer from, Integer to) {
+		Grid<?, ?> grid = board.getGraph();
 		int offset = TILE_SIZE / 2;
-		int x1 = board.graph.col(from) * TILE_SIZE + offset;
-		int y1 = board.graph.row(from) * TILE_SIZE + offset;
-		int x2 = board.graph.col(to) * TILE_SIZE + offset;
-		int y2 = board.graph.row(to) * TILE_SIZE + offset;
+		int x1 = grid.col(from) * TILE_SIZE + offset;
+		int y1 = grid.row(from) * TILE_SIZE + offset;
+		int x2 = grid.col(to) * TILE_SIZE + offset;
+		int y2 = grid.row(to) * TILE_SIZE + offset;
 		g.drawLine(x1, y1, x2, y2);
 	}
 

@@ -46,7 +46,7 @@ public abstract class BoardMover extends GameEntity {
 
 	public BoardMover(Board board) {
 		this.board = Objects.requireNonNull(board);
-		canEnterTile = tile -> board.isTileValid(tile);
+		canEnterTile = tile -> board.isBoardTile(tile);
 		xOffset = () -> 0;
 		route = new ArrayList<>();
 		moveDir = nextMoveDir = E;

@@ -27,7 +27,7 @@ public class ChaseWithPartner extends State {
 			int dx = middle.col - partnerTile.col;
 			int dy = middle.row - partnerTile.row;
 			Tile targetTile = new Tile(partnerTile.row + 2 * dy, partnerTile.col + 2 * dx);
-			if (board.isTileValid(targetTile)) {
+			if (board.isBoardTile(targetTile)) {
 				chaser.setRoute(board.shortestRoute(chaser.currentTile(), targetTile));
 				if (!chaser.getRoute().isEmpty()) {
 					int chaseDir = chaser.getRoute().get(0);

@@ -23,7 +23,7 @@ public class Board {
 
 	public final int numRows;
 	public final int numCols;
-	public final Grid<Character, Integer> graph;
+	private final Grid<Character, Integer> graph;
 	private final String[] boardRows;
 
 	/**
@@ -39,15 +39,15 @@ public class Board {
 		// create orthogonal grid graph from board data
 		graph = new Grid<>(numCols, numRows, None.toChar(), false);
 		graph.setTopology(Top4);
-		resetContent();
+		loadContent();
 		/*@formatter:off*/
 		graph.vertexStream()
-			.filter(tile -> graph.get(tile) != Wall.toChar())
-			.forEach(tile -> {
+			.filter(cell -> graph.get(cell) != Wall.toChar())
+			.forEach(cell -> {
 				Top4.dirs().forEach(dir -> {
-					graph.neighbor(tile, dir).ifPresent(neighbor -> {
-						if (graph.get(neighbor) != Wall.toChar()	&& !graph.adjacent(tile, neighbor)) {
-							graph.addEdge(tile, neighbor);
+					graph.neighbor(cell, dir).ifPresent(neighbor -> {
+						if (graph.get(neighbor) != Wall.toChar() && !graph.adjacent(cell, neighbor)) {
+							graph.addEdge(cell, neighbor);
 						}
 					});
 				});
@@ -60,22 +60,29 @@ public class Board {
 	}
 
 	/**
-	 * Resets the board to its initial content.
+	 * @return the grid graph of this board
 	 */
-	public void resetContent() {
+	public Grid<Character, Integer> getGraph() {
+		return graph;
+	}
+
+	/**
+	 * Loads the original board content.
+	 */
+	public void loadContent() {
 		graph.vertexStream().forEach(cell -> graph.set(cell, getOriginalContent(graph.row(cell), graph.col(cell))));
 	}
 
 	/**
-	 * Tells if the specified tile is valid for this board.
+	 * Tells if the specified tile is part of this board.
 	 * 
 	 * @param tile
 	 *          a tile
-	 * @return <code>true</code> if the tile is valid
+	 * @return <code>true</code> if the tile is part of this board
 	 */
-	public boolean isTileValid(Tile tile) {
-		int row = tile.row, col = tile.col;
-		return row >= 0 && row < numRows && col >= 0 && col < numCols && getOriginalContent(row, col) != Outside.toChar();
+	public boolean isBoardTile(Tile tile) {
+		return 0 <= tile.row && tile.row < numRows && 0 <= tile.col && tile.col < numCols
+				&& getOriginalContent(tile.row, tile.col) != Outside.toChar();
 	}
 
 	/**
@@ -87,8 +94,7 @@ public class Board {
 	 *          some tile content
 	 */
 	public void setContent(Tile tile, TileContent content) {
-		Integer cell = graph.cell(tile.col, tile.row);
-		graph.set(cell, content.toChar());
+		graph.set(graph.cell(tile.col, tile.row), content.toChar());
 	}
 
 	/**
@@ -176,30 +182,30 @@ public class Board {
 	 * @return a stream of all tiles with that content
 	 */
 	public Stream<Tile> tilesWithContent(TileContent content) {
-		///*@formatter:off*/
+		/*@formatter:off*/
 		return graph.vertexStream()
-				.filter(cell -> graph.get(cell) == content.toChar())
-				.map(cell -> new Tile(graph.row(cell), graph.col(cell)));
-		///*@formatter:on*/
+			.filter(cell -> graph.get(cell) == content.toChar())
+			.map(cell -> new Tile(graph.row(cell), graph.col(cell)));
+		/*@formatter:on*/
 	}
 
 	/**
 	 * Computes the shortest route between the given tiles.
 	 * 
-	 * @param source
-	 *          route start
-	 * @param target
-	 *          route target
+	 * @param sourceTile
+	 *          route start tile
+	 * @param targetTile
+	 *          route target tile
 	 * @return list of directions to walk from the source tile to reach the target tile
 	 */
-	public List<Integer> shortestRoute(Tile source, Tile target) {
-		Integer sourceCell = graph.cell(source.col, source.row);
-		Integer targetCell = graph.cell(target.col, target.row);
-		PathFinder<Integer> pathFinder = new BreadthFirstTraversal<>(graph, sourceCell);
+	public List<Integer> shortestRoute(Tile sourceTile, Tile targetTile) {
+		Integer source = graph.cell(sourceTile.col, sourceTile.row);
+		Integer target = graph.cell(targetTile.col, targetTile.row);
+		PathFinder<Integer> pathFinder = new BreadthFirstTraversal<>(graph, source);
 		pathFinder.run();
 		List<Integer> route = new ArrayList<>();
 		Integer pred = null;
-		for (Integer cell : pathFinder.findPath(targetCell)) {
+		for (Integer cell : pathFinder.findPath(target)) {
 			if (pred != null) {
 				route.add(graph.direction(pred, cell).getAsInt());
 			}

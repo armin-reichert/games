@@ -300,7 +300,7 @@ public class PlayScene extends Scene<PacManGame> {
 	private void nextLevel() {
 		++level;
 		ghostsEatenAtLevel = 0;
-		board.resetContent();
+		board.loadContent();
 		removeBonus();
 		ghostAttackTimer.setLevel(level);
 		ghostAttackTimer.init();
