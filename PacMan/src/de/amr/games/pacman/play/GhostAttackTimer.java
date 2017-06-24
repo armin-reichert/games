@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.timing.Motor;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
-import de.amr.games.pacman.core.statemachine.StateMachine;
 
 /**
  * State machine which controls the timing of the ghost attacks.

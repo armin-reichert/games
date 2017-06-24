@@ -17,13 +17,13 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.statemachine.State;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
-import de.amr.games.pacman.core.statemachine.State;
-import de.amr.games.pacman.core.statemachine.StateMachine;
 import de.amr.games.pacman.theme.PacManTheme;
 
 /**

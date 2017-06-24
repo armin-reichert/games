@@ -5,11 +5,11 @@ import static de.amr.easy.grid.impl.Top4.Top4;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.amr.easy.statemachine.State;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.board.TileContent;
 import de.amr.games.pacman.core.entities.BoardMover;
-import de.amr.games.pacman.core.statemachine.State;
 
 /**
  * A state that lets the specified entity walk to the start tile (e.g. a corner tile) and then run

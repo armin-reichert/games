@@ -3,10 +3,10 @@ package de.amr.games.pacman.core.entities.ghost.behaviors;
 import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.games.pacman.core.board.TileContent.GhostHouse;
 
+import de.amr.easy.statemachine.State;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.BoardMover;
-import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.play.PlayScene;
 
 /**

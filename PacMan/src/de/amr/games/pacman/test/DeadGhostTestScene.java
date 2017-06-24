@@ -9,7 +9,6 @@ import static de.amr.games.pacman.core.entities.ghost.behaviors.GhostState.Scatt
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawSprite;
 import static de.amr.games.pacman.misc.SceneHelper.drawTextCentered;
-import static de.amr.games.pacman.play.PlayScene.GHOST_HOUSE_ENTRY;
 import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import static java.util.stream.IntStream.range;
 
@@ -30,6 +29,8 @@ import de.amr.games.pacman.theme.PacManTheme;
 
 public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
+	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
+	
 	private final PacManTheme theme;
 	private final Board board;
 	private final Random rand;

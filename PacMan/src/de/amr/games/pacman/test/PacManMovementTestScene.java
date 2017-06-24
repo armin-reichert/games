@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.statemachine.State;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -36,7 +37,6 @@ import de.amr.games.pacman.core.entities.PacManState;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
-import de.amr.games.pacman.core.statemachine.State;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 

@@ -1,4 +1,4 @@
-package de.amr.games.pacman.core.statemachine;
+package de.amr.easy.statemachine;
 
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;

@@ -68,6 +68,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.Tile;
@@ -81,7 +82,6 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.ChaseWithPartner;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostState;
 import de.amr.games.pacman.core.entities.ghost.behaviors.LoopAroundWalls;
-import de.amr.games.pacman.core.statemachine.StateMachine;
 import de.amr.games.pacman.misc.Highscore;
 import de.amr.games.pacman.theme.PacManTheme;
 
@@ -477,8 +477,8 @@ public class PlayScene extends Scene<PacManGame> {
 
 			// When Pac-Man gets empowered, become frightened for the same duration
 			Stream.of(GhostState.Waiting, GhostState.Scattering, GhostState.Chasing).forEach(ghostState -> {
-				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened,
-						(oldState, newState) -> newState.setDuration(app.motor.secToTicks(model.getPacManAggressiveSeconds(level))));
+				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened, (oldState,
+						newState) -> newState.setDuration(app.motor.secToTicks(model.getPacManAggressiveSeconds(level))));
 			});
 
 			// When in "frightened" state, ghosts move randomly:
