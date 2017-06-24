@@ -243,7 +243,13 @@ public class StateMachine<StateID, Input> {
 	}
 
 	private void traceStateChange(StateID oldState, StateID newState) {
-		logger.ifPresent(log -> log.info(format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState)));
+		logger.ifPresent(log -> {
+			if (oldState != newState) {
+				log.info(format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
+			} else {
+				log.info(format("FSM(%s) stays in state '%s'", description, oldState));
+			}
+		});
 	}
 
 	private void traceStateExit() {
