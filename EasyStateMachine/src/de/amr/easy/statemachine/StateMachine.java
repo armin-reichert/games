@@ -82,7 +82,7 @@ public class StateMachine<StateID, Input> {
 	 * @param frequency
 	 *          the frequency (ticks per second) how this state machine is updated
 	 * 
-	 * TODO this does not really belong to such a general class
+	 *          TODO this does not really belong to such a general class
 	 */
 	public void setFrequency(int frequency) {
 		this.frequency = frequency;
@@ -341,7 +341,7 @@ public class StateMachine<StateID, Input> {
 
 	/**
 	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the given input (event) and the given condition holds.
+	 * (event) equals the current input (event) and the given condition holds.
 	 * 
 	 * @param input
 	 *          the current input (event)
@@ -358,8 +358,8 @@ public class StateMachine<StateID, Input> {
 
 	/**
 	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the given input (event) and the given condition holds. If the transition fires,
-	 * also the given action is executed.
+	 * (event) equals the current input (event). If the transition fires, the given action is
+	 * executed.
 	 * 
 	 * @param input
 	 *          the current input (event)

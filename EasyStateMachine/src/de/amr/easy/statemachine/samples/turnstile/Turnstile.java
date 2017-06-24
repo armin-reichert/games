@@ -11,11 +11,10 @@ import java.util.logging.Logger;
 import de.amr.easy.statemachine.StateMachine;
 
 /**
- * Sample adapted from
+ * Sample taken from
  * https://www.linkedin.com/pulse/automata-based-programming-general-purpose-finite-state-kolarova-1.
  * 
  * @author Armin Reichert
- *
  */
 public class Turnstile {
 
@@ -29,20 +28,14 @@ public class Turnstile {
 		fsm.changeOnInput(COIN, LOCKED, UNLOCKED, (before, after) -> controller.unlock());
 		fsm.changeOnInput(PASS, UNLOCKED, LOCKED, (before, after) -> controller.lock());
 		fsm.changeOnInput(COIN, UNLOCKED, UNLOCKED, (before, after) -> controller.thankyou());
-		fsm.setLogger(LOGGER);
+		// fsm.setLogger(LOGGER);
 	}
 
 	public void init() {
 		fsm.init();
 	}
 
-	/**
-	 * Receives an event and reacts on it.
-	 * 
-	 * @param event
-	 *          {@link TurnstileEvent} enumeration value representing the event type that occurred
-	 */
-	void event(TurnstileEvent event) {
+	public void event(TurnstileEvent event) {
 		fsm.addInput(event);
 		fsm.update();
 	}
