@@ -54,7 +54,7 @@ public class StateMachine<StateID, Input> {
 		this.transitionsByStateID = new HashMap<>();
 		this.logger = Optional.empty();
 	}
-	
+
 	/**
 	 * Sets a logger and activates tracing to this logger.
 	 * 
@@ -94,6 +94,15 @@ public class StateMachine<StateID, Input> {
 	 */
 	public void addInput(Input input) {
 		inputQ.add(input);
+	}
+
+	/**
+	 * Tells if there is input.
+	 * 
+	 * @return if there is input
+	 */
+	public boolean hasInput() {
+		return !inputQ.isEmpty();
 	}
 
 	/**
