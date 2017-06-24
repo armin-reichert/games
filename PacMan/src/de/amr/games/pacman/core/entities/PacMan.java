@@ -19,7 +19,6 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -43,7 +42,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  * @author Armin Reichert
  */
 public class PacMan extends BoardMover {
-	
+
 	private static final Font TEXTFONT = new Font(Font.DIALOG, Font.PLAIN, TILE_SIZE * 9 / 10);
 
 	public StateMachine<PacManState, PacManEvent> control;
@@ -62,7 +61,7 @@ public class PacMan extends BoardMover {
 		this.theme = theme;
 		this.enemies = new HashSet<>();
 		setName("Pac-Man");
-		control = new StateMachine<>("Pac-Man Control", new EnumMap<>(PacManState.class), Initialized);
+		control = new StateMachine<>("Pac-Man Control", PacManState.class, Initialized);
 		steering = this::defaultSteering;
 		canEnterTile = this::defaultCanEnterTileCondition;
 		onContentFound = this::defaultContentFoundHandler;
@@ -172,7 +171,7 @@ public class PacMan extends BoardMover {
 		}
 		enemies.stream().filter(enemy -> enemy.getCol() == getCol() && enemy.getRow() == getRow()).forEach(onEnemyContact);
 	}
-	
+
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(xOffset.getAsInt(), 0);
@@ -191,7 +190,7 @@ public class PacMan extends BoardMover {
 			text.append(")");
 			g.drawString(text.toString(), tr.getX(), tr.getY() - TILE_SIZE);
 		}
-		
+
 		if (app.settings.getBool("drawGrid")) {
 			drawCollisionBox(g, isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
 		}

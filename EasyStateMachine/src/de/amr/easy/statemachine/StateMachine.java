@@ -37,35 +37,24 @@ public class StateMachine<StateID, Input> {
 	private int frequency = 60;
 
 	/**
-	 * Creates a new state machine whose states are stored in the given map.
-	 * 
-	 * @param statesByID
-	 *          a map for storing the states, for example an {@link EnumMap}
-	 * @param initialStateID
-	 *          the ID of the initial state
-	 */
-	public StateMachine(Map<StateID, State> statesByID, StateID initialStateID) {
-		this("Anon state machine", statesByID, initialStateID);
-	}
-
-	/**
-	 * Creates a new state machine whose states are stored in the given map.
+	 * Creates a new state machine.
 	 * 
 	 * @param description
 	 *          a string describing this state machine, used for tracing
-	 * @param statesByID
-	 *          a map for storing the states, for example an {@link EnumMap}
+	 * @param stateIDClass
+	 *          type used for the state IDs, for example an enum
 	 * @param initialStateID
 	 *          the ID of the initial state
 	 */
-	public StateMachine(String description, Map<StateID, State> statesByID, StateID initialStateID) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public StateMachine(String description, Class<StateID> stateIDClass, StateID initialStateID) {
 		this.description = description;
-		this.statesByID = statesByID;
+		this.statesByID = stateIDClass.isEnum() ? new EnumMap(stateIDClass) : new HashMap<>();
 		this.initialStateID = initialStateID;
 		this.transitionsByStateID = new HashMap<>();
 		this.logger = Optional.empty();
 	}
-
+	
 	/**
 	 * Sets a logger and activates tracing to this logger.
 	 * 
@@ -212,10 +201,10 @@ public class StateMachine<StateID, Input> {
 			state().doExit();
 			traceStateExit();
 		}
-		State prevState = state(currentStateID);
+		State stateBefore = state(currentStateID);
 		currentStateID = newStateID;
 		if (action != null) {
-			action.accept(prevState, state());
+			action.accept(stateBefore, state());
 		}
 		traceStateEntry();
 		state().doEntry();

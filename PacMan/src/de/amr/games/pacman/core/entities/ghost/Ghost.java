@@ -11,7 +11,6 @@ import static de.amr.games.pacman.theme.PacManTheme.TILE_SIZE;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.EnumMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -45,7 +44,7 @@ public class Ghost extends BoardMover {
 		setName(name);
 		this.app = app;
 		this.theme = theme;
-		this.control = new StateMachine<>(name, new EnumMap<>(GhostState.class), Initialized);
+		this.control = new StateMachine<>(name, GhostState.class, Initialized);
 		color = Color.WHITE;
 		resume = () -> {
 		};

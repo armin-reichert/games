@@ -2,11 +2,11 @@ package de.amr.easy.statemachine.samples.turnstile;
 
 import java.util.logging.Logger;
 
-class MockController implements TurnstileController {
+class TurnstileTraceController implements TurnstileController {
 	
 	private final Logger log;
 	
-	public MockController(Logger log) {
+	public TurnstileTraceController(Logger log) {
 		this.log = log;
 	}
 

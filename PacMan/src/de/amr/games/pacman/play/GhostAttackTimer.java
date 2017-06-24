@@ -4,7 +4,6 @@ import static de.amr.games.pacman.play.GhostAttackState.Chasing;
 import static de.amr.games.pacman.play.GhostAttackState.Initialized;
 import static de.amr.games.pacman.play.GhostAttackState.Scattering;
 
-import java.util.EnumMap;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -21,7 +20,7 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
  */
 public class GhostAttackTimer {
 
-	private final StateMachine<GhostAttackState,String> fsm;
+	private final StateMachine<GhostAttackState, String> fsm;
 	private final Motor motor;
 	private int level;
 	private int wave;
@@ -35,8 +34,8 @@ public class GhostAttackTimer {
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {
 		this.motor = app.motor;
 
-		fsm = new StateMachine<>("GhostAttackTimer", new EnumMap<>(GhostAttackState.class), Initialized);
-		
+		fsm = new StateMachine<>("GhostAttackTimer", GhostAttackState.class, Initialized);
+
 		fsm.change(Initialized, Scattering, () -> true);
 
 		fsm.state(Scattering).entry = state -> {

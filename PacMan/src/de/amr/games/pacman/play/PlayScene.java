@@ -56,7 +56,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -140,7 +139,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		public PlayControl() {
 
-			super("Play control", new EnumMap<>(PlayState.class), Initializing);
+			super("Play control", PlayState.class, Initializing);
 
 			// Initializing
 
