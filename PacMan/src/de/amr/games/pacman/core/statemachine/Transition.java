@@ -4,7 +4,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 
 /**
- * Transition in a state machine.
+ * A transition in a state machine.
  * 
  * @author Armin Reichert
  *
@@ -13,8 +13,8 @@ import java.util.function.BooleanSupplier;
  */
 class Transition<StateID> {
 
-	BooleanSupplier condition;
-	BiConsumer<State, State> action;
-	StateID oldState;
-	StateID newState;
+	public BooleanSupplier condition;
+	public BiConsumer<State, State> action;
+	public StateID from;
+	public StateID to;
 }

@@ -47,10 +47,10 @@ import de.amr.games.pacman.theme.PacManTheme;
  */
 public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
-	static final Tile PACMAN_HOME = new Tile(26, 13);
-	static final Tile GHOST_HOUSE_LEFT = new Tile(17, 12);
-	static final Tile GHOST_HOUSE_MIDDLE = new Tile(17, 13);
-	static final Tile GHOST_HOUSE_RIGHT = new Tile(17, 15);
+	private static final Tile PACMAN_HOME = new Tile(26, 13);
+	private static final Tile GHOST_HOUSE_LEFT = new Tile(17, 12);
+	private static final Tile GHOST_HOUSE_MIDDLE = new Tile(17, 13);
+	private static final Tile GHOST_HOUSE_RIGHT = new Tile(17, 15);
 
 	private final PacManTheme theme;
 	private final Board board;
@@ -155,6 +155,11 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 			// Initialized
 			ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);
 
+			// Chasing
+			ghost.control.changeOnTimeout(Chasing, Scattering);
+			ghost.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
+			ghost.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
+			
 			// Scattering
 			ghost.control.state(Scattering).update = state -> ghost.follow(getGhostHomeTile(ghost));
 			ghost.control.change(Scattering, Waiting, () -> ghost.currentTile().equals(getGhostHomeTile(ghost)));
@@ -185,39 +190,27 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 			pinky.speed = () -> getGhostSpeed(pinky);
 		};
 		pinky.control.state(Chasing).update = state -> pinky.follow(pacMan.currentTile());
-		pinky.control.changeOnTimeout(Chasing, Scattering);
-		pinky.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
-		pinky.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
 		// Chasing for Inky
 		inky.control.defineState(Chasing, new InkyChasingState());
-		inky.control.changeOnTimeout(Chasing, Scattering);
-		inky.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
-		inky.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
 		// Chasing for Clyde
 		clyde.control.defineState(Chasing, new ClydeChasingState());
-		clyde.control.changeOnTimeout(Chasing, Scattering);
-		clyde.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
-		clyde.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
 
 		start();
 	};
 
 	private class InkyChasingState extends State {
 
-		final Tile[] CORNERS = { new Tile(4, 1), new Tile(32, 1), new Tile(4, 26), new Tile(32, 26) };
-
+		private final Tile[] CORNERS = { new Tile(4, 1), new Tile(32, 1), new Tile(4, 26), new Tile(32, 26) };
 		private Tile currentTarget;
 
 		public InkyChasingState() {
-
 			entry = state -> {
 				state.setDuration(app.motor.secToTicks(20));
 				inky.speed = () -> getGhostSpeed(inky);
 				currentTarget = randomCorner();
 			};
-
 			update = state -> {
 				inky.follow(currentTarget);
 				if (inky.currentTile().equals(currentTarget)) {
@@ -242,13 +235,11 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 	private class ClydeChasingState extends State {
 
 		public ClydeChasingState() {
-
 			entry = state -> {
 				state.setDuration(app.motor.secToTicks(20));
 				clyde.speed = () -> getGhostSpeed(clyde);
 
 			};
-
 			update = state -> {
 				clyde.moveRandomly();
 			};

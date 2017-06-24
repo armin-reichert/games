@@ -80,7 +80,7 @@ public class Ghost extends BoardMover {
 
 	public void setLogger(Logger logger) {
 		control.setLogger(logger);
-		control.setFps(app.motor.getFrequency());
+		control.setFrequency(app.motor.getFrequency());
 	}
 
 	public void receiveEvent(GhostEvent event) {
