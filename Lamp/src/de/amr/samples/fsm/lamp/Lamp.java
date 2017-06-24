@@ -14,29 +14,33 @@ import javax.swing.JPanel;
 
 public class Lamp extends JPanel {
 
-	private static Icon BULB_BRIGHT = null, BULB_DARK = null;
+	private Icon bulbOnImage;
+	private Icon bulbOffImage;
 
-	static {
+	private void loadImages() {
 		BufferedImage bulbs;
 		try {
-			bulbs = ImageIO.read(Lamp.class.getResourceAsStream("assets/bulbs.png"));
+			bulbs = ImageIO.read(getClass().getResourceAsStream("/bulbs.png"));
 			int w = bulbs.getWidth() / 2, h = bulbs.getHeight();
-			BULB_DARK = new ImageIcon(bulbs.getSubimage(0, 0, w, h));
-			BULB_BRIGHT = new ImageIcon(bulbs.getSubimage(w, 0, w, h));
+			bulbOffImage = new ImageIcon(bulbs.getSubimage(0, 0, w, h));
+			bulbOnImage = new ImageIcon(bulbs.getSubimage(w, 0, w, h));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private final JLabel bulb;
+	private final JLabel bulbView;
 	private final JButton lightSwitch;
 
 	public Lamp() {
-		bulb = new JLabel("", JLabel.CENTER);
+		loadImages();
+		bulbView = new JLabel("", bulbOffImage, JLabel.CENTER);
 		lightSwitch = new JButton();
+		lightSwitch.setText("Einschalten");
+		lightSwitch.setIcon(new ImageIcon("assets/lightbulb.png"));
 		setBackground(Color.BLACK);
 		setLayout(new BorderLayout());
-		add(bulb, BorderLayout.CENTER);
+		add(bulbView, BorderLayout.CENTER);
 		add(lightSwitch, BorderLayout.SOUTH);
 	}
 
@@ -45,13 +49,13 @@ public class Lamp extends JPanel {
 	}
 
 	public void switchOn() {
-		bulb.setIcon(BULB_BRIGHT);
+		bulbView.setIcon(bulbOnImage);
 		lightSwitch.setText("Ausschalten");
 		lightSwitch.setIcon(new ImageIcon("assets/lightbulb_off.png"));
 	}
 
 	public void switchOff() {
-		bulb.setIcon(BULB_DARK);
+		bulbView.setIcon(bulbOffImage);
 		lightSwitch.setText("Einschalten");
 		lightSwitch.setIcon(new ImageIcon("assets/lightbulb.png"));
 	}

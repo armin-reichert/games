@@ -8,10 +8,9 @@ import javax.swing.JFrame;
 
 public class LampSample {
 
-	public static final LampSample App = new LampSample();
-
 	public static void main(String[] args) {
-		EventQueue.invokeLater(App::showUI);
+		LampSample app = new LampSample();
+		EventQueue.invokeLater(app::showUI);
 	}
 
 	private final LampControl lampControl;
@@ -29,7 +28,7 @@ public class LampSample {
 	public LampSample() {
 		lamp = new Lamp();
 		lampControl = new LampControl(lamp);
+		lamp.getLightSwitch().addActionListener(e -> lampControl.toggle());
 		lampControl.init();
-		lamp.getLightSwitch().addActionListener((e) -> lampControl.run(LampControl.SWITCHED));
 	}
 }

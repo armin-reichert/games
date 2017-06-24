@@ -1,29 +1,24 @@
 package de.amr.samples.fsm.lamp;
 
-import de.amr.easy.fsm.FSM;
+import de.amr.easy.statemachine.StateMachine;
 
-public class LampControl extends FSM<Boolean, String> {
+public class LampControl extends StateMachine<Boolean, Boolean> {
 
-	public static final Boolean LAMP_IS_OFF = Boolean.FALSE;
-	public static final Boolean LAMP_IS_ON = Boolean.TRUE;
+	// states
+	public static final boolean OFF = false;
+	public static final boolean ON = true;
 
-	public static final String SWITCHED = "X";
+	// events
+	public static final boolean TOGGLE = true;
 
 	public LampControl(Lamp lamp) {
-		//@formatter:off
-		beginFSM()
-			.description("Lamp Controller")
-			.acceptedEvents(SWITCHED)
-			.initialState(LAMP_IS_OFF)
-			.state(LAMP_IS_OFF)
-				.entering(lamp::switchOff)
-				.into(LAMP_IS_ON).on(SWITCHED)
-			.end()
-			.state(LAMP_IS_ON)
-				.entering(lamp::switchOn)
-				.into(LAMP_IS_OFF).on(SWITCHED)
-			.end()
-		.endFSM();
-		//@formatter:on
+		super("Lamp Control", Boolean.class, OFF);
+		changeOnInput(TOGGLE, OFF, ON, (before, after) -> lamp.switchOn());
+		changeOnInput(TOGGLE, ON, OFF, (before, after) -> lamp.switchOff());
+	}
+
+	public void toggle() {
+		addInput(TOGGLE);
+		update();
 	}
 }
