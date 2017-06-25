@@ -40,7 +40,7 @@ public class Vector2 {
 	}
 
 	public float x;
-	
+
 	public float y;
 
 	public Vector2(float x, float y) {
@@ -117,9 +117,10 @@ public class Vector2 {
 	}
 
 	public Vector2 normalize() {
-		if (x != 0 || y != 0) {
-			x = 1;
-			y = 1;
+		float len = length();
+		if (len != 0) {
+			x /= len;
+			y /= len;
 		}
 		return this;
 	}

@@ -1,6 +1,5 @@
 package de.amr.samples.marbletoy.entities;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -20,12 +19,12 @@ public class Marble extends GameEntity {
 	public void update() {
 		tr.move();
 	}
-	
+
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		g.setColor(Color.BLACK);
-		g.fill(getCollisionBox());
+		// g.setColor(Color.BLACK);
+		// g.fill(getCollisionBox());
 	}
 
 }

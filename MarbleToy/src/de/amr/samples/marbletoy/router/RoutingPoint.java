@@ -24,5 +24,5 @@ public enum RoutingPoint {
 		return location;
 	}
 
-	final Vector2 location;
+	private final Vector2 location;
 }

@@ -56,8 +56,8 @@ public class MarbleToy extends GameEntity {
 	@Override
 	public void update() {
 		if (router.is(C, D)) {
-			router.init();
 			Character nextSlot = new Random().nextBoolean() ? 'A' : 'B';
+			router.init();
 			router.addInput(nextSlot);
 			leverControl.addInput(nextSlot);
 		}

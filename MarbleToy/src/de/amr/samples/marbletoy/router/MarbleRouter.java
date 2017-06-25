@@ -52,6 +52,11 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 		change(X2, X3, () -> isMarbleAtLever(2));
 		change(X2, F, () -> isMarbleAt(F));
 
+		state(X3).entry = s -> routeMarble(X3, toy.getLever(2).pointsLeft() ? G : H);
+		state(X3).update = s -> marble.update();
+		change(X3, G, () -> isMarbleAt(G));
+		change(X3, H, () -> isMarbleAt(H));
+		
 		state(E).entry = s -> routeMarble(E, G);
 		state(E).update = s -> marble.update();
 		change(E, G, () -> isMarbleAt(G));
@@ -59,11 +64,6 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 		state(F).entry = s -> routeMarble(F, H);
 		state(F).update = s -> marble.update();
 		change(F, H, () -> isMarbleAt(H));
-		
-		state(X3).entry = s -> routeMarble(X3, toy.getLever(2).pointsLeft() ? G : H);
-		state(X3).update = s -> marble.update();
-		change(X3, G, () -> isMarbleAt(G));
-		change(X3, H, () -> isMarbleAt(H));
 
 		state(G).entry = s -> routeMarble(G, C);
 		state(G).update = s -> marble.update();
@@ -75,12 +75,12 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private void placeMarbleCenteredAt(RoutingPoint p) {
-		marble.tr.moveTo(p.location.x - marble.getWidth() / 2, p.location.y - marble.getHeight() / 2);
+		marble.tr.moveTo(p.getLocation().x - marble.getWidth() / 2, p.getLocation().y - marble.getHeight() / 2);
 	}
 
 	private void routeMarble(RoutingPoint from, RoutingPoint to) {
 		placeMarbleCenteredAt(from);
-		marble.tr.setVel(diff(to.location, from.location).normalize().times(MARBLE_SPEED));
+		marble.tr.setVel(diff(to.getLocation(), from.getLocation()).normalize().times(MARBLE_SPEED));
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {
@@ -88,6 +88,6 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private boolean isMarbleAt(RoutingPoint p) {
-		return marble.getCollisionBox().contains(p.location.roundedX(), p.location.roundedY());
+		return marble.getCollisionBox().contains(p.getLocation().roundedX(), p.getLocation().roundedY());
 	}
 }
