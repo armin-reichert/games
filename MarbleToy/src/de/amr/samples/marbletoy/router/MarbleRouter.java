@@ -15,6 +15,7 @@ import static de.amr.samples.marbletoy.router.RoutingPoint.X2;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X3;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.math.Vector2;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
@@ -30,16 +31,16 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 
 		this.toy = toy;
 		this.marble = toy.getMarble();
-			
-		changeOnInput('A', Initial, A, (s,t) -> placeMarbleCenteredAt(A));
-		changeOnInput('B', Initial, B, (s,t) -> placeMarbleCenteredAt(B));
-		
+
+		changeOnInput('A', Initial, A, (s, t) -> placeMarbleCenteredAt(A));
+		changeOnInput('B', Initial, B, (s, t) -> placeMarbleCenteredAt(B));
+
 		state(A).entry = s -> routeMarble(A, X1);
 		state(A).update = s -> marble.update();
 		change(A, X1, () -> isMarbleAtLever(0));
-		
-		state(B).entry = s -> routeMarble(B,X2);
-		state(B).update = s-> marble.update();
+
+		state(B).entry = s -> routeMarble(B, X2);
+		state(B).update = s -> marble.update();
 		change(B, X2, () -> isMarbleAtLever(1));
 
 		state(X1).entry = s -> routeMarble(X1, toy.getLever(0).pointsLeft() ? E : X3);
@@ -56,7 +57,7 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 		state(X3).update = s -> marble.update();
 		change(X3, G, () -> isMarbleAt(G));
 		change(X3, H, () -> isMarbleAt(H));
-		
+
 		state(E).entry = s -> routeMarble(E, G);
 		state(E).update = s -> marble.update();
 		change(E, G, () -> isMarbleAt(G));
@@ -84,10 +85,12 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {
-		return marble.getCollisionBox().intersects(toy.getLever(leverIndex).getCollisionBox());
+		Vector2 leverLocation = toy.getLever(leverIndex).getCenter();
+		return marble.getCollisionBox().contains(leverLocation.roundedX(), leverLocation.roundedY());
 	}
 
-	private boolean isMarbleAt(RoutingPoint p) {
-		return marble.getCollisionBox().contains(p.getLocation().roundedX(), p.getLocation().roundedY());
+	private boolean isMarbleAt(RoutingPoint point) {
+		Vector2 pointLocation = point.getLocation();
+		return marble.getCollisionBox().contains(pointLocation.roundedX(), pointLocation.roundedY());
 	}
 }
