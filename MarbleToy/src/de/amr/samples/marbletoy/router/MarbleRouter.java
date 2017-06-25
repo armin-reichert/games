@@ -14,108 +14,80 @@ import static de.amr.samples.marbletoy.router.RoutingPoint.X1;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X2;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X3;
 
-import java.util.EnumMap;
-import java.util.Map;
-
-import de.amr.easy.fsm.FSM;
-import de.amr.easy.fsm.FSMState;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
-public class MarbleRouter extends FSM<RoutingPoint, Character> {
+public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 
 	private static final float MARBLE_SPEED = 1.5f;
 
 	private final MarbleToy toy;
 	private final GameEntity marble;
 
-	@Override
-	protected Map<RoutingPoint, FSMState<RoutingPoint, Character>> createStateMap() {
-		return new EnumMap<>(RoutingPoint.class);
-	}
-
 	public MarbleRouter(MarbleToy toy) {
+		super("Marble Router", RoutingPoint.class, RoutingPoint.Initial);
+
 		this.toy = toy;
 		this.marble = toy.getMarble();
-		/*@formatter:off*/
-		beginFSM()
-			.description("Marble Router")
-			.acceptedEvents('A', 'B', '*')
-			.defaultEvent('*')
-			.initialState(Initial)
-			.state(Initial)
-				.into(A).on('A').act(() -> placeMarbleCenteredAt(A))
-				.into(B).on('B').act(() -> placeMarbleCenteredAt(B))
-			.end()
-			.state(A)
-				.entering(() -> route(A, X1))
-				.into(X1).when(() -> atLever(0))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(B)
-				.entering(() -> route(B, X2))
-				.into(X2).when(() -> atLever(1))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(X1)
-				.entering(() -> route(X1, toy.getLever(0).pointsLeft() ? E : X3))
-				.into(E).when(() -> at(E.location))
-				.into(X3).when(() -> atLever(2))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(X2)
-				.entering(() -> route(X2, toy.getLever(1).pointsLeft() ? X3 : F))
-				.into(X3).when(() -> atLever(2))
-				.into(F).when(() -> at(F.location))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(E)
-				.entering(() -> route(E, G))
-				.into(G).when(() -> at(G.location))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(X3)
-				.entering(() -> route(X3, toy.getLever(2).pointsLeft() ? G : H))
-				.into(G).when(() -> at(G.location))
-				.into(H).when(() -> at(H.location))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(F)
-				.entering(() -> route(F, H))
-				.into(H).when(() -> at(H.location))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(G)
-				.entering(() -> route(G, C))
-				.into(C).when(() -> at(C.location))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(H)
-				.entering(() -> route(H, D))
-				.into(D).when(() -> at(D.location))
-				.keep().act(() -> marble.update())
-			.end()
-			.state(C).keep().end()
-			.state(D).keep().end()
-		.endFSM();
-		/*@formatter:on*/
+			
+		changeOnInput('A', Initial, A, (s,t) -> placeMarbleCenteredAt(A));
+		changeOnInput('B', Initial, B, (s,t) -> placeMarbleCenteredAt(B));
+		
+		state(A).entry = s -> routeMarble(A, X1);
+		state(A).update = s -> marble.update();
+		change(A, X1, () -> isMarbleAtLever(0));
+		
+		state(B).entry = s -> routeMarble(B,X2);
+		state(B).update = s-> marble.update();
+		change(B, X2, () -> isMarbleAtLever(1));
+
+		state(X1).entry = s -> routeMarble(X1, toy.getLever(0).pointsLeft() ? E : X3);
+		state(X1).update = s -> marble.update();
+		change(X1, E, () -> isMarbleAt(E));
+		change(X1, X3, () -> isMarbleAtLever(2));
+
+		state(X2).entry = s -> routeMarble(X2, toy.getLever(1).pointsLeft() ? X3 : F);
+		state(X2).update = s -> marble.update();
+		change(X2, X3, () -> isMarbleAtLever(2));
+		change(X2, F, () -> isMarbleAt(F));
+
+		state(E).entry = s -> routeMarble(E, G);
+		state(E).update = s -> marble.update();
+		change(E, G, () -> isMarbleAt(G));
+
+		state(F).entry = s -> routeMarble(F, H);
+		state(F).update = s -> marble.update();
+		change(F, H, () -> isMarbleAt(H));
+		
+		state(X3).entry = s -> routeMarble(X3, toy.getLever(2).pointsLeft() ? G : H);
+		state(X3).update = s -> marble.update();
+		change(X3, G, () -> isMarbleAt(G));
+		change(X3, H, () -> isMarbleAt(H));
+
+		state(G).entry = s -> routeMarble(G, C);
+		state(G).update = s -> marble.update();
+		change(G, C, () -> isMarbleAt(C));
+
+		state(H).entry = s -> routeMarble(H, D);
+		state(H).update = s -> marble.update();
+		change(H, D, () -> isMarbleAt(D));
 	}
 
 	private void placeMarbleCenteredAt(RoutingPoint p) {
 		marble.tr.moveTo(p.location.x - marble.getWidth() / 2, p.location.y - marble.getHeight() / 2);
 	}
 
-	private void route(RoutingPoint from, RoutingPoint to) {
+	private void routeMarble(RoutingPoint from, RoutingPoint to) {
 		placeMarbleCenteredAt(from);
 		marble.tr.setVel(diff(to.location, from.location).normalize().times(MARBLE_SPEED));
 	}
 
-	private boolean atLever(int leverIndex) {
+	private boolean isMarbleAtLever(int leverIndex) {
 		return marble.getCollisionBox().intersects(toy.getLever(leverIndex).getCollisionBox());
 	}
 
-	private boolean at(Vector2 location) {
-		return marble.getCollisionBox().contains(location.roundedX(), location.roundedY());
+	private boolean isMarbleAt(RoutingPoint p) {
+		return marble.getCollisionBox().contains(p.location.roundedX(), p.location.roundedY());
 	}
 }

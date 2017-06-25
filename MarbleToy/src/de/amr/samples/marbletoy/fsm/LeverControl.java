@@ -17,94 +17,71 @@ import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRL_D;
 import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRR;
 import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRR_D;
 
-import java.util.EnumMap;
-import java.util.Map;
-
-import de.amr.easy.fsm.FSM;
-import de.amr.easy.fsm.FSMState;
-import de.amr.easy.fsm.graphviz.FSMGraphVizExporter;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 import de.amr.samples.marbletoy.fsm.LeverControl.StateID;
 
-public class LeverControl extends FSM<StateID, Character> {
+public class LeverControl extends StateMachine<StateID, Character> {
 
 	public enum StateID {
 		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR, LLL_D, LLR_D, LRL_D, LRR_D, RLL_D, RLR_D, RRL_D, RRR_D;
 	};
 
-	@Override
-	protected Map<StateID, FSMState<StateID, Character>> createStateMap() {
-		return new EnumMap<>(StateID.class);
-	}
-
 	public LeverControl(MarbleToy toy) {
-		/*@formatter:off*/
-		beginFSM()
-			.description("Marble Toy Lever Control")
-			.acceptedEvents('A', 'B')
-			.initialState(LLL)
-			.state(LLL).into(RLL).on('A').end()
-			.state(LLL).into(LRR).on('B').end()
-			.state(LLL_D).into(RLL).on('A').end()
-			.state(LLL_D).into(LRR).on('B').end()
-			.state(LLR).into(RLR).on('A').end()
-			.state(LLR).into(LRL_D).on('B').end()
-			.state(LLR_D).into(RLR).on('A').end()
-			.state(LLR_D).into(LRL_D).on('B').end()
-			.state(LRL).into(RRL).on('A').end()
-			.state(LRL).into(LLL_D).on('B').end()
-			.state(LRL_D).into(RRL).on('A').end()
-			.state(LRL_D).into(LLL_D).on('B').end()
-			.state(LRR).into(RRR).on('A').end()
-			.state(LRR).into(LLR_D).on('B').end()
-			.state(LRR_D).into(RRR).on('A').end()
-			.state(LRR_D).into(LLR_D).on('B').end()
-			.state(RLL).into(LLR).on('A').end()
-			.state(RLL).into(RRR).on('B').end()
-			.state(RLL_D).into(LLR).on('A').end()
-			.state(RLL_D).into(RRR).on('B').end()
-			.state(RLR).into(LLL_D).on('A').end()
-			.state(RLR).into(RRL_D).on('B').end()
-			.state(RLR_D).into(LLL_D).on('A').end()
-			.state(RLR_D).into(RRL_D).on('B').end()
-			.state(RRL).into(LRR).on('A').end()
-			.state(RRL).into(RLL_D).on('B').end()
-			.state(RRL_D).into(LRR).on('A').end()
-			.state(RRL_D).into(RLL_D).on('B').end()
-			.state(RRR).into(LRL_D).on('A').end()
-			.state(RRR).into(RLR_D).on('B').end()
-			.state(RRR_D).into(LRL_D).on('A').end()
-			.state(RRR_D).into(RLR_D).on('B').end()
-		.endFSM();
-		/*@formatter:on*/
+		super("Marble Toy Lever Control", StateID.class, LLL);
 
 		for (StateID stateID : StateID.values()) {
-			getState(stateID).setEntryAction(toy::updateLevers);
+			state(stateID).entry = state -> toy.updateLevers();
 		}
+
+		changeOnInput('A', LLL, RLL);
+		changeOnInput('B', LLL, LRR);
+		changeOnInput('A', LLL_D, RLL);
+		changeOnInput('B', LLL_D, LRR);
+		changeOnInput('A', LLR, RLR);
+		changeOnInput('B', LLR, LRL_D);
+		changeOnInput('A', LLR_D, RLR);
+		changeOnInput('B', LLR_D, LRL_D);
+		changeOnInput('A', LRL, RRL);
+		changeOnInput('B', LRL, LLL_D);
+		changeOnInput('A', LRL_D, RRL);
+		changeOnInput('B', LRL_D, LLL_D);
+		changeOnInput('A', LRR, RRR);
+		changeOnInput('B', LRR, LLR_D);
+		changeOnInput('A', LRR_D, RRR);
+		changeOnInput('B', LRR_D, LLR_D);
+		changeOnInput('A', RLL, LLR);
+		changeOnInput('B', RLL, RRR);
+		changeOnInput('A', RLL_D, LLR);
+		changeOnInput('B', RLL_D, RRR);
+		changeOnInput('A', RLR, LLL_D);
+		changeOnInput('B', RLR, RRL_D);
+		changeOnInput('A', RLR_D, LLL_D);
+		changeOnInput('B', RLR_D, RRL_D);
+		changeOnInput('A', RRL, LRR);
+		changeOnInput('B', RRL, RLL_D);
+		changeOnInput('A', RRL_D, LRR);
+		changeOnInput('B', RRL_D, RLL_D);
+		changeOnInput('A', RRR, LRL_D);
+		changeOnInput('B', RRR, RLR_D);
+		changeOnInput('A', RRR_D, LRL_D);
+		changeOnInput('B', RRR_D, RLR_D);
 	}
 
 	public boolean isFinalState() {
-		return getCurrentState().name().endsWith("_D");
+		return stateID().name().endsWith("_D");
 	}
 
 	public boolean isRoutingLeft(int leverIndex) {
-		return getCurrentState().name().charAt(leverIndex) == 'L';
+		return stateID().name().charAt(leverIndex) == 'L';
 	}
 
 	public boolean accepts(String input) {
 		init();
 		for (int i = 0; i < input.length(); ++i) {
-			run(input.charAt(i));
+			addInput(input.charAt(i));
+			update();
 		}
 		return isFinalState();
 	}
-
-	@Override
-	public String toGraphViz() {
-		FSMGraphVizExporter<StateID, Character> gv = new FSMGraphVizExporter<>();
-		gv.setFontSize(10);
-		gv.setLeftToRight(true);
-		return gv.exportFSM(this);
-	}
-
 }

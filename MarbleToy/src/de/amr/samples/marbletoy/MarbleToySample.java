@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.amr.samples.marbletoy.entities.Marble;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 import de.amr.samples.marbletoy.fsm.LeverControl;
 import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine;
@@ -15,13 +16,12 @@ import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine;
 public class MarbleToySample {
 
 	public static void main(String[] args) {
-		MarbleToySample sample = new MarbleToySample(args.length == 0 ? 4 : Integer.parseInt(args[0]));
-		System.out.println(sample.leverControlFA.toGraphViz());
+		new MarbleToySample(10);
 	}
 
 	private final Set<String> inputs;
 	private final LeverControlMealyMachine mealy = new LeverControlMealyMachine();
-	private final LeverControl leverControlFA = new LeverControl(new MarbleToy());
+	private final LeverControl leverControlFA = new LeverControl(new MarbleToy(null, new Marble(null)));
 	private final Set<String> acceptedByMealy = new LinkedHashSet<>();
 	private final Set<String> acceptedByFA = new LinkedHashSet<>();
 
@@ -43,6 +43,7 @@ public class MarbleToySample {
 			System.out.print(acceptedByFA.contains(input));
 			if (acceptedByMealy.contains(input) != acceptedByFA.contains(input)) {
 				System.out.print(" ERROR!");
+				return;
 			}
 			System.out.println();
 		}

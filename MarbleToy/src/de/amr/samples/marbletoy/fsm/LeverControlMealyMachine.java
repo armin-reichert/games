@@ -1,67 +1,56 @@
 package de.amr.samples.marbletoy.fsm;
 
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.LLL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.LLR;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.LRL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.LRR;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.RLL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.RLR;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.RRL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State.RRR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LLL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LLR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LRL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LRR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RLL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RLR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RRL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RRR;
 
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.function.BiConsumer;
 
-import de.amr.easy.fsm.FSM;
-import de.amr.easy.fsm.FSMState;
-import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.State;
+import de.amr.easy.statemachine.State;
+import de.amr.easy.statemachine.StateMachine;
+import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID;
 
-public class LeverControlMealyMachine extends FSM<State, Character> {
+public class LeverControlMealyMachine extends StateMachine<StateID, Character> {
 
-	public enum State {
+	public enum StateID {
 		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR;
 	};
 
 	private final StringBuilder output = new StringBuilder();
-	private final Runnable C = () -> output.append('C');
-	private final Runnable D = () -> output.append('D');
+	private final BiConsumer<State, State> C = (before, after) -> output.append('C');
+	private final BiConsumer<State, State> D = (before, after) -> output.append('D');
 
 	public LeverControlMealyMachine() {
-		/*@formatter:off*/
-		beginFSM()
-			.description("Mealy Machine for Marble MarbleToy")
-			.acceptedEvents('A', 'B')
-			.initialState(LLL)
-			.state(LLL).into(RLL).on('A').act(C).end()
-			.state(LLL).into(LRR).on('B').act(C).end()
-			.state(LLR).into(RLR).on('A').act(C).end()
-			.state(LLR).into(LRL).on('B').act(D).end()
-			.state(LRL).into(RRL).on('A').act(C).end()
-			.state(LRL).into(LLL).on('B').act(D).end()
-			.state(LRR).into(RRR).on('A').act(C).end()
-			.state(LRR).into(LLR).on('B').act(D).end()
-			.state(RLL).into(LLR).on('A').act(C).end()
-			.state(RLL).into(RRR).on('B').act(C).end()
-			.state(RLR).into(LLL).on('A').act(D).end()
-			.state(RLR).into(RRL).on('B').act(D).end()
-			.state(RRL).into(LRR).on('A').act(C).end()
-			.state(RRL).into(RLL).on('B').act(D).end()
-			.state(RRR).into(LRL).on('A').act(D).end()
-			.state(RRR).into(RLR).on('B').act(D).end()
-		.endFSM();		
-		/*@formatter:on*/
-	}
-
-	@Override
-	protected Map<State, FSMState<State, Character>> createStateMap() {
-		return new EnumMap<>(State.class);
+		super("Mealy Machine for Marble MarbleToy", StateID.class, StateID.LLL);
+		changeOnInput('A', LLL, RLL, C);
+		changeOnInput('B', LLL, LRR, C);
+		changeOnInput('A', LLR, RLR, C);
+		changeOnInput('B', LLR, LRL, D);
+		changeOnInput('A', LRL, RRL, C);
+		changeOnInput('B', LRL, LLL, D);
+		changeOnInput('A', LRR, RRR, C);
+		changeOnInput('B', LRR, LLR, D);
+		changeOnInput('A', RLL, LLR, C);
+		changeOnInput('B', RLL, RRR, C);
+		changeOnInput('A', RLR, LLL, D);
+		changeOnInput('B', RLR, RRL, D);
+		changeOnInput('A', RRL, LRR, C);
+		changeOnInput('B', RRL, RLL, D);
+		changeOnInput('A', RRR, LRL, D);
+		changeOnInput('B', RRR, RLR, D);
 	}
 
 	public boolean accepts(String input) {
 		init();
 		output.setLength(0);
 		for (int i = 0; i < input.length(); ++i) {
-			run(input.charAt(i));
+			addInput(input.charAt(i));
+			update();
 		}
 		return output.length() > 0 && output.charAt(output.length() - 1) == 'D';
 	}

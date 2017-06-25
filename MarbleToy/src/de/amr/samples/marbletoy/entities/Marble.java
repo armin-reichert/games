@@ -1,14 +1,15 @@
 package de.amr.samples.marbletoy.entities;
 
-import static de.amr.samples.marbletoy.MarbleToySimulation.App;
+import java.awt.Color;
+import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 
 public class Marble extends GameEntity {
 
-	public Marble() {
-		super(new Sprite(App.assets.image("marble.png")).scale(50, 50));
+	public Marble(Sprite sprite) {
+		super(sprite);
 	}
 
 	@Override
@@ -18,6 +19,13 @@ public class Marble extends GameEntity {
 	@Override
 	public void update() {
 		tr.move();
+	}
+	
+	@Override
+	public void draw(Graphics2D g) {
+		super.draw(g);
+		g.setColor(Color.BLACK);
+		g.fill(getCollisionBox());
 	}
 
 }

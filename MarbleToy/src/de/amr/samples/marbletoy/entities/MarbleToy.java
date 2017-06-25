@@ -1,6 +1,5 @@
 package de.amr.samples.marbletoy.entities;
 
-import static de.amr.samples.marbletoy.MarbleToySimulation.App;
 import static de.amr.samples.marbletoy.router.RoutingPoint.C;
 import static de.amr.samples.marbletoy.router.RoutingPoint.D;
 import static de.amr.samples.marbletoy.router.RoutingPoint.E;
@@ -16,6 +15,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.EnumSet;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
@@ -32,38 +32,37 @@ public class MarbleToy extends GameEntity {
 	private final Lever[] levers = new Lever[3];
 	private final EnumSet<RoutingPoint> auxPoints = EnumSet.of(E, F, G, H);
 	private final GameEntity marble;
-	private Character inputSlot;
 
-	public MarbleToy() {
-		super(new Sprite(App.assets.image("toy.png")));
-		marble = new Marble();
+	public MarbleToy(Sprite sprite, Marble marble) {
+		super(sprite);
+		this.marble = marble;
 		marble.tr.moveTo(-marble.getWidth(), -marble.getHeight());
 		levers[0] = new Lever(178, 82);
 		levers[1] = new Lever(424, 82);
 		levers[2] = new Lever(301, 204);
 		leverControl = new LeverControl(this);
+		leverControl.setLogger(Logger.getGlobal());
 		router = new MarbleRouter(this);
-		leverControl.init();
-		router.init();
-		inputSlot = 'A';
+		router.setLogger(Logger.getGlobal());
 	}
 
 	@Override
 	public void init() {
-
+		leverControl.init();
+		router.init();
+		router.addInput('A');
 	}
 
 	@Override
 	public void update() {
-		if (router.getCurrentState() == Initial) {
-			router.run(inputSlot);
-		} else if (router.getCurrentState() == C || router.getCurrentState() == D) {
-			leverControl.run(inputSlot);
-			inputSlot = new Random().nextBoolean() ? 'A' : 'B';
+		if (router.is(C, D)) {
 			router.init();
-		} else {
-			router.run('*');
+			Character nextSlot = new Random().nextBoolean() ? 'A' : 'B';
+			router.addInput(nextSlot);
+			leverControl.addInput(nextSlot);
 		}
+		leverControl.update();
+		router.update();
 	}
 
 	public GameEntity getMarble() {

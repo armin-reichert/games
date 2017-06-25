@@ -9,7 +9,7 @@ import de.amr.easy.game.entity.GameEntity;
 
 public class Lever extends GameEntity {
 
-	private int size = 30;
+	private int size = 50;
 	private int legLen = size * 75 / 100;
 	private boolean pointsLeft;
 
@@ -17,6 +17,16 @@ public class Lever extends GameEntity {
 		tr.moveTo(x, y);
 	}
 
+	@Override
+	public int getWidth() {
+		return size;
+	}
+	
+	@Override
+	public int getHeight() {
+		return size;
+	}
+	
 	@Override
 	public void init() {
 	}
@@ -44,6 +54,8 @@ public class Lever extends GameEntity {
 			g.drawLine(x - legLen, y - legLen, x + legLen, y + legLen);
 		}
 		g.fillOval(x - size / 2, y - size / 2, size, size);
+		g.setColor(Color.BLACK);
+		g.fill(getCollisionBox());
 	}
 
 	@Override

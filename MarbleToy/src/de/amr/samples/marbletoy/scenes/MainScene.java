@@ -1,7 +1,5 @@
 package de.amr.samples.marbletoy.scenes;
 
-import static de.amr.samples.marbletoy.MarbleToySimulation.App;
-
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.scene.Scene;
@@ -18,7 +16,8 @@ public class MainScene extends Scene<MarbleToySimulation> {
 
 	@Override
 	public void init() {
-		toy = App.entities.findAny(MarbleToy.class);
+		toy = app.entities.findAny(MarbleToy.class);
+		toy.init();
 	}
 
 	@Override
