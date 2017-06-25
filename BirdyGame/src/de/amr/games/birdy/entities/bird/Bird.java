@@ -1,13 +1,12 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.games.birdy.GameEvent.Tick;
 import static de.amr.games.birdy.Globals.BIRD_JUMP_SPEED;
 import static de.amr.games.birdy.Globals.WORLD_GRAVITY;
 
 import java.awt.Rectangle;
 
-import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMEventDispatcher;
+import de.amr.easy.game.Application;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
@@ -16,8 +15,8 @@ import de.amr.games.birdy.assets.BirdySound;
 
 public class Bird extends GameEntity implements FSMEventDispatcher<GameEvent> {
 
-	private final FSM<FlightState, GameEvent> flight;
-	private final FSM<HealthState, GameEvent> health;
+	private final FlightControl flight;
+	private final HealthControl health;
 	private Feathers feathers;
 
 	public Bird(Score score) {
@@ -25,6 +24,7 @@ public class Bird extends GameEntity implements FSMEventDispatcher<GameEvent> {
 		feathers = Feathers.YELLOW;
 		flight = new FlightControl(this);
 		health = new HealthControl(this);
+		health.setLogger(Application.Log);
 	}
 
 	@Override
@@ -35,26 +35,22 @@ public class Bird extends GameEntity implements FSMEventDispatcher<GameEvent> {
 
 	@Override
 	public void update() {
-		flight.run(Tick);
-		health.run(Tick);
+		flight.update();
+		health.update();
 	}
 
 	@Override
 	public void dispatch(GameEvent event) {
-		if (flight.isEventAccepted(event)) {
-			flight.enqueue(event);
-		}
-		if (health.isEventAccepted(event)) {
-			health.enqueue(event);
-		}
+		flight.addInput(event);
+		health.addInput(event);
 	}
 
 	public FlightState getFlightState() {
-		return flight.getCurrentState();
+		return flight.stateID();
 	}
 
 	public HealthState getHealthState() {
-		return health.getCurrentState();
+		return health.stateID();
 	}
 
 	@Override

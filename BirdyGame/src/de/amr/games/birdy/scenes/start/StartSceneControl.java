@@ -1,8 +1,6 @@
 package de.amr.games.birdy.scenes.start;
 
-import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.GameEvent.Tick;
 import static de.amr.games.birdy.Globals.JUMP_KEY;
 import static de.amr.games.birdy.Globals.TIME_BEFORE_PLAY;
 import static de.amr.games.birdy.scenes.start.StartSceneState.Over;
@@ -11,58 +9,33 @@ import static de.amr.games.birdy.scenes.start.StartSceneState.StartPlaying;
 import static de.amr.games.birdy.scenes.start.StartSceneState.Waiting;
 import static java.awt.event.KeyEvent.VK_SPACE;
 
-import java.util.EnumMap;
-import java.util.Map;
-
-import de.amr.easy.fsm.FSM;
-import de.amr.easy.fsm.FSMState;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.timing.Countdown;
+import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.GameEvent;
 import de.amr.games.birdy.scenes.play.PlayScene;
 
-public class StartSceneControl extends FSM<StartSceneState, GameEvent> {
+public class StartSceneControl extends StateMachine<StartSceneState, GameEvent> {
 
-	private Countdown ready321 = new Countdown(TIME_BEFORE_PLAY);
+	public StartSceneControl(BirdyGame app, StartScene scene) {
+		super("Start Scene Control", StartSceneState.class, Waiting);
 
-	@Override
-	protected Map<StartSceneState, FSMState<StartSceneState, GameEvent>> createStateMap() {
-		return new EnumMap<>(StartSceneState.class);
-	}
+		state(Waiting).entry = s -> scene.reset();
+		state(Waiting).update = s -> scene.keepBirdInAir();
+		change(Waiting, Ready, () -> Keyboard.keyDown(JUMP_KEY));
+		changeOnInput(BirdTouchedGround, Waiting, Over);
 
-	public StartSceneControl(StartScene scene) {
-		//@formatter:off
-		beginFSM()
-			.description("Start Scene Control")
-			.acceptedEvents(Tick, BirdTouchedGround)
-			.defaultEvent(Tick)
-			.initialState(Waiting)
-			
-			.state(Waiting)
-				.entering(scene::reset)
-				.keep().act(scene::keepBirdInAir)
-				.into(Ready).when(() -> Keyboard.keyDown(JUMP_KEY))
-				.into(Over).on(BirdTouchedGround)
-			.end()
-			
-			.state(Ready)
-				.entering(() -> {	scene.showReadyText(); ready321.restart(); })
-				.keep().act(ready321::update)
-				.into(Over).on(BirdTouchedGround).act(scene::showTitleText)
-				.into(StartPlaying).when(() -> Keyboard.keyDown(JUMP_KEY) || ready321.isComplete())
-			.end()
-			
-			.state(Over)
-				.entering(scene::stopScrolling)
-				.into(Waiting).when(() -> Keyboard.keyPressedOnce(VK_SPACE))
-				.keep()
-			.end()
-			
-			.state(StartPlaying)
-				.entering(() -> Game.views.show(PlayScene.class))
-			.end()
-			
-		.endFSM();
-		//@formatter:on
+		state(Ready).entry = s -> {
+			s.setDuration(TIME_BEFORE_PLAY);
+			scene.showReadyText();
+		};
+		changeOnInput(BirdTouchedGround, Ready, Over, (s, t) -> scene.showTitleText());
+		change(Ready, StartPlaying, () -> Keyboard.keyDown(JUMP_KEY));
+		changeOnTimeout(Ready, StartPlaying);
+
+		state(Over).entry = s -> scene.stopScrolling();
+		change(Over, Waiting, () -> Keyboard.keyPressedOnce(VK_SPACE));
+
+		state(StartSceneState.StartPlaying).entry = s -> app.views.show(PlayScene.class);
 	}
 }

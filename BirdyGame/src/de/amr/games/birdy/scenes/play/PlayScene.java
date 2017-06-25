@@ -5,7 +5,6 @@ import static de.amr.games.birdy.GameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.GameEvent.BirdTouchedPipe;
-import static de.amr.games.birdy.GameEvent.Tick;
 import static de.amr.games.birdy.Globals.OBSTACLE_MAX_CREATION_TIME;
 import static de.amr.games.birdy.Globals.OBSTACLE_MIN_CREATION_TIME;
 import static de.amr.games.birdy.Globals.OBSTACLE_MIN_PIPE_HEIGHT;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Random;
 
 import de.amr.easy.fsm.FSMEventDispatcher;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
@@ -53,13 +51,12 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 
 	public PlayScene(BirdyGame game) {
 		super(game);
-		control = new PlaySceneControl(this);
-		Application.Log.info("\n" + control.toGraphViz());
+		control = new PlaySceneControl(app, this);
 	}
 
 	@Override
 	public void dispatch(GameEvent event) {
-		control.enqueue(event);
+		control.addInput(event);
 		bird.dispatch(event);
 	}
 
@@ -95,7 +92,7 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 		for (Collision collision : CollisionHandler.collisions()) {
 			dispatch((GameEvent) collision.getAppEvent());
 		}
-		control.run(Tick);
+		control.update();
 	}
 
 	@Override
@@ -105,7 +102,7 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 		ground.draw(g);
 		scoreDisplay.draw(g);
 		bird.draw(g);
-		if (control.getCurrentState() == PlaySceneState.GameOver) {
+		if (control.stateID() == PlaySceneState.GameOver) {
 			gameOverText.draw(g);
 		}
 		showState(g);
@@ -120,7 +117,7 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 
 	@Override
 	public String toString() {
-		return control.getDescription() + " (" + control.getCurrentState() + ")";
+		return control.getDescription() + " (" + control.stateID() + ")";
 	}
 
 	void startScrolling() {

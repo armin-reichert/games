@@ -78,6 +78,15 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
+	 * The description of this state machine.
+	 * 
+	 * @return the description of this state machine
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
 	 * Initializes this stae machine by switching to the initial state and executing an optional entry
 	 * action.
 	 */
@@ -384,4 +393,27 @@ public class StateMachine<StateID, Input> {
 	public void changeOnInput(Input input, StateID from, StateID to, BiConsumer<State, State> action) {
 		change(from, to, () -> input.equals(inputQ.peek()), action);
 	}
+
+	/**
+	 * Defines a transition between the given states which can be fired only if the given input
+	 * (event) equals the current input (event). If the transition fires, the given action is
+	 * executed.
+	 * 
+	 * @param input
+	 *          the current input (event)
+	 * @param from
+	 *          the source state
+	 * @param to
+	 *          the target state
+	 * @param condition
+	 *          some condition
+	 * @param action
+	 *          some action method. When calling the action, the first parameter contains the old
+	 *          state and the second parameter the new state after the transition has fired
+	 */
+	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition,
+			BiConsumer<State, State> action) {
+		change(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()), action);
+	}
+
 }

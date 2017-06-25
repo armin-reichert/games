@@ -3,7 +3,6 @@ package de.amr.games.birdy.scenes.start;
 import static de.amr.games.birdy.BirdyGame.Game;
 import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.GameEvent.Tick;
 import static de.amr.games.birdy.Globals.WORLD_SPEED;
 
 import java.awt.Color;
@@ -11,7 +10,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import de.amr.easy.fsm.FSM;
 import de.amr.easy.fsm.FSMEventDispatcher;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.common.PumpingText;
@@ -36,12 +34,12 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 	private Ground ground;
 	private GameEntity displayedText;
 
-	private final FSM<StartSceneState, GameEvent> control;
+	private final StartSceneControl control;
 
 	public StartScene(BirdyGame game) {
 		super(game);
-		control = new StartSceneControl(this);
-		Application.Log.info("\n" + control.toGraphViz());
+		control = new StartSceneControl(app, this);
+//		control.setLogger(Application.Log);
 	}
 
 	@Override
@@ -80,12 +78,11 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 		for (Collision ce : CollisionHandler.collisions()) {
 			dispatch((GameEvent) ce.getAppEvent());
 		}
-		control.run(Tick);
+		control.update();
 	}
 
 	@Override
 	public void dispatch(GameEvent event) {
-		control.enqueue(event);
 		bird.dispatch(event);
 	}
 
@@ -108,7 +105,7 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 
 	@Override
 	public String toString() {
-		return control.getDescription() + "(" + control.getCurrentState() + ")";
+		return control.getDescription() + "(" + control.stateID() + ")";
 	}
 
 	void showReadyText() {
