@@ -295,6 +295,18 @@ public class StateMachine<StateID, Input> {
 	};
 
 	/**
+	 * Defines a transition between the given states which can always be fired.
+	 * 
+	 * @param from
+	 *          the source state
+	 * @param to
+	 *          the target state
+	 */
+	public void change(StateID from, StateID to) {
+		change(from, to, () -> true);
+	};
+
+	/**
 	 * Defines a transition between the given states which can be fired if the source state got a
 	 * timeout.
 	 * 

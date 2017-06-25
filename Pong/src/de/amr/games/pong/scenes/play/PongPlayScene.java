@@ -1,15 +1,15 @@
 package de.amr.games.pong.scenes.play;
 
-import static de.amr.games.pong.Globals.BALL_SPEED;
-import static de.amr.games.pong.Globals.FONT;
-import static de.amr.games.pong.Globals.WINNING_SCORE;
-import static de.amr.games.pong.PongGame.Game;
+import static de.amr.games.pong.PongGlobals.BALL_SPEED;
+import static de.amr.games.pong.PongGlobals.FONT;
+import static de.amr.games.pong.PongGlobals.WINNING_SCORE;
 import static java.awt.event.KeyEvent.VK_C;
 import static java.awt.event.KeyEvent.VK_CONTROL;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
@@ -22,7 +22,7 @@ import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.ScoreDisplay;
 import de.amr.games.pong.scenes.menu.Menu;
 
-public class PlayScene extends Scene<PongGame> {
+public class PongPlayScene extends Scene<PongGame> {
 
 	private final PlaySceneControl control;
 	private Court court;
@@ -31,34 +31,35 @@ public class PlayScene extends Scene<PongGame> {
 	private Ball ball;
 	private ScoreDisplay score;
 
-	public PlayScene(PongGame game) {
+	public PongPlayScene(PongGame game) {
 		super(game);
 		control = new PlaySceneControl(this);
+		control.setLogger(Logger.getGlobal());
 	}
 
 	@Override
 	public void init() {
-		court = Game.entities.findAny(Court.class);
+		court = app.entities.findAny(Court.class);
 		switch (getApp().getPlayMode()) {
 		case Computer_Computer:
-			paddleLeft = Game.entities.findAny(AutoPaddleLeft.class);
-			paddleRight = Game.entities.findAny(AutoPaddleRight.class);
+			paddleLeft = app.entities.findAny(AutoPaddleLeft.class);
+			paddleRight = app.entities.findAny(AutoPaddleRight.class);
 			break;
 		case Computer_Player2:
-			paddleLeft = Game.entities.findAny(AutoPaddleLeft.class);
-			paddleRight = Game.entities.findByName(Paddle.class, "paddleRight");
+			paddleLeft = app.entities.findAny(AutoPaddleLeft.class);
+			paddleRight = app.entities.findByName(Paddle.class, "paddleRight");
 			break;
 		case Player1_Computer:
-			paddleLeft = Game.entities.findByName(Paddle.class, "paddleLeft");
-			paddleRight = Game.entities.findAny(AutoPaddleRight.class);
+			paddleLeft = app.entities.findByName(Paddle.class, "paddleLeft");
+			paddleRight = app.entities.findAny(AutoPaddleRight.class);
 			break;
 		case Player1_Player2:
-			paddleLeft = Game.entities.findByName(Paddle.class, "paddleLeft");
-			paddleRight = Game.entities.findByName(Paddle.class, "paddleRight");
+			paddleLeft = app.entities.findByName(Paddle.class, "paddleLeft");
+			paddleRight = app.entities.findByName(Paddle.class, "paddleRight");
 			break;
 		}
-		ball = Game.entities.findAny(Ball.class);
-		score = Game.entities.findAny(ScoreDisplay.class);
+		ball = app.entities.findAny(Ball.class);
+		score = app.entities.findAny(ScoreDisplay.class);
 		score.centerHor(getWidth());
 		score.tr.setY(100);
 		control.init();
@@ -67,9 +68,9 @@ public class PlayScene extends Scene<PongGame> {
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(VK_CONTROL, VK_C)) {
-			Game.views.show(Menu.class);
+			app.views.show(Menu.class);
 		}
-		control.run(PlaySceneEvent.Tick);
+		control.update();
 	}
 
 	void updateEntities() {
@@ -151,13 +152,13 @@ public class PlayScene extends Scene<PongGame> {
 	void bounceBallFromLeftPaddle() {
 		ball.tr.setX(paddleLeft.tr.getX() + paddleLeft.getWidth() + 1);
 		ball.tr.setVelX(-ball.tr.getVelX());
-		Game.assets.sound("plop.mp3").play();
+		app.assets.sound("plop.mp3").play();
 	}
 
 	void bounceBallFromRightPaddle() {
 		ball.tr.setX(paddleRight.tr.getX() - ball.getWidth() - 1);
 		ball.tr.setVelX(-ball.tr.getVelX());
-		Game.assets.sound("plip.mp3").play();
+		app.assets.sound("plip.mp3").play();
 	}
 
 	boolean leftPlayerWins() {

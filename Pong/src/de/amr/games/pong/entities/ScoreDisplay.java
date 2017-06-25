@@ -1,7 +1,7 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.Globals.FONT;
-import static de.amr.games.pong.Globals.SCORE_COLOR;
+import static de.amr.games.pong.PongGlobals.FONT;
+import static de.amr.games.pong.PongGlobals.SCORE_COLOR;
 
 import java.awt.Graphics2D;
 

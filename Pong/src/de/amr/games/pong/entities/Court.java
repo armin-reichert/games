@@ -1,8 +1,8 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.Globals.COURT_BACKGROUND;
-import static de.amr.games.pong.Globals.COURT_LINES_COLOR;
-import static de.amr.games.pong.Globals.COURT_LINE_WIDTH;
+import static de.amr.games.pong.PongGlobals.COURT_BACKGROUND;
+import static de.amr.games.pong.PongGlobals.COURT_LINES_COLOR;
+import static de.amr.games.pong.PongGlobals.COURT_LINE_WIDTH;
 
 import java.awt.Graphics2D;
 

@@ -1,6 +1,6 @@
 package de.amr.games.pong;
 
-import static de.amr.games.pong.Globals.WINNING_SCORE;
+import static de.amr.games.pong.PongGlobals.WINNING_SCORE;
 
 import java.awt.event.KeyEvent;
 
@@ -14,7 +14,7 @@ import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.ScoreDisplay;
 import de.amr.games.pong.scenes.menu.Menu;
-import de.amr.games.pong.scenes.play.PlayScene;
+import de.amr.games.pong.scenes.play.PongPlayScene;
 
 public class PongGame extends Application {
 
@@ -22,14 +22,13 @@ public class PongGame extends Application {
 		Player1_Player2, Player1_Computer, Computer_Player2, Computer_Computer
 	}
 
-	public static final PongGame Game = new PongGame();
-
 	public static void main(String[] args) {
-		Game.settings.title = "Pong";
-		Game.settings.width = 640;
-		Game.settings.height = 480;
-		Game.settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
-		launch(Game);
+		PongGame app = new PongGame();
+		app.settings.title = "Pong";
+		app.settings.width = 640;
+		app.settings.height = 480;
+		app.settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
+		launch(app);
 	}
 
 	private PlayMode playMode;
@@ -61,7 +60,7 @@ public class PongGame extends Application {
 		entities.add(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
 
 		views.add(new Menu(this));
-		views.add(new PlayScene(this));
+		views.add(new PongPlayScene(this));
 		views.show(Menu.class);
 	}
 

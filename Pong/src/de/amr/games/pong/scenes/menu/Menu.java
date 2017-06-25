@@ -1,10 +1,9 @@
 package de.amr.games.pong.scenes.menu;
 
-import static de.amr.games.pong.Globals.FONT;
-import static de.amr.games.pong.Globals.MENU_BACKGROUND;
-import static de.amr.games.pong.Globals.MENU_HIGHLIGHT;
-import static de.amr.games.pong.Globals.MENU_SELECTED_BACKGROUND;
-import static de.amr.games.pong.PongGame.Game;
+import static de.amr.games.pong.PongGlobals.FONT;
+import static de.amr.games.pong.PongGlobals.MENU_BACKGROUND;
+import static de.amr.games.pong.PongGlobals.MENU_HIGHLIGHT;
+import static de.amr.games.pong.PongGlobals.MENU_SELECTED_BACKGROUND;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -15,7 +14,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.PongGame.PlayMode;
-import de.amr.games.pong.scenes.play.PlayScene;
+import de.amr.games.pong.scenes.play.PongPlayScene;
 
 public class Menu extends Scene<PongGame> {
 
@@ -52,7 +51,7 @@ public class Menu extends Scene<PongGame> {
 			int current = getApp().getPlayMode().ordinal();
 			getApp().setPlayMode(current == 0 ? values[values.length - 1] : values[current - 1]);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-			Game.views.show(PlayScene.class);
+			app.views.show(PongPlayScene.class);
 		}
 	}
 

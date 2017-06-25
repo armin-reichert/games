@@ -1,9 +1,9 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.Globals.PADDLE_COLOR;
-import static de.amr.games.pong.Globals.PADDLE_HEIGHT;
-import static de.amr.games.pong.Globals.PADDLE_SPEED;
-import static de.amr.games.pong.Globals.PADDLE_WIDTH;
+import static de.amr.games.pong.PongGlobals.PADDLE_COLOR;
+import static de.amr.games.pong.PongGlobals.PADDLE_HEIGHT;
+import static de.amr.games.pong.PongGlobals.PADDLE_SPEED;
+import static de.amr.games.pong.PongGlobals.PADDLE_WIDTH;
 
 import java.awt.Graphics2D;
 

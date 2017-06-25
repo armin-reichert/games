@@ -1,7 +1,7 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.Globals.BALL_COLOR;
-import static de.amr.games.pong.Globals.BALL_SIZE;
+import static de.amr.games.pong.PongGlobals.BALL_COLOR;
+import static de.amr.games.pong.PongGlobals.BALL_SIZE;
 
 import java.awt.Graphics2D;
 

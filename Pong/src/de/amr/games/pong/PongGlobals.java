@@ -3,7 +3,7 @@ package de.amr.games.pong;
 import java.awt.Color;
 import java.awt.Font;
 
-public class Globals {
+public class PongGlobals {
 
 	public static final int WINNING_SCORE = 11;
 
@@ -17,7 +17,7 @@ public class Globals {
 	public static final Color COURT_LINES_COLOR = Color.WHITE;
 	public static final int COURT_LINE_WIDTH = 5;
 
-	public static final int NEW_BALL_DELAY = 120;
+	public static final int SERVING_TIME = 120;
 	public static final int BALL_SIZE = 16;
 	public static final int BALL_SPEED = 10;
 	public static final Color BALL_COLOR = Color.YELLOW;
