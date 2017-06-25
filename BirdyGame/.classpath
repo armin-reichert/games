@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="assets"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EasyGame"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/EasyFSM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EasyStateMachine"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

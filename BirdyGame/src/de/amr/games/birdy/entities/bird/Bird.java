@@ -5,7 +5,6 @@ import static de.amr.games.birdy.Globals.WORLD_GRAVITY;
 
 import java.awt.Rectangle;
 
-import de.amr.easy.fsm.FSMEventDispatcher;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
@@ -13,7 +12,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.GameEvent;
 import de.amr.games.birdy.assets.BirdySound;
 
-public class Bird extends GameEntity implements FSMEventDispatcher<GameEvent> {
+public class Bird extends GameEntity {
 
 	private final FlightControl flight;
 	private final HealthControl health;
@@ -39,7 +38,6 @@ public class Bird extends GameEntity implements FSMEventDispatcher<GameEvent> {
 		health.update();
 	}
 
-	@Override
 	public void dispatch(GameEvent event) {
 		flight.addInput(event);
 		health.addInput(event);

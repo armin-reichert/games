@@ -3,61 +3,38 @@ package de.amr.games.breakout.scenes;
 import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBat;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBrick;
-import static de.amr.games.breakout.scenes.PlayEvent.Tick;
 import static de.amr.games.breakout.scenes.PlayState.BallOut;
 import static de.amr.games.breakout.scenes.PlayState.Initial;
 import static de.amr.games.breakout.scenes.PlayState.Playing;
-import static java.awt.event.KeyEvent.VK_SPACE;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
+import java.awt.event.KeyEvent;
 
-import de.amr.easy.fsm.FSM;
-import de.amr.easy.fsm.FSMState;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.breakout.entities.Ball;
-import de.amr.games.breakout.entities.Brick;
 
-public class PlaySceneControl extends FSM<PlayState, PlayEvent> {
-
-	@Override
-	protected Map<PlayState, FSMState<PlayState, PlayEvent>> createStateMap() {
-		return new EnumMap<>(PlayState.class);
-	}
+public class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
 
 	public PlaySceneControl(PlayScene scene) {
+		super("Breakout Application Control", PlayState.class, Initial);
 		final Ball ball = Game.entities.findAny(Ball.class);
-		/*@formatter:off*/
-		beginFSM()
-			.description("Breakout Application Control")
-			.acceptedEvents(EnumSet.allOf(PlayEvent.class))
-			.defaultEvent(Tick)
-			.initialState(Initial)
-			
-			.state(Initial)
-				.entering(scene::reset)
-				.into(Playing).when(() -> Keyboard.keyPressedOnce(VK_SPACE))
-				.keep()
-			.end()
-			
-			.state(Playing)
-				.entering(scene::shootBall)
-				.keep().act(scene::updateEntities)
-				.keep().on(BallHitsBat).act(scene::bounceBallFromBat)
-				.keep().on(BallHitsBrick).act((context) -> {
-					Brick brick = context.getEvent().collision.getSecond();
-					scene.brickWasHit(brick);
-				})
-				.into(BallOut).when(ball::isOut) 
-			.end()
-			
-			.state(BallOut)
-				.entering(() -> {	scene.resetBat();	scene.resetBall(); })
-				.into(Playing).when(() -> Keyboard.keyPressedOnce(VK_SPACE))
-				.keep()
-			.end()
-		.endFSM();
-		/*@formatter:on*/
+
+		state(Initial).entry = s -> scene.reset();
+		change(Initial, Playing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+
+		state(Playing).entry = s -> scene.shootBall();
+		state(Playing).update = s -> scene.updateEntities();
+		changeOnInput(BallHitsBat, Playing, Playing, (s, t) -> scene.bounceBallFromBat());
+		changeOnInput(BallHitsBrick, Playing, Playing, (s, t) -> {
+			// TODO Brick brick = context.getEvent().collision.getSecond();
+			// scene.brickWasHit(brick);
+		});
+		change(Playing, BallOut, ball::isOut);
+
+		state(BallOut).entry = s -> {
+			scene.resetBat();
+			scene.resetBall();
+		};
+		change(BallOut, Playing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 	}
 }

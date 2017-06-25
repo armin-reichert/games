@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import de.amr.easy.fsm.FSMEventDispatcher;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
@@ -38,7 +37,7 @@ import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.utils.Util;
 
-public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<GameEvent> {
+public class PlayScene extends Scene<BirdyGame> {
 
 	private PipesManager pipesManager;
 	private Bird bird;
@@ -54,7 +53,6 @@ public class PlayScene extends Scene<BirdyGame> implements FSMEventDispatcher<Ga
 		control = new PlaySceneControl(app, this);
 	}
 
-	@Override
 	public void dispatch(GameEvent event) {
 		control.addInput(event);
 		bird.dispatch(event);

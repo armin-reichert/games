@@ -10,8 +10,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import de.amr.easy.fsm.FSMEventDispatcher;
-import de.amr.easy.game.Application;
 import de.amr.easy.game.common.PumpingText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
@@ -27,7 +25,7 @@ import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.entities.bird.Feathers;
 import de.amr.games.birdy.utils.Util;
 
-public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<GameEvent> {
+public class StartScene extends Scene<BirdyGame> {
 
 	private Bird bird;
 	private City city;
@@ -39,7 +37,7 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 	public StartScene(BirdyGame game) {
 		super(game);
 		control = new StartSceneControl(app, this);
-//		control.setLogger(Application.Log);
+		// control.setLogger(Application.Log);
 	}
 
 	@Override
@@ -81,7 +79,6 @@ public class StartScene extends Scene<BirdyGame> implements FSMEventDispatcher<G
 		control.update();
 	}
 
-	@Override
 	public void dispatch(GameEvent event) {
 		bird.dispatch(event);
 	}

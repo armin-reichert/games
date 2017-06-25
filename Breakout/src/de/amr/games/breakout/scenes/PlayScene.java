@@ -10,7 +10,6 @@ import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBrick;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import de.amr.easy.fsm.FSM;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.scene.Scene;
@@ -25,7 +24,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private Bat bat;
 	private Ball ball;
 	private Brick[][] bricks;
-	private FSM<PlayState, PlayEvent> control;
+	private PlaySceneControl control;
 
 	public PlayScene(BreakoutGame game) {
 		super(game);
@@ -45,9 +44,9 @@ public class PlayScene extends Scene<BreakoutGame> {
 		for (Collision collision : CollisionHandler.collisions()) {
 			PlayEvent event = collision.getAppEvent();
 			event.collision = collision;
-			control.enqueue(event);
+			control.addInput(event);
 		}
-		control.run(PlayEvent.Tick);
+		control.update();
 	}
 
 	@Override
