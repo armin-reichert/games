@@ -7,6 +7,7 @@ import static de.amr.games.birdy.BirdyGame.MAX_PIPE_TIME;
 import static de.amr.games.birdy.BirdyGame.MIN_PIPE_TIME;
 import static de.amr.games.birdy.BirdyGame.OBSTACLE_MIN_PIPE_HEIGHT;
 import static de.amr.games.birdy.BirdyGame.OBSTACLE_PASSAGE_HEIGHT;
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_PIPE_WIDTH;
 import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
 import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
@@ -61,138 +62,50 @@ public class PlayScene extends Scene<BirdyGame> {
 			super("Play Scene Control", PlaySceneState.class, Playing);
 
 			state(Playing).entry = s -> {
-				app.score.reset();
 				startScrolling();
-				app.SND_PLAYING.loop();
+				app.score.reset();
+				app.assets.sound("music/bgmusic.mp3").loop();
 			};
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> app.score.points > 3, (s, t) -> {
-				app.SND_BIRD_HITS_OBSTACLE.play();
 				app.score.points -= 3;
-				bird.tr.setX(bird.tr.getX() + BirdyGame.OBSTACLE_PIPE_WIDTH + bird.getWidth());
+				bird.tr.setX(bird.tr.getX() + OBSTACLE_PIPE_WIDTH + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
+				app.assets.sound("sfx/hit.mp3").play();
 			});
 
 			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> app.score.points <= 3, (s, t) -> {
-				app.SND_BIRD_HITS_OBSTACLE.play();
 				bird.receiveEvent(BirdCrashed);
+				app.assets.sound("sfx/hit.mp3").play();
 			});
 
 			changeOnInput(BirdLeftPassage, Playing, Playing, (s, t) -> {
-				app.SND_WON_POINT.play();
 				app.score.points++;
-				Application.LOG.info("Score: " + app.score.points);
+				app.assets.sound("sfx/point.mp3").play();
 			});
 
 			changeOnInput(BirdTouchedGround, Playing, GameOver, (s, t) -> {
-				app.SND_PLAYING.stop();
 				bird.receiveEvent(BirdTouchedGround);
+				app.assets.sound("music/bgmusic.mp3").stop();
 			});
 
 			changeOnInput(BirdLeftWorld, Playing, GameOver, (s, t) -> {
-				app.SND_PLAYING.stop();
 				bird.receiveEvent(BirdLeftWorld);
+				app.assets.sound("music/bgmusic.mp3").stop();
 			});
 
-			state(GameOver).entry = s -> {
-				stopScrolling();
-				pipesManager.stop();
-			};
+			state(GameOver).entry = s -> stopScrolling();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.SND_PLAYING.stop());
+			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.assets.sound("music/bgmusic.mp3").stop());
 
 			state(StartingNewGame).entry = s -> app.views.show(StartScene.class);
 		}
 	}
 
-	private final PlaySceneControl control;
-	private PipeManager pipesManager;
-	private Bird bird;
-	private City city;
-	private Ground ground;
-	private GameEntity gameOverText;
-	private ScoreDisplay scoreDisplay;
-
-	public PlayScene(BirdyGame game) {
-		super(game);
-		control = new PlaySceneControl();
-		// control.setLogger(Application.LOG);
-	}
-
-	public void receive(BirdyGameEvent event) {
-		control.addInput(event);
-		bird.receiveEvent(event);
-	}
-
-	@Override
-	public void init() {
-		ground = app.entities.findAny(Ground.class);
-		city = app.entities.findAny(City.class);
-		bird = app.entities.findAny(Bird.class);
-		scoreDisplay = new ScoreDisplay(app.assets, app.score, 1.5f);
-		scoreDisplay.centerHor(getWidth());
-		scoreDisplay.tr.setY(ground.tr.getY() / 4);
-		gameOverText = app.entities.add(new GameOverText(app.assets));
-		gameOverText.center(getWidth(), getHeight());
-		pipesManager = new PipeManager();
-		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
-		Area birdWorld = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
-		CollisionHandler.detectCollisionEnd(bird, birdWorld, BirdLeftWorld);
-		control.init();
-	}
-
-	@Override
-	public void update() {
-		bird.update();
-		city.update();
-		ground.update();
-		pipesManager.update();
-		gameOverText.update();
-		scoreDisplay.update();
-		for (Collision collision : CollisionHandler.collisions()) {
-			receive((BirdyGameEvent) collision.getAppEvent());
-		}
-		control.update();
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		city.draw(g);
-		pipesManager.render(g);
-		ground.draw(g);
-		scoreDisplay.draw(g);
-		bird.draw(g);
-		if (control.stateID() == PlaySceneState.GameOver) {
-			gameOverText.draw(g);
-		}
-		showState(g);
-	}
-
-	private void showState(Graphics2D g) {
-		g.setColor(Color.BLACK);
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(), bird.getFlightState(),
-				bird.getHealthState()), 20, getHeight() - 50);
-	}
-
-	@Override
-	public String toString() {
-		return control.getDescription() + " (" + control.stateID() + ")";
-	}
-
-	void startScrolling() {
-		ground.tr.setVel(WORLD_SPEED, 0);
-		pipesManager.start();
-	}
-
-	void stopScrolling() {
-		ground.tr.setVel(0, 0);
-		pipesManager.stop();
-	}
-
-	// --- inner class for managing creation/deletion of pipe pairs
-
+	/**
+	 * Manages the creation and deletion of pipes.
+	 */
 	private class PipeManager {
 
 		private final List<PipePair> pairs = new LinkedList<>();
@@ -266,5 +179,87 @@ public class PlayScene extends Scene<BirdyGame> {
 			app.entities.removeAll(PipeUp.class);
 			app.entities.removeAll(PipeDown.class);
 		}
+	}
+
+	private final PlaySceneControl control;
+	private PipeManager pipesManager;
+	private Bird bird;
+	private City city;
+	private Ground ground;
+	private GameEntity gameOverText;
+	private ScoreDisplay scoreDisplay;
+
+	public PlayScene(BirdyGame game) {
+		super(game);
+		control = new PlaySceneControl();
+		// control.setLogger(Application.LOG);
+	}
+
+	public void receive(BirdyGameEvent event) {
+		control.addInput(event);
+		bird.receiveEvent(event);
+	}
+
+	@Override
+	public void init() {
+		ground = app.entities.findAny(Ground.class);
+		city = app.entities.findAny(City.class);
+		bird = app.entities.findAny(Bird.class);
+		scoreDisplay = new ScoreDisplay(app.assets, app.score, 1.5f);
+		scoreDisplay.centerHor(getWidth());
+		scoreDisplay.tr.setY(ground.tr.getY() / 4);
+		gameOverText = app.entities.add(new GameOverText(app.assets));
+		gameOverText.center(getWidth(), getHeight());
+		pipesManager = new PipeManager();
+		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
+		Area world = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
+		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
+		control.init();
+	}
+
+	@Override
+	public void update() {
+		bird.update();
+		city.update();
+		ground.update();
+		pipesManager.update();
+		gameOverText.update();
+		scoreDisplay.update();
+		for (Collision collision : CollisionHandler.collisions()) {
+			receive((BirdyGameEvent) collision.getAppEvent());
+		}
+		control.update();
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		city.draw(g);
+		pipesManager.render(g);
+		ground.draw(g);
+		scoreDisplay.draw(g);
+		bird.draw(g);
+		if (control.stateID() == GameOver) {
+			gameOverText.draw(g);
+		}
+		showState(g);
+	}
+
+	private void startScrolling() {
+		ground.tr.setVelocity(WORLD_SPEED, 0);
+		pipesManager.start();
+	}
+
+	private void stopScrolling() {
+		ground.tr.setVelocity(0, 0);
+		pipesManager.stop();
+	}
+
+	private Font stateTextFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
+
+	private void showState(Graphics2D g) {
+		g.setColor(Color.BLACK);
+		g.setFont(stateTextFont);
+		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(), bird.getFlightState(),
+				bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

@@ -51,7 +51,7 @@ public class Pen extends GameEntity {
 	}
 
 	public void setSpeed(float vx, float vy) {
-		tr.setVel(vx, vy);
+		tr.setVelocity(vx, vy);
 	}
 
 	public void setThickness(int thickness) {

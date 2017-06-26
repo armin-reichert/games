@@ -121,7 +121,7 @@ public class PongPlayScene extends Scene<PongGame> {
 			ball.tr.moveTo(paddleRight.tr.getX() - ball.getWidth(),
 					paddleRight.tr.getY() + paddleRight.getHeight() / 2 - ball.getHeight() / 2);
 		}
-		ball.tr.setVel(0, 0);
+		ball.tr.setVelocity(0, 0);
 	}
 
 	void shootBall() {

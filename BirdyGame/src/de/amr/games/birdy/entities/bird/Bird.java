@@ -91,14 +91,14 @@ public class Bird extends GameEntity {
 	}
 
 	public void jump(float force) {
-		app.SND_BIRD_WING.play();
+		app.assets.sound("sfx/wing.mp3").play();
 		tr.setVelY(tr.getVelY() - force * BIRD_JUMP_SPEED);
 		fly();
 	}
 
 	void fly() {
 		if (tr.getY() < -getHeight()) {
-			tr.setVel(0, 0);
+			tr.setVelocity(0, 0);
 		}
 		tr.setVelY(tr.getVelY() + WORLD_GRAVITY);
 		double damp = tr.getVelY() < 0 ? 0.05 : 0.2;
@@ -119,7 +119,7 @@ public class Bird extends GameEntity {
 
 	void lookDead() {
 		tr.setRot(Math.PI / 2);
-		tr.setVel(0, 0);
+		tr.setVelocity(0, 0);
 		updateAnimation();
 	}
 

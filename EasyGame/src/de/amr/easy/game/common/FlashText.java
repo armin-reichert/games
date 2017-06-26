@@ -36,7 +36,7 @@ public class FlashText extends GameEntity {
 		text = "";
 		font = DEFAULT_FONT;
 		color = Color.BLACK;
-		tr.setVel(0, 0);
+		tr.setVelocity(0, 0);
 	}
 
 	@Override

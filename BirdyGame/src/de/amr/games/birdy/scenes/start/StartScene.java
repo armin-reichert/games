@@ -92,7 +92,7 @@ public class StartScene extends Scene<BirdyGame> {
 	}
 
 	private void stopScrolling() {
-		ground.tr.setVel(0, 0);
+		ground.tr.setVelocity(0, 0);
 	}
 
 	private void keepBirdInAir() {
@@ -108,11 +108,11 @@ public class StartScene extends Scene<BirdyGame> {
 		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
 		ground.tr.moveTo(0, getHeight() - ground.getHeight());
-		ground.tr.setVel(WORLD_SPEED, 0);
+		ground.tr.setVelocity(WORLD_SPEED, 0);
 		bird = app.entities.findAny(Bird.class);
 		bird.init();
 		bird.tr.moveTo(getWidth() / 8, ground.tr.getY() / 2);
-		bird.tr.setVel(0, 0);
+		bird.tr.setVelocity(0, 0);
 		bird.setFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 		displayedText = app.entities.add(new TitleText(app.assets));
 		PumpingText readyText = new PumpingText(app, "text_ready", 0.2f);

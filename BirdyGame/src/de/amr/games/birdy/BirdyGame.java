@@ -3,7 +3,6 @@ package de.amr.games.birdy;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.birdy.entities.City;
@@ -40,19 +39,12 @@ public class BirdyGame extends Application {
 	public static final int OBSTACLE_MIN_PIPE_HEIGHT = 100;
 	public static final int OBSTACLE_PASSAGE_HEIGHT = 100;
 
-	public final Sound SND_PLAYING = assets.sound("music/bgmusic.mp3");
-	public final Sound SND_BIRD_DIES = assets.sound("sfx/die.mp3");
-	public final Sound SND_BIRD_HITS_OBSTACLE = assets.sound("sfx/hit.mp3");
-	public final Sound SND_WON_POINT = assets.sound("sfx/point.mp3");
-	public final Sound SND_BIRD_SWOOSHING = assets.sound("sfx/swooshing.mp3");
-	public final Sound SND_BIRD_WING = assets.sound("sfx/wing.mp3");
-
 	public final Score score = new Score();
 
 	@Override
 	public void init() {
 		SpritesheetReader.extractSpriteSheet(assets);
-		SND_PLAYING.volume(-20);
+		assets.sound("music/bgmusic.mp3").volume(-20);
 
 		entities.add(new Bird(this, score));
 		entities.add(new Ground(this.assets));

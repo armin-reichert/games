@@ -42,7 +42,7 @@ public class Transform {
 		position.add(velocity);
 	}
 
-	public void setVel(float vx, float vy) {
+	public void setVelocity(float vx, float vy) {
 		velocity.assign(vx, vy);
 	}
 

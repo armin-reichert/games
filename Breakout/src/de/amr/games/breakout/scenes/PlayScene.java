@@ -114,13 +114,13 @@ public class PlayScene extends Scene<BreakoutGame> {
 	void resetBall() {
 		ball.centerHor(getWidth());
 		ball.tr.setY(bat.tr.getY() - ball.getHeight());
-		ball.tr.setVel(0, 0);
+		ball.tr.setVelocity(0, 0);
 	}
 
 	void resetBat() {
 		bat.tr.moveTo(0, getHeight() - bat.getHeight());
 		bat.centerHor(getWidth());
-		bat.tr.setVel(0, 0);
+		bat.tr.setVelocity(0, 0);
 		bat.setSpeed(5);
 	}
 
