@@ -1,6 +1,6 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGameGlobals.CITY_MAX_STARS;
+import static de.amr.games.birdy.BirdyGame.CITY_MAX_STARS;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

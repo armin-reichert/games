@@ -11,7 +11,6 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.BirdyGameEvent;
-import de.amr.games.birdy.BirdyGameGlobals;
 
 public class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
 
@@ -20,7 +19,7 @@ public class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
 
 		state(Flying).entry = s -> bird.lookFlying();
 		state(Flying).update = s -> {
-			if (Keyboard.keyDown(BirdyGameGlobals.JUMP_KEY)) {
+			if (Keyboard.keyDown(BirdyGame.JUMP_KEY)) {
 				bird.jump();
 			} else {
 				bird.fly();

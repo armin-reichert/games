@@ -1,15 +1,15 @@
 package de.amr.games.birdy.scenes.play;
 
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_MAX_CREATION_TIME;
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_MIN_CREATION_TIME;
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_MIN_PIPE_HEIGHT;
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_PASSAGE_HEIGHT;
+import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
 import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
-import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_MAX_CREATION_TIME;
-import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_MIN_CREATION_TIME;
-import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_MIN_PIPE_HEIGHT;
-import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_PASSAGE_HEIGHT;
-import static de.amr.games.birdy.BirdyGameGlobals.WORLD_SPEED;
 import static de.amr.games.birdy.scenes.play.PlaySceneState.GameOver;
 import static de.amr.games.birdy.scenes.play.PlaySceneState.Playing;
 import static de.amr.games.birdy.scenes.play.PlaySceneState.StartingNewGame;
@@ -33,7 +33,6 @@ import de.amr.easy.game.timing.Countdown;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.BirdyGameEvent;
-import de.amr.games.birdy.BirdyGameGlobals;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.GameOverText;
@@ -67,7 +66,7 @@ public class PlayScene extends Scene<BirdyGame> {
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> app.score.points > 3, (s, t) -> {
 				app.BIRD_HITS_OBSTACLE.play();
 				app.score.points -= 3;
-				bird.tr.setX(bird.tr.getX() + BirdyGameGlobals.OBSTACLE_PIPE_WIDTH + bird.getWidth());
+				bird.tr.setX(bird.tr.getX() + BirdyGame.OBSTACLE_PIPE_WIDTH + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 			});
 

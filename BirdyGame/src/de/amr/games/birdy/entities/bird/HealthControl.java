@@ -1,9 +1,9 @@
 package de.amr.games.birdy.entities.bird;
 
+import static de.amr.games.birdy.BirdyGame.BIRD_INJURED_TIME;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
-import static de.amr.games.birdy.BirdyGameGlobals.BIRD_INJURED_TIME;
 import static de.amr.games.birdy.entities.bird.HealthState.Dead;
 import static de.amr.games.birdy.entities.bird.HealthState.Injured;
 import static de.amr.games.birdy.entities.bird.HealthState.Sane;

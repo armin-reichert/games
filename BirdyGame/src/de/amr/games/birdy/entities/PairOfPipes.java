@@ -1,8 +1,8 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_PASSAGE_HEIGHT;
-import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_PIPE_HEIGHT;
-import static de.amr.games.birdy.BirdyGameGlobals.WORLD_SPEED;
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_PASSAGE_HEIGHT;
+import static de.amr.games.birdy.BirdyGame.OBSTACLE_PIPE_HEIGHT;
+import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -1,12 +1,11 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.games.birdy.BirdyGameGlobals.BIRD_FLAP_DURATION_MILLIS;
-import static de.amr.games.birdy.BirdyGameGlobals.BIRD_JUMP_SPEED;
-import static de.amr.games.birdy.BirdyGameGlobals.WORLD_GRAVITY;
+import static de.amr.games.birdy.BirdyGame.BIRD_FLAP_DURATION_MILLIS;
+import static de.amr.games.birdy.BirdyGame.BIRD_JUMP_SPEED;
+import static de.amr.games.birdy.BirdyGame.WORLD_GRAVITY;
 
 import java.awt.Rectangle;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;

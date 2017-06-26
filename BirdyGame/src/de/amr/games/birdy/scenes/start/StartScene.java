@@ -1,9 +1,9 @@
 package de.amr.games.birdy.scenes.start;
 
+import static de.amr.games.birdy.BirdyGame.JUMP_KEY;
+import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.BirdyGameGlobals.JUMP_KEY;
-import static de.amr.games.birdy.BirdyGameGlobals.WORLD_SPEED;
 import static de.amr.games.birdy.scenes.start.StartSceneState.GameOver;
 import static de.amr.games.birdy.scenes.start.StartSceneState.Ready;
 import static de.amr.games.birdy.scenes.start.StartSceneState.StartPlaying;
@@ -25,7 +25,6 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.BirdyGameEvent;
-import de.amr.games.birdy.BirdyGameGlobals;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
@@ -54,7 +53,7 @@ public class StartScene extends Scene<BirdyGame> {
 
 			// Ready
 			state(Ready).entry = s -> {
-				s.setDuration(BirdyGameGlobals.READY_TIME);
+				s.setDuration(BirdyGame.READY_TIME);
 				showText(app.entities.findByName(PumpingText.class, "readyText"));
 			};
 			state(Ready).exit = s -> hideText();
