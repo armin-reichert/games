@@ -9,13 +9,13 @@ import static de.amr.games.birdy.scenes.start.StartSceneState.Ready;
 import static de.amr.games.birdy.scenes.start.StartSceneState.StartPlaying;
 import static de.amr.games.birdy.scenes.start.StartSceneState.Starting;
 import static java.awt.event.KeyEvent.VK_SPACE;
+import static java.lang.String.format;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.common.PumpingText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
@@ -75,7 +75,7 @@ public class StartScene extends Scene<BirdyGame> {
 	public StartScene(BirdyGame game) {
 		super(game);
 		control = new StartSceneControl();
-		control.setLogger(Application.LOG);
+		// control.setLogger(Application.LOG);
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class StartScene extends Scene<BirdyGame> {
 		ground.update();
 		bird.update();
 		for (Collision ce : CollisionHandler.collisions()) {
-			BirdyGameEvent event = (BirdyGameEvent) ce.getAppEvent(); 
+			BirdyGameEvent event = (BirdyGameEvent) ce.getAppEvent();
 			bird.receiveEvent(event);
 			control.addInput(event);
 		}
@@ -147,9 +147,14 @@ public class StartScene extends Scene<BirdyGame> {
 			displayedText.draw(g);
 		}
 		// debugging: show state
+		showState(g);
+	}
+
+	private void showState(Graphics2D g) {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(toString() + ", bird:" + bird.getFlightState() + " & " + bird.getHealthState(), 20, getHeight() - 50);
+		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(), bird.getFlightState(),
+				bird.getHealthState()), 20, getHeight() - 50);
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import java.util.Random;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.games.birdy.BirdyGame;
 
-public class PairOfPipes {
+public class PipePair {
 
 	private final GameEntity pipeDown;
 	private final GameEntity pipeUp;
@@ -50,7 +50,7 @@ public class PairOfPipes {
 		}
 	}
 
-	public PairOfPipes(BirdyGame app, int centerY) {
+	public PipePair(BirdyGame app, int centerY) {
 		pipeDown = app.entities.add(new PipeDown(app.assets));
 		pipeDown.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2 - OBSTACLE_PIPE_HEIGHT);
 		passage = new Passage();
