@@ -15,9 +15,9 @@ import java.util.logging.Logger;
  */
 public class Motor {
 
-	private Optional<Logger> logger;
 	private final Task renderTask;
 	private final Task updateTask;
+	private Optional<Logger> logger;
 	private int frequency;
 	private long updateCount;
 	private long period;
@@ -28,6 +28,7 @@ public class Motor {
 		this.updateTask = new Task(updateTask, "ups", SECONDS.toNanos(1));
 		this.renderTask = new Task(renderTask, "fps", SECONDS.toNanos(1));
 		setFrequency(60);
+		setLogger(null);
 	}
 
 	public void setLogger(Logger log) {
