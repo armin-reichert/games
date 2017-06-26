@@ -34,7 +34,7 @@ public class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
 		changeOnInput(BirdTouchedGround, Crashing, OnGround);
 
 		state(OnGround).entry = s -> {
-			app.BIRD_DIES.play();
+			app.SND_BIRD_DIES.play();
 			bird.lookDead();
 		};
 	}

@@ -26,13 +26,13 @@ public enum KeyboardHandler implements KeyListener {
 	@Override
 	public synchronized void keyPressed(KeyEvent e) {
 		pressed.set(e.getKeyCode());
-		Application.Log.fine(e.toString());
+		Application.LOG.fine(e.toString());
 	}
 
 	@Override
 	public synchronized void keyReleased(KeyEvent e) {
 		pressed.clear(e.getKeyCode());
-		Application.Log.fine(e.toString());
+		Application.LOG.fine(e.toString());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public enum KeyboardHandler implements KeyListener {
 			if (pressed.get(key)) {
 				if (!once.get(key) && !longer.get(key)) {
 					once.set(key);
-					Application.Log.fine("Pressed first time " + key);
+					Application.LOG.fine("Pressed first time " + key);
 				} else if (once.get(key)) {
 					once.clear(key);
 					longer.set(key);

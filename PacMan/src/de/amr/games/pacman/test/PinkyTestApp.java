@@ -23,7 +23,7 @@ public class PinkyTestApp extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new PinkyTestScene(this));
 		views.show(PinkyTestScene.class);
 	}

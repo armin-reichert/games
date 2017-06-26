@@ -23,7 +23,7 @@ public class RoutingTestApp extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new RoutingTestScene(this));
 		views.show(RoutingTestScene.class);
 	}

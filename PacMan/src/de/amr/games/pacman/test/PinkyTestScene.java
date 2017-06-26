@@ -58,7 +58,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 			state.setDuration(app.motor.secToTicks(2));
 		};
 		pacMan.control.changeOnTimeout(PacManState.Dying, PacManState.Peaceful, (oldState, newState) -> start());
-		pacMan.setLogger(Application.Log);
+		pacMan.setLogger(Application.LOG);
 
 		pinky = new Ghost(app, board, "Pinky", () -> theme);
 		pinky.init();

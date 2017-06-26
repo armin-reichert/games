@@ -29,7 +29,7 @@ public class MazeDemoApp extends Application {
 	private GridAnimation animation;
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new Menu(this));
 		views.add(new MazeGeneration(this));
 		views.add(new BFSTraversal(this));

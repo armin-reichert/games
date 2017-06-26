@@ -16,7 +16,7 @@ public class Diashow extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		assets.image("0.jpg");
 		assets.image("1.jpg");
 		assets.image("2.jpg");

@@ -23,7 +23,7 @@ public class PacManMovementTestApp extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new PacManMovementTestScene(this));
 		views.show(PacManMovementTestScene.class);
 	}

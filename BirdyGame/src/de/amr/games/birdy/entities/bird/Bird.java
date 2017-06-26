@@ -91,7 +91,7 @@ public class Bird extends GameEntity {
 	}
 
 	public void jump(float force) {
-		app.BIRD_WING.play();
+		app.SND_BIRD_WING.play();
 		tr.setVelY(tr.getVelY() - force * BIRD_JUMP_SPEED);
 		fly();
 	}

@@ -60,41 +60,41 @@ public class PlayScene extends Scene<BirdyGame> {
 			state(Playing).entry = s -> {
 				app.score.reset();
 				startScrolling();
-				app.PLAYING_MUSIC.loop();
+				app.SND_PLAYING.loop();
 			};
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> app.score.points > 3, (s, t) -> {
-				app.BIRD_HITS_OBSTACLE.play();
+				app.SND_BIRD_HITS_OBSTACLE.play();
 				app.score.points -= 3;
 				bird.tr.setX(bird.tr.getX() + BirdyGame.OBSTACLE_PIPE_WIDTH + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 			});
 
 			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> app.score.points <= 3, (s, t) -> {
-				app.BIRD_HITS_OBSTACLE.play();
+				app.SND_BIRD_HITS_OBSTACLE.play();
 				bird.receiveEvent(BirdCrashed);
 			});
 
 			changeOnInput(BirdLeftPassage, Playing, Playing, (s, t) -> {
-				app.BIRD_GETS_POINT.play();
+				app.SND_WON_POINT.play();
 				app.score.points++;
-				Application.Log.info("Score: " + app.score.points);
+				Application.LOG.info("Score: " + app.score.points);
 			});
 
 			changeOnInput(BirdTouchedGround, Playing, GameOver, (s, t) -> {
-				app.PLAYING_MUSIC.stop();
+				app.SND_PLAYING.stop();
 				bird.receiveEvent(BirdTouchedGround);
 			});
 
 			changeOnInput(BirdLeftWorld, Playing, GameOver, (s, t) -> {
-				app.PLAYING_MUSIC.stop();
+				app.SND_PLAYING.stop();
 				bird.receiveEvent(BirdLeftWorld);
 			});
 
 			state(GameOver).entry = s -> stopScrolling();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.PLAYING_MUSIC.stop());
+			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.SND_PLAYING.stop());
 
 			state(StartingNewGame).entry = s -> app.views.show(StartScene.class);
 		}
@@ -112,7 +112,7 @@ public class PlayScene extends Scene<BirdyGame> {
 	public PlayScene(BirdyGame game) {
 		super(game);
 		control = new PlaySceneControl();
-		control.setLogger(Application.Log);
+		control.setLogger(Application.LOG);
 	}
 
 	public void dispatch(BirdyGameEvent event) {

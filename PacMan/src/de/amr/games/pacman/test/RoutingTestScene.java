@@ -1,6 +1,6 @@
 package de.amr.games.pacman.test;
 
-import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.core.board.TileContent.Wall;
 import static de.amr.games.pacman.misc.SceneHelper.drawGridLines;
 import static de.amr.games.pacman.misc.SceneHelper.drawRoute;
@@ -76,14 +76,14 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 				if (!route.isEmpty()) {
 					ghost.placeAt(startTile);
 					targetTile = clickedTile;
-					Log.info("New target tile: " + targetTile);
+					LOG.info("New target tile: " + targetTile);
 				}
 			} else {
 				route = board.shortestRoute(targetTile, clickedTile);
 				if (!route.isEmpty()) {
 					startTile = targetTile;
 					targetTile = clickedTile;
-					Log.info("New target tile: " + targetTile);
+					LOG.info("New target tile: " + targetTile);
 				}
 			}
 			clickedTile = null;

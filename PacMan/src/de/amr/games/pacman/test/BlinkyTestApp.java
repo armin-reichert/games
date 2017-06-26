@@ -23,7 +23,7 @@ public class BlinkyTestApp extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new BlinkyTestScene(this));
 		views.show(BlinkyTestScene.class);
 	}

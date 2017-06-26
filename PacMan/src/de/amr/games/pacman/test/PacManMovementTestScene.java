@@ -1,6 +1,6 @@
 package de.amr.games.pacman.test;
 
-import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.None;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
@@ -107,12 +107,12 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		// Event handlers
 		pacMan.onContentFound = content -> {
 			if (content == Energizer) {
-				Log.info("Pac-Man hat Energizer gefressen auf Feld " + pacMan.currentTile());
+				LOG.info("Pac-Man hat Energizer gefressen auf Feld " + pacMan.currentTile());
 				board.setContent(pacMan.currentTile(), None);
 				points += 50;
 				pacMan.receiveEvent(GotDrugs);
 			} else if (content == Pellet) {
-				Log.info("Pac-Man hat Pille gefressen auf Feld " + pacMan.currentTile());
+				LOG.info("Pac-Man hat Pille gefressen auf Feld " + pacMan.currentTile());
 				board.setContent(pacMan.currentTile(), None);
 				points += 10;
 			}
@@ -121,14 +121,14 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		pacMan.onEnemyContact = enemy -> {
 			if (pacMan.control.is(Aggressive)) {
 				if (!enemy.control.is(GhostState.Dead)) {
-					Log.info("Pac-Man tötet" + enemy.getName());
+					LOG.info("Pac-Man tötet" + enemy.getName());
 					points += 100;
 					enemy.receiveEvent(GhostEvent.Killed);
 				}
 			} else if (pacMan.control.is(Dying)) {
 				// nothing happens
 			} else {
-				Log.info(enemy.getName() + " tötet Pac-Man");
+				LOG.info(enemy.getName() + " tötet Pac-Man");
 				pacMan.receiveEvent(PacManEvent.Killed);
 				pinky.init();
 				pinky.placeAt(GHOST_HOUSE_LEFT);
@@ -150,7 +150,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		Stream.of(pinky, inky, clyde).forEach(ghost -> {
 
-			ghost.setLogger(Application.Log);
+			ghost.setLogger(Application.LOG);
 
 			// Initialized
 			ghost.control.changeOnTimeout(GhostState.Initialized, Chasing);

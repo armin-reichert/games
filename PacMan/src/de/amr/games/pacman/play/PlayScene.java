@@ -1,6 +1,6 @@
 package de.amr.games.pacman.play;
 
-import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
@@ -130,11 +130,11 @@ public class PlayScene extends Scene<PacManGame> {
 	private class PlayControl extends StateMachine<PlayState, PlaySceneInput> {
 
 		private void configureTracing() {
-			setLogger(Log);
+			setLogger(LOG);
 			setFrequency(app.motor.getFrequency());
 			// ghostAttackTimer.setLogger(Log);
 			// pacMan.setLogger(Log);
-			ghosts.forEach(ghost -> ghost.setLogger(Log));
+			ghosts.forEach(ghost -> ghost.setLogger(LOG));
 		}
 
 		public PlayControl() {
@@ -234,7 +234,7 @@ public class PlayScene extends Scene<PacManGame> {
 				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
 				removeBonus();
 				pacMan.receiveEvent(PacManEvent.Killed);
-				Log.info("PacMan killed, lives remaining: " + lives);
+				LOG.info("PacMan killed, lives remaining: " + lives);
 			};
 
 			state(Crashing).update = state -> pacMan.update();
@@ -248,7 +248,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(GameOver).entry = state -> {
 				checkHighscore();
 				app.entities.all().forEach(entity -> entity.setAnimated(false));
-				Log.info("Game over.");
+				LOG.info("Game over.");
 			};
 
 			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE),
@@ -303,7 +303,7 @@ public class PlayScene extends Scene<PacManGame> {
 		removeBonus();
 		ghostAttackTimer.setLevel(level);
 		ghostAttackTimer.init();
-		Log.info(format("Level %d: %d pellets, %d energizers.", level, board.count(Pellet), board.count(Energizer)));
+		LOG.info(format("Level %d: %d pellets, %d energizers.", level, board.count(Pellet), board.count(Energizer)));
 	}
 
 	private void createPacManAndGhosts() {
@@ -346,7 +346,7 @@ public class PlayScene extends Scene<PacManGame> {
 				return;
 			}
 			if (pacMan.control.is(PacManState.Aggressive)) {
-				Log.info("Pac-Man kills " + ghost.getName());
+				LOG.info("Pac-Man kills " + ghost.getName());
 				app.assets.sound("sfx/eat-ghost.mp3").play();
 				score(nextGhostPoints);
 				showFlashText(nextGhostPoints, ghost.tr.getX(), ghost.tr.getY());
@@ -356,7 +356,7 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints *= 2;
 				ghost.receiveEvent(GhostEvent.Killed);
 			} else {
-				Log.info(ghost.getName() + " kills Pac-Man.");
+				LOG.info(ghost.getName() + " kills Pac-Man.");
 				--lives;
 				playControl.addInput(PlaySceneInput.PacManCrashed);
 			}

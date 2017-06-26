@@ -40,7 +40,7 @@ public class PongGame extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		setPlayMode(PlayMode.Player1_Player2);
 
 		assets.sound("plop.mp3");

@@ -1,6 +1,6 @@
 package de.amr.games.pacman.misc;
 
-import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.Application.LOG;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,9 +34,9 @@ public class Highscore {
 			points = Integer.parseInt(record[0]);
 			level = record.length == 2 ? Integer.parseInt(record[1]) : 1;
 		} catch (FileNotFoundException e) {
-			Log.warning("Highscore file not found: " + file);
+			LOG.warning("Highscore file not found: " + file);
 		} catch (IOException e) {
-			Log.warning("Could not read from highscore file: " + file);
+			LOG.warning("Could not read from highscore file: " + file);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class Highscore {
 		try (PrintWriter w = new PrintWriter(new FileWriter(file))) {
 			w.println(points + "," + level);
 		} catch (IOException e) {
-			Log.warning("Could not save highscore: " + file);
+			LOG.warning("Could not save highscore: " + file);
 		}
 	}
 

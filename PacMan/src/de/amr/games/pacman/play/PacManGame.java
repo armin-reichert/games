@@ -30,7 +30,7 @@ public class PacManGame extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new PlayScene(this));
 		views.show(PlayScene.class);
 	}

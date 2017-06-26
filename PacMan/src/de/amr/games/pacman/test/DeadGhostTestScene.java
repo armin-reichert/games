@@ -48,7 +48,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 		range(0, 3).forEach(i -> {
 			Ghost ghost = new Ghost(app, board, randomGhostName(), () -> theme);
 			ghost.init();
-			ghost.setLogger(Application.Log);
+			ghost.setLogger(Application.LOG);
 			ghost.placeAt(randomTile());
 			ghost.speed = () -> 2f;
 			ghost.xOffset = () -> ghost.control.is(Recovering) ? TILE_SIZE / 2 : 0;

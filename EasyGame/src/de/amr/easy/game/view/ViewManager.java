@@ -52,6 +52,6 @@ public class ViewManager {
 		}
 		viewStack.push(view);
 		view.init();
-		Application.Log.info("Current view: " + view);
+		Application.LOG.info("Current view: " + view);
 	}
 }

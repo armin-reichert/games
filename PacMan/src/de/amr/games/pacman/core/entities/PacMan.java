@@ -1,6 +1,6 @@
 package de.amr.games.pacman.core.entities;
 
-import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
@@ -69,7 +69,7 @@ public class PacMan extends BoardMover {
 	}
 
 	private void defaultEnemyContactHandler(Ghost enemy) {
-		Log.info("PacMan meets enemy '" + enemy.getName() + "' at " + currentTile());
+		LOG.info("PacMan meets enemy '" + enemy.getName() + "' at " + currentTile());
 	}
 
 	private boolean defaultCanEnterTileCondition(Tile tile) {
@@ -81,11 +81,11 @@ public class PacMan extends BoardMover {
 		case Bonus:
 		case Energizer:
 		case Pellet:
-			Log.info(getName() + " eats " + content + " at " + currentTile());
+			LOG.info(getName() + " eats " + content + " at " + currentTile());
 			board.setContent(currentTile(), None);
 			break;
 		default:
-			Log.info("PacMan visits " + content + " at " + currentTile());
+			LOG.info("PacMan visits " + content + " at " + currentTile());
 			break;
 		}
 	}

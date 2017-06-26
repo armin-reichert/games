@@ -23,7 +23,7 @@ public class DeadGhostTestApp extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 		views.add(new DeadGhostTestScene(this));
 		views.show(DeadGhostTestScene.class);
 	}

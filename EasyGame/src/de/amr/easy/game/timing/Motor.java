@@ -1,16 +1,21 @@
 package de.amr.easy.game.timing;
 
 import static java.lang.String.format;
-import static java.lang.System.out;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.beans.PropertyChangeListener;
+import java.util.Optional;
+import java.util.logging.Logger;
 
+/**
+ * Animation motor.
+ * 
+ * @author Armin Reichert
+ */
 public class Motor {
 
-	public boolean log = false;
-
+	private Optional<Logger> logger;
 	private final Task renderTask;
 	private final Task updateTask;
 	private int frequency;
@@ -23,6 +28,10 @@ public class Motor {
 		this.updateTask = new Task(updateTask, "ups", SECONDS.toNanos(1));
 		this.renderTask = new Task(renderTask, "fps", SECONDS.toNanos(1));
 		setFrequency(60);
+	}
+
+	public void setLogger(Logger log) {
+		this.logger = log != null ? Optional.of(log) : Optional.empty();
 	}
 
 	public void setFrequency(int fps) {
@@ -78,11 +87,10 @@ public class Motor {
 		while (running) {
 			updateTask.run();
 			renderTask.run();
-			if (log) {
-				out.println();
-				out.println(format("Update time:    %10.2f millis", updateTask.getUsedTime() / 1000000f));
-				out.println(format("Rendering time: %10.2f millis", renderTask.getUsedTime() / 1000000f));
-			}
+			logger.ifPresent(log -> {
+				log.info(format("\nUpdate time:    %10.2f millis", updateTask.getUsedTime() / 1000000f));
+				log.info(format("Rendering time: %10.2f millis", renderTask.getUsedTime() / 1000000f));
+			});
 			++updateCount;
 			long usedTime = updateTask.getUsedTime() + renderTask.getUsedTime();
 			long timeLeft = (period - usedTime);
@@ -93,16 +101,16 @@ public class Motor {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				if (log) {
-					out.println(format("Sleep time:     %10.2f millis", sleepTime / 1000000f));
-				}
+				logger.ifPresent(log -> {
+					log.info(format("Sleep time:     %10.2f millis", sleepTime / 1000000f));
+				});
 			} else if (timeLeft < 0) {
 				overTime += (-timeLeft);
 				for (int extraUpdates = 3; extraUpdates > 0 && overTime > period; overTime -= period, --extraUpdates) {
 					updateTask.run();
-					if (log) {
-						out.println(format("Extra Update time: %10.2f millis", updateTask.getUsedTime() / 1000000f));
-					}
+					logger.ifPresent(log -> {
+						log.info(format("Extra Update time: %10.2f millis", updateTask.getUsedTime() / 1000000f));
+					});
 					++updateCount;
 				}
 			}

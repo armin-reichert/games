@@ -1,7 +1,7 @@
 package de.amr.demos.maze.bfs;
 
 import static de.amr.demos.maze.MazeDemoApp.App;
-import static de.amr.easy.game.Application.Log;
+import static de.amr.easy.game.Application.LOG;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
@@ -40,24 +40,24 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 		animation = getApp().getAnimation();
 		bfsRunner = new Thread(() -> {
 			animation.setDelay(0);
-			Log.info("Start first BFS to compute maximum distance:");
+			LOG.info("Start first BFS to compute maximum distance:");
 			bfs = new BreadthFirstTraversal<>(grid, startCell);
 			bfs.findPath(startCell);
-			Log.info("BFS finished.");
+			LOG.info("BFS finished.");
 			maxDistance = bfs.getMaxDistance();
-			Log.info("Max distance: " + maxDistance);
+			LOG.info("Max distance: " + maxDistance);
 			animation.setRenderingModel(
 					new BFSAnimationRenderingModel(grid, getApp().settings.getInt("cellSize"), bfs, maxDistance));
 			animation.setDelay(0);
-			Log.info("Start second, animated BFS:");
+			LOG.info("Start second, animated BFS:");
 			bfs.addObserver(animation);
 			bfs.findPath(startCell);
 			bfs.removeObserver(animation);
-			Log.info("BFS finished.");
+			LOG.info("BFS finished.");
 		}, "BreadFirstTraversal");
 		grid.clearContent();
 		bfsRunner.start();
-		Log.info("BFS animation screen initialized.");
+		LOG.info("BFS animation screen initialized.");
 	}
 
 	@Override
@@ -83,10 +83,10 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 	}
 
 	private void stopBreadthFirstTraversal() {
-		Log.info("Stopping BFS");
+		LOG.info("Stopping BFS");
 		while (bfsRunner.isAlive()) {
 			/* wait for BFS thread to finish */
 		}
-		Log.info("BFS finished");
+		LOG.info("BFS finished");
 	}
 }

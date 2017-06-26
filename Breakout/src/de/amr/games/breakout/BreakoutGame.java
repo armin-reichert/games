@@ -30,7 +30,7 @@ public class BreakoutGame extends Application {
 	}
 
 	@Override
-	protected void init() {
+	public void init() {
 
 		assets.image("Background/background.jpg");
 		assets.image("Balls/ball_green.png");

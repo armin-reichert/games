@@ -27,7 +27,7 @@ public class Assets {
 	private InputStream asInputStream(String path) {
 		InputStream istream = Assets.class.getClassLoader().getResourceAsStream(path);
 		if (istream == null) {
-			Application.Log.severe("Could not get input stream for path: " + path);
+			Application.LOG.severe("Could not get input stream for path: " + path);
 			throw new IllegalArgumentException();
 		}
 		return istream;
@@ -50,7 +50,7 @@ public class Assets {
 			}
 			return sb.toString();
 		} catch (IOException e) {
-			Application.Log.severe("Could not read text resource from path: " + path);
+			Application.LOG.severe("Could not read text resource from path: " + path);
 			throw new IllegalArgumentException();
 		} finally {
 			if (reader != null) {
@@ -69,7 +69,7 @@ public class Assets {
 			fontStream = asInputStream(path);
 			return Font.createFont(Font.TRUETYPE_FONT, fontStream);
 		} catch (Exception e) {
-			Application.Log.severe("Could not read font resource from path: " + path);
+			Application.LOG.severe("Could not read font resource from path: " + path);
 			throw new IllegalArgumentException();
 		}
 	}
@@ -80,12 +80,12 @@ public class Assets {
 			is = asInputStream(path);
 			BufferedImage image = ImageIO.read(is);
 			if (image == null) {
-				Application.Log.severe("Unsupported image resource at path: " + path);
+				Application.LOG.severe("Unsupported image resource at path: " + path);
 				throw new IllegalArgumentException();
 			}
 			return image;
 		} catch (IOException e) {
-			Application.Log.severe("Could not read image resource from path: " + path);
+			Application.LOG.severe("Could not read image resource from path: " + path);
 			throw new IllegalArgumentException();
 		} finally {
 			if (is != null) {
@@ -112,7 +112,7 @@ public class Assets {
 
 	public void storeImage(String path, Image image) {
 		if (images.put(path, image) != null) {
-			Application.Log.warning("Image with name: " + path + " has been replaced.");
+			Application.LOG.warning("Image with name: " + path + " has been replaced.");
 		}
 	}
 

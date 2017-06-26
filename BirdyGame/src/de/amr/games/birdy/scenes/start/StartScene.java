@@ -57,8 +57,8 @@ public class StartScene extends Scene<BirdyGame> {
 				showText(app.entities.findByName(PumpingText.class, "readyText"));
 			};
 			state(Ready).exit = s -> hideText();
-			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
 			changeOnTimeout(Ready, StartPlaying, (s, t) -> app.views.show(PlayScene.class));
+			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
 
 			// GameOver
 			state(GameOver).entry = s -> stopScrolling();
@@ -75,7 +75,7 @@ public class StartScene extends Scene<BirdyGame> {
 	public StartScene(BirdyGame game) {
 		super(game);
 		control = new StartSceneControl();
-		control.setLogger(Application.Log);
+		control.setLogger(Application.LOG);
 	}
 
 	@Override

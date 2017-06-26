@@ -6,7 +6,7 @@ import java.util.Map;
 
 import de.amr.easy.game.ui.FullScreen;
 
-public class ApplicationSettings {
+public class AppSettings {
 
 	public String title = "My Application!";
 	public int width = 600;

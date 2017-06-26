@@ -75,7 +75,7 @@ public enum CollisionHandler {
 				Collision event = new Collision(pair.either(), pair.other(), pair.getIntersection(),
 						startMap.get(pair), true);
 				events.add(event);
-				Application.Log.fine(event.toString());
+				Application.LOG.fine(event.toString());
 			}
 		}
 		for (CollisionPair pair : endMap.keySet()) {
@@ -83,7 +83,7 @@ public enum CollisionHandler {
 				Collision event = new Collision(pair.either(), pair.other(), pair.getIntersection(),
 						endMap.get(pair), false);
 				events.add(event);
-				Application.Log.fine(event.toString());
+				Application.LOG.fine(event.toString());
 			}
 		}
 	}
