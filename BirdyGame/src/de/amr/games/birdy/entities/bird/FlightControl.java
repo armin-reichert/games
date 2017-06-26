@@ -1,26 +1,26 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.games.birdy.GameEvent.BirdCrashed;
-import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
+import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
+import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.entities.bird.FlightState.Crashing;
 import static de.amr.games.birdy.entities.bird.FlightState.Flying;
 import static de.amr.games.birdy.entities.bird.FlightState.OnGround;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.GameEvent;
-import de.amr.games.birdy.Globals;
-import de.amr.games.birdy.assets.BirdySound;
+import de.amr.games.birdy.BirdyGame;
+import de.amr.games.birdy.BirdyGameEvent;
+import de.amr.games.birdy.BirdyGameGlobals;
 
-public class FlightControl extends StateMachine<FlightState, GameEvent> {
+public class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
 
-	public FlightControl(Bird bird) {
+	public FlightControl(BirdyGame app, Bird bird) {
 		super("Bird Flight Control", FlightState.class, Flying);
 
 		state(Flying).entry = s -> bird.lookFlying();
 		state(Flying).update = s -> {
-			if (Keyboard.keyDown(Globals.JUMP_KEY)) {
+			if (Keyboard.keyDown(BirdyGameGlobals.JUMP_KEY)) {
 				bird.jump();
 			} else {
 				bird.fly();
@@ -35,7 +35,7 @@ public class FlightControl extends StateMachine<FlightState, GameEvent> {
 		changeOnInput(BirdTouchedGround, Crashing, OnGround);
 
 		state(OnGround).entry = s -> {
-			BirdySound.BIRD_DIES.play();
+			app.BIRD_DIES.play();
 			bird.lookDead();
 		};
 	}

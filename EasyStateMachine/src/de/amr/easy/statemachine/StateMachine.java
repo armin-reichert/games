@@ -213,6 +213,7 @@ public class StateMachine<StateID, Input> {
 			if (action != null) {
 				action.accept(state(), state());
 			}
+			return; // state loop, no exit/entry actions are executed
 		}
 		traceStateChange(currentStateID, newStateID);
 		if (currentStateID != null) {

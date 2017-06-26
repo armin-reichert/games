@@ -1,43 +1,82 @@
 package de.amr.games.birdy.scenes.start;
 
-import static de.amr.games.birdy.BirdyGame.Game;
-import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.Globals.WORLD_SPEED;
+import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
+import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.BirdyGameGlobals.JUMP_KEY;
+import static de.amr.games.birdy.BirdyGameGlobals.WORLD_SPEED;
+import static de.amr.games.birdy.scenes.start.StartSceneState.GameOver;
+import static de.amr.games.birdy.scenes.start.StartSceneState.Ready;
+import static de.amr.games.birdy.scenes.start.StartSceneState.StartPlaying;
+import static de.amr.games.birdy.scenes.start.StartSceneState.Starting;
+import static java.awt.event.KeyEvent.VK_SPACE;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.common.PumpingText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.GameEvent;
+import de.amr.games.birdy.BirdyGameEvent;
+import de.amr.games.birdy.BirdyGameGlobals;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.TitleText;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.entities.bird.Feathers;
+import de.amr.games.birdy.scenes.play.PlayScene;
 import de.amr.games.birdy.utils.Util;
 
+/**
+ * Start scene of the game: bird flaps in the air until user presses the JUMP key.
+ * 
+ * @author Armin Reichert
+ */
 public class StartScene extends Scene<BirdyGame> {
 
+	private class StartSceneControl extends StateMachine<StartSceneState, BirdyGameEvent> {
+
+		public StartSceneControl() {
+			super("Start Scene Control", StartSceneState.class, Starting);
+
+			// Starting
+			state(Starting).entry = s -> reset();
+			state(Starting).update = s -> keepBirdInAir();
+			change(Starting, Ready, () -> Keyboard.keyDown(JUMP_KEY));
+			changeOnInput(BirdTouchedGround, Starting, GameOver);
+
+			// Ready
+			state(Ready).entry = s -> {
+				s.setDuration(BirdyGameGlobals.READY_TIME);
+				showText(app.entities.findByName(PumpingText.class, "readyText"));
+			};
+			state(Ready).exit = s -> hideText();
+			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
+			changeOnTimeout(Ready, StartPlaying, (s, t) -> app.views.show(PlayScene.class));
+
+			// GameOver
+			state(GameOver).entry = s -> stopScrolling();
+			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(VK_SPACE));
+		}
+	}
+
+	private final StartSceneControl control;
 	private Bird bird;
 	private City city;
 	private Ground ground;
 	private GameEntity displayedText;
 
-	private final StartSceneControl control;
-
 	public StartScene(BirdyGame game) {
 		super(game);
-		control = new StartSceneControl(app, this);
-		// control.setLogger(Application.Log);
+		control = new StartSceneControl();
+		control.setLogger(Application.Log);
 	}
 
 	@Override
@@ -45,23 +84,41 @@ public class StartScene extends Scene<BirdyGame> {
 		control.init();
 	}
 
-	void reset() {
-		city = Game.entities.findAny(City.class);
+	private void hideText() {
+		displayedText = null;
+	}
+
+	private void showText(GameEntity text) {
+		displayedText = text;
+	}
+
+	private void stopScrolling() {
+		ground.tr.setVel(0, 0);
+	}
+
+	private void keepBirdInAir() {
+		while (bird.tr.getY() > ground.tr.getY() / 2) {
+			bird.jump(Util.randomInt(1, 4));
+		}
+	}
+
+	private void reset() {
+		city = app.entities.findAny(City.class);
 		city.setWidth(getWidth());
 		city.setNight(new Random().nextBoolean());
-		ground = Game.entities.findAny(Ground.class);
+		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
 		ground.tr.moveTo(0, getHeight() - ground.getHeight());
 		ground.tr.setVel(WORLD_SPEED, 0);
-		bird = Game.entities.findAny(Bird.class);
+		bird = app.entities.findAny(Bird.class);
 		bird.init();
 		bird.tr.moveTo(getWidth() / 8, ground.tr.getY() / 2);
 		bird.tr.setVel(0, 0);
-		bird.setFeathers(city.isNight() ? Feathers.BLUE : Feathers.YELLOW);
-		displayedText = Game.entities.add(new TitleText());
-		PumpingText readyText = new PumpingText(Game, "text_ready", 0.2f);
+		bird.setFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
+		displayedText = app.entities.add(new TitleText(app.assets));
+		PumpingText readyText = new PumpingText(app, "text_ready", 0.2f);
 		readyText.setName("readyText");
-		Game.entities.add(readyText);
+		app.entities.add(readyText);
 		CollisionHandler.clear();
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
 		Area birdWorld = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
@@ -74,13 +131,11 @@ public class StartScene extends Scene<BirdyGame> {
 		ground.update();
 		bird.update();
 		for (Collision ce : CollisionHandler.collisions()) {
-			dispatch((GameEvent) ce.getAppEvent());
+			BirdyGameEvent event = (BirdyGameEvent) ce.getAppEvent(); 
+			bird.receiveEvent(event);
+			control.addInput(event);
 		}
 		control.update();
-	}
-
-	public void dispatch(GameEvent event) {
-		bird.dispatch(event);
 	}
 
 	@Override
@@ -88,38 +143,18 @@ public class StartScene extends Scene<BirdyGame> {
 		city.draw(g);
 		ground.draw(g);
 		bird.draw(g);
-		displayedText.center(getWidth(), getHeight() - ground.getHeight());
-		displayedText.draw(g);
-		showState(g);
-	}
-
-	private void showState(Graphics2D g) {
+		if (displayedText != null) {
+			displayedText.center(getWidth(), getHeight() - ground.getHeight());
+			displayedText.draw(g);
+		}
+		// debugging: show state
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(toString() + ", bird state:" + bird.getFlightState() + " - " + bird.getHealthState(), 20,
-				getHeight() - 50);
+		g.drawString(toString() + ", bird:" + bird.getFlightState() + " & " + bird.getHealthState(), 20, getHeight() - 50);
 	}
 
 	@Override
 	public String toString() {
 		return control.getDescription() + "(" + control.stateID() + ")";
-	}
-
-	void showReadyText() {
-		displayedText = Game.entities.findByName(PumpingText.class, "readyText");
-	}
-
-	void showTitleText() {
-		displayedText = Game.entities.findAny(TitleText.class);
-	}
-
-	void stopScrolling() {
-		ground.tr.setVel(0, 0);
-	}
-
-	void keepBirdInAir() {
-		while (bird.tr.getY() > ground.tr.getY() / 2) {
-			bird.jump(Util.randomInt(1, 4));
-		}
 	}
 }

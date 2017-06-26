@@ -1,15 +1,15 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGame.Game;
-import static de.amr.games.birdy.Globals.OBSTACLE_PASSAGE_HEIGHT;
-import static de.amr.games.birdy.Globals.OBSTACLE_PIPE_HEIGHT;
-import static de.amr.games.birdy.Globals.WORLD_SPEED;
+import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_PASSAGE_HEIGHT;
+import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_PIPE_HEIGHT;
+import static de.amr.games.birdy.BirdyGameGlobals.WORLD_SPEED;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.games.birdy.BirdyGame;
 
 public class PairOfPipes {
 
@@ -50,12 +50,12 @@ public class PairOfPipes {
 		}
 	}
 
-	public PairOfPipes(int centerY) {
-		pipeDown = Game.entities.add(new PipeDown());
+	public PairOfPipes(BirdyGame app, int centerY) {
+		pipeDown = app.entities.add(new PipeDown(app.assets));
 		pipeDown.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2 - OBSTACLE_PIPE_HEIGHT);
 		passage = new Passage();
 		passage.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2);
-		pipeUp = Game.entities.add(new PipeUp());
+		pipeUp = app.entities.add(new PipeUp(app.assets));
 		pipeUp.tr.setY(centerY + OBSTACLE_PASSAGE_HEIGHT / 2);
 		setVelocityX(WORLD_SPEED);
 	}

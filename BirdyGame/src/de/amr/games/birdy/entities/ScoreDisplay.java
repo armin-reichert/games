@@ -1,12 +1,10 @@
 package de.amr.games.birdy.entities;
 
-
-import static de.amr.games.birdy.BirdyGame.Game;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 
@@ -17,14 +15,13 @@ public class ScoreDisplay extends GameEntity {
 	private final Image[] digits;
 	private String scoreText;
 
-	public ScoreDisplay(Score score, float scale) {
+	public ScoreDisplay(Assets assets, Score score, float scale) {
 		this.score = score;
 		this.scale = scale;
 		this.digits = new Image[10];
 		for (int d = 0; d <= 9; d++) {
-			BufferedImage digitImage = Game.assets.image("number_score_0" + d);
-			digits[d] = digitImage.getScaledInstance(-1, Math.round(scale) * digitImage.getHeight(),
-					Image.SCALE_SMOOTH);
+			BufferedImage digitImage = assets.image("number_score_0" + d);
+			digits[d] = digitImage.getScaledInstance(-1, Math.round(scale) * digitImage.getHeight(), Image.SCALE_SMOOTH);
 		}
 		scoreText = String.valueOf(score.points);
 	}
@@ -42,9 +39,8 @@ public class ScoreDisplay extends GameEntity {
 	public void draw(Graphics2D g) {
 		for (int i = 0; i < scoreText.length(); i++) {
 			int digit = "0123456789".indexOf(scoreText.charAt(i));
-			g.drawImage(digits[digit],
-					(int) tr.getX() + i * (digits[0].getWidth(null) - Math.round(3 * scale)), (int) tr.getY(),
-					null);
+			g.drawImage(digits[digit], (int) tr.getX() + i * (digits[0].getWidth(null) - Math.round(3 * scale)),
+					(int) tr.getY(), null);
 		}
 	}
 

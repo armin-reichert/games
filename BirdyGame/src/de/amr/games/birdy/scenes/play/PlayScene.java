@@ -1,31 +1,39 @@
 package de.amr.games.birdy.scenes.play;
 
-import static de.amr.games.birdy.BirdyGame.Game;
-import static de.amr.games.birdy.GameEvent.BirdLeftPassage;
-import static de.amr.games.birdy.GameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.GameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.GameEvent.BirdTouchedPipe;
-import static de.amr.games.birdy.Globals.OBSTACLE_MAX_CREATION_TIME;
-import static de.amr.games.birdy.Globals.OBSTACLE_MIN_CREATION_TIME;
-import static de.amr.games.birdy.Globals.OBSTACLE_MIN_PIPE_HEIGHT;
-import static de.amr.games.birdy.Globals.OBSTACLE_PASSAGE_HEIGHT;
-import static de.amr.games.birdy.Globals.WORLD_SPEED;
+import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
+import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
+import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
+import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
+import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_MAX_CREATION_TIME;
+import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_MIN_CREATION_TIME;
+import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_MIN_PIPE_HEIGHT;
+import static de.amr.games.birdy.BirdyGameGlobals.OBSTACLE_PASSAGE_HEIGHT;
+import static de.amr.games.birdy.BirdyGameGlobals.WORLD_SPEED;
+import static de.amr.games.birdy.scenes.play.PlaySceneState.GameOver;
+import static de.amr.games.birdy.scenes.play.PlaySceneState.Playing;
+import static de.amr.games.birdy.scenes.play.PlaySceneState.StartingNewGame;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.timing.Countdown;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.GameEvent;
+import de.amr.games.birdy.BirdyGameEvent;
+import de.amr.games.birdy.BirdyGameGlobals;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.GameOverText;
@@ -35,27 +43,82 @@ import de.amr.games.birdy.entities.PipeDown;
 import de.amr.games.birdy.entities.PipeUp;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
+import de.amr.games.birdy.scenes.start.StartScene;
 import de.amr.games.birdy.utils.Util;
 
+/**
+ * Play scene of the game.
+ * 
+ * @author Armin Reichert
+ */
 public class PlayScene extends Scene<BirdyGame> {
+
+	private class PlaySceneControl extends StateMachine<PlaySceneState, BirdyGameEvent> {
+
+		public PlaySceneControl() {
+			super("Play Scene Control", PlaySceneState.class, Playing);
+
+			state(Playing).entry = s -> {
+				app.score.reset();
+				startScrolling();
+				app.PLAYING_MUSIC.loop();
+			};
+
+			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> app.score.points > 3, (s, t) -> {
+				app.BIRD_HITS_OBSTACLE.play();
+				app.score.points -= 3;
+				bird.tr.setX(bird.tr.getX() + BirdyGameGlobals.OBSTACLE_PIPE_WIDTH + bird.getWidth());
+				bird.receiveEvent(BirdTouchedPipe);
+			});
+
+			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> app.score.points <= 3, (s, t) -> {
+				app.BIRD_HITS_OBSTACLE.play();
+				bird.receiveEvent(BirdCrashed);
+			});
+
+			changeOnInput(BirdLeftPassage, Playing, Playing, (s, t) -> {
+				app.BIRD_GETS_POINT.play();
+				app.score.points++;
+				Application.Log.info("Score: " + app.score.points);
+			});
+
+			changeOnInput(BirdTouchedGround, Playing, GameOver, (s, t) -> {
+				app.PLAYING_MUSIC.stop();
+				bird.receiveEvent(BirdTouchedGround);
+			});
+
+			changeOnInput(BirdLeftWorld, Playing, GameOver, (s, t) -> {
+				app.PLAYING_MUSIC.stop();
+				bird.receiveEvent(BirdLeftWorld);
+			});
+
+			state(GameOver).entry = s -> stopScrolling();
+
+			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.PLAYING_MUSIC.stop());
+
+			state(StartingNewGame).entry = s -> app.views.show(StartScene.class);
+		}
+	}
 
 	private PipesManager pipesManager;
 	private Bird bird;
 	private City city;
 	private Ground ground;
 	private GameEntity gameOverText;
-	private GameEntity scoreDisplay;
+	private ScoreDisplay scoreDisplay;
 
 	private final PlaySceneControl control;
 
 	public PlayScene(BirdyGame game) {
 		super(game);
-		control = new PlaySceneControl(app, this);
+		control = new PlaySceneControl();
+		control.setLogger(Application.Log);
 	}
 
-	public void dispatch(GameEvent event) {
+	public void dispatch(BirdyGameEvent event) {
 		control.addInput(event);
-		bird.dispatch(event);
+		bird.receiveEvent(event);
 	}
 
 	@Override
@@ -65,13 +128,13 @@ public class PlayScene extends Scene<BirdyGame> {
 	}
 
 	void initEntities() {
-		ground = Game.entities.findAny(Ground.class);
-		city = Game.entities.findAny(City.class);
-		bird = Game.entities.findAny(Bird.class);
-		scoreDisplay = new ScoreDisplay(getApp().score, 1.5f);
+		ground = app.entities.findAny(Ground.class);
+		city = app.entities.findAny(City.class);
+		bird = app.entities.findAny(Bird.class);
+		scoreDisplay = new ScoreDisplay(app.assets, app.score, 1.5f);
 		scoreDisplay.centerHor(getWidth());
 		scoreDisplay.tr.setY(ground.tr.getY() / 4);
-		gameOverText = Game.entities.add(new GameOverText());
+		gameOverText = app.entities.add(new GameOverText(app.assets));
 		gameOverText.center(getWidth(), getHeight());
 		pipesManager = new PipesManager();
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
@@ -88,7 +151,7 @@ public class PlayScene extends Scene<BirdyGame> {
 		gameOverText.update();
 		scoreDisplay.update();
 		for (Collision collision : CollisionHandler.collisions()) {
-			dispatch((GameEvent) collision.getAppEvent());
+			dispatch((BirdyGameEvent) collision.getAppEvent());
 		}
 		control.update();
 	}
@@ -170,7 +233,7 @@ public class PlayScene extends Scene<BirdyGame> {
 
 		private void addPipes() {
 			if (pipeCreation321.isComplete()) {
-				PairOfPipes pipes = new PairOfPipes(Util.randomInt(OBSTACLE_MIN_PIPE_HEIGHT + OBSTACLE_PASSAGE_HEIGHT / 2,
+				PairOfPipes pipes = new PairOfPipes(app, Util.randomInt(OBSTACLE_MIN_PIPE_HEIGHT + OBSTACLE_PASSAGE_HEIGHT / 2,
 						(int) ground.tr.getY() - OBSTACLE_MIN_PIPE_HEIGHT - OBSTACLE_PASSAGE_HEIGHT / 2));
 				pipes.setPositionX(getApp().getWidth());
 				pipes.setLighted(city.isNight() && new Random().nextBoolean());
@@ -195,8 +258,8 @@ public class PlayScene extends Scene<BirdyGame> {
 					it.remove();
 				}
 			}
-			Game.entities.removeAll(PipeUp.class);
-			Game.entities.removeAll(PipeDown.class);
+			app.entities.removeAll(PipeUp.class);
+			app.entities.removeAll(PipeDown.class);
 		}
 	}
 }

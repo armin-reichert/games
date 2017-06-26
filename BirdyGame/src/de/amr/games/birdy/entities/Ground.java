@@ -1,10 +1,9 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGame.Game;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 
@@ -13,8 +12,8 @@ public class Ground extends GameEntity {
 	private int width;
 	private float startX;
 
-	public Ground() {
-		setSprites(new Sprite(Game.assets, "land"));
+	public Ground(Assets assets) {
+		setSprites(new Sprite(assets, "land"));
 		width = currentSprite().getWidth();
 	}
 

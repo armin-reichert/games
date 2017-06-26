@@ -1,7 +1,6 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGame.Game;
-import static de.amr.games.birdy.Globals.CITY_MAX_STARS;
+import static de.amr.games.birdy.BirdyGameGlobals.CITY_MAX_STARS;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -9,16 +8,19 @@ import java.awt.Image;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.game.timing.Countdown;
+import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.utils.Util;
 
 public class City extends GameEntity {
 
+	private final BirdyGame app;
 	private int width;
 	private boolean night;
 	private Countdown starLifetime;
 
-	public City() {
-		setSprites(new Sprite(Game.assets, "bg_night"), new Sprite(Game.assets, "bg_day"));
+	public City(BirdyGame app) {
+		this.app = app;
+		setSprites(new Sprite(app.assets, "bg_night"), new Sprite(app.assets, "bg_day"));
 	}
 
 	@Override
@@ -32,15 +34,15 @@ public class City extends GameEntity {
 				createStars();
 				starLifetime.restart();
 			}
-			Game.entities.filter(Star.class).forEach(GameEntity::update);
+			app.entities.filter(Star.class).forEach(GameEntity::update);
 			starLifetime.update();
 		}
 	}
 
 	private void createStars() {
-		Game.entities.removeAll(Star.class);
+		app.entities.removeAll(Star.class);
 		for (int i = 0; i < Util.randomInt(1, CITY_MAX_STARS); ++i) {
-			Star star = Game.entities.add(new Star());
+			Star star = app.entities.add(new Star(app.assets));
 			star.tr.moveTo(Util.randomInt(50, width - 50), Util.randomInt(100, 180));
 		}
 		starLifetime = new Countdown(300);
@@ -56,7 +58,7 @@ public class City extends GameEntity {
 		if (night) {
 			createStars();
 		} else {
-			Game.entities.removeAll(Star.class);
+			app.entities.removeAll(Star.class);
 		}
 	}
 
@@ -81,7 +83,7 @@ public class City extends GameEntity {
 		for (int x = 0; x < width; x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
-		Game.entities.filter(Star.class).forEach(e -> e.draw(g));
+		app.entities.filter(Star.class).forEach(e -> e.draw(g));
 		g.translate(-tr.getX(), -tr.getY());
 	}
 }

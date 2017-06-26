@@ -1,7 +1,5 @@
 package de.amr.games.birdy.scenes.util;
 
-import static de.amr.games.birdy.BirdyGame.Game;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -25,7 +23,7 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 	public SpriteBrowser(BirdyGame game) {
 		super(game);
 		spriteNames = new ArrayList<>();
-		for (String name : Game.assets.imageNames()) {
+		for (String name : app.assets.imageNames()) {
 			spriteNames.add(name);
 		}
 		Collections.sort(spriteNames);
@@ -42,14 +40,14 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
 			index = index == 0 ? spriteNames.size() - 1 : index - 1;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_X)) {
-			Game.views.show(StartScene.class);
+			app.views.show(StartScene.class);
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		String name = spriteNames.get(index);
-		BufferedImage image = Game.assets.image(name);
+		BufferedImage image = app.assets.image(name);
 		String text = name + " (" + image.getWidth() + "x" + image.getHeight() + ")";
 		text += " (Keys: LEFT=Previous, RIGHT=Next, X=Exit)";
 		g.setColor(Color.WHITE);

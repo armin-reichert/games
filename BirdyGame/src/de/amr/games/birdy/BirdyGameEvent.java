@@ -1,5 +1,5 @@
 package de.amr.games.birdy;
 
-public enum GameEvent {
+public enum BirdyGameEvent {
 	Tick, BirdTouchedGround, BirdTouchedPipe, BirdLeftPassage, BirdLeftWorld, BirdCrashed;
 }

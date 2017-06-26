@@ -2,13 +2,13 @@ package de.amr.games.birdy;
 
 import java.awt.event.KeyEvent;
 
-public class Globals {
+public class BirdyGameGlobals {
 
 	public static final int JUMP_KEY = KeyEvent.VK_UP;
 
 	public static final float WORLD_GRAVITY = 0.3f;
 	public static final float WORLD_SPEED = -2.5f;
-	public static final int TIME_BEFORE_PLAY = 300;
+	public static final int READY_TIME = 120;
 	public static final int CITY_MAX_STARS = 5;
 	public static final float BIRD_JUMP_SPEED = WORLD_GRAVITY * 2.5f;
 	public static final int BIRD_FLAP_DURATION_MILLIS = 50;
