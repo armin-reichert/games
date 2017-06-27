@@ -31,8 +31,8 @@ public class StateMachine<StateID, Input> {
 	private final Map<StateID, State> statesByID;
 	private final Map<StateID, List<Transition<StateID>>> transitionsByStateID;
 	private final StateID initialStateID;
+	private final Deque<Input> inputQ = new LinkedList<>();
 	private StateID currentStateID;
-	private Deque<Input> inputQ = new LinkedList<>();
 	private Optional<Logger> logger;
 	private int frequency = 60;
 
@@ -87,8 +87,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Initializes this stae machine by switching to the initial state and executing an optional entry
-	 * action.
+	 * Initializes this state machine by switching to the initial state and executing an optional
+	 * entry action.
 	 */
 	public void init() {
 		currentStateID = initialStateID;

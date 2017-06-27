@@ -156,9 +156,4 @@ public class StartScene extends Scene<BirdyGame> {
 		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(), bird.getFlightState(),
 				bird.getHealthState()), 20, getHeight() - 50);
 	}
-
-	@Override
-	public String toString() {
-		return control.getDescription() + "(" + control.stateID() + ")";
-	}
 }
