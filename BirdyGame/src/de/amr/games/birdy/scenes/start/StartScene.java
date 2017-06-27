@@ -45,7 +45,7 @@ public class StartScene extends Scene<BirdyGame> {
 			super("Start Scene Control", StartSceneState.class, Starting);
 
 			// Starting
-			state(Starting).entry = s -> reset();
+			state(Starting).entry = s -> resetScene();
 			
 			state(Starting).update = s -> keepBirdInAir();
 			
@@ -107,7 +107,7 @@ public class StartScene extends Scene<BirdyGame> {
 		}
 	}
 
-	private void reset() {
+	private void resetScene() {
 		city = app.entities.findAny(City.class);
 		city.setWidth(getWidth());
 		city.setNight(new Random().nextBoolean());

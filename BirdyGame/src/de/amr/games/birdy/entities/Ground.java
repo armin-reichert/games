@@ -3,17 +3,17 @@ package de.amr.games.birdy.entities;
 import java.awt.Graphics2D;
 import java.awt.Image;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.birdy.BirdyGame;
 
 public class Ground extends GameEntity {
 
 	private int width;
 	private float startX;
 
-	public Ground(Assets assets) {
-		setSprites(new Sprite(assets, "land"));
+	public Ground(BirdyGame app) {
+		setSprites(new Sprite(app.assets, "land"));
 		width = currentSprite().getWidth();
 	}
 

@@ -49,7 +49,7 @@ public class BirdyGame extends Application {
 		assets.sound("music/bgmusic.mp3").volume(-20);
 
 		entities.add(new Bird(this));
-		entities.add(new Ground(this.assets));
+		entities.add(new Ground(this));
 		entities.add(new City(this));
 
 		views.add(new IntroScene(this));
