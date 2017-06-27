@@ -1,6 +1,5 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.games.birdy.BirdyGame.BIRD_INJURED_TIME;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
@@ -10,13 +9,14 @@ import static de.amr.games.birdy.entities.bird.HealthState.Sane;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.BirdyGameEvent;
 
 public class HealthControl extends StateMachine<HealthState, BirdyGameEvent> {
 
 	private Sprite feathersBeforeInjury;
 
-	public HealthControl(Bird bird) {
+	public HealthControl(BirdyGame app, Bird bird) {
 		super("Bird Health Control", HealthState.class, Sane);
 
 		changeOnInput(BirdTouchedPipe, Sane, Injured);
@@ -24,14 +24,14 @@ public class HealthControl extends StateMachine<HealthState, BirdyGameEvent> {
 		changeOnInput(BirdLeftWorld, Sane, Dead);
 
 		state(Injured).entry = s -> {
-			s.setDuration(BIRD_INJURED_TIME);
+			s.setDuration(app.motor.secToTicks(app.settings.get("bird injured seconds")));
 			feathersBeforeInjury = bird.currentSprite();
 			bird.setFeathers(bird.RED_FEATHERS);
 		};
 		state(Injured).exit = s -> bird.setFeathers(feathersBeforeInjury);
 
 		changeOnInput(BirdTouchedPipe, Injured, Injured, (s, t) -> {
-			s.setDuration(BIRD_INJURED_TIME);
+			s.resetTimer();
 		});
 		changeOnTimeout(Injured, Sane);
 		changeOnInput(BirdTouchedGround, Injured, Dead);

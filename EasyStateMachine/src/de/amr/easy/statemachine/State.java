@@ -31,7 +31,8 @@ public class State {
 	 * Creates a new state with unlimited duration.
 	 */
 	public State() {
-		duration = remaining = FOREVER;
+		remaining = FOREVER;
+		resetTimer();
 	}
 
 	void doEntry() {
@@ -65,7 +66,13 @@ public class State {
 		if (updates < 0) {
 			throw new IllegalStateException();
 		}
-		remaining = duration = updates;
+		duration = updates;
+		resetTimer();
+	}
+
+	/** Resets the timer to the complete state duration. */
+	public void resetTimer() {
+		remaining = duration;
 	}
 
 	/**

@@ -1,6 +1,5 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGame.CITY_MAX_STARS;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -41,7 +40,7 @@ public class City extends GameEntity {
 
 	private void createStars() {
 		app.entities.removeAll(Star.class);
-		for (int i = 0; i < Util.randomInt(1, CITY_MAX_STARS); ++i) {
+		for (int i = 0; i < Util.randomInt(1, app.settings.get("max stars")); ++i) {
 			Star star = app.entities.add(new Star(app.assets));
 			star.tr.moveTo(Util.randomInt(50, width - 50), Util.randomInt(100, 180));
 		}

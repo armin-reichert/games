@@ -3,12 +3,6 @@ package de.amr.games.birdy.scenes.play;
 import static de.amr.easy.game.entity.collision.CollisionHandler.detectCollisionEnd;
 import static de.amr.easy.game.entity.collision.CollisionHandler.detectCollisionStart;
 import static de.amr.easy.game.entity.collision.CollisionHandler.ignoreCollisionEnd;
-import static de.amr.games.birdy.BirdyGame.MAX_PIPE_TIME;
-import static de.amr.games.birdy.BirdyGame.MIN_PIPE_TIME;
-import static de.amr.games.birdy.BirdyGame.OBSTACLE_MIN_PIPE_HEIGHT;
-import static de.amr.games.birdy.BirdyGame.OBSTACLE_PASSAGE_HEIGHT;
-import static de.amr.games.birdy.BirdyGame.OBSTACLE_PIPE_WIDTH;
-import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
 import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
@@ -29,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
+import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
@@ -42,9 +36,7 @@ import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.GameOverText;
 import de.amr.games.birdy.entities.Ground;
-import de.amr.games.birdy.entities.PipeDown;
 import de.amr.games.birdy.entities.PipePair;
-import de.amr.games.birdy.entities.PipeUp;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.scenes.start.StartScene;
@@ -56,31 +48,33 @@ import de.amr.games.birdy.scenes.start.StartScene;
  */
 public class PlayScene extends Scene<BirdyGame> {
 
+	private final Score score = new Score();
+
 	private class PlaySceneControl extends StateMachine<PlaySceneState, BirdyGameEvent> {
 
 		public PlaySceneControl() {
 			super("Play Scene Control", PlaySceneState.class, Playing);
 
 			state(Playing).entry = s -> {
-				startScrolling();
-				app.score.reset();
+				score.reset();
+				start();
 				app.assets.sound("music/bgmusic.mp3").loop();
 			};
 
-			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> app.score.points > 3, (s, t) -> {
-				app.score.points -= 3;
-				bird.tr.setX(bird.tr.getX() + OBSTACLE_PIPE_WIDTH + bird.getWidth());
+			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, (s, t) -> {
+				score.points -= 3;
+				bird.tr.setX(bird.tr.getX() + app.settings.getInt("pipe width") + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				app.assets.sound("sfx/hit.mp3").play();
 			});
 
-			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> app.score.points <= 3, (s, t) -> {
+			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> score.points <= 3, (s, t) -> {
 				bird.receiveEvent(BirdCrashed);
 				app.assets.sound("sfx/hit.mp3").play();
 			});
 
 			changeOnInput(BirdLeftPassage, Playing, Playing, (s, t) -> {
-				app.score.points++;
+				score.points++;
 				app.assets.sound("sfx/point.mp3").play();
 			});
 
@@ -94,7 +88,7 @@ public class PlayScene extends Scene<BirdyGame> {
 				app.assets.sound("music/bgmusic.mp3").stop();
 			});
 
-			state(GameOver).entry = s -> stopScrolling();
+			state(GameOver).entry = s -> stop();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.assets.sound("music/bgmusic.mp3").stop());
@@ -103,41 +97,61 @@ public class PlayScene extends Scene<BirdyGame> {
 		}
 	}
 
+	// Pipe creation/deletion/update is encapsulated in the following inner class:
+
+	/** Pipe manager states. */
+	public enum PipeManagerState {
+		Stopped, Breeding, Birthing
+	};
+
 	/**
 	 * Manages the creation and deletion of pipes.
 	 */
-	private class PipeManager {
+	private class PipeManager extends GameEntity {
 
 		private final List<PipePair> pairs = new LinkedList<>();
-		private final StateMachine<String, String> control;
+		private final StateMachine<PipeManagerState, String> control;
 
 		private PipeManager() {
-			control = new StateMachine<>("PipeManagerControl", String.class, "Stopped");
+			control = new StateMachine<>("PipeManagerControl", PipeManagerState.class, PipeManagerState.Stopped);
 
-			// Stay breeding for some random time from interval:
-			control.state("Breeding").entry = s -> s.setDuration(randomInt(MIN_PIPE_TIME, MAX_PIPE_TIME));
+			// Stay breeding for some random time from interval [MIN_PIPE_TIME, MAX_PIPE_TIME]:
+			control.state(PipeManagerState.Breeding).entry = s -> {
+				int minCreationTime = app.motor.secToTicks(app.settings.getFloat("min pipe creation sec"));
+				int maxCreationTime = app.motor.secToTicks(app.settings.getFloat("max pipe creation sec"));
+				s.setDuration(randomInt(minCreationTime, maxCreationTime));
+			};
+
 			// Update (move) pipes during breeding:
-			control.state("Breeding").update = s -> pairs.forEach(PipePair::update);
+			control.state(PipeManagerState.Breeding).update = s -> {
+				pairs.forEach(PipePair::update);
+			};
 
 			// When breeding is over, give birth to new pipe pair:
-			control.changeOnTimeout("Breeding", "Birthing", (s, t) -> addPair());
+			control.changeOnTimeout(PipeManagerState.Breeding, PipeManagerState.Birthing, (s, t) -> {
+				addPipePair();
+				removeObsoletePipePairs();
+			});
+
 			// On "Stop" event, enter "Stopped" state:
-			control.changeOnInput("Stop", "Breeding", "Stopped");
+			control.changeOnInput("Stop", PipeManagerState.Breeding, PipeManagerState.Stopped);
 
 			// Immediately become breeding again:
-			control.change("Birthing", "Breeding");
+			control.change(PipeManagerState.Birthing, PipeManagerState.Breeding);
+
 			// Handle "Stop" event:
-			control.changeOnInput("Stop", "Birthing", "Stopped");
+			control.changeOnInput("Stop", PipeManagerState.Birthing, PipeManagerState.Stopped);
 
 			// On "Start" event, become breeding again:
-			control.changeOnInput("Start", "Stopped", "Breeding");
+			control.changeOnInput("Start", PipeManagerState.Stopped, PipeManagerState.Breeding);
+		}
 
-			// Tracing
-			control.setLogger(Application.LOG);
+		@Override
+		public void init() {
+			control.init();
 		}
 
 		public void start() {
-			control.init();
 			control.addInput("Start");
 		}
 
@@ -145,18 +159,22 @@ public class PlayScene extends Scene<BirdyGame> {
 			control.addInput("Stop");
 		}
 
+		@Override
 		public void update() {
 			control.update();
-			removeObsoletePipes();
 		}
 
-		public void render(Graphics2D g) {
+		@Override
+		public void draw(Graphics2D g) {
 			pairs.forEach(pair -> pair.render(g));
 		}
 
-		private void addPair() {
-			PipePair pair = new PipePair(app, randomInt(OBSTACLE_MIN_PIPE_HEIGHT + OBSTACLE_PASSAGE_HEIGHT / 2,
-					(int) ground.tr.getY() - OBSTACLE_MIN_PIPE_HEIGHT - OBSTACLE_PASSAGE_HEIGHT / 2));
+		private void addPipePair() {
+			int minPipeHeight = app.settings.get("min pipe height");
+			int passageHeight = app.settings.get("passage height");
+			int centerY = randomInt(minPipeHeight + passageHeight / 2,
+					(int) ground.tr.getY() - minPipeHeight - passageHeight / 2);
+			PipePair pair = new PipePair(app, centerY);
 			pair.setPositionX(getApp().getWidth());
 			pair.setLighted(city.isNight() && new Random().nextBoolean());
 			pairs.add(pair);
@@ -165,7 +183,7 @@ public class PlayScene extends Scene<BirdyGame> {
 			detectCollisionEnd(bird, pair.getPassage(), BirdLeftPassage);
 		}
 
-		private void removeObsoletePipes() {
+		private void removeObsoletePipePairs() {
 			Iterator<PipePair> it = pairs.iterator();
 			while (it.hasNext()) {
 				PipePair pipes = it.next();
@@ -176,8 +194,6 @@ public class PlayScene extends Scene<BirdyGame> {
 					it.remove();
 				}
 			}
-			app.entities.removeAll(PipeUp.class);
-			app.entities.removeAll(PipeDown.class);
 		}
 	}
 
@@ -205,7 +221,7 @@ public class PlayScene extends Scene<BirdyGame> {
 		ground = app.entities.findAny(Ground.class);
 		city = app.entities.findAny(City.class);
 		bird = app.entities.findAny(Bird.class);
-		scoreDisplay = new ScoreDisplay(app.assets, app.score, 1.5f);
+		scoreDisplay = new ScoreDisplay(app.assets, score, 1.5f);
 		scoreDisplay.centerHor(getWidth());
 		scoreDisplay.tr.setY(ground.tr.getY() / 4);
 		gameOverText = app.entities.add(new GameOverText(app.assets));
@@ -214,7 +230,12 @@ public class PlayScene extends Scene<BirdyGame> {
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
 		Area world = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
 		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
+
+		pipesManager.init();
 		control.init();
+
+		// Tracing
+		// pipesManager.control.setLogger(Application.LOG);
 	}
 
 	@Override
@@ -234,7 +255,7 @@ public class PlayScene extends Scene<BirdyGame> {
 	@Override
 	public void draw(Graphics2D g) {
 		city.draw(g);
-		pipesManager.render(g);
+		pipesManager.draw(g);
 		ground.draw(g);
 		scoreDisplay.draw(g);
 		bird.draw(g);
@@ -244,12 +265,12 @@ public class PlayScene extends Scene<BirdyGame> {
 		showState(g);
 	}
 
-	private void startScrolling() {
-		ground.tr.setVelocity(WORLD_SPEED, 0);
+	private void start() {
+		ground.tr.setVelocity(app.settings.get("world speed"), 0);
 		pipesManager.start();
 	}
 
-	private void stopScrolling() {
+	private void stop() {
 		ground.tr.setVelocity(0, 0);
 		pipesManager.stop();
 	}

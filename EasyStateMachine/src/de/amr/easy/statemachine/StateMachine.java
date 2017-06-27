@@ -92,6 +92,7 @@ public class StateMachine<StateID, Input> {
 	 */
 	public void init() {
 		currentStateID = initialStateID;
+		traceStateEntry();
 		state().doEntry();
 	}
 

@@ -1,7 +1,5 @@
 package de.amr.games.birdy.scenes.start;
 
-import static de.amr.games.birdy.BirdyGame.JUMP_KEY;
-import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.scenes.start.StartSceneState.GameOver;
@@ -16,6 +14,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.common.PumpingText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
@@ -47,21 +46,28 @@ public class StartScene extends Scene<BirdyGame> {
 
 			// Starting
 			state(Starting).entry = s -> reset();
+			
 			state(Starting).update = s -> keepBirdInAir();
-			change(Starting, Ready, () -> Keyboard.keyDown(JUMP_KEY));
+			
+			change(Starting, Ready, () -> Keyboard.keyDown(app.settings.get("jump key")));
+			
 			changeOnInput(BirdTouchedGround, Starting, GameOver);
 
 			// Ready
 			state(Ready).entry = s -> {
-				s.setDuration(BirdyGame.READY_TIME);
+				s.setDuration(app.motor.secToTicks(app.settings.getFloat("ready time sec")));
 				showText(app.entities.findByName(PumpingText.class, "readyText"));
 			};
+			
 			state(Ready).exit = s -> hideText();
+			
 			changeOnTimeout(Ready, StartPlaying, (s, t) -> app.views.show(PlayScene.class));
+			
 			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
 
 			// GameOver
 			state(GameOver).entry = s -> stopScrolling();
+			
 			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(VK_SPACE));
 		}
 	}
@@ -75,7 +81,7 @@ public class StartScene extends Scene<BirdyGame> {
 	public StartScene(BirdyGame game) {
 		super(game);
 		control = new StartSceneControl();
-		// control.setLogger(Application.LOG);
+		 control.setLogger(Application.LOG);
 	}
 
 	@Override
@@ -108,7 +114,7 @@ public class StartScene extends Scene<BirdyGame> {
 		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
 		ground.tr.moveTo(0, getHeight() - ground.getHeight());
-		ground.tr.setVelocity(WORLD_SPEED, 0);
+		ground.tr.setVelocity(app.settings.getFloat("world speed"), 0);
 		bird = app.entities.findAny(Bird.class);
 		bird.init();
 		bird.tr.moveTo(getWidth() / 8, ground.tr.getY() / 2);

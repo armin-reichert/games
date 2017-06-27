@@ -1,9 +1,5 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGame.OBSTACLE_PASSAGE_HEIGHT;
-import static de.amr.games.birdy.BirdyGame.OBSTACLE_PIPE_HEIGHT;
-import static de.amr.games.birdy.BirdyGame.WORLD_SPEED;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
@@ -13,6 +9,7 @@ import de.amr.games.birdy.BirdyGame;
 
 public class PipePair {
 
+	private final BirdyGame app;
 	private final GameEntity pipeDown;
 	private final GameEntity pipeUp;
 	private final GameEntity passage;
@@ -36,7 +33,7 @@ public class PipePair {
 
 		@Override
 		public int getHeight() {
-			return OBSTACLE_PASSAGE_HEIGHT;
+			return app.settings.get("passage height");
 		}
 
 		@Override
@@ -44,20 +41,21 @@ public class PipePair {
 			g.translate(tr.getX(), tr.getY());
 			if (lighted) {
 				g.setColor(new Color(255, 255, 0, new Random().nextInt(170)));
-				g.fillRect(3, 0, getWidth() - 6, OBSTACLE_PASSAGE_HEIGHT);
+				g.fillRect(3, 0, getWidth() - 6, getPassageHeight());
 			}
 			g.translate(-tr.getX(), -tr.getY());
 		}
 	}
 
 	public PipePair(BirdyGame app, int centerY) {
+		this.app = app;
 		pipeDown = app.entities.add(new PipeDown(app.assets));
-		pipeDown.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2 - OBSTACLE_PIPE_HEIGHT);
+		pipeDown.tr.setY(centerY - getPassageHeight() / 2 - getPipeHeight());
 		passage = new Passage();
-		passage.tr.setY(centerY - OBSTACLE_PASSAGE_HEIGHT / 2);
+		passage.tr.setY(centerY - getPassageHeight() / 2);
 		pipeUp = app.entities.add(new PipeUp(app.assets));
-		pipeUp.tr.setY(centerY + OBSTACLE_PASSAGE_HEIGHT / 2);
-		setVelocityX(WORLD_SPEED);
+		pipeUp.tr.setY(centerY + getPassageHeight() / 2);
+		setVelocityX(app.settings.get("world speed"));
 	}
 
 	public void update() {
@@ -98,6 +96,14 @@ public class PipePair {
 
 	public int getWidth() {
 		return Math.max(pipeDown.getWidth(), pipeUp.getWidth());
+	}
+
+	public int getPassageHeight() {
+		return app.settings.get("passage height");
+	}
+
+	public int getPipeHeight() {
+		return app.settings.get("pipe height");
 	}
 
 	public GameEntity getPipeDown() {

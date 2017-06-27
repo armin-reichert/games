@@ -18,19 +18,25 @@ public class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
 		super("Bird Flight Control", FlightState.class, Flying);
 
 		state(Flying).entry = s -> bird.lookFlying();
+		
 		state(Flying).update = s -> {
-			if (Keyboard.keyDown(BirdyGame.JUMP_KEY)) {
+			if (Keyboard.keyDown(app.settings.get("jump key"))) {
 				bird.jump();
 			} else {
 				bird.fly();
 			}
 		};
-		changeOnInput(BirdTouchedGround, Flying, OnGround);
+		
 		changeOnInput(BirdCrashed, Flying, Crashing);
+		
 		changeOnInput(BirdLeftWorld, Flying, Crashing);
+		
+		changeOnInput(BirdTouchedGround, Flying, OnGround);
 
 		state(Crashing).entry = s -> bird.lookDead();
+		
 		state(Crashing).update = s -> bird.fall(2);
+		
 		changeOnInput(BirdTouchedGround, Crashing, OnGround);
 
 		state(OnGround).entry = s -> {

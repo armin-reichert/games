@@ -36,7 +36,11 @@ public class AppSettings {
 	}
 
 	public int getInt(String key) {
-		return (Integer) get(key);
+		return (int) get(key);
+	}
+
+	public float getFloat(String key) {
+		return (float) get(key);
 	}
 
 	public Color getColor(String key) {
