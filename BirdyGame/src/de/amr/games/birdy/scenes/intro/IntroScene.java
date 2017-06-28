@@ -7,59 +7,83 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
-import de.amr.easy.game.common.PumpingText;
+import de.amr.easy.game.common.PumpingImage;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.scenes.start.StartScene;
 
+/**
+ * Intro scene.
+ * 
+ * @author Armin Reichert
+ */
 public class IntroScene extends Scene<BirdyGame> {
 
 	private class IntroSceneControl extends StateMachine<String, String> {
 
 		public IntroSceneControl() {
-			super("IntroScene Control", String.class, "Scrolling");
-
-			state("Scrolling").entry = s -> textY = getHeight();
-			state("Scrolling").update = s -> textY -= 0.5f;
-			change("Scrolling", "Waiting", () -> textY < getHeight() / 2);
-
-			state("Waiting").entry = s -> s.setDuration(app.motor.secToTicks(1));
+			super("Intro Scene Control", String.class, "MovingText");
+			state("MovingText").entry = s -> textY = getHeight();
+			state("MovingText").update = s -> textY -= textSpeed;
+			change("MovingText", "Waiting", this::endPositionReached);
+			state("Waiting").entry = s -> s.setDuration(app.motor.secToTicks(2));
 			changeOnTimeout("Waiting", "StartingGame");
-
 			state("StartingGame").entry = s -> s.setDuration(app.motor.secToTicks(3));
 			state("StartingGame").exit = s -> app.views.show(StartScene.class);
-			changeOnTimeout("StartingGame", "ChangingScene");
+			changeOnTimeout("StartingGame", "ExitScene");
+		}
+
+		private boolean endPositionReached() {
+			return textBounds != null && textY < (getHeight() - textBounds.getHeight()) / 2;
 		}
 	}
 
-	private final IntroSceneControl control;
-	private Color textColor;
+	private final IntroSceneControl control = new IntroSceneControl();
+
 	private String[] textLines;
+	private float lineSpacing = 1.5f;
+	private Color textColor;
 	private Font textFont;
 	private float textY;
+	private float textSpeed = .75f;
+	private Rectangle2D textBounds;
+
 	private City city;
-	private PumpingText flappyBirdText;
+	private PumpingImage titleImage;
 
 	public IntroScene(BirdyGame app) {
 		super(app);
-		control = new IntroSceneControl();
-		textLines = "Anna proudly presents".split("\n");
 		textFont = new Font("Sans", Font.PLAIN, 40);
 		textColor = Color.WHITE;
 	}
 
+	public void setText(String text) {
+		this.textLines = text.split("\n");
+	}
+
+	public void setTextFont(Font textFont) {
+		this.textFont = textFont;
+	}
+
+	public void setTextColor(Color textColor) {
+		this.textColor = textColor;
+	}
+
 	@Override
 	public void init() {
-		app.assets.storeFont("Pacifico-Regular", "fonts/Pacifico-Regular.ttf", 40, Font.BOLD);
 		city = app.entities.findAny(City.class);
 		city.setWidth(getWidth());
 		city.setNight(new Random().nextBoolean());
-		textFont = app.assets.font("Pacifico-Regular");
-		textColor = city.isNight() ? Color.WHITE : Color.DARK_GRAY;
-		flappyBirdText = new PumpingText(app, "title", .25f);
-		flappyBirdText.tr.setY(getHeight());
+
+		titleImage = new PumpingImage(app.assets.image("title"));
+		titleImage.setScale(3);
+
+		setText("Anna proudly presents" + "\nin cooperation with" + "\nProf. Zwickmann" + "\nGeräteschuppen Software 2017");
+		setTextFont(app.assets.font("Pacifico-Regular"));
+		setTextColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
+
 		control.init();
 	}
 
@@ -71,30 +95,29 @@ public class IntroScene extends Scene<BirdyGame> {
 	@Override
 	public void draw(Graphics2D pen) {
 		city.draw(pen);
-		if (control.stateID() == "Scrolling") {
-			pen.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			pen.setFont(textFont);
-			pen.setColor(textColor);
-			float y = textY;
-			for (int line = 0; line < textLines.length; ++line) {
-				String text = textLines[line];
-				Rectangle2D bounds = pen.getFontMetrics().getStringBounds(text, pen);
-				float x = (float) (getWidth() / 2 - bounds.getWidth() / 2);
-				pen.drawString(text, x, y);
-				y += 2 * bounds.getHeight();
-			}
+		if (control.is("MovingText", "Waiting")) {
+			drawTextLines(pen);
 		} else if (control.stateID() == "StartingGame") {
-			flappyBirdText.center(getWidth(), getHeight());
-			flappyBirdText.draw(pen);
+			titleImage.center(getWidth(), getHeight());
+			titleImage.draw(pen);
 		}
 	}
 
-	public void setText(String text) {
-		this.textLines = text.split("\n");
+	private void drawTextLines(Graphics2D pen) {
+		pen.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		pen.setFont(textFont);
+		pen.setColor(textColor);
+		float y = textY;
+		double textHeight = 0;
+		double textWidth = 0;
+		for (String line : textLines) {
+			Rectangle2D lineBounds = pen.getFontMetrics().getStringBounds(line, pen);
+			float x = (float) (getWidth() - lineBounds.getWidth()) / 2;
+			pen.drawString(line, x, y);
+			y += lineSpacing * lineBounds.getHeight();
+			textHeight += lineBounds.getHeight();
+			textWidth = Math.max(textWidth, lineBounds.getWidth());
+		}
+		textBounds = new Rectangle2D.Double(0, 0, textWidth, textHeight);
 	}
-
-	public void setTextFont(Font textFont) {
-		this.textFont = textFont;
-	}
-
 }

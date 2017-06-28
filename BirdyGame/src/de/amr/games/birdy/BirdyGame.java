@@ -1,5 +1,6 @@
 package de.amr.games.birdy;
 
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
@@ -13,12 +14,16 @@ import de.amr.games.birdy.scenes.start.StartScene;
 import de.amr.games.birdy.scenes.util.SpriteBrowser;
 import de.amr.games.birdy.tools.SpritesheetReader;
 
+/**
+ * "Flappy Bird"-like game.
+ * 
+ * @author Armin Reichert
+ */
 public class BirdyGame extends Application {
 
 	public static void main(String[] args) {
-		
 		BirdyGame game = new BirdyGame();
-		
+
 		// general settings
 		game.settings.title = "Zwick, das listige Vögelchen";
 		game.settings.width = 640;
@@ -47,7 +52,9 @@ public class BirdyGame extends Application {
 	public void init() {
 		SpritesheetReader.extractSpriteSheet(assets);
 		assets.sound("music/bgmusic.mp3").volume(-20);
+		assets.storeFont("Pacifico-Regular", "fonts/Pacifico-Regular.ttf", 40, Font.BOLD);
 
+		// create entities shared by different scenes:
 		entities.add(new Bird(this));
 		entities.add(new Ground(this));
 		entities.add(new City(this));

@@ -15,7 +15,7 @@ import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.common.PumpingText;
+import de.amr.easy.game.common.PumpingImage;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
@@ -44,35 +44,27 @@ public class StartScene extends Scene<BirdyGame> {
 		public StartSceneControl() {
 			super("Start Scene Control", StartSceneState.class, Starting);
 
-			// Starting
 			state(Starting).entry = s -> resetScene();
-			
 			state(Starting).update = s -> keepBirdInAir();
-			
 			change(Starting, Ready, () -> Keyboard.keyDown(app.settings.get("jump key")));
-			
 			changeOnInput(BirdTouchedGround, Starting, GameOver);
 
-			// Ready
 			state(Ready).entry = s -> {
 				s.setDuration(app.motor.secToTicks(app.settings.getFloat("ready time sec")));
-				showText(app.entities.findByName(PumpingText.class, "readyText"));
+				showText(app.entities.findByName(PumpingImage.class, "readyText"));
+				app.assets.sound("music/bgmusic.mp3").loop();
 			};
-			
-			state(Ready).exit = s -> hideText();
-			
 			changeOnTimeout(Ready, StartPlaying, (s, t) -> app.views.show(PlayScene.class));
-			
 			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
+			state(Ready).exit = s -> hideText();
 
-			// GameOver
 			state(GameOver).entry = s -> stopScrolling();
-			
 			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(VK_SPACE));
 		}
 	}
 
-	private final StartSceneControl control;
+	private final StartSceneControl control = new StartSceneControl();
+
 	private Bird bird;
 	private City city;
 	private Ground ground;
@@ -80,8 +72,7 @@ public class StartScene extends Scene<BirdyGame> {
 
 	public StartScene(BirdyGame game) {
 		super(game);
-		control = new StartSceneControl();
-		 control.setLogger(Application.LOG);
+		control.setLogger(Application.LOG);
 	}
 
 	@Override
@@ -121,7 +112,7 @@ public class StartScene extends Scene<BirdyGame> {
 		bird.tr.setVelocity(0, 0);
 		bird.setFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 		displayedText = app.entities.add(new TitleText(app.assets));
-		PumpingText readyText = new PumpingText(app, "text_ready", 0.2f);
+		PumpingImage readyText = new PumpingImage(app.assets.image("text_ready"));
 		readyText.setName("readyText");
 		app.entities.add(readyText);
 		CollisionHandler.clear();

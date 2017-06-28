@@ -58,7 +58,6 @@ public class PlayScene extends Scene<BirdyGame> {
 			state(Playing).entry = s -> {
 				score.reset();
 				start();
-				app.assets.sound("music/bgmusic.mp3").loop();
 			};
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, (s, t) -> {
@@ -157,6 +156,7 @@ public class PlayScene extends Scene<BirdyGame> {
 
 		public void stop() {
 			control.addInput("Stop");
+			control.update();
 		}
 
 		@Override
