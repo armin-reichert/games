@@ -2,13 +2,14 @@ package de.amr.easy.game.entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
+import de.amr.easy.game.entity.collision.CollisionBoxSupplier;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.game.view.View;
 
-public abstract class GameEntity implements View {
+public abstract class GameEntity implements View, CollisionBoxSupplier {
 
 	public final Transform tr = new Transform();
 	private Sprite[] sprites;
@@ -31,9 +32,9 @@ public abstract class GameEntity implements View {
 	}
 
 	protected void drawCollisionBox(Graphics2D g, Color color) {
-		Rectangle box = getCollisionBox();
+		Rectangle2D box = getCollisionBox();
 		g.setColor(color);
-		g.drawRect(box.x, box.y, box.width, box.height);
+		g.draw(box);
 	}
 
 	public Sprite currentSprite() {
@@ -74,8 +75,9 @@ public abstract class GameEntity implements View {
 		return currentSprite() != null ? currentSprite().getHeight() : 0;
 	}
 
-	public Rectangle getCollisionBox() {
-		return new Rectangle((int) tr.getX(), (int) tr.getY(), getWidth(), getHeight());
+	@Override
+	public Rectangle2D getCollisionBox() {
+		return new Rectangle2D.Double(tr.getX(), tr.getY(), getWidth(), getHeight());
 	}
 
 	public Vector2 getCenter() {

@@ -1,33 +1,31 @@
 package de.amr.easy.game.entity.collision;
 
-import java.awt.Rectangle;
-
-import de.amr.easy.game.entity.GameEntity;
+import java.awt.geom.Rectangle2D;
 
 public class CollisionPair {
 
-	private final GameEntity either;
-	private final GameEntity other;
-	private Rectangle intersection;
+	private final CollisionBoxSupplier either;
+	private final CollisionBoxSupplier other;
+	private Rectangle2D intersection;
 
-	public CollisionPair(GameEntity x, GameEntity y) {
+	public CollisionPair(CollisionBoxSupplier x, CollisionBoxSupplier y) {
 		this.either = x;
 		this.other = y;
 	}
 
-	public GameEntity either() {
+	public CollisionBoxSupplier either() {
 		return either;
 	}
 
-	public GameEntity other() {
+	public CollisionBoxSupplier other() {
 		return other;
 	}
 
-	public Rectangle getIntersection() {
+	public Rectangle2D getIntersection() {
 		return intersection;
 	}
 
-	public void setIntersection(Rectangle intersection) {
+	public void setIntersection(Rectangle2D intersection) {
 		this.intersection = intersection;
 	}
 
@@ -37,8 +35,7 @@ public class CollisionPair {
 			return true;
 		}
 		CollisionPair pair = (CollisionPair) obj;
-		return pair.either == either && pair.other == other
-				|| pair.either == other && pair.other == either;
+		return pair.either == either && pair.other == other || pair.either == other && pair.other == either;
 	}
 
 	@Override

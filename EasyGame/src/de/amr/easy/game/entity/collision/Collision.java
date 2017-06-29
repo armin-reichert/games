@@ -1,18 +1,16 @@
 package de.amr.easy.game.entity.collision;
 
-import java.awt.Rectangle;
-
-import de.amr.easy.game.entity.GameEntity;
+import java.awt.geom.Rectangle2D;
 
 public class Collision {
 
-	private final GameEntity first;
-	private final GameEntity second;
-	private final Rectangle intersection;
+	private final CollisionBoxSupplier first;
+	private final CollisionBoxSupplier second;
+	private final Rectangle2D intersection;
 	private final boolean collisionStart;
 	private final Object appEvent;
 
-	public Collision(GameEntity first, GameEntity second, Rectangle intersection, Object appEvent,
+	public Collision(CollisionBoxSupplier first, CollisionBoxSupplier second, Rectangle2D intersection, Object appEvent,
 			boolean collisionStart) {
 		this.first = first;
 		this.second = second;
@@ -23,18 +21,16 @@ public class Collision {
 
 	@Override
 	public String toString() {
-		return "Collision" + (collisionStart ? "Start" : "End") + "(" + first.getClass().getSimpleName()
-				+ "<->" + second.getClass().getSimpleName() + ") -> " + appEvent;
+		return "Collision" + (collisionStart ? "Start" : "End") + "(" + first.getClass().getSimpleName() + "<->"
+				+ second.getClass().getSimpleName() + ") -> " + appEvent;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends GameEntity> T getFirst() {
-		return (T) first;
+	public CollisionBoxSupplier getFirst() {
+		return first;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends GameEntity> T getSecond() {
-		return (T) second;
+	public CollisionBoxSupplier getSecond() {
+		return second;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -46,7 +42,7 @@ public class Collision {
 		return collisionStart;
 	}
 
-	public Rectangle getIntersection() {
+	public Rectangle2D getIntersection() {
 		return intersection;
 	}
 }

@@ -1,31 +1,30 @@
 package de.amr.easy.game.entity.collision;
 
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.entity.GameEntity;
 
 public enum CollisionHandler {
 
 	INSTANCE;
 
-	public static void detectCollisionStart(GameEntity x, GameEntity y, Object event) {
+	public static void detectCollisionStart(CollisionBoxSupplier x, CollisionBoxSupplier y, Object event) {
 		INSTANCE.startMap.put(new CollisionPair(x, y), event);
 	}
 
-	public static void detectCollisionEnd(GameEntity x, GameEntity y, Object event) {
+	public static void detectCollisionEnd(CollisionBoxSupplier x, CollisionBoxSupplier y, Object event) {
 		INSTANCE.endMap.put(new CollisionPair(x, y), event);
 	}
 
-	public static void ignoreCollisionStart(GameEntity x, GameEntity y) {
+	public static void ignoreCollisionStart(CollisionBoxSupplier x, CollisionBoxSupplier y) {
 		INSTANCE.startMap.remove(new CollisionPair(x, y));
 	}
 
-	public static void ignoreCollisionEnd(GameEntity x, GameEntity y) {
+	public static void ignoreCollisionEnd(CollisionBoxSupplier x, CollisionBoxSupplier y) {
 		INSTANCE.endMap.remove(new CollisionPair(x, y));
 	}
 
@@ -72,16 +71,14 @@ public enum CollisionHandler {
 		}
 		for (CollisionPair pair : startMap.keySet()) {
 			if (newCollisions.contains(pair) && !oldCollisions.contains(pair)) {
-				Collision event = new Collision(pair.either(), pair.other(), pair.getIntersection(),
-						startMap.get(pair), true);
+				Collision event = new Collision(pair.either(), pair.other(), pair.getIntersection(), startMap.get(pair), true);
 				events.add(event);
 				Application.LOG.fine(event.toString());
 			}
 		}
 		for (CollisionPair pair : endMap.keySet()) {
 			if (!newCollisions.contains(pair) && oldCollisions.contains(pair)) {
-				Collision event = new Collision(pair.either(), pair.other(), pair.getIntersection(),
-						endMap.get(pair), false);
+				Collision event = new Collision(pair.either(), pair.other(), pair.getIntersection(), endMap.get(pair), false);
 				events.add(event);
 				Application.LOG.fine(event.toString());
 			}
@@ -89,7 +86,7 @@ public enum CollisionHandler {
 	}
 
 	private static boolean checkCollision(CollisionPair p) {
-		Rectangle intersection = p.either().getCollisionBox().intersection(p.other().getCollisionBox());
+		Rectangle2D intersection = p.either().getCollisionBox().createIntersection(p.other().getCollisionBox());
 		if (!intersection.isEmpty()) {
 			p.setIntersection(intersection);
 			return true;

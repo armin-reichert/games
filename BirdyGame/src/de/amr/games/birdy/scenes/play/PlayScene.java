@@ -1,8 +1,5 @@
 package de.amr.games.birdy.scenes.play;
 
-import static de.amr.easy.game.entity.collision.CollisionHandler.detectCollisionEnd;
-import static de.amr.easy.game.entity.collision.CollisionHandler.detectCollisionStart;
-import static de.amr.easy.game.entity.collision.CollisionHandler.ignoreCollisionEnd;
 import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
@@ -36,7 +33,7 @@ import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.GameOverText;
 import de.amr.games.birdy.entities.Ground;
-import de.amr.games.birdy.entities.PipePair;
+import de.amr.games.birdy.entities.Obstacle;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.scenes.start.StartScene;
@@ -48,7 +45,14 @@ import de.amr.games.birdy.scenes.start.StartScene;
  */
 public class PlayScene extends Scene<BirdyGame> {
 
+	private final PlaySceneControl control;
 	private final Score score = new Score();
+	private final ObstacleManager obstacleManager;
+	private Bird bird;
+	private City city;
+	private Ground ground;
+	private GameEntity gameOverText;
+	private ScoreDisplay scoreDisplay;
 
 	private class PlaySceneControl extends StateMachine<PlaySceneState, BirdyGameEvent> {
 
@@ -96,53 +100,49 @@ public class PlayScene extends Scene<BirdyGame> {
 		}
 	}
 
-	// Pipe creation/deletion/update is encapsulated in the following inner class:
-
-	/** Pipe manager states. */
-	public enum PipeManagerState {
+	public enum ObstacleManagerState {
 		Stopped, Breeding, Birthing
 	};
 
 	/**
 	 * Manages the creation and deletion of pipes.
 	 */
-	private class PipeManager extends GameEntity {
+	private class ObstacleManager extends GameEntity {
 
-		private final List<PipePair> pairs = new LinkedList<>();
-		private final StateMachine<PipeManagerState, String> control;
+		private final List<Obstacle> obstacles = new LinkedList<>();
+		private final StateMachine<ObstacleManagerState, String> control;
 
-		private PipeManager() {
-			control = new StateMachine<>("PipeManagerControl", PipeManagerState.class, PipeManagerState.Stopped);
+		private ObstacleManager() {
+			control = new StateMachine<>("Obstacle Manager Control", ObstacleManagerState.class,
+					ObstacleManagerState.Stopped);
 
 			// Stay breeding for some random time from interval [MIN_PIPE_TIME, MAX_PIPE_TIME]:
-			control.state(PipeManagerState.Breeding).entry = s -> {
+			control.state(ObstacleManagerState.Breeding).entry = s -> {
 				int minCreationTime = app.motor.secToTicks(app.settings.getFloat("min pipe creation sec"));
 				int maxCreationTime = app.motor.secToTicks(app.settings.getFloat("max pipe creation sec"));
 				s.setDuration(randomInt(minCreationTime, maxCreationTime));
 			};
 
 			// Update (move) pipes during breeding:
-			control.state(PipeManagerState.Breeding).update = s -> {
-				pairs.forEach(PipePair::update);
-			};
+			control.state(ObstacleManagerState.Breeding).update = s -> obstacles.forEach(Obstacle::update);
 
 			// When breeding is over, give birth to new pipe pair:
-			control.changeOnTimeout(PipeManagerState.Breeding, PipeManagerState.Birthing, (s, t) -> {
-				addPipePair();
-				removeObsoletePipePairs();
+			control.changeOnTimeout(ObstacleManagerState.Breeding, ObstacleManagerState.Birthing, (s, t) -> {
+				addObstacle();
+				removeObsoleteObstacles();
 			});
 
 			// On "Stop" event, enter "Stopped" state:
-			control.changeOnInput("Stop", PipeManagerState.Breeding, PipeManagerState.Stopped);
+			control.changeOnInput("Stop", ObstacleManagerState.Breeding, ObstacleManagerState.Stopped);
 
 			// Immediately become breeding again:
-			control.change(PipeManagerState.Birthing, PipeManagerState.Breeding);
+			control.change(ObstacleManagerState.Birthing, ObstacleManagerState.Breeding);
 
 			// Handle "Stop" event:
-			control.changeOnInput("Stop", PipeManagerState.Birthing, PipeManagerState.Stopped);
+			control.changeOnInput("Stop", ObstacleManagerState.Birthing, ObstacleManagerState.Stopped);
 
 			// On "Start" event, become breeding again:
-			control.changeOnInput("Start", PipeManagerState.Stopped, PipeManagerState.Breeding);
+			control.changeOnInput("Start", ObstacleManagerState.Stopped, ObstacleManagerState.Breeding);
 		}
 
 		@Override
@@ -166,48 +166,43 @@ public class PlayScene extends Scene<BirdyGame> {
 
 		@Override
 		public void draw(Graphics2D g) {
-			pairs.forEach(pair -> pair.render(g));
+			obstacles.forEach(o -> o.draw(g));
 		}
 
-		private void addPipePair() {
+		private void addObstacle() {
 			int minPipeHeight = app.settings.get("min pipe height");
 			int passageHeight = app.settings.get("passage height");
 			int centerY = randomInt(minPipeHeight + passageHeight / 2,
 					(int) ground.tr.getY() - minPipeHeight - passageHeight / 2);
-			PipePair pair = new PipePair(app, centerY);
-			pair.setPositionX(getApp().getWidth());
-			pair.setLighted(city.isNight() && new Random().nextBoolean());
-			pairs.add(pair);
-			detectCollisionStart(bird, pair.getPipeDown(), BirdTouchedPipe);
-			detectCollisionStart(bird, pair.getPipeUp(), BirdTouchedPipe);
-			detectCollisionEnd(bird, pair.getPassage(), BirdLeftPassage);
+			Obstacle obstacle = new Obstacle(app, app.settings.get("pipe width"), app.settings.get("pipe height"),
+					app.settings.get("passage height"), centerY);
+			obstacle.tr.setVelX(app.settings.get("world speed"));
+			obstacle.tr.setX(app.getWidth());
+			obstacle.setLighted(city.isNight() && new Random().nextBoolean());
+			obstacles.add(obstacle);
+			CollisionHandler.detectCollisionStart(bird, obstacle.getUpperPart(), BirdTouchedPipe);
+			CollisionHandler.detectCollisionStart(bird, obstacle.getLowerPart(), BirdTouchedPipe);
+			CollisionHandler.detectCollisionEnd(bird, obstacle.getPassage(), BirdLeftPassage);
 		}
 
-		private void removeObsoletePipePairs() {
-			Iterator<PipePair> it = pairs.iterator();
+		private void removeObsoleteObstacles() {
+			Iterator<Obstacle> it = obstacles.iterator();
 			while (it.hasNext()) {
-				PipePair pipes = it.next();
-				if (pipes.getPositionX() + pipes.getWidth() < 0) {
-					ignoreCollisionEnd(bird, pipes.getPipeDown());
-					ignoreCollisionEnd(bird, pipes.getPipeUp());
-					ignoreCollisionEnd(bird, pipes.getPassage());
+				Obstacle obstacle = it.next();
+				if (obstacle.tr.getX() + obstacle.getWidth() < 0) {
+					CollisionHandler.ignoreCollisionEnd(bird, obstacle.getUpperPart());
+					CollisionHandler.ignoreCollisionEnd(bird, obstacle.getLowerPart());
+					CollisionHandler.ignoreCollisionEnd(bird, obstacle.getPassage());
 					it.remove();
 				}
 			}
 		}
 	}
 
-	private final PlaySceneControl control;
-	private PipeManager pipesManager;
-	private Bird bird;
-	private City city;
-	private Ground ground;
-	private GameEntity gameOverText;
-	private ScoreDisplay scoreDisplay;
-
 	public PlayScene(BirdyGame game) {
 		super(game);
 		control = new PlaySceneControl();
+		obstacleManager = new ObstacleManager();
 		// control.setLogger(Application.LOG);
 	}
 
@@ -226,12 +221,11 @@ public class PlayScene extends Scene<BirdyGame> {
 		scoreDisplay.tr.setY(ground.tr.getY() / 4);
 		gameOverText = app.entities.add(new GameOverText(app.assets));
 		gameOverText.center(getWidth(), getHeight());
-		pipesManager = new PipeManager();
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
 		Area world = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
 		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
 
-		pipesManager.init();
+		obstacleManager.init();
 		control.init();
 
 		// Tracing
@@ -243,7 +237,7 @@ public class PlayScene extends Scene<BirdyGame> {
 		bird.update();
 		city.update();
 		ground.update();
-		pipesManager.update();
+		obstacleManager.update();
 		gameOverText.update();
 		scoreDisplay.update();
 		for (Collision collision : CollisionHandler.collisions()) {
@@ -255,7 +249,7 @@ public class PlayScene extends Scene<BirdyGame> {
 	@Override
 	public void draw(Graphics2D g) {
 		city.draw(g);
-		pipesManager.draw(g);
+		obstacleManager.draw(g);
 		ground.draw(g);
 		scoreDisplay.draw(g);
 		bird.draw(g);
@@ -267,12 +261,12 @@ public class PlayScene extends Scene<BirdyGame> {
 
 	private void start() {
 		ground.tr.setVelocity(app.settings.get("world speed"), 0);
-		pipesManager.start();
+		obstacleManager.start();
 	}
 
 	private void stop() {
 		ground.tr.setVelocity(0, 0);
-		pipesManager.stop();
+		obstacleManager.stop();
 	}
 
 	private Font stateTextFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);

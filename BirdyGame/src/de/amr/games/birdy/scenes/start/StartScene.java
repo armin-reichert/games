@@ -14,7 +14,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.PumpingImage;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
@@ -44,7 +44,7 @@ public class StartScene extends Scene<BirdyGame> {
 		public StartSceneControl() {
 			super("Start Scene Control", StartSceneState.class, Starting);
 
-			state(Starting).entry = s -> resetScene();
+			state(Starting).entry = s -> reset();
 			state(Starting).update = s -> keepBirdInAir();
 			change(Starting, Ready, () -> Keyboard.keyDown(app.settings.get("jump key")));
 			changeOnInput(BirdTouchedGround, Starting, GameOver);
@@ -52,13 +52,15 @@ public class StartScene extends Scene<BirdyGame> {
 			state(Ready).entry = s -> {
 				s.setDuration(app.motor.secToTicks(app.settings.getFloat("ready time sec")));
 				showText(app.entities.findByName(PumpingImage.class, "readyText"));
-				app.assets.sound("music/bgmusic.mp3").loop();
 			};
 			changeOnTimeout(Ready, StartPlaying, (s, t) -> app.views.show(PlayScene.class));
 			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
 			state(Ready).exit = s -> hideText();
 
-			state(GameOver).entry = s -> stopScrolling();
+			state(GameOver).entry = s -> {
+				stop();
+				app.assets.sounds().forEach(Sound::stop);
+			};
 			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(VK_SPACE));
 		}
 	}
@@ -72,11 +74,11 @@ public class StartScene extends Scene<BirdyGame> {
 
 	public StartScene(BirdyGame game) {
 		super(game);
-		control.setLogger(Application.LOG);
 	}
 
 	@Override
 	public void init() {
+		// control.setLogger(Application.LOG);
 		control.init();
 	}
 
@@ -88,7 +90,7 @@ public class StartScene extends Scene<BirdyGame> {
 		displayedText = text;
 	}
 
-	private void stopScrolling() {
+	private void stop() {
 		ground.tr.setVelocity(0, 0);
 	}
 
@@ -98,7 +100,7 @@ public class StartScene extends Scene<BirdyGame> {
 		}
 	}
 
-	private void resetScene() {
+	private void reset() {
 		city = app.entities.findAny(City.class);
 		city.setWidth(getWidth());
 		city.setNight(new Random().nextBoolean());

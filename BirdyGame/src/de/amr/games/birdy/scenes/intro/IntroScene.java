@@ -25,7 +25,10 @@ public class IntroScene extends Scene<BirdyGame> {
 
 		public IntroSceneControl() {
 			super("Intro Scene Control", String.class, "MovingText");
-			state("MovingText").entry = s -> textY = getHeight();
+			state("MovingText").entry = s -> {
+				textY = getHeight();
+				app.assets.sound("music/bgmusic.mp3").loop();
+			};
 			state("MovingText").update = s -> textY -= textSpeed;
 			change("MovingText", "Waiting", this::endPositionReached);
 			state("Waiting").entry = s -> s.setDuration(app.motor.secToTicks(2));
