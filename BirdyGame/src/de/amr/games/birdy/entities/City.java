@@ -1,73 +1,79 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.game.timing.Countdown;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.utils.Util;
 
+/**
+ * The city shown in the background.
+ * 
+ * @author Armin Reichert
+ */
 public class City extends GameEntity {
 
 	private final BirdyGame app;
-	private int width;
+	private final StateMachine<Boolean, String> starControl;
 	private boolean night;
-	private Countdown starLifetime;
+	private int displayWidth;
 
 	public City(BirdyGame app) {
 		this.app = app;
 		setSprites(new Sprite(app.assets, "bg_night"), new Sprite(app.assets, "bg_day"));
+		starControl = new StateMachine<>("Star control", Boolean.class, true);
+		starControl.state(true).entry = s -> {
+			s.setDuration(app.motor.secToTicks(5));
+			createStars();
+		};
+		starControl.changeOnTimeout(true, false);
+		starControl.change(false, true);
 	}
 
 	@Override
 	public void init() {
+		starControl.init();
 	}
 
 	@Override
 	public void update() {
 		if (night) {
-			if (starLifetime.isComplete()) {
-				createStars();
-				starLifetime.restart();
-			}
+			starControl.update();
 			app.entities.filter(Star.class).forEach(GameEntity::update);
-			starLifetime.update();
 		}
 	}
 
 	private void createStars() {
 		app.entities.removeAll(Star.class);
-		for (int i = 0; i < Util.randomInt(1, app.settings.get("max stars")); ++i) {
-			Star star = app.entities.add(new Star(app.assets));
-			star.tr.moveTo(Util.randomInt(50, width - 50), Util.randomInt(100, 180));
+		for (int i = 0; i < randomInt(1, app.settings.get("max stars")); ++i) {
+			Star star = app.entities.add(new Star(new Sprite(app.assets, "blink_00", "blink_01", "blink_02")));
+			star.tr.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		}
-		starLifetime = new Countdown(300);
-		starLifetime.start();
 	}
 
 	public boolean isNight() {
 		return night;
 	}
 
-	public void setNight(boolean b) {
-		this.night = b;
-		if (night) {
-			createStars();
-		} else {
+	public void setNight(boolean night) {
+		this.night = night;
+		if (!night) {
 			app.entities.removeAll(Star.class);
 		}
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
+		starControl.init();
 	}
 
 	@Override
 	public int getWidth() {
-		return width;
+		return displayWidth;
+	}
+
+	public void setWidth(int width) {
+		displayWidth = width;
 	}
 
 	@Override
@@ -79,7 +85,7 @@ public class City extends GameEntity {
 	public void draw(Graphics2D g) {
 		g.translate(tr.getX(), tr.getY());
 		Image image = currentSprite().getImage();
-		for (int x = 0; x < width; x += image.getWidth(null)) {
+		for (int x = 0; x < displayWidth; x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
 		app.entities.filter(Star.class).forEach(e -> e.draw(g));

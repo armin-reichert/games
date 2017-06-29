@@ -9,7 +9,7 @@ import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.game.view.View;
 
-public abstract class GameEntity implements View, CollisionBoxSupplier {
+public class GameEntity implements View, CollisionBoxSupplier {
 
 	public final Transform tr = new Transform();
 	private Sprite[] sprites;
@@ -94,5 +94,13 @@ public abstract class GameEntity implements View, CollisionBoxSupplier {
 
 	public void center(int width, int height) {
 		tr.moveTo((width - getWidth()) / 2, (height - getHeight()) / 2);
+	}
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void update() {
 	}
 }

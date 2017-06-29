@@ -2,13 +2,17 @@ package de.amr.games.birdy.entities;
 
 import de.amr.easy.game.entity.GameEntity;
 
+/**
+ * A transparent area used for collision handling.
+ * 
+ * @author Armin Reichert
+ */
 public class Area extends GameEntity {
 
-	private final int width;
-	private final int height;
+	private int width;
+	private int height;
 
-	public Area(int x, int y, int width, int height) {
-		tr.moveTo(x, y);
+	public Area(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
@@ -29,5 +33,13 @@ public class Area extends GameEntity {
 	@Override
 	public int getHeight() {
 		return height;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 }

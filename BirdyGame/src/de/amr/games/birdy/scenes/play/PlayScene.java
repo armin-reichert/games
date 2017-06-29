@@ -22,12 +22,12 @@ import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.BirdyGameEvent;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.entities.GameOverText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
@@ -117,16 +117,17 @@ public class PlayScene extends Scene<BirdyGame> {
 		scoreDisplay = new ScoreDisplay(app.assets, score, 1.5f);
 		scoreDisplay.centerHor(getWidth());
 		scoreDisplay.tr.setY(ground.tr.getY() / 4);
-		gameOverText = app.entities.add(new GameOverText(app.assets));
+		gameOverText = app.entities.add(new GameEntity(new Sprite(app.assets.image("text_game_over"))));
 		gameOverText.center(getWidth(), getHeight());
+		Area world = new Area(getWidth(), 2 * getHeight());
+		world.tr.moveTo(0, -getHeight());
+
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
-		Area world = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
 		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
 
 		obstacleManager.init();
-		control.init();
-		// Tracing
 		obstacleManager.setLogger(Application.LOG);
+		control.init();
 	}
 
 	@Override

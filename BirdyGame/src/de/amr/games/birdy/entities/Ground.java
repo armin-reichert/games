@@ -5,20 +5,18 @@ import java.awt.Image;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.BirdyGame;
 
+/**
+ * The ground.
+ * 
+ * @author Armin Reichert
+ */
 public class Ground extends GameEntity {
 
-	private int width;
 	private float startX;
 
-	public Ground(BirdyGame app) {
-		setSprites(new Sprite(app.assets, "land"));
-		width = currentSprite().getWidth();
-	}
-
-	@Override
-	public void init() {
+	public Ground(Sprite sprite) {
+		setSprites(sprite);
 	}
 
 	@Override
@@ -29,13 +27,8 @@ public class Ground extends GameEntity {
 		}
 	}
 
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
 	public void setWidth(int width) {
-		this.width = width;
+		currentSprite().scale(width, getHeight());
 	}
 
 	public void stopMoving() {
@@ -45,7 +38,7 @@ public class Ground extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		Image image = currentSprite().getImage();
-		for (float x = -startX; x < width; x += image.getWidth(null)) {
+		for (float x = -startX; x < getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, (int) x, (int) tr.getY(), null);
 		}
 	}

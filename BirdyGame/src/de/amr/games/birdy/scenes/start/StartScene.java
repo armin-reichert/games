@@ -6,13 +6,12 @@ import static de.amr.games.birdy.scenes.start.StartSceneState.GameOver;
 import static de.amr.games.birdy.scenes.start.StartSceneState.Ready;
 import static de.amr.games.birdy.scenes.start.StartSceneState.StartPlaying;
 import static de.amr.games.birdy.scenes.start.StartSceneState.Starting;
-import static java.awt.event.KeyEvent.VK_SPACE;
 import static java.lang.String.format;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.Random;
+import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.PumpingImage;
@@ -21,13 +20,13 @@ import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.BirdyGameEvent;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
-import de.amr.games.birdy.entities.TitleText;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.scenes.play.PlayScene;
 import de.amr.games.birdy.utils.Util;
@@ -59,14 +58,16 @@ public class StartScene extends Scene<BirdyGame> {
 				showText(app.entities.findByName(PumpingImage.class, "readyText"));
 			};
 			changeOnTimeout(Ready, StartPlaying, (s, t) -> app.views.show(PlayScene.class));
-			changeOnInput(BirdTouchedGround, Ready, GameOver, (s, t) -> showText(app.entities.findAny(TitleText.class)));
+			changeOnInput(BirdTouchedGround, Ready, GameOver,
+					(s, t) -> showText(app.entities.findByName(GameEntity.class, "title")));
 			state(Ready).exit = s -> hideText();
 
 			state(GameOver).entry = s -> {
 				stop();
+				showText(app.entities.findByName(GameEntity.class, "game_over"));
 				app.assets.sounds().forEach(Sound::stop);
 			};
-			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(VK_SPACE));
+			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
 	}
 
@@ -108,7 +109,6 @@ public class StartScene extends Scene<BirdyGame> {
 	private void reset() {
 		city = app.entities.findAny(City.class);
 		city.setWidth(getWidth());
-		city.setNight(new Random().nextBoolean());
 		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
 		ground.tr.moveTo(0, getHeight() - ground.getHeight());
@@ -118,14 +118,23 @@ public class StartScene extends Scene<BirdyGame> {
 		bird.tr.moveTo(getWidth() / 8, ground.tr.getY() / 2);
 		bird.tr.setVelocity(0, 0);
 		bird.setFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
-		displayedText = app.entities.add(new TitleText(app.assets));
+		GameEntity titleText = new GameEntity(new Sprite(app.assets.image("title")));
+		titleText.setName("title");
+		app.entities.add(titleText);
+		GameEntity gameOverText = new GameEntity(new Sprite(app.assets.image("text_game_over")));
+		gameOverText.setName("game_over");
+		app.entities.add(gameOverText);
+
+		displayedText = titleText;
+
 		PumpingImage readyText = new PumpingImage(app.assets.image("text_ready"));
 		readyText.setName("readyText");
 		app.entities.add(readyText);
 		CollisionHandler.clear();
 		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
-		Area birdWorld = new Area(0, -getHeight(), getWidth(), 2 * getHeight());
-		CollisionHandler.detectCollisionEnd(bird, birdWorld, BirdLeftWorld);
+		Area world = new Area(getWidth(), 2 * getHeight());
+		world.tr.moveTo(0, -getHeight());
+		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
 	}
 
 	@Override

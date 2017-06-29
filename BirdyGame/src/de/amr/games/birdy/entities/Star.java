@@ -1,28 +1,23 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
+import static de.amr.easy.game.sprite.AnimationMode.CYCLIC;
+import static de.amr.games.birdy.utils.Util.randomInt;
+
 import java.util.Random;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.utils.Util;
 
+/**
+ * A shining and blinking star...
+ * 
+ * @author Armin Reichert
+ */
 public class Star extends GameEntity {
 
-	public Star(Assets assets) {
-		Sprite blinking = new Sprite(assets, "blink_00", "blink_01", "blink_02");
-		blinking.createAnimation(new Random().nextBoolean() ? AnimationMode.BACK_AND_FORTH : AnimationMode.CYCLIC,
-				Util.randomInt(300, 2000));
-		setSprites(blinking);
+	public Star(Sprite sprite) {
+		sprite.createAnimation(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
+		setSprites(sprite);
 	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
-	}
-
 }

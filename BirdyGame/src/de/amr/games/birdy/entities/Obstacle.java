@@ -26,12 +26,14 @@ public class Obstacle extends GameEntity {
 	private Image pipeDown;
 	private Image pipeUp;
 	private boolean lighted;
+	private final Random rand = new Random();
 
 	public Obstacle(BirdyGame app, int width, int height, int passageHeight, int passageCenterY) {
-		upperPart = new Rectangle2D.Double(0, 0, width, passageCenterY - passageHeight / 2);
-		passage = new Rectangle2D.Double(0, passageCenterY - passageHeight / 2, width, passageHeight);
-		lowerPart = new Rectangle2D.Double(0, passageCenterY + passageHeight / 2, width,
-				height - passageHeight / 2 - passageCenterY);
+		int passageRadius = passageHeight / 2;
+		upperPart = new Rectangle2D.Double(0, 0, width, passageCenterY - passageRadius);
+		passage = new Rectangle2D.Double(0, passageCenterY - passageRadius, width, passageHeight);
+		lowerPart = new Rectangle2D.Double(0, passageCenterY + passageRadius, width,
+				height - passageRadius - passageCenterY);
 		pipeDown = app.assets.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 		pipeUp = app.assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),
@@ -62,8 +64,9 @@ public class Obstacle extends GameEntity {
 		g.translate(tr.getX(), tr.getY());
 		g.drawImage(pipeDown, 0, 0, null);
 		if (lighted) {
-			g.setColor(new Color(255, 255, 0, new Random().nextInt(170)));
-			g.fillRect((int) passage.getX() + 3, (int) passage.getY(), (int) (passage.getWidth() - 6),
+			int inset = (int) passage.getWidth() / 10;
+			g.setColor(new Color(255, 255, 0, rand.nextInt(170)));
+			g.fillRect((int) passage.getX() + inset, (int) passage.getY(), (int) (passage.getWidth() - 2 * inset),
 					(int) passage.getHeight());
 		}
 		g.drawImage(pipeUp, 0, (int) (upperPart.getHeight() + passage.getHeight()), null);
