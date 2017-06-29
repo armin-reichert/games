@@ -27,11 +27,11 @@ public class Obstacle extends GameEntity {
 	private Image pipeUp;
 	private boolean lighted;
 
-	public Obstacle(BirdyGame app, int width, int height, int passageHeight, int centerY) {
-		upperPart = new Rectangle2D.Double(0, 0, width, centerY - passageHeight / 2);
-		passage = new Rectangle2D.Double(0, centerY - passageHeight / 2, width, passageHeight);
-		lowerPart = new Rectangle2D.Double(0, centerY + passageHeight / 2, width,
-				height - passage.getHeight() - upperPart.getHeight());
+	public Obstacle(BirdyGame app, int width, int height, int passageHeight, int passageCenterY) {
+		upperPart = new Rectangle2D.Double(0, 0, width, passageCenterY - passageHeight / 2);
+		passage = new Rectangle2D.Double(0, passageCenterY - passageHeight / 2, width, passageHeight);
+		lowerPart = new Rectangle2D.Double(0, passageCenterY + passageHeight / 2, width,
+				height - passageHeight / 2 - passageCenterY);
 		pipeDown = app.assets.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 		pipeUp = app.assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),

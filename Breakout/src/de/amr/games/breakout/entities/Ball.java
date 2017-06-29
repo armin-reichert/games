@@ -26,20 +26,20 @@ public class Ball extends GameEntity {
 		tr.move();
 		if (tr.getX() < 0) {
 			tr.setX(0);
-			if (tr.getVelX() < 0) {
-				tr.setVelX(-tr.getVelX());
+			if (tr.getVelocityX() < 0) {
+				tr.setVelocityX(-tr.getVelocityX());
 			}
 		}
 		if (tr.getX() > gameWidth - getWidth()) {
 			tr.setX(gameWidth - getWidth());
-			if (tr.getVelX() > 0) {
-				tr.setVelX(-tr.getVelX());
+			if (tr.getVelocityX() > 0) {
+				tr.setVelocityX(-tr.getVelocityX());
 			}
 		}
 		if (tr.getY() < 0) {
 			tr.setY(0);
-			if (tr.getVelY() < 0) {
-				tr.setVelY(-tr.getVelY());
+			if (tr.getVelocityY() < 0) {
+				tr.setVelocityY(-tr.getVelocityY());
 			}
 		}
 	}

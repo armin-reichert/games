@@ -19,15 +19,15 @@ public class AutoPaddleRight extends Paddle {
 	public void update() {
 		Ball ball = game.entities.findAny(Ball.class);
 		float targetY = game.getHeight() / 2 + getHeight();
-		if (ball.tr.getVelX() > 0) {
+		if (ball.tr.getVelocityX() > 0) {
 			computeBallPositionRight();
 			targetY = ballRightY;
 		}
 		float diff = tr.getY() + getHeight() / 2 - targetY;
 		if (diff < -BALL_SIZE) {
-			tr.setVelY(PADDLE_SPEED);
+			tr.setVelocityY(PADDLE_SPEED);
 		} else if (diff > BALL_SIZE) {
-			tr.setVelY(-PADDLE_SPEED);
+			tr.setVelocityY(-PADDLE_SPEED);
 		}
 		moveAndStopAtBorder();
 	}
@@ -35,11 +35,11 @@ public class AutoPaddleRight extends Paddle {
 	private void computeBallPositionRight() {
 		Ball ball = game.entities.findAny(Ball.class);
 		ballRightY = ball.tr.getY() + ball.getHeight() / 2;
-		for (float x = ball.tr.getX(); x < game.getWidth() - getWidth() - ball.getWidth(); x += ball.tr.getVelX()) {
+		for (float x = ball.tr.getX(); x < game.getWidth() - getWidth() - ball.getWidth(); x += ball.tr.getVelocityX()) {
 			if (ballRightY < 0) {
-				ballRightY += ball.tr.getVelY();
+				ballRightY += ball.tr.getVelocityY();
 			} else if (ballRightY >= game.getHeight()) {
-				ballRightY -= ball.tr.getVelY();
+				ballRightY -= ball.tr.getVelocityY();
 			}
 		}
 	}

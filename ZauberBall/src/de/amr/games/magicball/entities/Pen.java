@@ -32,10 +32,10 @@ public class Pen extends GameEntity {
 	public void update() {
 		tr.move();
 		if (tr.getY() > image.getHeight() - getHeight() || tr.getY() < 0) {
-			tr.setVelY(-tr.getVelY());
+			tr.setVelocityY(-tr.getVelocityY());
 		}
 		if (tr.getX() < 0 || tr.getX() > image.getWidth() - getWidth()) {
-			tr.setVelX(-tr.getVelX());
+			tr.setVelocityX(-tr.getVelocityX());
 		}
 		color = randomColor();
 		draw();

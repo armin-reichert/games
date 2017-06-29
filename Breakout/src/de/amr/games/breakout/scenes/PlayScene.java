@@ -125,24 +125,24 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	void bounceBallFromBat() {
-		ball.tr.setVelY(-ball.tr.getVelY());
+		ball.tr.setVelocityY(-ball.tr.getVelocityY());
 		ball.tr.setY(bat.tr.getY() - ball.getHeight());
 		Game.assets.sound("Sounds/plop.mp3").play();
 	}
 
 	void bounceBallFromBrick(Brick brick) {
 		ball.tr.setY(brick.tr.getY() + brick.getHeight());
-		ball.tr.setVelY(-ball.tr.getVelY());
+		ball.tr.setVelocityY(-ball.tr.getVelocityY());
 	}
 
 	void shootBall() {
 		resetBat();
 		resetBall();
 		Random random = new Random();
-		ball.tr.setVelX(2 + random.nextFloat() * 2);
-		ball.tr.setVelY(-(8 + random.nextFloat() * 8));
+		ball.tr.setVelocityX(2 + random.nextFloat() * 2);
+		ball.tr.setVelocityY(-(8 + random.nextFloat() * 8));
 		if (random.nextBoolean()) {
-			ball.tr.setVelX(-ball.tr.getVelX());
+			ball.tr.setVelocityX(-ball.tr.getVelocityX());
 		}
 	}
 

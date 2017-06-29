@@ -25,10 +25,10 @@ public class Ball extends GameEntity implements Drawable {
 		tr.move();
 		if (tr.getY() < 0) {
 			tr.setY(0);
-			tr.setVelY(-tr.getVelY());
+			tr.setVelocityY(-tr.getVelocityY());
 		} else if (tr.getY() >= gameHeight - getHeight()) {
 			tr.setY(gameHeight - getHeight() - 1);
-			tr.setVelY(-tr.getVelY());
+			tr.setVelocityY(-tr.getVelocityY());
 		}
 	}
 

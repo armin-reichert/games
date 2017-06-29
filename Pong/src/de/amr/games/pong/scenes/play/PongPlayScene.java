@@ -126,10 +126,10 @@ public class PongPlayScene extends Scene<PongGame> {
 
 	void shootBall() {
 		Random rnd = new Random();
-		ball.tr.setVelX(isBallOutRight() ? -BALL_SPEED : BALL_SPEED);
-		ball.tr.setVelY((BALL_SPEED / 4) + (rnd.nextFloat() * BALL_SPEED / 4));
+		ball.tr.setVelocityX(isBallOutRight() ? -BALL_SPEED : BALL_SPEED);
+		ball.tr.setVelocityY((BALL_SPEED / 4) + (rnd.nextFloat() * BALL_SPEED / 4));
 		if (rnd.nextBoolean()) {
-			ball.tr.setVelY(-ball.tr.getVelY());
+			ball.tr.setVelocityY(-ball.tr.getVelocityY());
 		}
 	}
 
@@ -142,22 +142,22 @@ public class PongPlayScene extends Scene<PongGame> {
 	}
 
 	boolean leftPaddleHitsBall() {
-		return ball.tr.getVelX() <= 0 && paddleLeft.hitsBall(ball);
+		return ball.tr.getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
 	}
 
 	boolean rightPaddleHitsBall() {
-		return ball.tr.getVelX() >= 0 && paddleRight.hitsBall(ball);
+		return ball.tr.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
 	}
 
 	void bounceBallFromLeftPaddle() {
 		ball.tr.setX(paddleLeft.tr.getX() + paddleLeft.getWidth() + 1);
-		ball.tr.setVelX(-ball.tr.getVelX());
+		ball.tr.setVelocityX(-ball.tr.getVelocityX());
 		app.assets.sound("plop.mp3").play();
 	}
 
 	void bounceBallFromRightPaddle() {
 		ball.tr.setX(paddleRight.tr.getX() - ball.getWidth() - 1);
-		ball.tr.setVelX(-ball.tr.getVelX());
+		ball.tr.setVelocityX(-ball.tr.getVelocityX());
 		app.assets.sound("plip.mp3").play();
 	}
 

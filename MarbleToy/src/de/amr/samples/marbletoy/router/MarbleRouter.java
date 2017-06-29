@@ -81,7 +81,7 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 
 	private void routeMarble(RoutingPoint from, RoutingPoint to) {
 		placeMarbleCenteredAt(from);
-		marble.tr.setVel(diff(to.getLocation(), from.getLocation()).normalize().times(MARBLE_SPEED));
+		marble.tr.setVelocity(diff(to.getLocation(), from.getLocation()).normalize().times(MARBLE_SPEED));
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {

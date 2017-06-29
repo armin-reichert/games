@@ -2,6 +2,11 @@ package de.amr.easy.game.entity;
 
 import de.amr.easy.game.math.Vector2;
 
+/**
+ * Encapsulates position, velocity and rotation of a game object.
+ * 
+ * @author Armin Reichert
+ */
 public class Transform {
 
 	private final Vector2 position;
@@ -46,31 +51,31 @@ public class Transform {
 		velocity.assign(vx, vy);
 	}
 
-	public void setVel(Vector2 v) {
+	public void setVelocity(Vector2 v) {
 		velocity.assign(v);
 	}
 
-	public void setVelX(float vx) {
+	public void setVelocityX(float vx) {
 		velocity.x = vx;
 	}
 
-	public void setVelY(float vy) {
+	public void setVelocityY(float vy) {
 		velocity.y = vy;
 	}
 
-	public float getVelX() {
+	public float getVelocityX() {
 		return velocity.x;
 	}
 
-	public float getVelY() {
+	public float getVelocityY() {
 		return velocity.y;
 	}
 
-	public double getRot() {
+	public double getRotation() {
 		return rotation;
 	}
 
-	public void setRot(double rotation) {
+	public void setRotation(double rotation) {
 		this.rotation = rotation;
 	}
 }

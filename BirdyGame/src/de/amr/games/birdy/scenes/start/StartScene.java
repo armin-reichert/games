@@ -44,7 +44,12 @@ public class StartScene extends Scene<BirdyGame> {
 		public StartSceneControl() {
 			super("Start Scene Control", StartSceneState.class, Starting);
 
-			state(Starting).entry = s -> reset();
+			state(Starting).entry = s -> {
+				reset();
+				if (!app.assets.sound("music/bgmusic.mp3").isRunning()) {
+					app.assets.sound("music/bgmusic.mp3").loop();
+				}
+			};
 			state(Starting).update = s -> keepBirdInAir();
 			change(Starting, Ready, () -> Keyboard.keyDown(app.settings.get("jump key")));
 			changeOnInput(BirdTouchedGround, Starting, GameOver);

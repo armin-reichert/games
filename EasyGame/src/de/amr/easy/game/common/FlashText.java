@@ -20,7 +20,7 @@ public class FlashText extends GameEntity {
 		flash.setColor(color);
 		flash.setDisplayTime(displayTime);
 		flash.tr.moveTo(position);
-		flash.tr.setVel(velocity);
+		flash.tr.setVelocity(velocity);
 	}
 
 	private Application app;

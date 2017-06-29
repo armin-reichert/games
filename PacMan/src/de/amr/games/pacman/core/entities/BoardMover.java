@@ -168,7 +168,7 @@ public abstract class BoardMover extends GameEntity {
 	 */
 	public void move() {
 		Vector2 velocity = new Vector2(Top4.dx(moveDir), Top4.dy(moveDir)).times(speed.get());
-		tr.setVel(velocity);
+		tr.setVelocity(velocity);
 		tr.move();
 
 		Tile tile = currentTile();

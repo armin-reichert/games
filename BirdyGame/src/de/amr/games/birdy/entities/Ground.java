@@ -23,7 +23,7 @@ public class Ground extends GameEntity {
 
 	@Override
 	public void update() {
-		startX -= tr.getVelX();
+		startX -= tr.getVelocityX();
 		if (startX < 0) {
 			startX = currentSprite().getImage().getWidth(null);
 		}
@@ -39,7 +39,7 @@ public class Ground extends GameEntity {
 	}
 
 	public void stopMoving() {
-		tr.setVelX(0);
+		tr.setVelocityX(0);
 	}
 
 	@Override

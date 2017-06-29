@@ -25,13 +25,13 @@ public class Bat extends GameEntity {
 	@Override
 	public void update() {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			tr.setVelX(-speed);
+			tr.setVelocityX(-speed);
 		}
 		if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			tr.setVelX(speed);
+			tr.setVelocityX(speed);
 		}
 		tr.move();
-		tr.setVelX(0);
+		tr.setVelocityX(0);
 		tr.setX(Math.min(gameWidth - getWidth(), Math.max(0, tr.getX())));
 	}
 

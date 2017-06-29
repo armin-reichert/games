@@ -29,10 +29,10 @@ public class Paddle extends GameEntity {
 	@Override
 	public void update() {
 		if (Keyboard.keyDown(paddleUpKey)) {
-			tr.setVelY(-PADDLE_SPEED);
+			tr.setVelocityY(-PADDLE_SPEED);
 		}
 		if (Keyboard.keyDown(paddleDownKey)) {
-			tr.setVelY(PADDLE_SPEED);
+			tr.setVelocityY(PADDLE_SPEED);
 		}
 		moveAndStopAtBorder();
 	}
@@ -44,7 +44,7 @@ public class Paddle extends GameEntity {
 		} else if (tr.getY() >= game.getHeight() - getHeight()) {
 			tr.setY(game.getHeight() - getHeight());
 		}
-		tr.setVelY(0);
+		tr.setVelocityY(0);
 	}
 
 	@Override

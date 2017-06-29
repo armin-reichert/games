@@ -90,7 +90,7 @@ public class Bird extends GameEntity {
 
 	public void jump(float force) {
 		app.assets.sound("sfx/wing.mp3").play();
-		tr.setVelY(tr.getVelY() - force * getWorldGravity());
+		tr.setVelocityY(tr.getVelocityY() - force * getWorldGravity());
 		fly();
 	}
 
@@ -98,25 +98,25 @@ public class Bird extends GameEntity {
 		if (tr.getY() < -getHeight()) {
 			tr.setVelocity(0, 0);
 		}
-		tr.setVelY(tr.getVelY() + getWorldGravity());
-		double damp = tr.getVelY() < 0 ? 0.05 : 0.2;
-		tr.setRot(-Math.PI / 8 + damp * tr.getVelY());
-		if (tr.getRot() < -Math.PI / 4)
-			tr.setRot(-Math.PI / 4);
-		if (tr.getRot() > Math.PI / 2)
-			tr.setRot(Math.PI / 2);
+		tr.setVelocityY(tr.getVelocityY() + getWorldGravity());
+		double damp = tr.getVelocityY() < 0 ? 0.05 : 0.2;
+		tr.setRotation(-Math.PI / 8 + damp * tr.getVelocityY());
+		if (tr.getRotation() < -Math.PI / 4)
+			tr.setRotation(-Math.PI / 4);
+		if (tr.getRotation() > Math.PI / 2)
+			tr.setRotation(Math.PI / 2);
 		tr.move();
 		updateAnimation();
 	}
 
 	void fall(float slowdown) {
-		tr.setVelY(tr.getVelY() + getWorldGravity() / slowdown);
+		tr.setVelocityY(tr.getVelocityY() + getWorldGravity() / slowdown);
 		tr.move();
 		updateAnimation();
 	}
 
 	void lookDead() {
-		tr.setRot(Math.PI / 2);
+		tr.setRotation(Math.PI / 2);
 		tr.setVelocity(0, 0);
 		updateAnimation();
 	}
@@ -126,6 +126,6 @@ public class Bird extends GameEntity {
 	}
 
 	private void updateAnimation() {
-		currentSprite().setAnimated(tr.getVelY() < 0);
+		currentSprite().setAnimated(tr.getVelocityY() < 0);
 	}
 }

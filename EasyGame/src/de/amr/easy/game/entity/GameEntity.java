@@ -25,7 +25,7 @@ public abstract class GameEntity implements View, CollisionBoxSupplier {
 		if (currentSprite() != null) {
 			Graphics2D g2 = (Graphics2D) g.create();
 			g2.translate(tr.getX(), tr.getY());
-			g2.rotate(tr.getRot());
+			g2.rotate(tr.getRotation());
 			currentSprite().draw(g2);
 			g2.dispose();
 		}
