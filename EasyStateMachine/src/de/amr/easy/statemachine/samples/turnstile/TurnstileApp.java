@@ -1,27 +1,36 @@
 package de.amr.easy.statemachine.samples.turnstile;
 
-import static de.amr.easy.statemachine.samples.turnstile.TurnstileEvent.COIN;
-import static de.amr.easy.statemachine.samples.turnstile.TurnstileEvent.PASS;
-
-import java.util.logging.Logger;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 public class TurnstileApp {
 
-	public static void main(String[] args) {
-		Turnstile t = new Turnstile();
-		t.init();
-		t.event(COIN);
-		t.event(PASS);
-		t.event(COIN);
-		t.event(PASS);
-		t.event(PASS);
+	private static Random rand = new Random();
 
-		t.setController(new TurnstileTraceController(Logger.getGlobal()));
+	private static TurnstileEvent randomEvent() {
+		TurnstileEvent[] events = TurnstileEvent.values();
+		return events[rand.nextInt(events.length)];
+	}
+
+	public static void main(String[] args) {
+		TurnstileImplementation t = new TurnstileImplementation();
+		t.setController(new TurnstileTraceController());
 		t.init();
-		t.event(COIN);
-		t.event(PASS);
-		t.event(COIN);
-		t.event(PASS);
-		t.event(PASS);
+
+		System.out.println(t.getState());
+		IntStream.range(0, 5).forEach(i -> {
+			TurnstileEvent event = randomEvent();
+			System.out.println(event.name());
+			t.event(event);
+			System.out.println("->" + t.getState());
+		});
+
+		t.setController(new TurnstileNullController());
+		IntStream.range(0, 5).forEach(i -> {
+			TurnstileEvent event = randomEvent();
+			System.out.println(event.name());
+			t.event(event);
+			System.out.println("->" + t.getState());
+		});
 	}
 }

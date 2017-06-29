@@ -1,32 +1,27 @@
 package de.amr.easy.statemachine.samples.turnstile;
 
-import java.util.logging.Logger;
-
 class TurnstileTraceController implements TurnstileController {
-	
-	private final Logger log;
-	
-	public TurnstileTraceController(Logger log) {
-		this.log = log;
+
+	public TurnstileTraceController() {
 	}
 
 	@Override
 	public void lock() {
-		log.info("lock");
+		System.out.println("Action: lock");
 	}
 
 	@Override
 	public void unlock() {
-		log.info("unlock");
+		System.out.println("Action: unlock");
 	}
 
 	@Override
 	public void thankyou() {
-		log.info("thankyou");
+		System.out.println("Action: thankyou");
 	}
 
 	@Override
 	public void alarm() {
-		log.info("alarm");
+		System.out.println("Action: alarm");
 	}
 }

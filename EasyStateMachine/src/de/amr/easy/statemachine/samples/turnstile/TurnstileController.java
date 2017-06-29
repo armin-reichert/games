@@ -3,22 +3,22 @@ package de.amr.easy.statemachine.samples.turnstile;
 public interface TurnstileController {
 
 	/**
-	 * Locks the turnstile
+	 * Locks the turnstile.
 	 */
 	void lock();
 
 	/**
-	 * Unlocks the turnstile
+	 * Unlocks the turnstile.
 	 */
 	void unlock();
 
 	/**
-	 * Says thanks ;)
+	 * Says thanks ;).
 	 */
 	void thankyou();
 
 	/**
-	 * Plays an alarm sound
+	 * Plays an alarm sound.
 	 */
 	void alarm();
 }
