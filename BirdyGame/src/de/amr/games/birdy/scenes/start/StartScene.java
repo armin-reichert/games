@@ -106,7 +106,7 @@ public class StartScene extends Scene<BirdyGame> {
 
 	private void keepBirdInAir() {
 		while (bird.tr.getY() > ground.tr.getY() / 2) {
-			bird.jump(randomInt(1, 4));
+			bird.flap(randomInt(1, 4));
 		}
 	}
 

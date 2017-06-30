@@ -15,7 +15,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
@@ -125,7 +124,7 @@ public class PlayScene extends Scene<BirdyGame> {
 		app.collisionHandler.registerEnd(bird, world, BirdLeftWorld);
 
 		obstacleManager.init();
-		obstacleManager.setLogger(Application.LOG);
+		// obstacleManager.setLogger(Application.LOG);
 		control.init();
 	}
 

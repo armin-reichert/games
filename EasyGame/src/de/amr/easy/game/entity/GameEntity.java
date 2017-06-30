@@ -32,9 +32,8 @@ public class GameEntity implements View, CollisionBoxSupplier {
 	}
 
 	protected void drawCollisionBox(Graphics2D g, Color color) {
-		Rectangle2D box = getCollisionBox();
 		g.setColor(color);
-		g.draw(box);
+		g.draw(getCollisionBox());
 	}
 
 	public Sprite currentSprite() {
