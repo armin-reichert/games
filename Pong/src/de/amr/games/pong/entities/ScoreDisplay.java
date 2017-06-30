@@ -22,8 +22,8 @@ public class ScoreDisplay extends GameEntity {
 	public void draw(Graphics2D g) {
 		g.setColor(SCORE_COLOR);
 		g.setFont(FONT);
-		g.drawString("" + scoreLeft.points, (int) tr.getX() - 100, 50);
-		g.drawString("" + scoreRight.points, (int) tr.getX() + 100, 50);
+		g.drawString("" + scoreLeft.points, (int) tf.getX() - 100, 50);
+		g.drawString("" + scoreRight.points, (int) tf.getX() + 100, 50);
 	}
 
 	@Override

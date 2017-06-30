@@ -19,8 +19,8 @@ public class FlashText extends GameEntity {
 		flash.setFont(font);
 		flash.setColor(color);
 		flash.setDisplayTime(displayTime);
-		flash.tr.moveTo(position);
-		flash.tr.setVelocity(velocity);
+		flash.tf.moveTo(position);
+		flash.tf.setVelocity(velocity);
 	}
 
 	private Application app;
@@ -36,7 +36,7 @@ public class FlashText extends GameEntity {
 		text = "";
 		font = DEFAULT_FONT;
 		color = Color.BLACK;
-		tr.setVelocity(0, 0);
+		tf.setVelocity(0, 0);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class FlashText extends GameEntity {
 		if (timer == 0) {
 			app.entities.remove(this);
 		} else {
-			tr.move();
+			tf.move();
 			--timer;
 		}
 	}
@@ -57,7 +57,7 @@ public class FlashText extends GameEntity {
 	public void draw(Graphics2D g) {
 		g.setColor(color);
 		g.setFont(font);
-		g.drawString(text, tr.getX(), tr.getY());
+		g.drawString(text, tf.getX(), tf.getY());
 	}
 
 	public void setDisplayTime(int displayTime) {

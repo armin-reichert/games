@@ -127,7 +127,8 @@ public class Ghost extends BoardMover {
 			drawRoute(g, color);
 		}
 		if (app.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
+			g.setColor(isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
+			g.draw(getCollisionBox());
 		}
 	}
 
@@ -141,6 +142,6 @@ public class Ghost extends BoardMover {
 			text.append(":" + state.getRemaining()).append("|").append(state.getDuration());
 		}
 		text.append(")");
-		g.drawString(text.toString(), tr.getX(), tr.getY() - 10);
+		g.drawString(text.toString(), tf.getX(), tf.getY() - 10);
 	}
 }

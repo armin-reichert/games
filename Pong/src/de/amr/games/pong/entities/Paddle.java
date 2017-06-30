@@ -29,28 +29,28 @@ public class Paddle extends GameEntity {
 	@Override
 	public void update() {
 		if (Keyboard.keyDown(paddleUpKey)) {
-			tr.setVelocityY(-PADDLE_SPEED);
+			tf.setVelocityY(-PADDLE_SPEED);
 		}
 		if (Keyboard.keyDown(paddleDownKey)) {
-			tr.setVelocityY(PADDLE_SPEED);
+			tf.setVelocityY(PADDLE_SPEED);
 		}
 		moveAndStopAtBorder();
 	}
 
 	protected void moveAndStopAtBorder() {
-		tr.move();
-		if (tr.getY() < 0) {
-			tr.setY(0);
-		} else if (tr.getY() >= game.getHeight() - getHeight()) {
-			tr.setY(game.getHeight() - getHeight());
+		tf.move();
+		if (tf.getY() < 0) {
+			tf.setY(0);
+		} else if (tf.getY() >= game.getHeight() - getHeight()) {
+			tf.setY(game.getHeight() - getHeight());
 		}
-		tr.setVelocityY(0);
+		tf.setVelocityY(0);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(PADDLE_COLOR);
-		g.fillRect((int) tr.getX(), (int) tr.getY(), getWidth(), getHeight());
+		g.fillRect((int) tf.getX(), (int) tf.getY(), getWidth(), getHeight());
 	}
 
 	@Override

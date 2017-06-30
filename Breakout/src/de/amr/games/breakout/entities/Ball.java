@@ -23,28 +23,28 @@ public class Ball extends GameEntity {
 
 	@Override
 	public void update() {
-		tr.move();
-		if (tr.getX() < 0) {
-			tr.setX(0);
-			if (tr.getVelocityX() < 0) {
-				tr.setVelocityX(-tr.getVelocityX());
+		tf.move();
+		if (tf.getX() < 0) {
+			tf.setX(0);
+			if (tf.getVelocityX() < 0) {
+				tf.setVelocityX(-tf.getVelocityX());
 			}
 		}
-		if (tr.getX() > gameWidth - getWidth()) {
-			tr.setX(gameWidth - getWidth());
-			if (tr.getVelocityX() > 0) {
-				tr.setVelocityX(-tr.getVelocityX());
+		if (tf.getX() > gameWidth - getWidth()) {
+			tf.setX(gameWidth - getWidth());
+			if (tf.getVelocityX() > 0) {
+				tf.setVelocityX(-tf.getVelocityX());
 			}
 		}
-		if (tr.getY() < 0) {
-			tr.setY(0);
-			if (tr.getVelocityY() < 0) {
-				tr.setVelocityY(-tr.getVelocityY());
+		if (tf.getY() < 0) {
+			tf.setY(0);
+			if (tf.getVelocityY() < 0) {
+				tf.setVelocityY(-tf.getVelocityY());
 			}
 		}
 	}
 
 	public boolean isOut() {
-		return tr.getY() > gameHeight;
+		return tf.getY() > gameHeight;
 	}
 }

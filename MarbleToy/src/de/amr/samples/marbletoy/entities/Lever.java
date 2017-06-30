@@ -14,7 +14,7 @@ public class Lever extends GameEntity {
 	private boolean pointsLeft;
 
 	public Lever(int x, int y) {
-		tr.moveTo(x, y);
+		tf.moveTo(x, y);
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class Lever extends GameEntity {
 	public void draw(Graphics2D g) {
 		g.setColor(new Color(200, 200, 200));
 		g.setStroke(new BasicStroke(4));
-		int x = (int) tr.getX(), y = (int) tr.getY();
+		int x = (int) tf.getX(), y = (int) tf.getY();
 		if (pointsLeft) {
 			g.drawLine(x + legLen, y - legLen, x - legLen, y + legLen);
 		} else {
@@ -60,7 +60,7 @@ public class Lever extends GameEntity {
 
 	@Override
 	public Rectangle getCollisionBox() {
-		return new Rectangle((int) tr.getX() - size / 2, (int) tr.getY() - size / 2, size / 2,
+		return new Rectangle((int) tf.getX() - size / 2, (int) tf.getY() - size / 2, size / 2,
 				size / 2);
 	}
 }

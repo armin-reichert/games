@@ -56,7 +56,7 @@ public class ScoreDisplay extends GameEntity {
 	public void draw(Graphics2D g) {
 		for (int i = 0; i < scoreText.length(); i++) {
 			int digit = "0123456789".indexOf(scoreText.charAt(i));
-			g.drawImage(digits[digit], (int) tr.getX() + i * (digits[0].getWidth(null) - round(3 * scale)), (int) tr.getY(),
+			g.drawImage(digits[digit], (int) tf.getX() + i * (digits[0].getWidth(null) - round(3 * scale)), (int) tf.getY(),
 					null);
 		}
 	}

@@ -36,7 +36,7 @@ public class MarbleToy extends GameEntity {
 	public MarbleToy(Sprite sprite, Marble marble) {
 		super(sprite);
 		this.marble = marble;
-		marble.tr.moveTo(-marble.getWidth(), -marble.getHeight());
+		marble.tf.moveTo(-marble.getWidth(), -marble.getHeight());
 		levers[0] = new Lever(178, 82);
 		levers[1] = new Lever(424, 82);
 		levers[2] = new Lever(301, 204);

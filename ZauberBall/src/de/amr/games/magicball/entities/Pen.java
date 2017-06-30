@@ -30,12 +30,12 @@ public class Pen extends GameEntity {
 
 	@Override
 	public void update() {
-		tr.move();
-		if (tr.getY() > image.getHeight() - getHeight() || tr.getY() < 0) {
-			tr.setVelocityY(-tr.getVelocityY());
+		tf.move();
+		if (tf.getY() > image.getHeight() - getHeight() || tf.getY() < 0) {
+			tf.setVelocityY(-tf.getVelocityY());
 		}
-		if (tr.getX() < 0 || tr.getX() > image.getWidth() - getWidth()) {
-			tr.setVelocityX(-tr.getVelocityX());
+		if (tf.getX() < 0 || tf.getX() > image.getWidth() - getWidth()) {
+			tf.setVelocityX(-tf.getVelocityX());
 		}
 		color = randomColor();
 		draw();
@@ -45,13 +45,13 @@ public class Pen extends GameEntity {
 		Graphics2D g = (Graphics2D) image.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.translate(tr.getX() + getWidth() / 2, tr.getY() + getHeight() / 2);
+		g.translate(tf.getX() + getWidth() / 2, tf.getY() + getHeight() / 2);
 		g.fillOval(0, 0, thickness, thickness);
-		g.translate(-tr.getX() - getWidth() / 2, -tr.getY() - getHeight() / 2);
+		g.translate(-tf.getX() - getWidth() / 2, -tf.getY() - getHeight() / 2);
 	}
 
 	public void setSpeed(float vx, float vy) {
-		tr.setVelocity(vx, vy);
+		tf.setVelocity(vx, vy);
 	}
 
 	public void setThickness(int thickness) {

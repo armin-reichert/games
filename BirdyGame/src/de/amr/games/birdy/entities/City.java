@@ -51,7 +51,7 @@ public class City extends GameEntity {
 		app.entities.removeAll(Star.class);
 		for (int i = 0; i < randomInt(1, app.settings.get("max stars")); ++i) {
 			Star star = app.entities.add(new Star(new Sprite(app.assets, "blink_00", "blink_01", "blink_02")));
-			star.tr.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
+			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		}
 	}
 
@@ -83,12 +83,12 @@ public class City extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.translate(tr.getX(), tr.getY());
+		g.translate(tf.getX(), tf.getY());
 		Image image = currentSprite().getImage();
 		for (int x = 0; x < displayWidth; x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
 		app.entities.filter(Star.class).forEach(e -> e.draw(g));
-		g.translate(-tr.getX(), -tr.getY());
+		g.translate(-tf.getX(), -tf.getY());
 	}
 }

@@ -56,12 +56,12 @@ public class Obstacle extends GameEntity {
 
 	@Override
 	public void update() {
-		tr.move();
+		tf.move();
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.translate(tr.getX(), tr.getY());
+		g.translate(tf.getX(), tf.getY());
 		g.drawImage(pipeDown, 0, 0, null);
 		if (lighted) {
 			int inset = (int) passage.getWidth() / 10;
@@ -70,7 +70,7 @@ public class Obstacle extends GameEntity {
 					(int) passage.getHeight());
 		}
 		g.drawImage(pipeUp, 0, (int) (upperPart.getHeight() + passage.getHeight()), null);
-		g.translate(-tr.getX(), -tr.getY());
+		g.translate(-tf.getX(), -tf.getY());
 	}
 
 	public void setLighted(boolean lighted) {
@@ -78,16 +78,16 @@ public class Obstacle extends GameEntity {
 	}
 
 	public CollisionBoxSupplier getUpperPart() {
-		return () -> new Rectangle2D.Double(tr.getX(), tr.getY(), upperPart.getWidth(), upperPart.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY(), upperPart.getWidth(), upperPart.getHeight());
 	}
 
 	public CollisionBoxSupplier getLowerPart() {
-		return () -> new Rectangle2D.Double(tr.getX(), tr.getY() + upperPart.getHeight() + passage.getHeight(),
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight() + passage.getHeight(),
 				lowerPart.getWidth(), lowerPart.getHeight());
 	}
 
 	public CollisionBoxSupplier getPassage() {
-		return () -> new Rectangle2D.Double(tr.getX(), tr.getY() + upperPart.getHeight(), passage.getWidth(),
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight(), passage.getWidth(),
 				passage.getHeight());
 	}
 }

@@ -61,7 +61,7 @@ public class PlayScene extends Scene<BirdyGame> {
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, (s, t) -> {
 				score.points -= 3;
-				bird.tr.setX(bird.tr.getX() + app.settings.getInt("pipe width") + bird.getWidth());
+				bird.tf.setX(bird.tf.getX() + app.settings.getInt("pipe width") + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				app.assets.sound("sfx/hit.mp3").play();
 			});
@@ -113,12 +113,12 @@ public class PlayScene extends Scene<BirdyGame> {
 		city = app.entities.findAny(City.class);
 		bird = app.entities.findAny(Bird.class);
 		scoreDisplay = new ScoreDisplay(app.assets, score, 1.5f);
-		scoreDisplay.centerHor(getWidth());
-		scoreDisplay.tr.setY(ground.tr.getY() / 4);
+		scoreDisplay.hCenter(getWidth());
+		scoreDisplay.tf.setY(ground.tf.getY() / 4);
 		gameOverText = app.entities.add(new GameEntity(new Sprite(app.assets.image("text_game_over"))));
 		gameOverText.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
-		world.tr.moveTo(0, -getHeight());
+		world.tf.moveTo(0, -getHeight());
 
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 		app.collisionHandler.registerEnd(bird, world, BirdLeftWorld);
@@ -156,12 +156,12 @@ public class PlayScene extends Scene<BirdyGame> {
 	}
 
 	private void start() {
-		ground.tr.setVelocity(app.settings.get("world speed"), 0);
+		ground.tf.setVelocity(app.settings.get("world speed"), 0);
 		obstacleManager.start();
 	}
 
 	private void stop() {
-		ground.tr.setVelocity(0, 0);
+		ground.tf.setVelocity(0, 0);
 		obstacleManager.stop();
 	}
 

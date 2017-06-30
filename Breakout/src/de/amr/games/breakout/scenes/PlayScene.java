@@ -74,7 +74,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 				Brick.BrickColor color = i == 0 ? Brick.BrickColor.green : Brick.BrickColor.yellow;
 				Brick brick = new Brick(color, value);
 				addBrick(brick, i, j);
-				brick.tr.moveTo(x, y);
+				brick.tf.moveTo(x, y);
 				x += padding + brick.getWidth();
 			}
 			x = padding;
@@ -111,37 +111,37 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	void resetBall() {
-		ball.centerHor(getWidth());
-		ball.tr.setY(bat.tr.getY() - ball.getHeight());
-		ball.tr.setVelocity(0, 0);
+		ball.hCenter(getWidth());
+		ball.tf.setY(bat.tf.getY() - ball.getHeight());
+		ball.tf.setVelocity(0, 0);
 	}
 
 	void resetBat() {
-		bat.tr.moveTo(0, getHeight() - bat.getHeight());
-		bat.centerHor(getWidth());
-		bat.tr.setVelocity(0, 0);
+		bat.tf.moveTo(0, getHeight() - bat.getHeight());
+		bat.hCenter(getWidth());
+		bat.tf.setVelocity(0, 0);
 		bat.setSpeed(5);
 	}
 
 	void bounceBallFromBat() {
-		ball.tr.setVelocityY(-ball.tr.getVelocityY());
-		ball.tr.setY(bat.tr.getY() - ball.getHeight());
+		ball.tf.setVelocityY(-ball.tf.getVelocityY());
+		ball.tf.setY(bat.tf.getY() - ball.getHeight());
 		Game.assets.sound("Sounds/plop.mp3").play();
 	}
 
 	void bounceBallFromBrick(Brick brick) {
-		ball.tr.setY(brick.tr.getY() + brick.getHeight());
-		ball.tr.setVelocityY(-ball.tr.getVelocityY());
+		ball.tf.setY(brick.tf.getY() + brick.getHeight());
+		ball.tf.setVelocityY(-ball.tf.getVelocityY());
 	}
 
 	void shootBall() {
 		resetBat();
 		resetBall();
 		Random random = new Random();
-		ball.tr.setVelocityX(2 + random.nextFloat() * 2);
-		ball.tr.setVelocityY(-(8 + random.nextFloat() * 8));
+		ball.tf.setVelocityX(2 + random.nextFloat() * 2);
+		ball.tf.setVelocityY(-(8 + random.nextFloat() * 8));
 		if (random.nextBoolean()) {
-			ball.tr.setVelocityX(-ball.tr.getVelocityX());
+			ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		}
 	}
 

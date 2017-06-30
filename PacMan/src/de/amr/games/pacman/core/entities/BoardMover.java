@@ -122,11 +122,11 @@ public abstract class BoardMover extends GameEntity {
 	}
 
 	public void placeAt(Tile tile) {
-		tr.moveTo(tile.col * TILE_SIZE, tile.row * TILE_SIZE);
+		tf.moveTo(tile.col * TILE_SIZE, tile.row * TILE_SIZE);
 	}
 
 	public void placeAt(int row, int col) {
-		tr.moveTo(col * TILE_SIZE, row * TILE_SIZE);
+		tf.moveTo(col * TILE_SIZE, row * TILE_SIZE);
 	}
 
 	public void adjust() {
@@ -143,7 +143,7 @@ public abstract class BoardMover extends GameEntity {
 
 	protected boolean isExactlyOver(int row, int col) {
 		int tolerance = 1;
-		return abs(tr.getX() - col * TILE_SIZE) <= tolerance && abs(tr.getY() - row * TILE_SIZE) <= tolerance;
+		return abs(tf.getX() - col * TILE_SIZE) <= tolerance && abs(tf.getY() - row * TILE_SIZE) <= tolerance;
 	}
 
 	public boolean canEnterTileTowards(int dir) {
@@ -168,8 +168,8 @@ public abstract class BoardMover extends GameEntity {
 	 */
 	public void move() {
 		Vector2 velocity = new Vector2(Top4.dx(moveDir), Top4.dy(moveDir)).times(speed.get());
-		tr.setVelocity(velocity);
-		tr.move();
+		tf.setVelocity(velocity);
+		tf.move();
 
 		Tile tile = currentTile();
 		int row = tile.row, col = tile.col;
@@ -189,10 +189,10 @@ public abstract class BoardMover extends GameEntity {
 		// adjust position if stuck and reaching into inaccessible neighbor tile
 		if (stuck) {
 			/*@formatter:off*/
-			if (moveDir == E && tr.getX() >= col * TILE_SIZE
-			 || moveDir == W && tr.getX() <  col * TILE_SIZE
-			 || moveDir == N && tr.getY() <  row * TILE_SIZE
-			 || moveDir == S && tr.getY() >= row * TILE_SIZE) {
+			if (moveDir == E && tf.getX() >= col * TILE_SIZE
+			 || moveDir == W && tf.getX() <  col * TILE_SIZE
+			 || moveDir == N && tf.getY() <  row * TILE_SIZE
+			 || moveDir == S && tf.getY() >= row * TILE_SIZE) {
 				placeAt(row, col);
 			}
 			/*@formatter:on*/

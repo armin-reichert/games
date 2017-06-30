@@ -22,20 +22,20 @@ public class Ball extends GameEntity implements Drawable {
 
 	@Override
 	public void update() {
-		tr.move();
-		if (tr.getY() < 0) {
-			tr.setY(0);
-			tr.setVelocityY(-tr.getVelocityY());
-		} else if (tr.getY() >= gameHeight - getHeight()) {
-			tr.setY(gameHeight - getHeight() - 1);
-			tr.setVelocityY(-tr.getVelocityY());
+		tf.move();
+		if (tf.getY() < 0) {
+			tf.setY(0);
+			tf.setVelocityY(-tf.getVelocityY());
+		} else if (tf.getY() >= gameHeight - getHeight()) {
+			tf.setY(gameHeight - getHeight() - 1);
+			tf.setVelocityY(-tf.getVelocityY());
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(BALL_COLOR);
-		g.fillOval((int) tr.getX(), (int) tr.getY(), BALL_SIZE, BALL_SIZE);
+		g.fillOval((int) tf.getX(), (int) tf.getY(), BALL_SIZE, BALL_SIZE);
 	}
 
 	@Override

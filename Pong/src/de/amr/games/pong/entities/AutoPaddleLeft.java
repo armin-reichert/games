@@ -18,28 +18,28 @@ public class AutoPaddleLeft extends Paddle {
 	public void update() {
 		Ball ball = game.entities.findAny(Ball.class);
 		int targetY = game.getHeight() / 2 + getHeight();
-		if (ball.tr.getVelocityX() < 0) {
+		if (ball.tf.getVelocityX() < 0) {
 			computeBallPositionLeft();
 			targetY = (int) ballLeftY;
 		}
-		float diff = tr.getY() + getHeight() / 2 - targetY;
+		float diff = tf.getY() + getHeight() / 2 - targetY;
 		if (diff < -BALL_SIZE) {
-			tr.setVelocityY(PADDLE_SPEED);
+			tf.setVelocityY(PADDLE_SPEED);
 		} else if (diff > BALL_SIZE) {
-			tr.setVelocityY(-PADDLE_SPEED);
+			tf.setVelocityY(-PADDLE_SPEED);
 		}
 		moveAndStopAtBorder();
 	}
 
 	private void computeBallPositionLeft() {
 		Ball ball = game.entities.findAny(Ball.class);
-		ballLeftY = ball.tr.getY() + ball.getHeight() / 2;
-		for (float x = ball.tr.getX(); x > getWidth() - 1; x += ball.tr.getVelocityX()) {
-			ballLeftY += ball.tr.getVelocityY();
+		ballLeftY = ball.tf.getY() + ball.getHeight() / 2;
+		for (float x = ball.tf.getX(); x > getWidth() - 1; x += ball.tf.getVelocityX()) {
+			ballLeftY += ball.tf.getVelocityY();
 			if (ballLeftY < 0) {
-				ballLeftY += ball.tr.getVelocityY();
+				ballLeftY += ball.tf.getVelocityY();
 			} else if (ballLeftY >= game.getHeight()) {
-				ballLeftY -= ball.tr.getVelocityY();
+				ballLeftY -= ball.tf.getVelocityY();
 			}
 		}
 	}

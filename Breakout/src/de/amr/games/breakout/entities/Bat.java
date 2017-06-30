@@ -25,14 +25,14 @@ public class Bat extends GameEntity {
 	@Override
 	public void update() {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			tr.setVelocityX(-speed);
+			tf.setVelocityX(-speed);
 		}
 		if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			tr.setVelocityX(speed);
+			tf.setVelocityX(speed);
 		}
-		tr.move();
-		tr.setVelocityX(0);
-		tr.setX(Math.min(gameWidth - getWidth(), Math.max(0, tr.getX())));
+		tf.move();
+		tf.setVelocityX(0);
+		tf.setX(Math.min(gameWidth - getWidth(), Math.max(0, tf.getX())));
 	}
 
 	public void setSpeed(int speed) {

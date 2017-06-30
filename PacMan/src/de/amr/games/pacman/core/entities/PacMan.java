@@ -188,11 +188,12 @@ public class PacMan extends BoardMover {
 				text.append(":").append(state.getRemaining()).append("|").append(state.getDuration());
 			}
 			text.append(")");
-			g.drawString(text.toString(), tr.getX(), tr.getY() - TILE_SIZE);
+			g.drawString(text.toString(), tf.getX(), tf.getY() - TILE_SIZE);
 		}
 
 		if (app.settings.getBool("drawGrid")) {
-			drawCollisionBox(g, isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
+			g.setColor(isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
+			g.draw(getCollisionBox());
 		}
 	}
 }

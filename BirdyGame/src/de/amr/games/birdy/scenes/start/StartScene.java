@@ -101,11 +101,11 @@ public class StartScene extends Scene<BirdyGame> {
 	}
 
 	private void stop() {
-		ground.tr.setVelocity(0, 0);
+		ground.tf.setVelocity(0, 0);
 	}
 
 	private void keepBirdInAir() {
-		while (bird.tr.getY() > ground.tr.getY() / 2) {
+		while (bird.tf.getY() > ground.tf.getY() / 2) {
 			bird.flap(randomInt(1, 4));
 		}
 	}
@@ -120,13 +120,13 @@ public class StartScene extends Scene<BirdyGame> {
 
 		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
-		ground.tr.moveTo(0, getHeight() - ground.getHeight());
-		ground.tr.setVelocity(app.settings.getFloat("world speed"), 0);
+		ground.tf.moveTo(0, getHeight() - ground.getHeight());
+		ground.tf.setVelocity(app.settings.getFloat("world speed"), 0);
 
 		bird = app.entities.findAny(Bird.class);
 		bird.init();
-		bird.tr.moveTo(getWidth() / 8, ground.tr.getY() / 2);
-		bird.tr.setVelocity(0, 0);
+		bird.tf.moveTo(getWidth() / 8, ground.tf.getY() / 2);
+		bird.tf.setVelocity(0, 0);
 		bird.setFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 
 		if (!app.entities.contains("title")) {
@@ -150,7 +150,7 @@ public class StartScene extends Scene<BirdyGame> {
 		if (!app.entities.contains("world")) {
 			Area world = new Area(getWidth(), 2 * getHeight());
 			world.setName("world");
-			world.tr.moveTo(0, -getHeight());
+			world.tf.moveTo(0, -getHeight());
 			app.entities.add(world);
 		}
 

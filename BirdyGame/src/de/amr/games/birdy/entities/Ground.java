@@ -21,7 +21,7 @@ public class Ground extends GameEntity {
 
 	@Override
 	public void update() {
-		startX -= tr.getVelocityX();
+		startX -= tf.getVelocityX();
 		if (startX < 0) {
 			startX = currentSprite().getImage().getWidth(null);
 		}
@@ -32,14 +32,14 @@ public class Ground extends GameEntity {
 	}
 
 	public void stopMoving() {
-		tr.setVelocityX(0);
+		tf.setVelocityX(0);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		Image image = currentSprite().getImage();
 		for (float x = -startX; x < getWidth(); x += image.getWidth(null)) {
-			g.drawImage(image, (int) x, (int) tr.getY(), null);
+			g.drawImage(image, (int) x, (int) tf.getY(), null);
 		}
 	}
 }

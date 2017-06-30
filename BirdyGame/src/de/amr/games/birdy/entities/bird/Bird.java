@@ -135,13 +135,14 @@ public class Bird extends GameEntity {
 	public void update() {
 		flightControl.update();
 		healthControl.update();
-		currentSprite().setAnimated(tr.getVelocityY() < 0);
+		currentSprite().setAnimated(tf.getVelocityY() < 0);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		drawCollisionBox(g, Color.BLACK);
+		g.setColor(Color.BLACK);
+		g.draw(getCollisionBox());
 	}
 
 	public void receiveEvent(BirdyGameEvent event) {
@@ -164,7 +165,7 @@ public class Bird extends GameEntity {
 	@Override
 	public Rectangle2D getCollisionBox() {
 		int margin = Math.min(getWidth() / 4, getHeight() / 4);
-		return new Rectangle2D.Double(tr.getX() + margin, tr.getY() + margin, getWidth() - 2 * margin,
+		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin, getWidth() - 2 * margin,
 				getHeight() - 2 * margin);
 	}
 
@@ -179,31 +180,31 @@ public class Bird extends GameEntity {
 
 	public void flap(float force) {
 		app.assets.sound("sfx/wing.mp3").play();
-		tr.setVelocityY(tr.getVelocityY() - force * gravity);
+		tf.setVelocityY(tf.getVelocityY() - force * gravity);
 		fly();
 	}
 
 	public void fly() {
-		if (tr.getY() < -getHeight()) {
-			tr.setVelocity(0, 0);
+		if (tf.getY() < -getHeight()) {
+			tf.setVelocity(0, 0);
 		}
-		tr.setVelocityY(tr.getVelocityY() + gravity);
-		double damp = tr.getVelocityY() < 0 ? 0.05 : 0.2;
-		tr.setRotation(-PI / 8 + damp * tr.getVelocityY());
-		if (tr.getRotation() < -PI / 4)
-			tr.setRotation(-PI / 4);
-		if (tr.getRotation() > PI / 2)
-			tr.setRotation(PI / 2);
-		tr.move();
+		tf.setVelocityY(tf.getVelocityY() + gravity);
+		double damp = tf.getVelocityY() < 0 ? 0.05 : 0.2;
+		tf.setRotation(-PI / 8 + damp * tf.getVelocityY());
+		if (tf.getRotation() < -PI / 4)
+			tf.setRotation(-PI / 4);
+		if (tf.getRotation() > PI / 2)
+			tf.setRotation(PI / 2);
+		tf.move();
 	}
 
 	public void fall(float slowdown) {
-		tr.setVelocityY(tr.getVelocityY() + gravity / slowdown);
-		tr.move();
+		tf.setVelocityY(tf.getVelocityY() + gravity / slowdown);
+		tf.move();
 	}
 
 	private void turnDown() {
-		tr.setRotation(PI / 2);
-		tr.setVelocity(0, 0);
+		tf.setRotation(PI / 2);
+		tf.setVelocity(0, 0);
 	}
 }

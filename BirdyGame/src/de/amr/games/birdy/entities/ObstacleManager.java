@@ -102,12 +102,12 @@ public class ObstacleManager extends GameEntity {
 		int width = app.settings.get("pipe width");
 		int height = app.settings.get("pipe height");
 		int passageCenterY = randomInt(minHeight + passageHeight / 2,
-				(int) ground.tr.getY() - minHeight - passageHeight / 2);
+				(int) ground.tf.getY() - minHeight - passageHeight / 2);
 		float speed = app.settings.get("world speed");
 
 		Obstacle obstacle = new Obstacle(app, width, height, passageHeight, passageCenterY);
-		obstacle.tr.setVelocityX(speed);
-		obstacle.tr.setX(app.getWidth());
+		obstacle.tf.setVelocityX(speed);
+		obstacle.tf.setX(app.getWidth());
 		obstacle.setLighted(city.isNight() && randomInt(0, 5) == 0);
 		obstacles.add(obstacle);
 
@@ -119,7 +119,7 @@ public class ObstacleManager extends GameEntity {
 		Iterator<Obstacle> it = obstacles.iterator();
 		while (it.hasNext()) {
 			obstacle = it.next();
-			if (obstacle.tr.getX() + obstacle.getWidth() < 0) {
+			if (obstacle.tf.getX() + obstacle.getWidth() < 0) {
 				app.collisionHandler.unregisterStart(bird, obstacle.getUpperPart());
 				app.collisionHandler.unregisterStart(bird, obstacle.getLowerPart());
 				app.collisionHandler.unregisterEnd(bird, obstacle.getPassage());

@@ -60,8 +60,8 @@ public class PongPlayScene extends Scene<PongGame> {
 		}
 		ball = app.entities.findAny(Ball.class);
 		score = app.entities.findAny(ScoreDisplay.class);
-		score.centerHor(getWidth());
-		score.tr.setY(100);
+		score.hCenter(getWidth());
+		score.tf.setY(100);
 		control.init();
 	}
 
@@ -101,10 +101,10 @@ public class PongPlayScene extends Scene<PongGame> {
 	}
 
 	private void resetPaddles() {
-		paddleLeft.tr.setX(0);
-		paddleLeft.centerVert(getHeight());
-		paddleRight.tr.setX(getWidth() - paddleRight.getWidth());
-		paddleRight.centerVert(getHeight());
+		paddleLeft.tf.setX(0);
+		paddleLeft.vCenter(getHeight());
+		paddleRight.tf.setX(getWidth() - paddleRight.getWidth());
+		paddleRight.vCenter(getHeight());
 	}
 
 	void resetScores() {
@@ -115,49 +115,49 @@ public class PongPlayScene extends Scene<PongGame> {
 	void prepareBall() {
 		resetPaddles();
 		if (!isBallOutRight()) {
-			ball.tr.moveTo(paddleLeft.tr.getX() + paddleLeft.getWidth(),
-					paddleLeft.tr.getY() + paddleLeft.getHeight() / 2 - ball.getHeight() / 2);
+			ball.tf.moveTo(paddleLeft.tf.getX() + paddleLeft.getWidth(),
+					paddleLeft.tf.getY() + paddleLeft.getHeight() / 2 - ball.getHeight() / 2);
 		} else {
-			ball.tr.moveTo(paddleRight.tr.getX() - ball.getWidth(),
-					paddleRight.tr.getY() + paddleRight.getHeight() / 2 - ball.getHeight() / 2);
+			ball.tf.moveTo(paddleRight.tf.getX() - ball.getWidth(),
+					paddleRight.tf.getY() + paddleRight.getHeight() / 2 - ball.getHeight() / 2);
 		}
-		ball.tr.setVelocity(0, 0);
+		ball.tf.setVelocity(0, 0);
 	}
 
 	void shootBall() {
 		Random rnd = new Random();
-		ball.tr.setVelocityX(isBallOutRight() ? -BALL_SPEED : BALL_SPEED);
-		ball.tr.setVelocityY((BALL_SPEED / 4) + (rnd.nextFloat() * BALL_SPEED / 4));
+		ball.tf.setVelocityX(isBallOutRight() ? -BALL_SPEED : BALL_SPEED);
+		ball.tf.setVelocityY((BALL_SPEED / 4) + (rnd.nextFloat() * BALL_SPEED / 4));
 		if (rnd.nextBoolean()) {
-			ball.tr.setVelocityY(-ball.tr.getVelocityY());
+			ball.tf.setVelocityY(-ball.tf.getVelocityY());
 		}
 	}
 
 	boolean isBallOutLeft() {
-		return ball.tr.getX() + ball.getWidth() < 0;
+		return ball.tf.getX() + ball.getWidth() < 0;
 	}
 
 	boolean isBallOutRight() {
-		return ball.tr.getX() > getWidth();
+		return ball.tf.getX() > getWidth();
 	}
 
 	boolean leftPaddleHitsBall() {
-		return ball.tr.getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
+		return ball.tf.getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
 	}
 
 	boolean rightPaddleHitsBall() {
-		return ball.tr.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
+		return ball.tf.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
 	}
 
 	void bounceBallFromLeftPaddle() {
-		ball.tr.setX(paddleLeft.tr.getX() + paddleLeft.getWidth() + 1);
-		ball.tr.setVelocityX(-ball.tr.getVelocityX());
+		ball.tf.setX(paddleLeft.tf.getX() + paddleLeft.getWidth() + 1);
+		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		app.assets.sound("plop.mp3").play();
 	}
 
 	void bounceBallFromRightPaddle() {
-		ball.tr.setX(paddleRight.tr.getX() - ball.getWidth() - 1);
-		ball.tr.setVelocityX(-ball.tr.getVelocityX());
+		ball.tf.setX(paddleRight.tf.getX() - ball.getWidth() - 1);
+		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		app.assets.sound("plip.mp3").play();
 	}
 

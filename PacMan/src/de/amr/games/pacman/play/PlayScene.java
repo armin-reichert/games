@@ -349,7 +349,7 @@ public class PlayScene extends Scene<PacManGame> {
 				LOG.info("Pac-Man kills " + ghost.getName());
 				app.assets.sound("sfx/eat-ghost.mp3").play();
 				score(nextGhostPoints);
-				showFlashText(nextGhostPoints, ghost.tr.getX(), ghost.tr.getY());
+				showFlashText(nextGhostPoints, ghost.tf.getX(), ghost.tf.getY());
 				if (++ghostsEatenAtLevel == 16) {
 					score(12000);
 				}
