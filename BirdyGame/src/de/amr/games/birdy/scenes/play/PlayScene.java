@@ -19,7 +19,6 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
-import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
@@ -122,8 +121,8 @@ public class PlayScene extends Scene<BirdyGame> {
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tr.moveTo(0, -getHeight());
 
-		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
-		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
+		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
+		app.collisionHandler.registerEnd(bird, world, BirdLeftWorld);
 
 		obstacleManager.init();
 		obstacleManager.setLogger(Application.LOG);
@@ -132,7 +131,7 @@ public class PlayScene extends Scene<BirdyGame> {
 
 	@Override
 	public void update() {
-		for (Collision collision : CollisionHandler.collisions()) {
+		for (Collision collision : app.collisionHandler.collisions()) {
 			receive((BirdyGameEvent) collision.getAppEvent());
 		}
 		control.update();

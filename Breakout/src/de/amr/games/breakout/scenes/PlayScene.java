@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.game.entity.collision.Collision;
-import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.breakout.BreakoutGame;
 import de.amr.games.breakout.entities.Ball;
@@ -35,13 +34,13 @@ public class PlayScene extends Scene<BreakoutGame> {
 	public void init() {
 		ball = Game.entities.findAny(Ball.class);
 		bat = Game.entities.findAny(Bat.class);
-		CollisionHandler.detectCollisionStart(ball, bat, BallHitsBat);
+		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
 
 	@Override
 	public void update() {
-		for (Collision collision : CollisionHandler.collisions()) {
+		for (Collision collision : app.collisionHandler.collisions()) {
 			PlayEvent event = collision.getAppEvent();
 			event.collision = collision;
 			control.addInput(event);
@@ -85,11 +84,11 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	void addBrick(Brick brick, int i, int j) {
 		bricks[i][j] = brick;
-		CollisionHandler.detectCollisionStart(ball, brick, BallHitsBrick);
+		app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
 	}
 
 	void removeBrick(Brick brick) {
-		CollisionHandler.ignoreCollisionStart(ball, brick);
+		app.collisionHandler.unregisterStart(ball, brick);
 		for (int i = 0; i < BRICK_ROWS; ++i) {
 			for (int j = 0; j < BRICK_COLS; ++j) {
 				if (brick == bricks[i][j]) {

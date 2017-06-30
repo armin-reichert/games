@@ -11,11 +11,9 @@ import java.awt.Graphics2D;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.entities.bird.Bird;
@@ -49,11 +47,8 @@ public class ObstacleManager extends GameEntity {
 		// When breeding time is over, it's birthday:
 		control.changeOnTimeout(Breeding, Birth);
 
-		// On birthday, a new obstacle is born and obsolete obstacles die:
-		control.state(Birth).entry = s -> {
-			addObstacle();
-			removeObsoleteObstacles();
-		};
+		// On birthday, update (add/remove) obstacles:
+		control.state(Birth).entry = s -> updateObstacles();
 
 		// And immediately become breeding again, like the M-people
 		control.change(Birth, Breeding);
@@ -64,6 +59,10 @@ public class ObstacleManager extends GameEntity {
 
 		// On "Start" event, become breeding again:
 		control.changeOnInput("Start", Stopped, Breeding);
+	}
+
+	public void setLogger(Logger log) {
+		control.setLogger(log);
 	}
 
 	@Override
@@ -92,40 +91,40 @@ public class ObstacleManager extends GameEntity {
 		obstacles.forEach(o -> o.draw(g));
 	}
 
-	private void addObstacle() {
+	private void updateObstacles() {
 		Ground ground = app.entities.findAny(Ground.class);
 		City city = app.entities.findAny(City.class);
 		Bird bird = app.entities.findAny(Bird.class);
-		int minPipeHeight = app.settings.get("min pipe height");
-		int passageHeight = app.settings.get("passage height");
-		int passageCenterY = randomInt(minPipeHeight + passageHeight / 2,
-				(int) ground.tr.getY() - minPipeHeight - passageHeight / 2);
-		Obstacle obstacle = new Obstacle(app, app.settings.get("pipe width"), app.settings.get("pipe height"),
-				app.settings.get("passage height"), passageCenterY);
-		obstacle.tr.setVelocityX(app.settings.get("world speed"));
-		obstacle.tr.setX(app.getWidth());
-		obstacle.setLighted(city.isNight() && new Random().nextInt(5) == 0);
-		obstacles.add(obstacle);
-		CollisionHandler.detectCollisionStart(bird, obstacle.getUpperPart(), BirdTouchedPipe);
-		CollisionHandler.detectCollisionStart(bird, obstacle.getLowerPart(), BirdTouchedPipe);
-		CollisionHandler.detectCollisionEnd(bird, obstacle.getPassage(), BirdLeftPassage);
-	}
 
-	private void removeObsoleteObstacles() {
-		Bird bird = app.entities.findAny(Bird.class);
+		// Add new obstacle
+		int minHeight = app.settings.get("min pipe height");
+		int passageHeight = app.settings.get("passage height");
+		int width = app.settings.get("pipe width");
+		int height = app.settings.get("pipe height");
+		int passageCenterY = randomInt(minHeight + passageHeight / 2,
+				(int) ground.tr.getY() - minHeight - passageHeight / 2);
+		float speed = app.settings.get("world speed");
+
+		Obstacle obstacle = new Obstacle(app, width, height, passageHeight, passageCenterY);
+		obstacle.tr.setVelocityX(speed);
+		obstacle.tr.setX(app.getWidth());
+		obstacle.setLighted(city.isNight() && randomInt(0, 5) == 0);
+		obstacles.add(obstacle);
+
+		app.collisionHandler.registerStart(bird, obstacle.getUpperPart(), BirdTouchedPipe);
+		app.collisionHandler.registerStart(bird, obstacle.getLowerPart(), BirdTouchedPipe);
+		app.collisionHandler.registerEnd(bird, obstacle.getPassage(), BirdLeftPassage);
+
+		// Remove obstacles that ran out of screen
 		Iterator<Obstacle> it = obstacles.iterator();
 		while (it.hasNext()) {
-			Obstacle obstacle = it.next();
+			obstacle = it.next();
 			if (obstacle.tr.getX() + obstacle.getWidth() < 0) {
-				CollisionHandler.ignoreCollisionEnd(bird, obstacle.getUpperPart());
-				CollisionHandler.ignoreCollisionEnd(bird, obstacle.getLowerPart());
-				CollisionHandler.ignoreCollisionEnd(bird, obstacle.getPassage());
+				app.collisionHandler.unregisterStart(bird, obstacle.getUpperPart());
+				app.collisionHandler.unregisterStart(bird, obstacle.getLowerPart());
+				app.collisionHandler.unregisterEnd(bird, obstacle.getPassage());
 				it.remove();
 			}
 		}
-	}
-
-	public void setLogger(Logger log) {
-		control.setLogger(log);
 	}
 }

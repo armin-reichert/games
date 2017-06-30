@@ -8,37 +8,7 @@ import java.util.Set;
 
 import de.amr.easy.game.Application;
 
-public enum CollisionHandler {
-
-	INSTANCE;
-
-	public static void detectCollisionStart(CollisionBoxSupplier x, CollisionBoxSupplier y, Object event) {
-		INSTANCE.startMap.put(new CollisionPair(x, y), event);
-	}
-
-	public static void detectCollisionEnd(CollisionBoxSupplier x, CollisionBoxSupplier y, Object event) {
-		INSTANCE.endMap.put(new CollisionPair(x, y), event);
-	}
-
-	public static void ignoreCollisionStart(CollisionBoxSupplier x, CollisionBoxSupplier y) {
-		INSTANCE.startMap.remove(new CollisionPair(x, y));
-	}
-
-	public static void ignoreCollisionEnd(CollisionBoxSupplier x, CollisionBoxSupplier y) {
-		INSTANCE.endMap.remove(new CollisionPair(x, y));
-	}
-
-	public static Iterable<Collision> collisions() {
-		return INSTANCE.events;
-	}
-
-	public static void update() {
-		INSTANCE.updateInternal();
-	}
-
-	public static void clear() {
-		INSTANCE.clearInternal();
-	}
+public class CollisionHandler {
 
 	private final Map<CollisionPair, Object> startMap = new HashMap<>();
 	private final Map<CollisionPair, Object> endMap = new HashMap<>();
@@ -46,15 +16,27 @@ public enum CollisionHandler {
 	private final Set<CollisionPair> oldCollisions = new HashSet<>();
 	private final Set<Collision> events = new HashSet<>();
 
-	private void clearInternal() {
-		newCollisions.clear();
-		oldCollisions.clear();
-		events.clear();
-		startMap.clear();
-		endMap.clear();
+	public void registerStart(CollisionBoxSupplier x, CollisionBoxSupplier y, Object event) {
+		startMap.put(new CollisionPair(x, y), event);
 	}
 
-	private void updateInternal() {
+	public void registerEnd(CollisionBoxSupplier x, CollisionBoxSupplier y, Object event) {
+		endMap.put(new CollisionPair(x, y), event);
+	}
+
+	public void unregisterStart(CollisionBoxSupplier x, CollisionBoxSupplier y) {
+		startMap.remove(new CollisionPair(x, y));
+	}
+
+	public void unregisterEnd(CollisionBoxSupplier x, CollisionBoxSupplier y) {
+		endMap.remove(new CollisionPair(x, y));
+	}
+
+	public Iterable<Collision> collisions() {
+		return events;
+	}
+
+	public void update() {
 		oldCollisions.clear();
 		oldCollisions.addAll(newCollisions);
 		newCollisions.clear();
@@ -85,7 +67,15 @@ public enum CollisionHandler {
 		}
 	}
 
-	private static boolean checkCollision(CollisionPair p) {
+	public void clear() {
+		newCollisions.clear();
+		oldCollisions.clear();
+		events.clear();
+		startMap.clear();
+		endMap.clear();
+	}
+
+	private boolean checkCollision(CollisionPair p) {
 		Rectangle2D intersection = p.either().getCollisionBox().createIntersection(p.other().getCollisionBox());
 		if (!intersection.isEmpty()) {
 			p.setIntersection(intersection);

@@ -17,7 +17,6 @@ import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.PumpingImage;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
-import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
@@ -130,11 +129,11 @@ public class StartScene extends Scene<BirdyGame> {
 		PumpingImage readyText = new PumpingImage(app.assets.image("text_ready"));
 		readyText.setName("readyText");
 		app.entities.add(readyText);
-		CollisionHandler.clear();
-		CollisionHandler.detectCollisionStart(bird, ground, BirdTouchedGround);
+		app.collisionHandler.clear();
+		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tr.moveTo(0, -getHeight());
-		CollisionHandler.detectCollisionEnd(bird, world, BirdLeftWorld);
+		app.collisionHandler.registerEnd(bird, world, BirdLeftWorld);
 	}
 
 	@Override
@@ -142,7 +141,7 @@ public class StartScene extends Scene<BirdyGame> {
 		city.update();
 		ground.update();
 		bird.update();
-		for (Collision ce : CollisionHandler.collisions()) {
+		for (Collision ce : app.collisionHandler.collisions()) {
 			BirdyGameEvent event = (BirdyGameEvent) ce.getAppEvent();
 			bird.receiveEvent(event);
 			control.addInput(event);

@@ -49,6 +49,7 @@ public abstract class Application {
 	public final EntitySet entities = new EntitySet();
 	public final ViewManager views = new ViewManager();
 	public final Motor motor = new Motor(this::update, this::render);
+	public final CollisionHandler collisionHandler = new CollisionHandler();
 
 	private boolean paused;
 	private ApplicationShell shell;
@@ -89,7 +90,7 @@ public abstract class Application {
 		}
 		if (!paused) {
 			if (views.current() != null) {
-				CollisionHandler.update();
+				collisionHandler.update();
 				views.current().update();
 			} else {
 				defaultView.update();
