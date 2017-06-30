@@ -38,15 +38,13 @@ public class Bird extends GameEntity {
 	private final BirdyGame app;
 	private final FlightControl flightControl;
 	private final HealthControl healthControl;
-	private Sprite currentSprite;
+	private Sprite normalFeathers;
 	private float gravity;
 
 	/**
 	 * State machine controlling the health state of the bird.
 	 */
 	private class HealthControl extends StateMachine<HealthState, BirdyGameEvent> {
-
-		private Sprite feathersBeforeInjury;
 
 		public HealthControl() {
 			super("Bird Health Control", HealthState.class, Sane);
@@ -57,10 +55,8 @@ public class Bird extends GameEntity {
 
 			state(Injured).entry = s -> {
 				s.setDuration(app.motor.secToTicks(app.settings.get("bird injured seconds")));
-				feathersBeforeInjury = currentSprite();
-				setFeathers(RED_FEATHERS);
+				setNormalFeathers(RED_FEATHERS);
 			};
-			state(Injured).exit = s -> setFeathers(feathersBeforeInjury);
 
 			changeOnInput(BirdTouchedPipe, Injured, Injured, (s, t) -> {
 				s.resetTimer();
@@ -115,7 +111,7 @@ public class Bird extends GameEntity {
 		BLUE_FEATHERS = createFeathers("bird1");
 		RED_FEATHERS = createFeathers("bird2");
 		setSprites(YELLOW_FEATHERS, BLUE_FEATHERS, RED_FEATHERS);
-		currentSprite = YELLOW_FEATHERS;
+		normalFeathers = YELLOW_FEATHERS;
 		gravity = app.settings.getFloat("world gravity");
 	}
 
@@ -150,8 +146,8 @@ public class Bird extends GameEntity {
 		healthControl.addInput(event);
 	}
 
-	public void setFeathers(Sprite sprite) {
-		currentSprite = sprite;
+	public void setNormalFeathers(Sprite sprite) {
+		normalFeathers = sprite;
 	}
 
 	public FlightState getFlightState() {
@@ -171,7 +167,7 @@ public class Bird extends GameEntity {
 
 	@Override
 	public Sprite currentSprite() {
-		return currentSprite;
+		return healthControl.is(Injured) ? RED_FEATHERS : normalFeathers;
 	}
 
 	public void flap() {

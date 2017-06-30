@@ -4,6 +4,7 @@ import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.util.stream.IntStream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
@@ -49,10 +50,11 @@ public class City extends GameEntity {
 
 	private void createStars() {
 		app.entities.removeAll(Star.class);
-		for (int i = 0; i < randomInt(1, app.settings.get("max stars")); ++i) {
-			Star star = app.entities.add(new Star(new Sprite(app.assets, "blink_00", "blink_01", "blink_02")));
+		int numStars = randomInt(1, app.settings.get("max stars"));
+		IntStream.range(1, numStars).forEach(i -> {
+			Star star = app.entities.add(new Star(app));
 			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
-		}
+		});
 	}
 
 	public boolean isNight() {
