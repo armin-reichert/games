@@ -17,7 +17,7 @@ public class GameEntity implements View, CollisionBoxSupplier {
 
 	public GameEntity(Sprite... sprites) {
 		this.sprites = sprites;
-		this.name = "unnamed";
+		this.name = toString();
 	}
 
 	@Override

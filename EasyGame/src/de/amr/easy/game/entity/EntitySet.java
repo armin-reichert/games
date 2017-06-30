@@ -38,7 +38,7 @@ public class EntitySet {
 		Objects.requireNonNull(type);
 		entitySet.removeIf((e) -> type.isAssignableFrom(e.getClass()));
 	}
-	
+
 	public void removeAll() {
 		entitySet.clear();
 	}
@@ -50,7 +50,11 @@ public class EntitySet {
 
 	public <E extends GameEntity> E findByName(Class<E> type, String name) {
 		Objects.requireNonNull(name);
-		return filter(type).filter(e -> name.equals(e.getName())).findFirst()
-				.orElseThrow(IllegalArgumentException::new);
+		return filter(type).filter(e -> name.equals(e.getName())).findFirst().orElseThrow(IllegalArgumentException::new);
+	}
+
+	public boolean contains(String name) {
+		Objects.requireNonNull(name);
+		return entitySet.stream().filter(e -> name.equals(e.getName())).findAny().isPresent();
 	}
 }
