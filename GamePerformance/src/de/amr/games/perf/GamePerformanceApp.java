@@ -15,7 +15,7 @@ public class GamePerformanceApp extends Application {
 	public void init() {
 		views.add(new MainScene(this));
 		views.show(MainScene.class);
-		motor.setLogger(LOG);
-		motor.setFrequency(100);
+		pulse.setLogger(LOG);
+		pulse.setFrequency(100);
 	}
 }

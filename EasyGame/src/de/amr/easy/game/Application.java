@@ -15,7 +15,7 @@ import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.KeyboardHandler;
-import de.amr.easy.game.timing.Motor;
+import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.ui.ApplicationShell;
 import de.amr.easy.game.view.DefaultView;
 import de.amr.easy.game.view.View;
@@ -48,7 +48,7 @@ public abstract class Application {
 	public final Assets assets = new Assets();
 	public final EntitySet entities = new EntitySet();
 	public final ViewManager views = new ViewManager();
-	public final Motor motor = new Motor(this::update, this::render);
+	public final Pulse pulse = new Pulse(this::update, this::render);
 	public final CollisionHandler collisionHandler = new CollisionHandler();
 
 	private boolean paused;
@@ -56,7 +56,7 @@ public abstract class Application {
 	private View defaultView;
 
 	public Application() {
-		motor.setFrequency(60);
+		pulse.setFrequency(60);
 		defaultView = new DefaultView(this);
 		LOG.info("Application " + getClass().getSimpleName() + " created.");
 	}
@@ -65,10 +65,10 @@ public abstract class Application {
 
 	private final void start() {
 		defaultView.init();
+		LOG.info("Default view initialized.");
 		init();
-		LOG.info("Application Assets:\n" + assets.overview());
 		LOG.info("Application initialized.");
-		motor.start();
+		pulse.start();
 		LOG.info("Application started.");
 	}
 
@@ -78,7 +78,7 @@ public abstract class Application {
 	}
 
 	public final void exit() {
-		motor.stop();
+		pulse.stop();
 		LOG.info("Application terminated.");
 		System.exit(0);
 	}

@@ -11,7 +11,7 @@ public class Diashow extends Application {
 		App.settings.title = "Diashow";
 		App.settings.width = 900;
 		App.settings.height = 600;
-		App.motor.setFrequency(3);
+		App.pulse.setFrequency(3);
 		launch(App);
 	}
 

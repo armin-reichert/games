@@ -54,7 +54,7 @@ public class Bird extends GameEntity {
 			changeOnInput(BirdLeftWorld, Sane, Dead);
 
 			state(Injured).entry = s -> {
-				s.setDuration(app.motor.secToTicks(app.settings.get("bird injured seconds")));
+				s.setDuration(app.pulse.secToTicks(app.settings.get("bird injured seconds")));
 				setNormalFeathers(RED_FEATHERS);
 			};
 

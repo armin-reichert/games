@@ -52,10 +52,10 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 	public void init() {
 		pacMan = new PacMan(app, board, () -> theme);
 		pacMan.init();
-		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
+		pacMan.speed = () -> (float) Math.round(8f * TILE_SIZE / app.pulse.getFrequency());
 		pacMan.onEnemyContact = ghost -> pacMan.receiveEvent(PacManEvent.Killed);
 		pacMan.control.state(PacManState.Dying).entry = state -> {
-			state.setDuration(app.motor.secToTicks(2));
+			state.setDuration(app.pulse.secToTicks(2));
 		};
 		pacMan.control.changeOnTimeout(PacManState.Dying, PacManState.Peaceful, (oldState, newState) -> start());
 		pacMan.setLogger(Application.LOG);

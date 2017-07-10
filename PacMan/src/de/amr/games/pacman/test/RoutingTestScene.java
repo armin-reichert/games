@@ -62,7 +62,7 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 		ghost = new Ghost(app, board, "Pinky", () -> theme);
 		ghost.init();
-		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.motor.getFrequency());
+		ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.pulse.getFrequency());
 		ghost.canEnterTile = tile -> board.isBoardTile(tile) && !board.contains(tile, Wall);
 		ghost.placeAt(4, 1);
 		ghost.receiveEvent(GhostEvent.ChasingStarts);

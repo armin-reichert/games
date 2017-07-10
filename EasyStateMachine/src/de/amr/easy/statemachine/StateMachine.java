@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * A finite state machine.
  *
  * @param <StateID>
- *          type for identifying states, for example an enumeration type
+ *          type for identifying the states, for example an enumeration type
  * @param <Input>
  *          type for inputs / events
  * 
@@ -33,7 +33,7 @@ public class StateMachine<StateID, Input> {
 	private final StateID initialStateID;
 	private final Deque<Input> inputQ = new LinkedList<>();
 	private StateID currentStateID;
-	private Optional<Logger> logger;
+	private Optional<Logger> optLogger;
 	private int frequency = 60;
 
 	/**
@@ -42,7 +42,7 @@ public class StateMachine<StateID, Input> {
 	 * @param description
 	 *          a string describing this state machine, used for tracing
 	 * @param stateIDClass
-	 *          type used for the state IDs, for example an enum
+	 *          type used for identifying the states, for example an enumeration type
 	 * @param initialStateID
 	 *          the ID of the initial state
 	 */
@@ -52,7 +52,7 @@ public class StateMachine<StateID, Input> {
 		this.statesByID = stateIDClass.isEnum() ? new EnumMap(stateIDClass) : new HashMap<>();
 		this.initialStateID = initialStateID;
 		this.transitionsByStateID = new HashMap<>();
-		this.logger = Optional.empty();
+		this.optLogger = Optional.empty();
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class StateMachine<StateID, Input> {
 	 *          a logger
 	 */
 	public void setLogger(Logger log) {
-		this.logger = log != null ? Optional.of(log) : Optional.empty();
+		this.optLogger = log != null ? Optional.of(log) : Optional.empty();
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class StateMachine<StateID, Input> {
 	public State state(StateID stateID) {
 		if (!statesByID.containsKey(stateID)) {
 			statesByID.put(stateID, new State());
-			logger.ifPresent(log -> log.info(format("Created state %s:%s ", description, stateID)));
+			optLogger.ifPresent(log -> log.info(format("Created state %s:%s ", description, stateID)));
 		}
 		return statesByID.get(stateID);
 	}
@@ -191,15 +191,22 @@ public class StateMachine<StateID, Input> {
 	 */
 	public void update() {
 		if (!inputQ.isEmpty()) {
-			logger.ifPresent(log -> log.info(format("FSM(%s) processes event '%s'", description, inputQ.peek())));
-			step();
-			inputQ.poll();
+			Optional<Transition<StateID>> transition = step();
+			Input input = inputQ.poll();
+			optLogger.ifPresent(log -> {
+				if (transition.isPresent()) {
+					log.info(format("FSM(%s) processed input '%s' and made transition from %s to %s", description, input,
+							transition.get().from, transition.get().to));
+				} else {
+					log.info(format("FSM(%s) ignored input '%s'", description, input));
+				}
+			});
 		} else {
 			step();
 		}
 	}
 
-	private void step() {
+	private Optional<Transition<StateID>> step() {
 		Optional<Transition<StateID>> match = getOutgoingTransitions(currentStateID).stream()
 				.filter(transition -> transition.condition.getAsBoolean()).findFirst();
 		if (match.isPresent()) {
@@ -207,6 +214,7 @@ public class StateMachine<StateID, Input> {
 		} else {
 			state().doUpdate();
 		}
+		return match;
 	}
 
 	private void enterState(StateID newStateID, BiConsumer<State, State> action) {
@@ -214,6 +222,7 @@ public class StateMachine<StateID, Input> {
 			if (action != null) {
 				action.accept(state(), state());
 			}
+			traceStateLoop(currentStateID);
 			return; // state loop, no exit/entry actions are executed
 		}
 		traceStateChange(currentStateID, newStateID);
@@ -226,8 +235,8 @@ public class StateMachine<StateID, Input> {
 		if (action != null) {
 			action.accept(stateBefore, state());
 		}
-		traceStateEntry();
 		state().doEntry();
+		traceStateEntry();
 	}
 
 	private List<Transition<StateID>> getOutgoingTransitions(StateID stateID) {
@@ -240,7 +249,7 @@ public class StateMachine<StateID, Input> {
 	// Tracing
 
 	private void traceStateEntry() {
-		logger.ifPresent(log -> {
+		optLogger.ifPresent(log -> {
 			if (state().getDuration() != State.FOREVER) {
 				float seconds = (float) state().getDuration() / frequency;
 				log.info(format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(), seconds,
@@ -251,8 +260,14 @@ public class StateMachine<StateID, Input> {
 		});
 	}
 
+	private void traceStateLoop(StateID state) {
+		optLogger.ifPresent(log -> {
+			log.info(format("FSM(%s) stays in state '%s'", description, state));
+		});
+	}
+
 	private void traceStateChange(StateID oldState, StateID newState) {
-		logger.ifPresent(log -> {
+		optLogger.ifPresent(log -> {
 			if (oldState != newState) {
 				log.info(format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
 			} else {
@@ -262,7 +277,7 @@ public class StateMachine<StateID, Input> {
 	}
 
 	private void traceStateExit() {
-		logger.ifPresent(log -> log.info(format("FSM(%s) exits state '%s'", description, stateID())));
+		optLogger.ifPresent(log -> log.info(format("FSM(%s) exits state '%s'", description, stateID())));
 	}
 
 	// methods for specifying the transitions

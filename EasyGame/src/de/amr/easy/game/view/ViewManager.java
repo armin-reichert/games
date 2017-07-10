@@ -54,4 +54,13 @@ public class ViewManager {
 		view.init();
 		Application.LOG.info("Current view: " + view);
 	}
+
+	public void show(View view) {
+		if (!viewStack.isEmpty()) {
+			viewStack.pop();
+		}
+		viewStack.push(view);
+		view.init();
+		Application.LOG.info("Current view: " + view);
+	}
 }

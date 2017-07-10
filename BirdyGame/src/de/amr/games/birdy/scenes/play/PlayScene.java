@@ -5,9 +5,9 @@ import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
-import static de.amr.games.birdy.scenes.play.PlaySceneState.GameOver;
-import static de.amr.games.birdy.scenes.play.PlaySceneState.Playing;
-import static de.amr.games.birdy.scenes.play.PlaySceneState.StartingNewGame;
+import static de.amr.games.birdy.scenes.play.PlayScene.State.GameOver;
+import static de.amr.games.birdy.scenes.play.PlayScene.State.Playing;
+import static de.amr.games.birdy.scenes.play.PlayScene.State.StartingNewGame;
 import static java.lang.String.format;
 
 import java.awt.Color;
@@ -48,10 +48,14 @@ public class PlayScene extends Scene<BirdyGame> {
 	private GameEntity gameOverText;
 	private ScoreDisplay scoreDisplay;
 
-	private class PlaySceneControl extends StateMachine<PlaySceneState, BirdyGameEvent> {
+	public enum State {
+		Playing, GameOver, StartingNewGame;
+	}
+
+	private class PlaySceneControl extends StateMachine<State, BirdyGameEvent> {
 
 		public PlaySceneControl() {
-			super("Play Scene Control", PlaySceneState.class, Playing);
+			super("Play Scene Control", State.class, Playing);
 
 			state(Playing).entry = s -> {
 				score.reset();

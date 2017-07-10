@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
- * Animation motor.
+ * The "pulse" which delivers "ticks" with a specified frequency.
  * 
  * @author Armin Reichert
  */
-public class Motor {
+public class Pulse {
 
 	private final Task renderTask;
 	private final Task updateTask;
@@ -24,7 +24,7 @@ public class Motor {
 	private Thread thread;
 	private volatile boolean running;
 
-	public Motor(Runnable updateTask, Runnable renderTask) {
+	public Pulse(Runnable updateTask, Runnable renderTask) {
 		this.updateTask = new Task(updateTask, "ups", SECONDS.toNanos(1));
 		this.renderTask = new Task(renderTask, "fps", SECONDS.toNanos(1));
 		setFrequency(60);

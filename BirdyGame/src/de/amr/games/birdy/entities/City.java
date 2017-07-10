@@ -1,12 +1,19 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.birdy.entities.City.CityEvent.SunGoesDown;
+import static de.amr.games.birdy.entities.City.CityEvent.SunGoesUp;
+import static de.amr.games.birdy.entities.City.CityState.Day;
+import static de.amr.games.birdy.entities.City.CityState.Night;
 import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGame;
@@ -18,79 +25,108 @@ import de.amr.games.birdy.BirdyGame;
  */
 public class City extends GameEntity {
 
+	public enum CityState {
+		Day, Night
+	}
+
+	public enum CityEvent {
+		SunGoesDown, SunGoesUp
+	}
+
 	private final BirdyGame app;
-	private final StateMachine<Boolean, String> starControl;
-	private boolean night;
-	private int displayWidth;
+	private final StateMachine<CityState, CityEvent> control;
+	private int width;
 
 	public City(BirdyGame app) {
 		this.app = app;
+
 		setSprites(new Sprite(app.assets, "bg_night"), new Sprite(app.assets, "bg_day"));
-		starControl = new StateMachine<>("Star control", Boolean.class, true);
-		starControl.state(true).entry = s -> {
-			s.setDuration(app.motor.secToTicks(5));
-			createStars();
+
+		control = new StateMachine<>("City control", CityState.class, Day);
+
+		control.changeOnInput(SunGoesDown, Day, Night);
+
+		control.state(Night).entry = s -> {
+			s.setDuration(app.pulse.secToTicks(10));
+			replaceStars();
 		};
-		starControl.changeOnTimeout(true, false);
-		starControl.change(false, true);
+
+		control.state(Night).update = s -> {
+			app.entities.filter(Star.class).forEach(Star::update);
+		};
+
+		control.state(Night).exit = s -> {
+			app.entities.removeAll(Star.class);
+		};
+
+		control.changeOnTimeout(Night, Night, (s, t) -> {
+			replaceStars();
+			s.resetTimer();
+		});
+
+		control.changeOnInput(SunGoesUp, Night, Day);
 	}
 
 	@Override
 	public void init() {
-		starControl.init();
+		control.init();
+		control.setLogger(LOG);
 	}
 
 	@Override
 	public void update() {
-		if (night) {
-			starControl.update();
-			app.entities.filter(Star.class).forEach(GameEntity::update);
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
+			letSunGoDown();
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
+			letSunGoUp();
 		}
+		control.update();
 	}
 
-	private void createStars() {
+	private void replaceStars() {
 		app.entities.removeAll(Star.class);
 		int numStars = randomInt(1, app.settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
 			Star star = app.entities.add(new Star(app));
 			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		});
+		LOG.info("Created " + numStars + " new stars");
 	}
 
 	public boolean isNight() {
-		return night;
+		return control.is(Night);
 	}
 
-	public void setNight(boolean night) {
-		this.night = night;
-		if (!night) {
-			app.entities.removeAll(Star.class);
-		}
-		starControl.init();
+	public void letSunGoDown() {
+		control.addInput(SunGoesDown);
+	}
+
+	public void letSunGoUp() {
+		control.addInput(SunGoesUp);
 	}
 
 	@Override
 	public int getWidth() {
-		return displayWidth;
+		return width;
 	}
 
 	public void setWidth(int width) {
-		displayWidth = width;
+		this.width = width;
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return getSprite(night ? 0 : 1);
+		return getSprite(isNight() ? 0 : 1);
 	}
 
 	@Override
-	public void draw(Graphics2D g) {
-		g.translate(tf.getX(), tf.getY());
+	public void draw(Graphics2D pen) {
+		pen.translate(tf.getX(), tf.getY());
 		Image image = currentSprite().getImage();
-		for (int x = 0; x < displayWidth; x += image.getWidth(null)) {
-			g.drawImage(image, x, 0, null);
+		for (int x = 0; x < width; x += image.getWidth(null)) {
+			pen.drawImage(image, x, 0, null);
 		}
-		app.entities.filter(Star.class).forEach(e -> e.draw(g));
-		g.translate(-tf.getX(), -tf.getY());
+		app.entities.filter(Star.class).forEach(star -> star.draw(pen));
+		pen.translate(-tf.getX(), -tf.getY());
 	}
 }

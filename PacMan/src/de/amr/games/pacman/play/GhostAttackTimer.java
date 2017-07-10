@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.timing.Motor;
+import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
@@ -21,7 +21,7 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 public class GhostAttackTimer {
 
 	private final StateMachine<GhostAttackState, String> fsm;
-	private final Motor motor;
+	private final Pulse motor;
 	private int level;
 	private int wave;
 
@@ -32,7 +32,7 @@ public class GhostAttackTimer {
 	}
 
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {
-		this.motor = app.motor;
+		this.motor = app.pulse;
 
 		fsm = new StateMachine<>("GhostAttackTimer", GhostAttackState.class, Initialized);
 

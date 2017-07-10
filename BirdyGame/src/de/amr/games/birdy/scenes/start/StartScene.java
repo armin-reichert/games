@@ -2,10 +2,10 @@ package de.amr.games.birdy.scenes.start;
 
 import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.scenes.start.StartSceneState.GameOver;
-import static de.amr.games.birdy.scenes.start.StartSceneState.Ready;
-import static de.amr.games.birdy.scenes.start.StartSceneState.StartPlaying;
-import static de.amr.games.birdy.scenes.start.StartSceneState.Starting;
+import static de.amr.games.birdy.scenes.start.StartScene.State.GameOver;
+import static de.amr.games.birdy.scenes.start.StartScene.State.Ready;
+import static de.amr.games.birdy.scenes.start.StartScene.State.StartPlaying;
+import static de.amr.games.birdy.scenes.start.StartScene.State.Starting;
 import static de.amr.games.birdy.utils.Util.randomInt;
 import static java.lang.String.format;
 
@@ -38,10 +38,14 @@ import de.amr.games.birdy.scenes.play.PlayScene;
  */
 public class StartScene extends Scene<BirdyGame> {
 
-	private class StartSceneControl extends StateMachine<StartSceneState, BirdyGameEvent> {
+	public enum State {
+		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser;
+	}
+
+	private class StartSceneControl extends StateMachine<State, BirdyGameEvent> {
 
 		public StartSceneControl() {
-			super("Start Scene Control", StartSceneState.class, Starting);
+			super("Start Scene Control", State.class, Starting);
 
 			// Starting ---
 
@@ -61,7 +65,7 @@ public class StartScene extends Scene<BirdyGame> {
 			// Ready ---
 
 			state(Ready).entry = s -> {
-				s.setDuration(app.motor.secToTicks(app.settings.getFloat("ready time sec")));
+				s.setDuration(app.pulse.secToTicks(app.settings.getFloat("ready time sec")));
 				displayText("readyText");
 			};
 
@@ -117,6 +121,7 @@ public class StartScene extends Scene<BirdyGame> {
 	private void reset() {
 		city = app.entities.findAny(City.class);
 		city.setWidth(getWidth());
+		city.init();
 
 		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());

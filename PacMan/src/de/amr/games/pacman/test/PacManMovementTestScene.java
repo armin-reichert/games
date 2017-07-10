@@ -84,13 +84,13 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		// Aggressive
 		pacMan.control.state(Aggressive).entry = state -> {
-			state.setDuration(app.motor.secToTicks(3));
+			state.setDuration(app.pulse.secToTicks(3));
 			pacMan.speed = this::fastSpeed;
 		};
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
 		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
 		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, (oldState, newState) -> {
-			newState.setDuration(app.motor.secToTicks(3));
+			newState.setDuration(app.pulse.secToTicks(3));
 		});
 
 		// Dying
@@ -171,14 +171,14 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 			// Recovering
 			ghost.control.state(Recovering).entry = state -> {
-				state.setDuration(app.motor.secToTicks(3));
+				state.setDuration(app.pulse.secToTicks(3));
 				ghost.adjust();
 			};
 			ghost.control.changeOnTimeout(Recovering, Chasing);
 
 			// Waiting
 			ghost.control.state(Waiting).entry = state -> {
-				state.setDuration(app.motor.secToTicks(2));
+				state.setDuration(app.pulse.secToTicks(2));
 				ghost.adjust();
 			};
 			ghost.control.changeOnTimeout(Waiting, Chasing);
@@ -186,7 +186,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		// Chasing for Pinky
 		pinky.control.state(Chasing).entry = state -> {
-			state.setDuration(app.motor.secToTicks(10));
+			state.setDuration(app.pulse.secToTicks(10));
 			pinky.speed = () -> getGhostSpeed(pinky);
 		};
 		pinky.control.state(Chasing).update = state -> pinky.follow(pacMan.currentTile());
@@ -207,7 +207,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		public InkyChasingState() {
 			entry = state -> {
-				state.setDuration(app.motor.secToTicks(20));
+				state.setDuration(app.pulse.secToTicks(20));
 				inky.speed = () -> getGhostSpeed(inky);
 				currentTarget = randomCorner();
 			};
@@ -236,7 +236,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		public ClydeChasingState() {
 			entry = state -> {
-				state.setDuration(app.motor.secToTicks(20));
+				state.setDuration(app.pulse.secToTicks(20));
 				clyde.speed = () -> getGhostSpeed(clyde);
 
 			};
@@ -272,17 +272,17 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		pinky.init();
 		pinky.placeAt(getGhostHomeTile(pinky));
 		pinky.canEnterTile = tile -> board.getContent(tile) != Wall;
-		pinky.control.state().setDuration(app.motor.secToTicks(2));
+		pinky.control.state().setDuration(app.pulse.secToTicks(2));
 
 		inky.init();
 		inky.placeAt(getGhostHomeTile(inky));
 		inky.canEnterTile = tile -> board.getContent(tile) != Wall;
-		inky.control.state().setDuration(app.motor.secToTicks(0));
+		inky.control.state().setDuration(app.pulse.secToTicks(0));
 
 		clyde.init();
 		clyde.placeAt(getGhostHomeTile(clyde));
 		clyde.canEnterTile = tile -> board.getContent(tile) != Wall;
-		clyde.control.state().setDuration(app.motor.secToTicks(1));
+		clyde.control.state().setDuration(app.pulse.secToTicks(1));
 	}
 
 	private float normalSpeed() {

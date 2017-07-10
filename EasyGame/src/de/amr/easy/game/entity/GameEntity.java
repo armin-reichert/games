@@ -2,6 +2,7 @@ package de.amr.easy.game.entity;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.function.BooleanSupplier;
 
 import de.amr.easy.game.entity.collision.CollisionBoxSupplier;
 import de.amr.easy.game.math.Vector2;
@@ -20,14 +21,16 @@ import de.amr.easy.game.view.View;
  */
 public class GameEntity implements View, CollisionBoxSupplier {
 
-	public final Transform tf = new Transform();
-
-	private Sprite[] sprites;
 	private String name;
+	private Sprite[] sprites;
+	public BooleanSupplier visibility;
+	public final Transform tf;
 
 	public GameEntity(Sprite... sprites) {
-		this.sprites = sprites;
 		this.name = toString();
+		this.sprites = sprites;
+		this.tf = new Transform();
+		this.visibility = () -> currentSprite() != null;
 	}
 
 	@Override
@@ -40,7 +43,7 @@ public class GameEntity implements View, CollisionBoxSupplier {
 
 	@Override
 	public void draw(Graphics2D g) {
-		if (currentSprite() != null) {
+		if (visibility.getAsBoolean()) {
 			Graphics2D pen = (Graphics2D) g.create();
 			pen.translate(tf.getX(), tf.getY());
 			pen.rotate(tf.getRotation());

@@ -21,7 +21,7 @@ public class MazeDemoApp extends Application {
 		App.settings.width = 640;
 		App.settings.height = 640;
 		App.settings.set("cellSize", 4);
-		App.motor.setFrequency(30);
+		App.pulse.setFrequency(30);
 		launch(App);
 	}
 
