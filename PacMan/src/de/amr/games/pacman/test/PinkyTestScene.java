@@ -105,7 +105,7 @@ public class PinkyTestScene extends Scene<PinkyTestApp> {
 				drawSprite(g, row, col, theme.getEnergizerSprite());
 			}
 		}));
-		if (app.settings.getBool("drawGrid")) {
+		if (app.settings.getAsBoolean("drawGrid")) {
 			drawGridLines(g, getWidth(), getHeight());
 		}
 		if (!pacMan.control.is(PacManState.Dying)) {

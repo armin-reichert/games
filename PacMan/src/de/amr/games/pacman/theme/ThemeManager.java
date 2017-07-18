@@ -28,7 +28,7 @@ public class ThemeManager {
 		if (++themeIndex == themes.size()) {
 			themeIndex = 0;
 		}
-		getTheme().getEnergizerSprite().setAnimated(false);
+		getTheme().getEnergizerSprite().setAnimationEnabled(false);
 	}
 
 }

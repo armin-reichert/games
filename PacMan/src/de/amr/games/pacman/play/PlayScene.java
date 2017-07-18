@@ -156,7 +156,7 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 				});
 				nextLevel();
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
 
 				configureTracing();
@@ -167,7 +167,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// Ready to rumble
 
 			state(Ready).entry = state -> {
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(true);
 				ghosts.forEach(ghost -> {
 					ghost.speed = () -> model.getGhostSpeed(ghost, level);
 					ghost.receiveEvent(GhostEvent.WaitingStarts);
@@ -205,7 +205,7 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.receiveEvent(GhostEvent.WaitingStarts);
 				});
 
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(true);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(true);
 				ghostAttackTimer.init();
 			};
 
@@ -231,7 +231,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Crashing).entry = state -> {
 				app.assets.sounds().forEach(Sound::stop);
 				app.assets.sound("sfx/die.mp3").play();
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimated(false);
+				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(false);
 				removeBonus();
 				pacMan.receiveEvent(PacManEvent.Killed);
 				LOG.info("PacMan killed, lives remaining: " + lives);
@@ -278,11 +278,11 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void handleInput() {
 		if (keyPressedOnce(VK_ALT, VK_I)) {
-			app.settings.set("drawInternals", !app.settings.getBool("drawInternals"));
+			app.settings.set("drawInternals", !app.settings.getAsBoolean("drawInternals"));
 		} else if (keyPressedOnce(VK_ALT, VK_G)) {
-			app.settings.set("drawGrid", !app.settings.getBool("drawGrid"));
+			app.settings.set("drawGrid", !app.settings.getAsBoolean("drawGrid"));
 		} else if (keyPressedOnce(VK_ALT, VK_R)) {
-			app.settings.set("drawRoute", !app.settings.getBool("drawRoute"));
+			app.settings.set("drawRoute", !app.settings.getAsBoolean("drawRoute"));
 		} else if (keyPressedOnce(VK_ALT, VK_L)) {
 			lives += 1;
 		} else if (keyPressedOnce(VK_ALT, VK_P)) {
@@ -399,7 +399,7 @@ public class PlayScene extends Scene<PacManGame> {
 			PacManTheme theme = app.getThemeManager().getTheme();
 			if (theme.getPacManDyingSprite() != null) {
 				theme.getPacManDyingSprite().resetAnimation();
-				theme.getPacManDyingSprite().setAnimated(true);
+				theme.getPacManDyingSprite().setAnimationEnabled(true);
 			}
 		};
 
@@ -753,12 +753,12 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 
 		// Grid lines
-		if (app.settings.getBool("drawGrid")) {
+		if (app.settings.getAsBoolean("drawGrid")) {
 			drawGridLines(pen, getWidth(), getHeight());
 		}
 
 		// Internals
-		if (app.settings.getBool("drawInternals")) {
+		if (app.settings.getAsBoolean("drawInternals")) {
 			// play state and ghost attack state
 			drawTextCentered(pen, getWidth(), 33, playControl.stateID() + "  " + ghostAttackTimer.state());
 			// mark home positions of ghosts

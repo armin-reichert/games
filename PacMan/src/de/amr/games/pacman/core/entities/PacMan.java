@@ -153,7 +153,7 @@ public class PacMan extends BoardMover {
 	@Override
 	public void setAnimated(boolean animated) {
 		Top4.dirs().forEach(dir -> {
-			theme.get().getPacManRunningSprite(dir).setAnimated(animated);
+			theme.get().getPacManRunningSprite(dir).setAnimationEnabled(animated);
 		});
 	}
 
@@ -178,7 +178,7 @@ public class PacMan extends BoardMover {
 		super.draw(g);
 		g.translate(-xOffset.getAsInt(), 0);
 
-		if (app.settings.getBool("drawInternals")) {
+		if (app.settings.getAsBoolean("drawInternals")) {
 			g.setColor(Color.WHITE);
 			g.setFont(TEXTFONT);
 			State state = control.state();
@@ -191,7 +191,7 @@ public class PacMan extends BoardMover {
 			g.drawString(text.toString(), tf.getX(), tf.getY() - TILE_SIZE);
 		}
 
-		if (app.settings.getBool("drawGrid")) {
+		if (app.settings.getAsBoolean("drawGrid")) {
 			g.setColor(isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
 			g.draw(getCollisionBox());
 		}

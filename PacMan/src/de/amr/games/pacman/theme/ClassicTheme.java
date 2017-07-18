@@ -58,7 +58,7 @@ public class ClassicTheme extends PacManTheme {
 		g.setColor(Color.PINK);
 		g.fillOval(0, 0, TILE_SIZE, TILE_SIZE);
 		Sprite sprite = new Sprite(energizerImage, EmptyImage);
-		sprite.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
+		sprite.makeAnimated(AnimationMode.BACK_AND_FORTH, 333);
 		return sprite;
 	}
 
@@ -94,7 +94,7 @@ public class ClassicTheme extends PacManTheme {
 		for (int dir = 0; dir < dirs.size(); ++dir) {
 			Sprite sprite = new Sprite(tile(dir, 1), tile(dir, 0));
 			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-			sprite.createAnimation(BACK_AND_FORTH, 100);
+			sprite.makeAnimated(BACK_AND_FORTH, 100);
 			pacManRunningSprites.put(dirs.get(dir), sprite);
 		}
 
@@ -104,7 +104,7 @@ public class ClassicTheme extends PacManTheme {
 		}
 		pacManDyingSprite = new Sprite(dyingAnimationFrames);
 		pacManDyingSprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-		pacManDyingSprite.createAnimation(AnimationMode.LEFT_TO_RIGHT, 160);
+		pacManDyingSprite.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 160);
 
 		// Ghosts
 		int ghostFrameMillis = 333;
@@ -113,18 +113,18 @@ public class ClassicTheme extends PacManTheme {
 			for (int dir = 0; dir < dirs.size(); ++dir) {
 				Sprite sprite = new Sprite(tile(4 + ghost, 2 * dir), tile(4 + ghost, 2 * dir + 1));
 				sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-				sprite.createAnimation(CYCLIC, ghostFrameMillis);
+				sprite.makeAnimated(CYCLIC, ghostFrameMillis);
 				ghostNormalSprites.get(ghostNames.get(ghost)).put(dirs.get(dir), sprite);
 			}
 		}
 
 		ghostFrightenedSprite = new Sprite(tile(4, 8), tile(4, 9));
 		ghostFrightenedSprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostFrightenedSprite.createAnimation(CYCLIC, ghostFrameMillis);
+		ghostFrightenedSprite.makeAnimated(CYCLIC, ghostFrameMillis);
 
 		ghostRecoveringSprite = new Sprite(tile(4, 8), tile(4, 10), tile(4, 9), tile(4, 11));
 		ghostRecoveringSprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostRecoveringSprite.createAnimation(CYCLIC, ghostFrameMillis);
+		ghostRecoveringSprite.makeAnimated(CYCLIC, ghostFrameMillis);
 
 		for (int dir = 0; dir < dirs.size(); ++dir) {
 			Sprite sprite = new Sprite(tile(5, 8 + dir));

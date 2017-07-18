@@ -108,11 +108,11 @@ public class Ghost extends BoardMover {
 	@Override
 	public void setAnimated(boolean animated) {
 		Top4.dirs().forEach(dir -> {
-			theme.get().getGhostNormalSprite(getName(), dir).setAnimated(animated);
-			theme.get().getGhostDeadSprite(dir).setAnimated(animated);
+			theme.get().getGhostNormalSprite(getName(), dir).setAnimationEnabled(animated);
+			theme.get().getGhostDeadSprite(dir).setAnimationEnabled(animated);
 		});
-		theme.get().getGhostFrightenedSprite().setAnimated(animated);
-		theme.get().getGhostRecoveringSprite().setAnimated(animated);
+		theme.get().getGhostFrightenedSprite().setAnimationEnabled(animated);
+		theme.get().getGhostRecoveringSprite().setAnimationEnabled(animated);
 	}
 
 	@Override
@@ -120,13 +120,13 @@ public class Ghost extends BoardMover {
 		g.translate(xOffset.getAsInt(), 0);
 		super.draw(g);
 		g.translate(-xOffset.getAsInt(), 0);
-		if (app.settings.getBool("drawInternals")) {
+		if (app.settings.getAsBoolean("drawInternals")) {
 			drawState(g);
 		}
-		if (app.settings.getBool("drawRoute")) {
+		if (app.settings.getAsBoolean("drawRoute")) {
 			drawRoute(g, color);
 		}
-		if (app.settings.getBool("drawGrid")) {
+		if (app.settings.getAsBoolean("drawGrid")) {
 			g.setColor(isAdjusted() ? Color.GREEN : Color.LIGHT_GRAY);
 			g.draw(getCollisionBox());
 		}

@@ -22,12 +22,20 @@ import de.amr.easy.game.view.View;
 import de.amr.easy.game.view.ViewManager;
 
 /**
- * Application base class.
+ * Application base class. To start an application, create an application instance, defined its
+ * settings and call the {@link #launch(Application)} method.
  * 
  * @author Armin Reichert
  */
 public abstract class Application {
 
+	/**
+	 * Starts the given application inside a window or in full-screen mode according to the settings
+	 * defined after its creation.
+	 * 
+	 * @param app
+	 *          the application
+	 */
 	public static void launch(Application app) {
 		EventQueue.invokeLater(() -> {
 			try {
@@ -41,28 +49,46 @@ public abstract class Application {
 		});
 	}
 
-	public static final Logger LOG = Logger.getLogger(Application.class.getName());
 	private static final int PAUSE_TOGGLE_KEY = KeyEvent.VK_P;
 
+	/** A logger that may be used by any application. */
+	public static final Logger LOG = Logger.getLogger(Application.class.getName());
+
+	/** The settings of this application. */
 	public final AppSettings settings = new AppSettings();
+
+	/** The assets used by this application. */
 	public final Assets assets = new Assets();
+
+	/** The set of entities used by this application. */
 	public final EntitySet entities = new EntitySet();
+
+	/** The views of this application. */
 	public final ViewManager views = new ViewManager();
+
+	/** The pulse (tact) of this application. */
 	public final Pulse pulse = new Pulse(this::update, this::render);
+
+	/** The collision handler of this application. */
 	public final CollisionHandler collisionHandler = new CollisionHandler();
 
 	private boolean paused;
 	private ApplicationShell shell;
 	private View defaultView;
 
-	public Application() {
+	/**
+	 * Base class constructor. By default, applications run at 60 frames/second.
+	 */
+	protected Application() {
 		pulse.setFrequency(60);
 		defaultView = new DefaultView(this);
 		LOG.info("Application " + getClass().getSimpleName() + " created.");
 	}
 
+	/** Called when the application should be initialized. */
 	public abstract void init();
 
+	/** Called after initialization and starts the pulse. */
 	private final void start() {
 		defaultView.init();
 		LOG.info("Default view initialized.");
@@ -77,6 +103,9 @@ public abstract class Application {
 		LOG.info("Application" + (state ? " paused." : " resumed."));
 	}
 
+	/**
+	 * Exits the application and the Java VM.
+	 */
 	public final void exit() {
 		pulse.stop();
 		LOG.info("Application terminated.");
@@ -103,22 +132,47 @@ public abstract class Application {
 		shell.draw(currentView != null ? currentView : defaultView);
 	}
 
+	/**
+	 * Sets the application shell. Not to be called by application code.
+	 * 
+	 * @param shell
+	 */
 	public void setShell(ApplicationShell shell) {
 		this.shell = shell;
 	}
 
+	/**
+	 * Returns the application shell.
+	 * 
+	 * @return the application shell
+	 */
 	public ApplicationShell getShell() {
 		return shell;
 	}
 
+	/**
+	 * The width of this application (without scaling).
+	 * 
+	 * @return the width in pixels
+	 */
 	public int getWidth() {
 		return settings.width;
 	}
 
+	/**
+	 * The height of this application (without scaling).
+	 * 
+	 * @return the height in pixels
+	 */
 	public int getHeight() {
 		return settings.height;
 	}
 
+	/**
+	 * Tells if the application is paused.
+	 * 
+	 * @return if the application is paused
+	 */
 	public boolean isPaused() {
 		return paused;
 	}

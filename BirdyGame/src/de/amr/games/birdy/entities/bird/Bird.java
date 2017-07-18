@@ -112,12 +112,12 @@ public class Bird extends GameEntity {
 		RED_FEATHERS = createFeathers("bird2");
 		setSprites(YELLOW_FEATHERS, BLUE_FEATHERS, RED_FEATHERS);
 		normalFeathers = YELLOW_FEATHERS;
-		gravity = app.settings.getFloat("world gravity");
+		gravity = app.settings.getAsFloat("world gravity");
 	}
 
 	private Sprite createFeathers(String birdName) {
 		Sprite sprite = new Sprite(app.assets, birdName + "_0", birdName + "_1", birdName + "_2");
-		sprite.createAnimation(AnimationMode.BACK_AND_FORTH, app.settings.get("bird flap millis"));
+		sprite.makeAnimated(AnimationMode.BACK_AND_FORTH, app.settings.get("bird flap millis"));
 		return sprite;
 	}
 
@@ -131,7 +131,7 @@ public class Bird extends GameEntity {
 	public void update() {
 		flightControl.update();
 		healthControl.update();
-		currentSprite().setAnimated(tf.getVelocityY() < 0);
+		currentSprite().setAnimationEnabled(tf.getVelocityY() < 0);
 	}
 
 	@Override

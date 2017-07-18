@@ -65,7 +65,7 @@ public class StartScene extends Scene<BirdyGame> {
 			// Ready ---
 
 			state(Ready).entry = s -> {
-				s.setDuration(app.pulse.secToTicks(app.settings.getFloat("ready time sec")));
+				s.setDuration(app.pulse.secToTicks(app.settings.getAsFloat("ready time sec")));
 				displayText("readyText");
 			};
 
@@ -126,7 +126,7 @@ public class StartScene extends Scene<BirdyGame> {
 		ground = app.entities.findAny(Ground.class);
 		ground.setWidth(getWidth());
 		ground.tf.moveTo(0, getHeight() - ground.getHeight());
-		ground.tf.setVelocity(app.settings.getFloat("world speed"), 0);
+		ground.tf.setVelocity(app.settings.getAsFloat("world speed"), 0);
 
 		bird = app.entities.findAny(Bird.class);
 		bird.init();

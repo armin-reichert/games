@@ -10,9 +10,12 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.game.view.View;
 
 /**
- * Base class for game entities. Provides a {@link Transform transform} object for storing position,
- * velocity and rotation. A game entity can store a list of sprites. By overriding the
- * {@link #currentSprite()} method, the sprite used for drawing is defined.
+ * Base class for game entities with the lifetime methods {@link #init()}, {@link #update()} and
+ * {@link #draw(Graphics2D)}.
+ * 
+ * Provides a {@link Transform transform} object for storing position, velocity and rotation. A game
+ * entity can store a list of sprites. By overriding the {@link #currentSprite()} method, the sprite
+ * used for drawing is defined.
  * <p>
  * Game entities can be stored and accessed in the entity set of an application which serves as a
  * generic container for the application's entities.
@@ -27,9 +30,9 @@ public class GameEntity implements View, CollisionBoxSupplier {
 	public final Transform tf;
 
 	public GameEntity(Sprite... sprites) {
-		this.name = toString();
-		this.sprites = sprites;
 		this.tf = new Transform();
+		this.name = super.toString();
+		this.sprites = sprites;
 		this.visibility = () -> currentSprite() != null;
 	}
 
@@ -91,7 +94,7 @@ public class GameEntity implements View, CollisionBoxSupplier {
 
 	public void setAnimated(boolean animated) {
 		for (Sprite sprite : sprites) {
-			sprite.setAnimated(animated);
+			sprite.setAnimationEnabled(animated);
 		}
 	}
 

@@ -75,7 +75,7 @@ public class ModernTheme extends PacManTheme {
 		for (int dir = 0; dir < dirs.size(); ++dir) {
 			Sprite sprite = new Sprite(tile(dir, 11), tile(dir, 10));
 			sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-			sprite.createAnimation(AnimationMode.CYCLIC, 100);
+			sprite.makeAnimated(AnimationMode.CYCLIC, 100);
 			pacManRunningSprites.put(dirs.get(dir), sprite);
 		}
 
@@ -86,25 +86,25 @@ public class ModernTheme extends PacManTheme {
 			for (int dir = 0; dir < dirs.size(); ++dir) {
 				Sprite sprite = new Sprite(tile(dir, 2 * ghost), tile(dir, 2 * ghost + 1));
 				sprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-				sprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+				sprite.makeAnimated(AnimationMode.CYCLIC, ghostFrame);
 				ghostNormalSprites.get(ghostNames.get(ghost)).put(dirs.get(dir), sprite);
 			}
 		}
 
 		ghostFrightenedSprite = new Sprite(tile(0, 12), tile(0, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostFrightenedSprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+		ghostFrightenedSprite.makeAnimated(AnimationMode.CYCLIC, ghostFrame);
 
 		ghostRecoveringSprite = new Sprite(tile(0, 12), tile(1, 12), tile(0, 13), tile(1, 13)).scale(SPRITE_SIZE,
 				SPRITE_SIZE);
-		ghostRecoveringSprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+		ghostRecoveringSprite.makeAnimated(AnimationMode.CYCLIC, ghostFrame);
 
 		ghostDeadSprite = new Sprite(tile(2, 12), tile(2, 13)).scale(SPRITE_SIZE, SPRITE_SIZE);
-		ghostDeadSprite.createAnimation(AnimationMode.CYCLIC, ghostFrame);
+		ghostDeadSprite.makeAnimated(AnimationMode.CYCLIC, ghostFrame);
 
 		lifeSprite = new Sprite(tile(2, 11)).scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		energizerSprite = new Sprite(tile(modernTileSheet, 2, 7), tile(modernTileSheet, 2, 8)).scale(TILE_SIZE, TILE_SIZE);
-		energizerSprite.createAnimation(AnimationMode.BACK_AND_FORTH, 333);
+		energizerSprite.makeAnimated(AnimationMode.BACK_AND_FORTH, 333);
 
 		pillSprite = new Sprite(tile(modernTileSheet, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
 

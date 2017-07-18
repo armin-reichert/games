@@ -68,7 +68,7 @@ public abstract class PacManTheme {
 
 		if (blinkTime > 0) {
 			Sprite sprite = new Sprite(scaled, EmptyImage);
-			sprite.createAnimation(CYCLIC, blinkTime);
+			sprite.makeAnimated(CYCLIC, blinkTime);
 			return sprite;
 		} else {
 			return new Sprite(scaled);

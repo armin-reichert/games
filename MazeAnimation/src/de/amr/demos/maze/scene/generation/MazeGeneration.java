@@ -64,7 +64,7 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 		startCell = grid.cell(GridPosition.TOP_LEFT);
 		mazeGeneration = new Thread(() -> {
 			chooseRandomAlgorithm();
-			animation.setRenderingModel(new GridVisualization(grid, getApp().settings.getInt("cellSize")));
+			animation.setRenderingModel(new GridVisualization(grid, getApp().settings.getAsInt("cellSize")));
 			animation.clearCanvas();
 			prepareGrid(algorithm);
 			algorithm.accept(startCell);

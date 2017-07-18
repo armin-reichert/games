@@ -19,7 +19,7 @@ public class Star extends GameEntity {
 
 	public Star(BirdyGame app) {
 		Sprite sprite = new Sprite(app.assets, "blink_00", "blink_01", "blink_02");
-		sprite.createAnimation(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
+		sprite.makeAnimated(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
 		setSprites(sprite);
 	}
 }

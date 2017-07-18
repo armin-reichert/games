@@ -65,7 +65,7 @@ public class PlayScene extends Scene<BirdyGame> {
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, (s, t) -> {
 				score.points -= 3;
-				bird.tf.setX(bird.tf.getX() + app.settings.getInt("pipe width") + bird.getWidth());
+				bird.tf.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				app.assets.sound("sfx/hit.mp3").play();
 			});

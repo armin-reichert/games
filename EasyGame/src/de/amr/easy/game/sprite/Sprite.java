@@ -1,16 +1,28 @@
 package de.amr.easy.game.sprite;
 
+import static de.amr.easy.game.assets.Assets.scaledImage;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.util.Optional;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.view.Drawable;
 
-public class Sprite implements Drawable {
+/**
+ * A sprite is a sequence of images used to simulate an animated object.
+ * 
+ * @author Armin Reichert
+ */
+public class Sprite {
 
-	protected Image[] images;
-	protected Animation animation;
+	private final Image[] images;
+	private Optional<Animation> animation = Optional.empty();
 
+	/**
+	 * Creates a sprite from the given image sequence.
+	 * 
+	 * @param images
+	 */
 	public Sprite(Image... images) {
 		if (images.length == 0) {
 			throw new IllegalArgumentException("Sprite needs at least one image");
@@ -18,6 +30,14 @@ public class Sprite implements Drawable {
 		this.images = images;
 	}
 
+	/**
+	 * Creates a sprite from the image sequence taken from the given assets and with the given keys.
+	 * 
+	 * @param assets
+	 *          Assets to take images from
+	 * @param imageKeys
+	 *          image keys as stored inside the assets
+	 */
 	public Sprite(Assets assets, String... imageKeys) {
 		if (imageKeys.length == 0) {
 			throw new IllegalArgumentException("Sprite needs at least one image");
@@ -29,67 +49,117 @@ public class Sprite implements Drawable {
 		}
 	}
 
+	/**
+	 * Scales the i'th image of this sprite to the given size.
+	 * 
+	 * @param index
+	 *          index of image to be scaled
+	 * @param width
+	 *          target width
+	 * @param height
+	 *          target height
+	 * @return this sprite to allow method chaining
+	 */
 	public Sprite scale(int index, int width, int height) {
 		if (index < 0 || index >= images.length) {
 			throw new IllegalArgumentException("Sprite index out of range: " + index);
 		}
-		images[index] = Assets.scaledImage(images[index], width, height);
+		images[index] = scaledImage(images[index], width, height);
 		return this;
 	}
 
+	/**
+	 * Scales all images of this sprite to the given size.
+	 * 
+	 * @param width
+	 *          target width
+	 * @param height
+	 *          target height
+	 * @return this sprite to allow method chaining
+	 */
 	public Sprite scale(int width, int height) {
 		for (int i = 0; i < images.length; ++i) {
-			images[i] = Assets.scaledImage(images[i], width, height);
+			images[i] = scaledImage(images[i], width, height);
 		}
 		return this;
 	}
 
+	/**
+	 * Returns the current image of this sprite.
+	 * 
+	 * @return currently used image
+	 */
 	public Image getImage() {
-		return animation == null ? images[0] : animation.getCurrentFrame();
+		return animation.isPresent() ? animation.get().currentImage() : images[0];
 	}
 
+	/**
+	 * Returns the width of this sprite.
+	 * 
+	 * @return width of current image
+	 */
 	public int getWidth() {
 		return getImage().getWidth(null);
 	}
 
+	/**
+	 * Returns the height of this sprite.
+	 * 
+	 * @return height of current image
+	 */
 	public int getHeight() {
 		return getImage().getHeight(null);
 	}
 
-	@Override
+	/**
+	 * Draws this sprite (its current image).
+	 * 
+	 * @param g
+	 *          graphics context
+	 */
 	public void draw(Graphics2D g) {
 		g.drawImage(getImage(), 0, 0, null);
-		if (animation != null && animation.isEnabled()) {
-			animation.update();
-		}
+		animation.ifPresent(Animation::update);
 	}
 
-	public void createAnimation(AnimationMode mode, int frameDurationMillis) {
+	/**
+	 * Creates an animation for this sprite.
+	 * 
+	 * @param mode
+	 *          the animation mode
+	 * @param frameDurationMillis
+	 *          the time in milliseconds for each animation frame
+	 */
+	public void makeAnimated(AnimationMode mode, int frameDurationMillis) {
 		if (mode == AnimationMode.LEFT_TO_RIGHT) {
-			animation = new LeftToRightAnimation(images);
+			animation = Optional.of(new LeftToRightAnimation(images));
 		} else if (mode == AnimationMode.BACK_AND_FORTH) {
-			animation = new BackForthAnimation(images);
+			animation = Optional.of(new BackForthAnimation(images));
 		} else if (mode == AnimationMode.CYCLIC) {
-			animation = new CyclicAnimation(images);
+			animation = Optional.of(new CyclicAnimation(images));
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Illegal animation mode: " + mode);
 		}
-		animation.setFrameDuration(frameDurationMillis);
-		animation.setEnabled(true);
+		animation.get().setFrameDuration(frameDurationMillis);
+		animation.get().setEnabled(true);
 	}
 
-	public void setAnimated(boolean enabled) {
-		if (animation == null && images != null && images.length > 1) {
-			createAnimation(AnimationMode.BACK_AND_FORTH, 300);
-		}
-		if (animation != null) {
-			animation.setEnabled(enabled);
-		}
+	/**
+	 * Enables or disables the animation of this sprite.
+	 * 
+	 * @param enabled
+	 *          the new state
+	 */
+	public void setAnimationEnabled(boolean enabled) {
+		animation.ifPresent(a -> {
+			a.setEnabled(enabled);
+		});
 	}
 
+	/**
+	 * Resets the animation of this sprite to its initial state.
+	 */
 	public void resetAnimation() {
-		if (animation != null) {
-			animation.reset();
-		}
+		animation.ifPresent(Animation::reset);
 	}
 }

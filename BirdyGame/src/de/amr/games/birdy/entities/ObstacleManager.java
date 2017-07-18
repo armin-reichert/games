@@ -36,8 +36,8 @@ public class ObstacleManager extends GameEntity {
 
 		// Stay breeding for some random time from interval [MIN_PIPE_TIME, MAX_PIPE_TIME]:
 		control.state(Breeding).entry = s -> {
-			int minCreationTime = app.pulse.secToTicks(app.settings.getFloat("min pipe creation sec"));
-			int maxCreationTime = app.pulse.secToTicks(app.settings.getFloat("max pipe creation sec"));
+			int minCreationTime = app.pulse.secToTicks(app.settings.getAsFloat("min pipe creation sec"));
+			int maxCreationTime = app.pulse.secToTicks(app.settings.getAsFloat("max pipe creation sec"));
 			s.setDuration(randomInt(minCreationTime, maxCreationTime));
 		};
 

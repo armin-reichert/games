@@ -47,7 +47,7 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 			maxDistance = bfs.getMaxDistance();
 			LOG.info("Max distance: " + maxDistance);
 			animation.setRenderingModel(
-					new BFSAnimationRenderingModel(grid, getApp().settings.getInt("cellSize"), bfs, maxDistance));
+					new BFSAnimationRenderingModel(grid, getApp().settings.getAsInt("cellSize"), bfs, maxDistance));
 			animation.setDelay(0);
 			LOG.info("Start second, animated BFS:");
 			bfs.addObserver(animation);

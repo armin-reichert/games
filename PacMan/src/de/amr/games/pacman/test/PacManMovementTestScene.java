@@ -96,7 +96,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		// Dying
 		pacMan.control.state(Dying).entry = state -> {
 			app.assets.sound("sfx/die.mp3").play();
-			theme.getPacManDyingSprite().setAnimated(true);
+			theme.getPacManDyingSprite().setAnimationEnabled(true);
 		};
 		pacMan.control.state(Dying).exit = state -> {
 			theme.getPacManDyingSprite().resetAnimation();
@@ -322,7 +322,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 				drawSprite(pen, row, col, theme.getEnergizerSprite());
 			}
 		}));
-		if (app.settings.getBool("drawGrid")) {
+		if (app.settings.getAsBoolean("drawGrid")) {
 			drawGridLines(pen, getWidth(), getHeight());
 		}
 		pen.setColor(Color.WHITE);

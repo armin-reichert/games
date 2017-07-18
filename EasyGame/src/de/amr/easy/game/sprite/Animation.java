@@ -2,6 +2,12 @@ package de.amr.easy.game.sprite;
 
 import java.awt.Image;
 
+/**
+ * Animation for a sprite. Loops through the image sequence of a sprite in a way defined by the
+ * animation mode and frame timeing.
+ * 
+ * @author Armin Reichert
+ */
 abstract class Animation {
 
 	protected final Image[] frames;
@@ -60,7 +66,7 @@ abstract class Animation {
 		reset();
 	}
 
-	public Image getCurrentFrame() {
+	public Image currentImage() {
 		return frames[current];
 	}
 }
