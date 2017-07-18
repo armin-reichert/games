@@ -55,33 +55,38 @@ public abstract class Application {
 	public static final Logger LOG = Logger.getLogger(Application.class.getName());
 
 	/** The settings of this application. */
-	public final AppSettings settings = new AppSettings();
+	public final AppSettings settings;
 
 	/** The assets used by this application. */
-	public final Assets assets = new Assets();
+	public final Assets assets;
 
 	/** The set of entities used by this application. */
-	public final EntitySet entities = new EntitySet();
+	public final EntitySet entities;
 
 	/** The views of this application. */
-	public final ViewManager views = new ViewManager();
+	public final ViewManager views;
 
 	/** The pulse (tact) of this application. */
-	public final Pulse pulse = new Pulse(this::update, this::render);
+	public final Pulse pulse;
 
 	/** The collision handler of this application. */
-	public final CollisionHandler collisionHandler = new CollisionHandler();
+	public final CollisionHandler collisionHandler;
 
 	private boolean paused;
+
 	private ApplicationShell shell;
-	private View defaultView;
 
 	/**
 	 * Base class constructor. By default, applications run at 60 frames/second.
 	 */
 	protected Application() {
+		settings = new AppSettings();
+		assets = new Assets();
+		entities = new EntitySet();
+		pulse = new Pulse(this::update, this::render);
 		pulse.setFrequency(60);
-		defaultView = new DefaultView(this);
+		views = new ViewManager(new DefaultView(this));
+		collisionHandler = new CollisionHandler();
 		LOG.info("Application " + getClass().getSimpleName() + " created.");
 	}
 
@@ -90,7 +95,7 @@ public abstract class Application {
 
 	/** Called after initialization and starts the pulse. */
 	private final void start() {
-		defaultView.init();
+		views.getDefaultView().init();
 		LOG.info("Default view initialized.");
 		init();
 		LOG.info("Application initialized.");
@@ -122,14 +127,14 @@ public abstract class Application {
 				collisionHandler.update();
 				views.current().update();
 			} else {
-				defaultView.update();
+				views.getDefaultView().update();
 			}
 		}
 	}
 
 	private void render() {
 		View currentView = views.current();
-		shell.draw(currentView != null ? currentView : defaultView);
+		shell.draw(currentView != null ? currentView : views.getDefaultView());
 	}
 
 	/**
