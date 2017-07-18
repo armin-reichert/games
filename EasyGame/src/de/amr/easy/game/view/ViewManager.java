@@ -6,7 +6,7 @@ import java.util.Set;
 import de.amr.easy.game.Application;
 
 /**
- * Stores the views of an application and provide methods for finding and selecting views.
+ * Stores the views of an application and provides methods for finding and selecting views.
  * 
  * @author Armin Reichert
  */
