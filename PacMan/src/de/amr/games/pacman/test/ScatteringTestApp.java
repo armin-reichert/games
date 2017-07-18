@@ -23,6 +23,6 @@ public class ScatteringTestApp extends Application {
 	@Override
 	public void init() {
 		views.add(new ScatteringTestScene(this));
-		views.show(ScatteringTestScene.class);
+		views.select(ScatteringTestScene.class);
 	}
 }

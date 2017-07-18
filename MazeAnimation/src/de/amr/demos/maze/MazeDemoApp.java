@@ -36,7 +36,7 @@ public class MazeDemoApp extends Application {
 		int cellSize = settings.getAsInt("cellSize");
 		grid = new ObservableGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
 		animation = new GridAnimation(grid, cellSize, getWidth(), getHeight());
-		views.show(Menu.class);
+		views.select(Menu.class);
 	}
 
 	public ObservableGrid<TraversalState, Integer> getGrid() {

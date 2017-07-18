@@ -32,7 +32,7 @@ public class PacManGame extends Application {
 	@Override
 	public void init() {
 		views.add(new PlayScene(this));
-		views.show(PlayScene.class);
+		views.select(PlayScene.class);
 	}
 
 	public ThemeManager getThemeManager() {

@@ -95,7 +95,7 @@ public class PlayScene extends Scene<BirdyGame> {
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 			changeOnInput(BirdTouchedGround, GameOver, GameOver, (s, t) -> app.assets.sound("music/bgmusic.mp3").stop());
 
-			state(StartingNewGame).entry = s -> app.views.show(StartScene.class);
+			state(StartingNewGame).entry = s -> app.views.select(StartScene.class);
 		}
 	}
 

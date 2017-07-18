@@ -25,6 +25,6 @@ public class DeadGhostTestApp extends Application {
 	@Override
 	public void init() {
 		views.add(new DeadGhostTestScene(this));
-		views.show(DeadGhostTestScene.class);
+		views.select(DeadGhostTestScene.class);
 	}
 }

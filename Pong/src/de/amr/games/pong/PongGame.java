@@ -61,7 +61,7 @@ public class PongGame extends Application {
 
 		views.add(new Menu(this));
 		views.add(new PongPlayScene(this));
-		views.show(Menu.class);
+		views.select(Menu.class);
 	}
 
 	public void setPlayMode(PlayMode playMode) {

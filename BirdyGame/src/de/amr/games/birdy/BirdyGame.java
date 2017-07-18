@@ -66,6 +66,6 @@ public class BirdyGame extends Application {
 		views.add(new PlayScene(this));
 		views.add(new SpriteBrowser(this));
 
-		views.show(IntroScene.class);
+		views.select(IntroScene.class);
 	}
 }

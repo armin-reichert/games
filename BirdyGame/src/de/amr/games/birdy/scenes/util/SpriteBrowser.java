@@ -40,7 +40,7 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
 			index = index == 0 ? spriteNames.size() - 1 : index - 1;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_X)) {
-			app.views.show(StartScene.class);
+			app.views.select(StartScene.class);
 		}
 	}
 

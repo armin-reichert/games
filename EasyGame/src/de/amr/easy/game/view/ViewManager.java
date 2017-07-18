@@ -14,7 +14,7 @@ public class ViewManager {
 
 	private final Set<View> views;
 	private final View defaultView;
-	private View currentView;
+	private View selected;
 
 	/**
 	 * Creates a new view manager.
@@ -25,6 +25,7 @@ public class ViewManager {
 	public ViewManager(View defaultView) {
 		views = new HashSet<>();
 		this.defaultView = defaultView;
+		selected = defaultView;
 	}
 
 	/**
@@ -45,6 +46,9 @@ public class ViewManager {
 	 * @return view that was added
 	 */
 	public <V extends View> V add(V view) {
+		if (view == null) {
+			throw new IllegalArgumentException("Cannot add null view");
+		}
 		views.add(view);
 		return view;
 	}
@@ -73,7 +77,7 @@ public class ViewManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public <V extends View> V current() {
-		return (V) currentView;
+		return (V) selected;
 	}
 
 	/**
@@ -82,9 +86,8 @@ public class ViewManager {
 	 * @param viewClass
 	 *          class of view to be selected
 	 */
-	public <V extends View> void show(Class<V> viewClass) {
-		View view = find(viewClass);
-		show(view == null ? defaultView : view);
+	public <V extends View> void select(Class<V> viewClass) {
+		select(find(viewClass));
 	}
 
 	/**
@@ -93,9 +96,9 @@ public class ViewManager {
 	 * @param view
 	 *          the view to be displayed
 	 */
-	public void show(View view) {
-		view.init();
-		currentView = view;
-		Application.LOG.info("Current view: " + view);
+	public void select(View view) {
+		selected = view == null ? defaultView : view;
+		selected.init();
+		Application.LOG.info("Current view: " + selected);
 	}
 }

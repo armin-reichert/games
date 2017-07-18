@@ -38,7 +38,7 @@ public class Menu extends Scene<MazeDemoApp> {
 	public Menu(MazeDemoApp app) {
 		super(app);
 		entries.add(
-				new MenuEntry("Press ENTER to start maze generation", VK_ENTER, () -> App.views.show(MazeGeneration.class)));
+				new MenuEntry("Press ENTER to start maze generation", VK_ENTER, () -> App.views.select(MazeGeneration.class)));
 		entries.add(new MenuEntry("Press ESCAPE to exit program", VK_ESCAPE, null));
 	}
 

@@ -22,6 +22,6 @@ public class Diashow extends Application {
 		assets.image("2.jpg");
 		assets.image("3.jpg");
 		views.add(new DiashowScreen(this));
-		views.show(DiashowScreen.class);
+		views.select(DiashowScreen.class);
 	}
 }

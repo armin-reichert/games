@@ -14,7 +14,7 @@ public class GamePerformanceApp extends Application {
 	@Override
 	public void init() {
 		views.add(new MainScene(this));
-		views.show(MainScene.class);
+		views.select(MainScene.class);
 		pulse.setLogger(LOG);
 		pulse.setFrequency(100);
 	}

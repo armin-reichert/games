@@ -78,7 +78,7 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
-			App.views.show(MazeGeneration.class);
+			App.views.select(MazeGeneration.class);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_PLUS)) {
 			animation.faster(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_MINUS)) {
@@ -86,9 +86,9 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 		}
 		if (aborted) {
 			stopGeneration();
-			App.views.show(Menu.class);
+			App.views.select(Menu.class);
 		} else if (!mazeGeneration.isAlive()) {
-			App.views.show(BFSTraversal.class);
+			App.views.select(BFSTraversal.class);
 		}
 	}
 

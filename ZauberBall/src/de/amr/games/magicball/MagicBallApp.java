@@ -24,6 +24,6 @@ public class MagicBallApp extends Application {
 	public void init() {
 		assets.image("ball.png");
 		views.add(new DrawingScene(this));
-		views.show(DrawingScene.class);
+		views.select(DrawingScene.class);
 	}
 }
