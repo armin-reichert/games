@@ -18,7 +18,6 @@ import de.amr.easy.game.input.KeyboardHandler;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.ui.ApplicationShell;
 import de.amr.easy.game.view.DefaultView;
-import de.amr.easy.game.view.View;
 import de.amr.easy.game.view.ViewManager;
 
 /**
@@ -83,7 +82,7 @@ public abstract class Application {
 		settings = new AppSettings();
 		assets = new Assets();
 		entities = new EntitySet();
-		pulse = new Pulse(this::update, this::showCurrentView);
+		pulse = new Pulse(this::update, this::draw);
 		pulse.setFrequency(60);
 		views = new ViewManager(new DefaultView(this));
 		collisionHandler = new CollisionHandler();
@@ -132,9 +131,8 @@ public abstract class Application {
 		}
 	}
 
-	private void showCurrentView() {
-		View currentView = views.current();
-		shell.draw(currentView);
+	private void draw() {
+		shell.draw(views.current());
 	}
 
 	/**

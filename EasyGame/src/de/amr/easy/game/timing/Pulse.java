@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
- * The "pulse" which delivers "ticks" with a specified frequency.
+ * The "pulse" which runs the game loop with a specified frequency.
  * 
  * @author Armin Reichert
  */
@@ -67,7 +67,7 @@ public class Pulse {
 	public synchronized void start() {
 		if (!running) {
 			running = true;
-			thread = new Thread(this::run, "GameLoop");
+			thread = new Thread(this::gameLoop, "GameLoop");
 			thread.start();
 		}
 	}
@@ -83,7 +83,7 @@ public class Pulse {
 		}
 	}
 
-	private void run() {
+	private void gameLoop() {
 		long overTime = 0;
 		while (running) {
 			updateTask.run();

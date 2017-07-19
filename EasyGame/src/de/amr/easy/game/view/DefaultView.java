@@ -46,15 +46,15 @@ public class DefaultView implements View {
 	public void update() {
 		text.update();
 		if (text.tf.getY() < -text.getHeight()) {
-			text.tf.setY(app.settings.height);
+			text.tf.setY(app.getHeight());
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(Color.DARK_GRAY);
-		g.fillRect(0, 0, app.settings.width, app.settings.height);
-		text.hCenter(app.settings.width);
+		g.fillRect(0, 0, app.getWidth(), app.getHeight());
+		text.hCenter(app.getWidth());
 		text.draw(g);
 	}
 }
