@@ -9,7 +9,7 @@ import java.util.Random;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.CollisionBoxSupplier;
-import de.amr.games.birdy.BirdyGame;
+import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * An obstacle consisting of a hanging and a standing pipe with a passage in the middle.

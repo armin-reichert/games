@@ -1,10 +1,10 @@
-package de.amr.games.birdy.scenes.intro;
+package de.amr.games.birdy.play.scenes;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.birdy.scenes.intro.IntroScene.State.Finished;
-import static de.amr.games.birdy.scenes.intro.IntroScene.State.ShowCredits;
-import static de.amr.games.birdy.scenes.intro.IntroScene.State.ShowGameTitle;
-import static de.amr.games.birdy.scenes.intro.IntroScene.State.WaitForShowGameTitle;
+import static de.amr.games.birdy.play.scenes.IntroScene.State.Finished;
+import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowCredits;
+import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowGameTitle;
+import static de.amr.games.birdy.play.scenes.IntroScene.State.WaitForShowGameTitle;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -15,9 +15,8 @@ import de.amr.easy.game.common.PumpingImage;
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.scenes.start.StartScene;
+import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * Intro scene.

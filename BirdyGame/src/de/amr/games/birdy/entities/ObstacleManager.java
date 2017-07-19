@@ -1,10 +1,10 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
-import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Birth;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Breeding;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Stopped;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
 import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.awt.Graphics2D;
@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.BirdyGame;
 import de.amr.games.birdy.entities.bird.Bird;
+import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * Manages the creation and deletion of obstacles.

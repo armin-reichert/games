@@ -1,4 +1,4 @@
-package de.amr.games.birdy;
+package de.amr.games.birdy.play;
 
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -9,10 +9,10 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.scenes.intro.IntroScene;
-import de.amr.games.birdy.scenes.play.PlayScene;
-import de.amr.games.birdy.scenes.start.StartScene;
-import de.amr.games.birdy.tools.SpritesheetReader;
+import de.amr.games.birdy.play.scenes.IntroScene;
+import de.amr.games.birdy.play.scenes.PlayScene;
+import de.amr.games.birdy.play.scenes.StartScene;
+import de.amr.games.birdy.utils.SpritesheetReader;
 
 /**
  * "Flappy Bird"-like game.

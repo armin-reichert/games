@@ -1,15 +1,15 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
-import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
 import static de.amr.games.birdy.entities.bird.FlightState.Crashing;
 import static de.amr.games.birdy.entities.bird.FlightState.Flying;
 import static de.amr.games.birdy.entities.bird.FlightState.OnGround;
 import static de.amr.games.birdy.entities.bird.HealthState.Dead;
 import static de.amr.games.birdy.entities.bird.HealthState.Injured;
 import static de.amr.games.birdy.entities.bird.HealthState.Sane;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdCrashed;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
 import static java.lang.Math.PI;
 
 import java.awt.Graphics2D;
@@ -20,8 +20,8 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.BirdyGameEvent;
+import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.play.BirdyGameEvent;
 
 /**
  * The little bird.

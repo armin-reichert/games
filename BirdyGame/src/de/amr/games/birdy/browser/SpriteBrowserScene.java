@@ -1,4 +1,4 @@
-package de.amr.games.birdy.scenes.browser;
+package de.amr.games.birdy.browser;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -11,15 +11,14 @@ import java.util.List;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.birdy.BirdySpriteBrowser;
 
-public class SpriteBrowserScene extends Scene<BirdySpriteBrowser> {
+public class SpriteBrowserScene extends Scene<SpriteBrowser> {
 
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);
 	private final List<String> spriteNames;
 	private int index;
 
-	public SpriteBrowserScene(BirdySpriteBrowser app) {
+	public SpriteBrowserScene(SpriteBrowser app) {
 		super(app);
 		spriteNames = new ArrayList<>();
 		for (String name : app.assets.imageNames()) {

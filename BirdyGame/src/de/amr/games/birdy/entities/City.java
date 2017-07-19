@@ -16,7 +16,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.BirdyGame;
+import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * The city shown in the background.

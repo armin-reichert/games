@@ -8,7 +8,7 @@ import java.util.Random;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.BirdyGame;
+import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * A shining and blinking star...

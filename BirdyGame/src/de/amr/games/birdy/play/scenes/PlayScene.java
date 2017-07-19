@@ -1,13 +1,13 @@
-package de.amr.games.birdy.scenes.play;
+package de.amr.games.birdy.play.scenes;
 
-import static de.amr.games.birdy.BirdyGameEvent.BirdCrashed;
-import static de.amr.games.birdy.BirdyGameEvent.BirdLeftPassage;
-import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedPipe;
-import static de.amr.games.birdy.scenes.play.PlayScene.State.GameOver;
-import static de.amr.games.birdy.scenes.play.PlayScene.State.Playing;
-import static de.amr.games.birdy.scenes.play.PlayScene.State.StartingNewGame;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdCrashed;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
+import static de.amr.games.birdy.play.scenes.PlayScene.State.GameOver;
+import static de.amr.games.birdy.play.scenes.PlayScene.State.Playing;
+import static de.amr.games.birdy.play.scenes.PlayScene.State.StartingNewGame;
 import static java.lang.String.format;
 
 import java.awt.Color;
@@ -22,15 +22,14 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.BirdyGameEvent;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.scenes.start.StartScene;
+import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.play.BirdyGameEvent;
 
 /**
  * Play scene of the game.

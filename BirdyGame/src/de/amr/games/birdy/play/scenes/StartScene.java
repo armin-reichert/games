@@ -1,11 +1,11 @@
-package de.amr.games.birdy.scenes.start;
+package de.amr.games.birdy.play.scenes;
 
-import static de.amr.games.birdy.BirdyGameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.scenes.start.StartScene.State.GameOver;
-import static de.amr.games.birdy.scenes.start.StartScene.State.Ready;
-import static de.amr.games.birdy.scenes.start.StartScene.State.StartPlaying;
-import static de.amr.games.birdy.scenes.start.StartScene.State.Starting;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.play.scenes.StartScene.State.GameOver;
+import static de.amr.games.birdy.play.scenes.StartScene.State.Ready;
+import static de.amr.games.birdy.play.scenes.StartScene.State.StartPlaying;
+import static de.amr.games.birdy.play.scenes.StartScene.State.Starting;
 import static de.amr.games.birdy.utils.Util.randomInt;
 import static java.lang.String.format;
 
@@ -23,13 +23,12 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.BirdyGameEvent;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.scenes.play.PlayScene;
+import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.play.BirdyGameEvent;
 
 /**
  * Start scene of the game: bird flaps in the air until user presses the JUMP key.

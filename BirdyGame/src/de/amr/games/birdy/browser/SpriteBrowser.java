@@ -1,16 +1,15 @@
-package de.amr.games.birdy;
+package de.amr.games.birdy.browser;
 
 import de.amr.easy.game.Application;
-import de.amr.games.birdy.scenes.browser.SpriteBrowserScene;
-import de.amr.games.birdy.tools.SpritesheetReader;
+import de.amr.games.birdy.utils.SpritesheetReader;
 
-public class BirdySpriteBrowser extends Application {
+public class SpriteBrowser extends Application {
 
 	public static void main(String[] args) {
-		launch(new BirdySpriteBrowser());
+		launch(new SpriteBrowser());
 	}
 
-	public BirdySpriteBrowser() {
+	public SpriteBrowser() {
 		settings.title = "Birdy Sprites";
 		settings.width = 1024;
 		settings.height = 1024;
