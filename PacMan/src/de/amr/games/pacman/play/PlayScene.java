@@ -156,7 +156,7 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 				});
 				nextLevel();
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(false);
+				app.themeManager.getTheme().getEnergizerSprite().setAnimationEnabled(false);
 				app.assets.sound("sfx/insert-coin.mp3").play();
 
 				configureTracing();
@@ -167,7 +167,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// Ready to rumble
 
 			state(Ready).entry = state -> {
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(true);
+				app.themeManager.getTheme().getEnergizerSprite().setAnimationEnabled(true);
 				ghosts.forEach(ghost -> {
 					ghost.speed = () -> model.getGhostSpeed(ghost, level);
 					ghost.receiveEvent(GhostEvent.WaitingStarts);
@@ -205,7 +205,7 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.receiveEvent(GhostEvent.WaitingStarts);
 				});
 
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(true);
+				app.themeManager.getTheme().getEnergizerSprite().setAnimationEnabled(true);
 				ghostAttackTimer.init();
 			};
 
@@ -231,7 +231,7 @@ public class PlayScene extends Scene<PacManGame> {
 			state(Crashing).entry = state -> {
 				app.assets.sounds().forEach(Sound::stop);
 				app.assets.sound("sfx/die.mp3").play();
-				app.getThemeManager().getTheme().getEnergizerSprite().setAnimationEnabled(false);
+				app.themeManager.getTheme().getEnergizerSprite().setAnimationEnabled(false);
 				removeBonus();
 				pacMan.receiveEvent(PacManEvent.Killed);
 				LOG.info("PacMan killed, lives remaining: " + lives);
@@ -290,7 +290,7 @@ public class PlayScene extends Scene<PacManGame> {
 		} else if (keyPressedOnce(VK_ALT, VK_E)) {
 			board.tilesWithContent(Energizer).forEach(tile -> board.setContent(tile, None));
 		} else if (keyPressedOnce(VK_ALT, VK_T)) {
-			app.getThemeManager().selectNextTheme();
+			app.themeManager.selectNextTheme();
 		} else if (keyPressedOnce(VK_ALT, VK_K)) {
 			ghosts.forEach(ghost -> ghost.receiveEvent(GhostEvent.Killed));
 		}
@@ -308,7 +308,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 	private void createPacManAndGhosts() {
 
-		pacMan = new PacMan(app, board, () -> app.getThemeManager().getTheme());
+		pacMan = new PacMan(app, board, () -> app.themeManager.getTheme());
 		pacMan.init();
 
 		pacMan.onContentFound = content -> {
@@ -396,7 +396,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		// Dying
 		pacMan.control.state(Dying).entry = state -> {
-			PacManTheme theme = app.getThemeManager().getTheme();
+			PacManTheme theme = app.themeManager.getTheme();
 			if (theme.getPacManDyingSprite() != null) {
 				theme.getPacManDyingSprite().resetAnimation();
 				theme.getPacManDyingSprite().setAnimationEnabled(true);
@@ -407,19 +407,19 @@ public class PlayScene extends Scene<PacManGame> {
 
 		ghosts = new HashSet<>();
 
-		Ghost blinky = new Ghost(app, board, "Blinky", () -> app.getThemeManager().getTheme());
+		Ghost blinky = new Ghost(app, board, "Blinky", () -> app.themeManager.getTheme());
 		blinky.color = Color.RED;
 		ghosts.add(blinky);
 
-		Ghost inky = new Ghost(app, board, "Inky", () -> app.getThemeManager().getTheme());
+		Ghost inky = new Ghost(app, board, "Inky", () -> app.themeManager.getTheme());
 		inky.color = new Color(64, 224, 208);
 		ghosts.add(inky);
 
-		Ghost pinky = new Ghost(app, board, "Pinky", () -> app.getThemeManager().getTheme());
+		Ghost pinky = new Ghost(app, board, "Pinky", () -> app.themeManager.getTheme());
 		pinky.color = Color.PINK;
 		ghosts.add(pinky);
 
-		Ghost clyde = new Ghost(app, board, "Clyde", () -> app.getThemeManager().getTheme());
+		Ghost clyde = new Ghost(app, board, "Clyde", () -> app.themeManager.getTheme());
 		clyde.color = Color.ORANGE;
 		ghosts.add(clyde);
 
@@ -672,14 +672,14 @@ public class PlayScene extends Scene<PacManGame> {
 			x -= 3 * TILE_SIZE;
 		}
 		FlashText.show(app, String.valueOf(object),
-				app.getThemeManager().getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE), Color.YELLOW,
+				app.themeManager.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE), Color.YELLOW,
 				app.pulse.secToTicks(1), new Vector2(x, y), new Vector2(0, -0.2f));
 	}
 
 	@Override
 	public void draw(Graphics2D pen) {
 
-		final PacManTheme theme = app.getThemeManager().getTheme();
+		final PacManTheme theme = app.themeManager.getTheme();
 
 		// Board & content
 		drawSprite(pen, 3, 0, theme.getBoardSprite());

@@ -262,6 +262,6 @@ public abstract class Application {
 		selectedView = view == null ? defaultView : view;
 		selectedView.init(); // TODO should this be done here?
 		views.add(selectedView);
-		Application.LOG.info("Current view: " + selectedView);
+		LOG.info("Current view: " + selectedView);
 	}
 }

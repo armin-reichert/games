@@ -16,7 +16,7 @@ import de.amr.games.pacman.theme.ThemeManager;
  */
 public class PacManGame extends Application {
 
-	private ThemeManager themeManager;
+	public final ThemeManager themeManager;
 
 	public static void main(String... args) {
 		launch(new PacManGame());
@@ -33,11 +33,6 @@ public class PacManGame extends Application {
 
 	@Override
 	public void init() {
-		addView(new PlayScene(this));
-		selectView(PlayScene.class);
-	}
-
-	public ThemeManager getThemeManager() {
-		return themeManager;
+		selectView(new PlayScene(this));
 	}
 }

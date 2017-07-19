@@ -60,7 +60,7 @@ public class BirdyGame extends Application {
 		entities.add(new Ground(new Sprite(assets.image("land"))));
 		entities.add(new City(this));
 
-		selectView(addView(new IntroScene(this)));
+		selectView(new IntroScene(this));
 		addView(new StartScene(this));
 		addView(new PlayScene(this));
 	}
