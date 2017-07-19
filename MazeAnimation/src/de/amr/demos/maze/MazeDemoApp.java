@@ -32,13 +32,13 @@ public class MazeDemoApp extends Application {
 
 	@Override
 	public void init() {
-		views.add(new Menu(this));
-		views.add(new MazeGeneration(this));
-		views.add(new BFSTraversalScene(this));
+		addView(new Menu(this));
+		addView(new MazeGeneration(this));
+		addView(new BFSTraversalScene(this));
 		int cellSize = settings.getAsInt("cellSize");
 		grid = new ObservableGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
 		animation = new GridAnimation(grid, cellSize, getWidth(), getHeight());
-		views.select(Menu.class);
+		selectView(Menu.class);
 	}
 
 	public ObservableGrid<TraversalState, Integer> getGrid() {

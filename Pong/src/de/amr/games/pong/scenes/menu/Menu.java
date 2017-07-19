@@ -51,7 +51,7 @@ public class Menu extends Scene<PongGame> {
 			int current = app.getPlayMode().ordinal();
 			app.setPlayMode(current == 0 ? values[values.length - 1] : values[current - 1]);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-			app.views.select(PongPlayScene.class);
+			app.selectView(PongPlayScene.class);
 		}
 	}
 

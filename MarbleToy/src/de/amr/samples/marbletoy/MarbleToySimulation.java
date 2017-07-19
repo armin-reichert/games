@@ -25,6 +25,6 @@ public class MarbleToySimulation extends Application {
 	public void init() {
 		Marble marble = new Marble(new Sprite(assets.image("marble.png")).scale(50, 50));
 		entities.add(new MarbleToy(new Sprite(assets.image("toy.png")), marble));
-		views.select(new MainScene(this));
+		selectView(new MainScene(this));
 	}
 }

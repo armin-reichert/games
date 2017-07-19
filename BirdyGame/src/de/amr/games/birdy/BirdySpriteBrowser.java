@@ -20,6 +20,6 @@ public class BirdySpriteBrowser extends Application {
 	@Override
 	public void init() {
 		SpritesheetReader.extractSpriteSheet(assets);
-		views.select(new SpriteBrowserScene(this));
+		selectView(new SpriteBrowserScene(this));
 	}
 }

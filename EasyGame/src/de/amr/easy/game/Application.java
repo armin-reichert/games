@@ -4,6 +4,8 @@ import static java.awt.event.KeyEvent.VK_CONTROL;
 
 import java.awt.EventQueue;
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -18,7 +20,7 @@ import de.amr.easy.game.input.KeyboardHandler;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.ui.ApplicationShell;
 import de.amr.easy.game.view.DefaultView;
-import de.amr.easy.game.view.ViewManager;
+import de.amr.easy.game.view.View;
 
 /**
  * Application base class. To start an application, create an application instance, defined its
@@ -63,7 +65,13 @@ public abstract class Application {
 	public final EntitySet entities;
 
 	/** The views of this application. */
-	public final ViewManager views;
+	private final Set<View> views;
+
+	/** The default view of this application. */
+	private final View defaultView;
+
+	/** The currently displayed view. */
+	private View selectedView;
 
 	/** The pulse (tact) of this application. */
 	public final Pulse pulse;
@@ -81,10 +89,12 @@ public abstract class Application {
 	protected Application() {
 		settings = new AppSettings();
 		assets = new Assets();
+		views = new HashSet<>();
+		defaultView = new DefaultView(this);
+		selectedView = defaultView;
 		entities = new EntitySet();
 		pulse = new Pulse(this::update, this::draw);
 		pulse.setFrequency(60);
-		views = new ViewManager(new DefaultView(this));
 		collisionHandler = new CollisionHandler();
 		LOG.info("Application " + getClass().getSimpleName() + " created.");
 	}
@@ -94,7 +104,7 @@ public abstract class Application {
 
 	/** Called after initialization and starts the pulse. */
 	private final void start() {
-		views.getDefaultView().init();
+		defaultView.init();
 		LOG.info("Default view initialized.");
 		init();
 		LOG.info("Application initialized.");
@@ -122,17 +132,17 @@ public abstract class Application {
 			pause(!paused);
 		}
 		if (!paused) {
-			if (views.current() != null) {
+			if (currentView() != null) {
 				collisionHandler.update();
-				views.current().update();
+				currentView().update();
 			} else {
-				views.getDefaultView().update();
+				defaultView.update();
 			}
 		}
 	}
 
 	private void draw() {
-		shell.draw(views.current());
+		shell.draw(currentView());
 	}
 
 	/**
@@ -178,5 +188,80 @@ public abstract class Application {
 	 */
 	public boolean isPaused() {
 		return paused;
+	}
+
+	/**
+	 * Returns the default view which is displayed in case no view has been created so far or no view
+	 * is selected.
+	 * 
+	 * @return the default view
+	 */
+	public View getDefaultView() {
+		return defaultView;
+	}
+
+	/**
+	 * Adds a view to the set of views.
+	 * 
+	 * @param view
+	 *          view to be added
+	 * @return view that was added
+	 */
+	public <V extends View> V addView(V view) {
+		if (view == null) {
+			throw new IllegalArgumentException("Cannot add null view");
+		}
+		views.add(view);
+		return view;
+	}
+
+	/**
+	 * Finds a view by its class. Only one view of any class should be added.
+	 * 
+	 * @param viewClass
+	 *          class of view to be found
+	 * @return view of given class
+	 */
+	@SuppressWarnings("unchecked")
+	public <V extends View> V findView(Class<V> viewClass) {
+		for (View view : views) {
+			if (viewClass.isAssignableFrom(view.getClass())) {
+				return (V) view;
+			}
+		}
+		throw new IllegalArgumentException("No view with class '" + viewClass.getName() + "' exists");
+	}
+
+	/**
+	 * The current view.
+	 * 
+	 * @return the current view
+	 */
+	@SuppressWarnings("unchecked")
+	public <V extends View> V currentView() {
+		return (V) selectedView;
+	}
+
+	/**
+	 * Selects the view of the given class as the current view.
+	 * 
+	 * @param viewClass
+	 *          class of view to be selected
+	 */
+	public <V extends View> void selectView(Class<V> viewClass) {
+		selectView(findView(viewClass));
+	}
+
+	/**
+	 * Selects the given view and displays it.
+	 * 
+	 * @param view
+	 *          the view to be displayed
+	 */
+	public void selectView(View view) {
+		selectedView = view == null ? defaultView : view;
+		selectedView.init(); // TODO should this be done here?
+		views.add(selectedView);
+		Application.LOG.info("Current view: " + selectedView);
 	}
 }

@@ -40,7 +40,7 @@ public class BreakoutGame extends Application {
 		entities.add(new Bat(assets, getWidth()));
 		entities.add(new ScoreDisplay(this));
 
-		views.select(new PlayScene(this));
+		selectView(new PlayScene(this));
 	}
 
 	public Score getScore() {

@@ -12,7 +12,6 @@ import static de.amr.games.birdy.entities.bird.HealthState.Injured;
 import static de.amr.games.birdy.entities.bird.HealthState.Sane;
 import static java.lang.Math.PI;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
@@ -137,8 +136,8 @@ public class Bird extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		g.setColor(Color.BLACK);
-		g.draw(getCollisionBox());
+		// g.setColor(Color.BLACK);
+		// g.draw(getCollisionBox());
 	}
 
 	public void receiveEvent(BirdyGameEvent event) {

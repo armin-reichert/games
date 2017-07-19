@@ -33,8 +33,8 @@ public class PacManGame extends Application {
 
 	@Override
 	public void init() {
-		views.add(new PlayScene(this));
-		views.select(PlayScene.class);
+		addView(new PlayScene(this));
+		selectView(PlayScene.class);
 	}
 
 	public ThemeManager getThemeManager() {

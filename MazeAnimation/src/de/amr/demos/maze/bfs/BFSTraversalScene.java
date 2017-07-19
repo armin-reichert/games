@@ -68,11 +68,11 @@ public class BFSTraversalScene extends Scene<MazeDemoApp> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !bfsRunner.isAlive()) {
-			app.views.select(MazeGeneration.class);
+			app.selectView(MazeGeneration.class);
 		}
 		if (aborted) {
 			stopBreadthFirstTraversal();
-			app.views.select(Menu.class);
+			app.selectView(Menu.class);
 		}
 	}
 

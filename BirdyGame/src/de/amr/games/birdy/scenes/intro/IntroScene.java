@@ -60,7 +60,7 @@ public class IntroScene extends Scene<BirdyGame> {
 
 		control.changeOnTimeout(ShowGameTitle, Finished);
 
-		control.state(ShowGameTitle).exit = s -> app.views.select(StartScene.class);
+		control.state(ShowGameTitle).exit = s -> app.selectView(StartScene.class);
 	}
 
 	@Override

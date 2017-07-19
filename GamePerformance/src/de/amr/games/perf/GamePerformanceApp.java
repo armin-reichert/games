@@ -17,6 +17,6 @@ public class GamePerformanceApp extends Application {
 
 	@Override
 	public void init() {
-		views.select(new MainScene(this));
+		selectView(new MainScene(this));
 	}
 }

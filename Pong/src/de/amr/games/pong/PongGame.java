@@ -58,9 +58,9 @@ public class PongGame extends Application {
 		entities.add(paddleRight);
 		entities.add(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
 
-		views.add(new Menu(this));
-		views.add(new PongPlayScene(this));
-		views.select(Menu.class);
+		addView(new Menu(this));
+		addView(new PongPlayScene(this));
+		selectView(Menu.class);
 	}
 
 	public void setPlayMode(PlayMode playMode) {

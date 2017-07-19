@@ -26,6 +26,6 @@ public class RoutingTestApp extends Application {
 
 	@Override
 	public void init() {
-		views.select(new RoutingTestScene(this));
+		selectView(new RoutingTestScene(this));
 	}
 }

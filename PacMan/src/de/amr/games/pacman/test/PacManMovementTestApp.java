@@ -26,6 +26,6 @@ public class PacManMovementTestApp extends Application {
 
 	@Override
 	public void init() {
-		views.select(new PacManMovementTestScene(this));
+		selectView(new PacManMovementTestScene(this));
 	}
 }
