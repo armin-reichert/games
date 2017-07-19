@@ -1,4 +1,4 @@
-package de.amr.games.birdy.scenes.util;
+package de.amr.games.birdy.scenes.browser;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -11,17 +11,16 @@ import java.util.List;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.birdy.BirdyGame;
-import de.amr.games.birdy.scenes.start.StartScene;
+import de.amr.games.birdy.BirdySpriteBrowser;
 
-public class SpriteBrowser extends Scene<BirdyGame> {
+public class SpriteBrowserScene extends Scene<BirdySpriteBrowser> {
 
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);
 	private final List<String> spriteNames;
 	private int index;
 
-	public SpriteBrowser(BirdyGame game) {
-		super(game);
+	public SpriteBrowserScene(BirdySpriteBrowser app) {
+		super(app);
 		spriteNames = new ArrayList<>();
 		for (String name : app.assets.imageNames()) {
 			spriteNames.add(name);
@@ -39,13 +38,14 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 			index = index + 1 == spriteNames.size() ? 0 : index + 1;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
 			index = index == 0 ? spriteNames.size() - 1 : index - 1;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_X)) {
-			app.views.select(StartScene.class);
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
+		if (spriteNames.isEmpty()) {
+			return;
+		}
 		String name = spriteNames.get(index);
 		BufferedImage image = app.assets.image(name);
 		String text = name + " (" + image.getWidth() + "x" + image.getHeight() + ")";
@@ -53,6 +53,6 @@ public class SpriteBrowser extends Scene<BirdyGame> {
 		g.setColor(Color.WHITE);
 		g.setFont(font);
 		g.drawImage(image, 0, 0, null);
-		g.drawString(text, 0, getApp().getHeight() - 2 * font.getSize());
+		g.drawString(text, 0, getHeight() - 2 * font.getSize());
 	}
 }

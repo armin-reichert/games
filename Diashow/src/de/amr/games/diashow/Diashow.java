@@ -5,14 +5,15 @@ import de.amr.games.diashow.screens.DiashowScreen;
 
 public class Diashow extends Application {
 
-	public static final Diashow App = new Diashow();
-
 	public static void main(String[] args) {
-		App.settings.title = "Diashow";
-		App.settings.width = 900;
-		App.settings.height = 600;
-		App.pulse.setFrequency(3);
-		launch(App);
+		launch(new Diashow());
+	}
+
+	public Diashow() {
+		settings.title = "Diashow";
+		settings.width = 900;
+		settings.height = 600;
+		pulse.setFrequency(10);
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class PongPlayScene extends Scene<PongGame> {
 	@Override
 	public void init() {
 		court = app.entities.findAny(Court.class);
-		switch (getApp().getPlayMode()) {
+		switch (app.getPlayMode()) {
 		case Computer_Computer:
 			paddleLeft = app.entities.findAny(AutoPaddleLeft.class);
 			paddleRight = app.entities.findAny(AutoPaddleRight.class);
@@ -108,8 +108,8 @@ public class PongPlayScene extends Scene<PongGame> {
 	}
 
 	void resetScores() {
-		getApp().getScorePlayerLeft().reset();
-		getApp().getScorePlayerRight().reset();
+		app.getScorePlayerLeft().reset();
+		app.getScorePlayerRight().reset();
 	}
 
 	void prepareBall() {
@@ -162,18 +162,18 @@ public class PongPlayScene extends Scene<PongGame> {
 	}
 
 	boolean leftPlayerWins() {
-		return getApp().getScorePlayerLeft().points == WINNING_SCORE;
+		return app.getScorePlayerLeft().points == WINNING_SCORE;
 	}
 
 	boolean rightPlayerWins() {
-		return getApp().getScorePlayerRight().points == WINNING_SCORE;
+		return app.getScorePlayerRight().points == WINNING_SCORE;
 	}
 
 	void assignPointToRightPlayer() {
-		getApp().getScorePlayerRight().points++;
+		app.getScorePlayerRight().points++;
 	}
 
 	void assignPointToLeftPlayer() {
-		getApp().getScorePlayerLeft().points++;
+		app.getScorePlayerLeft().points++;
 	}
 }

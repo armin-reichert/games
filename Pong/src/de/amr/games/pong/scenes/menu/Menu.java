@@ -44,12 +44,12 @@ public class Menu extends Scene<PongGame> {
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
 			PlayMode[] values = PlayMode.values();
-			int current = getApp().getPlayMode().ordinal();
-			getApp().setPlayMode(current == values.length - 1 ? values[0] : values[current + 1]);
+			int current = app.getPlayMode().ordinal();
+			app.setPlayMode(current == values.length - 1 ? values[0] : values[current + 1]);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
 			PlayMode[] values = PlayMode.values();
-			int current = getApp().getPlayMode().ordinal();
-			getApp().setPlayMode(current == 0 ? values[values.length - 1] : values[current - 1]);
+			int current = app.getPlayMode().ordinal();
+			app.setPlayMode(current == 0 ? values[values.length - 1] : values[current - 1]);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
 			app.views.select(PongPlayScene.class);
 		}
@@ -59,14 +59,14 @@ public class Menu extends Scene<PongGame> {
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(MENU_BACKGROUND);
-		g.fillRect(0, 0, getApp().getWidth(), getHeight());
+		g.fillRect(0, 0, app.getWidth(), getHeight());
 		g.setFont(FONT);
 		PlayMode[] values = PlayMode.values();
 		int y = 60;
 		int h = getHeight() / values.length;
 		for (int i = 0; i < values.length; ++i) {
 			PlayMode mode = values[i];
-			if (mode == getApp().getPlayMode()) {
+			if (mode == app.getPlayMode()) {
 				g.setColor(MENU_SELECTED_BACKGROUND);
 				g.fillRect(0, h * i, getWidth(), h);
 				g.setColor(MENU_HIGHLIGHT);

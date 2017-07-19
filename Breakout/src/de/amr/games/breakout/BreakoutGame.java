@@ -13,19 +13,17 @@ public class BreakoutGame extends Application {
 		PlayScene
 	}
 
-	public static final BreakoutGame Game = new BreakoutGame();
-
 	public static void main(String[] args) {
-		Game.settings.title = "Breakout";
-		Game.settings.width = 300;
-		Game.settings.height = 300;
-		Game.settings.scale = 2;
-		launch(Game);
+		launch(new BreakoutGame());
 	}
 
 	private final Score score;
 
 	public BreakoutGame() {
+		settings.title = "Breakout";
+		settings.width = 300;
+		settings.height = 300;
+		settings.scale = 2;
 		score = new Score();
 	}
 
@@ -38,12 +36,11 @@ public class BreakoutGame extends Application {
 		assets.sound("Sounds/plop.mp3");
 		assets.sound("Sounds/point.mp3");
 
-		entities.add(new Ball(getWidth(), getHeight()));
-		entities.add(new Bat(getWidth()));
+		entities.add(new Ball(assets, getWidth(), getHeight()));
+		entities.add(new Bat(assets, getWidth()));
 		entities.add(new ScoreDisplay(this));
 
-		views.add(new PlayScene(this));
-		views.select(PlayScene.class);
+		views.select(new PlayScene(this));
 	}
 
 	public Score getScore() {

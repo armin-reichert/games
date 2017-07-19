@@ -1,8 +1,8 @@
 package de.amr.games.breakout.entities;
 
-import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.Globals.BALL_DIAMETER;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 
@@ -11,10 +11,10 @@ public class Ball extends GameEntity {
 	private final int gameWidth;
 	private final int gameHeight;
 
-	public Ball(int gameWidth, int gameHeight) {
+	public Ball(Assets assets, int gameWidth, int gameHeight) {
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
-		setSprites(new Sprite(Game.assets, "Balls/ball_green.png").scale(0, BALL_DIAMETER, BALL_DIAMETER));
+		setSprites(new Sprite(assets, "Balls/ball_green.png").scale(0, BALL_DIAMETER, BALL_DIAMETER));
 	}
 
 	@Override

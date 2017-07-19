@@ -11,18 +11,19 @@ import de.amr.easy.game.ui.FullScreen;
 public class ScatteringTestApp extends Application {
 
 	public static void main(String... args) {
-		ScatteringTestApp app = new ScatteringTestApp();
-		app.settings.title = "Ghost scattering test app";
-		app.settings.width = 448;
-		app.settings.height = 576;
-		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
-		app.settings.set("drawInternals", true);
-		launch(app);
+		launch(new ScatteringTestApp());
+	}
+
+	public ScatteringTestApp() {
+		settings.title = "Ghost scattering test app";
+		settings.width = 448;
+		settings.height = 576;
+		settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		settings.set("drawInternals", true);
 	}
 
 	@Override
 	public void init() {
-		views.add(new ScatteringTestScene(this));
-		views.select(ScatteringTestScene.class);
+		views.select(new ScatteringTestScene(this));
 	}
 }

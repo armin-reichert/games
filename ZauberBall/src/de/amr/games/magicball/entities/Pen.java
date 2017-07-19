@@ -1,13 +1,12 @@
 package de.amr.games.magicball.entities;
 
-import static de.amr.games.magicball.MagicBallApp.App;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 
@@ -17,8 +16,8 @@ public class Pen extends GameEntity {
 	private Color color;
 	private int thickness;
 
-	public Pen(BufferedImage image) {
-		super(new Sprite(App.assets.image("ball.png")).scale(0, 50, 50));
+	public Pen(Assets assets, BufferedImage image) {
+		super(new Sprite(assets.image("ball.png")).scale(0, 50, 50));
 		this.image = image;
 		thickness = 20;
 		color = randomColor();

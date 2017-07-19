@@ -1,6 +1,5 @@
 package de.amr.games.breakout.scenes;
 
-import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBat;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBrick;
 import static de.amr.games.breakout.scenes.PlayState.BallOut;
@@ -17,7 +16,7 @@ public class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
 
 	public PlaySceneControl(PlayScene scene) {
 		super("Breakout Application Control", PlayState.class, Initial);
-		final Ball ball = Game.entities.findAny(Ball.class);
+		final Ball ball = scene.app.entities.findAny(Ball.class);
 
 		state(Initial).entry = s -> scene.reset();
 		change(Initial, Playing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));

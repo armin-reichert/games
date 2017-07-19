@@ -8,22 +8,22 @@ import de.amr.games.magicball.views.DrawingScene;
 
 public class MagicBallApp extends Application {
 
-	public static final MagicBallApp App = new MagicBallApp();
-
 	public static void main(String[] args) {
-		App.settings.title = "Zauberball";
-		App.settings.width = 800;
-		App.settings.height = 600;
-		App.settings.bgColor = Color.WHITE;
-		App.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
-		App.settings.fullScreenOnStart = false;
-		launch(App);
+		launch(new MagicBallApp());
+	}
+
+	public MagicBallApp() {
+		settings.title = "Zauberball";
+		settings.width = 800;
+		settings.height = 600;
+		settings.bgColor = Color.WHITE;
+		settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		settings.fullScreenOnStart = false;
 	}
 
 	@Override
 	public void init() {
 		assets.image("ball.png");
-		views.add(new DrawingScene(this));
-		views.select(DrawingScene.class);
+		views.select(new DrawingScene(this));
 	}
 }

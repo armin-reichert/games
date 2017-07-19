@@ -11,20 +11,21 @@ import de.amr.easy.game.ui.FullScreen;
 public class DeadGhostTestApp extends Application {
 
 	public static void main(String... args) {
-		DeadGhostTestApp app = new DeadGhostTestApp();
-		app.settings.title = "Dead ghost test";
-		app.settings.width = 448;
-		app.settings.height = 576;
-		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
-		app.settings.set("drawInternals", true);
-		app.settings.set("drawGrid", true);
-		app.settings.set("drawRoute", true);
-		launch(app);
+		launch(new DeadGhostTestApp());
+	}
+
+	public DeadGhostTestApp() {
+		settings.title = "Dead ghost test";
+		settings.width = 448;
+		settings.height = 576;
+		settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		settings.set("drawInternals", true);
+		settings.set("drawGrid", true);
+		settings.set("drawRoute", true);
 	}
 
 	@Override
 	public void init() {
-		views.add(new DeadGhostTestScene(this));
-		views.select(DeadGhostTestScene.class);
+		views.select(new DeadGhostTestScene(this));
 	}
 }

@@ -11,18 +11,19 @@ import de.amr.easy.game.ui.FullScreen;
 public class RandomMoveTestApp extends Application {
 
 	public static void main(String... args) {
-		RandomMoveTestApp app = new RandomMoveTestApp();
-		app.settings.title = "Random movement test";
-		app.settings.width = 448;
-		app.settings.height = 576;
-		app.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
-		app.settings.set("drawInternals", true);
-		launch(app);
+		launch(new RandomMoveTestApp());
+	}
+
+	public RandomMoveTestApp() {
+		settings.title = "Random movement test";
+		settings.width = 448;
+		settings.height = 576;
+		settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		settings.set("drawInternals", true);
 	}
 
 	@Override
 	public void init() {
-		views.add(new RandomMoveTestScene(this));
-		views.select(RandomMoveTestScene.class);
+		views.select(new RandomMoveTestScene(this));
 	}
 }

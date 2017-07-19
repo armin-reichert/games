@@ -1,7 +1,5 @@
 package de.amr.games.diashow.screens;
 
-import static de.amr.games.diashow.Diashow.App;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -18,15 +16,15 @@ public class DiashowScreen extends Scene<Diashow> {
 	private Image images[];
 	private int nImages = 4;
 
-	public DiashowScreen(Diashow game) {
-		super(game);
+	public DiashowScreen(Diashow app) {
+		super(app);
 	}
 
 	@Override
 	public void init() {
 		images = new Image[nImages];
 		for (int i = 0; i < nImages; i++) {
-			images[i] = App.assets.readImage(i + ".jpg").getScaledInstance(getApp().getWidth(), -1, Image.SCALE_SMOOTH);
+			images[i] = app.assets.readImage(i + ".jpg").getScaledInstance(app.getWidth(), -1, Image.SCALE_SMOOTH);
 		}
 		current = 0;
 	}
@@ -41,7 +39,7 @@ public class DiashowScreen extends Scene<Diashow> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(images[current], 0, 0, getApp().getWidth(), getApp().getHeight(), null);
+		g.drawImage(images[current], 0, 0, app.getWidth(), app.getHeight(), null);
 	}
 
 }

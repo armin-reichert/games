@@ -1,9 +1,8 @@
 package de.amr.games.breakout.entities;
 
-import static de.amr.games.breakout.BreakoutGame.Game;
-
 import java.awt.event.KeyEvent;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -13,9 +12,9 @@ public class Bat extends GameEntity {
 	private final int gameWidth;
 	private int speed;
 
-	public Bat(int gameWidth) {
+	public Bat(Assets assets, int gameWidth) {
 		this.gameWidth = gameWidth;
-		setSprites(new Sprite(Game.assets, "Bats/bat_blue.png").scale(120, 26));
+		setSprites(new Sprite(assets, "Bats/bat_blue.png").scale(50, 10));
 	}
 
 	@Override

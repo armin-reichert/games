@@ -99,6 +99,7 @@ public class ViewManager {
 	public void select(View view) {
 		selected = view == null ? defaultView : view;
 		selected.init();
+		views.add(selected);
 		Application.LOG.info("Current view: " + selected);
 	}
 }

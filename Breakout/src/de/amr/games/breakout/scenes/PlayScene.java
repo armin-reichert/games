@@ -1,6 +1,5 @@
 package de.amr.games.breakout.scenes;
 
-import static de.amr.games.breakout.BreakoutGame.Game;
 import static de.amr.games.breakout.Globals.BRICK_COLS;
 import static de.amr.games.breakout.Globals.BRICK_ROWS;
 import static de.amr.games.breakout.Globals.BRICK_WIDTH;
@@ -25,15 +24,15 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private Brick[][] bricks;
 	private PlaySceneControl control;
 
-	public PlayScene(BreakoutGame game) {
-		super(game);
+	public PlayScene(BreakoutGame app) {
+		super(app);
 		control = new PlaySceneControl(this);
 	}
 
 	@Override
 	public void init() {
-		ball = Game.entities.findAny(Ball.class);
-		bat = Game.entities.findAny(Bat.class);
+		ball = app.entities.findAny(Ball.class);
+		bat = app.entities.findAny(Bat.class);
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -50,7 +49,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(Game.assets.image("Background/background.jpg"), 0, 0, getWidth(), getHeight(), null);
+		g.drawImage(app.assets.image("Background/background.jpg"), 0, 0, getWidth(), getHeight(), null);
 		for (int i = 0; i < BRICK_ROWS; ++i) {
 			for (int j = 0; j < BRICK_COLS; ++j) {
 				Brick brick = bricks[i][j];
@@ -59,7 +58,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 				}
 			}
 		}
-		Game.entities.findAny(ScoreDisplay.class).draw(g);
+		app.entities.findAny(ScoreDisplay.class).draw(g);
 		bat.draw(g);
 		ball.draw(g);
 	}
@@ -72,7 +71,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 			for (int j = 0; j < BRICK_COLS; ++j) {
 				int value = i == 0 ? 10 : 5;
 				Brick.BrickColor color = i == 0 ? Brick.BrickColor.green : Brick.BrickColor.yellow;
-				Brick brick = new Brick(color, value);
+				Brick brick = new Brick(app.assets, color, value);
 				addBrick(brick, i, j);
 				brick.tf.moveTo(x, y);
 				x += padding + brick.getWidth();
@@ -104,7 +103,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	void reset() {
-		getApp().getScore().reset();
+		app.getScore().reset();
 		resetBat();
 		resetBall();
 		newBricks();
@@ -126,7 +125,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	void bounceBallFromBat() {
 		ball.tf.setVelocityY(-ball.tf.getVelocityY());
 		ball.tf.setY(bat.tf.getY() - ball.getHeight());
-		Game.assets.sound("Sounds/plop.mp3").play();
+		app.assets.sound("Sounds/plop.mp3").play();
 	}
 
 	void bounceBallFromBrick(Brick brick) {
@@ -146,7 +145,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	void addToScore(int points) {
-		getApp().getScore().points += points;
+		app.getScore().points += points;
 	}
 
 	void brickWasHit(Brick brick) {
@@ -154,7 +153,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 			bounceBallFromBrick(brick);
 			brick.crack();
 		} else {
-			Game.assets.sound("Sounds/point.mp3").play();
+			app.assets.sound("Sounds/point.mp3").play();
 			addToScore(brick.getValue());
 			removeBrick(brick);
 		}

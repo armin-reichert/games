@@ -5,17 +5,18 @@ import de.amr.easy.game.Application;
 public class GamePerformanceApp extends Application {
 
 	public static void main(String[] args) {
-		GamePerformanceApp app = new GamePerformanceApp();
-		app.settings.title = "Game performance measurement";
-		app.settings.width = 1000;
-		launch(app);
+		launch(new GamePerformanceApp());
+	}
+
+	public GamePerformanceApp() {
+		settings.title = "Game performance measurement";
+		settings.width = 1000;
+		pulse.setLogger(LOG);
+		pulse.setFrequency(100);
 	}
 
 	@Override
 	public void init() {
-		views.add(new MainScene(this));
-		views.select(MainScene.class);
-		pulse.setLogger(LOG);
-		pulse.setFrequency(100);
+		views.select(new MainScene(this));
 	}
 }

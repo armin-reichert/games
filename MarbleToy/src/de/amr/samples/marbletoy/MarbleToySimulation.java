@@ -11,19 +11,20 @@ import de.amr.samples.marbletoy.scenes.MainScene;
 public class MarbleToySimulation extends Application {
 
 	public static void main(String[] args) {
-		MarbleToySimulation app = new MarbleToySimulation();
-		app.settings.title = "Marble Toy State Machine";
-		app.settings.width = 600;
-		app.settings.height = 410;
-		app.settings.bgColor = Color.WHITE;
-		launch(app);
+		launch(new MarbleToySimulation());
+	}
+
+	public MarbleToySimulation() {
+		settings.title = "Marble Toy State Machine";
+		settings.width = 600;
+		settings.height = 410;
+		settings.bgColor = Color.WHITE;
 	}
 
 	@Override
 	public void init() {
 		Marble marble = new Marble(new Sprite(assets.image("marble.png")).scale(50, 50));
 		entities.add(new MarbleToy(new Sprite(assets.image("toy.png")), marble));
-		views.add(new MainScene(this));
-		views.select(MainScene.class);
+		views.select(new MainScene(this));
 	}
 }

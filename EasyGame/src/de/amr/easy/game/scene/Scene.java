@@ -8,19 +8,29 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.view.View;
 
-public abstract class Scene<App extends Application> implements View {
+/**
+ * Base class for scenes of an application.
+ * 
+ * @author Armin Reichert
+ *
+ * @param <A>
+ *          type of concrete application
+ */
+public abstract class Scene<A extends Application> implements View {
 
-	protected final App app;
+	public final A app;
 	private Image bgImage;
 	private Color bgColor;
 
-	public Scene(App app) {
+	/**
+	 * Creates a scene for the given app with a black background.
+	 * 
+	 * @param app
+	 *          an application
+	 */
+	public Scene(A app) {
 		this.app = app;
 		bgColor = Color.BLACK;
-	}
-
-	public App getApp() {
-		return app;
 	}
 
 	public int getWidth() {
@@ -57,8 +67,8 @@ public abstract class Scene<App extends Application> implements View {
 		g.setColor(bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		if (bgImage != null) {
-			g.drawImage(bgImage, 0, 0, bgImage.getWidth(null), bgImage.getHeight(null), null);
+			g.drawImage(bgImage, 0, 0, null);
 		}
-		app.entities.all().forEach(entity -> entity.draw(g));
+		app.entities.all().forEach(e -> e.draw(g));
 	}
 }

@@ -1,7 +1,5 @@
 package de.amr.demos.maze.scene.generation;
 
-import static de.amr.demos.maze.MazeDemoApp.App;
-
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Random;
@@ -9,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import de.amr.demos.maze.MazeDemoApp;
-import de.amr.demos.maze.bfs.BFSTraversal;
+import de.amr.demos.maze.bfs.BFSTraversalScene;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.demos.maze.ui.GridVisualization;
@@ -59,12 +57,12 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 	@Override
 	public void init() {
 		aborted = false;
-		grid = getApp().getGrid();
-		animation = getApp().getAnimation();
+		grid = app.getGrid();
+		animation = app.getAnimation();
 		startCell = grid.cell(GridPosition.TOP_LEFT);
 		mazeGeneration = new Thread(() -> {
 			chooseRandomAlgorithm();
-			animation.setRenderingModel(new GridVisualization(grid, getApp().settings.getAsInt("cellSize")));
+			animation.setRenderingModel(new GridVisualization(grid, app.settings.getAsInt("cellSize")));
 			animation.clearCanvas();
 			prepareGrid(algorithm);
 			algorithm.accept(startCell);
@@ -78,7 +76,7 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
-			App.views.select(MazeGeneration.class);
+			app.views.select(MazeGeneration.class);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_PLUS)) {
 			animation.faster(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_MINUS)) {
@@ -86,9 +84,9 @@ public class MazeGeneration extends Scene<MazeDemoApp> {
 		}
 		if (aborted) {
 			stopGeneration();
-			App.views.select(Menu.class);
+			app.views.select(Menu.class);
 		} else if (!mazeGeneration.isAlive()) {
-			App.views.select(BFSTraversal.class);
+			app.views.select(BFSTraversalScene.class);
 		}
 	}
 

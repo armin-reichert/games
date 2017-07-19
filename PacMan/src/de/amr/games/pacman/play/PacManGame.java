@@ -19,14 +19,16 @@ public class PacManGame extends Application {
 	private ThemeManager themeManager;
 
 	public static void main(String... args) {
-		PacManGame game = new PacManGame();
-		game.themeManager = new ThemeManager(new ClassicTheme(game.assets), new ModernTheme(game.assets));
-		game.settings.title = "Armin's Pac-Man";
-		game.settings.width = 448;
-		game.settings.height = 576;
-		game.settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
-		game.settings.set("drawInternals", false);
-		launch(game);
+		launch(new PacManGame());
+	}
+
+	public PacManGame() {
+		themeManager = new ThemeManager(new ClassicTheme(assets), new ModernTheme(assets));
+		settings.title = "Armin's Pac-Man";
+		settings.width = 448;
+		settings.height = 576;
+		settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		settings.set("drawInternals", false);
 	}
 
 	@Override

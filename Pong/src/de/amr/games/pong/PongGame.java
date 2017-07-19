@@ -23,18 +23,17 @@ public class PongGame extends Application {
 	}
 
 	public static void main(String[] args) {
-		PongGame app = new PongGame();
-		app.settings.title = "Pong";
-		app.settings.width = 640;
-		app.settings.height = 480;
-		app.settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
-		launch(app);
+		launch(new PongGame());
 	}
 
 	private PlayMode playMode;
 	private Score scorePlayerLeft, scorePlayerRight;
 
 	public PongGame() {
+		settings.title = "Pong";
+		settings.width = 640;
+		settings.height = 480;
+		settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
 		scorePlayerLeft = new Score(points -> points == WINNING_SCORE);
 		scorePlayerRight = new Score(points -> points == WINNING_SCORE);
 	}

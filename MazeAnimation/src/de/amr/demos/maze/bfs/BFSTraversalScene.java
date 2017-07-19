@@ -1,6 +1,5 @@
 package de.amr.demos.maze.bfs;
 
-import static de.amr.demos.maze.MazeDemoApp.App;
 import static de.amr.easy.game.Application.LOG;
 
 import java.awt.Graphics2D;
@@ -18,7 +17,7 @@ import de.amr.easy.graph.api.WeightedEdge;
 import de.amr.easy.grid.api.GridPosition;
 import de.amr.easy.grid.impl.ObservableGrid;
 
-public class BFSTraversal extends Scene<MazeDemoApp> {
+public class BFSTraversalScene extends Scene<MazeDemoApp> {
 
 	private ObservableGrid<TraversalState, Integer> grid;
 	private BreadthFirstTraversal<Integer, WeightedEdge<Integer, Integer>> bfs;
@@ -28,16 +27,16 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 	private int maxDistance;
 	private boolean aborted;
 
-	public BFSTraversal(MazeDemoApp app) {
+	public BFSTraversalScene(MazeDemoApp app) {
 		super(app);
 	}
 
 	@Override
 	public void init() {
 		aborted = false;
-		grid = getApp().getGrid();
+		grid = app.getGrid();
 		startCell = grid.cell(GridPosition.TOP_LEFT);
-		animation = getApp().getAnimation();
+		animation = app.getAnimation();
 		bfsRunner = new Thread(() -> {
 			animation.setDelay(0);
 			LOG.info("Start first BFS to compute maximum distance:");
@@ -46,8 +45,8 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 			LOG.info("BFS finished.");
 			maxDistance = bfs.getMaxDistance();
 			LOG.info("Max distance: " + maxDistance);
-			animation.setRenderingModel(
-					new BFSAnimationRenderingModel(grid, getApp().settings.getAsInt("cellSize"), bfs, maxDistance));
+			animation
+					.setRenderingModel(new BFSAnimationRenderingModel(grid, app.settings.getAsInt("cellSize"), bfs, maxDistance));
 			animation.setDelay(0);
 			LOG.info("Start second, animated BFS:");
 			bfs.addObserver(animation);
@@ -69,11 +68,11 @@ public class BFSTraversal extends Scene<MazeDemoApp> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !bfsRunner.isAlive()) {
-			App.views.select(MazeGeneration.class);
+			app.views.select(MazeGeneration.class);
 		}
 		if (aborted) {
 			stopBreadthFirstTraversal();
-			App.views.select(Menu.class);
+			app.views.select(Menu.class);
 		}
 	}
 

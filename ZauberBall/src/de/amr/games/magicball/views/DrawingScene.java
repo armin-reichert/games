@@ -1,7 +1,5 @@
 package de.amr.games.magicball.views;
 
-import static de.amr.games.magicball.MagicBallApp.App;
-
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -19,8 +17,8 @@ public class DrawingScene extends Scene<MagicBallApp> {
 	public DrawingScene(MagicBallApp app) {
 		super(app);
 		image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-		pen = App.entities.add(new Pen(image));
-		pen2 = App.entities.add(new Pen(image));
+		pen = app.entities.add(new Pen(app.assets, image));
+		pen2 = app.entities.add(new Pen(app.assets, image));
 	}
 
 	@Override
