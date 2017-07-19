@@ -3,6 +3,7 @@ package de.amr.easy.game.config;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.ui.FullScreen;
 
@@ -37,6 +38,10 @@ public class AppSettings {
 
 	/** The background color of the application. */
 	public Color bgColor = Color.BLACK;
+
+	public Stream<String> keys() {
+		return settings.keySet().stream();
+	}
 
 	/**
 	 * Sets a property value.

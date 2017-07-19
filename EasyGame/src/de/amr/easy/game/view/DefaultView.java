@@ -5,41 +5,56 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.common.ScrollingText;
 
+/**
+ * This view is displayed for an application if no view is selected.
+ * 
+ * @author Armin Reichert
+ */
 public class DefaultView implements View {
 
 	private final Application app;
-	private Font font = new Font("Georgia", Font.BOLD, 36);
-	private String text;
-	private int width;
-	private int y;
+	private final ScrollingText text;
 
 	public DefaultView(Application app) {
 		this.app = app;
-		text = app.getClass().getSimpleName();
-		width = 0;
+		text = new ScrollingText();
 	}
 
 	@Override
 	public void init() {
-		y = app.getHeight() * 3 / 4;
+		StringBuilder sb = new StringBuilder();
+		sb.append(app.getClass().getSimpleName()).append("\n\n");
+		sb.append("title = " + app.settings.title).append("\n");
+		sb.append("width = " + app.settings.width).append("\n");
+		sb.append("height = " + app.settings.height).append("\n");
+		sb.append("scale = " + app.settings.scale).append("\n");
+		sb.append("fullScreenMode = " + app.settings.fullScreenMode).append("\n");
+		sb.append("bgColor = " + app.settings.bgColor).append("\n");
+		app.settings.keys().forEach(key -> {
+			sb.append(key + " = " + app.settings.getAsString(key)).append("\n");
+		});
+		text.setText(sb.toString());
+		text.tf.setY(app.settings.height);
+		text.setScrollSpeed(-0.5f);
+		text.setColor(Color.WHITE);
+		text.setFont(new Font("Monospaced", Font.BOLD, 16));
 	}
 
 	@Override
 	public void update() {
-		y -= 1;
-		if (y <= 0) {
-			y = app.getHeight();
+		text.update();
+		if (text.tf.getY() < -text.getHeight()) {
+			text.tf.setY(app.settings.height);
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(Color.BLUE);
-		g.setFont(font);
-		if (width == 0) {
-			width = g.getFontMetrics().stringWidth(text);
-		}
-		g.drawString(text, (app.getWidth() - width) / 2, y);
+		g.setColor(Color.DARK_GRAY);
+		g.fillRect(0, 0, app.settings.width, app.settings.height);
+		text.hCenter(app.settings.width);
+		text.draw(g);
 	}
 }

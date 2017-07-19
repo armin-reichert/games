@@ -1,6 +1,7 @@
 package de.amr.easy.game.ui;
 
 import static de.amr.easy.game.Application.LOG;
+import static java.lang.String.format;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -24,6 +25,12 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.input.KeyboardHandler;
 import de.amr.easy.game.view.Drawable;
 
+/**
+ * The application shell provides the window or the fullscreen area where the current scene of the
+ * application is displayed.
+ * 
+ * @author Armin Reichert
+ */
 public class ApplicationShell implements PropertyChangeListener {
 
 	private final Application app;
@@ -58,20 +65,11 @@ public class ApplicationShell implements PropertyChangeListener {
 	}
 
 	private void updateTitle() {
-		frame.setTitle(app.settings.title + " - " + fps + " frames/s" + " - " + ups + " updates/s");
+		frame.setTitle(format("%s - %d frames/sec - %d updates/sec", app.settings.title, fps, ups));
 	}
 
 	public void show() {
 		if (fullScreen) {
-			if (app.settings.fullScreenMode == null) {
-				LOG.info("Cannot enter full-screen mode: No full-screen mode specified.");
-				return;
-			}
-			DisplayMode mode = app.settings.fullScreenMode.getDisplayMode();
-			if (!isValidDisplayMode(mode)) {
-				LOG.info("Cannot enter full-screen mode: Display mode not supported: " + format(mode));
-				return;
-			}
 			showFullScreen();
 		} else {
 			showAsWindow();
@@ -86,7 +84,7 @@ public class ApplicationShell implements PropertyChangeListener {
 		return fullScreen ? frame.getHeight() : canvas.getHeight();
 	}
 
-	public void draw(Drawable view) {
+	public void draw(Drawable content) {
 		do {
 			do {
 				Graphics2D g = null;
@@ -103,11 +101,11 @@ public class ApplicationShell implements PropertyChangeListener {
 							}
 						}
 						g.scale(app.settings.scale, app.settings.scale);
-						view.draw(g);
+						content.draw(g);
 					}
 				} catch (Exception x) {
-					 x.printStackTrace(System.err);
-					 LOG.info("Exception occured when rendering current view");
+					x.printStackTrace(System.err);
+					LOG.info("Exception occured when rendering current view");
 				} finally {
 					if (g != null) {
 						g.dispose();
@@ -176,7 +174,7 @@ public class ApplicationShell implements PropertyChangeListener {
 		canvas.setFocusable(false);
 		return canvas;
 	}
-	
+
 	public Canvas getCanvas() {
 		return canvas;
 	}
@@ -191,7 +189,16 @@ public class ApplicationShell implements PropertyChangeListener {
 			LOG.info("Full-screen mode not supported for this device.");
 			return;
 		}
+		if (app.settings.fullScreenMode == null) {
+			LOG.info("Cannot enter full-screen mode: No full-screen mode specified.");
+			return;
+		}
 		DisplayMode mode = app.settings.fullScreenMode.getDisplayMode();
+		if (!isValidDisplayMode(mode)) {
+			LOG.info("Cannot enter full-screen mode: Display mode not supported: " + formatDisplayMode(mode));
+			return;
+		}
+		// Note: The order of the following statements is important!
 		frame.setVisible(false);
 		frame.dispose();
 		frame.setUndecorated(true);
@@ -199,7 +206,7 @@ public class ApplicationShell implements PropertyChangeListener {
 		device.setDisplayMode(mode);
 		frame.createBufferStrategy(2);
 		buffer = frame.getBufferStrategy();
-		LOG.info("Full-screen mode: " + format(mode));
+		LOG.info("Full-screen mode: " + formatDisplayMode(mode));
 	}
 
 	private void showAsWindow() {
@@ -225,8 +232,8 @@ public class ApplicationShell implements PropertyChangeListener {
 		return false;
 	}
 
-	private String format(DisplayMode mode) {
-		return String.format("%d x %d, depth: %d, refresh rate: %d", mode.getWidth(), mode.getHeight(), mode.getBitDepth(),
+	private String formatDisplayMode(DisplayMode mode) {
+		return format("%d x %d, depth: %d, refresh rate: %d", mode.getWidth(), mode.getHeight(), mode.getBitDepth(),
 				mode.getRefreshRate());
 	}
 }

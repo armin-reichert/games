@@ -83,7 +83,7 @@ public abstract class Application {
 		settings = new AppSettings();
 		assets = new Assets();
 		entities = new EntitySet();
-		pulse = new Pulse(this::update, this::render);
+		pulse = new Pulse(this::update, this::showCurrentView);
 		pulse.setFrequency(60);
 		views = new ViewManager(new DefaultView(this));
 		collisionHandler = new CollisionHandler();
@@ -132,9 +132,9 @@ public abstract class Application {
 		}
 	}
 
-	private void render() {
+	private void showCurrentView() {
 		View currentView = views.current();
-		shell.draw(currentView != null ? currentView : views.getDefaultView());
+		shell.draw(currentView);
 	}
 
 	/**

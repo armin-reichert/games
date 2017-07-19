@@ -9,7 +9,6 @@ import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.scenes.intro.IntroScene;
 import de.amr.games.birdy.scenes.play.PlayScene;
 import de.amr.games.birdy.scenes.start.StartScene;
 import de.amr.games.birdy.tools.SpritesheetReader;
@@ -60,7 +59,7 @@ public class BirdyGame extends Application {
 		entities.add(new Ground(new Sprite(assets.image("land"))));
 		entities.add(new City(this));
 
-		views.select(views.add(new IntroScene(this)));
+		// views.select(views.add(new IntroScene(this)));
 		views.add(new StartScene(this));
 		views.add(new PlayScene(this));
 	}
