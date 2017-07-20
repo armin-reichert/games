@@ -25,9 +25,9 @@ public class BreakoutGame extends Application {
 
 	@Override
 	public void init() {
-		assets.image("Background/background.jpg");
-		assets.image("Balls/ball_green.png");
-		assets.image("Bats/bat_blue.png");
+		assets.image("background.jpg");
+		assets.image("ball_green.png");
+		assets.image("bat_blue.png");
 		assets.sound("Sounds/plop.mp3");
 		assets.sound("Sounds/point.mp3");
 		selectView(new PlayScene(this));

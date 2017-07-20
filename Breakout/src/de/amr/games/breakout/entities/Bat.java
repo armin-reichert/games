@@ -18,7 +18,7 @@ public class Bat extends GameEntity {
 
 	public Bat(BreakoutGame app, int width, int height) {
 		boardSize = new Dimension(app.getWidth(), app.getHeight());
-		setSprites(new Sprite(app.assets, "Bats/bat_blue.png").scale(width, height));
+		setSprites(new Sprite(app.assets, "bat_blue.png").scale(width, height));
 	}
 
 	@Override

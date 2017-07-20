@@ -1,7 +1,16 @@
 package de.amr.games.breakout.scenes;
 
 public enum PlayEvent {
-	Tick, BallHitsBrick, BallHitsBat;
+	BallHitsBrick, BallHitsBat;
 
-	public Object userData;
+	private Object userData;
+
+	public <T> void setUserData(T t) {
+		userData = t;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getUserData() {
+		return (T) userData;
+	}
 }
