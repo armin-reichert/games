@@ -4,7 +4,6 @@ import java.awt.Font;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
@@ -57,7 +56,7 @@ public class BirdyGame extends Application {
 
 		// create entities shared by different scenes:
 		entities.add(new Bird(this));
-		entities.add(new Ground(new Sprite(assets.image("land"))));
+		entities.add(new Ground(this));
 		entities.add(new City(this));
 
 		selectView(new IntroScene(this));

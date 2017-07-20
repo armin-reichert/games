@@ -5,6 +5,7 @@ import java.awt.Image;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * The ground.
@@ -15,8 +16,8 @@ public class Ground extends GameEntity {
 
 	private float startX;
 
-	public Ground(Sprite sprite) {
-		setSprites(sprite);
+	public Ground(BirdyGame app) {
+		setSprites(new Sprite(app.assets.image("land")));
 	}
 
 	@Override
