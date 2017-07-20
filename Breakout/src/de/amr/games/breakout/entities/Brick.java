@@ -7,7 +7,7 @@ import de.amr.games.breakout.BreakoutGame;
 public class Brick extends GameEntity {
 
 	public enum Type {
-		blue, green, pink, violet, yellow;
+		pink, blue, green, violet, yellow;
 	}
 
 	private boolean cracked;

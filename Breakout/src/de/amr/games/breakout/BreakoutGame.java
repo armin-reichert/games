@@ -19,8 +19,8 @@ public class BreakoutGame extends Application {
 	public BreakoutGame() {
 		score = new Score();
 		settings.title = "Breakout";
-		settings.width = 600;
-		settings.height = 400;
+		settings.width = 800;
+		settings.height = 600;
 	}
 
 	@Override
