@@ -89,8 +89,8 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		};
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
 		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
-		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, (oldState, newState) -> {
-			newState.setDuration(app.pulse.secToTicks(3));
+		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, (e, s, t) -> {
+			t.setDuration(app.pulse.secToTicks(3));
 		});
 
 		// Dying
@@ -159,7 +159,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 			ghost.control.changeOnTimeout(Chasing, Scattering);
 			ghost.control.changeOnInput(GhostEvent.Killed, Chasing, Dead);
 			ghost.control.changeOnInput(GhostEvent.ScatteringStarts, Chasing, Scattering);
-			
+
 			// Scattering
 			ghost.control.state(Scattering).update = state -> ghost.follow(getGhostHomeTile(ghost));
 			ghost.control.change(Scattering, Waiting, () -> ghost.currentTile().equals(getGhostHomeTile(ghost)));

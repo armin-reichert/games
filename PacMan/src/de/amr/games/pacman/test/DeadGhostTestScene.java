@@ -30,7 +30,7 @@ import de.amr.games.pacman.theme.PacManTheme;
 public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
-	
+
 	private final PacManTheme theme;
 	private final Board board;
 	private final Random rand;
@@ -85,8 +85,8 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 			}
 		};
 
-		ghost.control.changeOnInput(RecoveringStarts, Dead, Recovering, (oldState, newState) -> {
-			newState.setDuration(120);
+		ghost.control.changeOnInput(RecoveringStarts, Dead, Recovering, (e, s, t) -> {
+			t.setDuration(120);
 		});
 
 		// Recovering

@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -207,25 +206,19 @@ public class StateMachine<StateID, Input> {
 	}
 
 	private Optional<Transition<StateID>> step() {
-		Stream<Transition<StateID>> transitions = getOutgoingTransitions(currentStateID).stream();
-		Optional<Transition<StateID>> match = transitions.filter(t -> {
-			BooleanSupplier c = t.condition;
-			boolean value = c.getAsBoolean();
-			return value;
-		}).findFirst();
-		if (match.isPresent()) {
-			enterState(match.get().to, match.get().action);
+		Optional<Transition<StateID>> matchingTransition = getTransitions(currentStateID).stream()
+				.filter(t -> t.condition.getAsBoolean()).findFirst();
+		if (matchingTransition.isPresent()) {
+			changeIntoState(matchingTransition.get().to, matchingTransition.get().action);
 		} else {
 			state().doUpdate();
 		}
-		return match;
+		return matchingTransition;
 	}
 
-	private void enterState(StateID newStateID, BiConsumer<State, State> action) {
+	private void changeIntoState(StateID newStateID, TransitionAction action) {
 		if (currentStateID == newStateID) {
-			if (action != null) {
-				action.accept(state(), state());
-			}
+			executeTransitionAction(action, state(), state());
 			traceStateLoop(currentStateID);
 			return; // state loop, no exit/entry actions are executed
 		}
@@ -237,13 +230,24 @@ public class StateMachine<StateID, Input> {
 		State stateBefore = state(currentStateID);
 		currentStateID = newStateID;
 		if (action != null) {
-			action.accept(stateBefore, state());
+			executeTransitionAction(action, stateBefore, state());
 		}
 		state().doEntry();
 		traceStateEntry();
 	}
 
-	private List<Transition<StateID>> getOutgoingTransitions(StateID stateID) {
+	private void executeTransitionAction(TransitionAction action, State from, State to) {
+		if (action instanceof SimpleTransitionAction) {
+			SimpleTransitionAction sta = (SimpleTransitionAction) action;
+			sta.accept(from, to);
+		} else if (action instanceof InputTransitionAction<?>) {
+			@SuppressWarnings("unchecked")
+			InputTransitionAction<Input> ita = (InputTransitionAction<Input>) action;
+			ita.accept(inputQ.peek(), from, to);
+		}
+	}
+
+	private List<Transition<StateID>> getTransitions(StateID stateID) {
 		if (!transitionsByStateID.containsKey(stateID)) {
 			transitionsByStateID.put(stateID, new ArrayList<>(3));
 		}
@@ -286,6 +290,15 @@ public class StateMachine<StateID, Input> {
 
 	// methods for specifying the transitions
 
+	private void addTransition(StateID from, StateID to, BooleanSupplier condition, TransitionAction action) {
+		Transition<StateID> transition = new Transition<>();
+		transition.from = from;
+		transition.to = to;
+		transition.condition = condition;
+		transition.action = action;
+		getTransitions(from).add(transition);
+	}
+
 	/**
 	 * Defines a transition between the given states which can be fired only if the given condition
 	 * holds. If the transition is executed the given action is also executed. This happens before the
@@ -300,13 +313,8 @@ public class StateMachine<StateID, Input> {
 	 * @param action
 	 *          the action executed when the transition is executed
 	 */
-	public void change(StateID from, StateID to, BooleanSupplier condition, BiConsumer<State, State> action) {
-		Transition<StateID> transition = new Transition<>();
-		transition.from = from;
-		transition.to = to;
-		transition.condition = condition;
-		transition.action = action;
-		getOutgoingTransitions(from).add(transition);
+	public void change(StateID from, StateID to, BooleanSupplier condition, SimpleTransitionAction action) {
+		addTransition(from, to, condition, action);
 	}
 
 	/**
@@ -321,7 +329,7 @@ public class StateMachine<StateID, Input> {
 	 *          the condition which must hold
 	 */
 	public void change(StateID from, StateID to, BooleanSupplier condition) {
-		change(from, to, condition, null);
+		addTransition(from, to, condition, (SimpleTransitionAction) null);
 	};
 
 	/**
@@ -360,8 +368,8 @@ public class StateMachine<StateID, Input> {
 	 * @param action
 	 *          the action executed when the transition is executed
 	 */
-	public void changeOnTimeout(StateID from, StateID to, BiConsumer<State, State> action) {
-		change(from, to, () -> state(from).isTerminated(), action);
+	public void changeOnTimeout(StateID from, StateID to, SimpleTransitionAction action) {
+		addTransition(from, to, () -> state(from).isTerminated(), action);
 	}
 
 	/**
@@ -411,8 +419,8 @@ public class StateMachine<StateID, Input> {
 	 *          some action method. When calling the action, the first parameter contains the old
 	 *          state and the second parameter the new state after the transition has fired
 	 */
-	public void changeOnInput(Input input, StateID from, StateID to, BiConsumer<State, State> action) {
-		change(from, to, () -> input.equals(inputQ.peek()), action);
+	public void changeOnInput(Input input, StateID from, StateID to, InputTransitionAction<Input> action) {
+		addTransition(from, to, () -> input.equals(inputQ.peek()), action);
 	}
 
 	/**
@@ -433,8 +441,8 @@ public class StateMachine<StateID, Input> {
 	 *          state and the second parameter the new state after the transition has fired
 	 */
 	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition,
-			BiConsumer<State, State> action) {
-		change(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()), action);
+			InputTransitionAction<Input> action) {
+		addTransition(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()), action);
 	}
 
 }

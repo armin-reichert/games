@@ -13,8 +13,8 @@ public class LampControl extends StateMachine<Boolean, Boolean> {
 
 	public LampControl(Lamp lamp) {
 		super("Lamp Control", Boolean.class, OFF);
-		changeOnInput(TOGGLE, OFF, ON, (before, after) -> lamp.switchOn());
-		changeOnInput(TOGGLE, ON, OFF, (before, after) -> lamp.switchOff());
+		changeOnInput(TOGGLE, OFF, ON, (evt, src, tgt) -> lamp.switchOn());
+		changeOnInput(TOGGLE, ON, OFF, (evt, src, tgt) -> lamp.switchOff());
 	}
 
 	public void toggle() {

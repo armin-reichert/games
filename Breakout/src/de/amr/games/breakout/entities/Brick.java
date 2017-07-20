@@ -10,27 +10,27 @@ public class Brick extends GameEntity {
 		pink, blue, green, violet, yellow;
 	}
 
-	private boolean cracked;
+	private boolean damaged;
 	private int value;
 
 	public Brick(BreakoutGame app, int width, int height, Type type, int value) {
 		this.value = value;
 		setSprites(new Sprite(app.assets, "Bricks/brick_" + type + "_small.png").scale(width, height),
 				new Sprite(app.assets, "Bricks/brick_" + type + "_small_cracked.png").scale(width, height));
-		cracked = false;
+		damaged = false;
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return getSprite(cracked ? 1 : 0);
+		return getSprite(damaged ? 1 : 0);
 	}
 
-	public void crack() {
-		cracked = true;
+	public void damage() {
+		damaged = true;
 	}
 
-	public boolean isCracked() {
-		return cracked;
+	public boolean isDamaged() {
+		return damaged;
 	}
 
 	public int getValue() {

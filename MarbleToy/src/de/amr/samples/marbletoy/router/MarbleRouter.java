@@ -32,8 +32,8 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 		this.toy = toy;
 		this.marble = toy.getMarble();
 
-		changeOnInput('A', Initial, A, (s, t) -> placeMarbleCenteredAt(A));
-		changeOnInput('B', Initial, B, (s, t) -> placeMarbleCenteredAt(B));
+		changeOnInput('A', Initial, A, (e, s, t) -> placeMarbleCenteredAt(A));
+		changeOnInput('B', Initial, B, (e, s, t) -> placeMarbleCenteredAt(B));
 
 		state(A).entry = s -> routeMarble(A, X1);
 		state(A).update = s -> marble.update();

@@ -24,10 +24,10 @@ public class TurnstileImplementation implements Turnstile {
 	public TurnstileImplementation(TurnstileController c) {
 		controller = c;
 		fsm = new StateMachine<>("TurnstileStateMachine", TurnstileState.class, LOCKED);
-		fsm.changeOnInput(PASS, LOCKED, LOCKED, (before, after) -> controller.alarm());
-		fsm.changeOnInput(COIN, LOCKED, UNLOCKED, (before, after) -> controller.unlock());
-		fsm.changeOnInput(PASS, UNLOCKED, LOCKED, (before, after) -> controller.lock());
-		fsm.changeOnInput(COIN, UNLOCKED, UNLOCKED, (before, after) -> controller.thankyou());
+		fsm.changeOnInput(PASS, LOCKED, LOCKED, (evt, src, tgt) -> controller.alarm());
+		fsm.changeOnInput(COIN, LOCKED, UNLOCKED, (evt, src, tgt) -> controller.unlock());
+		fsm.changeOnInput(PASS, UNLOCKED, LOCKED, (evt, src, tgt) -> controller.lock());
+		fsm.changeOnInput(COIN, UNLOCKED, UNLOCKED, (evt, src, tgt) -> controller.thankyou());
 	}
 
 	public void setController(TurnstileController controller) {

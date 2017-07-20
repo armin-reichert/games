@@ -57,7 +57,7 @@ public class Bird extends GameEntity {
 				setNormalFeathers(RED_FEATHERS);
 			};
 
-			changeOnInput(BirdTouchedPipe, Injured, Injured, (s, t) -> {
+			changeOnInput(BirdTouchedPipe, Injured, Injured, (e, s, t) -> {
 				s.resetTimer();
 			});
 			changeOnTimeout(Injured, Sane);

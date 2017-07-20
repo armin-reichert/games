@@ -40,7 +40,6 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private int brickPadding = brickHeight / 2;
 	private int numBricks;
 	private Brick[][] bricks;
-	private Brick lastBrickHit;
 	private Image background;
 
 	private class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
@@ -65,9 +64,11 @@ public class PlayScene extends Scene<BreakoutGame> {
 				app.entities.all().forEach(GameEntity::update);
 			};
 
-			changeOnInput(BallHitsBat, Playing, Playing, (s, t) -> bounceBallFromBat());
+			changeOnInput(BallHitsBat, Playing, Playing, (e, s, t) -> bounceBallFromBat());
 
-			changeOnInput(BallHitsBrick, Playing, Playing, (s, t) -> onBrickHit(lastBrickHit));
+			changeOnInput(BallHitsBrick, Playing, Playing, (e, s, t) -> {
+				onBrickHit((Brick) e.userData);
+			});
 
 			change(Playing, BallOut, () -> ball.isOut());
 
@@ -106,10 +107,11 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	private void handleCollisions() {
 		for (Collision coll : app.collisionHandler.collisions()) {
+			PlayEvent event = coll.getAppEvent();
 			if (coll.getSecond() instanceof Brick) {
-				lastBrickHit = (Brick) coll.getSecond();
+				event.userData = coll.getSecond();
 			}
-			control.addInput(coll.getAppEvent());
+			control.addInput(event);
 		}
 	}
 
@@ -213,9 +215,9 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	private void onBrickHit(Brick brick) {
-		if (!brick.isCracked()) {
+		if (!brick.isDamaged()) {
 			bounceBallFromBrick(brick);
-			brick.crack();
+			brick.damage();
 		} else {
 			app.assets.sound("Sounds/point.mp3").play();
 			app.score.points += brick.getValue();

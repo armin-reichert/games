@@ -1,6 +1,5 @@
 package de.amr.easy.statemachine;
 
-import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -14,7 +13,7 @@ import java.util.function.BooleanSupplier;
 class Transition<StateID> {
 
 	public BooleanSupplier condition;
-	public BiConsumer<State, State> action;
+	public TransitionAction action;
 	public StateID from;
 	public StateID to;
 }

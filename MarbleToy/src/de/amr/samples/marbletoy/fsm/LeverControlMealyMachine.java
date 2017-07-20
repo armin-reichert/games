@@ -9,9 +9,7 @@ import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RLR;
 import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RRL;
 import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RRR;
 
-import java.util.function.BiConsumer;
-
-import de.amr.easy.statemachine.State;
+import de.amr.easy.statemachine.InputTransitionAction;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID;
 
@@ -22,8 +20,8 @@ public class LeverControlMealyMachine extends StateMachine<StateID, Character> {
 	};
 
 	private final StringBuilder output = new StringBuilder();
-	private final BiConsumer<State, State> C = (before, after) -> output.append('C');
-	private final BiConsumer<State, State> D = (before, after) -> output.append('D');
+	private final InputTransitionAction<Character> C = (evt, before, after) -> output.append('C');
+	private final InputTransitionAction<Character> D = (evt, before, after) -> output.append('D');
 
 	public LeverControlMealyMachine() {
 		super("Mealy Machine for Marble MarbleToy", StateID.class, StateID.LLL);
