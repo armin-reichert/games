@@ -207,8 +207,12 @@ public class StateMachine<StateID, Input> {
 	}
 
 	private Optional<Transition<StateID>> step() {
-		Optional<Transition<StateID>> match = getOutgoingTransitions(currentStateID).stream()
-				.filter(transition -> transition.condition.getAsBoolean()).findFirst();
+		Stream<Transition<StateID>> transitions = getOutgoingTransitions(currentStateID).stream();
+		Optional<Transition<StateID>> match = transitions.filter(t -> {
+			BooleanSupplier c = t.condition;
+			boolean value = c.getAsBoolean();
+			return value;
+		}).findFirst();
 		if (match.isPresent()) {
 			enterState(match.get().to, match.get().action);
 		} else {

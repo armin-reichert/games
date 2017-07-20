@@ -38,7 +38,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
 public class StartScene extends Scene<BirdyGame> {
 
 	public enum State {
-		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser;
+		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser
 	}
 
 	private class StartSceneControl extends StateMachine<State, BirdyGameEvent> {
@@ -86,8 +86,7 @@ public class StartScene extends Scene<BirdyGame> {
 		}
 	}
 
-	private final StartSceneControl control = new StartSceneControl();
-
+	private final StartSceneControl control;
 	private Bird bird;
 	private City city;
 	private Ground ground;
@@ -95,6 +94,7 @@ public class StartScene extends Scene<BirdyGame> {
 
 	public StartScene(BirdyGame game) {
 		super(game);
+		control = new StartSceneControl();
 	}
 
 	@Override

@@ -1,39 +1,32 @@
 package de.amr.games.breakout.entities;
 
-import static de.amr.games.breakout.Globals.BRICK_HEIGHT;
-import static de.amr.games.breakout.Globals.BRICK_WIDTH;
-
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.breakout.BreakoutGame;
 
 public class Brick extends GameEntity {
 
-	public enum BrickColor {
+	public enum Type {
 		blue, green, pink, violet, yellow;
 	}
 
 	private boolean cracked;
 	private int value;
 
-	public Brick(Assets assets, BrickColor color, int value) {
+	public Brick(BreakoutGame app, int width, int height, Type type, int value) {
 		this.value = value;
-		setSprites(new Sprite(assets, "Bricks/brick_" + color + "_small.png").scale(BRICK_WIDTH, BRICK_HEIGHT),
-				new Sprite(assets, "Bricks/brick_" + color + "_small_cracked.png").scale(BRICK_WIDTH, BRICK_HEIGHT));
+		setSprites(new Sprite(app.assets, "Bricks/brick_" + type + "_small.png").scale(width, height),
+				new Sprite(app.assets, "Bricks/brick_" + type + "_small_cracked.png").scale(width, height));
 		cracked = false;
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
 	}
 
 	@Override
 	public Sprite currentSprite() {
 		return getSprite(cracked ? 1 : 0);
+	}
+
+	public void crack() {
+		cracked = true;
 	}
 
 	public boolean isCracked() {
@@ -42,9 +35,5 @@ public class Brick extends GameEntity {
 
 	public int getValue() {
 		return value;
-	}
-
-	public void crack() {
-		cracked = true;
 	}
 }

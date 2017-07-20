@@ -152,7 +152,7 @@ public class PlayScene extends Scene<BirdyGame> {
 		ground.draw(g);
 		scoreDisplay.draw(g);
 		bird.draw(g);
-		if (control.stateID() == GameOver) {
+		if (control.is(GameOver)) {
 			gameOverText.draw(g);
 		}
 		showState(g);

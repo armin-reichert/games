@@ -11,20 +11,12 @@ import de.amr.games.breakout.BreakoutGame;
 
 public class ScoreDisplay extends GameEntity {
 
-	private final BreakoutGame game;
+	private final BreakoutGame app;
 	private Font font = new Font(Font.SANS_SERIF, Font.BOLD, 60);
 	private Color color = Color.RED;
 
-	public ScoreDisplay(BreakoutGame game) {
-		this.game = game;
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
+	public ScoreDisplay(BreakoutGame app) {
+		this.app = app;
 	}
 
 	@Override
@@ -32,10 +24,10 @@ public class ScoreDisplay extends GameEntity {
 		g.setColor(color);
 		g.setFont(font);
 		FontMetrics fm = g.getFontMetrics(font);
-		String text = game.getScore().points + "";
+		String text = app.score.points + "";
 		Rectangle2D bounds = fm.getStringBounds(text, g);
-		int x = game.getWidth() / 2 - (int) bounds.getWidth() / 2;
-		int y = game.getHeight() / 2 - fm.getDescent();
+		int x = app.getWidth() / 2 - (int) bounds.getWidth() / 2;
+		int y = app.getHeight() / 2 - fm.getDescent();
 		g.drawString(text, x, y);
 	}
 }

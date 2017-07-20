@@ -4,7 +4,7 @@ import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.Finished;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowCredits;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowGameTitle;
-import static de.amr.games.birdy.play.scenes.IntroScene.State.WaitForShowGameTitle;
+import static de.amr.games.birdy.play.scenes.IntroScene.State.Wait;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,11 +28,10 @@ public class IntroScene extends Scene<BirdyGame> {
 	private static final String CREDITS_TEXT = "Anna proudly presents\nin cooperation with\nProf. Zwickmann\nGeräteschuppen Software 2017";
 
 	public enum State {
-		ShowCredits, WaitForShowGameTitle, ShowGameTitle, Finished
+		ShowCredits, Wait, ShowGameTitle, Finished
 	}
 
 	private final StateMachine<State, Object> control;
-
 	private City city;
 	private PumpingImage gameTitleImage;
 	private ScrollingText creditsText;
@@ -41,8 +40,8 @@ public class IntroScene extends Scene<BirdyGame> {
 		super(app);
 
 		control = new StateMachine<>("Intro Scene Control", State.class, ShowCredits);
-		control.setLogger(LOG);
 
+		// ShowCredits
 		control.state(ShowCredits).entry = s -> {
 			creditsText.tf.setY(getHeight());
 			creditsText.setScrollSpeed(-.75f);
@@ -51,12 +50,13 @@ public class IntroScene extends Scene<BirdyGame> {
 
 		control.state(ShowCredits).update = s -> creditsText.update();
 
-		control.change(ShowCredits, WaitForShowGameTitle,
-				() -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
+		control.change(ShowCredits, Wait, () -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
 				(s, t) -> t.setDuration(app.pulse.secToTicks(2)));
 
-		control.changeOnTimeout(WaitForShowGameTitle, ShowGameTitle, (s, t) -> t.setDuration(app.pulse.secToTicks(3)));
+		// Wait
+		control.changeOnTimeout(Wait, ShowGameTitle, (s, t) -> t.setDuration(app.pulse.secToTicks(3)));
 
+		// ShowGameTitle
 		control.changeOnTimeout(ShowGameTitle, Finished);
 
 		control.state(ShowGameTitle).exit = s -> app.selectView(StartScene.class);
@@ -74,13 +74,14 @@ public class IntroScene extends Scene<BirdyGame> {
 
 		gameTitleImage = new PumpingImage(app.assets.image("title"));
 		gameTitleImage.setScale(3);
-		gameTitleImage.visibility = () -> control.stateID() == ShowGameTitle;
+		gameTitleImage.visibility = () -> control.is(ShowGameTitle);
 
 		creditsText = new ScrollingText(CREDITS_TEXT);
 		creditsText.setFont(app.assets.font("Pacifico-Regular"));
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
-		creditsText.visibility = () -> control.is(ShowCredits, WaitForShowGameTitle);
+		creditsText.visibility = () -> control.is(ShowCredits, Wait);
 
+		control.setLogger(LOG);
 		control.init();
 	}
 
