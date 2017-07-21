@@ -15,6 +15,7 @@ import static java.lang.Math.PI;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationMode;
@@ -94,7 +95,7 @@ public class Bird extends GameEntity {
 			changeOnInput(BirdTouchedGround, Crashing, OnGround);
 
 			state(OnGround).entry = s -> {
-				app.assets.sound("sfx/die.mp3").play();
+				Assets.OBJECT.sound("sfx/die.mp3").play();
 				turnDown();
 			};
 		}
@@ -115,7 +116,7 @@ public class Bird extends GameEntity {
 	}
 
 	private Sprite createFeathers(String birdName) {
-		Sprite sprite = new Sprite(app.assets, birdName + "_0", birdName + "_1", birdName + "_2");
+		Sprite sprite = new Sprite(Assets.OBJECT, birdName + "_0", birdName + "_1", birdName + "_2");
 		sprite.makeAnimated(AnimationMode.BACK_AND_FORTH, app.settings.get("bird flap millis"));
 		return sprite;
 	}
@@ -174,7 +175,7 @@ public class Bird extends GameEntity {
 	}
 
 	public void flap(float force) {
-		app.assets.sound("sfx/wing.mp3").play();
+		Assets.OBJECT.sound("sfx/wing.mp3").play();
 		tf.setVelocityY(tf.getVelocityY() - force * gravity);
 		fly();
 	}

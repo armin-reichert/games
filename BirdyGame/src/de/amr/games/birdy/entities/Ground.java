@@ -3,6 +3,7 @@ package de.amr.games.birdy.entities;
 import java.awt.Graphics2D;
 import java.awt.Image;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.play.BirdyGame;
@@ -17,7 +18,7 @@ public class Ground extends GameEntity {
 	private float startX;
 
 	public Ground(BirdyGame app) {
-		setSprites(new Sprite(app.assets.image("land")));
+		setSprites(new Sprite(Assets.OBJECT.image("land")));
 	}
 
 	@Override

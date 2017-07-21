@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
@@ -45,8 +46,8 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 	public ScatteringTestScene(ScatteringTestApp app) {
 		super(app);
-		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt"));
+		theme = new ClassicTheme(Assets.OBJECT);
+		board = new Board(Assets.OBJECT.text("board.txt"));
 	}
 
 	@Override

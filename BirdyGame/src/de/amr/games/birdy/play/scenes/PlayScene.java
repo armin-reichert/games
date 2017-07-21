@@ -15,6 +15,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
@@ -66,33 +67,33 @@ public class PlayScene extends Scene<BirdyGame> {
 				score.points -= 3;
 				bird.tf.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
-				app.assets.sound("sfx/hit.mp3").play();
+				Assets.OBJECT.sound("sfx/hit.mp3").play();
 			});
 
 			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> score.points <= 3, (e, s, t) -> {
 				bird.receiveEvent(BirdCrashed);
-				app.assets.sound("sfx/hit.mp3").play();
+				Assets.OBJECT.sound("sfx/hit.mp3").play();
 			});
 
 			changeOnInput(BirdLeftPassage, Playing, Playing, (e, s, t) -> {
 				score.points++;
-				app.assets.sound("sfx/point.mp3").play();
+				Assets.OBJECT.sound("sfx/point.mp3").play();
 			});
 
 			changeOnInput(BirdTouchedGround, Playing, GameOver, (e, s, t) -> {
 				bird.receiveEvent(BirdTouchedGround);
-				app.assets.sound("music/bgmusic.mp3").stop();
+				Assets.OBJECT.sound("music/bgmusic.mp3").stop();
 			});
 
 			changeOnInput(BirdLeftWorld, Playing, GameOver, (e, s, t) -> {
 				bird.receiveEvent(BirdLeftWorld);
-				app.assets.sound("music/bgmusic.mp3").stop();
+				Assets.OBJECT.sound("music/bgmusic.mp3").stop();
 			});
 
 			state(GameOver).entry = s -> stop();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver, (e, s, t) -> app.assets.sound("music/bgmusic.mp3").stop());
+			changeOnInput(BirdTouchedGround, GameOver, GameOver, (e, s, t) -> Assets.OBJECT.sound("music/bgmusic.mp3").stop());
 
 			state(StartingNewGame).entry = s -> app.selectView(StartScene.class);
 		}
@@ -115,10 +116,10 @@ public class PlayScene extends Scene<BirdyGame> {
 		ground = app.entities.findAny(Ground.class);
 		city = app.entities.findAny(City.class);
 		bird = app.entities.findAny(Bird.class);
-		scoreDisplay = new ScoreDisplay(app.assets, score, 1.5f);
+		scoreDisplay = new ScoreDisplay(Assets.OBJECT, score, 1.5f);
 		scoreDisplay.hCenter(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
-		gameOverText = app.entities.add(new GameEntity(new Sprite(app.assets.image("text_game_over"))));
+		gameOverText = app.entities.add(new GameEntity(new Sprite(Assets.OBJECT.image("text_game_over"))));
 		gameOverText.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tf.moveTo(0, -getHeight());

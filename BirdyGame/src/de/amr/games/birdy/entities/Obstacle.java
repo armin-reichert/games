@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.CollisionBoxSupplier;
 import de.amr.games.birdy.play.BirdyGame;
@@ -34,9 +35,9 @@ public class Obstacle extends GameEntity {
 		passage = new Rectangle2D.Double(0, passageCenterY - passageRadius, width, passageHeight);
 		lowerPart = new Rectangle2D.Double(0, passageCenterY + passageRadius, width,
 				height - passageRadius - passageCenterY);
-		pipeDown = app.assets.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
+		pipeDown = Assets.OBJECT.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
-		pipeUp = app.assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),
+		pipeUp = Assets.OBJECT.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 	}
 

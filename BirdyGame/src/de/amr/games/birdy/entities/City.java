@@ -12,6 +12,7 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -40,7 +41,7 @@ public class City extends GameEntity {
 	public City(BirdyGame app) {
 		this.app = app;
 
-		setSprites(new Sprite(app.assets, "bg_night"), new Sprite(app.assets, "bg_day"));
+		setSprites(new Sprite(Assets.OBJECT, "bg_night"), new Sprite(Assets.OBJECT, "bg_day"));
 
 		control = new StateMachine<>("City control", CityState.class, Day);
 

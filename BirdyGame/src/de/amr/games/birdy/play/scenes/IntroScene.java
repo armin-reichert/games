@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.PumpingImage;
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.scene.Scene;
@@ -45,7 +46,7 @@ public class IntroScene extends Scene<BirdyGame> {
 		control.state(ShowCredits).entry = s -> {
 			creditsText.tf.setY(getHeight());
 			creditsText.setScrollSpeed(-.75f);
-			app.assets.sound("music/bgmusic.mp3").loop();
+			Assets.OBJECT.sound("music/bgmusic.mp3").loop();
 		};
 
 		control.state(ShowCredits).update = s -> creditsText.update();
@@ -72,12 +73,12 @@ public class IntroScene extends Scene<BirdyGame> {
 			city.letSunGoUp();
 		}
 
-		gameTitleImage = new PumpingImage(app.assets.image("title"));
+		gameTitleImage = new PumpingImage(Assets.OBJECT.image("title"));
 		gameTitleImage.setScale(3);
 		gameTitleImage.visibility = () -> control.is(ShowGameTitle);
 
 		creditsText = new ScrollingText(CREDITS_TEXT);
-		creditsText.setFont(app.assets.font("Pacifico-Regular"));
+		creditsText.setFont(Assets.OBJECT.font("Pacifico-Regular"));
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
 		creditsText.visibility = () -> control.is(ShowCredits, Wait);
 

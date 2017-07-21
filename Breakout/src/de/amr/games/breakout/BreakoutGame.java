@@ -1,6 +1,7 @@
 package de.amr.games.breakout;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.games.breakout.scenes.PlayScene;
 
 /**
@@ -26,11 +27,11 @@ public class BreakoutGame extends Application {
 
 	@Override
 	public void init() {
-		assets.image("background.jpg");
-		assets.image("ball_green.png");
-		assets.image("bat_blue.png");
-		assets.sound("Sounds/plop.mp3");
-		assets.sound("Sounds/point.mp3");
+		Assets.OBJECT.image("background.jpg");
+		Assets.OBJECT.image("ball_green.png");
+		Assets.OBJECT.image("bat_blue.png");
+		Assets.OBJECT.sound("Sounds/plop.mp3");
+		Assets.OBJECT.sound("Sounds/point.mp3");
 		selectView(new PlayScene(this));
 	}
 }

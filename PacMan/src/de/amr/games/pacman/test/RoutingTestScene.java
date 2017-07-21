@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
@@ -44,12 +45,12 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	public RoutingTestScene(RoutingTestApp app) {
 		super(app);
-		theme = new ClassicTheme(app.assets);
+		theme = new ClassicTheme(Assets.OBJECT);
 	}
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt"));
+		board = new Board(Assets.OBJECT.text("board.txt"));
 
 		clickHandler = new MouseAdapter() {
 

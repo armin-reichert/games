@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
@@ -40,8 +41,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	public BlinkyTestScene(BlinkyTestApp app) {
 		super(app);
-		board = new Board(app.assets.text("board.txt"));
-		theme = new ClassicTheme(app.assets);
+		board = new Board(Assets.OBJECT.text("board.txt"));
+		theme = new ClassicTheme(Assets.OBJECT);
 	}
 
 	@Override

@@ -17,7 +17,14 @@ import javax.imageio.ImageIO;
 
 import de.amr.easy.game.Application;
 
-public class Assets {
+/**
+ * This class provides functionality to access assets like image, soinds, fonts etc.
+ * 
+ * @author Armin Reichert
+ */
+public enum Assets {
+
+	OBJECT;
 
 	private final Map<String, Font> fonts = new HashMap<>();
 	private final Map<String, Image> images = new HashMap<>();
@@ -105,7 +112,7 @@ public class Assets {
 	public Iterable<String> soundNames() {
 		return sounds.keySet();
 	}
-	
+
 	public Stream<Sound> sounds() {
 		return sounds.values().stream();
 	}
@@ -118,14 +125,13 @@ public class Assets {
 
 	public static BufferedImage scaledImage(Image image, int width, int height) {
 		Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-		BufferedImage copy = new BufferedImage(scaled.getWidth(null), scaled.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage copy = new BufferedImage(scaled.getWidth(null), scaled.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 		Graphics g = copy.getGraphics();
 		g.drawImage(scaled, 0, 0, null);
 		g.dispose();
 		return copy;
 	}
-	
+
 	public Font storeFont(String key, String fontName, float size, int style) {
 		if (!fonts.containsKey(key)) {
 			Font font = readFont(fontName).deriveFont(style, size);
@@ -133,7 +139,7 @@ public class Assets {
 		}
 		return fonts.get(key);
 	}
-	
+
 	public Font font(String key) {
 		if (fonts.containsKey(key)) {
 			return fonts.get(key);
@@ -185,8 +191,7 @@ public class Assets {
 		s.append("\n-- Images:\n");
 		for (String name : imageNames) {
 			Image image = image(name);
-			s.append(name).append(": ").append(image.getWidth(null) + "x" + image.getHeight(null))
-					.append("\n");
+			s.append(name).append(": ").append(image.getWidth(null) + "x" + image.getHeight(null)).append("\n");
 		}
 		s.append("\n-- Sounds:\n");
 		for (String name : soundNames) {

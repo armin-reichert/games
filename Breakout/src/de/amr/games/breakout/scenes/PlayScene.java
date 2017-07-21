@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
@@ -75,7 +76,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void init() {
-		Image background = app.assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
+		Image background = Assets.OBJECT.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 		setBgImage(background);
 		ball = app.entities.add(new Ball(app, app.settings.get("ball_size")));
@@ -177,7 +178,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private void bounceBallFromBat() {
 		ball.tf.setY(bat.tf.getY() - ball.getHeight());
 		ball.tf.setVelocityY(-ball.tf.getVelocityY());
-		app.assets.sound("Sounds/plop.mp3").play();
+		Assets.OBJECT.sound("Sounds/plop.mp3").play();
 	}
 
 	private void bounceBallFromBrick(Brick brick) {
@@ -203,7 +204,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 		if (brick.isDamaged()) {
 			removeBrick(brick);
 			points += brick.getValue();
-			app.assets.sound("Sounds/point.mp3").play();
+			Assets.OBJECT.sound("Sounds/point.mp3").play();
 		} else {
 			brick.damage();
 			bounceBallFromBrick(brick);

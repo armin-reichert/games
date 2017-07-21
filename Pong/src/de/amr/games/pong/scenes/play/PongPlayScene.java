@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pong.PongGame;
@@ -152,13 +153,13 @@ public class PongPlayScene extends Scene<PongGame> {
 	void bounceBallFromLeftPaddle() {
 		ball.tf.setX(paddleLeft.tf.getX() + paddleLeft.getWidth() + 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
-		app.assets.sound("plop.mp3").play();
+		Assets.OBJECT.sound("plop.mp3").play();
 	}
 
 	void bounceBallFromRightPaddle() {
 		ball.tf.setX(paddleRight.tf.getX() - ball.getWidth() - 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
-		app.assets.sound("plip.mp3").play();
+		Assets.OBJECT.sound("plip.mp3").play();
 	}
 
 	boolean leftPlayerWins() {

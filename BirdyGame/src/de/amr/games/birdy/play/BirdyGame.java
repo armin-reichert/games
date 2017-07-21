@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
@@ -50,9 +51,9 @@ public class BirdyGame extends Application {
 
 	@Override
 	public void init() {
-		SpritesheetReader.extractSpriteSheet(assets);
-		assets.sound("music/bgmusic.mp3").volume(-20);
-		assets.storeFont("Pacifico-Regular", "fonts/Pacifico-Regular.ttf", 40, Font.BOLD);
+		SpritesheetReader.extractSpriteSheet(Assets.OBJECT);
+		Assets.OBJECT.sound("music/bgmusic.mp3").volume(-20);
+		Assets.OBJECT.storeFont("Pacifico-Regular", "fonts/Pacifico-Regular.ttf", 40, Font.BOLD);
 
 		// create entities shared by different scenes:
 		entities.add(new Bird(this));

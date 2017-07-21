@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
@@ -34,12 +35,12 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
 	public RandomMoveTestScene(RandomMoveTestApp app) {
 		super(app);
-		theme = new ClassicTheme(app.assets);
+		theme = new ClassicTheme(Assets.OBJECT);
 	}
 
 	@Override
 	public void init() {
-		board = new Board(app.assets.text("board.txt"));
+		board = new Board(Assets.OBJECT.text("board.txt"));
 		createGhosts();
 	};
 

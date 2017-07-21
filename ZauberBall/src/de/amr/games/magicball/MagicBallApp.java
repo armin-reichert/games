@@ -3,6 +3,7 @@ package de.amr.games.magicball;
 import java.awt.Color;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.magicball.views.DrawingScene;
 
@@ -23,7 +24,7 @@ public class MagicBallApp extends Application {
 
 	@Override
 	public void init() {
-		assets.image("ball.png");
+		Assets.OBJECT.image("ball.png");
 		selectView(new DrawingScene(this));
 	}
 }

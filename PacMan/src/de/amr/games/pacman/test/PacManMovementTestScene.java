@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.State;
 import de.amr.games.pacman.core.board.Board;
@@ -62,8 +63,8 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 	public PacManMovementTestScene(PacManMovementTestApp app) {
 		super(app);
-		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt"));
+		theme = new ClassicTheme(Assets.OBJECT);
+		board = new Board(Assets.OBJECT.text("board.txt"));
 	}
 
 	@Override
@@ -95,14 +96,14 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		// Dying
 		pacMan.control.state(Dying).entry = state -> {
-			app.assets.sound("sfx/die.mp3").play();
+			Assets.OBJECT.sound("sfx/die.mp3").play();
 			theme.getPacManDyingSprite().setAnimationEnabled(true);
 		};
 		pacMan.control.state(Dying).exit = state -> {
 			theme.getPacManDyingSprite().resetAnimation();
 			start();
 		};
-		pacMan.control.change(Dying, Initialized, () -> !app.assets.sound("sfx/die.mp3").isRunning());
+		pacMan.control.change(Dying, Initialized, () -> !Assets.OBJECT.sound("sfx/die.mp3").isRunning());
 
 		// Event handlers
 		pacMan.onContentFound = content -> {

@@ -1,6 +1,7 @@
 package de.amr.games.diashow;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.games.diashow.screens.DiashowScreen;
 
 public class Diashow extends Application {
@@ -18,10 +19,10 @@ public class Diashow extends Application {
 
 	@Override
 	public void init() {
-		assets.image("0.jpg");
-		assets.image("1.jpg");
-		assets.image("2.jpg");
-		assets.image("3.jpg");
+		Assets.OBJECT.image("0.jpg");
+		Assets.OBJECT.image("1.jpg");
+		Assets.OBJECT.image("2.jpg");
+		Assets.OBJECT.image("3.jpg");
 		addView(new DiashowScreen(this));
 		selectView(DiashowScreen.class);
 	}

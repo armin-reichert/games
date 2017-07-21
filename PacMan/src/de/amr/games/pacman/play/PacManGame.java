@@ -1,6 +1,7 @@
 package de.amr.games.pacman.play;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.ModernTheme;
@@ -23,7 +24,7 @@ public class PacManGame extends Application {
 	}
 
 	public PacManGame() {
-		themeManager = new ThemeManager(new ClassicTheme(assets), new ModernTheme(assets));
+		themeManager = new ThemeManager(new ClassicTheme(Assets.OBJECT), new ModernTheme(Assets.OBJECT));
 		settings.title = "Armin's Pac-Man";
 		settings.width = 448;
 		settings.height = 576;

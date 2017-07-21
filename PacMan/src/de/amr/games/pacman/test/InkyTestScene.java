@@ -17,6 +17,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -40,8 +41,8 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 	public InkyTestScene(InkyTestApp app) {
 		super(app);
-		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt"));
+		theme = new ClassicTheme(Assets.OBJECT);
+		board = new Board(Assets.OBJECT.text("board.txt"));
 	}
 
 	@Override

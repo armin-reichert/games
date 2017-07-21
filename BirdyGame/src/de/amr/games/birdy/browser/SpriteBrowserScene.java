@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 
@@ -21,7 +22,7 @@ public class SpriteBrowserScene extends Scene<SpriteBrowser> {
 	public SpriteBrowserScene(SpriteBrowser app) {
 		super(app);
 		spriteNames = new ArrayList<>();
-		for (String name : app.assets.imageNames()) {
+		for (String name : Assets.OBJECT.imageNames()) {
 			spriteNames.add(name);
 		}
 		Collections.sort(spriteNames);
@@ -46,7 +47,7 @@ public class SpriteBrowserScene extends Scene<SpriteBrowser> {
 			return;
 		}
 		String name = spriteNames.get(index);
-		BufferedImage image = app.assets.image(name);
+		BufferedImage image = Assets.OBJECT.image(name);
 		String text = name + " (" + image.getWidth() + "x" + image.getHeight() + ")";
 		text += " (Keys: LEFT=Previous, RIGHT=Next, X=Exit)";
 		g.setColor(Color.WHITE);

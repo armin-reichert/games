@@ -5,6 +5,7 @@ import static de.amr.games.pong.PongGlobals.WINNING_SCORE;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.Score;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pong.entities.AutoPaddleLeft;
@@ -42,9 +43,9 @@ public class PongGame extends Application {
 	public void init() {
 		setPlayMode(PlayMode.Player1_Player2);
 
-		assets.sound("plop.mp3");
-		assets.sound("plip.mp3");
-		assets.sound("out.mp3");
+		Assets.OBJECT.sound("plop.mp3");
+		Assets.OBJECT.sound("plip.mp3");
+		Assets.OBJECT.sound("out.mp3");
 
 		entities.add(new AutoPaddleLeft(this));
 		entities.add(new AutoPaddleRight(this));

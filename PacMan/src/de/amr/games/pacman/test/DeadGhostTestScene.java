@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.util.Random;
 
 import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
@@ -37,8 +38,8 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
 	public DeadGhostTestScene(DeadGhostTestApp app) {
 		super(app);
-		theme = new ClassicTheme(app.assets);
-		board = new Board(app.assets.text("board.txt"));
+		theme = new ClassicTheme(Assets.OBJECT);
+		board = new Board(Assets.OBJECT.text("board.txt"));
 		rand = new Random();
 	}
 

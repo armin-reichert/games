@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.config.AppSettings;
 import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.entity.collision.CollisionHandler;
@@ -58,9 +57,6 @@ public abstract class Application {
 	/** The settings of this application. */
 	public final AppSettings settings;
 
-	/** The assets used by this application. */
-	public final Assets assets;
-
 	/** The set of entities used by this application. */
 	public final EntitySet entities;
 
@@ -88,7 +84,6 @@ public abstract class Application {
 	 */
 	protected Application() {
 		settings = new AppSettings();
-		assets = new Assets();
 		views = new HashSet<>();
 		defaultView = new DefaultView(this);
 		selectedView = defaultView;

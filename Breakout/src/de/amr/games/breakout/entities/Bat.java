@@ -6,6 +6,7 @@ import static java.lang.Math.min;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -18,7 +19,7 @@ public class Bat extends GameEntity {
 
 	public Bat(BreakoutGame app, int width, int height) {
 		boardSize = new Dimension(app.getWidth(), app.getHeight());
-		setSprites(new Sprite(app.assets, "bat_blue.png").scale(width, height));
+		setSprites(new Sprite(Assets.OBJECT, "bat_blue.png").scale(width, height));
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.diashow.Diashow;
@@ -24,7 +25,7 @@ public class DiashowScreen extends Scene<Diashow> {
 	public void init() {
 		images = new Image[nImages];
 		for (int i = 0; i < nImages; i++) {
-			images[i] = app.assets.readImage(i + ".jpg").getScaledInstance(app.getWidth(), -1, Image.SCALE_SMOOTH);
+			images[i] = Assets.OBJECT.readImage(i + ".jpg").getScaledInstance(app.getWidth(), -1, Image.SCALE_SMOOTH);
 		}
 		current = 0;
 	}
