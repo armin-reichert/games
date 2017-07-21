@@ -53,11 +53,11 @@ public class ModernTheme extends PacManTheme {
 		return tile(modernSpriteSheet, row, col);
 	}
 
-	public ModernTheme(Assets assets) {
+	public ModernTheme() {
 
-		originalSheet = assets.image("pacman_original.png");
-		modernSpriteSheet = assets.image("chompersprites.png");
-		modernTileSheet = assets.image("chompermazetiles.png");
+		originalSheet = Assets.image("pacman_original.png");
+		modernSpriteSheet = Assets.image("chompersprites.png");
+		modernTileSheet = Assets.image("chompermazetiles.png");
 
 		boardSprite = new Sprite(originalSheet.getSubimage(228, 0, 224, 248)).scale(28 * TILE_SIZE, (36 - 5) * TILE_SIZE);
 
@@ -109,8 +109,8 @@ public class ModernTheme extends PacManTheme {
 		pillSprite = new Sprite(tile(modernTileSheet, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
 
 		// Text display
-		assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
-		textFont = assets.font("textFont");
+		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		textFont = Assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
 

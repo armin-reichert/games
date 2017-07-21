@@ -38,8 +38,8 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 
 	public DeadGhostTestScene(DeadGhostTestApp app) {
 		super(app);
-		theme = new ClassicTheme(Assets.OBJECT);
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		theme = new ClassicTheme();
+		board = new Board(Assets.text("board.txt"));
 		rand = new Random();
 	}
 

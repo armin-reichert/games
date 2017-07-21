@@ -44,7 +44,7 @@ public class Sprite {
 		images = new Image[imageKeys.length];
 		int i = 0;
 		for (String key : imageKeys) {
-			images[i++] = Assets.OBJECT.image(key);
+			images[i++] = Assets.image(key);
 		}
 	}
 

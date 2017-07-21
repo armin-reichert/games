@@ -46,8 +46,8 @@ public class ScatteringTestScene extends Scene<ScatteringTestApp> {
 
 	public ScatteringTestScene(ScatteringTestApp app) {
 		super(app);
-		theme = new ClassicTheme(Assets.OBJECT);
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		theme = new ClassicTheme();
+		board = new Board(Assets.text("board.txt"));
 	}
 
 	@Override

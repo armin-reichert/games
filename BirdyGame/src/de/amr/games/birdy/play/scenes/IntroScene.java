@@ -46,7 +46,7 @@ public class IntroScene extends Scene<BirdyGame> {
 		control.state(ShowCredits).entry = s -> {
 			creditsText.tf.setY(getHeight());
 			creditsText.setScrollSpeed(-.75f);
-			Assets.OBJECT.sound("music/bgmusic.mp3").loop();
+			Assets.sound("music/bgmusic.mp3").loop();
 		};
 
 		control.state(ShowCredits).update = s -> creditsText.update();
@@ -73,12 +73,12 @@ public class IntroScene extends Scene<BirdyGame> {
 			city.letSunGoUp();
 		}
 
-		gameTitleImage = new PumpingImage(Assets.OBJECT.image("title"));
+		gameTitleImage = new PumpingImage(Assets.image("title"));
 		gameTitleImage.setScale(3);
 		gameTitleImage.visibility = () -> control.is(ShowGameTitle);
 
 		creditsText = new ScrollingText(CREDITS_TEXT);
-		creditsText.setFont(Assets.OBJECT.font("Pacifico-Regular"));
+		creditsText.setFont(Assets.font("Pacifico-Regular"));
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
 		creditsText.visibility = () -> control.is(ShowCredits, Wait);
 

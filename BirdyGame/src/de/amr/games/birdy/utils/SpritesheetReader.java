@@ -6,9 +6,9 @@ import de.amr.easy.game.assets.Assets;
 
 public class SpritesheetReader {
 
-	public static void extractSpriteSheet(Assets assets) {
-		BufferedImage atlas = assets.image("spritesheet/atlas.png");
-		String[] map = assets.readTextFile("spritesheet/atlas.txt").split("\\s+");
+	public static void extractSpriteSheet() {
+		BufferedImage atlas = Assets.image("spritesheet/atlas.png");
+		String[] map = Assets.readTextFile("spritesheet/atlas.txt").split("\\s+");
 		int scale = 1024;
 		for (int i = 0; i < map.length;) {
 			String spriteName = map[i++];
@@ -17,7 +17,7 @@ public class SpritesheetReader {
 			int y = Math.round(Float.parseFloat(map[i++]) * scale);
 			int width = Math.round(Float.parseFloat(map[i++]) * scale);
 			int height = Math.round(Float.parseFloat(map[i++]) * scale);
-			assets.storeImage(spriteName, atlas.getSubimage(x, y, width, height));
+			Assets.storeImage(spriteName, atlas.getSubimage(x, y, width, height));
 		}
 	}
 }

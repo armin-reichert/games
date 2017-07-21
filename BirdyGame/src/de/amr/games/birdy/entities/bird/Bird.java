@@ -95,7 +95,7 @@ public class Bird extends GameEntity {
 			changeOnInput(BirdTouchedGround, Crashing, OnGround);
 
 			state(OnGround).entry = s -> {
-				Assets.OBJECT.sound("sfx/die.mp3").play();
+				Assets.sound("sfx/die.mp3").play();
 				turnDown();
 			};
 		}
@@ -175,7 +175,7 @@ public class Bird extends GameEntity {
 	}
 
 	public void flap(float force) {
-		Assets.OBJECT.sound("sfx/wing.mp3").play();
+		Assets.sound("sfx/wing.mp3").play();
 		tf.setVelocityY(tf.getVelocityY() - force * gravity);
 		fly();
 	}

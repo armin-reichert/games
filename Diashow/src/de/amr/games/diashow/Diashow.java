@@ -19,10 +19,10 @@ public class Diashow extends Application {
 
 	@Override
 	public void init() {
-		Assets.OBJECT.image("0.jpg");
-		Assets.OBJECT.image("1.jpg");
-		Assets.OBJECT.image("2.jpg");
-		Assets.OBJECT.image("3.jpg");
+		Assets.image("0.jpg");
+		Assets.image("1.jpg");
+		Assets.image("2.jpg");
+		Assets.image("3.jpg");
 		addView(new DiashowScreen(this));
 		selectView(DiashowScreen.class);
 	}

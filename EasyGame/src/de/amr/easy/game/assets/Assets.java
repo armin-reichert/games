@@ -18,26 +18,27 @@ import javax.imageio.ImageIO;
 import de.amr.easy.game.Application;
 
 /**
- * This class provides functionality to access assets like image, soinds, fonts etc.
+ * This class provides functionality to access assets like image, sounds, fonts etc.
  * 
  * @author Armin Reichert
  */
 public enum Assets {
 
-	OBJECT;
+	/** The singleton object of this class. */
+	OBJ;
 
 	private final Map<String, Font> fonts = new HashMap<>();
 	private final Map<String, Image> images = new HashMap<>();
 	private final Map<String, Sound> sounds = new HashMap<>();
 	private final Map<String, String> texts = new HashMap<>();
 
-	private InputStream asInputStream(String path) {
-		InputStream istream = Assets.class.getClassLoader().getResourceAsStream(path);
-		if (istream == null) {
-			Application.LOG.severe("Could not get input stream for path: " + path);
-			throw new IllegalArgumentException();
+	private static InputStream toInputStream(String path) {
+		InputStream is = Assets.class.getClassLoader().getResourceAsStream(path);
+		if (is == null) {
+			Application.LOG.severe("Could not access resource with assets path: " + path);
+			throw new RuntimeException();
 		}
-		return istream;
+		return is;
 	}
 
 	/**
@@ -47,10 +48,8 @@ public enum Assets {
 	 *          relative path inside "assets" folder
 	 * @return the text file content as a single string
 	 */
-	public String readTextFile(String path) {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(asInputStream(path)));
+	public static String readTextFile(String path) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(toInputStream(path)));) {
 			StringBuilder sb = new StringBuilder();
 			for (String line; (line = reader.readLine()) != null;) {
 				sb.append(line).append('\n');
@@ -58,71 +57,92 @@ public enum Assets {
 			return sb.toString();
 		} catch (IOException e) {
 			Application.LOG.severe("Could not read text resource from path: " + path);
-			throw new IllegalArgumentException();
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			throw new RuntimeException(e);
 		}
 	}
 
-	private Font readFont(String path) {
-		InputStream fontStream = null;
-		try {
-			fontStream = asInputStream(path);
+	private static Font readFont(String path) {
+		try (InputStream fontStream = toInputStream(path)) {
 			return Font.createFont(Font.TRUETYPE_FONT, fontStream);
 		} catch (Exception e) {
-			Application.LOG.severe("Could not read font resource from path: " + path);
-			throw new IllegalArgumentException();
+			Application.LOG.severe("Could not read font from asset path: " + path);
+			throw new RuntimeException(e);
 		}
 	}
 
-	public BufferedImage readImage(String path) {
-		InputStream is = null;
-		try {
-			is = asInputStream(path);
+	/**
+	 * Reads an image from the given assets path.
+	 * 
+	 * @param path
+	 *          relative path inside "assets" folder
+	 * @return the image
+	 */
+	public static BufferedImage readImage(String path) {
+		try (InputStream is = toInputStream(path)) {
 			BufferedImage image = ImageIO.read(is);
-			if (image == null) {
-				Application.LOG.severe("Unsupported image resource at path: " + path);
-				throw new IllegalArgumentException();
+			if (image != null) {
+				return image;
 			}
-			return image;
-		} catch (IOException e) {
-			Application.LOG.severe("Could not read image resource from path: " + path);
+			Application.LOG.severe("No image resource found at asset path: " + path);
 			throw new IllegalArgumentException();
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException x) {
-					x.printStackTrace();
-				}
-			}
+		} catch (IOException e) {
+			Application.LOG.severe("Could not read image resource from asset path: " + path);
+			throw new RuntimeException(e);
 		}
 	}
 
-	public Iterable<String> imageNames() {
-		return images.keySet();
+	/**
+	 * Returns the names of all images accessed so far.
+	 * 
+	 * @return the image names
+	 */
+	public static Iterable<String> imageNames() {
+		return OBJ.images.keySet();
 	}
 
-	public Iterable<String> soundNames() {
-		return sounds.keySet();
+	/**
+	 * Returns the names of all sounds accessed so far.
+	 * 
+	 * @return the sound names
+	 */
+	public static Iterable<String> soundNames() {
+		return OBJ.sounds.keySet();
 	}
 
-	public Stream<Sound> sounds() {
-		return sounds.values().stream();
+	/**
+	 * Returns the sound objects accessed so far.
+	 * 
+	 * @return the sound objects
+	 */
+	public static Stream<Sound> sounds() {
+		return OBJ.sounds.values().stream();
 	}
 
-	public void storeImage(String path, Image image) {
-		if (images.put(path, image) != null) {
+	/**
+	 * Stores the given image under the given path name.
+	 * 
+	 * @param path
+	 *          path names
+	 * @param image
+	 *          image
+	 */
+	public static void storeImage(String path, Image image) {
+		if (OBJ.images.put(path, image) != null) {
 			Application.LOG.warning("Image with name: " + path + " has been replaced.");
 		}
 	}
 
+	/**
+	 * Returns a scaled version of the given image as a buffered image.
+	 * 
+	 * @param image
+	 *          an image
+	 * @param width
+	 *          the scaled width
+	 * @param height
+	 *          the scaled height
+	 * @return the scaled image
+	 */
 	public static BufferedImage scaledImage(Image image, int width, int height) {
 		Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 		BufferedImage copy = new BufferedImage(scaled.getWidth(null), scaled.getHeight(null), BufferedImage.TYPE_INT_ARGB);
@@ -132,55 +152,99 @@ public enum Assets {
 		return copy;
 	}
 
-	public Font storeFont(String key, String fontName, float size, int style) {
-		if (!fonts.containsKey(key)) {
+	/**
+	 * Stores the font with given name, size and style under the given key.
+	 * 
+	 * @param key
+	 *          key under which the font my be accessed
+	 * @param fontName
+	 *          font name
+	 * @param size
+	 *          font size
+	 * @param style
+	 *          font style
+	 * @return font as specified
+	 */
+	public static Font storeFont(String key, String fontName, float size, int style) {
+		if (!OBJ.fonts.containsKey(key)) {
 			Font font = readFont(fontName).deriveFont(style, size);
-			fonts.put(key, font);
+			OBJ.fonts.put(key, font);
 		}
-		return fonts.get(key);
+		return OBJ.fonts.get(key);
 	}
 
-	public Font font(String key) {
-		if (fonts.containsKey(key)) {
-			return fonts.get(key);
+	/**
+	 * Returns the font stored with the given key.
+	 * 
+	 * @param key
+	 *          font key
+	 * @return font as requested
+	 */
+	public static Font font(String key) {
+		if (OBJ.fonts.containsKey(key)) {
+			return OBJ.fonts.get(key);
 		}
-		throw new IllegalStateException("Font not found");
+		throw new IllegalStateException("No font found with key: " + key);
 	}
 
+	/**
+	 * Returns the image with the given path. If the image is requested for the first time, it is
+	 * loaded from the specified path.
+	 * 
+	 * @param path
+	 *          path under assets folder or key in assets map
+	 * @return image as requested
+	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Image> T image(String key) {
-		if (!images.containsKey(key)) {
-			images.put(key, readImage(key));
+	public static <T extends Image> T image(String path) {
+		if (!OBJ.images.containsKey(path)) {
+			OBJ.images.put(path, readImage(path));
 		}
-		return (T) images.get(key);
+		return (T) OBJ.images.get(path);
 	}
 
-	public Sound sound(String key) {
-		if (!sounds.containsKey(key)) {
-			InputStream is = asInputStream(key);
-			sounds.put(key, new AudioClip(is));
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	/**
+	 * Returns the sound with the given path.
+	 * 
+	 * @param path
+	 *          path to sound file
+	 * @return sound object
+	 */
+	public static Sound sound(String path) {
+		if (OBJ.sounds.containsKey(path)) {
+			return OBJ.sounds.get(path);
 		}
-		return sounds.get(key);
+		try (InputStream is = toInputStream(path)) {
+			AudioClip clip = new AudioClip(is);
+			OBJ.sounds.put(path, clip);
+			return clip;
+		} catch (Exception e) {
+			Application.LOG.severe("Could not read sound resource from asset path: " + path);
+			throw new RuntimeException(e);
+		}
 	}
 
-	public String text(String key) {
-		if (!texts.containsKey(key)) {
-			String text = readTextFile(key);
-			texts.put(key, text);
+	/**
+	 * Returns the content of the text file under the specified path.
+	 * 
+	 * @param path
+	 *          path to text file
+	 * @return text file content as a single string
+	 */
+	public static String text(String path) {
+		if (OBJ.texts.containsKey(path)) {
+			return OBJ.texts.get(path);
 		}
-		return texts.get(key);
+		String text = readTextFile(path);
+		OBJ.texts.put(path, text);
+		return text;
 	}
 
-	public String overview() {
+	public static String overview() {
 		StringBuilder s = new StringBuilder();
-		String[] fontNames = fonts.keySet().toArray(new String[fonts.size()]);
-		String[] imageNames = images.keySet().toArray(new String[images.size()]);
-		String[] soundNames = sounds.keySet().toArray(new String[sounds.size()]);
+		String[] fontNames = OBJ.fonts.keySet().toArray(new String[OBJ.fonts.size()]);
+		String[] imageNames = OBJ.images.keySet().toArray(new String[OBJ.images.size()]);
+		String[] soundNames = OBJ.sounds.keySet().toArray(new String[OBJ.sounds.size()]);
 		Arrays.sort(fontNames);
 		Arrays.sort(imageNames);
 		Arrays.sort(soundNames);
@@ -199,7 +263,7 @@ public enum Assets {
 			s.append(name).append(": ").append(sound.getClass().getSimpleName()).append("\n");
 		}
 		s.append("\n-- Texts:\n");
-		texts.entrySet().stream().forEach(entry -> {
+		OBJ.texts.entrySet().stream().forEach(entry -> {
 			s.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
 		});
 		return s.toString();

@@ -22,12 +22,12 @@ public class ScoreDisplay extends GameEntity {
 	private final Image[] digits;
 	private String scoreText;
 
-	public ScoreDisplay(Assets assets, Score score, float scale) {
+	public ScoreDisplay(Score score, float scale) {
 		this.score = score;
 		this.scale = scale;
 		this.digits = new Image[10];
 		for (int d = 0; d <= 9; d++) {
-			BufferedImage digitImage = assets.image("number_score_0" + d);
+			BufferedImage digitImage = Assets.image("number_score_0" + d);
 			digits[d] = digitImage.getScaledInstance(-1, round(scale) * digitImage.getHeight(), Image.SCALE_SMOOTH);
 		}
 		scoreText = pointsText();

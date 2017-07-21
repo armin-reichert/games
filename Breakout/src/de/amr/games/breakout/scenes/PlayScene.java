@@ -76,7 +76,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void init() {
-		Image background = Assets.OBJECT.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
+		Image background = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 		setBgImage(background);
 		ball = app.entities.add(new Ball(app, app.settings.get("ball_size")));
@@ -178,7 +178,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private void bounceBallFromBat() {
 		ball.tf.setY(bat.tf.getY() - ball.getHeight());
 		ball.tf.setVelocityY(-ball.tf.getVelocityY());
-		Assets.OBJECT.sound("Sounds/plop.mp3").play();
+		Assets.sound("Sounds/plop.mp3").play();
 	}
 
 	private void bounceBallFromBrick(Brick brick) {
@@ -204,7 +204,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 		if (brick.isDamaged()) {
 			removeBrick(brick);
 			points += brick.getValue();
-			Assets.OBJECT.sound("Sounds/point.mp3").play();
+			Assets.sound("Sounds/point.mp3").play();
 		} else {
 			brick.damage();
 			bounceBallFromBrick(brick);

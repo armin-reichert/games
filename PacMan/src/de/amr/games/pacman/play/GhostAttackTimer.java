@@ -43,8 +43,8 @@ public class GhostAttackTimer {
 			++wave;
 			state.setDuration(computeFrames(scatteringSeconds));
 			ghosts.forEach(ghost -> ghost.receiveEvent(GhostEvent.ScatteringStarts));
-			Assets.OBJECT.sound("sfx/siren.mp3").stop();
-			Assets.OBJECT.sound("sfx/siren.mp3").loop();
+			Assets.sound("sfx/siren.mp3").stop();
+			Assets.sound("sfx/siren.mp3").loop();
 		};
 
 		fsm.changeOnTimeout(Scattering, Chasing);

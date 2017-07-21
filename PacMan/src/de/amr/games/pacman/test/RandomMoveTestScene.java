@@ -35,12 +35,12 @@ public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
 
 	public RandomMoveTestScene(RandomMoveTestApp app) {
 		super(app);
-		theme = new ClassicTheme(Assets.OBJECT);
+		theme = new ClassicTheme();
 	}
 
 	@Override
 	public void init() {
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		board = new Board(Assets.text("board.txt"));
 		createGhosts();
 	};
 

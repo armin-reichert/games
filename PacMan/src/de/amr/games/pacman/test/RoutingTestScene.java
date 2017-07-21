@@ -45,12 +45,12 @@ public class RoutingTestScene extends Scene<RoutingTestApp> {
 
 	public RoutingTestScene(RoutingTestApp app) {
 		super(app);
-		theme = new ClassicTheme(Assets.OBJECT);
+		theme = new ClassicTheme();
 	}
 
 	@Override
 	public void init() {
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		board = new Board(Assets.text("board.txt"));
 
 		clickHandler = new MouseAdapter() {
 

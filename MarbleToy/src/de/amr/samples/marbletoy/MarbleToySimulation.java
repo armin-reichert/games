@@ -24,8 +24,8 @@ public class MarbleToySimulation extends Application {
 
 	@Override
 	public void init() {
-		Marble marble = new Marble(new Sprite(Assets.OBJECT.image("marble.png")).scale(50, 50));
-		entities.add(new MarbleToy(new Sprite(Assets.OBJECT.image("toy.png")), marble));
+		Marble marble = new Marble(new Sprite(Assets.image("marble.png")).scale(50, 50));
+		entities.add(new MarbleToy(new Sprite(Assets.image("toy.png")), marble));
 		selectView(new MainScene(this));
 	}
 }

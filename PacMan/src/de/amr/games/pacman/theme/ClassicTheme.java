@@ -72,8 +72,8 @@ public class ClassicTheme extends PacManTheme {
 		return new Sprite(pelletImage);
 	}
 
-	public ClassicTheme(Assets assets) {
-		sheet = assets.image("pacman_original.png");
+	public ClassicTheme() {
+		sheet = Assets.image("pacman_original.png");
 
 		boardSprite = new Sprite(sheet.getSubimage(228, 0, 224, 248));
 		boardSprite.scale(TILE_SIZE * 28, TILE_SIZE * 31);
@@ -141,8 +141,8 @@ public class ClassicTheme extends PacManTheme {
 		lifeSprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		// Text display
-		assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
-		textFont = assets.font("textFont");
+		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		textFont = Assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
 

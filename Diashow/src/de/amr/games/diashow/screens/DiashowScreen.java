@@ -25,7 +25,7 @@ public class DiashowScreen extends Scene<Diashow> {
 	public void init() {
 		images = new Image[nImages];
 		for (int i = 0; i < nImages; i++) {
-			images[i] = Assets.OBJECT.readImage(i + ".jpg").getScaledInstance(app.getWidth(), -1, Image.SCALE_SMOOTH);
+			images[i] = Assets.readImage(i + ".jpg").getScaledInstance(app.getWidth(), -1, Image.SCALE_SMOOTH);
 		}
 		current = 0;
 	}

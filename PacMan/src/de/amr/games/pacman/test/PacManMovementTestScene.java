@@ -63,8 +63,8 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 	public PacManMovementTestScene(PacManMovementTestApp app) {
 		super(app);
-		theme = new ClassicTheme(Assets.OBJECT);
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		theme = new ClassicTheme();
+		board = new Board(Assets.text("board.txt"));
 	}
 
 	@Override
@@ -96,14 +96,14 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 
 		// Dying
 		pacMan.control.state(Dying).entry = state -> {
-			Assets.OBJECT.sound("sfx/die.mp3").play();
+			Assets.sound("sfx/die.mp3").play();
 			theme.getPacManDyingSprite().setAnimationEnabled(true);
 		};
 		pacMan.control.state(Dying).exit = state -> {
 			theme.getPacManDyingSprite().resetAnimation();
 			start();
 		};
-		pacMan.control.change(Dying, Initialized, () -> !Assets.OBJECT.sound("sfx/die.mp3").isRunning());
+		pacMan.control.change(Dying, Initialized, () -> !Assets.sound("sfx/die.mp3").isRunning());
 
 		// Event handlers
 		pacMan.onContentFound = content -> {

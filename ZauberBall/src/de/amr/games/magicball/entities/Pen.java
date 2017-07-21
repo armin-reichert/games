@@ -16,8 +16,8 @@ public class Pen extends GameEntity {
 	private Color color;
 	private int thickness;
 
-	public Pen(Assets assets, BufferedImage image) {
-		super(new Sprite(assets.image("ball.png")).scale(0, 50, 50));
+	public Pen(BufferedImage image) {
+		super(new Sprite(Assets.image("ball.png")).scale(0, 50, 50));
 		this.image = image;
 		thickness = 20;
 		color = randomColor();

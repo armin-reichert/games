@@ -1,7 +1,6 @@
 package de.amr.games.birdy.browser;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.assets.Assets;
 import de.amr.games.birdy.utils.SpritesheetReader;
 
 public class SpriteBrowser extends Application {
@@ -19,7 +18,7 @@ public class SpriteBrowser extends Application {
 
 	@Override
 	public void init() {
-		SpritesheetReader.extractSpriteSheet(Assets.OBJECT);
+		SpritesheetReader.extractSpriteSheet();
 		selectView(new SpriteBrowserScene(this));
 	}
 }

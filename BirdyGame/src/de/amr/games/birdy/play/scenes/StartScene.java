@@ -51,8 +51,8 @@ public class StartScene extends Scene<BirdyGame> {
 
 			state(Starting).entry = s -> {
 				reset();
-				if (!Assets.OBJECT.sound("music/bgmusic.mp3").isRunning()) {
-					Assets.OBJECT.sound("music/bgmusic.mp3").loop();
+				if (!Assets.sound("music/bgmusic.mp3").isRunning()) {
+					Assets.sound("music/bgmusic.mp3").loop();
 				}
 			};
 
@@ -80,7 +80,7 @@ public class StartScene extends Scene<BirdyGame> {
 			state(GameOver).entry = s -> {
 				stop();
 				displayedText = Optional.of(app.entities.findByName(GameEntity.class, "game_over"));
-				Assets.OBJECT.sounds().forEach(Sound::stop);
+				Assets.sounds().forEach(Sound::stop);
 			};
 
 			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
@@ -135,19 +135,19 @@ public class StartScene extends Scene<BirdyGame> {
 		bird.setNormalFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 
 		if (!app.entities.contains("title")) {
-			GameEntity titleText = new GameEntity(new Sprite(Assets.OBJECT.image("title")));
+			GameEntity titleText = new GameEntity(new Sprite(Assets.image("title")));
 			titleText.setName("title");
 			app.entities.add(titleText);
 		}
 
 		if (!app.entities.contains("text_game_over")) {
-			GameEntity gameOverText = new GameEntity(new Sprite(Assets.OBJECT.image("text_game_over")));
+			GameEntity gameOverText = new GameEntity(new Sprite(Assets.image("text_game_over")));
 			gameOverText.setName("game_over");
 			app.entities.add(gameOverText);
 		}
 
 		if (!app.entities.contains("text_ready")) {
-			PumpingImage readyText = new PumpingImage(Assets.OBJECT.image("text_ready"));
+			PumpingImage readyText = new PumpingImage(Assets.image("text_ready"));
 			readyText.setName("readyText");
 			app.entities.add(readyText);
 		}

@@ -35,9 +35,9 @@ public class Obstacle extends GameEntity {
 		passage = new Rectangle2D.Double(0, passageCenterY - passageRadius, width, passageHeight);
 		lowerPart = new Rectangle2D.Double(0, passageCenterY + passageRadius, width,
 				height - passageRadius - passageCenterY);
-		pipeDown = Assets.OBJECT.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
+		pipeDown = Assets.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
-		pipeUp = Assets.OBJECT.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),
+		pipeUp = Assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 	}
 

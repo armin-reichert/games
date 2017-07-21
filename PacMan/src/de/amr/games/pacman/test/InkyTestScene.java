@@ -41,8 +41,8 @@ public class InkyTestScene extends Scene<InkyTestApp> {
 
 	public InkyTestScene(InkyTestApp app) {
 		super(app);
-		theme = new ClassicTheme(Assets.OBJECT);
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		theme = new ClassicTheme();
+		board = new Board(Assets.text("board.txt"));
 	}
 
 	@Override

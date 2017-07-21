@@ -8,7 +8,6 @@ import de.amr.games.breakout.scenes.PlayScene;
  * A simple "Breakout" game.
  * 
  * @author Armin Reichert & Anna Schillo
- *
  */
 public class BreakoutGame extends Application {
 
@@ -27,11 +26,11 @@ public class BreakoutGame extends Application {
 
 	@Override
 	public void init() {
-		Assets.OBJECT.image("background.jpg");
-		Assets.OBJECT.image("ball_green.png");
-		Assets.OBJECT.image("bat_blue.png");
-		Assets.OBJECT.sound("Sounds/plop.mp3");
-		Assets.OBJECT.sound("Sounds/point.mp3");
+		Assets.image("background.jpg");
+		Assets.image("ball_green.png");
+		Assets.image("bat_blue.png");
+		Assets.sound("Sounds/plop.mp3");
+		Assets.sound("Sounds/point.mp3");
 		selectView(new PlayScene(this));
 	}
 }

@@ -153,13 +153,13 @@ public class PongPlayScene extends Scene<PongGame> {
 	void bounceBallFromLeftPaddle() {
 		ball.tf.setX(paddleLeft.tf.getX() + paddleLeft.getWidth() + 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
-		Assets.OBJECT.sound("plop.mp3").play();
+		Assets.sound("plop.mp3").play();
 	}
 
 	void bounceBallFromRightPaddle() {
 		ball.tf.setX(paddleRight.tf.getX() - ball.getWidth() - 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
-		Assets.OBJECT.sound("plip.mp3").play();
+		Assets.sound("plip.mp3").play();
 	}
 
 	boolean leftPlayerWins() {

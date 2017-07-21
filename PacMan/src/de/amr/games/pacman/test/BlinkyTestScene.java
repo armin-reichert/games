@@ -41,8 +41,8 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 
 	public BlinkyTestScene(BlinkyTestApp app) {
 		super(app);
-		board = new Board(Assets.OBJECT.text("board.txt"));
-		theme = new ClassicTheme(Assets.OBJECT);
+		board = new Board(Assets.text("board.txt"));
+		theme = new ClassicTheme();
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 			ghost.setMoveDir(dir); // TODO without this, ghost might get stuck
 			ghost.setNextMoveDir(dir);
 		};
-		
+
 		app.entities.add(pacMan);
 
 		Ghost blinky = new Ghost(app, board, "Blinky", () -> theme);
@@ -78,7 +78,7 @@ public class BlinkyTestScene extends Scene<BlinkyTestApp> {
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 
 		app.entities.add(blinky);
-		
+
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
 		pacMan.speed = () -> 2f;

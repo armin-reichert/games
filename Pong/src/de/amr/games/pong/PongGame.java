@@ -43,9 +43,9 @@ public class PongGame extends Application {
 	public void init() {
 		setPlayMode(PlayMode.Player1_Player2);
 
-		Assets.OBJECT.sound("plop.mp3");
-		Assets.OBJECT.sound("plip.mp3");
-		Assets.OBJECT.sound("out.mp3");
+		Assets.sound("plop.mp3");
+		Assets.sound("plip.mp3");
+		Assets.sound("out.mp3");
 
 		entities.add(new AutoPaddleLeft(this));
 		entities.add(new AutoPaddleRight(this));

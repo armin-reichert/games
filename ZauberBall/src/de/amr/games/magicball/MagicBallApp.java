@@ -24,7 +24,7 @@ public class MagicBallApp extends Application {
 
 	@Override
 	public void init() {
-		Assets.OBJECT.image("ball.png");
+		Assets.image("ball.png");
 		selectView(new DrawingScene(this));
 	}
 }

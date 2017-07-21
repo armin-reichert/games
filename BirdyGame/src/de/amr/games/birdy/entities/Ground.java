@@ -18,7 +18,7 @@ public class Ground extends GameEntity {
 	private float startX;
 
 	public Ground(BirdyGame app) {
-		setSprites(new Sprite(Assets.OBJECT.image("land")));
+		setSprites(new Sprite(Assets.image("land")));
 	}
 
 	@Override

@@ -22,7 +22,7 @@ public class SpriteBrowserScene extends Scene<SpriteBrowser> {
 	public SpriteBrowserScene(SpriteBrowser app) {
 		super(app);
 		spriteNames = new ArrayList<>();
-		for (String name : Assets.OBJECT.imageNames()) {
+		for (String name : Assets.imageNames()) {
 			spriteNames.add(name);
 		}
 		Collections.sort(spriteNames);
@@ -47,7 +47,7 @@ public class SpriteBrowserScene extends Scene<SpriteBrowser> {
 			return;
 		}
 		String name = spriteNames.get(index);
-		BufferedImage image = Assets.OBJECT.image(name);
+		BufferedImage image = Assets.image(name);
 		String text = name + " (" + image.getWidth() + "x" + image.getHeight() + ")";
 		text += " (Keys: LEFT=Previous, RIGHT=Next, X=Exit)";
 		g.setColor(Color.WHITE);

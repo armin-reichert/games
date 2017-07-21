@@ -158,12 +158,12 @@ public class PlayScene extends Scene<PacManGame> {
 				});
 				nextLevel();
 				app.themeManager.getTheme().getEnergizerSprite().setAnimationEnabled(false);
-				Assets.OBJECT.sound("sfx/insert-coin.mp3").play();
+				Assets.sound("sfx/insert-coin.mp3").play();
 
 				configureTracing();
 			};
 
-			change(Initializing, Ready, () -> !Assets.OBJECT.sound("sfx/insert-coin.mp3").isRunning());
+			change(Initializing, Ready, () -> !Assets.sound("sfx/insert-coin.mp3").isRunning());
 
 			// Ready to rumble
 
@@ -186,12 +186,12 @@ public class PlayScene extends Scene<PacManGame> {
 					ghost.placeAt(getGhostHomeTile(ghost));
 					ghost.receiveEvent(GhostEvent.WaitingStarts);
 				});
-				Assets.OBJECT.sound("sfx/ready.mp3").play();
+				Assets.sound("sfx/ready.mp3").play();
 			};
 
 			state(StartingLevel).update = state -> app.entities.all().forEach(GameEntity::update);
 
-			change(StartingLevel, Playing, () -> !Assets.OBJECT.sound("sfx/ready.mp3").isRunning());
+			change(StartingLevel, Playing, () -> !Assets.sound("sfx/ready.mp3").isRunning());
 
 			// Playing
 
@@ -230,8 +230,8 @@ public class PlayScene extends Scene<PacManGame> {
 			// Crashing
 
 			state(Crashing).entry = state -> {
-				Assets.OBJECT.sounds().forEach(Sound::stop);
-				Assets.OBJECT.sound("sfx/die.mp3").play();
+				Assets.sounds().forEach(Sound::stop);
+				Assets.sound("sfx/die.mp3").play();
 				app.themeManager.getTheme().getEnergizerSprite().setAnimationEnabled(false);
 				removeBonus();
 				pacMan.receiveEvent(PacManEvent.Killed);
@@ -240,9 +240,9 @@ public class PlayScene extends Scene<PacManGame> {
 
 			state(Crashing).update = state -> pacMan.update();
 
-			change(Crashing, Playing, () -> !Assets.OBJECT.sound("sfx/die.mp3").isRunning() && lives > 0);
+			change(Crashing, Playing, () -> !Assets.sound("sfx/die.mp3").isRunning() && lives > 0);
 
-			change(Crashing, GameOver, () -> !Assets.OBJECT.sound("sfx/die.mp3").isRunning() && lives == 0);
+			change(Crashing, GameOver, () -> !Assets.sound("sfx/die.mp3").isRunning() && lives == 0);
 
 			// GameOver
 
@@ -259,7 +259,7 @@ public class PlayScene extends Scene<PacManGame> {
 	public PlayScene(PacManGame app) {
 		super(app);
 		playControl = new PlayControl();
-		board = new Board(Assets.OBJECT.text("board.txt"));
+		board = new Board(Assets.text("board.txt"));
 		model = new PlaySceneModel(board, app.pulse, 8 * TILE_SIZE);
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusList = new ArrayList<>();
@@ -318,7 +318,7 @@ public class PlayScene extends Scene<PacManGame> {
 				board.setContent(tile, None);
 				score(POINTS_FOR_PELLET);
 				pacMan.freeze(WAIT_TICKS_AFTER_PELLET_EATEN);
-				Assets.OBJECT.sound("sfx/eat-pill.mp3").play();
+				Assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Energizer:
 				board.setContent(tile, None);
@@ -326,10 +326,10 @@ public class PlayScene extends Scene<PacManGame> {
 				nextGhostPoints = POINTS_FOR_KILLING_FIRST_GHOST;
 				pacMan.freeze(WAIT_TICKS_AFTER_ENERGIZER_EATEN);
 				pacMan.receiveEvent(PacManEvent.GotDrugs);
-				Assets.OBJECT.sound("sfx/eat-pill.mp3").play();
+				Assets.sound("sfx/eat-pill.mp3").play();
 				break;
 			case Bonus:
-				Assets.OBJECT.sound("sfx/eat-fruit.mp3").play();
+				Assets.sound("sfx/eat-fruit.mp3").play();
 				int points = model.getBonusValue(level);
 				score(points);
 				bonusList.add(model.getBonusSymbol(level));
@@ -347,7 +347,7 @@ public class PlayScene extends Scene<PacManGame> {
 			}
 			if (pacMan.control.is(PacManState.Aggressive)) {
 				LOG.info("Pac-Man kills " + ghost.getName());
-				Assets.OBJECT.sound("sfx/eat-ghost.mp3").play();
+				Assets.sound("sfx/eat-ghost.mp3").play();
 				score(nextGhostPoints);
 				showFlashText(nextGhostPoints, ghost.tf.getX(), ghost.tf.getY());
 				if (++ghostsEatenAtLevel == 16) {
@@ -385,12 +385,12 @@ public class PlayScene extends Scene<PacManGame> {
 		pacMan.control.state(Aggressive).entry = state -> {
 			state.setDuration(app.pulse.secToTicks(model.getPacManAggressiveSeconds(level)));
 			pacMan.enemies().forEach(ghost -> ghost.control.addInput(GhostEvent.PacManAttackStarts));
-			Assets.OBJECT.sound("sfx/waza.mp3").loop();
+			Assets.sound("sfx/waza.mp3").loop();
 		};
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
 		pacMan.control.state(Aggressive).exit = state -> {
 			pacMan.enemies().forEach(ghost -> ghost.resume.run());
-			Assets.OBJECT.sound("sfx/waza.mp3").stop();
+			Assets.sound("sfx/waza.mp3").stop();
 		};
 		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
 
@@ -642,7 +642,7 @@ public class PlayScene extends Scene<PacManGame> {
 		int newScore = score + points;
 		// check for extra life
 		if (score < SCORE_FOR_EXTRALIFE && newScore >= SCORE_FOR_EXTRALIFE) {
-			Assets.OBJECT.sound("sfx/extra-life.mp3").play();
+			Assets.sound("sfx/extra-life.mp3").play();
 			++lives;
 		}
 		score = newScore;
