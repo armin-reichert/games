@@ -36,7 +36,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private int cols;
 	private int brickWidth;
 	private int brickHeight;
-	private int brickPadding;
+	private int brickSpacing;
 	private int points;
 
 	private class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
@@ -128,18 +128,19 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	private void newBricks() {
-		Brick.Type[] types = Brick.Type.values();
-		int hSpace = brickWidth + brickPadding;
-		int vSpace = brickHeight + brickPadding;
-		cols = (getWidth() - brickPadding) / hSpace - 2;
-		rows = types.length;
-		int startX = (getWidth() - cols * (hSpace)) / 2;
+		Brick.Type[] brickTypes = Brick.Type.values();
+		int hSpace = brickWidth + brickSpacing;
+		int vSpace = brickHeight + brickSpacing;
+		cols = (getWidth() - brickSpacing) / hSpace - 2;
+		rows = brickTypes.length;
+		int startX = (getWidth() - cols * hSpace + brickSpacing) / 2;
 		int startY = brickHeight * 5;
+
 		int x = startX, y = startY;
 		for (int row = 0; row < rows; ++row) {
+			Brick.Type type = brickTypes[row];
+			int value = 5 * (brickTypes.length - row);
 			for (int col = 0; col < cols; ++col) {
-				Brick.Type type = types[row];
-				int value = 5 * (types.length - row);
 				Brick brick = new Brick(app, brickWidth, brickHeight, type, value);
 				brick.tf.moveTo(x, y);
 				app.entities.add(brick);
@@ -157,10 +158,10 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	private void reset() {
-		brickWidth = 60;
+		brickWidth = getWidth() / 16;
 		brickHeight = brickWidth / 4;
-		brickPadding = brickHeight / 2;
-		bat.speed = 12;
+		brickSpacing = brickHeight / 2;
+		bat.speed = getWidth() / 48;
 		points = 0;
 		resetBatAndBall();
 		newBricks();
@@ -192,7 +193,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 		resetBatAndBall();
 		Random random = new Random();
 		ball.tf.setVelocityX(4 + random.nextFloat() * 4);
-		ball.tf.setVelocityY(-(8 + random.nextFloat() * 8));
+		ball.tf.setVelocityY(-(6 + random.nextFloat() * 6));
 		if (random.nextBoolean()) {
 			ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		}
