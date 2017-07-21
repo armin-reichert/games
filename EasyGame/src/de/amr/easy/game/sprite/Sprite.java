@@ -31,21 +31,20 @@ public class Sprite {
 	}
 
 	/**
-	 * Creates a sprite from the image sequence taken from the given assets and with the given keys.
+	 * Creates a sprite from the image sequence taken from the application assets and with the given
+	 * keys.
 	 * 
-	 * @param assets
-	 *          Assets to take images from
 	 * @param imageKeys
 	 *          image keys as stored inside the assets
 	 */
-	public Sprite(Assets assets, String... imageKeys) {
+	public Sprite(String... imageKeys) {
 		if (imageKeys.length == 0) {
 			throw new IllegalArgumentException("Sprite needs at least one image");
 		}
 		images = new Image[imageKeys.length];
 		int i = 0;
 		for (String key : imageKeys) {
-			images[i++] = assets.image(key);
+			images[i++] = Assets.OBJECT.image(key);
 		}
 	}
 

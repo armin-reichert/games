@@ -12,7 +12,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -41,7 +40,7 @@ public class City extends GameEntity {
 	public City(BirdyGame app) {
 		this.app = app;
 
-		setSprites(new Sprite(Assets.OBJECT, "bg_night"), new Sprite(Assets.OBJECT, "bg_day"));
+		setSprites(new Sprite("bg_night"), new Sprite("bg_day"));
 
 		control = new StateMachine<>("City control", CityState.class, Day);
 
@@ -88,7 +87,7 @@ public class City extends GameEntity {
 		app.entities.removeAll(Star.class);
 		int numStars = randomInt(1, app.settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
-			Star star = app.entities.add(new Star(app));
+			Star star = app.entities.add(new Star());
 			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		});
 		LOG.info("Created " + numStars + " new stars");

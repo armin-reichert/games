@@ -1,9 +1,7 @@
 package de.amr.games.breakout.entities;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.breakout.BreakoutGame;
 
 public class Brick extends GameEntity {
 
@@ -14,10 +12,10 @@ public class Brick extends GameEntity {
 	private boolean damaged;
 	private int value;
 
-	public Brick(BreakoutGame app, int width, int height, Type type, int value) {
+	public Brick(int width, int height, Type type, int value) {
 		this.value = value;
-		setSprites(new Sprite(Assets.OBJECT, "Bricks/brick_" + type + "_small.png").scale(width, height),
-				new Sprite(Assets.OBJECT, "Bricks/brick_" + type + "_small_cracked.png").scale(width, height));
+		setSprites(new Sprite("Bricks/brick_" + type + "_small.png").scale(width, height),
+				new Sprite("Bricks/brick_" + type + "_small_cracked.png").scale(width, height));
 		damaged = false;
 	}
 

@@ -116,7 +116,7 @@ public class Bird extends GameEntity {
 	}
 
 	private Sprite createFeathers(String birdName) {
-		Sprite sprite = new Sprite(Assets.OBJECT, birdName + "_0", birdName + "_1", birdName + "_2");
+		Sprite sprite = new Sprite(birdName + "_0", birdName + "_1", birdName + "_2");
 		sprite.makeAnimated(AnimationMode.BACK_AND_FORTH, app.settings.get("bird flap millis"));
 		return sprite;
 	}

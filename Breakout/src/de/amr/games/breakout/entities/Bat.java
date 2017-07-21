@@ -3,23 +3,20 @@ package de.amr.games.breakout.entities;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.breakout.BreakoutGame;
 
 public class Bat extends GameEntity {
 
-	private final Dimension boardSize;
+	private final int boardWidth;
 	public int speed;
 
-	public Bat(BreakoutGame app, int width, int height) {
-		boardSize = new Dimension(app.getWidth(), app.getHeight());
-		setSprites(new Sprite(Assets.OBJECT, "bat_blue.png").scale(width, height));
+	public Bat(int width, int height, int boardWidth) {
+		this.boardWidth = boardWidth;
+		setSprites(new Sprite("bat_blue.png").scale(width, height));
 	}
 
 	@Override
@@ -28,11 +25,11 @@ public class Bat extends GameEntity {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
 			tf.setVelocityX(-speed);
 			tf.move();
-			tf.setX(min(boardSize.width - getWidth(), max(0, tf.getX())));
+			tf.setX(min(boardWidth - getWidth(), max(0, tf.getX())));
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
 			tf.setVelocityX(speed);
 			tf.move();
-			tf.setX(min(boardSize.width - getWidth(), max(0, tf.getX())));
+			tf.setX(min(boardWidth - getWidth(), max(0, tf.getX())));
 		}
 	}
 }

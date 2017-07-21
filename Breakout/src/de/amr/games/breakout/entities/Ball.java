@@ -2,7 +2,6 @@ package de.amr.games.breakout.entities;
 
 import java.awt.Dimension;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.breakout.BreakoutGame;
@@ -13,7 +12,7 @@ public class Ball extends GameEntity {
 
 	public Ball(BreakoutGame app, int size) {
 		boardSize = new Dimension(app.getWidth(), app.getHeight());
-		Sprite ballSprite = new Sprite(Assets.OBJECT, "ball_green.png").scale(0, size, size);
+		Sprite ballSprite = new Sprite("ball_green.png").scale(0, size, size);
 		setSprites(ballSprite);
 	}
 

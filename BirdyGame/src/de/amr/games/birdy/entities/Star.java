@@ -6,10 +6,8 @@ import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.util.Random;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * A shining and blinking star...
@@ -18,8 +16,8 @@ import de.amr.games.birdy.play.BirdyGame;
  */
 public class Star extends GameEntity {
 
-	public Star(BirdyGame app) {
-		Sprite sprite = new Sprite(Assets.OBJECT, "blink_00", "blink_01", "blink_02");
+	public Star() {
+		Sprite sprite = new Sprite("blink_00", "blink_01", "blink_02");
 		sprite.makeAnimated(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
 		setSprites(sprite);
 	}

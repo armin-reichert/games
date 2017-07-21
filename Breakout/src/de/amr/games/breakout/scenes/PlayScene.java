@@ -80,7 +80,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 				BufferedImage.SCALE_SMOOTH);
 		setBgImage(background);
 		ball = app.entities.add(new Ball(app, app.settings.get("ball_size")));
-		bat = app.entities.add(new Bat(app, app.settings.get("bat_width"), app.settings.get("bat_height")));
+		bat = app.entities.add(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -142,7 +142,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 			Brick.Type type = brickTypes[row];
 			int value = 5 * (brickTypes.length - row);
 			for (int col = 0; col < cols; ++col) {
-				Brick brick = new Brick(app, brickWidth, brickHeight, type, value);
+				Brick brick = new Brick(brickWidth, brickHeight, type, value);
 				brick.tf.moveTo(x, y);
 				app.entities.add(brick);
 				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
