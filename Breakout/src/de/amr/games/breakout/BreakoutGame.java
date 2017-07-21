@@ -1,26 +1,27 @@
 package de.amr.games.breakout;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.common.Score;
 import de.amr.games.breakout.scenes.PlayScene;
 
+/**
+ * A simple "Breakout" game.
+ * 
+ * @author Armin Reichert & Anna Schillo
+ *
+ */
 public class BreakoutGame extends Application {
-
-	public static int BALL_SIZE = 15;
-	public static int BAT_WIDTH = 8 * BALL_SIZE;
-	public static int BAT_HEIGHT = BALL_SIZE;
 
 	public static void main(String[] args) {
 		launch(new BreakoutGame());
 	}
 
-	public final Score score;
-
 	public BreakoutGame() {
-		score = new Score();
 		settings.title = "Breakout";
 		settings.width = 800;
 		settings.height = 600;
+		settings.set("ball_size", 12);
+		settings.set("bat_width", 96);
+		settings.set("bat_height", 12);
 	}
 
 	@Override

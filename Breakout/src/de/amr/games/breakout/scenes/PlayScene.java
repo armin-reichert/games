@@ -1,17 +1,18 @@
 package de.amr.games.breakout.scenes;
 
-import static de.amr.games.breakout.BreakoutGame.BALL_SIZE;
-import static de.amr.games.breakout.BreakoutGame.BAT_HEIGHT;
-import static de.amr.games.breakout.BreakoutGame.BAT_WIDTH;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBat;
 import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBrick;
 import static de.amr.games.breakout.scenes.PlayState.BallOut;
 import static de.amr.games.breakout.scenes.PlayState.Initialized;
 import static de.amr.games.breakout.scenes.PlayState.Playing;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -25,12 +26,10 @@ import de.amr.games.breakout.BreakoutGame;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Bat;
 import de.amr.games.breakout.entities.Brick;
-import de.amr.games.breakout.entities.ScoreDisplay;
 
 public class PlayScene extends Scene<BreakoutGame> {
 
 	private final PlaySceneControl control;
-	private ScoreDisplay score;
 	private Bat bat;
 	private Ball ball;
 	private int rows;
@@ -38,9 +37,7 @@ public class PlayScene extends Scene<BreakoutGame> {
 	private int brickWidth;
 	private int brickHeight;
 	private int brickPadding;
-	private int numBricks;
-	private Brick[][] bricks;
-	private Image background;
+	private int points;
 
 	private class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
 
@@ -55,29 +52,16 @@ public class PlayScene extends Scene<BreakoutGame> {
 			// Playing
 			state(Playing).entry = s -> shootBall();
 
-			state(Playing).update = s -> {
-				if (numBricks == 0) {
-					resetBat();
-					resetBall();
-					newBricks();
-				}
-				app.entities.all().forEach(GameEntity::update);
-			};
+			state(Playing).update = s -> play();
 
 			changeOnInput(BallHitsBat, Playing, Playing, (e, s, t) -> bounceBallFromBat());
 
-			changeOnInput(BallHitsBrick, Playing, Playing, (e, s, t) -> {
-				Brick brick = e.getUserData();
-				onBrickHit(brick);
-			});
+			changeOnInput(BallHitsBrick, Playing, Playing, (e, s, t) -> onBrickHit(e.getUserData()));
 
 			change(Playing, BallOut, () -> ball.isOut());
 
 			// BallOut
-			state(BallOut).entry = s -> {
-				resetBat();
-				resetBall();
-			};
+			state(BallOut).entry = s -> resetBatAndBall();
 
 			change(BallOut, Playing, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
@@ -91,11 +75,11 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void init() {
-		background = app.assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
+		Image background = app.assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
 				BufferedImage.SCALE_SMOOTH);
-		score = app.entities.add(new ScoreDisplay(app));
-		ball = app.entities.add(new Ball(app, BALL_SIZE));
-		bat = app.entities.add(new Bat(app, BAT_WIDTH, BAT_HEIGHT));
+		setBgImage(background);
+		ball = app.entities.add(new Ball(app, app.settings.get("ball_size")));
+		bat = app.entities.add(new Bat(app, app.settings.get("bat_width"), app.settings.get("bat_height")));
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -122,18 +106,25 @@ public class PlayScene extends Scene<BreakoutGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(background, 0, 0, null);
-		for (int row = 0; row < rows; ++row) {
-			for (int col = 0; col < cols; ++col) {
-				Brick brick = bricks[row][col];
-				if (brick != null) {
-					brick.draw(g);
-				}
-			}
+		super.draw(g);
+		drawScore(g);
+	}
+
+	private void drawScore(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setColor(Color.RED);
+		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 48));
+		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
+		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2,
+				(int) (getHeight() - bounds.getHeight()) / 2);
+	}
+
+	private void play() {
+		if (app.entities.filter(Brick.class).count() == 0) {
+			resetBatAndBall();
+			newBricks();
 		}
-		score.draw(g);
-		bat.draw(g);
-		ball.draw(g);
+		app.entities.all().forEach(GameEntity::update);
 	}
 
 	private void newBricks() {
@@ -142,8 +133,6 @@ public class PlayScene extends Scene<BreakoutGame> {
 		int vSpace = brickHeight + brickPadding;
 		cols = (getWidth() - brickPadding) / hSpace - 2;
 		rows = types.length;
-		numBricks = 0;
-		bricks = new Brick[rows][cols];
 		int startX = (getWidth() - cols * (hSpace)) / 2;
 		int startY = brickHeight * 5;
 		int x = startX, y = startY;
@@ -152,7 +141,9 @@ public class PlayScene extends Scene<BreakoutGame> {
 				Brick.Type type = types[row];
 				int value = 5 * (types.length - row);
 				Brick brick = new Brick(app, brickWidth, brickHeight, type, value);
-				addBrick(brick, row, col, x, y);
+				brick.tf.moveTo(x, y);
+				app.entities.add(brick);
+				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
 				x += hSpace;
 			}
 			x = startX;
@@ -160,23 +151,9 @@ public class PlayScene extends Scene<BreakoutGame> {
 		}
 	}
 
-	private void addBrick(Brick brick, int row, int col, int x, int y) {
-		bricks[row][col] = brick;
-		brick.tf.moveTo(x, y);
-		numBricks += 1;
-		app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
-	}
-
 	private void removeBrick(Brick brick) {
+		app.entities.remove(brick);
 		app.collisionHandler.unregisterStart(ball, brick);
-		for (int row = 0; row < rows; ++row) {
-			for (int col = 0; col < cols; ++col) {
-				if (brick == bricks[row][col]) {
-					bricks[row][col] = null;
-					numBricks -= 1;
-				}
-			}
-		}
 	}
 
 	private void reset() {
@@ -184,22 +161,16 @@ public class PlayScene extends Scene<BreakoutGame> {
 		brickHeight = brickWidth / 4;
 		brickPadding = brickHeight / 2;
 		bat.speed = 12;
-		app.score.reset();
-		resetBat();
-		resetBall();
+		points = 0;
+		resetBatAndBall();
 		newBricks();
 	}
 
-	private void resetBall() {
-		ball.hCenter(getWidth());
-		ball.tf.setY(bat.tf.getY() - ball.getHeight());
-		ball.tf.setVelocity(0, 0);
-	}
-
-	private void resetBat() {
-		bat.tf.moveTo(0, getHeight() - bat.getHeight());
-		bat.hCenter(getWidth());
+	private void resetBatAndBall() {
+		bat.tf.moveTo((getWidth() - bat.getWidth()) / 2, getHeight() - bat.getHeight());
+		ball.tf.moveTo((getWidth() - ball.getWidth()) / 2, bat.tf.getY() - ball.getHeight());
 		bat.tf.setVelocity(0, 0);
+		ball.tf.setVelocity(0, 0);
 	}
 
 	private void bounceBallFromBat() {
@@ -209,13 +180,16 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	private void bounceBallFromBrick(Brick brick) {
-		ball.tf.setY(brick.tf.getY() + brick.getHeight());
+		if (ball.tf.getVelocityY() > 0) {
+			ball.tf.setY(brick.tf.getY());
+		} else {
+			ball.tf.setY(brick.tf.getY() + brick.getHeight());
+		}
 		ball.tf.setVelocityY(-ball.tf.getVelocityY());
 	}
 
 	private void shootBall() {
-		resetBat();
-		resetBall();
+		resetBatAndBall();
 		Random random = new Random();
 		ball.tf.setVelocityX(4 + random.nextFloat() * 4);
 		ball.tf.setVelocityY(-(8 + random.nextFloat() * 8));
@@ -225,13 +199,13 @@ public class PlayScene extends Scene<BreakoutGame> {
 	}
 
 	private void onBrickHit(Brick brick) {
-		if (!brick.isDamaged()) {
-			bounceBallFromBrick(brick);
-			brick.damage();
-		} else {
-			app.assets.sound("Sounds/point.mp3").play();
-			app.score.points += brick.getValue();
+		if (brick.isDamaged()) {
 			removeBrick(brick);
+			points += brick.getValue();
+			app.assets.sound("Sounds/point.mp3").play();
+		} else {
+			brick.damage();
+			bounceBallFromBrick(brick);
 		}
 	}
 }
