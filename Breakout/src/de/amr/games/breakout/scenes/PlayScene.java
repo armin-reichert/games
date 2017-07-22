@@ -28,13 +28,16 @@ import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Bat;
 import de.amr.games.breakout.entities.Brick;
 
+/**
+ * The playing scene.
+ * 
+ * @author Armin Reichert & Anna Schillo
+ */
 public class PlayScene extends Scene<BreakoutGame> {
 
 	private final PlaySceneControl control;
 	private Bat bat;
 	private Ball ball;
-	private int rows;
-	private int cols;
 	private int points;
 
 	public PlayScene(BreakoutGame app) {
@@ -49,18 +52,42 @@ public class PlayScene extends Scene<BreakoutGame> {
 			super("BreakoutGameControl", PlayState.class, Initialized);
 
 			// Initialized
-			state(Initialized).entry = s -> reset();
+			state(Initialized).entry = s -> {
+				points = 0;
+				resetBatAndBall();
+				newBricks();
+			};
 
 			change(Initialized, Playing, () -> keyPressedOnce(VK_SPACE));
 
 			// Playing
-			state(Playing).entry = s -> shootBall();
+			state(Playing).entry = s -> launchBall();
 
-			state(Playing).update = s -> play();
+			state(Playing).update = s -> {
+				if (app.entities.filter(Brick.class).count() == 0) {
+					resetBatAndBall();
+					newBricks();
+				}
+				app.entities.all().forEach(GameEntity::update);
+			};
 
-			changeOnInput(BallHitsBat, Playing, Playing, (e, s, t) -> bounceBallFromBat());
+			changeOnInput(BallHitsBat, Playing, Playing, (e, s, t) -> {
+				ball.tf.setVelocityY(-ball.tf.getVelocityY());
+				Assets.sound("Sounds/plop.mp3").play();
+			});
 
-			changeOnInput(BallHitsBrick, Playing, Playing, (e, s, t) -> onBrickHit(e));
+			changeOnInput(BallHitsBrick, Playing, Playing, (e, s, t) -> {
+				Brick brick = e.getUserData();
+				if (brick.isDamaged()) {
+					app.entities.remove(brick);
+					app.collisionHandler.unregisterStart(ball, brick);
+					points += brick.getValue();
+					Assets.sound("Sounds/point.mp3").play();
+				} else {
+					brick.damage();
+					ball.tf.setVelocityY(-ball.tf.getVelocityY());
+				}
+			});
 
 			change(Playing, BallOut, () -> ball.isOut());
 
@@ -88,6 +115,58 @@ public class PlayScene extends Scene<BreakoutGame> {
 		control.update();
 	}
 
+	@Override
+	public void draw(Graphics2D g) {
+		super.draw(g);
+		drawScore(g);
+	}
+
+	private void newBricks() {
+		final Brick.Type[] brickTypes = Brick.Type.values();
+		final int brickWidth = getWidth() / 10;
+		final int brickHeight = brickWidth / 4;
+		final int brickSpacing = brickHeight / 2;
+		final int hSpace = brickWidth + brickSpacing;
+		final int vSpace = brickHeight + brickSpacing;
+		final int numRows = brickTypes.length;
+		final int numCols = (getWidth() - brickSpacing) / hSpace - 2;
+		final int startX = (getWidth() - numCols * hSpace + brickSpacing) / 2;
+		final int startY = brickHeight * 3;
+
+		int x = startX, y = startY;
+		for (int row = 0; row < numRows; ++row) {
+			Brick.Type type = brickTypes[row];
+			int value = 5 * (numRows - row);
+			for (int col = 0; col < numCols; ++col) {
+				Brick brick = new Brick(brickWidth, brickHeight, type, value);
+				brick.tf.moveTo(x, y);
+				app.entities.add(brick);
+				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
+				x += hSpace;
+			}
+			x = startX;
+			y += vSpace;
+		}
+	}
+
+	private void resetBatAndBall() {
+		bat.speed = getWidth() / 48;
+		bat.tf.moveTo((getWidth() - bat.getWidth()) / 2, getHeight() - bat.getHeight());
+		bat.tf.setVelocity(0, 0);
+		ball.tf.moveTo((getWidth() - ball.getWidth()) / 2, bat.tf.getY() - ball.getHeight());
+		ball.tf.setVelocity(0, 0);
+	}
+
+	private void launchBall() {
+		Random random = new Random();
+		float vx = 2 + random.nextFloat() * 2;
+		if (random.nextBoolean()) {
+			vx = -vx;
+		}
+		float vy = -(6 + random.nextFloat() * 6);
+		ball.tf.setVelocity(vx, vy);
+	}
+
 	private void handleCollisions() {
 		for (Collision coll : app.collisionHandler.collisions()) {
 			PlayEvent event = coll.getAppEvent();
@@ -102,104 +181,13 @@ public class PlayScene extends Scene<BreakoutGame> {
 		}
 	}
 
-	@Override
-	public void draw(Graphics2D g) {
-		super.draw(g);
-		drawScore(g);
-	}
+	private final Font scoreFont = new Font(Font.SANS_SERIF, Font.PLAIN, 48);
 
 	private void drawScore(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 48));
+		g.setFont(scoreFont);
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
 		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
-	}
-
-	private void play() {
-		if (app.entities.filter(Brick.class).count() == 0) {
-			resetBatAndBall();
-			newBricks();
-		}
-		app.entities.all().forEach(GameEntity::update);
-	}
-
-	private void newBricks() {
-		int brickWidth = getWidth() / 10;
-		int brickHeight = brickWidth / 4;
-		int brickSpacing = brickHeight / 2;
-		int hSpace = brickWidth + brickSpacing;
-		int vSpace = brickHeight + brickSpacing;
-		Brick.Type[] brickTypes = Brick.Type.values();
-
-		cols = (getWidth() - brickSpacing) / hSpace - 2;
-		rows = brickTypes.length;
-		int startX = (getWidth() - cols * hSpace + brickSpacing) / 2;
-		int startY = brickHeight * 3;
-
-		int x = startX, y = startY;
-		for (int row = 0; row < rows; ++row) {
-			Brick.Type type = brickTypes[row];
-			int value = 5 * (brickTypes.length - row);
-			for (int col = 0; col < cols; ++col) {
-				Brick brick = new Brick(brickWidth, brickHeight, type, value);
-				brick.tf.moveTo(x, y);
-				app.entities.add(brick);
-				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
-				x += hSpace;
-			}
-			x = startX;
-			y += vSpace;
-		}
-	}
-
-	private void removeBrick(Brick brick) {
-		app.entities.remove(brick);
-		app.collisionHandler.unregisterStart(ball, brick);
-	}
-
-	private void reset() {
-		points = 0;
-		resetBatAndBall();
-		newBricks();
-	}
-
-	private void resetBatAndBall() {
-		bat.speed = getWidth() / 48;
-		bat.tf.moveTo((getWidth() - bat.getWidth()) / 2, getHeight() - bat.getHeight());
-		bat.tf.setVelocity(0, 0);
-		ball.tf.moveTo((getWidth() - ball.getWidth()) / 2, bat.tf.getY() - ball.getHeight());
-		ball.tf.setVelocity(0, 0);
-	}
-
-	private void bounceBallFromBat() {
-		ball.tf.setVelocityY(-ball.tf.getVelocityY());
-		Assets.sound("Sounds/plop.mp3").play();
-	}
-
-	private void bounceBallFromBrick(Brick brick) {
-		ball.tf.setVelocityY(-ball.tf.getVelocityY());
-	}
-
-	private void shootBall() {
-		resetBatAndBall();
-		Random random = new Random();
-		ball.tf.setVelocityX(2 + random.nextFloat() * 2);
-		ball.tf.setVelocityY(-(6 + random.nextFloat() * 6));
-		if (random.nextBoolean()) {
-			ball.tf.setVelocityX(-ball.tf.getVelocityX());
-		}
-	}
-
-	private void onBrickHit(PlayEvent e) {
-		Brick brick = e.getUserData();
-		if (brick.isDamaged()) {
-			removeBrick(brick);
-			points += brick.getValue();
-			Assets.sound("Sounds/point.mp3").play();
-		} else {
-			brick.damage();
-			bounceBallFromBrick(brick);
-		}
 	}
 }
