@@ -23,8 +23,26 @@ import de.amr.easy.game.view.DefaultView;
 import de.amr.easy.game.view.View;
 
 /**
- * Application base class. To start an application, create an application instance, defined its
- * settings and call the {@link #launch(Application)} method.
+ * Application base class. To start an application, create an application instance, define its
+ * settings in the constructor and call the {@link #launch(Application)} method.
+ * <p>
+ * Example:
+ * <p>
+ * 
+ * <pre>
+ * public class MyApplication extends Application {
+ * 
+ * 	public static void main(String... args) {
+ * 		launch(new MyApplication());
+ * 	}
+ * 
+ * 	public MyApplication() {
+ * 		settings.title = "My Application";
+ * 		settings.width = 800;
+ * 		settings.width = 600;
+ * 	}
+ * }
+ * </pre>
  * 
  * @author Armin Reichert
  */
