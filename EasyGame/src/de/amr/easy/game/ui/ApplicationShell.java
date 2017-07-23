@@ -5,16 +5,20 @@ import static java.lang.String.format;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -26,8 +30,8 @@ import de.amr.easy.game.input.KeyboardHandler;
 import de.amr.easy.game.view.Drawable;
 
 /**
- * The application shell provides the window or the fullscreen area where the current scene of the
- * application is displayed.
+ * The application shell provides the window or the full-screen display where the current scene of
+ * the application is shown.
  * 
  * @author Armin Reichert
  */
@@ -49,7 +53,6 @@ public class ApplicationShell implements PropertyChangeListener {
 		device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		canvas = createCanvas();
 		frame = createFrame();
-		updateTitle();
 		LOG.info("Application shell created.");
 	}
 
@@ -60,14 +63,12 @@ public class ApplicationShell implements PropertyChangeListener {
 		} else if ("fps".equals(e.getPropertyName())) {
 			fps = (int) e.getNewValue();
 		}
-		EventQueue.invokeLater(this::updateTitle);
+		EventQueue.invokeLater(() -> {
+			frame.setTitle(format("%s - %d frames/sec - %d updates/sec", app.settings.title, fps, ups));
+		});
 	}
 
-	private void updateTitle() {
-		frame.setTitle(format("%s - %d frames/sec - %d updates/sec", app.settings.title, fps, ups));
-	}
-
-	public void show() {
+	public void showApplication() {
 		if (fullScreen) {
 			showFullScreen();
 		} else {
@@ -101,6 +102,15 @@ public class ApplicationShell implements PropertyChangeListener {
 						}
 						g.scale(app.settings.scale, app.settings.scale);
 						content.draw(g);
+						if (app.isPaused()) {
+							String text = "PAUSED";
+							g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+							g.setColor(Color.RED);
+							g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 40));
+							Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
+							g.drawString(text, (int) (getWidth() - bounds.getWidth()) / 2,
+									(int) (getHeight() - bounds.getHeight()) / 2);
+						}
 					}
 				} catch (Exception x) {
 					x.printStackTrace(System.err);
@@ -153,15 +163,6 @@ public class ApplicationShell implements PropertyChangeListener {
 		return frame;
 	}
 
-	private AppControlDialog controlDialog;
-
-	private void showControlDialog() {
-		if (controlDialog == null) {
-			controlDialog = new AppControlDialog(frame, app);
-		}
-		controlDialog.setVisible(true);
-	}
-
 	private Canvas createCanvas() {
 		Canvas canvas = new Canvas();
 		Dimension size = new Dimension(Math.round(app.settings.width * app.settings.scale),
@@ -180,7 +181,7 @@ public class ApplicationShell implements PropertyChangeListener {
 
 	private void toggleFullScreen() {
 		fullScreen = !fullScreen;
-		show();
+		showApplication();
 	}
 
 	private void showFullScreen() {
@@ -209,6 +210,7 @@ public class ApplicationShell implements PropertyChangeListener {
 	}
 
 	private void showAsWindow() {
+		// Note: The order of the following statements is important!
 		device.setFullScreenWindow(null);
 		frame.dispose();
 		frame.setUndecorated(false);
@@ -234,5 +236,16 @@ public class ApplicationShell implements PropertyChangeListener {
 	private String formatDisplayMode(DisplayMode mode) {
 		return format("%d x %d, depth: %d, refresh rate: %d", mode.getWidth(), mode.getHeight(), mode.getBitDepth(),
 				mode.getRefreshRate());
+	}
+
+	// TODO: provide useful control and info dialog
+
+	private AppControlDialog controlDialog;
+
+	private void showControlDialog() {
+		if (controlDialog == null) {
+			controlDialog = new AppControlDialog(frame, app);
+		}
+		controlDialog.setVisible(true);
 	}
 }

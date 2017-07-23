@@ -45,7 +45,7 @@ public abstract class Application {
 				LOG.warning("Could not set Nimbus Look&Feel");
 			}
 			app.shell = new ApplicationShell(app);
-			app.shell.show();
+			app.shell.showApplication();
 			app.start();
 		});
 	}

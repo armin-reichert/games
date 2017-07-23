@@ -18,23 +18,23 @@ public class AppSettings {
 
 	// Predefined properties
 
-	/** The application (window) title. */
+	/** The application title. */
 	public String title = "My Application!";
 
-	/** The width of the unscaled application area in pixel. */
+	/** The unscaled width of application area in pixel. */
 	public int width = 600;
 
-	/** The height of the unscaled application area in pixel. */
+	/** The unscaled height of the application area in pixel. */
 	public int height = 400;
 
 	/** The scale factor for the screen. */
 	public float scale = 1f;
 
-	/** If <code>true</code>, the application starts in fullscreen-mode. */
+	/** If <code>true</code>, the application starts in full-screen mode. */
 	public boolean fullScreenOnStart = false;
 
-	/** The fullscreen-mode (resolution, depth), see {@link FullScreen}. */
-	public FullScreen fullScreenMode = null;
+	/** The full-screen mode (resolution, depth), see {@link FullScreen}. */
+	public FullScreen fullScreenMode = FullScreen.Mode(800, 600, 32);
 
 	/** The background color of the application. */
 	public Color bgColor = Color.BLACK;
