@@ -9,6 +9,7 @@ import java.awt.EventQueue;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
@@ -206,6 +207,15 @@ public abstract class Application {
 	}
 
 	/**
+	 * Returns a stream of all views of this application.
+	 * 
+	 * @return stream of views
+	 */
+	public Stream<View> views() {
+		return views.stream();
+	}
+
+	/**
 	 * Adds a view to the set of views.
 	 * 
 	 * @param view
@@ -268,5 +278,14 @@ public abstract class Application {
 		selectedView.init(); // TODO should this be done here?
 		views.add(selectedView);
 		LOG.info("Current view: " + selectedView);
+	}
+
+	/**
+	 * Returns the currently selected view.
+	 * 
+	 * @return current view
+	 */
+	public View getSelectedView() {
+		return selectedView;
 	}
 }
