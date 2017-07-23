@@ -1,9 +1,11 @@
 package de.amr.easy.game;
 
+import static de.amr.easy.game.input.Keyboard.keyDown;
+import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
 import static java.awt.event.KeyEvent.VK_CONTROL;
+import static java.awt.event.KeyEvent.VK_P;
 
 import java.awt.EventQueue;
-import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -14,7 +16,6 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import de.amr.easy.game.config.AppSettings;
 import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.entity.collision.CollisionHandler;
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.KeyboardHandler;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.ui.ApplicationShell;
@@ -43,13 +44,13 @@ public abstract class Application {
 			} catch (Exception e) {
 				LOG.warning("Could not set Nimbus Look&Feel");
 			}
-			ApplicationShell shell = new ApplicationShell(app);
-			shell.show();
+			app.shell = new ApplicationShell(app);
+			app.shell.show();
 			app.start();
 		});
 	}
 
-	private static final int PAUSE_TOGGLE_KEY = KeyEvent.VK_P;
+	private static final int[] PAUSE_TOGGLE_KEY = { VK_CONTROL, VK_P };
 
 	/** A logger that may be used by any application. */
 	public static final Logger LOG = Logger.getLogger(Application.class.getName());
@@ -123,7 +124,7 @@ public abstract class Application {
 
 	private void update() {
 		KeyboardHandler.poll();
-		if (Keyboard.keyDown(VK_CONTROL) && Keyboard.keyPressedOnce(PAUSE_TOGGLE_KEY)) {
+		if (keyDown(PAUSE_TOGGLE_KEY[0]) && keyPressedOnce(PAUSE_TOGGLE_KEY[1])) {
 			pause(!paused);
 		}
 		if (!paused) {
@@ -138,15 +139,6 @@ public abstract class Application {
 
 	private void draw() {
 		shell.draw(currentView());
-	}
-
-	/**
-	 * Sets the application shell. Not to be called by application code.
-	 * 
-	 * @param shell
-	 */
-	public void setShell(ApplicationShell shell) {
-		this.shell = shell;
 	}
 
 	/**

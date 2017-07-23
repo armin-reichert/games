@@ -43,7 +43,6 @@ public class ApplicationShell implements PropertyChangeListener {
 
 	public ApplicationShell(Application app) {
 		this.app = app;
-		app.setShell(this);
 		app.pulse.addRenderListener(this);
 		app.pulse.addUpdateListener(this);
 		fullScreen = app.settings.fullScreenOnStart;
@@ -93,7 +92,7 @@ public class ApplicationShell implements PropertyChangeListener {
 					if (g != null) {
 						g.setColor(app.settings.bgColor);
 						g.fillRect(0, 0, getWidth(), getHeight());
-						if (fullScreen) {
+						if (fullScreen && app.settings.fullScreenMode != null) {
 							DisplayMode mode = app.settings.fullScreenMode.getDisplayMode();
 							float scaledWidth = app.settings.width * app.settings.scale;
 							if (mode.getWidth() > scaledWidth) {
