@@ -1,10 +1,6 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.PongGlobals.PADDLE_COLOR;
-import static de.amr.games.pong.PongGlobals.PADDLE_HEIGHT;
-import static de.amr.games.pong.PongGlobals.PADDLE_SPEED;
-import static de.amr.games.pong.PongGlobals.PADDLE_WIDTH;
-
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -13,6 +9,10 @@ import de.amr.games.pong.PongGame;
 
 public class Paddle extends GameEntity {
 
+	protected int width = 15;
+	protected int height = 60;
+	protected int speed = 5;
+	protected Color color = Color.LIGHT_GRAY;
 	protected PongGame game;
 	private final int paddleUpKey, paddleDownKey;
 
@@ -23,16 +23,12 @@ public class Paddle extends GameEntity {
 	}
 
 	@Override
-	public void init() {
-	}
-
-	@Override
 	public void update() {
 		if (Keyboard.keyDown(paddleUpKey)) {
-			tf.setVelocityY(-PADDLE_SPEED);
+			tf.setVelocityY(-speed);
 		}
 		if (Keyboard.keyDown(paddleDownKey)) {
-			tf.setVelocityY(PADDLE_SPEED);
+			tf.setVelocityY(speed);
 		}
 		moveAndStopAtBorder();
 	}
@@ -49,18 +45,18 @@ public class Paddle extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(PADDLE_COLOR);
+		g.setColor(color);
 		g.fillRect((int) tf.getX(), (int) tf.getY(), getWidth(), getHeight());
 	}
 
 	@Override
 	public int getWidth() {
-		return PADDLE_WIDTH;
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return PADDLE_HEIGHT;
+		return height;
 	}
 
 	public boolean hitsBall(Ball ball) {

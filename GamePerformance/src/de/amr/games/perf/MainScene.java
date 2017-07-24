@@ -29,10 +29,6 @@ public class MainScene extends Scene<GamePerformanceApp> {
 	}
 
 	@Override
-	public void update() {
-	}
-
-	@Override
 	public void draw(Graphics2D g) {
 		int xOffset = 50;
 		int yScale = -1;

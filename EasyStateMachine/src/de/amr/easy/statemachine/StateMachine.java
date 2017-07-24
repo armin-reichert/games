@@ -130,6 +130,16 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
+	 * Sets the given state as this state machine's current state. No actions are executed.
+	 * 
+	 * @param stateID
+	 *          a valid state ID
+	 */
+	public void setState(StateID stateID) {
+		currentStateID = stateID;
+	}
+
+	/**
 	 * Returns the ID of the current state.
 	 * 
 	 * @return the current state's ID

@@ -14,7 +14,7 @@ import de.amr.easy.game.view.View;
  * @author Armin Reichert
  *
  * @param <A>
- *          type of concrete application
+ *          type of application
  */
 public abstract class Scene<A extends Application> implements View {
 
@@ -55,6 +55,10 @@ public abstract class Scene<A extends Application> implements View {
 
 	public void setBgImage(Image bgImage) {
 		this.bgImage = bgImage;
+	}
+
+	@Override
+	public void init() {
 	}
 
 	@Override

@@ -1,8 +1,9 @@
 package de.amr.games.pong;
 
-import static de.amr.games.pong.PongGlobals.WINNING_SCORE;
-
-import java.awt.event.KeyEvent;
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_UP;
+import static java.awt.event.KeyEvent.VK_Y;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
@@ -14,9 +15,14 @@ import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.ScoreDisplay;
-import de.amr.games.pong.scenes.menu.Menu;
+import de.amr.games.pong.scenes.menu.MenuScene;
 import de.amr.games.pong.scenes.play.PongPlayScene;
 
+/**
+ * The classic "Pong" game with different play modes.
+ * 
+ * @author Armin Reichert & Anna Schillo
+ */
 public class PongGame extends Application {
 
 	public enum PlayMode {
@@ -27,7 +33,6 @@ public class PongGame extends Application {
 		launch(new PongGame());
 	}
 
-	private PlayMode playMode;
 	private Score scorePlayerLeft, scorePlayerRight;
 
 	public PongGame() {
@@ -35,41 +40,45 @@ public class PongGame extends Application {
 		settings.width = 640;
 		settings.height = 480;
 		settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
-		scorePlayerLeft = new Score(points -> points == WINNING_SCORE);
-		scorePlayerRight = new Score(points -> points == WINNING_SCORE);
+		scorePlayerLeft = new Score(points -> points == 11);
+		scorePlayerRight = new Score(points -> points == 11);
 	}
 
 	@Override
 	public void init() {
-		setPlayMode(PlayMode.Player1_Player2);
-
 		Assets.sound("plop.mp3");
 		Assets.sound("plip.mp3");
 		Assets.sound("out.mp3");
 
-		entities.add(new AutoPaddleLeft(this));
-		entities.add(new AutoPaddleRight(this));
-		entities.add(new Ball(getHeight()));
-		entities.add(new Court(this));
-		Paddle paddleLeft = new Paddle(this, KeyEvent.VK_A, KeyEvent.VK_Y);
-		paddleLeft.setName("paddleLeft");
-		entities.add(paddleLeft);
-		Paddle paddleRight = new Paddle(this, KeyEvent.VK_UP, KeyEvent.VK_DOWN);
-		paddleRight.setName("paddleRight");
-		entities.add(paddleRight);
+		entities.add(new Court(getWidth(), getHeight()));
 		entities.add(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
 
-		addView(new Menu(this));
+		entities.add(new Ball(getHeight()));
+
+		entities.add(new AutoPaddleLeft(this));
+		entities.add(new AutoPaddleRight(this));
+
+		Paddle paddleLeft = new Paddle(this, VK_A, VK_Y);
+		paddleLeft.setName("paddleLeft");
+		entities.add(paddleLeft);
+
+		Paddle paddleRight = new Paddle(this, VK_UP, VK_DOWN);
+		paddleRight.setName("paddleRight");
+		entities.add(paddleRight);
+
+		addView(new MenuScene(this));
 		addView(new PongPlayScene(this));
-		selectView(Menu.class);
+		selectView(MenuScene.class);
+
+		setPlayMode(PlayMode.Player1_Player2);
 	}
 
 	public void setPlayMode(PlayMode playMode) {
-		this.playMode = playMode;
+		findView(MenuScene.class).setSelectedPlayMode(playMode);
 	}
 
 	public PlayMode getPlayMode() {
-		return playMode;
+		return findView(MenuScene.class).getSelectedPlayMode();
 	}
 
 	public Score getScorePlayerLeft() {

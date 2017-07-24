@@ -1,19 +1,24 @@
 package de.amr.games.pong.scenes.play;
 
-import static de.amr.games.pong.PongGlobals.BALL_SPEED;
-import static de.amr.games.pong.PongGlobals.FONT;
-import static de.amr.games.pong.PongGlobals.WINNING_SCORE;
+import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
+import static de.amr.games.pong.scenes.play.PlaySceneState.GameOver;
+import static de.amr.games.pong.scenes.play.PlaySceneState.Initialized;
+import static de.amr.games.pong.scenes.play.PlaySceneState.Playing;
+import static de.amr.games.pong.scenes.play.PlaySceneState.Serving;
 import static java.awt.event.KeyEvent.VK_C;
 import static java.awt.event.KeyEvent.VK_CONTROL;
+import static java.awt.event.KeyEvent.VK_SPACE;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Random;
-import java.util.logging.Logger;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.entities.AutoPaddleLeft;
 import de.amr.games.pong.entities.AutoPaddleRight;
@@ -21,9 +26,57 @@ import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.ScoreDisplay;
-import de.amr.games.pong.scenes.menu.Menu;
+import de.amr.games.pong.scenes.menu.MenuScene;
 
+/**
+ * The play scene of the "Pong" game.
+ * 
+ * @author Armin Reichert
+ */
 public class PongPlayScene extends Scene<PongGame> {
+
+	/**
+	 * State machine for controlling the play scene.
+	 */
+	private class PlaySceneControl extends StateMachine<PlaySceneState, PlaySceneEvent> {
+
+		public PlaySceneControl() {
+			super("PongControl", PlaySceneState.class, Initialized);
+
+			// Initialized
+
+			state(Initialized).entry = s -> resetScores();
+
+			change(Initialized, Serving);
+
+			// Serving
+
+			state(Serving).entry = s -> {
+				s.setDuration(app.pulse.secToTicks(2));
+				prepareService();
+			};
+
+			changeOnTimeout(Serving, Playing, (s, t) -> serveBall());
+
+			// Playing
+
+			state(Playing).update = s -> app.entities.all().forEach(GameEntity::update);
+
+			change(Playing, Playing, () -> leftPaddleHitsBall(), (s, t) -> bounceBallFromLeftPaddle());
+
+			change(Playing, Playing, () -> rightPaddleHitsBall(), (s, t) -> bounceBallFromRightPaddle());
+
+			change(Playing, Serving, () -> isBallOutLeft(), (s, t) -> assignPointToRightPlayer());
+
+			change(Playing, Serving, () -> isBallOutRight(), (s, t) -> assignPointToLeftPlayer());
+
+			change(Playing, GameOver, () -> leftPlayerWins() || rightPlayerWins());
+
+			// GameOver
+
+			change(GameOver, Initialized, () -> keyPressedOnce(VK_SPACE));
+		}
+	}
 
 	private final PlaySceneControl control;
 	private Court court;
@@ -34,8 +87,8 @@ public class PongPlayScene extends Scene<PongGame> {
 
 	public PongPlayScene(PongGame game) {
 		super(game);
-		control = new PlaySceneControl(this);
-		control.setLogger(Logger.getGlobal());
+		control = new PlaySceneControl();
+		control.setLogger(Application.LOG);
 	}
 
 	@Override
@@ -68,21 +121,16 @@ public class PongPlayScene extends Scene<PongGame> {
 
 	@Override
 	public void update() {
-		if (Keyboard.keyPressedOnce(VK_CONTROL, VK_C)) {
-			app.selectView(Menu.class);
+		if (keyPressedOnce(VK_CONTROL, VK_C)) {
+			app.selectView(MenuScene.class);
 		}
 		control.update();
-	}
-
-	void updateEntities() {
-		ball.update();
-		paddleLeft.update();
-		paddleRight.update();
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		// draw in z-order:
 		court.draw(g);
 		paddleLeft.draw(g);
 		paddleRight.draw(g);
@@ -96,7 +144,7 @@ public class PongPlayScene extends Scene<PongGame> {
 	}
 
 	private void drawWinner(Graphics2D g, String text) {
-		g.setFont(FONT);
+		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 		int w = g.getFontMetrics().stringWidth(text);
 		g.drawString(text, getWidth() / 2 - w / 2, getHeight() - 100);
 	}
@@ -108,12 +156,12 @@ public class PongPlayScene extends Scene<PongGame> {
 		paddleRight.vCenter(getHeight());
 	}
 
-	void resetScores() {
+	private void resetScores() {
 		app.getScorePlayerLeft().reset();
 		app.getScorePlayerRight().reset();
 	}
 
-	void prepareBall() {
+	private void prepareService() {
 		resetPaddles();
 		if (!isBallOutRight()) {
 			ball.tf.moveTo(paddleLeft.tf.getX() + paddleLeft.getWidth(),
@@ -125,56 +173,57 @@ public class PongPlayScene extends Scene<PongGame> {
 		ball.tf.setVelocity(0, 0);
 	}
 
-	void shootBall() {
+	private void serveBall() {
 		Random rnd = new Random();
-		ball.tf.setVelocityX(isBallOutRight() ? -BALL_SPEED : BALL_SPEED);
-		ball.tf.setVelocityY((BALL_SPEED / 4) + (rnd.nextFloat() * BALL_SPEED / 4));
+		int ballSpeed = 10;
+		ball.tf.setVelocityX(isBallOutRight() ? -ballSpeed : ballSpeed);
+		ball.tf.setVelocityY((ballSpeed / 4) + (rnd.nextFloat() * ballSpeed / 4));
 		if (rnd.nextBoolean()) {
 			ball.tf.setVelocityY(-ball.tf.getVelocityY());
 		}
 	}
 
-	boolean isBallOutLeft() {
+	private boolean isBallOutLeft() {
 		return ball.tf.getX() + ball.getWidth() < 0;
 	}
 
-	boolean isBallOutRight() {
+	private boolean isBallOutRight() {
 		return ball.tf.getX() > getWidth();
 	}
 
-	boolean leftPaddleHitsBall() {
+	private boolean leftPaddleHitsBall() {
 		return ball.tf.getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
 	}
 
-	boolean rightPaddleHitsBall() {
+	private boolean rightPaddleHitsBall() {
 		return ball.tf.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
 	}
 
-	void bounceBallFromLeftPaddle() {
+	private void bounceBallFromLeftPaddle() {
 		ball.tf.setX(paddleLeft.tf.getX() + paddleLeft.getWidth() + 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plop.mp3").play();
 	}
 
-	void bounceBallFromRightPaddle() {
+	private void bounceBallFromRightPaddle() {
 		ball.tf.setX(paddleRight.tf.getX() - ball.getWidth() - 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plip.mp3").play();
 	}
 
-	boolean leftPlayerWins() {
-		return app.getScorePlayerLeft().points == WINNING_SCORE;
+	private boolean leftPlayerWins() {
+		return app.getScorePlayerLeft().isWinning();
 	}
 
-	boolean rightPlayerWins() {
-		return app.getScorePlayerRight().points == WINNING_SCORE;
+	private boolean rightPlayerWins() {
+		return app.getScorePlayerRight().isWinning();
 	}
 
-	void assignPointToRightPlayer() {
+	private void assignPointToRightPlayer() {
 		app.getScorePlayerRight().points++;
 	}
 
-	void assignPointToLeftPlayer() {
+	private void assignPointToLeftPlayer() {
 		app.getScorePlayerLeft().points++;
 	}
 }

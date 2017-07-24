@@ -1,49 +1,42 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.PongGlobals.COURT_BACKGROUND;
-import static de.amr.games.pong.PongGlobals.COURT_LINES_COLOR;
-import static de.amr.games.pong.PongGlobals.COURT_LINE_WIDTH;
-
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.games.pong.PongGame;
 
 public class Court extends GameEntity {
 
-	private final PongGame game;
+	private int width;
+	private int height;
+	private Color bgColor = Color.BLACK;
+	private Color lineColor = Color.WHITE;
+	private int lineWidth = 5;
 
-	public Court(PongGame game) {
-		this.game = game;
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
+	public Court(int width, int height) {
+		this.width = width;
+		this.height = height;
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(COURT_BACKGROUND);
+		g.setColor(bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
-		g.setColor(COURT_LINES_COLOR);
-		g.fillRect(0, 0, getWidth(), COURT_LINE_WIDTH);
-		g.fillRect(0, getHeight() - COURT_LINE_WIDTH, getWidth(), COURT_LINE_WIDTH);
-		g.fillRect(0, 0, COURT_LINE_WIDTH, getHeight());
-		g.fillRect(getWidth() - COURT_LINE_WIDTH, 0, COURT_LINE_WIDTH, getHeight());
-		g.fillRect(getWidth() / 2 - COURT_LINE_WIDTH / 2, 0, COURT_LINE_WIDTH, getHeight());
+		g.setColor(lineColor);
+		g.fillRect(0, 0, getWidth(), lineWidth);
+		g.fillRect(0, getHeight() - lineWidth, getWidth(), lineWidth);
+		g.fillRect(0, 0, lineWidth, getHeight());
+		g.fillRect(getWidth() - lineWidth, 0, lineWidth, getHeight());
+		g.fillRect(getWidth() / 2 - lineWidth / 2, 0, lineWidth, getHeight());
 	}
 
 	@Override
 	public int getWidth() {
-		return game.getWidth();
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return game.getHeight();
+		return height;
 	}
 }

@@ -1,8 +1,5 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.PongGlobals.BALL_SIZE;
-import static de.amr.games.pong.PongGlobals.PADDLE_SPEED;
-
 import java.awt.event.KeyEvent;
 
 import de.amr.games.pong.PongGame;
@@ -24,10 +21,10 @@ public class AutoPaddleRight extends Paddle {
 			targetY = ballRightY;
 		}
 		float diff = tf.getY() + getHeight() / 2 - targetY;
-		if (diff < -BALL_SIZE) {
-			tf.setVelocityY(PADDLE_SPEED);
-		} else if (diff > BALL_SIZE) {
-			tf.setVelocityY(-PADDLE_SPEED);
+		if (diff < -ball.getSize()) {
+			tf.setVelocityY(speed);
+		} else if (diff > ball.getSize()) {
+			tf.setVelocityY(-speed);
 		}
 		moveAndStopAtBorder();
 	}

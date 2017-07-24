@@ -6,10 +6,10 @@ import static java.awt.event.KeyEvent.VK_CONTROL;
 import static java.awt.event.KeyEvent.VK_P;
 
 import java.awt.EventQueue;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
@@ -104,7 +104,7 @@ public abstract class Application {
 	 */
 	protected Application() {
 		settings = new AppSettings();
-		views = new HashSet<>();
+		views = new LinkedHashSet<>();
 		defaultView = new DefaultView(this);
 		selectedView = defaultView;
 		entities = new EntitySet();
@@ -207,15 +207,6 @@ public abstract class Application {
 	}
 
 	/**
-	 * Returns a stream of all views of this application.
-	 * 
-	 * @return stream of views
-	 */
-	public Stream<View> views() {
-		return views.stream();
-	}
-
-	/**
 	 * Adds a view to the set of views.
 	 * 
 	 * @param view
@@ -287,5 +278,14 @@ public abstract class Application {
 	 */
 	public View getSelectedView() {
 		return selectedView;
+	}
+
+	/**
+	 * Returns the set of views. The iteration order corresponds to the insertion order.
+	 * 
+	 * @return set of views
+	 */
+	public Set<View> views() {
+		return Collections.unmodifiableSet(views);
 	}
 }

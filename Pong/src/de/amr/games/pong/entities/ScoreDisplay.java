@@ -1,8 +1,7 @@
 package de.amr.games.pong.entities;
 
-import static de.amr.games.pong.PongGlobals.FONT;
-import static de.amr.games.pong.PongGlobals.SCORE_COLOR;
-
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.common.Score;
@@ -20,17 +19,9 @@ public class ScoreDisplay extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(SCORE_COLOR);
-		g.setFont(FONT);
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 		g.drawString("" + scoreLeft.points, (int) tf.getX() - 100, 50);
 		g.drawString("" + scoreRight.points, (int) tf.getX() + 100, 50);
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
 	}
 }
