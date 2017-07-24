@@ -33,7 +33,7 @@ import de.amr.games.pong.scenes.menu.MenuScene;
  * 
  * @author Armin Reichert
  */
-public class PongPlayScene extends Scene<PongGame> {
+public class PlayScene extends Scene<PongGame> {
 
 	/**
 	 * State machine for controlling the play scene.
@@ -45,9 +45,7 @@ public class PongPlayScene extends Scene<PongGame> {
 
 			// Initialized
 
-			state(Initialized).entry = s -> resetScores();
-
-			change(Initialized, Serving);
+			change(Initialized, Serving, () -> true, (s, t) -> resetScores());
 
 			// Serving
 
@@ -76,6 +74,14 @@ public class PongPlayScene extends Scene<PongGame> {
 
 			change(GameOver, Initialized, () -> keyPressedOnce(VK_SPACE));
 		}
+
+		@Override
+		public void update() {
+			if (keyPressedOnce(VK_CONTROL, VK_C)) {
+				app.selectView(MenuScene.class);
+			}
+			super.update();
+		}
 	}
 
 	private final PlaySceneControl control;
@@ -85,7 +91,7 @@ public class PongPlayScene extends Scene<PongGame> {
 	private Ball ball;
 	private ScoreDisplay score;
 
-	public PongPlayScene(PongGame game) {
+	public PlayScene(PongGame game) {
 		super(game);
 		control = new PlaySceneControl();
 		control.setLogger(Application.LOG);
@@ -121,9 +127,6 @@ public class PongPlayScene extends Scene<PongGame> {
 
 	@Override
 	public void update() {
-		if (keyPressedOnce(VK_CONTROL, VK_C)) {
-			app.selectView(MenuScene.class);
-		}
 		control.update();
 	}
 
@@ -200,13 +203,11 @@ public class PongPlayScene extends Scene<PongGame> {
 	}
 
 	private void bounceBallFromLeftPaddle() {
-		ball.tf.setX(paddleLeft.tf.getX() + paddleLeft.getWidth() + 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plop.mp3").play();
 	}
 
 	private void bounceBallFromRightPaddle() {
-		ball.tf.setX(paddleRight.tf.getX() - ball.getWidth() - 1);
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plip.mp3").play();
 	}
