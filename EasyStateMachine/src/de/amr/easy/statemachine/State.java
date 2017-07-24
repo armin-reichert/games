@@ -31,7 +31,7 @@ public class State {
 	 * Creates a new state with unlimited duration.
 	 */
 	public State() {
-		remaining = FOREVER;
+		duration = FOREVER;
 		resetTimer();
 	}
 
