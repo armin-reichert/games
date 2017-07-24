@@ -40,7 +40,7 @@ import de.amr.easy.game.view.View;
  * 	public MyApplication() {
  * 		settings.title = "My Application";
  * 		settings.width = 800;
- * 		settings.width = 600;
+ * 		settings.height = 600;
  * 	}
  * }
  * </pre>
