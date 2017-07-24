@@ -1,13 +1,15 @@
 package de.amr.games.muehle;
 
+import static de.amr.games.muehle.Steinfarbe.SCHWARZ;
+import static de.amr.games.muehle.Steinfarbe.WEISS;
+
 import java.awt.Color;
 
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.muehle.MuehleBrett.Steinfarbe;
 
 public class MuehleScene extends Scene<MuehleApp> {
 
-	MuehleBrett brett;
+	private MuehleBrett brett;
 
 	public MuehleScene(MuehleApp app) {
 		super(app);
@@ -20,17 +22,15 @@ public class MuehleScene extends Scene<MuehleApp> {
 		brett.tf.moveTo(100, 100);
 		app.entities.add(brett);
 
-		brett.setzeStein(Steinfarbe.WEISS, 0);
-		// brett.setzeStein(Steinfarbe.WEISS, 1);
-		brett.setzeStein(Steinfarbe.WEISS, 2);
-		brett.setzeStein(Steinfarbe.WEISS, 14);
-		brett.setzeStein(Steinfarbe.WEISS, 2);
-		brett.setzeStein(Steinfarbe.WEISS, 23);
-		brett.setzeStein(Steinfarbe.SCHWARZ, 15);
-		brett.setzeStein(Steinfarbe.SCHWARZ, 16);
-		brett.setzeStein(Steinfarbe.SCHWARZ, 17);
-		brett.setzeStein(Steinfarbe.SCHWARZ, 19);
-		brett.setzeStein(Steinfarbe.SCHWARZ, 22);
+		brett.setzeStein(WEISS, 0);
+		brett.setzeStein(WEISS, 2);
+		brett.setzeStein(WEISS, 14);
+		brett.setzeStein(WEISS, 2);
+		brett.setzeStein(WEISS, 23);
+		brett.setzeStein(SCHWARZ, 15);
+		brett.setzeStein(SCHWARZ, 16);
+		brett.setzeStein(SCHWARZ, 17);
+		brett.setzeStein(SCHWARZ, 19);
+		brett.setzeStein(SCHWARZ, 22);
 	}
-
 }
