@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -42,6 +43,10 @@ public class MuehleBrett extends GameEntity {
 		MuehleStein stein = new MuehleStein(farbe);
 		stein.tf.moveTo(xpos[pos] * width, ypos[pos] * height);
 		belegung[pos] = stein;
+	}
+
+	public void entferneStein(int pos) {
+		belegung[pos] = null;
 	}
 
 	public MuehleStein gibStein(int p) {
@@ -154,14 +159,8 @@ public class MuehleBrett extends GameEntity {
 		return verbindungen[p][q] == Richtung.Norden || verbindungen[p][q] == Richtung.Süden;
 	}
 
-	public int anzNachbarn(int p, Richtung richtung) {
-		int n = 0;
-		for (int q = 0; q < POSITIONEN; q += 1) {
-			if (verbindungen[p][q] == richtung) {
-				n += 1;
-			}
-		}
-		return n;
+	public boolean inMühle(int p, Steinfarbe farbe) {
+		return findeHorizontaleMühle(p, farbe) != null || findeVertikaleMühle(p, farbe) != null;
 	}
 
 	public Muehle findeHorizontaleMühle(int p, Steinfarbe farbe) {
@@ -252,7 +251,16 @@ public class MuehleBrett extends GameEntity {
 		return null;
 	}
 
-	int findeNachbar(int p, Steinfarbe farbe, Richtung richtung) {
+	public int findeNachbar(int p, Richtung richtung) {
+		for (int q = 0; q < POSITIONEN; q += 1) {
+			if (verbindungen[p][q] == richtung) {
+				return q;
+			}
+		}
+		return -1; // kein Nachbar gefunden
+	}
+
+	private int findeNachbar(int p, Steinfarbe farbe, Richtung richtung) {
 		for (int q = 0; q < POSITIONEN; q += 1) {
 			if (verbindungen[p][q] == richtung) {
 				if (belegung[q] != null && belegung[q].getFarbe() == farbe) {
@@ -277,6 +285,12 @@ public class MuehleBrett extends GameEntity {
 			}
 		}
 		return gleicheSteine == 3;
+	}
+
+	public Point gibZeichenPosition(int p) {
+		int x = Math.round(xpos[p] * width);
+		int y = Math.round(ypos[p] * height);
+		return new Point(x, y);
 	}
 
 	@Override
