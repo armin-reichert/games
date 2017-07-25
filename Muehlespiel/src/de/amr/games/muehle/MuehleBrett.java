@@ -10,29 +10,52 @@ import de.amr.easy.game.entity.GameEntity;
 
 public class MuehleBrett extends GameEntity {
 
-	public static final int ANZAHL_POSITIONEN = 24;
+	public static final int POSITIONEN = 24;
 
 	private int width;
 	private int height;
 	private float[] xpos;
 	private float[] ypos;
-	private Richtung[][] matrix;
-	private Steinfarbe[] belegung;
+
+	private Richtung[][] verbindungen;
+	private MuehleStein[] belegung;
 
 	public MuehleBrett(int width, int height) {
 		this.width = width;
 		this.height = height;
-		belegung = new Steinfarbe[ANZAHL_POSITIONEN];
-		graphAufbauen();
+		belegung = new MuehleStein[POSITIONEN];
+		verbindungenErzeugen();
 		zeichenPositionenBerechnen();
 	}
 
-	public void setzeStein(Steinfarbe stein, int pos) {
+	@Override
+	public int getWidth() {
+		return width;
+	}
+
+	@Override
+	public int getHeight() {
+		return height;
+	}
+
+	public void setzeStein(Steinfarbe farbe, int pos) {
+		MuehleStein stein = new MuehleStein(farbe);
+		stein.tf.moveTo(xpos[pos] * width, ypos[pos] * height);
 		belegung[pos] = stein;
 	}
 
-	private void graphAufbauen() {
-		matrix = new Richtung[ANZAHL_POSITIONEN][ANZAHL_POSITIONEN];
+	public MuehleStein gibStein(int p) {
+		return belegung[p];
+	}
+
+	public void leeren() {
+		for (int p = 0; p < POSITIONEN; p += 1) {
+			belegung[p] = null;
+		}
+	}
+
+	private void verbindungenErzeugen() {
+		verbindungen = new Richtung[POSITIONEN][POSITIONEN];
 		hLinie(0, 1);
 		hLinie(1, 2);
 		hLinie(3, 4);
@@ -68,19 +91,19 @@ public class MuehleBrett extends GameEntity {
 		vLinie(14, 23);
 	}
 
-	private void hLinie(int punkt1, int punkt2) {
-		matrix[punkt1][punkt2] = Richtung.HORIZONTAL;
-		matrix[punkt2][punkt1] = Richtung.HORIZONTAL;
+	private void hLinie(int links, int rechts) {
+		verbindungen[links][rechts] = Richtung.Osten;
+		verbindungen[rechts][links] = Richtung.Westen;
 	}
 
-	private void vLinie(int punkt1, int punkt2) {
-		matrix[punkt1][punkt2] = Richtung.VERTIKAL;
-		matrix[punkt2][punkt1] = Richtung.VERTIKAL;
+	private void vLinie(int oben, int unten) {
+		verbindungen[oben][unten] = Richtung.Süden;
+		verbindungen[unten][oben] = Richtung.Norden;
 	}
 
 	private void zeichenPositionenBerechnen() {
-		xpos = new float[ANZAHL_POSITIONEN];
-		ypos = new float[ANZAHL_POSITIONEN];
+		xpos = new float[POSITIONEN];
+		ypos = new float[POSITIONEN];
 		posX(0f, 0, 9, 21);
 		posX(1f / 6, 3, 10, 18);
 		posX(1f / 3, 6, 11, 15);
@@ -109,38 +132,151 @@ public class MuehleBrett extends GameEntity {
 		}
 	}
 
+	public int findePosition(int x, int y, int radius) {
+		for (int p = 0; p < POSITIONEN; p += 1) {
+			int px = Math.round(xpos[p] * width);
+			int py = Math.round(ypos[p] * height);
+			int dx = px - x;
+			int dy = py - y;
+			double d = Math.sqrt(dx * dx + dy * dy);
+			if (d <= radius) {
+				return p;
+			}
+		}
+		return -1;
+	}
+
 	public boolean sindHorizontalVerbunden(int p, int q) {
-		return matrix[p][q] == Richtung.HORIZONTAL;
+		return verbindungen[p][q] == Richtung.Westen || verbindungen[p][q] == Richtung.Osten;
 	}
 
 	public boolean sindVertikalVerbunden(int p, int q) {
-		return matrix[p][q] == Richtung.VERTIKAL;
+		return verbindungen[p][q] == Richtung.Norden || verbindungen[p][q] == Richtung.Süden;
 	}
 
 	public int anzNachbarn(int p, Richtung richtung) {
 		int n = 0;
-		for (int q = 0; q < ANZAHL_POSITIONEN; q += 1) {
-			if (matrix[p][q] == richtung) {
+		for (int q = 0; q < POSITIONEN; q += 1) {
+			if (verbindungen[p][q] == richtung) {
 				n += 1;
 			}
 		}
 		return n;
 	}
 
-	public boolean istMühlenZentrum(int p, Steinfarbe farbe, Richtung richtung) {
-		int w = 0;
-		if (belegung[p] != farbe) {
-			return false;
+	public Muehle findeHorizontaleMühle(int p, Steinfarbe farbe) {
+
+		// Liegt auf Position @p ein Stein der Farbe @farbe?
+		if (belegung[p] == null) {
+			return null;
 		}
-		w = 1;
-		for (int q = 0; q < ANZAHL_POSITIONEN; q += 1) {
-			if (matrix[p][q] == richtung) {
-				if (belegung[q] == farbe) {
-					w += 1;
+		MuehleStein stein = belegung[p];
+		if (stein.getFarbe() != farbe) {
+			return null;
+		}
+		// "Ja"
+
+		int q, r;
+
+		// a) p -> q -> r
+		q = findeNachbar(p, farbe, Richtung.Osten);
+		if (q != -1) {
+			r = findeNachbar(q, farbe, Richtung.Osten);
+			if (r != -1) {
+				return new Muehle(p, q, r, true);
+			}
+		}
+
+		// b) q <- p -> r
+		q = findeNachbar(p, farbe, Richtung.Westen);
+		if (q != -1) {
+			r = findeNachbar(p, farbe, Richtung.Osten);
+			if (r != -1) {
+				return new Muehle(q, p, r, true);
+			}
+		}
+
+		// c) q <- r <- p
+		r = findeNachbar(p, farbe, Richtung.Westen);
+		if (r != -1) {
+			q = findeNachbar(r, farbe, Richtung.Westen);
+			if (q != -1) {
+				return new Muehle(q, r, p, true);
+			}
+		}
+
+		return null;
+	}
+
+	public Muehle findeVertikaleMühle(int p, Steinfarbe farbe) {
+
+		// Liegt auf Position @p ein Stein der Farbe @farbe?
+		if (belegung[p] == null) {
+			return null;
+		}
+		MuehleStein stein = belegung[p];
+		if (stein.getFarbe() != farbe) {
+			return null;
+		}
+		// "Ja"
+
+		int q, r;
+
+		// a) p -> q -> r
+		q = findeNachbar(p, farbe, Richtung.Süden);
+		if (q != -1) {
+			r = findeNachbar(q, farbe, Richtung.Süden);
+			if (r != -1) {
+				return new Muehle(p, q, r, false);
+			}
+		}
+
+		// b) q <- p -> r
+		q = findeNachbar(p, farbe, Richtung.Norden);
+		if (q != -1) {
+			r = findeNachbar(p, farbe, Richtung.Süden);
+			if (r != -1) {
+				return new Muehle(q, p, r, false);
+			}
+		}
+
+		// c) q <- r <- p
+		r = findeNachbar(p, farbe, Richtung.Norden);
+		if (r != -1) {
+			q = findeNachbar(r, farbe, Richtung.Norden);
+			if (q != -1) {
+				return new Muehle(q, r, p, false);
+			}
+		}
+
+		return null;
+	}
+
+	int findeNachbar(int p, Steinfarbe farbe, Richtung richtung) {
+		for (int q = 0; q < POSITIONEN; q += 1) {
+			if (verbindungen[p][q] == richtung) {
+				if (belegung[q] != null && belegung[q].getFarbe() == farbe) {
+					// q ist Nachbar von p in Richtung @richtung und trägt Stein der Farbe @farbe
+					return q;
 				}
 			}
 		}
-		return w == 3;
+		return -1; // kein Nachbar gefunden
+	}
+
+	public boolean istMühlenZentrum(int p, Steinfarbe farbe, Richtung richtung) {
+		if (belegung[p] == null || belegung[p].getFarbe() != farbe) {
+			return false;
+		}
+		int gleicheSteine = 1;
+		for (int q = 0; q < POSITIONEN; q += 1) {
+			if (verbindungen[p][q] == richtung) {
+				if (belegung[q] != null && belegung[q].getFarbe() == farbe) {
+					gleicheSteine += 1;
+				}
+			}
+		}
+		return gleicheSteine == 3;
 	}
 
 	@Override
@@ -150,55 +286,37 @@ public class MuehleBrett extends GameEntity {
 		int radius = 5;
 
 		// Linien zeichnen
-		g.setColor(Color.BLACK);
-		g.setStroke(new BasicStroke(radius / 2));
-		for (int p = 0; p < ANZAHL_POSITIONEN; p += 1) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		for (int p = 0; p < POSITIONEN; p += 1) {
+			int x1 = Math.round(xpos[p] * width);
+			int y1 = Math.round(ypos[p] * height);
 			for (int q = 0; q < p; q += 1) {
-				if (matrix[p][q] != null) {
-					int x1 = Math.round(xpos[p] * width);
-					int y1 = Math.round(ypos[p] * height);
+				if (verbindungen[p][q] != null) {
 					int x2 = Math.round(xpos[q] * width);
 					int y2 = Math.round(ypos[q] * height);
+					g.setColor(Color.BLACK);
+					g.setStroke(new BasicStroke(radius / 2));
 					g.drawLine(x1, y1, x2, y2);
 				}
 			}
 		}
 
-		// Punkte zeichnen
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		for (int p = 0; p < ANZAHL_POSITIONEN; p += 1) {
-			int x = Math.round(xpos[p] * width);
-			int y = Math.round(ypos[p] * height);
+		for (int p = 0; p < POSITIONEN; p += 1) {
+			int x1 = Math.round(xpos[p] * width);
+			int y1 = Math.round(ypos[p] * height);
+
+			// Punkte zeichnen
 			g.setColor(Color.BLACK);
-			g.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+			g.setFont(new Font("Arial", Font.PLAIN, 20));
+			g.fillOval(x1 - radius, y1 - radius, 2 * radius, 2 * radius);
+			g.drawString(p + "", x1 + 4 * radius, y1 + 4 * radius);
+		}
 
-			// Belegung
-			int steinGröße = 40;
-			if (belegung[p] == Steinfarbe.WEISS) {
-				g.setColor(Color.ORANGE);
-				g.fillOval(x - steinGröße / 2, y - steinGröße / 2, steinGröße, steinGröße);
-			} else if (belegung[p] == Steinfarbe.SCHWARZ) {
-				g.setColor(Color.BLACK);
-				g.fillOval(x - steinGröße / 2, y - steinGröße / 2, steinGröße, steinGröße);
+		// Steine zeichnen
+		for (int p = 0; p < POSITIONEN; p += 1) {
+			if (belegung[p] != null) {
+				belegung[p].draw(g);
 			}
-
-			// Infotext
-			g.setColor(Color.RED);
-			g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-			String text = p + "";
-			if (istMühlenZentrum(p, Steinfarbe.WEISS, Richtung.HORIZONTAL)) {
-				text += " WH";
-			}
-			if (istMühlenZentrum(p, Steinfarbe.WEISS, Richtung.VERTIKAL)) {
-				text += " WV";
-			}
-			if (istMühlenZentrum(p, Steinfarbe.SCHWARZ, Richtung.HORIZONTAL)) {
-				text += " SH";
-			}
-			if (istMühlenZentrum(p, Steinfarbe.SCHWARZ, Richtung.VERTIKAL)) {
-				text += " SV";
-			}
-			g.drawString(text, x + 2 * radius, y + 2 * radius);
 		}
 
 		g.translate(-tf.getX(), -tf.getY());

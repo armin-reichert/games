@@ -4,9 +4,9 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.scene.Scene;
 
 /**
+ * Mühlespiel.
  * 
  * @author Armin Reichert & Peter und Anna Schillo
- *
  */
 public class MuehleApp extends Application {
 
@@ -18,14 +18,12 @@ public class MuehleApp extends Application {
 		settings.title = "Mühlespiel";
 		settings.width = 800;
 		settings.height = 800;
-
 	}
 
 	@Override
 	public void init() {
-		Scene<MuehleApp> scene = new MuehleScene(this);
+		Scene<MuehleApp> scene = new SpielScene(this);
 		addView(scene);
 		selectView(scene);
 	}
-
 }

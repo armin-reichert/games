@@ -28,7 +28,7 @@ public class ScrollingText extends GameEntity {
 		setText(text);
 		setScrollSpeed(0);
 		setFont(new Font("Sans", Font.PLAIN, 40));
-		setColor(Color.WHITE);
+		setColor(Color.BLUE);
 		setLineSpacing(1.5f);
 	}
 
