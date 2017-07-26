@@ -7,9 +7,9 @@ public class Mouse extends MouseAdapter {
 
 	private MouseEvent event;
 
-	public boolean clicked;
-	public int x;
-	public int y;
+	private boolean clicked;
+	private int x;
+	private int y;
 
 	public synchronized void poll() {
 		clicked = event != null;
@@ -23,5 +23,17 @@ public class Mouse extends MouseAdapter {
 	@Override
 	public void mouseClicked(MouseEvent event) {
 		this.event = event;
+	}
+
+	public boolean clicked() {
+		return clicked;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
 	}
 };
