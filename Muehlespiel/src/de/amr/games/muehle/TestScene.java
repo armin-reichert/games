@@ -1,24 +1,24 @@
 package de.amr.games.muehle;
 
-import static de.amr.games.muehle.Steinfarbe.SCHWARZ;
-import static de.amr.games.muehle.Steinfarbe.WEISS;
+import static de.amr.games.muehle.Farbe.SCHWARZ;
+import static de.amr.games.muehle.Farbe.WEISS;
 
 import java.awt.Color;
 
 import de.amr.easy.game.scene.Scene;
 
-public class MuehleTestScene extends Scene<MuehleApp> {
+public class TestScene extends Scene<MuehleApp> {
 
-	private MuehleBrett brett;
+	private Brett brett;
 
-	public MuehleTestScene(MuehleApp app) {
+	public TestScene(MuehleApp app) {
 		super(app);
 		setBgColor(Color.WHITE);
 	}
 
 	@Override
 	public void init() {
-		brett = new MuehleBrett(600, 600);
+		brett = new Brett(600, 600);
 		brett.tf.moveTo(100, 100);
 		app.entities.add(brett);
 
@@ -35,23 +35,22 @@ public class MuehleTestScene extends Scene<MuehleApp> {
 
 		for (int p = 0; p < 24; p += 1) {
 			Muehle muehle;
-			muehle = brett.findeHorizontaleMühle(p, Steinfarbe.SCHWARZ);
+			muehle = brett.findeMühle(p, Farbe.SCHWARZ, true);
 			if (muehle != null) {
 				System.out.println(p + " liegt in horizontaler schwarzer Mühle: " + muehle);
 			}
-			muehle = brett.findeHorizontaleMühle(p, Steinfarbe.WEISS);
+			muehle = brett.findeMühle(p, Farbe.WEISS, true);
 			if (muehle != null) {
 				System.out.println(p + " liegt in horizontaler weißer Mühle: " + muehle);
 			}
-			muehle = brett.findeVertikaleMühle(p, Steinfarbe.SCHWARZ);
+			muehle = brett.findeMühle(p, Farbe.SCHWARZ, false);
 			if (muehle != null) {
 				System.out.println(p + " liegt in vertikaler schwarzer Mühle: " + muehle);
 			}
-			muehle = brett.findeVertikaleMühle(p, Steinfarbe.WEISS);
+			muehle = brett.findeMühle(p, Farbe.WEISS, false);
 			if (muehle != null) {
 				System.out.println(p + " liegt in vertikaler weißer Mühle: " + muehle);
 			}
 		}
-
 	}
 }

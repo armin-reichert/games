@@ -9,7 +9,7 @@ import java.awt.RenderingHints;
 
 import de.amr.easy.game.entity.GameEntity;
 
-public class MuehleBrett extends GameEntity {
+public class Brett extends GameEntity {
 
 	public static final int POSITIONEN = 24;
 
@@ -19,14 +19,14 @@ public class MuehleBrett extends GameEntity {
 	private float[] ypos;
 
 	private Richtung[][] verbindungen;
-	private MuehleStein[] belegung;
+	private Stein[] belegung;
 
-	public MuehleBrett(int width, int height) {
+	public Brett(int width, int height) {
 		this.width = width;
 		this.height = height;
-		belegung = new MuehleStein[POSITIONEN];
+		belegung = new Stein[POSITIONEN];
 		verbindungenErzeugen();
-		zeichenPositionenBerechnen();
+		berechneRelativeMalPositionen();
 	}
 
 	@Override
@@ -39,17 +39,17 @@ public class MuehleBrett extends GameEntity {
 		return height;
 	}
 
-	public void setzeStein(Steinfarbe farbe, int pos) {
-		MuehleStein stein = new MuehleStein(farbe);
-		stein.tf.moveTo(xpos[pos] * width, ypos[pos] * height);
-		belegung[pos] = stein;
+	public void setzeStein(Farbe farbe, int p) {
+		Stein stein = new Stein(farbe);
+		stein.tf.moveTo(xpos[p] * width, ypos[p] * height);
+		belegung[p] = stein;
 	}
 
-	public void entferneStein(int pos) {
-		belegung[pos] = null;
+	public void entferneStein(int p) {
+		belegung[p] = null;
 	}
 
-	public MuehleStein gibStein(int p) {
+	public Stein gibStein(int p) {
 		return belegung[p];
 	}
 
@@ -61,52 +61,53 @@ public class MuehleBrett extends GameEntity {
 
 	private void verbindungenErzeugen() {
 		verbindungen = new Richtung[POSITIONEN][POSITIONEN];
-		hLinie(0, 1);
-		hLinie(1, 2);
-		hLinie(3, 4);
-		hLinie(4, 5);
-		hLinie(6, 7);
-		hLinie(7, 8);
-		hLinie(9, 10);
-		hLinie(10, 11);
-		hLinie(12, 13);
-		hLinie(13, 14);
-		hLinie(15, 16);
-		hLinie(16, 17);
-		hLinie(18, 19);
-		hLinie(19, 20);
-		hLinie(21, 22);
-		hLinie(22, 23);
 
-		vLinie(0, 9);
-		vLinie(9, 21);
-		vLinie(3, 10);
-		vLinie(10, 18);
-		vLinie(6, 11);
-		vLinie(11, 15);
-		vLinie(1, 4);
-		vLinie(4, 7);
-		vLinie(16, 19);
-		vLinie(19, 22);
-		vLinie(8, 12);
-		vLinie(12, 17);
-		vLinie(5, 13);
-		vLinie(13, 20);
-		vLinie(2, 14);
-		vLinie(14, 23);
+		horizontal(0, 1);
+		horizontal(1, 2);
+		horizontal(3, 4);
+		horizontal(4, 5);
+		horizontal(6, 7);
+		horizontal(7, 8);
+		horizontal(9, 10);
+		horizontal(10, 11);
+		horizontal(12, 13);
+		horizontal(13, 14);
+		horizontal(15, 16);
+		horizontal(16, 17);
+		horizontal(18, 19);
+		horizontal(19, 20);
+		horizontal(21, 22);
+		horizontal(22, 23);
+
+		vertikal(0, 9);
+		vertikal(9, 21);
+		vertikal(3, 10);
+		vertikal(10, 18);
+		vertikal(6, 11);
+		vertikal(11, 15);
+		vertikal(1, 4);
+		vertikal(4, 7);
+		vertikal(16, 19);
+		vertikal(19, 22);
+		vertikal(8, 12);
+		vertikal(12, 17);
+		vertikal(5, 13);
+		vertikal(13, 20);
+		vertikal(2, 14);
+		vertikal(14, 23);
 	}
 
-	private void hLinie(int links, int rechts) {
+	private void horizontal(int links, int rechts) {
 		verbindungen[links][rechts] = Richtung.Osten;
 		verbindungen[rechts][links] = Richtung.Westen;
 	}
 
-	private void vLinie(int oben, int unten) {
+	private void vertikal(int oben, int unten) {
 		verbindungen[oben][unten] = Richtung.Süden;
 		verbindungen[unten][oben] = Richtung.Norden;
 	}
 
-	private void zeichenPositionenBerechnen() {
+	private void berechneRelativeMalPositionen() {
 		xpos = new float[POSITIONEN];
 		ypos = new float[POSITIONEN];
 		posX(0f, 0, 9, 21);
@@ -137,7 +138,7 @@ public class MuehleBrett extends GameEntity {
 		}
 	}
 
-	public int findePosition(int x, int y, int radius) {
+	public int findeBrettPosition(int x, int y, int radius) {
 		for (int p = 0; p < POSITIONEN; p += 1) {
 			int px = Math.round(xpos[p] * width);
 			int py = Math.round(ypos[p] * height);
@@ -151,25 +152,17 @@ public class MuehleBrett extends GameEntity {
 		return -1;
 	}
 
-	public boolean sindHorizontalVerbunden(int p, int q) {
-		return verbindungen[p][q] == Richtung.Westen || verbindungen[p][q] == Richtung.Osten;
+	public boolean inMühle(int p, Farbe farbe) {
+		return findeMühle(p, farbe, true) != null || findeMühle(p, farbe, false) != null;
 	}
 
-	public boolean sindVertikalVerbunden(int p, int q) {
-		return verbindungen[p][q] == Richtung.Norden || verbindungen[p][q] == Richtung.Süden;
-	}
-
-	public boolean inMühle(int p, Steinfarbe farbe) {
-		return findeHorizontaleMühle(p, farbe) != null || findeVertikaleMühle(p, farbe) != null;
-	}
-
-	public Muehle findeHorizontaleMühle(int p, Steinfarbe farbe) {
+	public Muehle findeMühle(int p, Farbe farbe, boolean horizontal) {
 
 		// Liegt auf Position @p ein Stein der Farbe @farbe?
 		if (belegung[p] == null) {
 			return null;
 		}
-		MuehleStein stein = belegung[p];
+		Stein stein = belegung[p];
 		if (stein.getFarbe() != farbe) {
 			return null;
 		}
@@ -178,73 +171,29 @@ public class MuehleBrett extends GameEntity {
 		int q, r;
 
 		// a) p -> q -> r
-		q = findeNachbar(p, farbe, Richtung.Osten);
+		q = findeNachbar(p, farbe, horizontal ? Richtung.Osten : Richtung.Süden);
 		if (q != -1) {
-			r = findeNachbar(q, farbe, Richtung.Osten);
+			r = findeNachbar(q, farbe, horizontal ? Richtung.Osten : Richtung.Süden);
 			if (r != -1) {
 				return new Muehle(p, q, r, true);
 			}
 		}
 
 		// b) q <- p -> r
-		q = findeNachbar(p, farbe, Richtung.Westen);
+		q = findeNachbar(p, farbe, horizontal ? Richtung.Westen : Richtung.Norden);
 		if (q != -1) {
-			r = findeNachbar(p, farbe, Richtung.Osten);
+			r = findeNachbar(p, farbe, horizontal ? Richtung.Osten : Richtung.Süden);
 			if (r != -1) {
 				return new Muehle(q, p, r, true);
 			}
 		}
 
 		// c) q <- r <- p
-		r = findeNachbar(p, farbe, Richtung.Westen);
+		r = findeNachbar(p, farbe, horizontal ? Richtung.Westen : Richtung.Norden);
 		if (r != -1) {
-			q = findeNachbar(r, farbe, Richtung.Westen);
+			q = findeNachbar(r, farbe, horizontal ? Richtung.Westen : Richtung.Norden);
 			if (q != -1) {
 				return new Muehle(q, r, p, true);
-			}
-		}
-
-		return null;
-	}
-
-	public Muehle findeVertikaleMühle(int p, Steinfarbe farbe) {
-
-		// Liegt auf Position @p ein Stein der Farbe @farbe?
-		if (belegung[p] == null) {
-			return null;
-		}
-		MuehleStein stein = belegung[p];
-		if (stein.getFarbe() != farbe) {
-			return null;
-		}
-		// "Ja"
-
-		int q, r;
-
-		// a) p -> q -> r
-		q = findeNachbar(p, farbe, Richtung.Süden);
-		if (q != -1) {
-			r = findeNachbar(q, farbe, Richtung.Süden);
-			if (r != -1) {
-				return new Muehle(p, q, r, false);
-			}
-		}
-
-		// b) q <- p -> r
-		q = findeNachbar(p, farbe, Richtung.Norden);
-		if (q != -1) {
-			r = findeNachbar(p, farbe, Richtung.Süden);
-			if (r != -1) {
-				return new Muehle(q, p, r, false);
-			}
-		}
-
-		// c) q <- r <- p
-		r = findeNachbar(p, farbe, Richtung.Norden);
-		if (r != -1) {
-			q = findeNachbar(r, farbe, Richtung.Norden);
-			if (q != -1) {
-				return new Muehle(q, r, p, false);
 			}
 		}
 
@@ -260,7 +209,7 @@ public class MuehleBrett extends GameEntity {
 		return -1; // kein Nachbar gefunden
 	}
 
-	private int findeNachbar(int p, Steinfarbe farbe, Richtung richtung) {
+	private int findeNachbar(int p, Farbe farbe, Richtung richtung) {
 		for (int q = 0; q < POSITIONEN; q += 1) {
 			if (verbindungen[p][q] == richtung) {
 				if (belegung[q] != null && belegung[q].getFarbe() == farbe) {
@@ -272,22 +221,7 @@ public class MuehleBrett extends GameEntity {
 		return -1; // kein Nachbar gefunden
 	}
 
-	public boolean istMühlenZentrum(int p, Steinfarbe farbe, Richtung richtung) {
-		if (belegung[p] == null || belegung[p].getFarbe() != farbe) {
-			return false;
-		}
-		int gleicheSteine = 1;
-		for (int q = 0; q < POSITIONEN; q += 1) {
-			if (verbindungen[p][q] == richtung) {
-				if (belegung[q] != null && belegung[q].getFarbe() == farbe) {
-					gleicheSteine += 1;
-				}
-			}
-		}
-		return gleicheSteine == 3;
-	}
-
-	public Point gibZeichenPosition(int p) {
+	public Point gibMalPosition(int p) {
 		int x = Math.round(xpos[p] * width);
 		int y = Math.round(ypos[p] * height);
 		return new Point(x, y);
