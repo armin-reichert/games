@@ -71,7 +71,7 @@ public class SpielScene extends Scene<MuehleApp> {
 				}
 			};
 
-			change(Setzen, Spielen, () -> whiteStonesSet == NUM_STONES && darkStonesSet == NUM_STONES);
+			change(Setzen, Spielen, () -> whiteStonesSet == NUM_STONES && darkStonesSet == NUM_STONES && !removeStone);
 
 			// Spielen
 
@@ -186,8 +186,8 @@ public class SpielScene extends Scene<MuehleApp> {
 			LOG.info("Stein an Klickposition besitzt die falsche Farbe");
 			return;
 		}
-		if (brett.isMillPosition(p, color) && !brett.allStonesInMill(color)) {
-			LOG.info("Stein in Mühle darf nicht entfernt werden");
+		if (brett.isMillPosition(p, color) && !brett.allStonesOfColorInsideMills(color)) {
+			LOG.info("Stein darf nicht aus Mühle entfernt werden, weil anderer Stein außerhalb Mühle existiert");
 			return;
 		}
 		brett.removeStone(p);
@@ -213,6 +213,10 @@ public class SpielScene extends Scene<MuehleApp> {
 		}
 		if (!whitesTurn && brett.getStone(p).getColor() == SteinFarbe.HELL) {
 			LOG.info("Weiß ist nicht am Zug");
+			return;
+		}
+		if (!brett.hasEmptyNeighbor(p)) {
+			LOG.info("Stein an dieser Position kann nicht ziehen");
 			return;
 		}
 		startPosition = p;
@@ -253,7 +257,7 @@ public class SpielScene extends Scene<MuehleApp> {
 	}
 
 	private void checkMoveFinished(Stein stone) {
-		Point endPoint = brett.getDrawPosition(endPosition);
+		Point endPoint = brett.computeDrawPoint(endPosition);
 		if (stone.tf.getX() == endPoint.getX() && stone.tf.getY() == endPoint.getY()) {
 			brett.removeStone(startPosition);
 			brett.placeStone(stone.getColor(), endPosition);
@@ -292,12 +296,12 @@ public class SpielScene extends Scene<MuehleApp> {
 		}
 		if (steuerung.is(Spielen)) {
 			if (startPosition != -1) {
-				Point p = brett.getDrawPosition(startPosition);
+				Point p = brett.computeDrawPoint(startPosition);
 				g.setColor(Color.GREEN);
 				g.fillOval(Math.round(brett.tf.getX() + p.x) - 5, Math.round(brett.tf.getY() + p.y) - 5, 10, 10);
 			}
 			if (endPosition != -1) {
-				Point p = brett.getDrawPosition(endPosition);
+				Point p = brett.computeDrawPoint(endPosition);
 				g.setColor(Color.RED);
 				g.fillOval(Math.round(brett.tf.getX() + p.x) - 5, Math.round(brett.tf.getY() + p.y) - 5, 10, 10);
 			}

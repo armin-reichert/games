@@ -18,6 +18,7 @@ public class MuehleApp extends Application {
 		settings.title = "Mühlespiel";
 		settings.width = 800;
 		settings.height = 800;
+		pulse.setFrequency(30);
 	}
 
 	@Override
