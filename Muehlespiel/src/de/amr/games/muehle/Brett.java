@@ -1,32 +1,83 @@
 package de.amr.games.muehle;
 
+import static de.amr.games.muehle.Richtung.Norden;
+import static de.amr.games.muehle.Richtung.Osten;
+import static de.amr.games.muehle.Richtung.Süden;
+import static de.amr.games.muehle.Richtung.Westen;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 
+/**
+ * Das Mühlebrett.
+ *
+ * @author Armin Reichert & Peter und Anna Schillo
+ */
 public class Brett extends GameEntity {
 
-	public static final int POSITIONEN = 24;
+	/** Anzahl Brettpositionen. */
+	public static final int NUM_POS = 24;
+
+	/* GRID[p] = {Norden, Osten, Süden, Westen} */
+	private static final int[][] GRID = {
+			/*@formatter:off*/
+			{ -1, 1, 9, -1 }, // 0
+			{ -1, 2, 4, 0 }, 
+			{ -1, -1, 14, 1 }, 
+			{ -1, 4, 10, -1 },
+			{ 1, 5, 7, 3 }, 
+			{ -1, -1, 13, 4 }, // 5
+			{ -1, 7, 11, -1 }, 
+			{ 4, 8, -1, 6 }, 
+			{ -1, -1, 12, 7 },
+			{ 0, 10, 21, -1 }, 
+			{ 3, 11, 18, 9 }, // 10
+			{ 6, -1, 15, 10 }, 
+			{ 8, 13, 17, -1 }, 
+			{ 5, 14, 20, 12 }, 
+			{ 2, -1, 23, 13 },
+			{ 11, 16, -1, -1 }, // 15
+			{ -1, 17, 19, 15 }, 
+			{ 12, -1, -1, 16 }, 
+			{ 10, 19, -1, -1 },
+			{ 16, 20, 22, 18 }, 
+			{ 13, -1, -1, 19 }, // 20
+			{ 9, 22, -1, -1 }, 
+			{ 19, 23, -1, 21 }, 
+			{ 14, -1, -1, 22 }, // 23
+			/*@formatter:on*/
+	};
+
+	private static final int[][] GRID_DRAW_POSITION = {
+			/*@formatter:off*/
+			{0,0}, {3,0}, {6,0},	
+			{1,1}, {3,1}, {5,1},	
+			{2,2}, {3,2}, {4,2},	
+			{0,3}, {1,3}, {2,3}, {4,3}, {5,3}, {6,3},
+			{2,4}, {3,4}, {4,4},	
+			{1,5}, {3,5}, {5,5},	
+			{0,6}, {3,6}, {6,6},	
+			/*@formatter:on*/
+	};
 
 	private int width;
 	private int height;
-	private float[] xpos;
-	private float[] ypos;
+	private int posRadius;
+	private Stein[] content;
 
-	private Richtung[][] verbindungen;
-	private Stein[] belegung;
-
-	public Brett(int width, int height) {
-		this.width = width;
-		this.height = height;
-		belegung = new Stein[POSITIONEN];
-		verbindungenErzeugen();
-		berechneRelativeMalPositionen();
+	public Brett(int w, int h) {
+		width = w;
+		height = h;
+		posRadius = 5;
+		content = new Stein[NUM_POS];
 	}
 
 	@Override
@@ -39,159 +90,90 @@ public class Brett extends GameEntity {
 		return height;
 	}
 
-	public void setzeStein(Farbe farbe, int p) {
-		Stein stein = new Stein(farbe);
-		stein.tf.moveTo(xpos[p] * width, ypos[p] * height);
-		belegung[p] = stein;
+	public void placeStone(SteinFarbe color, int p) {
+		Stein stone = new Stein(color, width / 24);
+		Point pos = getDrawPosition(p);
+		stone.tf.moveTo(pos.x, pos.y);
+		content[p] = stone;
 	}
 
-	public void entferneStein(int p) {
-		belegung[p] = null;
+	public void removeStone(int p) {
+		content[p] = null;
 	}
 
-	public Stein gibStein(int p) {
-		return belegung[p];
+	public Stein getStone(int p) {
+		return content[p];
 	}
 
-	public void leeren() {
-		for (int p = 0; p < POSITIONEN; p += 1) {
-			belegung[p] = null;
-		}
+	public Stream<Stein> getStones() {
+		return Stream.of(content).filter(c -> c != null);
 	}
 
-	private void verbindungenErzeugen() {
-		verbindungen = new Richtung[POSITIONEN][POSITIONEN];
-
-		horizontal(0, 1);
-		horizontal(1, 2);
-		horizontal(3, 4);
-		horizontal(4, 5);
-		horizontal(6, 7);
-		horizontal(7, 8);
-		horizontal(9, 10);
-		horizontal(10, 11);
-		horizontal(12, 13);
-		horizontal(13, 14);
-		horizontal(15, 16);
-		horizontal(16, 17);
-		horizontal(18, 19);
-		horizontal(19, 20);
-		horizontal(21, 22);
-		horizontal(22, 23);
-
-		vertikal(0, 9);
-		vertikal(9, 21);
-		vertikal(3, 10);
-		vertikal(10, 18);
-		vertikal(6, 11);
-		vertikal(11, 15);
-		vertikal(1, 4);
-		vertikal(4, 7);
-		vertikal(16, 19);
-		vertikal(19, 22);
-		vertikal(8, 12);
-		vertikal(12, 17);
-		vertikal(5, 13);
-		vertikal(13, 20);
-		vertikal(2, 14);
-		vertikal(14, 23);
+	public void clear() {
+		content = new Stein[NUM_POS];
 	}
 
-	private void horizontal(int links, int rechts) {
-		verbindungen[links][rechts] = Richtung.Osten;
-		verbindungen[rechts][links] = Richtung.Westen;
+	public boolean areNeighbors(int p, int q) {
+		return Stream.of(Richtung.values()).anyMatch(r -> areNeighbors(p, q, r));
 	}
 
-	private void vertikal(int oben, int unten) {
-		verbindungen[oben][unten] = Richtung.Süden;
-		verbindungen[unten][oben] = Richtung.Norden;
+	public IntStream getNeighbors(int p) {
+		return IntStream.of(GRID[p]).filter(n -> n != -1);
 	}
 
-	private void berechneRelativeMalPositionen() {
-		xpos = new float[POSITIONEN];
-		ypos = new float[POSITIONEN];
-		posX(0f, 0, 9, 21);
-		posX(1f / 6, 3, 10, 18);
-		posX(1f / 3, 6, 11, 15);
-		posX(1f / 2, 1, 4, 7, 16, 19, 22);
-		posX(2f / 3, 8, 12, 17);
-		posX(5f / 6, 5, 13, 20);
-		posX(1f, 2, 14, 23);
-		posY(0f, 0, 1, 2);
-		posY(1f / 6, 3, 4, 5);
-		posY(1f / 3, 6, 7, 8);
-		posY(1f / 2, 9, 10, 11, 12, 13, 14);
-		posY(2f / 3, 15, 16, 17);
-		posY(5f / 6, 18, 19, 20);
-		posY(1f, 21, 22, 23);
+	public boolean areNeighbors(int p, int q, Richtung r) {
+		return GRID[p][r.ordinal()] == q;
 	}
 
-	private void posX(float x, int... positions) {
-		for (int pos : positions) {
-			xpos[pos] = x;
-		}
-	}
-
-	private void posY(float y, int... positions) {
-		for (int pos : positions) {
-			ypos[pos] = y;
-		}
-	}
-
-	public int findeBrettPosition(int x, int y, int radius) {
-		for (int p = 0; p < POSITIONEN; p += 1) {
-			int px = Math.round(xpos[p] * width);
-			int py = Math.round(ypos[p] * height);
-			int dx = px - x;
-			int dy = py - y;
-			double d = Math.sqrt(dx * dx + dy * dy);
-			if (d <= radius) {
+	public int findNearestPosition(int x, int y, int radius) {
+		for (int p = 0; p < NUM_POS; p += 1) {
+			Point pos = getDrawPosition(p);
+			int dx = pos.x - x;
+			int dy = pos.y - y;
+			if (dx * dx + dy * dy <= radius * radius) {
 				return p;
 			}
 		}
 		return -1;
 	}
 
-	public boolean inMühle(int p, Farbe farbe) {
-		return findeMühle(p, farbe, true) != null || findeMühle(p, farbe, false) != null;
+	public boolean insideMill(int p, SteinFarbe color) {
+		return findMill(p, color, true) != null || findMill(p, color, false) != null;
 	}
 
-	public Muehle findeMühle(int p, Farbe farbe, boolean horizontal) {
-
+	public Muehle findMill(int p, SteinFarbe color, boolean horizontal) {
 		// Liegt auf Position @p ein Stein der Farbe @farbe?
-		if (belegung[p] == null) {
+		Stein stone = getStone(p);
+		if (stone == null || stone.getColor() != color) {
 			return null;
 		}
-		Stein stein = belegung[p];
-		if (stein.getFarbe() != farbe) {
-			return null;
-		}
-		// "Ja"
 
 		int q, r;
+		Richtung left = horizontal ? Westen : Norden;
+		Richtung right = horizontal ? Osten : Süden;
 
-		// a) p -> q -> r
-		q = findeNachbar(p, farbe, horizontal ? Richtung.Osten : Richtung.Süden);
+		// p -> q -> r
+		q = findNeighbor(p, right, color);
 		if (q != -1) {
-			r = findeNachbar(q, farbe, horizontal ? Richtung.Osten : Richtung.Süden);
+			r = findNeighbor(q, right, color);
 			if (r != -1) {
 				return new Muehle(p, q, r, true);
 			}
 		}
 
-		// b) q <- p -> r
-		q = findeNachbar(p, farbe, horizontal ? Richtung.Westen : Richtung.Norden);
+		// q <- p -> r
+		q = findNeighbor(p, left, color);
 		if (q != -1) {
-			r = findeNachbar(p, farbe, horizontal ? Richtung.Osten : Richtung.Süden);
+			r = findNeighbor(p, right, color);
 			if (r != -1) {
 				return new Muehle(q, p, r, true);
 			}
 		}
 
-		// c) q <- r <- p
-		r = findeNachbar(p, farbe, horizontal ? Richtung.Westen : Richtung.Norden);
+		// q <- r <- p
+		r = findNeighbor(p, left, color);
 		if (r != -1) {
-			q = findeNachbar(r, farbe, horizontal ? Richtung.Westen : Richtung.Norden);
+			q = findNeighbor(r, left, color);
 			if (q != -1) {
 				return new Muehle(q, r, p, true);
 			}
@@ -200,20 +182,21 @@ public class Brett extends GameEntity {
 		return null;
 	}
 
-	public int findeNachbar(int p, Richtung richtung) {
-		for (int q = 0; q < POSITIONEN; q += 1) {
-			if (verbindungen[p][q] == richtung) {
+	public int findNeighbor(int p, Richtung r) {
+		for (int q = 0; q < NUM_POS; q += 1) {
+			if (areNeighbors(p, q, r)) {
 				return q;
 			}
 		}
 		return -1; // kein Nachbar gefunden
 	}
 
-	private int findeNachbar(int p, Farbe farbe, Richtung richtung) {
-		for (int q = 0; q < POSITIONEN; q += 1) {
-			if (verbindungen[p][q] == richtung) {
-				if (belegung[q] != null && belegung[q].getFarbe() == farbe) {
-					// q ist Nachbar von p in Richtung @richtung und trägt Stein der Farbe @farbe
+	private int findNeighbor(int p, Richtung r, SteinFarbe color) {
+		for (int q = 0; q < NUM_POS; q += 1) {
+			if (areNeighbors(p, q, r)) {
+				Stein stone = getStone(q);
+				if (stone != null && stone.getColor() == color) {
+					// q ist Nachbar von p in Richtung @r und trägt Stein der Farbe @color
 					return q;
 				}
 			}
@@ -221,51 +204,43 @@ public class Brett extends GameEntity {
 		return -1; // kein Nachbar gefunden
 	}
 
-	public Point gibMalPosition(int p) {
-		int x = Math.round(xpos[p] * width);
-		int y = Math.round(ypos[p] * height);
+	public Point getDrawPosition(int p) {
+		int x = GRID_DRAW_POSITION[p][0] * width / 6;
+		int y = GRID_DRAW_POSITION[p][1] * height / 6;
 		return new Point(x, y);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
-
-		int radius = 5;
-
-		// Linien zeichnen
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		for (int p = 0; p < POSITIONEN; p += 1) {
-			int x1 = Math.round(xpos[p] * width);
-			int y1 = Math.round(ypos[p] * height);
-			for (int q = 0; q < p; q += 1) {
-				if (verbindungen[p][q] != null) {
-					int x2 = Math.round(xpos[q] * width);
-					int y2 = Math.round(ypos[q] * height);
-					g.setColor(Color.BLACK);
-					g.setStroke(new BasicStroke(radius / 2));
-					g.drawLine(x1, y1, x2, y2);
-				}
-			}
+
+		// Hintergrund
+		g.setColor(new Color(255, 255, 224));
+		g.fillRect(0, 0, width, height);
+
+		// Linien
+		g.setColor(Color.BLACK);
+		g.setStroke(new BasicStroke(posRadius / 2));
+		for (int p = 0; p < NUM_POS; p += 1) {
+			Point from = getDrawPosition(p);
+			getNeighbors(p).forEach(q -> {
+				Point to = getDrawPosition(q);
+				g.drawLine(from.x, from.y, to.x, to.y);
+			});
 		}
 
-		for (int p = 0; p < POSITIONEN; p += 1) {
-			int x1 = Math.round(xpos[p] * width);
-			int y1 = Math.round(ypos[p] * height);
-
-			// Punkte zeichnen
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Arial", Font.PLAIN, 20));
-			g.fillOval(x1 - radius, y1 - radius, 2 * radius, 2 * radius);
-			g.drawString(p + "", x1 + 4 * radius, y1 + 4 * radius);
+		// Positionen
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("Arial", Font.PLAIN, 20));
+		for (int p = 0; p < NUM_POS; p += 1) {
+			Point pos = getDrawPosition(p);
+			g.fillOval(pos.x - posRadius, pos.y - posRadius, 2 * posRadius, 2 * posRadius);
+			g.drawString(p + "", pos.x + 4 * posRadius, pos.y + 4 * posRadius);
 		}
 
-		// Steine zeichnen
-		for (int p = 0; p < POSITIONEN; p += 1) {
-			if (belegung[p] != null) {
-				belegung[p].draw(g);
-			}
-		}
+		// Steine
+		getStones().forEach(stone -> stone.draw(g));
 
 		g.translate(-tf.getX(), -tf.getY());
 	}

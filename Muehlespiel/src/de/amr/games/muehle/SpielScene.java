@@ -67,12 +67,12 @@ public class SpielScene extends Scene<MuehleApp> {
 
 			state(Setzen).update = s -> {
 				if (gegnerSteinEntfernen) {
-					steinMitMausEntfernen(weißAmZug ? Farbe.WEISS : Farbe.SCHWARZ);
+					steinMitMausEntfernen(weißAmZug ? SteinFarbe.HELL : SteinFarbe.DUNKEL);
 				} else {
 					int gesetzt = steinMitMausSetzen();
 					if (gesetzt != -1) {
-						Farbe meineFarbe = weißAmZug ? Farbe.WEISS : Farbe.SCHWARZ;
-						if (brett.inMühle(gesetzt, meineFarbe)) {
+						SteinFarbe meineFarbe = weißAmZug ? SteinFarbe.HELL : SteinFarbe.DUNKEL;
+						if (brett.insideMill(gesetzt, meineFarbe)) {
 							gegnerSteinEntfernen = true;
 						}
 						weißAmZug = !weißAmZug;
@@ -106,8 +106,8 @@ public class SpielScene extends Scene<MuehleApp> {
 						bewegungsRichtung = Richtung.Osten;
 					}
 					if (bewegungsRichtung != null) {
-						endPosition = brett.findeNachbar(startPosition, bewegungsRichtung);
-						if (endPosition == -1 || brett.gibStein(endPosition) != null) {
+						endPosition = brett.findNeighbor(startPosition, bewegungsRichtung);
+						if (endPosition == -1 || brett.getStone(endPosition) != null) {
 							endPosition = -1;
 						} else {
 							steinBewegen();
@@ -138,7 +138,7 @@ public class SpielScene extends Scene<MuehleApp> {
 		int mouseY = e.getY();
 		int brettX = Math.abs(Math.round(mouseX - brett.tf.getX()));
 		int brettY = Math.abs(Math.round(mouseY - brett.tf.getY()));
-		return brett.findeBrettPosition(brettX, brettY, brett.getWidth() / 18);
+		return brett.findNearestPosition(brettX, brettY, brett.getWidth() / 18);
 	}
 
 	@Override
@@ -186,12 +186,12 @@ public class SpielScene extends Scene<MuehleApp> {
 
 		} else if (steuerung.is(Spielen)) {
 			if (startPosition != -1) {
-				Point p = brett.gibMalPosition(startPosition);
+				Point p = brett.getDrawPosition(startPosition);
 				g.setColor(Color.GREEN);
 				g.fillOval(Math.round(brett.tf.getX() + p.x) - 5, Math.round(brett.tf.getY() + p.y) - 5, 10, 10);
 			}
 			if (endPosition != -1) {
-				Point p = brett.gibMalPosition(endPosition);
+				Point p = brett.getDrawPosition(endPosition);
 				g.setColor(Color.RED);
 				g.fillOval(Math.round(brett.tf.getX() + p.x) - 5, Math.round(brett.tf.getY() + p.y) - 5, 10, 10);
 			}
@@ -207,14 +207,14 @@ public class SpielScene extends Scene<MuehleApp> {
 		int setzPosition = -1;
 		if (mouseClick != null) {
 			int p = findeBrettPosition(mouseClick);
-			if (p != -1 && brett.gibStein(p) == null) {
+			if (p != -1 && brett.getStone(p) == null) {
 				// An Position p Stein setzen:
 				setzPosition = p;
 				if (weißAmZug) {
-					brett.setzeStein(Farbe.WEISS, setzPosition);
+					brett.placeStone(SteinFarbe.HELL, setzPosition);
 					weißeSteineGesetzt += 1;
 				} else {
-					brett.setzeStein(Farbe.SCHWARZ, setzPosition);
+					brett.placeStone(SteinFarbe.DUNKEL, setzPosition);
 					schwarzeSteineGesetzt += 1;
 				}
 			}
@@ -223,16 +223,16 @@ public class SpielScene extends Scene<MuehleApp> {
 		return setzPosition;
 	}
 
-	private void steinMitMausEntfernen(Farbe farbe) {
+	private void steinMitMausEntfernen(SteinFarbe farbe) {
 		if (mouseClick == null)
 			return;
 
 		int p = findeBrettPosition(mouseClick);
 		if (p == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
-		} else if (brett.gibStein(p) != null && brett.gibStein(p).getFarbe() == farbe) {
-			if (!brett.inMühle(p, farbe) || alleSteineInMühle(farbe)) {
-				brett.entferneStein(p);
+		} else if (brett.getStone(p) != null && brett.getStone(p).getColor() == farbe) {
+			if (!brett.insideMill(p, farbe) || alleSteineInMühle(farbe)) {
+				brett.removeStone(p);
 				gegnerSteinEntfernen = false;
 			} else {
 				LOG.info("Stein in Mühle darf nicht entfernt werden");
@@ -241,9 +241,9 @@ public class SpielScene extends Scene<MuehleApp> {
 		mouseClick = null;
 	}
 
-	private boolean alleSteineInMühle(Farbe farbe) {
-		for (int p = 0; p < Brett.POSITIONEN; p += 1) {
-			if (brett.gibStein(p) != null && brett.gibStein(p).getFarbe() == farbe && !brett.inMühle(p, farbe)) {
+	private boolean alleSteineInMühle(SteinFarbe farbe) {
+		for (int p = 0; p < Brett.NUM_POS; p += 1) {
+			if (brett.getStone(p) != null && brett.getStone(p).getColor() == farbe && !brett.insideMill(p, farbe)) {
 				return false;
 			}
 		}
@@ -260,17 +260,17 @@ public class SpielScene extends Scene<MuehleApp> {
 			mouseClick = null;
 			return;
 		}
-		if (brett.gibStein(p) == null) {
+		if (brett.getStone(p) == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
 			mouseClick = null;
 			return;
 		}
-		if (weißAmZug && brett.gibStein(p).getFarbe() == Farbe.SCHWARZ) {
+		if (weißAmZug && brett.getStone(p).getColor() == SteinFarbe.DUNKEL) {
 			LOG.info("Schwarz ist nicht am Zug");
 			mouseClick = null;
 			return;
 		}
-		if (!weißAmZug && brett.gibStein(p).getFarbe() == Farbe.WEISS) {
+		if (!weißAmZug && brett.getStone(p).getColor() == SteinFarbe.HELL) {
 			LOG.info("Weiß ist nicht am Zug");
 			mouseClick = null;
 			return;
@@ -280,7 +280,7 @@ public class SpielScene extends Scene<MuehleApp> {
 	}
 
 	private void steinBewegen() {
-		Stein stein = brett.gibStein(startPosition);
+		Stein stein = brett.getStone(startPosition);
 		stein.tf.setVelocity(0, 0);
 		switch (bewegungsRichtung) {
 		case Norden:
@@ -297,10 +297,10 @@ public class SpielScene extends Scene<MuehleApp> {
 			break;
 		}
 		stein.tf.move();
-		Point endPunkt = brett.gibMalPosition(endPosition);
+		Point endPunkt = brett.getDrawPosition(endPosition);
 		if (stein.tf.getX() == endPunkt.getX() && stein.tf.getY() == endPunkt.getY()) {
-			brett.entferneStein(startPosition);
-			brett.setzeStein(stein.getFarbe(), endPosition);
+			brett.removeStone(startPosition);
+			brett.placeStone(stein.getColor(), endPosition);
 			startPosition = -1;
 			endPosition = -1;
 			bewegungsRichtung = null;
