@@ -137,7 +137,7 @@ public class Brett extends GameEntity {
 		return -1;
 	}
 
-	public boolean insideMill(int p, SteinFarbe color) {
+	public boolean isMillPosition(int p, SteinFarbe color) {
 		return findMill(p, color, true) != null || findMill(p, color, false) != null;
 	}
 
@@ -180,6 +180,15 @@ public class Brett extends GameEntity {
 		}
 
 		return null;
+	}
+
+	public boolean allStonesInMill(SteinFarbe farbe) {
+		for (int p = 0; p < NUM_POS; p += 1) {
+			if (getStone(p) != null && getStone(p).getColor() == farbe && !isMillPosition(p, farbe)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public int findNeighbor(int p, Richtung r) {
