@@ -93,7 +93,7 @@ public class Brett extends GameEntity {
 
 	public void placeStone(SteinFarbe color, int p) {
 		Stein stone = new Stein(color, width / 24);
-		Point pos = computeDrawPoint(p);
+		Point pos = computeCenterPoint(p);
 		stone.tf.moveTo(pos.x, pos.y);
 		content[p] = stone;
 	}
@@ -132,7 +132,7 @@ public class Brett extends GameEntity {
 
 	public int findNearestPosition(int x, int y, int radius) {
 		for (int p = 0; p < NUM_POS; p += 1) {
-			Point pos = computeDrawPoint(p);
+			Point pos = computeCenterPoint(p);
 			int dx = pos.x - x;
 			int dy = pos.y - y;
 			if (dx * dx + dy * dy <= radius * radius) {
@@ -216,7 +216,7 @@ public class Brett extends GameEntity {
 		/*@formatter:on*/
 	}
 
-	public Point computeDrawPoint(int p) {
+	public Point computeCenterPoint(int p) {
 		int x = GRID_DRAW_POSITION[p][0] * width / 6;
 		int y = GRID_DRAW_POSITION[p][1] * height / 6;
 		return new Point(x, y);
@@ -235,9 +235,9 @@ public class Brett extends GameEntity {
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(posRadius / 2));
 		for (int p = 0; p < NUM_POS; p += 1) {
-			Point from = computeDrawPoint(p);
+			Point from = computeCenterPoint(p);
 			getNeighbors(p).forEach(q -> {
-				Point to = computeDrawPoint(q);
+				Point to = computeCenterPoint(q);
 				g.drawLine(from.x, from.y, to.x, to.y);
 			});
 		}
@@ -246,7 +246,7 @@ public class Brett extends GameEntity {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
 		for (int p = 0; p < NUM_POS; p += 1) {
-			Point pos = computeDrawPoint(p);
+			Point pos = computeCenterPoint(p);
 			g.fillOval(pos.x - posRadius, pos.y - posRadius, 2 * posRadius, 2 * posRadius);
 			g.drawString(p + "", pos.x + 3 * posRadius, pos.y + 3 * posRadius);
 		}
@@ -259,5 +259,19 @@ public class Brett extends GameEntity {
 
 	public boolean hasEmptyNeighbor(int p) {
 		return getNeighbors(p).anyMatch(q -> !hasStone(q));
+	}
+
+	public void moveStone(int from, int to) {
+		if (content[from] == null) {
+			throw new IllegalStateException("Startposition muss einen Stein enthalten");
+		}
+		if (content[to] != null) {
+			throw new IllegalStateException("Zielposition muss leer sein");
+		}
+		Stein stone = content[from];
+		content[to] = stone;
+		Point toPoint = computeCenterPoint(to);
+		stone.tf.moveTo((float) toPoint.getX(), (float) toPoint.getY());
+		content[from] = null;
 	}
 }

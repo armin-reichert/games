@@ -23,7 +23,7 @@ public class Stein extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX() - radius, tf.getY() - radius);
-		g.setColor(color == SteinFarbe.HELL ? new Color(255, 248, 220) : Color.DARK_GRAY);
+		g.setColor(color == SteinFarbe.WHITE ? new Color(255, 248, 220) : Color.DARK_GRAY);
 		g.fillOval(0, 0, 2 * radius, 2 * radius);
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(2));
