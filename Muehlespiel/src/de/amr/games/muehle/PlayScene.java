@@ -8,9 +8,6 @@ import static de.amr.games.muehle.Direction.WEST;
 import static de.amr.games.muehle.GamePhase.GAME_INITIALIZED;
 import static de.amr.games.muehle.GamePhase.GAME_MOVING_STONES;
 import static de.amr.games.muehle.GamePhase.GAME_PLACING_STONES;
-import static de.amr.games.muehle.PlayScene.MoveState.MOVE_GET_END;
-import static de.amr.games.muehle.PlayScene.MoveState.MOVE_GET_START;
-import static de.amr.games.muehle.PlayScene.MoveState.MOVE_IS_RUNNING;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
 import static java.lang.String.format;
@@ -30,20 +27,19 @@ import de.amr.games.muehle.mouse.Mouse;
 
 public class PlayScene extends Scene<MillApp> {
 
-	private final int NUM_STONES = 6;
-	private final float MOVE_SPEED = 2.5f;
+	private final int NUM_STONES = 9;
+	private final float MOVE_SPEED = 3f;
 
 	private final Mouse mouse;
 
 	private Board board;
+	private Move move;
 	private ScrollingText startText;
 
 	private StoneColor turn;
 	private int numWhiteStonesSet;
 	private int numBlackStonesSet;
 	private boolean mustRemoveOppositeStone;
-
-	private Move move;
 
 	private final PlayControl playControl = new PlayControl();
 
@@ -85,47 +81,20 @@ public class PlayScene extends Scene<MillApp> {
 			// MOVING
 
 			state(GAME_MOVING_STONES).entry = s -> {
-				moveControl.init();
-				moveControl.setLogger(Application.LOG);
+				move = new Move(board, MOVE_SPEED);
+				move.startPositionSupplier = PlayScene.this::supplyMoveStartPosition;
+				move.directionSupplier = PlayScene.this::supplyMoveDirection;
+				move.init();
 			};
 
 			state(GAME_MOVING_STONES).update = s -> {
-				moveControl.update();
+				move.update();
 			};
-		}
-	}
 
-	private final MoveControl moveControl = new MoveControl();
-
-	public enum MoveState {
-		MOVE_GET_START, MOVE_GET_END, MOVE_IS_RUNNING
-	};
-
-	private class MoveControl extends StateMachine<MoveState, String> {
-
-		public MoveControl() {
-			super("Move Control", MoveState.class, MOVE_GET_START);
-
-			state(MOVE_GET_START).entry = s -> move = new Move(board, MOVE_SPEED);
-
-			state(MOVE_GET_START).update = s -> setMoveStartPosition();
-
-			change(MOVE_GET_START, MOVE_GET_END, () -> move.getFrom() != -1);
-
-			state(MOVE_GET_END).entry = s -> move.setDirection(null);
-
-			state(MOVE_GET_END).update = s -> setMoveDirection();
-
-			change(MOVE_GET_END, MOVE_IS_RUNNING, () -> move.getTo() != -1);
-
-			state(MOVE_IS_RUNNING).update = s -> move.execute();
-
-			change(MOVE_IS_RUNNING, MOVE_GET_START, () -> move.isEndPositionReached());
-
-			state(MOVE_IS_RUNNING).exit = s -> {
-				board.moveStone(move.getFrom(), move.getTo());
+			change(GAME_MOVING_STONES, GAME_MOVING_STONES, () -> move.isComplete(), (s, t) -> {
 				nextTurn();
-			};
+				move.init();
+			});
 		}
 	}
 
@@ -233,44 +202,42 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving
 
-	private void setMoveStartPosition() {
+	private int supplyMoveStartPosition() {
 		if (!mouse.clicked())
-			return;
+			return -1;
 
 		int from = findBoardPosition(mouse.getX(), mouse.getY());
 		if (from == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
-			return;
+			return -1;
 		}
 		Stone stone = board.getStoneAt(from);
 		if (stone == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
-			return;
+			return -1;
 		}
 		if (turn != stone.getColor()) {
 			LOG.info(stone.getColor() + " ist nicht am Zug");
-			return;
+			return -1;
 		}
 		if (!board.hasEmptyNeighbor(from)) {
 			LOG.info("Stein an dieser Position kann nicht ziehen");
-			return;
+			return -1;
 		}
-		move.setFrom(from);
+		return from;
 	}
 
-	private void setMoveDirection() {
+	private Direction supplyMoveDirection() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
-			move.setDirection(NORTH);
+			return NORTH;
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
+			return EAST;
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
+			return SOUTH;
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
+			return WEST;
 		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
-			move.setDirection(EAST);
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
-			move.setDirection(SOUTH);
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
-			move.setDirection(WEST);
-		}
+		return null;
 	}
 
 	// Drawing

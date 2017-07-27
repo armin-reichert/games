@@ -1,7 +1,7 @@
 package de.amr.games.muehle;
 
-import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.EAST;
+import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
 import static de.amr.games.muehle.Direction.WEST;
 
@@ -123,12 +123,20 @@ public class Board extends GameEntity {
 		return neighbors(p).anyMatch(q -> !hasStoneAt(q));
 	}
 
+	public IntStream emptyNeighbors(int p) {
+		return neighbors(p).filter(q -> !hasStoneAt(q));
+	}
+
 	public boolean areNeighbors(int p, int q) {
 		return neighbors(p).anyMatch(nb -> nb == q);
 	}
 
 	public boolean areNeighbors(int p, int q, Direction r) {
 		return GRID[p][r.ordinal()] == q;
+	}
+
+	public Direction getDirection(int p, int q) {
+		return Stream.of(Direction.values()).filter(dir -> areNeighbors(p, q, dir)).findFirst().orElse(null);
 	}
 
 	public int findNearestPosition(int x, int y, int radius) {
