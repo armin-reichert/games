@@ -27,10 +27,10 @@ public class Board extends GameEntity {
 	/** Anzahl Brettpositionen. */
 	public static final int NUM_POS = 24;
 
-	/* GRID[p] = { Nachbar(Norden), Nachbar(Osten), Nachbar(Süden), Nachbar(Westen) } */
-	private static final int[][] GRID = {
+	/* NEIGHBORS[p] = { Nachbar(Norden), Nachbar(Osten), Nachbar(Süden), Nachbar(Westen) } */
+	private static final int[][] NEIGHBORS = {
 			/*@formatter:off*/
-			{ -1, 1, 9, -1 }, // Position 0: Nachbarpositionen: - (Norden), 1 (Osten), 9 (Süden), - (Westen) 
+			{ -1, 1, 9, -1 }, // Position 0: - (Norden), 1 (Osten), 9 (Süden), - (Westen) 
 			{ -1, 2, 4, 0 }, 
 			{ -1, -1, 14, 1 }, 
 			{ -1, 4, 10, -1 },
@@ -57,9 +57,9 @@ public class Board extends GameEntity {
 			/*@formatter:on*/
 	};
 
-	/* (GRID_X[p], GRID[p]) is the relative grid position of position p */
-	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
-	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
+	/* (relative) coordinates of board positions */
+	private static final int[] COORD_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
+	private static final int[] COORD_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
 	private int width;
 	private int height;
@@ -84,10 +84,6 @@ public class Board extends GameEntity {
 		return height;
 	}
 
-	public IntStream positions() {
-		return IntStream.range(0, NUM_POS);
-	}
-
 	public void clear() {
 		stones = new Stone[NUM_POS];
 	}
@@ -103,6 +99,20 @@ public class Board extends GameEntity {
 		stones[p] = null;
 	}
 
+	public void moveStone(int from, int to) {
+		if (stones[from] == null) {
+			throw new IllegalStateException("Startposition muss einen Stein enthalten");
+		}
+		if (stones[to] != null) {
+			throw new IllegalStateException("Zielposition muss leer sein");
+		}
+		Stone stone = stones[from];
+		stones[to] = stone;
+		Point toPoint = computeCenterPoint(to);
+		stone.tf.moveTo((float) toPoint.getX(), (float) toPoint.getY());
+		stones[from] = null;
+	}
+
 	public Stone getStoneAt(int p) {
 		return stones[p];
 	}
@@ -111,12 +121,25 @@ public class Board extends GameEntity {
 		return getStoneAt(p) != null;
 	}
 
+	public IntStream positions() {
+		return IntStream.range(0, NUM_POS);
+	}
+
 	public Stream<Stone> stones() {
 		return Stream.of(stones).filter(Objects::nonNull);
 	}
 
 	public IntStream neighbors(int p) {
-		return IntStream.of(GRID[p]).filter(n -> n != -1);
+		return IntStream.of(NEIGHBORS[p]).filter(n -> n != -1);
+	}
+
+	public int findNeighbor(int p, Direction r) {
+		return NEIGHBORS[p][r.ordinal()];
+	}
+
+	private int findNeighbor(int p, Direction r, StoneColor color) {
+		int n = findNeighbor(p, r);
+		return n != -1 && hasStoneAt(n) && getStoneAt(n).getColor() == color ? n : -1;
 	}
 
 	public boolean hasEmptyNeighbor(int p) {
@@ -128,11 +151,11 @@ public class Board extends GameEntity {
 	}
 
 	public boolean areNeighbors(int p, int q) {
-		return neighbors(p).anyMatch(nb -> nb == q);
+		return neighbors(p).anyMatch(n -> n == q);
 	}
 
 	public boolean areNeighbors(int p, int q, Direction r) {
-		return GRID[p][r.ordinal()] == q;
+		return NEIGHBORS[p][r.ordinal()] == q;
 	}
 
 	public Direction getDirection(int p, int q) {
@@ -202,28 +225,8 @@ public class Board extends GameEntity {
 		/*@formatter:on*/
 	}
 
-	public int findNeighbor(int p, Direction r) {
-		/*@formatter:off*/
-		return positions()
-				.filter(q -> areNeighbors(p, q, r))
-				.findAny()
-				.orElse(-1);
-		/*@formatter:on*/
-	}
-
-	private int findNeighbor(int p, Direction r, StoneColor color) {
-		/*@formatter:off*/
-		return positions()
-				.filter(q -> areNeighbors(p, q, r))
-				.filter(this::hasStoneAt)
-				.filter(q -> getStoneAt(q).getColor() == color)
-				.findAny()
-				.orElse(-1);
-		/*@formatter:on*/
-	}
-
 	public Point computeCenterPoint(int p) {
-		return new Point(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
+		return new Point(COORD_X[p] * width / 6, COORD_Y[p] * height / 6);
 	}
 
 	@Override
@@ -238,40 +241,26 @@ public class Board extends GameEntity {
 		// Linien
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		for (int p = 0; p < NUM_POS; p += 1) {
-			Point from = computeCenterPoint(p);
+		positions().forEach(p -> {
+			Point centerFrom = computeCenterPoint(p);
 			neighbors(p).forEach(q -> {
-				Point to = computeCenterPoint(q);
-				g.drawLine(from.x, from.y, to.x, to.y);
+				Point centerTo = computeCenterPoint(q);
+				g.drawLine(centerFrom.x, centerFrom.y, centerTo.x, centerTo.y);
 			});
-		}
+		});
 
 		// Positionen
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		for (int p = 0; p < NUM_POS; p += 1) {
-			Point pos = computeCenterPoint(p);
-			g.fillOval(pos.x - posRadius, pos.y - posRadius, 2 * posRadius, 2 * posRadius);
-			g.drawString(p + "", pos.x + 3 * posRadius, pos.y + 3 * posRadius);
-		}
+		positions().forEach(p -> {
+			Point center = computeCenterPoint(p);
+			g.fillOval(center.x - posRadius, center.y - posRadius, 2 * posRadius, 2 * posRadius);
+			g.drawString(p + "", center.x + 3 * posRadius, center.y + 3 * posRadius);
+		});
 
 		// Steine
 		stones().forEach(stone -> stone.draw(g));
 
 		g.translate(-tf.getX(), -tf.getY());
-	}
-
-	public void moveStone(int from, int to) {
-		if (stones[from] == null) {
-			throw new IllegalStateException("Startposition muss einen Stein enthalten");
-		}
-		if (stones[to] != null) {
-			throw new IllegalStateException("Zielposition muss leer sein");
-		}
-		Stone stone = stones[from];
-		stones[to] = stone;
-		Point toPoint = computeCenterPoint(to);
-		stone.tf.moveTo((float) toPoint.getX(), (float) toPoint.getY());
-		stones[from] = null;
 	}
 }
