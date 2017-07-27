@@ -5,18 +5,19 @@ import static de.amr.games.muehle.Direction.EAST;
 import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
 import static de.amr.games.muehle.Direction.WEST;
-import static de.amr.games.muehle.GamePhase.GAME_INITIALIZED;
-import static de.amr.games.muehle.GamePhase.GAME_MOVING_STONES;
 import static de.amr.games.muehle.GamePhase.GAME_OVER;
-import static de.amr.games.muehle.GamePhase.GAME_PLACING_STONES;
+import static de.amr.games.muehle.GamePhase.MOVING;
+import static de.amr.games.muehle.GamePhase.PLACING;
+import static de.amr.games.muehle.GamePhase.STARTED;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
-import static java.lang.String.format;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
@@ -26,10 +27,15 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.mouse.Mouse;
 
+/**
+ * The play scene of the game.
+ * 
+ * @author Armin Reichert
+ */
 public class PlayScene extends Scene<MillApp> {
 
 	private final int NUM_STONES = 9;
-	private final float MOVE_SPEED = 3f;
+	private final float STONE_SPEED = 3f;
 
 	private final Mouse mouse;
 
@@ -48,28 +54,28 @@ public class PlayScene extends Scene<MillApp> {
 	private class PlayControl extends StateMachine<GamePhase, String> {
 
 		public PlayControl() {
-			super("Mühlespiel Steuerung", GamePhase.class, GamePhase.GAME_INITIALIZED);
+			super("Mühlespiel Steuerung", GamePhase.class, STARTED);
 
-			// INITIALIZED
+			// STARTED
 
-			state(GAME_INITIALIZED).entry = s -> resetGame();
+			state(STARTED).entry = s -> resetGame();
 
-			state(GAME_INITIALIZED).exit = s -> {
+			state(STARTED).exit = s -> {
 				startText.visibility = () -> false;
 			};
 
-			change(GAME_INITIALIZED, GAME_PLACING_STONES, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			change(STARTED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 			// PLACING
 
-			state(GAME_PLACING_STONES).entry = s -> {
+			state(PLACING).entry = s -> {
 				turn = WHITE;
 				numWhiteStonesSet = 0;
 				numBlackStonesSet = 0;
 				mustRemoveOppositeStone = false;
 			};
 
-			state(GAME_PLACING_STONES).update = s -> {
+			state(PLACING).update = s -> {
 				if (mustRemoveOppositeStone) {
 					if (tryToRemoveStone(oppositeTurn())) {
 						mustRemoveOppositeStone = false;
@@ -87,19 +93,18 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(GAME_PLACING_STONES, GAME_MOVING_STONES,
-					() -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
+			change(PLACING, MOVING, () -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
 
 			// MOVING
 
-			state(GAME_MOVING_STONES).entry = s -> {
-				move = new Move(board, MOVE_SPEED);
+			state(MOVING).entry = s -> {
+				move = new Move(board, STONE_SPEED);
 				move.startPositionSupplier = PlayScene.this::supplyMoveStartPosition;
 				move.directionSupplier = PlayScene.this::supplyMoveDirection;
 				move.init();
 			};
 
-			state(GAME_MOVING_STONES).update = s -> {
+			state(MOVING).update = s -> {
 				if (mustRemoveOppositeStone) {
 					if (tryToRemoveStone(oppositeTurn())) {
 						mustRemoveOppositeStone = false;
@@ -110,9 +115,9 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(GAME_MOVING_STONES, GAME_OVER, PlayScene.this::gameIsOver);
+			change(MOVING, GAME_OVER, PlayScene.this::gameIsOver);
 
-			change(GAME_MOVING_STONES, GAME_MOVING_STONES, () -> move.isComplete(), (s, t) -> {
+			change(MOVING, MOVING, () -> move.isComplete(), (s, t) -> {
 				if (board.isInsideMill(move.getTo(), turn)) {
 					mustRemoveOppositeStone = true;
 					LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
@@ -284,20 +289,33 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawStatus(Graphics2D g) {
-		if (playControl.is(GAME_INITIALIZED)) {
+		if (playControl.is(STARTED)) {
 			startText.hCenter(getWidth());
 			startText.draw(g);
 			return;
 		}
-		if (playControl.is(GAME_PLACING_STONES)) {
-			String text = format("Setzen: Weiß hat %d Stein(e) übrig, Schwarz hat %d Stein(e) übrig",
-					NUM_STONES - numWhiteStonesSet, NUM_STONES - numBlackStonesSet);
+		if (playControl.is(PLACING)) {
+			int offset = 5;
+			Stone whiteStone = new Stone(StoneColor.WHITE);
+			whiteStone.tf.moveTo(50, getHeight() - 50);
+			whiteStone.draw(g);
 			g.setColor(Color.BLACK);
-			g.setFont(new Font("Sans", Font.PLAIN, 20));
-			g.drawString(text, 20, getHeight() - 20);
+			g.drawString(String.valueOf(NUM_STONES - numWhiteStonesSet), (int) whiteStone.tf.getX() - offset,
+					(int) whiteStone.tf.getY() + offset);
+			Stone blackStone = new Stone(StoneColor.BLACK);
+			blackStone.tf.moveTo(getWidth() - 50, getHeight() - 50);
+			blackStone.draw(g);
+			g.setColor(Color.WHITE);
+			g.drawString(String.valueOf(NUM_STONES - numBlackStonesSet), (int) blackStone.tf.getX() - offset,
+					(int) blackStone.tf.getY() + offset);
+			if (turn == WHITE) {
+				highlightStone(g, whiteStone);
+			} else {
+				highlightStone(g, blackStone);
+			}
 			return;
 		}
-		if (playControl.is(GAME_MOVING_STONES)) {
+		if (playControl.is(MOVING)) {
 			if (move.getFrom() != -1) {
 				Point p = board.computeCenterPoint(move.getFrom());
 				g.setColor(Color.GREEN);
@@ -314,5 +332,16 @@ public class PlayScene extends Scene<MillApp> {
 			g.drawString(text, 20, getHeight() - 20);
 			return;
 		}
+	}
+
+	private void highlightStone(Graphics2D gc, Stone stone) {
+		Graphics2D g = (Graphics2D) gc.create();
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.translate(stone.tf.getX() - Stone.radius, stone.tf.getY() - Stone.radius);
+		g.setColor(Color.RED);
+		g.setStroke(new BasicStroke(4));
+		g.drawOval(0, 0, 2 * Stone.radius, 2 * Stone.radius);
+		g.translate(-stone.tf.getX() + Stone.radius, -stone.tf.getY() + Stone.radius);
+		g.dispose();
 	}
 }
