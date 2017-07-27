@@ -5,9 +5,12 @@ import static de.amr.games.muehle.Direction.EAST;
 import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
 import static de.amr.games.muehle.Direction.WEST;
-import static de.amr.games.muehle.GamePhase.INITIALIZED;
-import static de.amr.games.muehle.GamePhase.MOVING;
-import static de.amr.games.muehle.GamePhase.PLACING;
+import static de.amr.games.muehle.GamePhase.GAME_INITIALIZED;
+import static de.amr.games.muehle.GamePhase.GAME_MOVING_STONES;
+import static de.amr.games.muehle.GamePhase.GAME_PLACING_STONES;
+import static de.amr.games.muehle.PlayScene.MoveState.MOVE_GET_END;
+import static de.amr.games.muehle.PlayScene.MoveState.MOVE_GET_START;
+import static de.amr.games.muehle.PlayScene.MoveState.MOVE_IS_RUNNING;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
 import static java.lang.String.format;
@@ -47,28 +50,28 @@ public class PlayScene extends Scene<MillApp> {
 	private class PlayControl extends StateMachine<GamePhase, String> {
 
 		public PlayControl() {
-			super("Mühlespiel Steuerung", GamePhase.class, GamePhase.INITIALIZED);
+			super("Mühlespiel Steuerung", GamePhase.class, GamePhase.GAME_INITIALIZED);
 
 			// INITIALIZED
 
-			state(INITIALIZED).entry = s -> resetGame();
+			state(GAME_INITIALIZED).entry = s -> resetGame();
 
-			state(INITIALIZED).exit = s -> {
+			state(GAME_INITIALIZED).exit = s -> {
 				startText.visibility = () -> false;
 			};
 
-			change(INITIALIZED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			change(GAME_INITIALIZED, GAME_PLACING_STONES, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 			// PLACING
 
-			state(PLACING).entry = s -> {
+			state(GAME_PLACING_STONES).entry = s -> {
 				turn = WHITE;
 				numWhiteStonesSet = 0;
 				numBlackStonesSet = 0;
 				mustRemoveOppositeStone = false;
 			};
 
-			state(PLACING).update = s -> {
+			state(GAME_PLACING_STONES).update = s -> {
 				if (mustRemoveOppositeStone) {
 					removeStone();
 				} else {
@@ -76,51 +79,52 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLACING, MOVING, () -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
+			change(GAME_PLACING_STONES, GAME_MOVING_STONES,
+					() -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
 
 			// MOVING
 
-			state(MOVING).entry = s -> {
+			state(GAME_MOVING_STONES).entry = s -> {
 				moveControl.init();
 				moveControl.setLogger(Application.LOG);
 			};
 
-			state(MOVING).update = s -> {
+			state(GAME_MOVING_STONES).update = s -> {
 				moveControl.update();
 			};
 		}
 	}
 
-	private final StoneMoveControl moveControl = new StoneMoveControl();
+	private final MoveControl moveControl = new MoveControl();
 
 	public enum MoveState {
-		GET_MOVE_START, GET_MOVE_END, MOVING
+		MOVE_GET_START, MOVE_GET_END, MOVE_IS_RUNNING
 	};
 
-	private class StoneMoveControl extends StateMachine<MoveState, String> {
+	private class MoveControl extends StateMachine<MoveState, String> {
 
-		public StoneMoveControl() {
-			super("Stone Move", MoveState.class, MoveState.GET_MOVE_START);
+		public MoveControl() {
+			super("Move Control", MoveState.class, MOVE_GET_START);
 
-			state(MoveState.GET_MOVE_START).entry = s -> move = new Move(board, MOVE_SPEED);
+			state(MOVE_GET_START).entry = s -> move = new Move(board, MOVE_SPEED);
 
-			state(MoveState.GET_MOVE_START).update = s -> setMoveStartPosition();
+			state(MOVE_GET_START).update = s -> setMoveStartPosition();
 
-			change(MoveState.GET_MOVE_START, MoveState.GET_MOVE_END, () -> move.getFrom() != -1);
+			change(MOVE_GET_START, MOVE_GET_END, () -> move.getFrom() != -1);
 
-			state(MoveState.GET_MOVE_END).entry = s -> move.setDirection(null);
+			state(MOVE_GET_END).entry = s -> move.setDirection(null);
 
-			state(MoveState.GET_MOVE_END).update = s -> setMoveDirection();
+			state(MOVE_GET_END).update = s -> setMoveDirection();
 
-			change(MoveState.GET_MOVE_END, MoveState.MOVING, () -> move.getTo() != -1);
+			change(MOVE_GET_END, MOVE_IS_RUNNING, () -> move.getTo() != -1);
 
-			state(MoveState.MOVING).update = s -> move.execute();
+			state(MOVE_IS_RUNNING).update = s -> move.execute();
 
-			change(MoveState.MOVING, MoveState.GET_MOVE_START, () -> move.isEndPositionReached());
+			change(MOVE_IS_RUNNING, MOVE_GET_START, () -> move.isEndPositionReached());
 
-			state(MoveState.MOVING).exit = s -> {
+			state(MOVE_IS_RUNNING).exit = s -> {
 				board.moveStone(move.getFrom(), move.getTo());
-				changeTurn();
+				nextTurn();
 			};
 		}
 	}
@@ -147,16 +151,12 @@ public class PlayScene extends Scene<MillApp> {
 	@Override
 	public void update() {
 		mouse.poll();
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			resetGame();
-			playControl.setState(INITIALIZED);
-		}
 		playControl.update();
 	}
 
 	private void resetGame() {
 		board = new Board(600, 600);
-		board.tf.moveTo(100, 100);
+		board.center(getWidth(), getHeight());
 		app.entities.add(board);
 
 		startText = new ScrollingText();
@@ -167,9 +167,11 @@ public class PlayScene extends Scene<MillApp> {
 		app.entities.add(startText);
 	}
 
-	private void changeTurn() {
+	private void nextTurn() {
 		turn = turn == WHITE ? BLACK : WHITE;
 	}
+
+	// Placing
 
 	private void placeStone() {
 		int gesetzt = placeStoneInteractively();
@@ -179,7 +181,7 @@ public class PlayScene extends Scene<MillApp> {
 				// Mühle wurde geschlossen
 				mustRemoveOppositeStone = true;
 			}
-			changeTurn();
+			nextTurn();
 		}
 	}
 
@@ -282,12 +284,12 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawStatus(Graphics2D g) {
-		if (playControl.is(INITIALIZED)) {
+		if (playControl.is(GAME_INITIALIZED)) {
 			startText.hCenter(getWidth());
 			startText.draw(g);
 			return;
 		}
-		if (playControl.is(PLACING)) {
+		if (playControl.is(GAME_PLACING_STONES)) {
 			String text = format("Setzen: Weiß hat %d Stein(e) übrig, Schwarz hat %d Stein(e) übrig",
 					NUM_STONES - numWhiteStonesSet, NUM_STONES - numBlackStonesSet);
 			g.setColor(Color.BLACK);
@@ -295,7 +297,7 @@ public class PlayScene extends Scene<MillApp> {
 			g.drawString(text, 20, getHeight() - 20);
 			return;
 		}
-		if (playControl.is(MOVING)) {
+		if (playControl.is(GAME_MOVING_STONES)) {
 			if (move.getFrom() != -1) {
 				Point p = board.computeCenterPoint(move.getFrom());
 				g.setColor(Color.GREEN);
