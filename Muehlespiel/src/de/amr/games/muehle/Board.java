@@ -1,10 +1,9 @@
 package de.amr.games.muehle;
 
-import static de.amr.games.muehle.Richtung.Norden;
-import static de.amr.games.muehle.Richtung.Osten;
-import static de.amr.games.muehle.Richtung.Süden;
-import static de.amr.games.muehle.Richtung.Westen;
-import static java.util.stream.IntStream.range;
+import static de.amr.games.muehle.Direction.NORTH;
+import static de.amr.games.muehle.Direction.EAST;
+import static de.amr.games.muehle.Direction.SOUTH;
+import static de.amr.games.muehle.Direction.WEST;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -12,6 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -22,15 +22,15 @@ import de.amr.easy.game.entity.GameEntity;
  *
  * @author Armin Reichert & Peter und Anna Schillo
  */
-public class Brett extends GameEntity {
+public class Board extends GameEntity {
 
 	/** Anzahl Brettpositionen. */
 	public static final int NUM_POS = 24;
 
-	/* GRID[p] = {Norden, Osten, Süden, Westen} */
+	/* GRID[p] = { Nachbar(Norden), Nachbar(Osten), Nachbar(Süden), Nachbar(Westen) } */
 	private static final int[][] GRID = {
 			/*@formatter:off*/
-			{ -1,	1, 9, -1 }, // Position 0: Nachbarpositionen: % (Norden), 1 (Osten), 9 (Süden), % (Westen) 
+			{ -1, 1, 9, -1 }, // Position 0: Nachbarpositionen: - (Norden), 1 (Osten), 9 (Süden), - (Westen) 
 			{ -1, 2, 4, 0 }, 
 			{ -1, -1, 14, 1 }, 
 			{ -1, 4, 10, -1 },
@@ -57,28 +57,21 @@ public class Brett extends GameEntity {
 			/*@formatter:on*/
 	};
 
-	private static final int[][] GRID_DRAW_POSITION = {
-			/*@formatter:off*/
-			{0,0}, {3,0}, {6,0},	
-			{1,1}, {3,1}, {5,1},	
-			{2,2}, {3,2}, {4,2},	
-			{0,3}, {1,3}, {2,3}, {4,3}, {5,3}, {6,3},
-			{2,4}, {3,4}, {4,4},	
-			{1,5}, {3,5}, {5,5},	
-			{0,6}, {3,6}, {6,6},	
-			/*@formatter:on*/
-	};
+	/* (GRID_X[p], GRID[p]) is the relative grid position of position p */
+	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
+	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
 	private int width;
 	private int height;
 	private int posRadius;
-	private Stein[] content;
+	private Stone[] stones;
 
-	public Brett(int w, int h) {
+	public Board(int w, int h) {
 		width = w;
 		height = h;
 		posRadius = w / 60;
-		content = new Stein[NUM_POS];
+		stones = new Stone[NUM_POS];
+		Stone.radius = width / 24;
 	}
 
 	@Override
@@ -91,78 +84,83 @@ public class Brett extends GameEntity {
 		return height;
 	}
 
-	public void placeStone(SteinFarbe color, int p) {
-		Stein stone = new Stein(color, width / 24);
-		Point pos = computeCenterPoint(p);
-		stone.tf.moveTo(pos.x, pos.y);
-		content[p] = stone;
-	}
-
-	public void removeStone(int p) {
-		content[p] = null;
-	}
-
-	public Stein getStone(int p) {
-		return content[p];
-	}
-
-	public boolean hasStone(int p) {
-		return content[p] != null;
-	}
-
-	public Stream<Stein> getStones() {
-		return Stream.of(content).filter(c -> c != null);
+	public IntStream positions() {
+		return IntStream.range(0, NUM_POS);
 	}
 
 	public void clear() {
-		content = new Stein[NUM_POS];
+		stones = new Stone[NUM_POS];
 	}
 
-	public boolean areNeighbors(int p, int q) {
-		return Stream.of(Richtung.values()).anyMatch(r -> areNeighbors(p, q, r));
+	public void placeStoneAt(int p, StoneColor color) {
+		Stone stone = new Stone(color);
+		stones[p] = stone;
+		Point center = computeCenterPoint(p);
+		stone.tf.moveTo(center.x, center.y);
 	}
 
-	public IntStream getNeighbors(int p) {
+	public void removeStoneAt(int p) {
+		stones[p] = null;
+	}
+
+	public Stone getStoneAt(int p) {
+		return stones[p];
+	}
+
+	public boolean isStoneAt(int p) {
+		return getStoneAt(p) != null;
+	}
+
+	public Stream<Stone> stones() {
+		return Stream.of(stones).filter(Objects::nonNull);
+	}
+
+	public IntStream neighbors(int p) {
 		return IntStream.of(GRID[p]).filter(n -> n != -1);
 	}
 
-	public boolean areNeighbors(int p, int q, Richtung r) {
+	public boolean hasEmptyNeighbor(int p) {
+		return neighbors(p).anyMatch(q -> !isStoneAt(q));
+	}
+
+	public boolean areNeighbors(int p, int q) {
+		return neighbors(p).anyMatch(nb -> nb == q);
+	}
+
+	public boolean areNeighbors(int p, int q, Direction r) {
 		return GRID[p][r.ordinal()] == q;
 	}
 
 	public int findNearestPosition(int x, int y, int radius) {
-		for (int p = 0; p < NUM_POS; p += 1) {
-			Point pos = computeCenterPoint(p);
-			int dx = pos.x - x;
-			int dy = pos.y - y;
-			if (dx * dx + dy * dy <= radius * radius) {
-				return p;
-			}
-		}
-		return -1;
+		return positions().filter(p -> {
+			Point center = computeCenterPoint(p);
+			int dx = center.x - x;
+			int dy = center.y - y;
+			return dx * dx + dy * dy <= radius * radius;
+		}).findFirst().orElse(-1);
 	}
 
-	public boolean isMillPosition(int p, SteinFarbe color) {
-		return findMill(p, color, true) != null || findMill(p, color, false) != null;
+	public boolean isInsideMill(int p, StoneColor color) {
+		return findContainingMill(p, color, true) != null || findContainingMill(p, color, false) != null;
 	}
 
-	public Muehle findMill(int p, SteinFarbe color, boolean horizontal) {
+	public Mill findContainingMill(int p, StoneColor color, boolean horizontal) {
 		// Liegt auf Position @p ein Stein der Farbe @farbe?
-		Stein stone = getStone(p);
+		Stone stone = getStoneAt(p);
 		if (stone == null || stone.getColor() != color) {
 			return null;
 		}
 
 		int q, r;
-		Richtung left = horizontal ? Westen : Norden;
-		Richtung right = horizontal ? Osten : Süden;
+		Direction left = horizontal ? WEST : NORTH;
+		Direction right = horizontal ? EAST : SOUTH;
 
 		// p -> q -> r
 		q = findNeighbor(p, right, color);
 		if (q != -1) {
 			r = findNeighbor(q, right, color);
 			if (r != -1) {
-				return new Muehle(p, q, r, true);
+				return new Mill(p, q, r, true);
 			}
 		}
 
@@ -171,7 +169,7 @@ public class Brett extends GameEntity {
 		if (q != -1) {
 			r = findNeighbor(p, right, color);
 			if (r != -1) {
-				return new Muehle(q, p, r, true);
+				return new Mill(q, p, r, true);
 			}
 		}
 
@@ -180,46 +178,44 @@ public class Brett extends GameEntity {
 		if (r != -1) {
 			q = findNeighbor(r, left, color);
 			if (q != -1) {
-				return new Muehle(q, r, p, true);
+				return new Mill(q, r, p, true);
 			}
 		}
 
 		return null;
 	}
 
-	public boolean allStonesOfColorInsideMills(SteinFarbe color) {
+	public boolean allStonesOfColorInsideMills(StoneColor color) {
 		/*@formatter:off*/
-		return range(0, NUM_POS)
-				.filter(this::hasStone)
-				.filter(p -> getStone(p).getColor() == color)
-				.allMatch(p -> isMillPosition(p, color));
+		return positions()
+				.filter(this::isStoneAt)
+				.filter(p -> getStoneAt(p).getColor() == color)
+				.allMatch(p -> isInsideMill(p, color));
 		/*@formatter:on*/
 	}
 
-	public int findNeighbor(int p, Richtung r) {
+	public int findNeighbor(int p, Direction r) {
 		/*@formatter:off*/
-		return range(0, NUM_POS)
+		return positions()
 				.filter(q -> areNeighbors(p, q, r))
 				.findAny()
 				.orElse(-1);
 		/*@formatter:on*/
 	}
 
-	private int findNeighbor(int p, Richtung r, SteinFarbe color) {
+	private int findNeighbor(int p, Direction r, StoneColor color) {
 		/*@formatter:off*/
-		return range(0, NUM_POS)
+		return positions()
 				.filter(q -> areNeighbors(p, q, r))
-				.filter(this::hasStone)
-				.filter(q -> getStone(q).getColor() == color)
+				.filter(this::isStoneAt)
+				.filter(q -> getStoneAt(q).getColor() == color)
 				.findAny()
 				.orElse(-1);
 		/*@formatter:on*/
 	}
 
 	public Point computeCenterPoint(int p) {
-		int x = GRID_DRAW_POSITION[p][0] * width / 6;
-		int y = GRID_DRAW_POSITION[p][1] * height / 6;
-		return new Point(x, y);
+		return new Point(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
 	}
 
 	@Override
@@ -236,7 +232,7 @@ public class Brett extends GameEntity {
 		g.setStroke(new BasicStroke(posRadius / 2));
 		for (int p = 0; p < NUM_POS; p += 1) {
 			Point from = computeCenterPoint(p);
-			getNeighbors(p).forEach(q -> {
+			neighbors(p).forEach(q -> {
 				Point to = computeCenterPoint(q);
 				g.drawLine(from.x, from.y, to.x, to.y);
 			});
@@ -252,26 +248,22 @@ public class Brett extends GameEntity {
 		}
 
 		// Steine
-		getStones().forEach(stone -> stone.draw(g));
+		stones().forEach(stone -> stone.draw(g));
 
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	public boolean hasEmptyNeighbor(int p) {
-		return getNeighbors(p).anyMatch(q -> !hasStone(q));
-	}
-
 	public void moveStone(int from, int to) {
-		if (content[from] == null) {
+		if (stones[from] == null) {
 			throw new IllegalStateException("Startposition muss einen Stein enthalten");
 		}
-		if (content[to] != null) {
+		if (stones[to] != null) {
 			throw new IllegalStateException("Zielposition muss leer sein");
 		}
-		Stein stone = content[from];
-		content[to] = stone;
+		Stone stone = stones[from];
+		stones[to] = stone;
 		Point toPoint = computeCenterPoint(to);
 		stone.tf.moveTo((float) toPoint.getX(), (float) toPoint.getY());
-		content[from] = null;
+		stones[from] = null;
 	}
 }

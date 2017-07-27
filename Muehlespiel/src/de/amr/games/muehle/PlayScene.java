@@ -1,15 +1,15 @@
 package de.amr.games.muehle;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.muehle.Richtung.Norden;
-import static de.amr.games.muehle.Richtung.Osten;
-import static de.amr.games.muehle.Richtung.Süden;
-import static de.amr.games.muehle.Richtung.Westen;
-import static de.amr.games.muehle.SpielPhase.Initialisiert;
-import static de.amr.games.muehle.SpielPhase.Setzen;
-import static de.amr.games.muehle.SpielPhase.Spielen;
-import static de.amr.games.muehle.SteinFarbe.BLACK;
-import static de.amr.games.muehle.SteinFarbe.WHITE;
+import static de.amr.games.muehle.Direction.EAST;
+import static de.amr.games.muehle.Direction.NORTH;
+import static de.amr.games.muehle.Direction.SOUTH;
+import static de.amr.games.muehle.Direction.WEST;
+import static de.amr.games.muehle.GamePhase.INITIALIZED;
+import static de.amr.games.muehle.GamePhase.MOVING;
+import static de.amr.games.muehle.GamePhase.PLACING;
+import static de.amr.games.muehle.StoneColor.BLACK;
+import static de.amr.games.muehle.StoneColor.WHITE;
 import static java.lang.String.format;
 
 import java.awt.Color;
@@ -26,57 +26,55 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.mouse.Mouse;
 
-public class SpielScene extends Scene<MuehleApp> {
+public class PlayScene extends Scene<MillApp> {
 
 	private final int NUM_STONES = 6;
 
 	private final Mouse mouse;
 
-	private Brett board;
+	private Board board;
 	private ScrollingText startText;
 
-	private SteinFarbe turn;
+	private StoneColor turn;
 	private int numWhiteStonesSet;
 	private int numBlackStonesSet;
 	private boolean mustRemoveOppositeStone;
 
 	// stone movement
-	private Stein movingStone;
+	private Stone movingStone;
 	private int moveStartPosition;
 	private int moveEndPosition;
-	private Richtung moveDirection;
+	private Direction moveDirection;
 
 	private float speed = 3;
 
-	private final SpielAblaufSteuerung steuerung = new SpielAblaufSteuerung();
+	private final PlayControl playControl = new PlayControl();
 
-	private class SpielAblaufSteuerung extends StateMachine<SpielPhase, String> {
+	private class PlayControl extends StateMachine<GamePhase, String> {
 
-		public SpielAblaufSteuerung() {
-			super("Mühlespiel Steuerung", SpielPhase.class, SpielPhase.Initialisiert);
+		public PlayControl() {
+			super("Mühlespiel Steuerung", GamePhase.class, GamePhase.INITIALIZED);
 
-			// Initialisiert
+			// INITIALIZED
 
-			state(Initialisiert).entry = s -> {
-				resetGame();
-			};
+			state(INITIALIZED).entry = s -> resetGame();
 
-			state(Initialisiert).exit = s -> {
+			state(INITIALIZED).exit = s -> {
 				startText.visibility = () -> false;
 			};
 
-			change(Initialisiert, Setzen, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			change(INITIALIZED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
-			// Setzen
+			// PLACING
 
-			state(Setzen).entry = s -> {
+			state(PLACING).entry = s -> {
 				turn = WHITE;
 				numWhiteStonesSet = 0;
 				numBlackStonesSet = 0;
 				mustRemoveOppositeStone = false;
 			};
 
-			state(Setzen).update = s -> {
+			state(PLACING).update = s -> {
 				if (mustRemoveOppositeStone) {
 					removeStone();
 				} else {
@@ -84,18 +82,16 @@ public class SpielScene extends Scene<MuehleApp> {
 				}
 			};
 
-			change(Setzen, Spielen,
-					() -> numWhiteStonesSet == NUM_STONES && numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
+			change(PLACING, MOVING, () -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
 
-			// Spielen
+			// MOVING
 
-			state(Spielen).entry = s -> {
-				clearMove();
+			state(MOVING).entry = s -> {
 				moveControl.init();
 				moveControl.setLogger(Application.LOG);
 			};
 
-			state(Spielen).update = s -> {
+			state(MOVING).update = s -> {
 				moveControl.update();
 			};
 		}
@@ -104,42 +100,40 @@ public class SpielScene extends Scene<MuehleApp> {
 	private final StoneMoveControl moveControl = new StoneMoveControl();
 
 	public enum MoveState {
-		Ready, ReadStartPosition, ReadDirection, Moving
+		GET_MOVE_START, GET_MOVE_END, MOVING
 	};
 
 	private class StoneMoveControl extends StateMachine<MoveState, String> {
 
 		public StoneMoveControl() {
-			super("Stone Move", MoveState.class, MoveState.Ready);
+			super("Stone Move", MoveState.class, MoveState.GET_MOVE_START);
 
-			state(MoveState.Ready).entry = s -> clearMove();
+			state(MoveState.GET_MOVE_START).entry = s -> clearMove();
 
-			change(MoveState.Ready, MoveState.ReadStartPosition);
+			state(MoveState.GET_MOVE_START).update = s -> readMoveStartPosition();
 
-			state(MoveState.ReadStartPosition).update = s -> readMoveStartPosition();
+			change(MoveState.GET_MOVE_START, MoveState.GET_MOVE_END, () -> moveStartPosition != -1);
 
-			change(MoveState.ReadStartPosition, MoveState.ReadDirection, () -> moveStartPosition != -1);
+			state(MoveState.GET_MOVE_END).entry = s -> moveDirection = null;
 
-			state(MoveState.ReadDirection).entry = s -> moveDirection = null;
+			state(MoveState.GET_MOVE_END).update = s -> readMoveDirection();
 
-			state(MoveState.ReadDirection).update = s -> readMoveDirection();
+			change(MoveState.GET_MOVE_END, MoveState.MOVING, () -> moveEndPosition != -1);
 
-			change(MoveState.ReadDirection, MoveState.Moving, () -> moveEndPosition != -1);
+			state(MoveState.MOVING).entry = s -> computeMoveEndPosition();
 
-			state(MoveState.Moving).entry = s -> computeMoveEndPosition();
+			state(MoveState.MOVING).update = s -> movingStone.tf.move();
 
-			state(MoveState.Moving).update = s -> movingStone.tf.move();
+			change(MoveState.MOVING, MoveState.GET_MOVE_START, () -> isMoveEndPositionReached());
 
-			change(MoveState.Moving, MoveState.Ready, () -> isMoveEndPositionReached());
-
-			state(MoveState.Moving).exit = s -> {
+			state(MoveState.MOVING).exit = s -> {
 				board.moveStone(moveStartPosition, moveEndPosition);
 				changeTurn();
 			};
 		}
 	}
 
-	public SpielScene(MuehleApp app) {
+	public PlayScene(MillApp app) {
 		super(app);
 		setBgColor(Color.WHITE);
 		mouse = new Mouse();
@@ -154,8 +148,8 @@ public class SpielScene extends Scene<MuehleApp> {
 
 	@Override
 	public void init() {
-		steuerung.setLogger(Application.LOG);
-		steuerung.init();
+		playControl.setLogger(Application.LOG);
+		playControl.init();
 	}
 
 	@Override
@@ -163,13 +157,13 @@ public class SpielScene extends Scene<MuehleApp> {
 		mouse.poll();
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			resetGame();
-			steuerung.setState(Initialisiert);
+			playControl.setState(INITIALIZED);
 		}
-		steuerung.update();
+		playControl.update();
 	}
 
 	private void resetGame() {
-		board = new Brett(600, 600);
+		board = new Board(600, 600);
 		board.tf.moveTo(100, 100);
 		app.entities.add(board);
 
@@ -188,8 +182,8 @@ public class SpielScene extends Scene<MuehleApp> {
 	private void placeStone() {
 		int gesetzt = placeStoneInteractively();
 		if (gesetzt != -1) {
-			SteinFarbe meineFarbe = turn;
-			if (board.isMillPosition(gesetzt, meineFarbe)) {
+			StoneColor meineFarbe = turn;
+			if (board.isInsideMill(gesetzt, meineFarbe)) {
 				// Mühle wurde geschlossen
 				mustRemoveOppositeStone = true;
 			}
@@ -203,14 +197,14 @@ public class SpielScene extends Scene<MuehleApp> {
 
 		int placedAt = -1;
 		int p = findBoardPosition(mouse.getX(), mouse.getY());
-		if (p != -1 && board.getStone(p) == null) {
+		if (p != -1 && board.getStoneAt(p) == null) {
 			// An Position p Stein setzen:
 			placedAt = p;
 			if (turn == WHITE) {
-				board.placeStone(WHITE, placedAt);
+				board.placeStoneAt(placedAt, WHITE);
 				numWhiteStonesSet += 1;
 			} else {
-				board.placeStone(BLACK, placedAt);
+				board.placeStoneAt(placedAt, BLACK);
 				numBlackStonesSet += 1;
 			}
 		}
@@ -221,25 +215,25 @@ public class SpielScene extends Scene<MuehleApp> {
 		if (!mouse.clicked())
 			return;
 
-		SteinFarbe color = turn;
+		StoneColor color = turn;
 		int p = findBoardPosition(mouse.getX(), mouse.getY());
 		if (p == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return;
 		}
-		if (board.getStone(p) == null) {
+		if (board.getStoneAt(p) == null) {
 			LOG.info("Kein Stein an Klickposition");
 			return;
 		}
-		if (board.getStone(p).getColor() != color) {
+		if (board.getStoneAt(p).getColor() != color) {
 			LOG.info("Stein an Klickposition besitzt die falsche Farbe");
 			return;
 		}
-		if (board.isMillPosition(p, color) && !board.allStonesOfColorInsideMills(color)) {
+		if (board.isInsideMill(p, color) && !board.allStonesOfColorInsideMills(color)) {
 			LOG.info("Stein darf nicht aus Mühle entfernt werden, weil anderer Stein außerhalb Mühle existiert");
 			return;
 		}
-		board.removeStone(p);
+		board.removeStoneAt(p);
 		mustRemoveOppositeStone = false;
 	}
 
@@ -259,7 +253,7 @@ public class SpielScene extends Scene<MuehleApp> {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return;
 		}
-		Stein stone = board.getStone(p);
+		Stone stone = board.getStoneAt(p);
 		if (stone == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
 			return;
@@ -278,19 +272,19 @@ public class SpielScene extends Scene<MuehleApp> {
 
 	private void readMoveDirection() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
-			moveDirection = Norden;
+			moveDirection = NORTH;
 			movingStone.tf.setVelocity(0, -speed);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
-			moveDirection = Osten;
+			moveDirection = EAST;
 			movingStone.tf.setVelocity(speed, 0);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
-			moveDirection = Süden;
+			moveDirection = SOUTH;
 			movingStone.tf.setVelocity(0, speed);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
-			moveDirection = Westen;
+			moveDirection = WEST;
 			movingStone.tf.setVelocity(-speed, 0);
 		}
 		if (moveDirection != null) {
@@ -301,7 +295,7 @@ public class SpielScene extends Scene<MuehleApp> {
 	private void computeMoveEndPosition() {
 		moveEndPosition = -1;
 		int targetPosition = board.findNeighbor(moveStartPosition, moveDirection);
-		if (targetPosition != -1 && !board.hasStone(targetPosition)) {
+		if (targetPosition != -1 && !board.isStoneAt(targetPosition)) {
 			moveEndPosition = targetPosition;
 		}
 	}
@@ -320,12 +314,12 @@ public class SpielScene extends Scene<MuehleApp> {
 	}
 
 	private void drawStatus(Graphics2D g) {
-		if (steuerung.is(Initialisiert)) {
+		if (playControl.is(INITIALIZED)) {
 			startText.hCenter(getWidth());
 			startText.draw(g);
 			return;
 		}
-		if (steuerung.is(Setzen)) {
+		if (playControl.is(PLACING)) {
 			String text = format("Setzen: Weiß hat %d Stein(e) übrig, Schwarz hat %d Stein(e) übrig",
 					NUM_STONES - numWhiteStonesSet, NUM_STONES - numBlackStonesSet);
 			g.setColor(Color.BLACK);
@@ -333,7 +327,7 @@ public class SpielScene extends Scene<MuehleApp> {
 			g.drawString(text, 20, getHeight() - 20);
 			return;
 		}
-		if (steuerung.is(Spielen)) {
+		if (playControl.is(MOVING)) {
 			if (moveStartPosition != -1) {
 				Point p = board.computeCenterPoint(moveStartPosition);
 				g.setColor(Color.GREEN);
