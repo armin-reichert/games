@@ -69,9 +69,19 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(GAME_PLACING_STONES).update = s -> {
 				if (mustRemoveOppositeStone) {
-					removeStone();
+					if (tryToRemoveStone(oppositeTurn())) {
+						mustRemoveOppositeStone = false;
+						nextTurn();
+					}
 				} else {
-					placeStone();
+					int placed = tryToPlaceStone();
+					if (placed != -1) {
+						if (board.isInsideMill(placed, turn)) {
+							mustRemoveOppositeStone = true;
+						} else {
+							nextTurn();
+						}
+					}
 				}
 			};
 
@@ -88,11 +98,23 @@ public class PlayScene extends Scene<MillApp> {
 			};
 
 			state(GAME_MOVING_STONES).update = s -> {
-				move.update();
+				if (mustRemoveOppositeStone) {
+					if (tryToRemoveStone(oppositeTurn())) {
+						mustRemoveOppositeStone = false;
+						nextTurn();
+					}
+				} else {
+					move.update();
+				}
 			};
 
 			change(GAME_MOVING_STONES, GAME_MOVING_STONES, () -> move.isComplete(), (s, t) -> {
-				nextTurn();
+				if (board.isInsideMill(move.getTo(), turn)) {
+					mustRemoveOppositeStone = true;
+					LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
+				} else {
+					nextTurn();
+				}
 				move.init();
 			});
 		}
@@ -137,67 +159,63 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void nextTurn() {
-		turn = turn == WHITE ? BLACK : WHITE;
+		turn = oppositeTurn();
+		LOG.info("Jetzt ist " + turn + " an der Reihe");
+	}
+
+	private StoneColor oppositeTurn() {
+		return turn == WHITE ? BLACK : WHITE;
 	}
 
 	// Placing
 
-	private void placeStone() {
-		int gesetzt = placeStoneInteractively();
-		if (gesetzt != -1) {
-			StoneColor meineFarbe = turn;
-			if (board.isInsideMill(gesetzt, meineFarbe)) {
-				// Mühle wurde geschlossen
-				mustRemoveOppositeStone = true;
-			}
-			nextTurn();
-		}
-	}
-
-	private int placeStoneInteractively() {
+	private int tryToPlaceStone() {
 		if (!mouse.clicked())
 			return -1;
 
-		int placedAt = -1;
 		int p = findBoardPosition(mouse.getX(), mouse.getY());
-		if (p != -1 && board.getStoneAt(p) == null) {
-			// An Position p Stein setzen:
-			placedAt = p;
-			if (turn == WHITE) {
-				board.placeStoneAt(placedAt, WHITE);
-				numWhiteStonesSet += 1;
-			} else {
-				board.placeStoneAt(placedAt, BLACK);
-				numBlackStonesSet += 1;
-			}
+		if (p == -1) {
+			LOG.info("Keine passende Position zu Mausklick gefunden");
+			return -1;
 		}
-		return placedAt;
+		if (board.hasStoneAt(p)) {
+			LOG.info("An Mausklick-Position ist bereits ein Stein");
+			return -1;
+		}
+		// An leerer Position p Stein setzen:
+		if (turn == WHITE) {
+			board.placeStoneAt(p, WHITE);
+			numWhiteStonesSet += 1;
+		} else {
+			board.placeStoneAt(p, BLACK);
+			numBlackStonesSet += 1;
+		}
+		return p;
 	}
 
-	private void removeStone() {
+	private boolean tryToRemoveStone(StoneColor color) {
 		if (!mouse.clicked())
-			return;
+			return false;
 
-		StoneColor color = turn;
 		int p = findBoardPosition(mouse.getX(), mouse.getY());
 		if (p == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
-			return;
+			return false;
 		}
-		if (board.getStoneAt(p) == null) {
+		if (!board.hasStoneAt(p)) {
 			LOG.info("Kein Stein an Klickposition");
-			return;
+			return false;
 		}
 		if (board.getStoneAt(p).getColor() != color) {
 			LOG.info("Stein an Klickposition besitzt die falsche Farbe");
-			return;
+			return false;
 		}
 		if (board.isInsideMill(p, color) && !board.allStonesOfColorInsideMills(color)) {
 			LOG.info("Stein darf nicht aus Mühle entfernt werden, weil anderer Stein außerhalb Mühle existiert");
-			return;
+			return false;
 		}
 		board.removeStoneAt(p);
-		mustRemoveOppositeStone = false;
+		return true;
 	}
 
 	// Moving
