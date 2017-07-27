@@ -107,7 +107,7 @@ public class Board extends GameEntity {
 		return stones[p];
 	}
 
-	public boolean isStoneAt(int p) {
+	public boolean hasStoneAt(int p) {
 		return getStoneAt(p) != null;
 	}
 
@@ -120,7 +120,7 @@ public class Board extends GameEntity {
 	}
 
 	public boolean hasEmptyNeighbor(int p) {
-		return neighbors(p).anyMatch(q -> !isStoneAt(q));
+		return neighbors(p).anyMatch(q -> !hasStoneAt(q));
 	}
 
 	public boolean areNeighbors(int p, int q) {
@@ -188,7 +188,7 @@ public class Board extends GameEntity {
 	public boolean allStonesOfColorInsideMills(StoneColor color) {
 		/*@formatter:off*/
 		return positions()
-				.filter(this::isStoneAt)
+				.filter(this::hasStoneAt)
 				.filter(p -> getStoneAt(p).getColor() == color)
 				.allMatch(p -> isInsideMill(p, color));
 		/*@formatter:on*/
@@ -207,7 +207,7 @@ public class Board extends GameEntity {
 		/*@formatter:off*/
 		return positions()
 				.filter(q -> areNeighbors(p, q, r))
-				.filter(this::isStoneAt)
+				.filter(this::hasStoneAt)
 				.filter(q -> getStoneAt(q).getColor() == color)
 				.findAny()
 				.orElse(-1);

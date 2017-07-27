@@ -17,7 +17,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Ellipse2D;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.common.ScrollingText;
@@ -29,6 +28,7 @@ import de.amr.games.muehle.mouse.Mouse;
 public class PlayScene extends Scene<MillApp> {
 
 	private final int NUM_STONES = 6;
+	private final float MOVE_SPEED = 2.5f;
 
 	private final Mouse mouse;
 
@@ -40,13 +40,7 @@ public class PlayScene extends Scene<MillApp> {
 	private int numBlackStonesSet;
 	private boolean mustRemoveOppositeStone;
 
-	// stone movement
-	private Stone movingStone;
-	private int moveStartPosition;
-	private int moveEndPosition;
-	private Direction moveDirection;
-
-	private float speed = 3;
+	private Move move;
 
 	private final PlayControl playControl = new PlayControl();
 
@@ -108,26 +102,24 @@ public class PlayScene extends Scene<MillApp> {
 		public StoneMoveControl() {
 			super("Stone Move", MoveState.class, MoveState.GET_MOVE_START);
 
-			state(MoveState.GET_MOVE_START).entry = s -> clearMove();
+			state(MoveState.GET_MOVE_START).entry = s -> move = new Move(board, MOVE_SPEED);
 
-			state(MoveState.GET_MOVE_START).update = s -> readMoveStartPosition();
+			state(MoveState.GET_MOVE_START).update = s -> setMoveStartPosition();
 
-			change(MoveState.GET_MOVE_START, MoveState.GET_MOVE_END, () -> moveStartPosition != -1);
+			change(MoveState.GET_MOVE_START, MoveState.GET_MOVE_END, () -> move.getFrom() != -1);
 
-			state(MoveState.GET_MOVE_END).entry = s -> moveDirection = null;
+			state(MoveState.GET_MOVE_END).entry = s -> move.setDirection(null);
 
-			state(MoveState.GET_MOVE_END).update = s -> readMoveDirection();
+			state(MoveState.GET_MOVE_END).update = s -> setMoveDirection();
 
-			change(MoveState.GET_MOVE_END, MoveState.MOVING, () -> moveEndPosition != -1);
+			change(MoveState.GET_MOVE_END, MoveState.MOVING, () -> move.getTo() != -1);
 
-			state(MoveState.MOVING).entry = s -> computeMoveEndPosition();
+			state(MoveState.MOVING).update = s -> move.execute();
 
-			state(MoveState.MOVING).update = s -> movingStone.tf.move();
-
-			change(MoveState.MOVING, MoveState.GET_MOVE_START, () -> isMoveEndPositionReached());
+			change(MoveState.MOVING, MoveState.GET_MOVE_START, () -> move.isEndPositionReached());
 
 			state(MoveState.MOVING).exit = s -> {
-				board.moveStone(moveStartPosition, moveEndPosition);
+				board.moveStone(move.getFrom(), move.getTo());
 				changeTurn();
 			};
 		}
@@ -237,23 +229,18 @@ public class PlayScene extends Scene<MillApp> {
 		mustRemoveOppositeStone = false;
 	}
 
-	private void clearMove() {
-		movingStone = null;
-		moveStartPosition = -1;
-		moveEndPosition = -1;
-		moveDirection = null;
-	}
+	// Moving
 
-	private void readMoveStartPosition() {
+	private void setMoveStartPosition() {
 		if (!mouse.clicked())
 			return;
 
-		int p = findBoardPosition(mouse.getX(), mouse.getY());
-		if (p == -1) {
+		int from = findBoardPosition(mouse.getX(), mouse.getY());
+		if (from == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return;
 		}
-		Stone stone = board.getStoneAt(p);
+		Stone stone = board.getStoneAt(from);
 		if (stone == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
 			return;
@@ -262,48 +249,29 @@ public class PlayScene extends Scene<MillApp> {
 			LOG.info(stone.getColor() + " ist nicht am Zug");
 			return;
 		}
-		if (!board.hasEmptyNeighbor(p)) {
+		if (!board.hasEmptyNeighbor(from)) {
 			LOG.info("Stein an dieser Position kann nicht ziehen");
 			return;
 		}
-		moveStartPosition = p;
-		movingStone = stone;
+		move.setFrom(from);
 	}
 
-	private void readMoveDirection() {
+	private void setMoveDirection() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
-			moveDirection = NORTH;
-			movingStone.tf.setVelocity(0, -speed);
+			move.setDirection(NORTH);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
-			moveDirection = EAST;
-			movingStone.tf.setVelocity(speed, 0);
+			move.setDirection(EAST);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
-			moveDirection = SOUTH;
-			movingStone.tf.setVelocity(0, speed);
+			move.setDirection(SOUTH);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
-			moveDirection = WEST;
-			movingStone.tf.setVelocity(-speed, 0);
-		}
-		if (moveDirection != null) {
-			computeMoveEndPosition();
+			move.setDirection(WEST);
 		}
 	}
 
-	private void computeMoveEndPosition() {
-		moveEndPosition = -1;
-		int targetPosition = board.findNeighbor(moveStartPosition, moveDirection);
-		if (targetPosition != -1 && !board.isStoneAt(targetPosition)) {
-			moveEndPosition = targetPosition;
-		}
-	}
-
-	private boolean isMoveEndPositionReached() {
-		Ellipse2D center = new Ellipse2D.Float(movingStone.tf.getX() - 2, movingStone.tf.getY() - 2, 4, 4);
-		return center.contains(board.computeCenterPoint(moveEndPosition));
-	}
+	// Drawing
 
 	@Override
 	public void draw(Graphics2D g) {
@@ -328,13 +296,13 @@ public class PlayScene extends Scene<MillApp> {
 			return;
 		}
 		if (playControl.is(MOVING)) {
-			if (moveStartPosition != -1) {
-				Point p = board.computeCenterPoint(moveStartPosition);
+			if (move.getFrom() != -1) {
+				Point p = board.computeCenterPoint(move.getFrom());
 				g.setColor(Color.GREEN);
 				g.fillOval(Math.round(board.tf.getX() + p.x) - 5, Math.round(board.tf.getY() + p.y) - 5, 10, 10);
 			}
-			if (moveEndPosition != -1) {
-				Point p = board.computeCenterPoint(moveEndPosition);
+			if (move.getTo() != -1) {
+				Point p = board.computeCenterPoint(move.getTo());
 				g.setColor(Color.RED);
 				g.fillOval(Math.round(board.tf.getX() + p.x) - 5, Math.round(board.tf.getY() + p.y) - 5, 10, 10);
 			}
