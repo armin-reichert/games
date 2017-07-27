@@ -11,11 +11,13 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.input.Keyboard;
 
 /**
  * Das Mühlebrett.
@@ -65,6 +67,7 @@ public class Board extends GameEntity {
 	private int height;
 	private int posRadius;
 	private Stone[] stones;
+	private boolean showPositionNumbers;
 
 	public Board(int w, int h) {
 		width = w;
@@ -129,6 +132,10 @@ public class Board extends GameEntity {
 		return Stream.of(stones).filter(Objects::nonNull);
 	}
 
+	public int numStones(StoneColor color) {
+		return (int) stones().filter(stone -> stone.getColor() == color).count();
+	}
+
 	public IntStream neighbors(int p) {
 		return IntStream.of(NEIGHBORS[p]).filter(n -> n != -1);
 	}
@@ -144,6 +151,11 @@ public class Board extends GameEntity {
 
 	public boolean hasEmptyNeighbor(int p) {
 		return neighbors(p).anyMatch(q -> !hasStoneAt(q));
+	}
+
+	public boolean cannotMove(StoneColor color) {
+		return positions().filter(p -> hasStoneAt(p) && getStoneAt(p).getColor() == color)
+				.allMatch(p -> emptyNeighbors(p).count() == 0);
 	}
 
 	public IntStream emptyNeighbors(int p) {
@@ -230,6 +242,13 @@ public class Board extends GameEntity {
 	}
 
 	@Override
+	public void update() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
+			showPositionNumbers = !showPositionNumbers;
+		}
+	}
+
+	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -255,7 +274,9 @@ public class Board extends GameEntity {
 		positions().forEach(p -> {
 			Point center = computeCenterPoint(p);
 			g.fillOval(center.x - posRadius, center.y - posRadius, 2 * posRadius, 2 * posRadius);
-			g.drawString(p + "", center.x + 3 * posRadius, center.y + 3 * posRadius);
+			if (showPositionNumbers) {
+				g.drawString(p + "", center.x + 3 * posRadius, center.y + 3 * posRadius);
+			}
 		});
 
 		// Steine

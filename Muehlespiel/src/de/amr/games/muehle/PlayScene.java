@@ -7,6 +7,7 @@ import static de.amr.games.muehle.Direction.SOUTH;
 import static de.amr.games.muehle.Direction.WEST;
 import static de.amr.games.muehle.GamePhase.GAME_INITIALIZED;
 import static de.amr.games.muehle.GamePhase.GAME_MOVING_STONES;
+import static de.amr.games.muehle.GamePhase.GAME_OVER;
 import static de.amr.games.muehle.GamePhase.GAME_PLACING_STONES;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
@@ -37,6 +38,7 @@ public class PlayScene extends Scene<MillApp> {
 	private ScrollingText startText;
 
 	private StoneColor turn;
+	private StoneColor winner;
 	private int numWhiteStonesSet;
 	private int numBlackStonesSet;
 	private boolean mustRemoveOppositeStone;
@@ -108,6 +110,8 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
+			change(GAME_MOVING_STONES, GAME_OVER, PlayScene.this::gameIsOver);
+
 			change(GAME_MOVING_STONES, GAME_MOVING_STONES, () -> move.isComplete(), (s, t) -> {
 				if (board.isInsideMill(move.getTo(), turn)) {
 					mustRemoveOppositeStone = true;
@@ -117,6 +121,12 @@ public class PlayScene extends Scene<MillApp> {
 				}
 				move.init();
 			});
+
+			state(GamePhase.GAME_OVER).entry = s -> {
+				winner = oppositeTurn();
+				LOG.info("Gewinner ist " + winner);
+			};
+
 		}
 	}
 
@@ -143,6 +153,7 @@ public class PlayScene extends Scene<MillApp> {
 	public void update() {
 		mouse.poll();
 		playControl.update();
+		board.update();
 	}
 
 	private void resetGame() {
@@ -256,6 +267,10 @@ public class PlayScene extends Scene<MillApp> {
 			return WEST;
 		}
 		return null;
+	}
+
+	private boolean gameIsOver() {
+		return board.numStones(turn) == 2 || board.cannotMove(turn);
 	}
 
 	// Drawing
