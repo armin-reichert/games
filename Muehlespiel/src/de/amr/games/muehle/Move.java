@@ -23,7 +23,6 @@ public class Move {
 
 	private int from;
 	private int to;
-	private Direction direction;
 
 	// State machine
 
@@ -50,12 +49,12 @@ public class Move {
 
 			change(KNOWS_FROM, RUNNING, () -> board.emptyNeighbors(from).count() == 1, (s, t) -> {
 				to = board.emptyNeighbors(from).findFirst().getAsInt();
-				direction = board.getDirection(from, to);
+				// direction = board.getDirection(from, to);
 			});
 
 			change(KNOWS_FROM, RUNNING, () -> to != -1);
 
-			state(RUNNING).entry = s -> getStone().tf.setVelocity(computeVelocity());
+			state(RUNNING).entry = s -> getStone().tf.setVelocity(computeVelocity(board.getDirection(from, to)));
 
 			state(RUNNING).update = s -> getStone().tf.move();
 
@@ -76,7 +75,6 @@ public class Move {
 	private void reset() {
 		from = -1;
 		to = -1;
-		direction = null;
 	}
 
 	public void init() {
@@ -96,10 +94,6 @@ public class Move {
 		return to;
 	}
 
-	public Direction getDirection() {
-		return direction;
-	}
-
 	public Stone getStone() {
 		return board.getStoneAt(from);
 	}
@@ -114,12 +108,10 @@ public class Move {
 		if (this.from != from) {
 			this.from = from;
 			to = -1;
-			direction = null;
 		}
 	}
 
 	private void computeTo(Direction direction) {
-		this.direction = direction;
 		if (direction != null) {
 			int targetPosition = board.findNeighbor(from, direction);
 			if (targetPosition != -1 && !board.hasStoneAt(targetPosition)) {
@@ -134,7 +126,7 @@ public class Move {
 		return center.contains(board.computeCenterPoint(to));
 	}
 
-	private Vector2 computeVelocity() {
+	private Vector2 computeVelocity(Direction direction) {
 		switch (direction) {
 		case NORTH:
 			return new Vector2(0, -speed);
