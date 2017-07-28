@@ -21,7 +21,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
@@ -42,18 +41,17 @@ public class PlayScene extends Scene<MillApp> {
 	private final Mouse mouse;
 
 	private Board board;
-	private Move move;
+	private StonesPlacedIndicator placedWhiteIndicator;
+	private StonesPlacedIndicator placedBlackIndicator;
 	private ScrollingText startText;
 	private ScrollingText winnerText;
 
+	private Move move;
 	private StoneColor turn;
 	private StoneColor winner;
 	private int numWhiteStonesSet;
 	private int numBlackStonesSet;
 	private boolean mustRemoveOppositeStone;
-
-	private StonesPlacedIndicator placedWhiteIndicator;
-	private StonesPlacedIndicator placedBlackIndicator;
 
 	private final PlayControl playControl = new PlayControl();
 
@@ -64,7 +62,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			// STARTED
 
-			state(STARTED).entry = s -> resetGame();
+			state(STARTED).entry = s -> newGame();
 
 			state(STARTED).exit = s -> {
 				startText.visibility = () -> false;
@@ -150,15 +148,11 @@ public class PlayScene extends Scene<MillApp> {
 		mouse = new Mouse();
 		app.getShell().getCanvas().addMouseListener(mouse);
 		setBgColor(Color.WHITE);
-		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> numWhiteStonesSet);
-		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
-		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> numBlackStonesSet);
-		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 	}
 
 	@Override
 	public void init() {
-		playControl.setLogger(Application.LOG);
+		playControl.setLogger(LOG);
 		playControl.init();
 	}
 
@@ -169,24 +163,27 @@ public class PlayScene extends Scene<MillApp> {
 		board.update();
 	}
 
-	private void resetGame() {
+	private void newGame() {
 		board = new Board(600, 600);
 		board.center(getWidth(), getHeight());
-		app.entities.add(board);
+
+		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> numWhiteStonesSet);
+		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
+
+		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> numBlackStonesSet);
+		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 
 		startText = new ScrollingText();
 		startText.setColor(Color.BLACK);
 		startText.setFont(new Font("Sans", Font.PLAIN, 20));
 		startText.setText("Drücke SPACE für neues Spiel");
 		startText.tf.moveTo(0, getHeight() - 40);
-		app.entities.add(startText);
 
 		winnerText = new ScrollingText();
 		winnerText.setColor(Color.BLACK);
 		winnerText.setFont(new Font("Sans", Font.PLAIN, 20));
 		winnerText.setText("Kein Gewinner");
 		winnerText.tf.moveTo(0, getHeight() - 40);
-		app.entities.add(winnerText);
 	}
 
 	private void nextTurn() {
@@ -208,7 +205,7 @@ public class PlayScene extends Scene<MillApp> {
 			return -1;
 		}
 		if (board.hasStoneAt(p)) {
-			LOG.info("An Mausklick-Position ist bereits ein Stein");
+			LOG.info("An Mausklick-Position liegt bereits ein Stein");
 			return -1;
 		}
 		if (turn == WHITE) {
@@ -252,6 +249,10 @@ public class PlayScene extends Scene<MillApp> {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return -1;
 		}
+		if (!board.hasEmptyNeighbor(from)) {
+			LOG.info("Stein an dieser Position kann nicht ziehen");
+			return -1;
+		}
 		Stone stone = board.getStoneAt(from);
 		if (stone == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
@@ -259,10 +260,6 @@ public class PlayScene extends Scene<MillApp> {
 		}
 		if (turn != stone.getColor()) {
 			LOG.info(stone.getColor() + " ist nicht am Zug");
-			return -1;
-		}
-		if (!board.hasEmptyNeighbor(from)) {
-			LOG.info("Stein an dieser Position kann nicht ziehen");
 			return -1;
 		}
 		return from;
@@ -288,7 +285,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		return board.numStones(turn) == 2 || board.cannotMove(turn);
+		return board.numStones(turn) == 2 || board.cannotMoveFrom(turn);
 	}
 
 	// Drawing

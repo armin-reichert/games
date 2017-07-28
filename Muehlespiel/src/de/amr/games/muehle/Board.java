@@ -82,6 +82,15 @@ public class Board extends GameEntity {
 		Stone.radius = width / 24;
 	}
 
+	// Keyboard shortcuts
+
+	@Override
+	public void update() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
+			showPositionNumbers = !showPositionNumbers;
+		}
+	}
+
 	@Override
 	public int getWidth() {
 		return width;
@@ -179,13 +188,12 @@ public class Board extends GameEntity {
 		return neighbors(p).anyMatch(this::isEmpty);
 	}
 
-	public boolean canMove(int p) {
+	public boolean canMoveFrom(int p) {
 		return hasStoneAt(p) && hasEmptyNeighbor(p);
 	}
 
-	public boolean cannotMove(StoneColor color) {
-		return positions().filter(p -> hasStoneAt(p) && getStoneAt(p).getColor() == color)
-				.allMatch(p -> emptyNeighbors(p).count() == 0);
+	public boolean cannotMoveFrom(StoneColor color) {
+		return positions(color).allMatch(p -> emptyNeighbors(p).count() == 0);
 	}
 
 	public IntStream allMovableStonePositions(StoneColor color) {
@@ -193,7 +201,7 @@ public class Board extends GameEntity {
 	}
 
 	public IntStream emptyNeighbors(int p) {
-		return neighbors(p).filter(q -> !hasStoneAt(q));
+		return neighbors(p).filter(this::isEmpty);
 	}
 
 	public boolean areNeighbors(int p, int q) {
@@ -214,6 +222,17 @@ public class Board extends GameEntity {
 
 	public boolean isPositionInsideMill(int p, StoneColor color) {
 		return findContainingMill(p, color, true) != null || findContainingMill(p, color, false) != null;
+	}
+
+	/**
+	 * Tells if all stones of the given color are inside some mill.
+	 * 
+	 * @param color
+	 *          stone color
+	 * @return if all stones of given color are inside some mill
+	 */
+	public boolean areAllStonesInsideMill(StoneColor color) {
+		return positions(color).allMatch(p -> isPositionInsideMill(p, color));
 	}
 
 	public Mill findContainingMill(int p, StoneColor color, boolean horizontal) {
@@ -255,26 +274,6 @@ public class Board extends GameEntity {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Tells if all stones of the given color are inside some mill.
-	 * 
-	 * @param color
-	 *          stone color
-	 * @return if all stones of given color are inside some mill
-	 */
-	public boolean areAllStonesInsideMill(StoneColor color) {
-		return positions(color).allMatch(p -> isPositionInsideMill(p, color));
-	}
-
-	// Keyboard shortcuts
-
-	@Override
-	public void update() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
-			showPositionNumbers = !showPositionNumbers;
-		}
 	}
 
 	// Draw related methods
