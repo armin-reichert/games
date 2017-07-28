@@ -23,7 +23,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 
 /**
- * Das Mühlebrett.
+ * The board.
  *
  * @author Armin Reichert & Peter und Anna Schillo
  */
@@ -31,39 +31,40 @@ public class Board extends GameEntity {
 
 	public static final int NUM_POS = 24;
 
-	/* NEIGHBORS[p] = { Nachbar(Norden), Nachbar(Osten), Nachbar(Süden), Nachbar(Westen) } */
+	/*
+	 * NEIGHBORS[p] = { neighbor(North), neighbor(East), neighbor(South), neighbor(West) }, -1 = no neighbor
+	 */
 	private static final int[][] NEIGHBORS = {
-			/*@formatter:off*/
-			{ -1, 1, 9, -1 }, // Position 0: - (Norden), 1 (Osten), 9 (Süden), - (Westen) 
-			{ -1, 2, 4, 0 }, 
-			{ -1, -1, 14, 1 }, 
-			{ -1, 4, 10, -1 },
-			{ 1, 5, 7, 3 }, 
-			{ -1, -1, 13, 4 },
-			{ -1, 7, 11, -1 }, 
-			{ 4, 8, -1, 6 }, 
-			{ -1, -1, 12, 7 },
-			{ 0, 10, 21, -1 }, 
-			{ 3, 11, 18, 9 },
-			{ 6, -1, 15, 10 }, 
-			{ 8, 13, 17, -1 }, 
-			{ 5, 14, 20, 12 }, 
-			{ 2, -1, 23, 13 },
-			{ 11, 16, -1, -1 },
-			{ -1, 17, 19, 15 }, 
-			{ 12, -1, -1, 16 }, 
-			{ 10, 19, -1, -1 },
-			{ 16, 20, 22, 18 }, 
-			{ 13, -1, -1, 19 },
-			{ 9, 22, -1, -1 }, 
-			{ 19, 23, -1, 21 }, 
-			{ 14, -1, -1, 22 },
-			/*@formatter:on*/
+		/*@formatter:off*/
+		{ -1, 1, 9, -1 }, 
+		{ -1, 2, 4, 0 }, 
+		{ -1, -1, 14, 1 }, 
+		{ -1, 4, 10, -1 },
+		{ 1, 5, 7, 3 }, 
+		{ -1, -1, 13, 4 },
+		{ -1, 7, 11, -1 }, 
+		{ 4, 8, -1, 6 }, 
+		{ -1, -1, 12, 7 },
+		{ 0, 10, 21, -1 }, 
+		{ 3, 11, 18, 9 },
+		{ 6, -1, 15, 10 }, 
+		{ 8, 13, 17, -1 }, 
+		{ 5, 14, 20, 12 }, 
+		{ 2, -1, 23, 13 },
+		{ 11, 16, -1, -1 },
+		{ -1, 17, 19, 15 }, 
+		{ 12, -1, -1, 16 }, 
+		{ 10, 19, -1, -1 },
+		{ 16, 20, 22, 18 }, 
+		{ 13, -1, -1, 19 },
+		{ 9, 22, -1, -1 }, 
+		{ 19, 23, -1, 21 }, 
+		{ 14, -1, -1, 22 },
+		/*@formatter:on*/
 	};
 
 	/*
-	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6]
-	 * grid.
+	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
 	 */
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
@@ -107,7 +108,7 @@ public class Board extends GameEntity {
 		return findNearestPosition(boardX, boardY, getWidth() / 18);
 	}
 
-	// Allocation related methods and predicates:
+	// Stone assignment:
 
 	public void clear() {
 		stones = new Stone[NUM_POS];
@@ -151,10 +152,6 @@ public class Board extends GameEntity {
 		return stones[p] != null;
 	}
 
-	public IntStream positions() {
-		return IntStream.range(0, NUM_POS);
-	}
-
 	public IntStream positions(StoneColor color) {
 		return positions().filter(this::hasStoneAt).filter(p -> getStoneAt(p).getColor() == color);
 	}
@@ -171,6 +168,12 @@ public class Board extends GameEntity {
 		return (int) stones(color).count();
 	}
 
+	// Board topology:
+
+	public IntStream positions() {
+		return IntStream.range(0, NUM_POS);
+	}
+
 	public IntStream neighbors(int p) {
 		return IntStream.of(NEIGHBORS[p]).filter(n -> n != -1);
 	}
@@ -184,24 +187,12 @@ public class Board extends GameEntity {
 		return n != -1 && hasStoneAt(n) && getStoneAt(n).getColor() == color ? n : -1;
 	}
 
-	public boolean hasEmptyNeighbor(int p) {
-		return neighbors(p).anyMatch(this::isEmpty);
-	}
-
-	public boolean canMoveFrom(int p) {
-		return hasStoneAt(p) && hasEmptyNeighbor(p);
-	}
-
-	public boolean cannotMoveFrom(StoneColor color) {
-		return positions(color).allMatch(p -> emptyNeighbors(p).count() == 0);
-	}
-
-	public IntStream allMovableStonePositions(StoneColor color) {
-		return positions(color).filter(this::hasEmptyNeighbor);
-	}
-
 	public IntStream emptyNeighbors(int p) {
 		return neighbors(p).filter(this::isEmpty);
+	}
+
+	public boolean hasEmptyNeighbor(int p) {
+		return neighbors(p).anyMatch(this::isEmpty);
 	}
 
 	public boolean areNeighbors(int p, int q) {
@@ -216,6 +207,20 @@ public class Board extends GameEntity {
 		return Stream.of(Direction.values()).filter(dir -> areNeighbors(p, q, dir)).findFirst().orElse(null);
 	}
 
+	// Stone movement:
+
+	public boolean canMoveStoneFrom(int p) {
+		return hasStoneAt(p) && hasEmptyNeighbor(p);
+	}
+
+	public boolean cannotMoveStones(StoneColor color) {
+		return positions(color).allMatch(p -> emptyNeighbors(p).count() == 0);
+	}
+
+	public IntStream allMovableStonePositions(StoneColor color) {
+		return positions(color).filter(this::hasEmptyNeighbor);
+	}
+
 	public int findNearestPosition(int x, int y, int radius) {
 		return positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
 	}
@@ -224,34 +229,27 @@ public class Board extends GameEntity {
 		return findContainingMill(p, color, true) != null || findContainingMill(p, color, false) != null;
 	}
 
-	/**
-	 * Tells if all stones of the given color are inside some mill.
-	 * 
-	 * @param color
-	 *          stone color
-	 * @return if all stones of given color are inside some mill
-	 */
 	public boolean areAllStonesInsideMill(StoneColor color) {
 		return positions(color).allMatch(p -> isPositionInsideMill(p, color));
 	}
 
 	public Mill findContainingMill(int p, StoneColor color, boolean horizontal) {
-		// Liegt auf Position @p ein Stein der Farbe @farbe?
 		Stone stone = getStoneAt(p);
 		if (stone == null || stone.getColor() != color) {
 			return null;
 		}
 
-		int q, r;
 		Direction left = horizontal ? WEST : NORTH;
 		Direction right = horizontal ? EAST : SOUTH;
+
+		int q, r;
 
 		// p -> q -> r
 		q = findNeighbor(p, right, color);
 		if (q != -1) {
 			r = findNeighbor(q, right, color);
 			if (r != -1) {
-				return new Mill(p, q, r, true);
+				return new Mill(p, q, r, horizontal);
 			}
 		}
 
@@ -260,7 +258,7 @@ public class Board extends GameEntity {
 		if (q != -1) {
 			r = findNeighbor(p, right, color);
 			if (r != -1) {
-				return new Mill(q, p, r, true);
+				return new Mill(q, p, r, horizontal);
 			}
 		}
 
@@ -269,14 +267,14 @@ public class Board extends GameEntity {
 		if (r != -1) {
 			q = findNeighbor(r, left, color);
 			if (q != -1) {
-				return new Mill(q, r, p, true);
+				return new Mill(q, r, p, horizontal);
 			}
 		}
 
 		return null;
 	}
 
-	// Draw related methods
+	// Drawing related methods
 
 	public Vector2 centerPoint(int p) {
 		return new Vector2(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);

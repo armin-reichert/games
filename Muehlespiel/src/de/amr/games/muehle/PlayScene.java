@@ -285,7 +285,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		return board.numStones(turn) == 2 || board.cannotMoveFrom(turn);
+		return board.numStones(turn) == 2 || board.cannotMoveStones(turn);
 	}
 
 	// Drawing
