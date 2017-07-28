@@ -136,6 +136,10 @@ public class Board extends GameEntity {
 		return IntStream.range(0, NUM_POS);
 	}
 
+	public IntStream positions(StoneColor color) {
+		return positions().filter(this::hasStoneAt).filter(p -> getStoneAt(p).getColor() == color);
+	}
+
 	public Stream<Stone> stones() {
 		return Stream.of(stones).filter(Objects::nonNull);
 	}

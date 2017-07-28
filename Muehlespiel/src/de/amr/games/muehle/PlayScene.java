@@ -52,7 +52,6 @@ public class PlayScene extends Scene<MillApp> {
 
 	private StonesPlacedIndicator placedWhiteIndicator;
 	private StonesPlacedIndicator placedBlackIndicator;
-	private StoneRemovalIndicator removalIndicator;
 
 	private final PlayControl playControl = new PlayControl();
 
@@ -149,8 +148,6 @@ public class PlayScene extends Scene<MillApp> {
 		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
 		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> numBlackStonesSet);
 		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
-		removalIndicator = new StoneRemovalIndicator(BLACK);
-		removalIndicator.tf.moveTo(getWidth() / 2, getHeight() - 50);
 	}
 
 	private int findBoardPosition(int x, int y) {
@@ -310,10 +307,8 @@ public class PlayScene extends Scene<MillApp> {
 			placedWhiteIndicator.draw(g);
 			placedBlackIndicator.draw(g);
 			highlightStone(g, turn == WHITE ? placedWhiteIndicator : placedBlackIndicator);
-
 			if (mustRemoveOppositeStone) {
-				removalIndicator.setStoneColor(oppositeTurn());
-				removalIndicator.draw(g);
+				markRemovableStones(g);
 			}
 			return;
 		}
@@ -325,12 +320,30 @@ public class PlayScene extends Scene<MillApp> {
 			if (move.getTo() != -1) {
 				markPosition(g, move.getTo(), Color.RED, 10);
 			}
+			if (mustRemoveOppositeStone) {
+				markRemovableStones(g);
+			}
 			String text = (turn == WHITE ? "Weiß" : "Schwarz") + " am Zug";
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Sans", Font.PLAIN, 20));
 			g.drawString(text, 20, getHeight() - 20);
 			return;
 		}
+	}
+
+	private void markRemovableStones(Graphics2D g) {
+		StoneColor colorToRemove = oppositeTurn();
+		boolean allInMill = board.allStonesOfColorInsideMills(colorToRemove);
+		board.positions(colorToRemove).filter(p -> allInMill || !board.isInsideMill(p, oppositeTurn())).forEach(p -> {
+			Stone stone = board.getStoneAt(p);
+			g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
+					board.tf.getY() + stone.tf.getY() - stone.getHeight() / 2);
+			g.setColor(Color.RED);
+			g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+			g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+			g.translate(-board.tf.getX() - stone.tf.getX() + stone.getWidth() / 2,
+					-board.tf.getY() - stone.tf.getY() + stone.getHeight() / 2);
+		});
 	}
 
 	private void markPosition(Graphics2D gc, int p, Color color, int markerSize) {
