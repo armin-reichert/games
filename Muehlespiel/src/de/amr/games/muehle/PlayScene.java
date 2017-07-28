@@ -7,8 +7,8 @@ import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
 import static de.amr.games.muehle.Direction.WEST;
 import static de.amr.games.muehle.GamePhase.GAME_OVER;
-import static de.amr.games.muehle.GamePhase.MOVING;
 import static de.amr.games.muehle.GamePhase.PLACING;
+import static de.amr.games.muehle.GamePhase.PLAYING;
 import static de.amr.games.muehle.GamePhase.STARTED;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
@@ -44,6 +44,7 @@ public class PlayScene extends Scene<MillApp> {
 	private Board board;
 	private Move move;
 	private ScrollingText startText;
+	private ScrollingText winnerText;
 
 	private StoneColor turn;
 	private StoneColor winner;
@@ -98,11 +99,11 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLACING, MOVING, () -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
+			change(PLACING, PLAYING, () -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
 
 			// MOVING
 
-			state(MOVING).entry = s -> {
+			state(PLAYING).entry = s -> {
 				move = new Move(board);
 				move.startPositionSupplier = PlayScene.this::supplyMoveStartPosition;
 				move.directionSupplier = PlayScene.this::supplyMoveDirection;
@@ -110,7 +111,7 @@ public class PlayScene extends Scene<MillApp> {
 				move.init();
 			};
 
-			state(MOVING).update = s -> {
+			state(PLAYING).update = s -> {
 				if (mustRemoveOppositeStone) {
 					if (tryToRemoveStone(oppositeTurn())) {
 						mustRemoveOppositeStone = false;
@@ -121,9 +122,9 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(MOVING, GAME_OVER, PlayScene.this::isGameOver);
+			change(PLAYING, GAME_OVER, PlayScene.this::isGameOver);
 
-			change(MOVING, MOVING, () -> move.isComplete(), (s, t) -> {
+			change(PLAYING, PLAYING, () -> move.isComplete(), (s, t) -> {
 				if (board.isInsideMill(move.getTo(), turn)) {
 					mustRemoveOppositeStone = true;
 					LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
@@ -133,10 +134,14 @@ public class PlayScene extends Scene<MillApp> {
 				move.init();
 			});
 
-			state(GamePhase.GAME_OVER).entry = s -> {
+			// GAME_OVER
+
+			state(GAME_OVER).entry = s -> {
 				winner = oppositeTurn();
 				LOG.info("Gewinner ist " + winner);
 			};
+
+			change(GAME_OVER, STARTED, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 		}
 	}
@@ -182,6 +187,13 @@ public class PlayScene extends Scene<MillApp> {
 		startText.setText("Drücke SPACE zum Start");
 		startText.tf.moveTo(0, getHeight() - 40);
 		app.entities.add(startText);
+
+		winnerText = new ScrollingText();
+		winnerText.setColor(Color.BLACK);
+		winnerText.setFont(new Font("Sans", Font.PLAIN, 20));
+		winnerText.setText("Kein Gewinner");
+		winnerText.tf.moveTo(0, getHeight() - 40);
+		app.entities.add(winnerText);
 	}
 
 	private void nextTurn() {
@@ -321,12 +333,11 @@ public class PlayScene extends Scene<MillApp> {
 			return;
 		}
 
-		if (playControl.is(MOVING)) {
+		if (playControl.is(PLAYING)) {
 			if (move.getFrom() != -1) {
-				markPosition(g, move.getFrom(), Color.GREEN, 10);
-			}
-			if (move.getTo() != -1) {
-				markPosition(g, move.getTo(), Color.RED, 10);
+				markPosition(g, move.getFrom(), Color.ORANGE, 10);
+			} else {
+				markAllPossibleMoveStarts(g);
 			}
 			if (mustRemoveOppositeStone) {
 				markRemovableStones(g);
@@ -337,6 +348,19 @@ public class PlayScene extends Scene<MillApp> {
 			g.drawString(text, 20, getHeight() - 20);
 			return;
 		}
+
+		if (playControl.is(GAME_OVER)) {
+			winnerText.setText(winner == WHITE ? "Weiß gewinnt" : "Schwarz gewinnt");
+			winnerText.hCenter(getWidth());
+			winnerText.draw(g);
+			return;
+		}
+	}
+
+	private void markAllPossibleMoveStarts(Graphics2D g) {
+		board.allMovableStonePositions(turn).forEach(p -> {
+			markPosition(g, p, Color.GREEN, 10);
+		});
 	}
 
 	private void markRemovableStones(Graphics2D g) {

@@ -178,6 +178,10 @@ public class Board extends GameEntity {
 				.allMatch(p -> emptyNeighbors(p).count() == 0);
 	}
 
+	public IntStream allMovableStonePositions(StoneColor color) {
+		return positions(color).filter(this::hasEmptyNeighbor);
+	}
+
 	public IntStream emptyNeighbors(int p) {
 		return neighbors(p).filter(q -> !hasStoneAt(q));
 	}
