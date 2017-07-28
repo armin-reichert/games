@@ -12,6 +12,7 @@ import static de.amr.games.muehle.GamePhase.PLAYING;
 import static de.amr.games.muehle.GamePhase.STARTED;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
+import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
 import java.awt.BasicStroke;
@@ -83,14 +84,14 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> {
 				if (mustRemoveOppositeStone) {
-					if (tryToRemoveStone(oppositeTurn())) {
+					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
 						nextTurn();
 					}
 				} else {
-					int placed = tryToPlaceStone();
-					if (placed != -1) {
-						if (board.isInsideMill(placed, turn)) {
+					int p = tryToPlaceStone(findClickPosition());
+					if (p != -1) {
+						if (board.isInsideMill(p, turn)) {
 							mustRemoveOppositeStone = true;
 						} else {
 							nextTurn();
@@ -113,7 +114,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLAYING).update = s -> {
 				if (mustRemoveOppositeStone) {
-					if (tryToRemoveStone(oppositeTurn())) {
+					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
 						nextTurn();
 					}
@@ -157,12 +158,6 @@ public class PlayScene extends Scene<MillApp> {
 		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 	}
 
-	private int findBoardPosition(int x, int y) {
-		int brettX = Math.abs(Math.round(x - board.tf.getX()));
-		int brettY = Math.abs(Math.round(y - board.tf.getY()));
-		return board.findNearestPosition(brettX, brettY, board.getWidth() / 18);
-	}
-
 	@Override
 	public void init() {
 		playControl.setLogger(Application.LOG);
@@ -198,7 +193,6 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void nextTurn() {
 		turn = oppositeTurn();
-		LOG.info("Jetzt ist " + turn + " an der Reihe");
 	}
 
 	private StoneColor oppositeTurn() {
@@ -207,20 +201,28 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Placing
 
-	private int tryToPlaceStone() {
-		if (!mouse.clicked())
-			return -1;
+	private int findBoardPosition(int x, int y) {
+		int boardX = abs(round(x - board.tf.getX()));
+		int boardY = abs(round(y - board.tf.getY()));
+		return board.findNearestPosition(boardX, boardY, board.getWidth() / 18);
+	}
 
-		int p = findBoardPosition(mouse.getX(), mouse.getY());
+	private int findClickPosition() {
+		if (mouse.clicked()) {
+			return findBoardPosition(mouse.getX(), mouse.getY());
+		}
+		return -1;
+	}
+
+	private int tryToPlaceStone(int p) {
 		if (p == -1) {
-			LOG.info("Keine passende Position zu Mausklick gefunden");
+			LOG.info("Keine gültige Brettposition");
 			return -1;
 		}
 		if (board.hasStoneAt(p)) {
 			LOG.info("An Mausklick-Position ist bereits ein Stein");
 			return -1;
 		}
-		// An leerer Position p Stein setzen:
 		if (turn == WHITE) {
 			board.putStoneAt(p, WHITE);
 			numWhiteStonesSet += 1;
@@ -231,13 +233,9 @@ public class PlayScene extends Scene<MillApp> {
 		return p;
 	}
 
-	private boolean tryToRemoveStone(StoneColor color) {
-		if (!mouse.clicked())
-			return false;
-
-		int p = findBoardPosition(mouse.getX(), mouse.getY());
+	private boolean tryToRemoveStone(int p, StoneColor color) {
 		if (p == -1) {
-			LOG.info("Keine Brettposition zu Klickposition gefunden");
+			LOG.info("Keine gültige Brettposition");
 			return false;
 		}
 		if (!board.hasStoneAt(p)) {
