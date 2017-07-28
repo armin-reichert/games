@@ -140,25 +140,29 @@ public class Board extends GameEntity {
 		return Stream.of(stones).filter(Objects::nonNull);
 	}
 
+	public Stream<Stone> stones(StoneColor color) {
+		return stones().filter(stone -> stone.getColor() == color);
+	}
+
 	public int numStones(StoneColor color) {
-		return (int) stones().filter(stone -> stone.getColor() == color).count();
+		return (int) stones(color).count();
 	}
 
 	public IntStream neighbors(int p) {
 		return IntStream.of(NEIGHBORS[p]).filter(n -> n != -1);
 	}
 
-	public int findNeighbor(int p, Direction r) {
-		return NEIGHBORS[p][r.ordinal()];
+	public int findNeighbor(int p, Direction dir) {
+		return NEIGHBORS[p][dir.ordinal()];
 	}
 
-	private int findNeighbor(int p, Direction r, StoneColor color) {
-		int n = findNeighbor(p, r);
+	private int findNeighbor(int p, Direction dir, StoneColor color) {
+		int n = findNeighbor(p, dir);
 		return n != -1 && hasStoneAt(n) && getStoneAt(n).getColor() == color ? n : -1;
 	}
 
 	public boolean hasEmptyNeighbor(int p) {
-		return neighbors(p).anyMatch(q -> !hasStoneAt(q));
+		return neighbors(p).anyMatch(this::isEmpty);
 	}
 
 	public boolean canMove(int p) {
@@ -244,15 +248,17 @@ public class Board extends GameEntity {
 		/*@formatter:on*/
 	}
 
-	public Vector2 centerPoint(int p) {
-		return new Vector2(COORD_X[p] * width / 6, COORD_Y[p] * height / 6);
-	}
-
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			showPositionNumbers = !showPositionNumbers;
 		}
+	}
+
+	// Draw related methods
+
+	public Vector2 centerPoint(int p) {
+		return new Vector2(COORD_X[p] * width / 6, COORD_Y[p] * height / 6);
 	}
 
 	@Override

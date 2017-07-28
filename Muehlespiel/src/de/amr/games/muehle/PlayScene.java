@@ -50,6 +50,10 @@ public class PlayScene extends Scene<MillApp> {
 	private int numBlackStonesSet;
 	private boolean mustRemoveOppositeStone;
 
+	private StonesPlacedIndicator placedWhiteIndicator;
+	private StonesPlacedIndicator placedBlackIndicator;
+	private StoneRemovalIndicator removalIndicator;
+
 	private final PlayControl playControl = new PlayControl();
 
 	private class PlayControl extends StateMachine<GamePhase, String> {
@@ -138,9 +142,15 @@ public class PlayScene extends Scene<MillApp> {
 
 	public PlayScene(MillApp app) {
 		super(app);
-		setBgColor(Color.WHITE);
 		mouse = new Mouse();
 		app.getShell().getCanvas().addMouseListener(mouse);
+		setBgColor(Color.WHITE);
+		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> numWhiteStonesSet);
+		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
+		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> numBlackStonesSet);
+		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
+		removalIndicator = new StoneRemovalIndicator(BLACK);
+		removalIndicator.tf.moveTo(getWidth() / 2, getHeight() - 50);
 	}
 
 	private int findBoardPosition(int x, int y) {
@@ -295,27 +305,19 @@ public class PlayScene extends Scene<MillApp> {
 			startText.draw(g);
 			return;
 		}
+
 		if (playControl.is(PLACING)) {
-			int offset = 5;
-			Stone whiteStone = new Stone(StoneColor.WHITE);
-			whiteStone.tf.moveTo(50, getHeight() - 50);
-			whiteStone.draw(g);
-			g.setColor(Color.BLACK);
-			g.drawString(String.valueOf(NUM_STONES - numWhiteStonesSet), (int) whiteStone.tf.getX() - offset,
-					(int) whiteStone.tf.getY() + offset);
-			Stone blackStone = new Stone(StoneColor.BLACK);
-			blackStone.tf.moveTo(getWidth() - 50, getHeight() - 50);
-			blackStone.draw(g);
-			g.setColor(Color.WHITE);
-			g.drawString(String.valueOf(NUM_STONES - numBlackStonesSet), (int) blackStone.tf.getX() - offset,
-					(int) blackStone.tf.getY() + offset);
-			if (turn == WHITE) {
-				highlightStone(g, whiteStone);
-			} else {
-				highlightStone(g, blackStone);
+			placedWhiteIndicator.draw(g);
+			placedBlackIndicator.draw(g);
+			highlightStone(g, turn == WHITE ? placedWhiteIndicator : placedBlackIndicator);
+
+			if (mustRemoveOppositeStone) {
+				removalIndicator.setStoneColor(oppositeTurn());
+				removalIndicator.draw(g);
 			}
 			return;
 		}
+
 		if (playControl.is(MOVING)) {
 			if (move.getFrom() != -1) {
 				markPosition(g, move.getFrom(), Color.GREEN, 10);

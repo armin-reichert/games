@@ -10,7 +10,7 @@ public class Stone extends GameEntity {
 
 	public static int radius = 20;
 
-	private StoneColor color;
+	protected StoneColor color;
 
 	public Stone(StoneColor color) {
 		this.color = color;
@@ -18,6 +18,16 @@ public class Stone extends GameEntity {
 
 	public StoneColor getColor() {
 		return color;
+	}
+
+	@Override
+	public int getWidth() {
+		return 2 * radius;
+	}
+
+	@Override
+	public int getHeight() {
+		return 2 * radius;
 	}
 
 	@Override
