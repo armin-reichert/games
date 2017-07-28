@@ -11,18 +11,19 @@ import static de.amr.games.muehle.GamePhase.PLACING;
 import static de.amr.games.muehle.GamePhase.STARTED;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
+import static java.lang.Math.round;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.mouse.Mouse;
@@ -115,7 +116,7 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(MOVING, GAME_OVER, PlayScene.this::gameIsOver);
+			change(MOVING, GAME_OVER, PlayScene.this::isGameOver);
 
 			change(MOVING, MOVING, () -> move.isComplete(), (s, t) -> {
 				if (board.isInsideMill(move.getTo(), turn)) {
@@ -200,10 +201,10 @@ public class PlayScene extends Scene<MillApp> {
 		}
 		// An leerer Position p Stein setzen:
 		if (turn == WHITE) {
-			board.placeStoneAt(p, WHITE);
+			board.putStoneAt(p, WHITE);
 			numWhiteStonesSet += 1;
 		} else {
-			board.placeStoneAt(p, BLACK);
+			board.putStoneAt(p, BLACK);
 			numBlackStonesSet += 1;
 		}
 		return p;
@@ -274,7 +275,7 @@ public class PlayScene extends Scene<MillApp> {
 		return null;
 	}
 
-	private boolean gameIsOver() {
+	private boolean isGameOver() {
 		return board.numStones(turn) == 2 || board.cannotMove(turn);
 	}
 
@@ -317,14 +318,10 @@ public class PlayScene extends Scene<MillApp> {
 		}
 		if (playControl.is(MOVING)) {
 			if (move.getFrom() != -1) {
-				Point p = board.computeCenterPoint(move.getFrom());
-				g.setColor(Color.GREEN);
-				g.fillOval(Math.round(board.tf.getX() + p.x) - 5, Math.round(board.tf.getY() + p.y) - 5, 10, 10);
+				markPosition(g, move.getFrom(), Color.GREEN, 10);
 			}
 			if (move.getTo() != -1) {
-				Point p = board.computeCenterPoint(move.getTo());
-				g.setColor(Color.RED);
-				g.fillOval(Math.round(board.tf.getX() + p.x) - 5, Math.round(board.tf.getY() + p.y) - 5, 10, 10);
+				markPosition(g, move.getTo(), Color.RED, 10);
 			}
 			String text = (turn == WHITE ? "Weiß" : "Schwarz") + " am Zug";
 			g.setColor(Color.BLACK);
@@ -332,6 +329,15 @@ public class PlayScene extends Scene<MillApp> {
 			g.drawString(text, 20, getHeight() - 20);
 			return;
 		}
+	}
+
+	private void markPosition(Graphics2D gc, int p, Color color, int markerSize) {
+		Graphics2D g = (Graphics2D) gc.create();
+		Vector2 center = board.centerPoint(p);
+		g.translate(board.tf.getX(), board.tf.getY());
+		g.setColor(color);
+		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
+		g.dispose();
 	}
 
 	private void highlightStone(Graphics2D gc, Stone stone) {

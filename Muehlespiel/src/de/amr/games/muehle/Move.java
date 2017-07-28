@@ -5,6 +5,7 @@ import static de.amr.games.muehle.Move.MoveState.KNOWS_FROM;
 import static de.amr.games.muehle.Move.MoveState.READY;
 import static de.amr.games.muehle.Move.MoveState.RUNNING;
 
+import java.awt.Point;
 import java.awt.geom.Ellipse2D;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -24,7 +25,7 @@ public class Move {
 	private int from;
 	private int to;
 
-	// State machine
+	// State machine for controlling the move phases
 
 	private final MoveControl control = new MoveControl();
 
@@ -49,7 +50,6 @@ public class Move {
 
 			change(KNOWS_FROM, RUNNING, () -> board.emptyNeighbors(from).count() == 1, (s, t) -> {
 				to = board.emptyNeighbors(from).findFirst().getAsInt();
-				// direction = board.getDirection(from, to);
 			});
 
 			change(KNOWS_FROM, RUNNING, () -> to != -1);
@@ -122,8 +122,9 @@ public class Move {
 
 	private boolean isEndPositionReached() {
 		Stone stone = board.getStoneAt(from);
-		Ellipse2D center = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-		return center.contains(board.computeCenterPoint(to));
+		Vector2 center = board.centerPoint(to);
+		Ellipse2D spot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
+		return spot.contains(new Point(center.roundedX(), center.roundedY()));
 	}
 
 	private Vector2 computeVelocity(Direction direction) {

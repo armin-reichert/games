@@ -22,16 +22,16 @@ public class TestScene extends Scene<MillApp> {
 		brett.tf.moveTo(100, 100);
 		app.entities.add(brett);
 
-		brett.placeStoneAt(0, WHITE);
-		brett.placeStoneAt(2, WHITE);
-		brett.placeStoneAt(14, WHITE);
-		brett.placeStoneAt(2, WHITE);
-		brett.placeStoneAt(23, WHITE);
-		brett.placeStoneAt(15, BLACK);
-		brett.placeStoneAt(16, BLACK);
-		brett.placeStoneAt(17, BLACK);
-		brett.placeStoneAt(19, BLACK);
-		brett.placeStoneAt(22, BLACK);
+		brett.putStoneAt(0, WHITE);
+		brett.putStoneAt(2, WHITE);
+		brett.putStoneAt(14, WHITE);
+		brett.putStoneAt(2, WHITE);
+		brett.putStoneAt(23, WHITE);
+		brett.putStoneAt(15, BLACK);
+		brett.putStoneAt(16, BLACK);
+		brett.putStoneAt(17, BLACK);
+		brett.putStoneAt(19, BLACK);
+		brett.putStoneAt(22, BLACK);
 
 		for (int p = 0; p < 24; p += 1) {
 			Mill muehle;

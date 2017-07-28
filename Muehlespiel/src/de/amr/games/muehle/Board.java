@@ -1,5 +1,6 @@
 package de.amr.games.muehle;
 
+import static de.amr.easy.game.math.Vector2.dist;
 import static de.amr.games.muehle.Direction.EAST;
 import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
@@ -9,7 +10,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.util.Objects;
@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.math.Vector2;
 
 /**
  * Das Mühlebrett.
@@ -87,15 +88,19 @@ public class Board extends GameEntity {
 		return height;
 	}
 
+	// Allocation related methods and predicates:
+
 	public void clear() {
 		stones = new Stone[NUM_POS];
 	}
 
-	public void placeStoneAt(int p, StoneColor color) {
+	public void putStoneAt(int p, StoneColor color) {
+		if (stones[p] != null) {
+			throw new IllegalStateException("Zielposition muss leer sein");
+		}
 		Stone stone = new Stone(color);
+		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
-		Point center = computeCenterPoint(p);
-		stone.tf.moveTo(center.x, center.y);
 	}
 
 	public void removeStoneAt(int p) {
@@ -111,8 +116,7 @@ public class Board extends GameEntity {
 		}
 		Stone stone = stones[from];
 		stones[to] = stone;
-		Point toPoint = computeCenterPoint(to);
-		stone.tf.moveTo((float) toPoint.getX(), (float) toPoint.getY());
+		stone.tf.moveTo(centerPoint(to));
 		stones[from] = null;
 	}
 
@@ -120,8 +124,12 @@ public class Board extends GameEntity {
 		return stones[p];
 	}
 
+	public boolean isEmpty(int p) {
+		return stones[p] == null;
+	}
+
 	public boolean hasStoneAt(int p) {
-		return getStoneAt(p) != null;
+		return stones[p] != null;
 	}
 
 	public IntStream positions() {
@@ -153,6 +161,10 @@ public class Board extends GameEntity {
 		return neighbors(p).anyMatch(q -> !hasStoneAt(q));
 	}
 
+	public boolean canMove(int p) {
+		return hasStoneAt(p) && hasEmptyNeighbor(p);
+	}
+
 	public boolean cannotMove(StoneColor color) {
 		return positions().filter(p -> hasStoneAt(p) && getStoneAt(p).getColor() == color)
 				.allMatch(p -> emptyNeighbors(p).count() == 0);
@@ -175,12 +187,7 @@ public class Board extends GameEntity {
 	}
 
 	public int findNearestPosition(int x, int y, int radius) {
-		return positions().filter(p -> {
-			Point center = computeCenterPoint(p);
-			int dx = center.x - x;
-			int dy = center.y - y;
-			return dx * dx + dy * dy <= radius * radius;
-		}).findFirst().orElse(-1);
+		return positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
 	}
 
 	public boolean isInsideMill(int p, StoneColor color) {
@@ -237,8 +244,8 @@ public class Board extends GameEntity {
 		/*@formatter:on*/
 	}
 
-	public Point computeCenterPoint(int p) {
-		return new Point(COORD_X[p] * width / 6, COORD_Y[p] * height / 6);
+	public Vector2 centerPoint(int p) {
+		return new Vector2(COORD_X[p] * width / 6, COORD_Y[p] * height / 6);
 	}
 
 	@Override
@@ -261,10 +268,10 @@ public class Board extends GameEntity {
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(posRadius / 2));
 		positions().forEach(p -> {
-			Point centerFrom = computeCenterPoint(p);
+			Vector2 centerFrom = centerPoint(p);
 			neighbors(p).forEach(q -> {
-				Point centerTo = computeCenterPoint(q);
-				g.drawLine(centerFrom.x, centerFrom.y, centerTo.x, centerTo.y);
+				Vector2 centerTo = centerPoint(q);
+				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(), centerTo.roundedY());
 			});
 		});
 
@@ -272,8 +279,8 @@ public class Board extends GameEntity {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
 		positions().forEach(p -> {
-			Point center = computeCenterPoint(p);
-			g.fillOval(center.x - posRadius, center.y - posRadius, 2 * posRadius, 2 * posRadius);
+			Vector2 center = centerPoint(p);
+			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
 			if (showPositionNumbers) {
 				g.drawString(p + "", center.x + 3 * posRadius, center.y + 3 * posRadius);
 			}
