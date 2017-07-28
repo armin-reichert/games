@@ -90,7 +90,7 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					int p = tryToPlaceStone(findClickPosition());
 					if (p != -1) {
-						if (board.isInsideMill(p, turn)) {
+						if (board.isPositionInsideMill(p, turn)) {
 							mustRemoveOppositeStone = true;
 						} else {
 							nextTurn();
@@ -122,10 +122,8 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLAYING, GAME_OVER, PlayScene.this::isGameOver);
-
 			change(PLAYING, PLAYING, () -> move.isComplete(), (s, t) -> {
-				if (board.isInsideMill(move.getTo(), turn)) {
+				if (board.isPositionInsideMill(move.getTo(), turn)) {
 					mustRemoveOppositeStone = true;
 					LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
 				} else {
@@ -134,15 +132,16 @@ public class PlayScene extends Scene<MillApp> {
 				move.init();
 			});
 
+			change(PLAYING, GAME_OVER, PlayScene.this::isGameOver);
+
 			// GAME_OVER
 
 			state(GAME_OVER).entry = s -> {
 				winner = oppositeTurn();
-				LOG.info("Gewinner ist " + winner);
+				LOG.info(winner == WHITE ? "Weiß gewinnt" : "Schwarz gewinnt");
 			};
 
 			change(GAME_OVER, STARTED, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-
 		}
 	}
 
@@ -178,7 +177,7 @@ public class PlayScene extends Scene<MillApp> {
 		startText = new ScrollingText();
 		startText.setColor(Color.BLACK);
 		startText.setFont(new Font("Sans", Font.PLAIN, 20));
-		startText.setText("Drücke SPACE zum Start");
+		startText.setText("Drücke SPACE für neues Spiel");
 		startText.tf.moveTo(0, getHeight() - 40);
 		app.entities.add(startText);
 
@@ -206,7 +205,6 @@ public class PlayScene extends Scene<MillApp> {
 
 	private int tryToPlaceStone(int p) {
 		if (p == -1) {
-			LOG.info("Keine gültige Brettposition");
 			return -1;
 		}
 		if (board.hasStoneAt(p)) {
@@ -225,7 +223,6 @@ public class PlayScene extends Scene<MillApp> {
 
 	private boolean tryToRemoveStone(int p, StoneColor color) {
 		if (p == -1) {
-			LOG.info("Keine gültige Brettposition");
 			return false;
 		}
 		if (!board.hasStoneAt(p)) {
@@ -236,7 +233,7 @@ public class PlayScene extends Scene<MillApp> {
 			LOG.info("Stein an Klickposition besitzt die falsche Farbe");
 			return false;
 		}
-		if (board.isInsideMill(p, color) && !board.allStonesOfColorInsideMills(color)) {
+		if (board.isPositionInsideMill(p, color) && !board.areAllStonesInsideMill(color)) {
 			LOG.info("Stein darf nicht aus Mühle entfernt werden, weil anderer Stein außerhalb Mühle existiert");
 			return false;
 		}
@@ -353,17 +350,18 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void markRemovableStones(Graphics2D g) {
 		StoneColor colorToRemove = oppositeTurn();
-		boolean allInMill = board.allStonesOfColorInsideMills(colorToRemove);
-		board.positions(colorToRemove).filter(p -> allInMill || !board.isInsideMill(p, oppositeTurn())).forEach(p -> {
-			Stone stone = board.getStoneAt(p);
-			g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
-					board.tf.getY() + stone.tf.getY() - stone.getHeight() / 2);
-			g.setColor(Color.RED);
-			g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-			g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-			g.translate(-board.tf.getX() - stone.tf.getX() + stone.getWidth() / 2,
-					-board.tf.getY() - stone.tf.getY() + stone.getHeight() / 2);
-		});
+		boolean allInMill = board.areAllStonesInsideMill(colorToRemove);
+		board.positions(colorToRemove).filter(p -> allInMill || !board.isPositionInsideMill(p, oppositeTurn()))
+				.forEach(p -> {
+					Stone stone = board.getStoneAt(p);
+					g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
+							board.tf.getY() + stone.tf.getY() - stone.getHeight() / 2);
+					g.setColor(Color.RED);
+					g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+					g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+					g.translate(-board.tf.getX() - stone.tf.getX() + stone.getWidth() / 2,
+							-board.tf.getY() - stone.tf.getY() + stone.getHeight() / 2);
+				});
 	}
 
 	private void markPosition(Graphics2D gc, int p, Color color, int markerSize) {

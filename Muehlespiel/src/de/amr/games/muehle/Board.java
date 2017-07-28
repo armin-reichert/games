@@ -200,8 +200,8 @@ public class Board extends GameEntity {
 		return neighbors(p).anyMatch(n -> n == q);
 	}
 
-	public boolean areNeighbors(int p, int q, Direction r) {
-		return NEIGHBORS[p][r.ordinal()] == q;
+	public boolean areNeighbors(int p, int q, Direction dir) {
+		return NEIGHBORS[p][dir.ordinal()] == q;
 	}
 
 	public Direction getDirection(int p, int q) {
@@ -212,7 +212,7 @@ public class Board extends GameEntity {
 		return positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
 	}
 
-	public boolean isInsideMill(int p, StoneColor color) {
+	public boolean isPositionInsideMill(int p, StoneColor color) {
 		return findContainingMill(p, color, true) != null || findContainingMill(p, color, false) != null;
 	}
 
@@ -257,14 +257,18 @@ public class Board extends GameEntity {
 		return null;
 	}
 
-	public boolean allStonesOfColorInsideMills(StoneColor color) {
-		/*@formatter:off*/
-		return positions()
-				.filter(this::hasStoneAt)
-				.filter(p -> getStoneAt(p).getColor() == color)
-				.allMatch(p -> isInsideMill(p, color));
-		/*@formatter:on*/
+	/**
+	 * Tells if all stones of the given color are inside some mill.
+	 * 
+	 * @param color
+	 *          stone color
+	 * @return if all stones of given color are inside some mill
+	 */
+	public boolean areAllStonesInsideMill(StoneColor color) {
+		return positions(color).allMatch(p -> isPositionInsideMill(p, color));
 	}
+
+	// Keyboard shortcuts
 
 	@Override
 	public void update() {
