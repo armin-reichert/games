@@ -7,6 +7,7 @@ import static de.amr.games.muehle.Move.MoveState.RUNNING;
 
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
+import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -16,11 +17,11 @@ import de.amr.easy.statemachine.StateMachine;
 
 public class Move {
 
+	public DoubleSupplier speedSupplier;
 	public IntSupplier startPositionSupplier;
 	public Supplier<Direction> directionSupplier;
 
 	private final Board board;
-	private final float speed;
 
 	private int from;
 	private int to;
@@ -54,7 +55,7 @@ public class Move {
 
 			change(KNOWS_FROM, RUNNING, () -> to != -1);
 
-			state(RUNNING).entry = s -> getStone().tf.setVelocity(computeVelocity(board.getDirection(from, to)));
+			state(RUNNING).entry = s -> getStone().tf.setVelocity(computeVelocity());
 
 			state(RUNNING).update = s -> getStone().tf.move();
 
@@ -64,11 +65,11 @@ public class Move {
 		}
 	}
 
-	public Move(Board board, float speed) {
+	public Move(Board board) {
 		this.board = board;
-		this.speed = speed;
 		startPositionSupplier = () -> -1;
 		directionSupplier = () -> null;
+		speedSupplier = () -> 3f;
 		reset();
 	}
 
@@ -123,11 +124,15 @@ public class Move {
 	private boolean isEndPositionReached() {
 		Stone stone = board.getStoneAt(from);
 		Vector2 center = board.centerPoint(to);
+		Vector2 velocity = new Vector2(stone.tf.getVelocityX(), stone.tf.getVelocityY());
+		float speed = velocity.length();
 		Ellipse2D spot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
 		return spot.contains(new Point(center.roundedX(), center.roundedY()));
 	}
 
-	private Vector2 computeVelocity(Direction direction) {
+	private Vector2 computeVelocity() {
+		Direction direction = board.getDirection(from, to);
+		float speed = (float) speedSupplier.getAsDouble();
 		switch (direction) {
 		case NORTH:
 			return new Vector2(0, -speed);

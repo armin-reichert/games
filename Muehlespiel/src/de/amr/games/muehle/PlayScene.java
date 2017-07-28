@@ -1,6 +1,7 @@
 package de.amr.games.muehle;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.math.Vector2.dist;
 import static de.amr.games.muehle.Direction.EAST;
 import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
@@ -35,8 +36,8 @@ import de.amr.games.muehle.mouse.Mouse;
  */
 public class PlayScene extends Scene<MillApp> {
 
-	private final int NUM_STONES = 9;
-	private final float STONE_SPEED = 3f;
+	private static final int NUM_STONES = 9;
+	private static final float SECONDS_PER_MOVE = 1f;
 
 	private final Mouse mouse;
 
@@ -102,9 +103,10 @@ public class PlayScene extends Scene<MillApp> {
 			// MOVING
 
 			state(MOVING).entry = s -> {
-				move = new Move(board, STONE_SPEED);
+				move = new Move(board);
 				move.startPositionSupplier = PlayScene.this::supplyMoveStartPosition;
 				move.directionSupplier = PlayScene.this::supplyMoveDirection;
+				move.speedSupplier = PlayScene.this::supplyMoveSpeed;
 				move.init();
 			};
 
@@ -280,6 +282,12 @@ public class PlayScene extends Scene<MillApp> {
 			return WEST;
 		}
 		return null;
+	}
+
+	private double supplyMoveSpeed() {
+		Vector2 centerFrom = board.centerPoint(move.getFrom());
+		Vector2 centerTo = board.centerPoint(move.getTo());
+		return dist(centerFrom, centerTo) / app.pulse.secToTicks(SECONDS_PER_MOVE);
 	}
 
 	private boolean isGameOver() {
