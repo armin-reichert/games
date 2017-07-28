@@ -5,6 +5,8 @@ import static de.amr.games.muehle.Direction.EAST;
 import static de.amr.games.muehle.Direction.NORTH;
 import static de.amr.games.muehle.Direction.SOUTH;
 import static de.amr.games.muehle.Direction.WEST;
+import static java.lang.Math.abs;
+import static java.lang.Math.round;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -27,7 +29,6 @@ import de.amr.easy.game.math.Vector2;
  */
 public class Board extends GameEntity {
 
-	/** Anzahl Brettpositionen. */
 	public static final int NUM_POS = 24;
 
 	/* NEIGHBORS[p] = { Nachbar(Norden), Nachbar(Osten), Nachbar(Süden), Nachbar(Westen) } */
@@ -60,9 +61,12 @@ public class Board extends GameEntity {
 			/*@formatter:on*/
 	};
 
-	/* (relative) coordinates of board positions */
-	private static final int[] COORD_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
-	private static final int[] COORD_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
+	/*
+	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6]
+	 * grid.
+	 */
+	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
+	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
 	private int width;
 	private int height;
@@ -86,6 +90,12 @@ public class Board extends GameEntity {
 	@Override
 	public int getHeight() {
 		return height;
+	}
+
+	public int findPosition(int x, int y) {
+		int boardX = abs(round(x - tf.getX()));
+		int boardY = abs(round(y - tf.getY()));
+		return findNearestPosition(boardX, boardY, getWidth() / 18);
 	}
 
 	// Allocation related methods and predicates:
@@ -266,7 +276,7 @@ public class Board extends GameEntity {
 	// Draw related methods
 
 	public Vector2 centerPoint(int p) {
-		return new Vector2(COORD_X[p] * width / 6, COORD_Y[p] * height / 6);
+		return new Vector2(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
 	}
 
 	@Override

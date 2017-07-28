@@ -12,7 +12,6 @@ import static de.amr.games.muehle.GamePhase.PLAYING;
 import static de.amr.games.muehle.GamePhase.STARTED;
 import static de.amr.games.muehle.StoneColor.BLACK;
 import static de.amr.games.muehle.StoneColor.WHITE;
-import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
 import java.awt.BasicStroke;
@@ -201,17 +200,8 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Placing
 
-	private int findBoardPosition(int x, int y) {
-		int boardX = abs(round(x - board.tf.getX()));
-		int boardY = abs(round(y - board.tf.getY()));
-		return board.findNearestPosition(boardX, boardY, board.getWidth() / 18);
-	}
-
 	private int findClickPosition() {
-		if (mouse.clicked()) {
-			return findBoardPosition(mouse.getX(), mouse.getY());
-		}
-		return -1;
+		return mouse.clicked() ? board.findPosition(mouse.getX(), mouse.getY()) : -1;
 	}
 
 	private int tryToPlaceStone(int p) {
@@ -260,7 +250,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (!mouse.clicked())
 			return -1;
 
-		int from = findBoardPosition(mouse.getX(), mouse.getY());
+		int from = board.findPosition(mouse.getX(), mouse.getY());
 		if (from == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return -1;
