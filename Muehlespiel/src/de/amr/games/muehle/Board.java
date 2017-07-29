@@ -152,7 +152,7 @@ public class Board extends GameEntity {
 		return stones[p] != null;
 	}
 
-	public IntStream positions(StoneColor color) {
+	public IntStream positionsWithStone(StoneColor color) {
 		return positions().filter(this::hasStoneAt).filter(p -> getStoneAt(p).getColor() == color);
 	}
 
@@ -214,11 +214,11 @@ public class Board extends GameEntity {
 	}
 
 	public boolean cannotMoveStones(StoneColor color) {
-		return positions(color).allMatch(p -> emptyNeighbors(p).count() == 0);
+		return positionsWithStone(color).allMatch(p -> emptyNeighbors(p).count() == 0);
 	}
 
 	public IntStream allMovableStonePositions(StoneColor color) {
-		return positions(color).filter(this::hasEmptyNeighbor);
+		return positionsWithStone(color).filter(this::hasEmptyNeighbor);
 	}
 
 	public int findNearestPosition(int x, int y, int radius) {
@@ -230,7 +230,7 @@ public class Board extends GameEntity {
 	}
 
 	public boolean areAllStonesInsideMill(StoneColor color) {
-		return positions(color).allMatch(p -> isPositionInsideMill(p, color));
+		return positionsWithStone(color).allMatch(p -> isPositionInsideMill(p, color));
 	}
 
 	public Mill findContainingMill(int p, StoneColor color, boolean horizontal) {

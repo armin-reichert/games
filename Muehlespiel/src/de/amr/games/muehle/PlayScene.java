@@ -20,6 +20,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.util.stream.IntStream;
 
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.input.Keyboard;
@@ -49,8 +50,8 @@ public class PlayScene extends Scene<MillApp> {
 	private Move move;
 	private StoneColor turn;
 	private StoneColor winner;
-	private int numWhiteStonesSet;
-	private int numBlackStonesSet;
+	private int whiteStonesSet;
+	private int blackStonesSet;
 	private boolean mustRemoveOppositeStone;
 
 	private final PlayControl playControl = new PlayControl();
@@ -64,18 +65,14 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(STARTED).entry = s -> newGame();
 
-			state(STARTED).exit = s -> {
-				startText.visibility = () -> false;
-			};
-
 			change(STARTED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 			// PLACING
 
 			state(PLACING).entry = s -> {
 				turn = WHITE;
-				numWhiteStonesSet = 0;
-				numBlackStonesSet = 0;
+				whiteStonesSet = 0;
+				blackStonesSet = 0;
 				mustRemoveOppositeStone = false;
 			};
 
@@ -97,7 +94,7 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLACING, PLAYING, () -> numBlackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
+			change(PLACING, PLAYING, () -> blackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
 
 			// MOVING
 
@@ -161,10 +158,10 @@ public class PlayScene extends Scene<MillApp> {
 		board = new Board(600, 600);
 		board.center(getWidth(), getHeight());
 
-		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> numWhiteStonesSet);
+		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> whiteStonesSet);
 		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
 
-		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> numBlackStonesSet);
+		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> blackStonesSet);
 		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 
 		startText = new ScrollingText();
@@ -204,10 +201,10 @@ public class PlayScene extends Scene<MillApp> {
 		}
 		if (turn == WHITE) {
 			board.putStoneAt(p, WHITE);
-			numWhiteStonesSet += 1;
+			whiteStonesSet += 1;
 		} else {
 			board.putStoneAt(p, BLACK);
-			numBlackStonesSet += 1;
+			blackStonesSet += 1;
 		}
 		return p;
 	}
@@ -234,6 +231,10 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving
 
+	private boolean canJump() {
+		return board.numStones(turn) == 3;
+	}
+
 	private void tryToMoveStone() {
 		if (move.getFrom() == -1) {
 			supplyMoveStartPosition();
@@ -253,7 +254,7 @@ public class PlayScene extends Scene<MillApp> {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return;
 		}
-		if (!board.hasEmptyNeighbor(from)) {
+		if (!canJump() && !board.hasEmptyNeighbor(from)) {
 			LOG.info("Stein an dieser Position kann nicht ziehen");
 			return;
 		}
@@ -263,15 +264,16 @@ public class PlayScene extends Scene<MillApp> {
 			return;
 		}
 		if (turn != stone.getColor()) {
-			LOG.info(stone.getColor() + " ist nicht am Zug");
+			LOG.info((stone.getColor() == WHITE ? "Weiß" : "Schwarz") + " ist nicht am Zug");
 			return;
 		}
 		move.setFrom(from);
 	}
 
 	private void supplyMoveEndPosition() {
+
 		// unique target position?
-		if (board.emptyNeighbors(move.getFrom()).count() == 1) {
+		if (!canJump() && board.emptyNeighbors(move.getFrom()).count() == 1) {
 			move.setTo(board.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
 			return;
 		}
@@ -287,7 +289,10 @@ public class PlayScene extends Scene<MillApp> {
 		// target position clicked?
 		if (mouse.clicked()) {
 			int p = board.findPosition(mouse.getX(), mouse.getY());
-			if (p != -1 && board.areNeighbors(move.getFrom(), p) && board.isEmpty(p)) {
+			if (p == -1 || board.hasStoneAt(p)) {
+				return;
+			}
+			if (canJump() || board.areNeighbors(move.getFrom(), p)) {
 				move.setTo(p);
 				return;
 			}
@@ -324,10 +329,11 @@ public class PlayScene extends Scene<MillApp> {
 		g.setColor(getBgColor());
 		g.fillRect(0, 0, getWidth(), getHeight());
 		board.draw(g);
-		drawStatus(g);
+		drawStateInformation(g);
 	}
 
-	private void drawStatus(Graphics2D g) {
+	private void drawStateInformation(Graphics2D g) {
+
 		if (playControl.is(STARTED)) {
 			startText.hCenter(getWidth());
 			startText.draw(g);
@@ -369,16 +375,18 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void markAllPossibleMoveStarts(Graphics2D g) {
-		board.allMovableStonePositions(turn).forEach(p -> {
+		IntStream startPositions = canJump() ? board.positionsWithStone(turn) : board.allMovableStonePositions(turn);
+		startPositions.forEach(p -> {
 			markPosition(g, p, Color.GREEN, 10);
 		});
+		startPositions.close();
 	}
 
 	private void markRemovableStones(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		StoneColor colorToRemove = oppositeTurn();
 		boolean allInMill = board.areAllStonesInsideMill(colorToRemove);
-		board.positions(colorToRemove).filter(p -> allInMill || !board.isPositionInsideMill(p, oppositeTurn()))
+		board.positionsWithStone(colorToRemove).filter(p -> allInMill || !board.isPositionInsideMill(p, oppositeTurn()))
 				.forEach(p -> {
 					Stone stone = board.getStoneAt(p);
 					g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,

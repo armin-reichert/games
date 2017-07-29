@@ -15,7 +15,7 @@ public class Move {
 
 	private int from;
 	private int to;
-	private boolean running;
+	private boolean moving;
 	private boolean complete;
 
 	public Move(Board board, DoubleSupplier speedSupplier) {
@@ -27,7 +27,7 @@ public class Move {
 	public void reset() {
 		from = -1;
 		to = -1;
-		running = false;
+		moving = false;
 		complete = false;
 	}
 
@@ -52,18 +52,33 @@ public class Move {
 	}
 
 	public void run() {
+		if (board.areNeighbors(from, to)) {
+			move();
+		} else {
+			jump();
+		}
+	}
+
+	private void move() {
 		Stone stone = board.getStoneAt(from);
-		if (!running) {
+		if (!moving) {
 			stone.tf.setVelocity(computeVelocity());
 			LOG.info("Starting move from " + from + " to " + to + " towards " + board.getDirection(from, to));
-			running = true;
+			moving = true;
 		}
 		stone.tf.move();
 		if (isEndPositionReached()) {
-			running = false;
+			moving = false;
 			complete = true;
 			board.moveStone(from, to);
 		}
+	}
+
+	private void jump() {
+		LOG.info("Jumping from " + from + " to " + to);
+		board.moveStone(from, to);
+		moving = false;
+		complete = true;
 	}
 
 	private boolean isEndPositionReached() {
