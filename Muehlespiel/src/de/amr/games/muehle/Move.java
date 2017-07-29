@@ -1,123 +1,68 @@
 package de.amr.games.muehle;
 
-import static de.amr.games.muehle.Move.MoveState.COMPLETE;
-import static de.amr.games.muehle.Move.MoveState.KNOWS_FROM;
-import static de.amr.games.muehle.Move.MoveState.READY;
-import static de.amr.games.muehle.Move.MoveState.RUNNING;
+import static de.amr.easy.game.Application.LOG;
 
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
 import java.util.function.DoubleSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.math.Vector2;
-import de.amr.easy.statemachine.StateMachine;
 
 public class Move {
 
-	public DoubleSupplier speedSupplier;
-	public IntSupplier startPositionSupplier;
-	public Supplier<Direction> directionSupplier;
-
 	private final Board board;
+	private final DoubleSupplier speedSupplier;
 
 	private int from;
 	private int to;
+	private boolean running;
+	private boolean complete;
 
-	// State machine for controlling the move phases
-
-	private final MoveControl control = new MoveControl();
-
-	public enum MoveState {
-		READY, KNOWS_FROM, RUNNING, COMPLETE
-	};
-
-	private class MoveControl extends StateMachine<MoveState, String> {
-
-		public MoveControl() {
-			super("Move Control", MoveState.class, READY);
-
-			state(READY).entry = s -> reset();
-
-			change(READY, KNOWS_FROM, () -> startPositionSupplier.getAsInt() != -1, (s, t) -> {
-				setFrom(startPositionSupplier.getAsInt());
-			});
-
-			change(READY, KNOWS_FROM, () -> from != -1);
-
-			state(KNOWS_FROM).update = s -> computeTo(directionSupplier.get());
-
-			change(KNOWS_FROM, RUNNING, () -> board.emptyNeighbors(from).count() == 1, (s, t) -> {
-				to = board.emptyNeighbors(from).findFirst().getAsInt();
-			});
-
-			change(KNOWS_FROM, RUNNING, () -> to != -1);
-
-			state(RUNNING).entry = s -> getStone().tf.setVelocity(computeVelocity());
-
-			state(RUNNING).update = s -> getStone().tf.move();
-
-			change(RUNNING, COMPLETE, () -> isEndPositionReached());
-
-			state(RUNNING).exit = s -> board.moveStone(from, to);
-		}
-	}
-
-	public Move(Board board) {
+	public Move(Board board, DoubleSupplier speedSupplier) {
 		this.board = board;
-		startPositionSupplier = () -> -1;
-		directionSupplier = () -> null;
-		speedSupplier = () -> 3f;
+		this.speedSupplier = speedSupplier;
 		reset();
 	}
 
-	private void reset() {
+	public void reset() {
 		from = -1;
 		to = -1;
+		running = false;
+		complete = false;
 	}
 
-	public void init() {
-		control.init();
-		control.setLogger(Application.LOG);
-	}
-
-	public void update() {
-		control.update();
+	public void setFrom(int p) {
+		from = p;
 	}
 
 	public int getFrom() {
 		return from;
 	}
 
+	public void setTo(int p) {
+		to = p;
+	}
+
 	public int getTo() {
 		return to;
 	}
 
-	public Stone getStone() {
-		return board.getStoneAt(from);
-	}
-
 	public boolean isComplete() {
-		return control.is(COMPLETE);
+		return complete;
 	}
 
-	// private methods
-
-	private void setFrom(int from) {
-		if (this.from != from) {
-			this.from = from;
-			to = -1;
+	public void run() {
+		Stone stone = board.getStoneAt(from);
+		if (!running) {
+			stone.tf.setVelocity(computeVelocity());
+			LOG.info("Starting move from " + from + " to " + to + " towards " + board.getDirection(from, to));
+			running = true;
 		}
-	}
-
-	private void computeTo(Direction direction) {
-		if (direction != null) {
-			int targetPosition = board.findNeighbor(from, direction);
-			if (targetPosition != -1 && !board.hasStoneAt(targetPosition)) {
-				to = targetPosition;
-			}
+		stone.tf.move();
+		if (isEndPositionReached()) {
+			running = false;
+			complete = true;
+			board.moveStone(from, to);
 		}
 	}
 

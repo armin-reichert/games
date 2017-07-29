@@ -102,11 +102,7 @@ public class PlayScene extends Scene<MillApp> {
 			// MOVING
 
 			state(PLAYING).entry = s -> {
-				move = new Move(board);
-				move.startPositionSupplier = PlayScene.this::supplyMoveStartPosition;
-				move.directionSupplier = PlayScene.this::supplyMoveDirection;
-				move.speedSupplier = PlayScene.this::supplyMoveSpeed;
-				move.init();
+				move = new Move(board, PlayScene.this::supplyMoveSpeed);
 			};
 
 			state(PLAYING).update = s -> {
@@ -116,19 +112,18 @@ public class PlayScene extends Scene<MillApp> {
 						nextTurn();
 					}
 				} else {
-					move.update();
+					moveStone();
+					if (move.isComplete()) {
+						if (board.isPositionInsideMill(move.getTo(), turn)) {
+							LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
+							mustRemoveOppositeStone = true;
+						} else {
+							nextTurn();
+						}
+						move.reset();
+					}
 				}
 			};
-
-			change(PLAYING, PLAYING, () -> move.isComplete(), (s, t) -> {
-				if (board.isPositionInsideMill(move.getTo(), turn)) {
-					mustRemoveOppositeStone = true;
-					LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
-				} else {
-					nextTurn();
-				}
-				move.init();
-			});
 
 			change(PLAYING, GAME_OVER, PlayScene.this::isGameOver);
 
@@ -240,29 +235,53 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving
 
-	private int supplyMoveStartPosition() {
+	private void moveStone() {
+		if (move.getFrom() == -1) {
+			supplyMoveStartPosition();
+		} else if (move.getTo() == -1) {
+			supplyMoveEndPosition();
+		} else {
+			move.run();
+		}
+	}
+
+	private void supplyMoveStartPosition() {
 		if (!mouse.clicked())
-			return -1;
+			return;
 
 		int from = board.findPosition(mouse.getX(), mouse.getY());
 		if (from == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
-			return -1;
+			return;
 		}
 		if (!board.hasEmptyNeighbor(from)) {
 			LOG.info("Stein an dieser Position kann nicht ziehen");
-			return -1;
+			return;
 		}
 		Stone stone = board.getStoneAt(from);
 		if (stone == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
-			return -1;
+			return;
 		}
 		if (turn != stone.getColor()) {
 			LOG.info(stone.getColor() + " ist nicht am Zug");
-			return -1;
+			return;
 		}
-		return from;
+		move.setFrom(from);
+	}
+
+	private void supplyMoveEndPosition() {
+		if (board.emptyNeighbors(move.getFrom()).count() == 1) {
+			move.setTo(board.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
+			return;
+		}
+		Direction dir = supplyMoveDirection();
+		if (dir != null) {
+			int p = board.findNeighbor(move.getFrom(), dir);
+			if (p != -1 && board.isEmpty(p)) {
+				move.setTo(p);
+			}
+		}
 	}
 
 	private Direction supplyMoveDirection() {
