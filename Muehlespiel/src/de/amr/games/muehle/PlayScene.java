@@ -101,18 +101,17 @@ public class PlayScene extends Scene<MillApp> {
 
 			// MOVING
 
-			state(PLAYING).entry = s -> {
-				move = new Move(board, PlayScene.this::supplyMoveSpeed);
-			};
+			state(PLAYING).entry = s -> move = new Move(board, PlayScene.this::supplyMoveSpeed);
 
 			state(PLAYING).update = s -> {
 				if (mustRemoveOppositeStone) {
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
+						LOG.info(turn + " hat gegnerischen Stein weggenommen");
 						mustRemoveOppositeStone = false;
 						nextTurn();
 					}
 				} else {
-					moveStone();
+					tryToMoveStone();
 					if (move.isComplete()) {
 						if (board.isPositionInsideMill(move.getTo(), turn)) {
 							LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
@@ -235,7 +234,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving
 
-	private void moveStone() {
+	private void tryToMoveStone() {
 		if (move.getFrom() == -1) {
 			supplyMoveStartPosition();
 		} else if (move.getTo() == -1) {
@@ -271,15 +270,26 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void supplyMoveEndPosition() {
+		// unique target position?
 		if (board.emptyNeighbors(move.getFrom()).count() == 1) {
 			move.setTo(board.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
 			return;
 		}
+		// direction key pressed?
 		Direction dir = supplyMoveDirection();
 		if (dir != null) {
 			int p = board.findNeighbor(move.getFrom(), dir);
 			if (p != -1 && board.isEmpty(p)) {
 				move.setTo(p);
+				return;
+			}
+		}
+		// target position clicked?
+		if (mouse.clicked()) {
+			int p = board.findPosition(mouse.getX(), mouse.getY());
+			if (p != -1 && board.areNeighbors(move.getFrom(), p) && board.isEmpty(p)) {
+				move.setTo(p);
+				return;
 			}
 		}
 	}
@@ -365,6 +375,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void markRemovableStones(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		StoneColor colorToRemove = oppositeTurn();
 		boolean allInMill = board.areAllStonesInsideMill(colorToRemove);
 		board.positions(colorToRemove).filter(p -> allInMill || !board.isPositionInsideMill(p, oppositeTurn()))
@@ -380,23 +391,21 @@ public class PlayScene extends Scene<MillApp> {
 				});
 	}
 
-	private void markPosition(Graphics2D gc, int p, Color color, int markerSize) {
-		Graphics2D g = (Graphics2D) gc.create();
+	private void markPosition(Graphics2D g, int p, Color color, int markerSize) {
 		Vector2 center = board.centerPoint(p);
 		g.translate(board.tf.getX(), board.tf.getY());
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
 		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
-		g.dispose();
+		g.translate(-board.tf.getX(), -board.tf.getY());
 	}
 
-	private void highlightStone(Graphics2D gc, Stone stone) {
-		Graphics2D g = (Graphics2D) gc.create();
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	private void highlightStone(Graphics2D g, Stone stone) {
 		g.translate(stone.tf.getX() - Stone.radius, stone.tf.getY() - Stone.radius);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setStroke(new BasicStroke(4));
 		g.drawOval(0, 0, 2 * Stone.radius, 2 * Stone.radius);
 		g.translate(-stone.tf.getX() + Stone.radius, -stone.tf.getY() + Stone.radius);
-		g.dispose();
 	}
 }
