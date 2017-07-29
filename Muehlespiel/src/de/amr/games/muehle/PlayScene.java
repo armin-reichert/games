@@ -44,8 +44,7 @@ public class PlayScene extends Scene<MillApp> {
 	private Board board;
 	private StonesPlacedIndicator placedWhiteIndicator;
 	private StonesPlacedIndicator placedBlackIndicator;
-	private ScrollingText startText;
-	private ScrollingText winnerText;
+	private ScrollingText messageText;
 
 	private Move move;
 	private StoneColor turn;
@@ -78,11 +77,13 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> {
 				if (mustRemoveOppositeStone) {
+					messageText.setText(inGerman(turn) + " muss einen " + inGerman(oppositeTurn()) + "en Stein wegnehmen!");
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
 						nextTurn();
 					}
 				} else {
+					messageText.setText(inGerman(turn) + " ist am Setzen!");
 					int p = tryToPlaceStone(findClickPosition());
 					if (p != -1) {
 						if (board.isPositionInsideMill(p, turn)) {
@@ -98,20 +99,22 @@ public class PlayScene extends Scene<MillApp> {
 
 			// MOVING
 
-			state(PLAYING).entry = s -> move = new Move(board, PlayScene.this::supplyMoveSpeed);
+			state(PLAYING).entry = s -> {
+				move = new Move(board, PlayScene.this::supplyMoveSpeed);
+			};
 
 			state(PLAYING).update = s -> {
 				if (mustRemoveOppositeStone) {
+					messageText.setText(inGerman(turn) + " muss einen " + inGerman(oppositeTurn()) + "en Stein wegnehmen!");
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
-						LOG.info(turn + " hat gegnerischen Stein weggenommen");
 						mustRemoveOppositeStone = false;
 						nextTurn();
 					}
 				} else {
+					messageText.setText(inGerman(turn) + " ist am Zug!");
 					tryToMoveStone();
 					if (move.isComplete()) {
 						if (board.isPositionInsideMill(move.getTo(), turn)) {
-							LOG.info(turn + " hat Mühle geschlossen und muss Stein wegnehmen");
 							mustRemoveOppositeStone = true;
 						} else {
 							nextTurn();
@@ -127,7 +130,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(GAME_OVER).entry = s -> {
 				winner = oppositeTurn();
-				LOG.info(winner == WHITE ? "Weiß gewinnt" : "Schwarz gewinnt");
+				messageText.setText(inGerman(winner) + " gewinnt");
 			};
 
 			change(GAME_OVER, STARTED, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
@@ -156,7 +159,8 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void newGame() {
 		board = new Board(600, 600);
-		board.center(getWidth(), getHeight());
+		board.hCenter(getWidth());
+		board.tf.setY(50);
 
 		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> whiteStonesSet);
 		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
@@ -164,17 +168,11 @@ public class PlayScene extends Scene<MillApp> {
 		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> blackStonesSet);
 		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 
-		startText = new ScrollingText();
-		startText.setColor(Color.BLACK);
-		startText.setFont(new Font("Sans", Font.PLAIN, 20));
-		startText.setText("Drücke SPACE für neues Spiel");
-		startText.tf.moveTo(0, getHeight() - 40);
-
-		winnerText = new ScrollingText();
-		winnerText.setColor(Color.BLACK);
-		winnerText.setFont(new Font("Sans", Font.PLAIN, 20));
-		winnerText.setText("Kein Gewinner");
-		winnerText.tf.moveTo(0, getHeight() - 40);
+		messageText = new ScrollingText();
+		messageText.setColor(Color.BLACK);
+		messageText.setFont(new Font("Sans", Font.PLAIN, 20));
+		messageText.setText("Drücke Leertaste für neues Spiel!");
+		messageText.tf.moveTo(0, getHeight() - 50);
 	}
 
 	private void nextTurn() {
@@ -226,6 +224,7 @@ public class PlayScene extends Scene<MillApp> {
 			return false;
 		}
 		board.removeStoneAt(p);
+		LOG.info(turn + " hat gegnerischen Stein weggenommen");
 		return true;
 	}
 
@@ -241,7 +240,7 @@ public class PlayScene extends Scene<MillApp> {
 		} else if (move.getTo() == -1) {
 			supplyMoveEndPosition();
 		} else {
-			move.run();
+			move.execute();
 		}
 	}
 
@@ -264,7 +263,7 @@ public class PlayScene extends Scene<MillApp> {
 			return;
 		}
 		if (turn != stone.getColor()) {
-			LOG.info((stone.getColor() == WHITE ? "Weiß" : "Schwarz") + " ist nicht am Zug");
+			LOG.info(inGerman(stone.getColor()) + " ist nicht am Zug");
 			return;
 		}
 		move.setFrom(from);
@@ -277,23 +276,23 @@ public class PlayScene extends Scene<MillApp> {
 			move.setTo(board.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
 			return;
 		}
-		// direction key pressed?
+		// cursor key pressed?
 		Direction dir = supplyMoveDirection();
 		if (dir != null) {
-			int p = board.findNeighbor(move.getFrom(), dir);
-			if (p != -1 && board.isEmpty(p)) {
-				move.setTo(p);
+			int to = board.findNeighbor(move.getFrom(), dir);
+			if (to != -1 && board.isEmpty(to)) {
+				move.setTo(to);
 				return;
 			}
 		}
-		// target position clicked?
+		// target position selected with mouse click?
 		if (mouse.clicked()) {
-			int p = board.findPosition(mouse.getX(), mouse.getY());
-			if (p == -1 || board.hasStoneAt(p)) {
+			int to = board.findPosition(mouse.getX(), mouse.getY());
+			if (to == -1 || board.hasStoneAt(to)) {
 				return;
 			}
-			if (canJump() || board.areNeighbors(move.getFrom(), p)) {
-				move.setTo(p);
+			if (canJump() || board.areNeighbors(move.getFrom(), to)) {
+				move.setTo(to);
 				return;
 			}
 		}
@@ -334,11 +333,8 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void drawStateInformation(Graphics2D g) {
 
-		if (playControl.is(STARTED)) {
-			startText.hCenter(getWidth());
-			startText.draw(g);
-			return;
-		}
+		messageText.hCenter(getWidth());
+		messageText.draw(g);
 
 		if (playControl.is(PLACING)) {
 			placedWhiteIndicator.draw(g);
@@ -351,30 +347,19 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		if (playControl.is(PLAYING)) {
-			if (move.getFrom() != -1) {
-				markPosition(g, move.getFrom(), Color.ORANGE, 10);
+			if (move.getFrom() == -1) {
+				markPossibleMoveStarts(g);
 			} else {
-				markAllPossibleMoveStarts(g);
+				markPosition(g, move.getFrom(), Color.ORANGE, 10);
 			}
 			if (mustRemoveOppositeStone) {
 				markRemovableStones(g);
 			}
-			String text = (turn == WHITE ? "Weiß" : "Schwarz") + " am Zug";
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Sans", Font.PLAIN, 20));
-			g.drawString(text, 20, getHeight() - 20);
-			return;
-		}
-
-		if (playControl.is(GAME_OVER)) {
-			winnerText.setText(winner == WHITE ? "Weiß gewinnt" : "Schwarz gewinnt");
-			winnerText.hCenter(getWidth());
-			winnerText.draw(g);
 			return;
 		}
 	}
 
-	private void markAllPossibleMoveStarts(Graphics2D g) {
+	private void markPossibleMoveStarts(Graphics2D g) {
 		IntStream startPositions = canJump() ? board.positionsWithStone(turn) : board.allMovableStonePositions(turn);
 		startPositions.forEach(p -> {
 			markPosition(g, p, Color.GREEN, 10);
@@ -415,5 +400,9 @@ public class PlayScene extends Scene<MillApp> {
 		g.setStroke(new BasicStroke(4));
 		g.drawOval(0, 0, 2 * Stone.radius, 2 * Stone.radius);
 		g.translate(-stone.tf.getX() + Stone.radius, -stone.tf.getY() + Stone.radius);
+	}
+
+	private String inGerman(StoneColor c) {
+		return c == StoneColor.WHITE ? "Weiß" : "Schwarz";
 	}
 }

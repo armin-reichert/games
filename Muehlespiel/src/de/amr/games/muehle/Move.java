@@ -51,7 +51,7 @@ public class Move {
 		return complete;
 	}
 
-	public void run() {
+	public void execute() {
 		if (board.areNeighbors(from, to)) {
 			move();
 		} else {
