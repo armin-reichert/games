@@ -1,10 +1,10 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.board;
 
 import static de.amr.easy.game.math.Vector2.dist;
-import static de.amr.games.muehle.Direction.EAST;
-import static de.amr.games.muehle.Direction.NORTH;
-import static de.amr.games.muehle.Direction.SOUTH;
-import static de.amr.games.muehle.Direction.WEST;
+import static de.amr.games.muehle.board.Direction.EAST;
+import static de.amr.games.muehle.board.Direction.NORTH;
+import static de.amr.games.muehle.board.Direction.SOUTH;
+import static de.amr.games.muehle.board.Direction.WEST;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
 

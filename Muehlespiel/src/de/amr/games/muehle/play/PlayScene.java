@@ -1,17 +1,17 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2.dist;
-import static de.amr.games.muehle.Direction.EAST;
-import static de.amr.games.muehle.Direction.NORTH;
-import static de.amr.games.muehle.Direction.SOUTH;
-import static de.amr.games.muehle.Direction.WEST;
-import static de.amr.games.muehle.GamePhase.GAME_OVER;
-import static de.amr.games.muehle.GamePhase.PLACING;
-import static de.amr.games.muehle.GamePhase.PLAYING;
-import static de.amr.games.muehle.GamePhase.STARTED;
-import static de.amr.games.muehle.StoneColor.BLACK;
-import static de.amr.games.muehle.StoneColor.WHITE;
+import static de.amr.games.muehle.board.Direction.EAST;
+import static de.amr.games.muehle.board.Direction.NORTH;
+import static de.amr.games.muehle.board.Direction.SOUTH;
+import static de.amr.games.muehle.board.Direction.WEST;
+import static de.amr.games.muehle.board.StoneColor.BLACK;
+import static de.amr.games.muehle.board.StoneColor.WHITE;
+import static de.amr.games.muehle.play.GamePhase.GAME_OVER;
+import static de.amr.games.muehle.play.GamePhase.PLACING;
+import static de.amr.games.muehle.play.GamePhase.PLAYING;
+import static de.amr.games.muehle.play.GamePhase.STARTED;
 import static java.lang.Math.round;
 
 import java.awt.BasicStroke;
@@ -21,7 +21,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -30,7 +29,14 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.board.Direction;
+import de.amr.games.muehle.board.Move;
+import de.amr.games.muehle.board.Stone;
+import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.mouse.Mouse;
+import de.amr.games.muehle.ui.StonesPlacedIndicator;
 
 /**
  * The play scene of the game.
@@ -40,10 +46,8 @@ import de.amr.games.muehle.mouse.Mouse;
 public class PlayScene extends Scene<MillApp> {
 
 	private static final int NUM_STONES = 9;
-	private static final float SECONDS_PER_MOVE = 1f;
 
-	private ResourceBundle messages;
-
+	private final PlayControl control;
 	private final Mouse mouse;
 
 	private Board board;
@@ -58,8 +62,6 @@ public class PlayScene extends Scene<MillApp> {
 	private int blackStonesSet;
 	private boolean mustRemoveOppositeStone;
 	private boolean assistantOn;
-
-	private final PlayControl playControl = new PlayControl();
 
 	private class PlayControl extends StateMachine<GamePhase, String> {
 
@@ -147,6 +149,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	public PlayScene(MillApp app) {
 		super(app);
+		control = new PlayControl();
 		mouse = new Mouse();
 		app.getShell().getCanvas().addMouseListener(mouse);
 		setBgColor(Color.WHITE);
@@ -154,22 +157,21 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
-		messages = ResourceBundle.getBundle("de.amr.games.muehle.Messages");
-		playControl.setLogger(LOG);
-		playControl.init();
+		control.setLogger(LOG);
+		control.init();
 	}
 
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-			playControl.init();
+			control.init();
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_H)) {
 			assistantOn = !assistantOn;
 			LOG.info("Help assistant is " + (assistantOn ? "on" : "off"));
 		}
 		mouse.poll();
-		playControl.update();
+		control.update();
 		board.update();
 	}
 
@@ -192,7 +194,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void displayMessage(String text, Object... args) {
-		messageDisplay.setText(MessageFormat.format(messages.getString(text), args));
+		messageDisplay.setText(MessageFormat.format(app.messages.getString(text), args));
 	}
 
 	private void nextTurn() {
@@ -290,7 +292,6 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void supplyMoveEndPosition() {
-
 		// unique target position?
 		if (!canJump() && board.emptyNeighbors(move.getFrom()).count() == 1) {
 			move.setTo(board.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
@@ -334,7 +335,7 @@ public class PlayScene extends Scene<MillApp> {
 	private double supplyMoveSpeed() {
 		Vector2 centerFrom = board.centerPoint(move.getFrom());
 		Vector2 centerTo = board.centerPoint(move.getTo());
-		return dist(centerFrom, centerTo) / app.pulse.secToTicks(SECONDS_PER_MOVE);
+		return dist(centerFrom, centerTo) / app.pulse.secToTicks(app.settings.getAsFloat("seconds-per-move"));
 	}
 
 	private boolean isGameOver() {
@@ -362,7 +363,7 @@ public class PlayScene extends Scene<MillApp> {
 		messageDisplay.hCenter(getWidth());
 		messageDisplay.draw(g);
 
-		if (playControl.is(PLACING)) {
+		if (control.is(PLACING)) {
 			placedWhiteIndicator.draw(g);
 			placedBlackIndicator.draw(g);
 			highlightStone(g, turn == WHITE ? placedWhiteIndicator : placedBlackIndicator);
@@ -370,18 +371,20 @@ public class PlayScene extends Scene<MillApp> {
 				markRemovableStones(g);
 			} else {
 				if (assistantOn) {
-					markCloseableMills(g, turn, Color.GREEN);
-					markPositionsForOpening2Mills(g, turn, Color.YELLOW);
-					markCloseableMills(g, oppositeTurn(), Color.RED);
+					markPositionsClosingMills(g, turn, Color.GREEN);
+					markPositionsOpeningTwoMills(g, turn, Color.YELLOW);
+					markPositionsClosingMills(g, oppositeTurn(), Color.RED);
 				}
 			}
 			return;
 		}
 
-		if (playControl.is(PLAYING)) {
+		if (control.is(PLAYING)) {
 			if (move.getFrom() == -1) {
 				markPossibleMoveStarts(g);
-				markOppositeGetsStuckPosition(g);
+				if (assistantOn) {
+					markPositionFixingOpponent(g, Color.RED);
+				}
 			} else {
 				markPosition(g, move.getFrom(), Color.ORANGE, 10);
 			}
@@ -392,21 +395,21 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
-	private void markPositionsForOpening2Mills(Graphics2D g, StoneColor stoneColor, Color color) {
+	private void markPositionsOpeningTwoMills(Graphics2D g, StoneColor stoneColor, Color color) {
 		board.positionsForOpening2Mills(stoneColor).forEach(p -> markPosition(g, p, color, 10));
 	}
 
-	private void markCloseableMills(Graphics2D g, StoneColor stoneColor, Color color) {
+	private void markPositionsClosingMills(Graphics2D g, StoneColor stoneColor, Color color) {
 		board.positionsForClosingMill(stoneColor).forEach(p -> markPosition(g, p, color, 10));
 	}
 
-	private void markOppositeGetsStuckPosition(Graphics2D g) {
-		Set<Integer> oppositeFreePositions = board.freeNeighbors(oppositeTurn());
-		if (oppositeFreePositions.size() == 1) {
+	private void markPositionFixingOpponent(Graphics2D g, Color color) {
+		Set<Integer> oppFreePositions = board.freeNeighbors(oppositeTurn());
+		if (oppFreePositions.size() == 1) {
 			Set<Integer> ownFreePositions = board.freeNeighbors(turn);
-			for (int p : oppositeFreePositions) {
+			for (int p : oppFreePositions) {
 				if (ownFreePositions.contains(p)) {
-					markPosition(g, p, Color.RED, 10);
+					markPosition(g, p, color, 10);
 				}
 			}
 		}

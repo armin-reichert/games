@@ -1,4 +1,4 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.board;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

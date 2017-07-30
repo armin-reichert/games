@@ -1,9 +1,12 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.ui;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.function.IntSupplier;
+
+import de.amr.games.muehle.board.Stone;
+import de.amr.games.muehle.board.StoneColor;
 
 public class StonesPlacedIndicator extends Stone {
 

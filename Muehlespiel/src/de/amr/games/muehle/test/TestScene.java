@@ -1,11 +1,15 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.test;
 
-import static de.amr.games.muehle.StoneColor.BLACK;
-import static de.amr.games.muehle.StoneColor.WHITE;
+import static de.amr.games.muehle.board.StoneColor.BLACK;
+import static de.amr.games.muehle.board.StoneColor.WHITE;
 
 import java.awt.Color;
 
 import de.amr.easy.game.scene.Scene;
+import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.board.Mill;
+import de.amr.games.muehle.board.StoneColor;
 
 public class TestScene extends Scene<MillApp> {
 
