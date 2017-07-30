@@ -22,6 +22,7 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.common.ScrollingText;
@@ -56,6 +57,7 @@ public class PlayScene extends Scene<MillApp> {
 	private int whiteStonesSet;
 	private int blackStonesSet;
 	private boolean mustRemoveOppositeStone;
+	private boolean assistantOn;
 
 	private final PlayControl playControl = new PlayControl();
 
@@ -161,6 +163,10 @@ public class PlayScene extends Scene<MillApp> {
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
 			playControl.init();
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_H)) {
+			assistantOn = !assistantOn;
+			LOG.info("Help assistant is " + (assistantOn ? "on" : "off"));
 		}
 		mouse.poll();
 		playControl.update();
@@ -363,8 +369,11 @@ public class PlayScene extends Scene<MillApp> {
 			if (mustRemoveOppositeStone) {
 				markRemovableStones(g);
 			} else {
-				markClosableMills(g, turn, Color.GREEN);
-				markClosableMills(g, oppositeTurn(), Color.RED);
+				if (assistantOn) {
+					markCloseableMills(g, turn, Color.GREEN);
+					markPositionsForOpening2Mills(g, turn, Color.YELLOW);
+					markCloseableMills(g, oppositeTurn(), Color.RED);
+				}
 			}
 			return;
 		}
@@ -372,6 +381,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (playControl.is(PLAYING)) {
 			if (move.getFrom() == -1) {
 				markPossibleMoveStarts(g);
+				markOppositeGetsStuckPosition(g);
 			} else {
 				markPosition(g, move.getFrom(), Color.ORANGE, 10);
 			}
@@ -382,8 +392,24 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
-	private void markClosableMills(Graphics2D g, StoneColor stoneColor, Color color) {
+	private void markPositionsForOpening2Mills(Graphics2D g, StoneColor stoneColor, Color color) {
+		board.positionsForOpening2Mills(stoneColor).forEach(p -> markPosition(g, p, color, 10));
+	}
+
+	private void markCloseableMills(Graphics2D g, StoneColor stoneColor, Color color) {
 		board.positionsForClosingMill(stoneColor).forEach(p -> markPosition(g, p, color, 10));
+	}
+
+	private void markOppositeGetsStuckPosition(Graphics2D g) {
+		Set<Integer> oppositeFreePositions = board.freeNeighbors(oppositeTurn());
+		if (oppositeFreePositions.size() == 1) {
+			Set<Integer> ownFreePositions = board.freeNeighbors(turn);
+			for (int p : oppositeFreePositions) {
+				if (ownFreePositions.contains(p)) {
+					markPosition(g, p, Color.RED, 10);
+				}
+			}
+		}
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g) {

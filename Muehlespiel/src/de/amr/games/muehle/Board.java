@@ -14,7 +14,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -182,6 +184,10 @@ public class Board extends GameEntity {
 		return stones[p] != null;
 	}
 
+	public boolean containsStoneOfColor(int p, StoneColor color) {
+		return hasStoneAt(p) && getStoneAt(p).getColor() == color;
+	}
+
 	public IntStream positionsWithStone(StoneColor color) {
 		return positions().filter(this::hasStoneAt).filter(p -> getStoneAt(p).getColor() == color);
 	}
@@ -196,6 +202,16 @@ public class Board extends GameEntity {
 
 	public int numStones(StoneColor color) {
 		return (int) stones(color).count();
+	}
+
+	public Set<Integer> freeNeighbors(StoneColor color) {
+		Set<Integer> result = new HashSet<>();
+		positionsWithStone(color).forEach(p -> {
+			emptyNeighbors(p).forEach(n -> {
+				result.add(n);
+			});
+		});
+		return result;
 	}
 
 	// Board topology:
@@ -316,14 +332,28 @@ public class Board extends GameEntity {
 		}
 		int[] row = POSSIBLE_MILLS[p];
 		int h1 = row[0], h2 = row[1];
-		if (hasStoneAt(h1) && getStoneAt(h1).getColor() == color && hasStoneAt(h2) && getStoneAt(h2).getColor() == color) {
+		if (containsStoneOfColor(h1, color) && containsStoneOfColor(h2, color)) {
 			return true;
 		}
 		int v1 = row[2], v2 = row[3];
-		if (hasStoneAt(v1) && getStoneAt(v1).getColor() == color && hasStoneAt(v2) && getStoneAt(v2).getColor() == color) {
+		if (containsStoneOfColor(v1, color) && containsStoneOfColor(v2, color)) {
 			return true;
 		}
 		return false;
+	}
+
+	public IntStream positionsForOpening2Mills(StoneColor color) {
+		return positions().filter(p -> can2MillsBeOpenedAt(p, color));
+	}
+
+	public boolean can2MillsBeOpenedAt(int p, StoneColor color) {
+		if (hasStoneAt(p)) {
+			return false;
+		}
+		int[] row = POSSIBLE_MILLS[p];
+		int h1 = row[0], h2 = row[1], v1 = row[2], v2 = row[3];
+		return (containsStoneOfColor(h1, color) && isEmpty(h2) || isEmpty(h1) && containsStoneOfColor(h2, color))
+				&& (containsStoneOfColor(v1, color) && isEmpty(v2) || isEmpty(v1) && containsStoneOfColor(v2, color));
 	}
 
 	// Drawing related methods
