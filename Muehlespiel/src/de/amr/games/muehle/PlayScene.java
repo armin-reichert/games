@@ -332,7 +332,13 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		return board.numStones(turn) == 2 || board.cannotMoveStones(turn);
+		if (board.numStones(turn) == 2) {
+			return true;
+		}
+		if (canJump()) {
+			return false;
+		}
+		return board.cannotMoveStones(turn);
 	}
 
 	// Drawing
@@ -356,6 +362,8 @@ public class PlayScene extends Scene<MillApp> {
 			highlightStone(g, turn == WHITE ? placedWhiteIndicator : placedBlackIndicator);
 			if (mustRemoveOppositeStone) {
 				markRemovableStones(g);
+			} else {
+				markClosableMills(g, turn);
 			}
 			return;
 		}
@@ -371,6 +379,10 @@ public class PlayScene extends Scene<MillApp> {
 			}
 			return;
 		}
+	}
+
+	private void markClosableMills(Graphics2D g, StoneColor color) {
+		board.positionsForClosingMill(color).forEach(p -> markPosition(g, p, Color.BLUE, 10));
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g) {

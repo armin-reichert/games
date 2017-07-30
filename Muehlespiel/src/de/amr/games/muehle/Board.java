@@ -69,6 +69,36 @@ public class Board extends GameEntity {
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
+	private static final int[][] POSSIBLE_MILLS = {
+			/*@formatter:off*/
+			/* h1, h2, v1, v2 */
+			{ 1, 2, 9, 21 },	
+			{ 0, 2, 4, 7 },
+			{ 0, 1, 14, 23 },
+			{ 4, 5, 10, 18 },
+			{ 3, 5, 1, 7 },
+			{ 3, 4, 13, 20 },
+			{ 7, 8, 11, 15 },
+			{ 6, 8, 1, 4 },
+			{ 6, 7, 12, 17 },
+			{ 10, 11, 0, 21 },
+			{ 9, 11, 3, 18 },
+			{ 9, 10, 6, 15 },
+			{ 13, 14, 8, 17 },
+			{ 12, 14, 5, 20 },
+			{ 12, 13, 2, 23 },
+			{ 16, 17, 6, 11 }, 
+			{ 15, 17, 19, 22 },
+			{ 15, 16, 8, 12 },
+			{ 19, 20, 3, 10 },
+			{ 18, 20, 16, 22 },
+			{ 18, 19, 5, 13 },
+			{ 22, 23, 0, 9 },
+			{ 21, 23, 16, 19 },
+			{ 21, 22, 2, 14 }
+			/*@formatter:on*/
+	};
+
 	private int width;
 	private int height;
 	private int posRadius;
@@ -225,6 +255,8 @@ public class Board extends GameEntity {
 		return positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
 	}
 
+	// Mill related methods
+
 	public boolean isPositionInsideMill(int p, StoneColor color) {
 		return findContainingMill(p, color, true) != null || findContainingMill(p, color, false) != null;
 	}
@@ -272,6 +304,26 @@ public class Board extends GameEntity {
 		}
 
 		return null;
+	}
+
+	public IntStream positionsForClosingMill(StoneColor color) {
+		return positions().filter(p -> canMillBeClosedAt(p, color));
+	}
+
+	public boolean canMillBeClosedAt(int p, StoneColor color) {
+		if (hasStoneAt(p)) {
+			return false;
+		}
+		int[] row = POSSIBLE_MILLS[p];
+		int h1 = row[0], h2 = row[1];
+		if (hasStoneAt(h1) && getStoneAt(h1).getColor() == color && hasStoneAt(h2) && getStoneAt(h2).getColor() == color) {
+			return true;
+		}
+		int v1 = row[2], v2 = row[3];
+		if (hasStoneAt(v1) && getStoneAt(v1).getColor() == color && hasStoneAt(v2) && getStoneAt(v2).getColor() == color) {
+			return true;
+		}
+		return false;
 	}
 
 	// Drawing related methods
