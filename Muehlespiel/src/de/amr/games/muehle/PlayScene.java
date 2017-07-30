@@ -20,6 +20,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.common.ScrollingText;
@@ -39,12 +41,14 @@ public class PlayScene extends Scene<MillApp> {
 	private static final int NUM_STONES = 9;
 	private static final float SECONDS_PER_MOVE = 1f;
 
+	private ResourceBundle messages;
+
 	private final Mouse mouse;
 
 	private Board board;
 	private StonesPlacedIndicator placedWhiteIndicator;
 	private StonesPlacedIndicator placedBlackIndicator;
-	private ScrollingText messageText;
+	private ScrollingText messageDisplay;
 
 	private Move move;
 	private StoneColor turn;
@@ -77,17 +81,17 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> {
 				if (mustRemoveOppositeStone) {
-					messageText.setText(inGerman(turn) + " muss einen " + inGerman(oppositeTurn()) + "en Stein wegnehmen!");
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
 						nextTurn();
 					}
 				} else {
-					messageText.setText(inGerman(turn) + " ist am Setzen!");
+					displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
 					int p = tryToPlaceStone(findClickPosition());
 					if (p != -1) {
 						if (board.isPositionInsideMill(p, turn)) {
 							mustRemoveOppositeStone = true;
+							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
 						} else {
 							nextTurn();
 						}
@@ -101,23 +105,25 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLAYING).entry = s -> {
 				move = new Move(board, PlayScene.this::supplyMoveSpeed);
+				displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
 			};
 
 			state(PLAYING).update = s -> {
 				if (mustRemoveOppositeStone) {
-					messageText.setText(inGerman(turn) + " muss einen " + inGerman(oppositeTurn()) + "en Stein wegnehmen!");
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
 						nextTurn();
+						displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
 					}
 				} else {
-					messageText.setText(inGerman(turn) + " ist am Zug!");
 					tryToMoveStone();
 					if (move.isComplete()) {
 						if (board.isPositionInsideMill(move.getTo(), turn)) {
 							mustRemoveOppositeStone = true;
+							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
 						} else {
 							nextTurn();
+							displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
 						}
 						move.reset();
 					}
@@ -130,7 +136,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(GAME_OVER).entry = s -> {
 				winner = oppositeTurn();
-				messageText.setText(inGerman(winner) + " gewinnt");
+				displayMessage(winner == WHITE ? "white_wins" : "black_wins");
 			};
 
 			change(GAME_OVER, STARTED, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
@@ -146,12 +152,16 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
+		messages = ResourceBundle.getBundle("de.amr.games.muehle.Messages");
 		playControl.setLogger(LOG);
 		playControl.init();
 	}
 
 	@Override
 	public void update() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
+			playControl.init();
+		}
 		mouse.poll();
 		playControl.update();
 		board.update();
@@ -168,11 +178,15 @@ public class PlayScene extends Scene<MillApp> {
 		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> blackStonesSet);
 		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 
-		messageText = new ScrollingText();
-		messageText.setColor(Color.BLACK);
-		messageText.setFont(new Font("Sans", Font.PLAIN, 20));
-		messageText.setText("Drücke Leertaste für neues Spiel!");
-		messageText.tf.moveTo(0, getHeight() - 50);
+		messageDisplay = new ScrollingText();
+		messageDisplay.setColor(Color.BLACK);
+		messageDisplay.setFont(new Font("Sans", Font.PLAIN, 20));
+		messageDisplay.tf.moveTo(0, getHeight() - 50);
+		displayMessage("newgame");
+	}
+
+	private void displayMessage(String text, Object... args) {
+		messageDisplay.setText(MessageFormat.format(messages.getString(text), args));
 	}
 
 	private void nextTurn() {
@@ -263,7 +277,7 @@ public class PlayScene extends Scene<MillApp> {
 			return;
 		}
 		if (turn != stone.getColor()) {
-			LOG.info(inGerman(stone.getColor()) + " ist nicht am Zug");
+			LOG.info("Gegner ist am Zug");
 			return;
 		}
 		move.setFrom(from);
@@ -333,8 +347,8 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void drawStateInformation(Graphics2D g) {
 
-		messageText.hCenter(getWidth());
-		messageText.draw(g);
+		messageDisplay.hCenter(getWidth());
+		messageDisplay.draw(g);
 
 		if (playControl.is(PLACING)) {
 			placedWhiteIndicator.draw(g);
@@ -400,9 +414,5 @@ public class PlayScene extends Scene<MillApp> {
 		g.setStroke(new BasicStroke(4));
 		g.drawOval(0, 0, 2 * Stone.radius, 2 * Stone.radius);
 		g.translate(-stone.tf.getX() + Stone.radius, -stone.tf.getY() + Stone.radius);
-	}
-
-	private String inGerman(StoneColor c) {
-		return c == StoneColor.WHITE ? "Weiß" : "Schwarz";
 	}
 }
