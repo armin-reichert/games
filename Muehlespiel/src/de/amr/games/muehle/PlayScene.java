@@ -363,7 +363,8 @@ public class PlayScene extends Scene<MillApp> {
 			if (mustRemoveOppositeStone) {
 				markRemovableStones(g);
 			} else {
-				markClosableMills(g, turn);
+				markClosableMills(g, turn, Color.GREEN);
+				markClosableMills(g, oppositeTurn(), Color.RED);
 			}
 			return;
 		}
@@ -381,8 +382,8 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
-	private void markClosableMills(Graphics2D g, StoneColor color) {
-		board.positionsForClosingMill(color).forEach(p -> markPosition(g, p, Color.BLUE, 10));
+	private void markClosableMills(Graphics2D g, StoneColor stoneColor, Color color) {
+		board.positionsForClosingMill(stoneColor).forEach(p -> markPosition(g, p, color, 10));
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g) {
