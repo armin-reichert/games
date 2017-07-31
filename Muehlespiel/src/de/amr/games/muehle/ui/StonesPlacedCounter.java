@@ -7,14 +7,19 @@ import java.util.function.IntSupplier;
 
 import de.amr.games.muehle.board.StoneType;
 
-public class StonesPlacedIndicator extends Stone {
+/**
+ * Visual indicator of placed stones.
+ * 
+ * @author Armin Reichert
+ */
+public class StonesPlacedCounter extends Stone {
 
-	private int totalStoneCount;
+	private int numStonesToPlace;
 	private IntSupplier stonesPlacedSupplier;
 
-	public StonesPlacedIndicator(StoneType stoneColor, int totalStoneCount, IntSupplier stonesPlacedSupplier) {
-		super(stoneColor);
-		this.totalStoneCount = totalStoneCount;
+	public StonesPlacedCounter(StoneType stoneType, int numStonesToPlace, IntSupplier stonesPlacedSupplier) {
+		super(stoneType);
+		this.numStonesToPlace = numStonesToPlace;
 		this.stonesPlacedSupplier = stonesPlacedSupplier;
 	}
 
@@ -25,7 +30,7 @@ public class StonesPlacedIndicator extends Stone {
 		g.setColor(getColor() == StoneType.WHITE ? Color.BLACK : Color.WHITE);
 		int fontSize = getHeight() / 2;
 		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, fontSize));
-		int stonesLeft = totalStoneCount - stonesPlacedSupplier.getAsInt();
+		int stonesLeft = numStonesToPlace - stonesPlacedSupplier.getAsInt();
 		String text = String.valueOf(stonesLeft);
 		g.drawString(text, -fontSize / 4, fontSize / 4);
 		g.translate(-tf.getX(), -tf.getY());

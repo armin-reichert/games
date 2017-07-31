@@ -53,7 +53,7 @@ public class Move {
 	}
 
 	public void execute() {
-		if (boardEntity.getBoard().areNeighbors(from, to)) {
+		if (boardEntity.getBoardGraph().areNeighbors(from, to)) {
 			move();
 		} else {
 			jump();
@@ -65,7 +65,7 @@ public class Move {
 		if (!moving) {
 			stone.tf.setVelocity(computeVelocity());
 			LOG.info(
-					"Starting move from " + from + " to " + to + " towards " + boardEntity.getBoard().getDirection(from, to));
+					"Starting move from " + from + " to " + to + " towards " + boardEntity.getBoardGraph().getDirection(from, to));
 			moving = true;
 		}
 		stone.tf.move();
@@ -93,7 +93,7 @@ public class Move {
 	}
 
 	private Vector2 computeVelocity() {
-		Direction direction = boardEntity.getBoard().getDirection(from, to);
+		Direction direction = boardEntity.getBoardGraph().getDirection(from, to);
 		float speed = (float) speedSupplier.getAsDouble();
 		switch (direction) {
 		case NORTH:

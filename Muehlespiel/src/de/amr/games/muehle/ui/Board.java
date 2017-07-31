@@ -32,15 +32,16 @@ public class Board extends GameEntity {
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	private final BoardGraph board;
-	private Stone[] stones;
-	private int width;
-	private int height;
-	private int posRadius;
-	private boolean showPositionNumbers;
+	private final BoardGraph boardGraph;
+	private final int width;
+	private final int height;
+	private final int posRadius;
 
-	public Board(BoardGraph board, int w, int h) {
-		this.board = board;
+	private boolean showPositionNumbers;
+	private Stone[] stones;
+
+	public Board(BoardGraph boardGraph, int w, int h) {
+		this.boardGraph = boardGraph;
 		width = w;
 		height = h;
 		posRadius = w / 60;
@@ -48,8 +49,8 @@ public class Board extends GameEntity {
 		Stone.radius = width / 24;
 	}
 
-	public BoardGraph getBoard() {
-		return board;
+	public BoardGraph getBoardGraph() {
+		return boardGraph;
 	}
 
 	public Stream<Stone> stones() {
@@ -73,8 +74,13 @@ public class Board extends GameEntity {
 		return height;
 	}
 
+	public void clear() {
+		boardGraph.clear();
+		stones = new Stone[BoardGraph.NUM_POS];
+	}
+
 	public void putStoneAt(int p, StoneType color) {
-		board.putStoneAt(p, color);
+		boardGraph.putStoneAt(p, color);
 		Stone stone = new Stone(color);
 		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
@@ -85,7 +91,7 @@ public class Board extends GameEntity {
 	}
 
 	public void moveStone(int from, int to) {
-		board.moveStone(from, to);
+		boardGraph.moveStone(from, to);
 		Stone stone = stones[from];
 		stone.tf.moveTo(centerPoint(to));
 		stones[to] = stone;
@@ -93,7 +99,7 @@ public class Board extends GameEntity {
 	}
 
 	public void removeStoneAt(int p) {
-		board.removeStoneAt(p);
+		boardGraph.removeStoneAt(p);
 		stones[p] = null;
 	}
 
@@ -102,7 +108,7 @@ public class Board extends GameEntity {
 	}
 
 	public int findNearestPosition(int x, int y, int radius) {
-		return board.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
+		return boardGraph.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
 	}
 
 	public int findPosition(int x, int y) {
@@ -116,25 +122,25 @@ public class Board extends GameEntity {
 		g.translate(tf.getX(), tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		// Hintergrund
+		// Background
 		g.setColor(new Color(255, 255, 224));
 		g.fillRect(0, 0, width, height);
 
-		// Linien
+		// Lines
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		board.positions().forEach(p -> {
+		boardGraph.positions().forEach(p -> {
 			Vector2 centerFrom = centerPoint(p);
-			board.neighbors(p).forEach(q -> {
+			boardGraph.neighbors(p).forEach(q -> {
 				Vector2 centerTo = centerPoint(q);
 				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(), centerTo.roundedY());
 			});
 		});
 
-		// Positionen
+		// Positions
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		board.positions().forEach(p -> {
+		boardGraph.positions().forEach(p -> {
 			Vector2 center = centerPoint(p);
 			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
 			if (showPositionNumbers) {
@@ -142,7 +148,7 @@ public class Board extends GameEntity {
 			}
 		});
 
-		// Steine
+		// Stones
 		stones().forEach(stone -> stone.draw(g));
 
 		g.translate(-tf.getX(), -tf.getY());

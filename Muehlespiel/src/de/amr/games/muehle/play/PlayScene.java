@@ -36,7 +36,7 @@ import de.amr.games.muehle.mouse.Mouse;
 import de.amr.games.muehle.ui.Board;
 import de.amr.games.muehle.ui.Move;
 import de.amr.games.muehle.ui.Stone;
-import de.amr.games.muehle.ui.StonesPlacedIndicator;
+import de.amr.games.muehle.ui.StonesPlacedCounter;
 
 /**
  * The play scene of the game.
@@ -52,18 +52,19 @@ public class PlayScene extends Scene<MillApp> {
 
 	private BoardGraph boardGraph;
 	private Board board;
-	private StonesPlacedIndicator placedWhiteIndicator;
-	private StonesPlacedIndicator placedBlackIndicator;
+	private StonesPlacedCounter whitePlacedIndicator;
+	private StonesPlacedCounter blackPlacedIndicator;
 	private ScrollingText messageDisplay;
 
 	private Move move;
 	private StoneType turn;
 	private StoneType winner;
-	private int whiteStonesSet;
-	private int blackStonesSet;
+	private int whiteStonesPlaced;
+	private int blackStonesPlaced;
 	private boolean mustRemoveOpponentStone;
 	private boolean assistantOn;
 
+	/* A finite-state machine which controls the play scene */
 	private class PlayControl extends StateMachine<GamePhase, String> {
 
 		public PlayControl() {
@@ -71,15 +72,18 @@ public class PlayScene extends Scene<MillApp> {
 
 			// STARTED
 
-			state(STARTED).entry = s -> newGame();
+			state(STARTED).entry = s -> {
+				displayMessage("newgame");
+				newGame();
+			};
 
 			change(STARTED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 			// PLACING
 
 			state(PLACING).entry = s -> {
-				whiteStonesSet = 0;
-				blackStonesSet = 0;
+				whiteStonesPlaced = 0;
+				blackStonesPlaced = 0;
 				mustRemoveOpponentStone = false;
 				turn = WHITE;
 				displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
@@ -106,7 +110,7 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLACING, MOVING, () -> blackStonesSet == NUM_STONES && !mustRemoveOpponentStone);
+			change(PLACING, MOVING, () -> blackStonesPlaced == NUM_STONES && !mustRemoveOpponentStone);
 
 			// MOVING
 
@@ -146,7 +150,7 @@ public class PlayScene extends Scene<MillApp> {
 				displayMessage(winner == WHITE ? "white_wins" : "black_wins");
 			};
 
-			change(GAME_OVER, STARTED, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			change(GAME_OVER, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER), (s, t) -> newGame());
 		}
 	}
 
@@ -184,17 +188,16 @@ public class PlayScene extends Scene<MillApp> {
 		board.hCenter(getWidth());
 		board.tf.setY(50);
 
-		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> whiteStonesSet);
-		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
+		whitePlacedIndicator = new StonesPlacedCounter(WHITE, NUM_STONES, () -> whiteStonesPlaced);
+		whitePlacedIndicator.tf.moveTo(50, getHeight() - 50);
 
-		placedBlackIndicator = new StonesPlacedIndicator(BLACK, NUM_STONES, () -> blackStonesSet);
-		placedBlackIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
+		blackPlacedIndicator = new StonesPlacedCounter(BLACK, NUM_STONES, () -> blackStonesPlaced);
+		blackPlacedIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
 
 		messageDisplay = new ScrollingText();
 		messageDisplay.setColor(Color.BLACK);
 		messageDisplay.setFont(new Font("Sans", Font.PLAIN, 20));
 		messageDisplay.tf.moveTo(0, getHeight() - 50);
-		displayMessage("newgame");
 	}
 
 	private void displayMessage(String text, Object... args) {
@@ -225,10 +228,10 @@ public class PlayScene extends Scene<MillApp> {
 		}
 		if (turn == WHITE) {
 			board.putStoneAt(p, WHITE);
-			whiteStonesSet += 1;
+			whiteStonesPlaced += 1;
 		} else {
 			board.putStoneAt(p, BLACK);
-			blackStonesSet += 1;
+			blackStonesPlaced += 1;
 		}
 		return p;
 	}
@@ -368,9 +371,9 @@ public class PlayScene extends Scene<MillApp> {
 		messageDisplay.draw(g);
 
 		if (control.is(PLACING)) {
-			placedWhiteIndicator.draw(g);
-			placedBlackIndicator.draw(g);
-			highlightStone(g, turn == WHITE ? placedWhiteIndicator : placedBlackIndicator);
+			whitePlacedIndicator.draw(g);
+			blackPlacedIndicator.draw(g);
+			highlightStone(g, turn == WHITE ? whitePlacedIndicator : blackPlacedIndicator);
 			if (mustRemoveOpponentStone) {
 				markRemovableStones(g);
 			} else {
@@ -426,7 +429,7 @@ public class PlayScene extends Scene<MillApp> {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		StoneType colorToRemove = opponent();
 		boolean allInMill = boardGraph.areAllStonesInsideMill(colorToRemove);
-		boardGraph.positions(colorToRemove).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, opponent()))
+		boardGraph.positions(colorToRemove).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, colorToRemove))
 				.forEach(p -> {
 					Stone stone = board.getStoneAt(p);
 					g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
