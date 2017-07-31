@@ -74,7 +74,6 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(STARTED).entry = s -> {
 				displayMessage("newgame");
-				newGame();
 			};
 
 			change(STARTED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
@@ -82,6 +81,7 @@ public class PlayScene extends Scene<MillApp> {
 			// PLACING
 
 			state(PLACING).entry = s -> {
+				board.clear();
 				whiteStonesPlaced = 0;
 				blackStonesPlaced = 0;
 				mustRemoveOpponentStone = false;
@@ -150,7 +150,7 @@ public class PlayScene extends Scene<MillApp> {
 				displayMessage(winner == WHITE ? "white_wins" : "black_wins");
 			};
 
-			change(GAME_OVER, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER), (s, t) -> newGame());
+			change(GAME_OVER, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER));
 		}
 	}
 
@@ -165,6 +165,21 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
+		board = new Board(boardGraph, 600, 600);
+		board.hCenter(getWidth());
+		board.tf.setY(50);
+
+		whitePlacedIndicator = new StonesPlacedCounter(WHITE, NUM_STONES, () -> whiteStonesPlaced);
+		whitePlacedIndicator.tf.moveTo(50, getHeight() - 50);
+
+		blackPlacedIndicator = new StonesPlacedCounter(BLACK, NUM_STONES, () -> blackStonesPlaced);
+		blackPlacedIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
+
+		messageDisplay = new ScrollingText();
+		messageDisplay.setColor(Color.BLACK);
+		messageDisplay.setFont(new Font("Sans", Font.PLAIN, 20));
+		messageDisplay.tf.moveTo(0, getHeight() - 50);
+
 		control.setLogger(LOG);
 		control.init();
 	}
@@ -181,23 +196,6 @@ public class PlayScene extends Scene<MillApp> {
 		mouse.poll();
 		control.update();
 		board.update();
-	}
-
-	private void newGame() {
-		board = new Board(boardGraph, 600, 600);
-		board.hCenter(getWidth());
-		board.tf.setY(50);
-
-		whitePlacedIndicator = new StonesPlacedCounter(WHITE, NUM_STONES, () -> whiteStonesPlaced);
-		whitePlacedIndicator.tf.moveTo(50, getHeight() - 50);
-
-		blackPlacedIndicator = new StonesPlacedCounter(BLACK, NUM_STONES, () -> blackStonesPlaced);
-		blackPlacedIndicator.tf.moveTo(getWidth() - 50, getHeight() - 50);
-
-		messageDisplay = new ScrollingText();
-		messageDisplay.setColor(Color.BLACK);
-		messageDisplay.setFont(new Font("Sans", Font.PLAIN, 20));
-		messageDisplay.tf.moveTo(0, getHeight() - 50);
 	}
 
 	private void displayMessage(String text, Object... args) {
@@ -373,7 +371,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (control.is(PLACING)) {
 			whitePlacedIndicator.draw(g);
 			blackPlacedIndicator.draw(g);
-			highlightStone(g, turn == WHITE ? whitePlacedIndicator : blackPlacedIndicator);
+			highlightStone(g, turn == WHITE ? whitePlacedIndicator : blackPlacedIndicator, Color.GREEN);
 			if (mustRemoveOpponentStone) {
 				markRemovableStones(g);
 			} else {
@@ -451,10 +449,10 @@ public class PlayScene extends Scene<MillApp> {
 		g.translate(-board.tf.getX(), -board.tf.getY());
 	}
 
-	private void highlightStone(Graphics2D g, Stone stone) {
+	private void highlightStone(Graphics2D g, Stone stone, Color color) {
 		g.translate(stone.tf.getX() - Stone.radius, stone.tf.getY() - Stone.radius);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(Color.RED);
+		g.setColor(color);
 		g.setStroke(new BasicStroke(4));
 		g.drawOval(0, 0, 2 * Stone.radius, 2 * Stone.radius);
 		g.translate(-stone.tf.getX() + Stone.radius, -stone.tf.getY() + Stone.radius);
