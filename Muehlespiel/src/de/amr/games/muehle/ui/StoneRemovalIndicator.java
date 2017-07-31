@@ -3,10 +3,9 @@ package de.amr.games.muehle.ui;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import de.amr.games.muehle.board.Stone;
 import de.amr.games.muehle.board.StoneColor;
 
-public class StoneRemovalIndicator extends Stone {
+public class StoneRemovalIndicator extends StoneEntity {
 
 	public StoneRemovalIndicator(StoneColor stoneColor) {
 		super(stoneColor);

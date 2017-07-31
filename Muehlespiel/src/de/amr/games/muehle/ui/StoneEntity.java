@@ -1,18 +1,19 @@
-package de.amr.games.muehle.board;
+package de.amr.games.muehle.ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.games.muehle.board.StoneColor;
 
-public class Stone extends GameEntity {
+public class StoneEntity extends GameEntity {
 
 	public static int radius = 20;
 
 	protected StoneColor color;
 
-	public Stone(StoneColor color) {
+	public StoneEntity(StoneColor color) {
 		this.color = color;
 	}
 

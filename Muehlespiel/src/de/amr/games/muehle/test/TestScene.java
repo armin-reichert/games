@@ -22,10 +22,7 @@ public class TestScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
-		brett = new Board(600, 600);
-		brett.tf.moveTo(100, 100);
-		app.entities.add(brett);
-
+		brett = new Board();
 		brett.putStoneAt(0, WHITE);
 		brett.putStoneAt(2, WHITE);
 		brett.putStoneAt(14, WHITE);
