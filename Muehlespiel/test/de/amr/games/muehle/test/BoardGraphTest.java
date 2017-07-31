@@ -29,7 +29,7 @@ public class BoardGraphTest {
 	@Test
 	public void testCreation() {
 		assertTrue(BoardGraph.NUM_POS == board.positions().count());
-		assertTrue(0 == board.stones().count());
+		assertTrue(0 == board.stoneCount());
 	}
 
 	@Test

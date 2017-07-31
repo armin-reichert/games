@@ -258,7 +258,7 @@ public class PlayScene extends Scene<MillApp> {
 	// Moving
 
 	private boolean canJump() {
-		return boardGraph.stones(turn).count() == 3;
+		return boardGraph.stoneCount(turn) == 3;
 	}
 
 	private void tryToMoveStone() {
@@ -344,7 +344,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		if (boardGraph.stones(turn).count() == 2) {
+		if (boardGraph.stoneCount(turn) == 2) {
 			return true;
 		}
 		if (canJump()) {
