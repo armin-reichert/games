@@ -11,7 +11,7 @@ import de.amr.games.muehle.board.Direction;
 
 public class Move {
 
-	private final BoardEntity boardEntity;
+	private final Board boardEntity;
 	private final DoubleSupplier speedSupplier;
 
 	private int from;
@@ -19,7 +19,7 @@ public class Move {
 	private boolean moving;
 	private boolean complete;
 
-	public Move(BoardEntity boardEntity, DoubleSupplier speedSupplier) {
+	public Move(Board boardEntity, DoubleSupplier speedSupplier) {
 		this.boardEntity = boardEntity;
 		this.speedSupplier = speedSupplier;
 		reset();
@@ -61,7 +61,7 @@ public class Move {
 	}
 
 	private void move() {
-		StoneEntity stone = boardEntity.getStoneAt(from);
+		Stone stone = boardEntity.getStoneAt(from);
 		if (!moving) {
 			stone.tf.setVelocity(computeVelocity());
 			LOG.info(
@@ -84,7 +84,7 @@ public class Move {
 	}
 
 	private boolean isEndPositionReached() {
-		StoneEntity stone = boardEntity.getStoneAt(from);
+		Stone stone = boardEntity.getStoneAt(from);
 		Vector2 center = boardEntity.centerPoint(to);
 		Vector2 velocity = new Vector2(stone.tf.getVelocityX(), stone.tf.getVelocityY());
 		float speed = velocity.length();

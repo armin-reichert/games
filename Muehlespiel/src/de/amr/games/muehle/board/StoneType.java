@@ -1,5 +1,5 @@
 package de.amr.games.muehle.board;
 
-public enum StoneColor {
+public enum StoneType {
 	WHITE, BLACK
 }

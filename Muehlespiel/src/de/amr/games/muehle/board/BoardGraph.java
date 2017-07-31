@@ -10,12 +10,14 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * The board data model.
+ * The board data model as an undirected oriented graph. Each node has at most one neighbor in one of the four
+ * directions. Nodes are numbered row-wise top to bottom.
  *
  * @author Armin Reichert & Peter und Anna Schillo
  */
-public class Board {
+public class BoardGraph {
 
+	/** The number of positions (nodes). */
 	public static final int NUM_POS = 24;
 
 	/*
@@ -85,10 +87,11 @@ public class Board {
 			/*@formatter:on*/
 	};
 
-	private StoneColor[] colors;
+	/* Stone content */
+	private StoneType[] content;
 
-	public Board() {
-		colors = new StoneColor[NUM_POS];
+	public BoardGraph() {
+		content = new StoneType[NUM_POS];
 	}
 
 	// Board topology:
@@ -105,9 +108,9 @@ public class Board {
 		return NEIGHBORS[p][dir.ordinal()];
 	}
 
-	private int neighbor(int p, Direction dir, StoneColor color) {
+	private int neighbor(int p, Direction dir, StoneType type) {
 		int n = neighbor(p, dir);
-		return n != -1 && hasStoneAt(n) && getStoneAt(n) == color ? n : -1;
+		return n != -1 && hasStoneAt(n) && getStoneAt(n) == type ? n : -1;
 	}
 
 	public IntStream emptyNeighbors(int p) {
@@ -129,61 +132,61 @@ public class Board {
 	// Stone assignment related methods:
 
 	public void clear() {
-		colors = new StoneColor[NUM_POS];
+		content = new StoneType[NUM_POS];
 	}
 
-	public IntStream positions(StoneColor color) {
-		return positions().filter(p -> colors[p] == color);
+	public IntStream positions(StoneType type) {
+		return positions().filter(p -> content[p] == type);
 	}
 
-	public IntStream positionsWithEmptyNeighbor(StoneColor color) {
-		return positions(color).filter(this::hasEmptyNeighbor);
+	public IntStream positionsWithEmptyNeighbor(StoneType type) {
+		return positions(type).filter(this::hasEmptyNeighbor);
 	}
 
-	public Stream<StoneColor> stones() {
-		return Stream.of(colors).filter(Objects::nonNull);
+	public Stream<StoneType> stones() {
+		return Stream.of(content).filter(Objects::nonNull);
 	}
 
-	public Stream<StoneColor> stones(StoneColor color) {
-		return stones().filter(stone -> stone == color);
+	public Stream<StoneType> stones(StoneType type) {
+		return stones().filter(stone -> stone == type);
 	}
 
-	public void putStoneAt(int p, StoneColor color) {
-		if (colors[p] != null) {
+	public void putStoneAt(int p, StoneType type) {
+		if (content[p] != null) {
 			throw new IllegalStateException("Zielposition muss leer sein");
 		}
-		colors[p] = color;
+		content[p] = type;
 	}
 
 	public void removeStoneAt(int p) {
-		colors[p] = null;
+		content[p] = null;
 	}
 
 	public void moveStone(int from, int to) {
-		if (colors[from] == null) {
+		if (content[from] == null) {
 			throw new IllegalStateException("Startposition muss einen Stein enthalten");
 		}
-		if (colors[to] != null) {
+		if (content[to] != null) {
 			throw new IllegalStateException("Zielposition muss leer sein");
 		}
-		colors[to] = colors[from];
-		colors[from] = null;
+		content[to] = content[from];
+		content[from] = null;
 	}
 
-	public StoneColor getStoneAt(int p) {
-		return colors[p];
+	public StoneType getStoneAt(int p) {
+		return content[p];
 	}
 
 	public boolean isEmpty(int p) {
-		return colors[p] == null;
+		return content[p] == null;
 	}
 
 	public boolean hasStoneAt(int p) {
-		return colors[p] != null;
+		return content[p] != null;
 	}
 
-	public boolean hasStoneAt(int p, StoneColor color) {
-		return colors[p] == color;
+	public boolean hasStoneAt(int p, StoneType type) {
+		return content[p] == type;
 	}
 
 	// Stone movement:
@@ -192,23 +195,23 @@ public class Board {
 		return hasStoneAt(p) && hasEmptyNeighbor(p);
 	}
 
-	public boolean cannotMoveStones(StoneColor color) {
-		return positions(color).allMatch(p -> emptyNeighbors(p).count() == 0);
+	public boolean cannotMoveStones(StoneType type) {
+		return positions(type).allMatch(p -> emptyNeighbors(p).count() == 0);
 	}
 
 	// Mill related methods
 
-	public boolean isPositionInsideMill(int p, StoneColor color) {
-		return findContainingMill(p, color, true) != null || findContainingMill(p, color, false) != null;
+	public boolean isPositionInsideMill(int p, StoneType type) {
+		return findContainingMill(p, type, true) != null || findContainingMill(p, type, false) != null;
 	}
 
-	public boolean areAllStonesInsideMill(StoneColor color) {
-		return positions(color).allMatch(p -> isPositionInsideMill(p, color));
+	public boolean areAllStonesInsideMill(StoneType type) {
+		return positions(type).allMatch(p -> isPositionInsideMill(p, type));
 	}
 
-	public Mill findContainingMill(int p, StoneColor color, boolean horizontal) {
-		StoneColor stone = getStoneAt(p);
-		if (stone == null || stone != color) {
+	public Mill findContainingMill(int p, StoneType type, boolean horizontal) {
+		StoneType stone = getStoneAt(p);
+		if (stone == null || stone != type) {
 			return null;
 		}
 
@@ -218,27 +221,27 @@ public class Board {
 		int q, r;
 
 		// p -> q -> r
-		q = neighbor(p, right, color);
+		q = neighbor(p, right, type);
 		if (q != -1) {
-			r = neighbor(q, right, color);
+			r = neighbor(q, right, type);
 			if (r != -1) {
 				return new Mill(p, q, r, horizontal);
 			}
 		}
 
 		// q <- p -> r
-		q = neighbor(p, left, color);
+		q = neighbor(p, left, type);
 		if (q != -1) {
-			r = neighbor(p, right, color);
+			r = neighbor(p, right, type);
 			if (r != -1) {
 				return new Mill(q, p, r, horizontal);
 			}
 		}
 
 		// q <- r <- p
-		r = neighbor(p, left, color);
+		r = neighbor(p, left, type);
 		if (r != -1) {
-			q = neighbor(r, left, color);
+			q = neighbor(r, left, type);
 			if (q != -1) {
 				return new Mill(q, r, p, horizontal);
 			}
@@ -247,38 +250,38 @@ public class Board {
 		return null;
 	}
 
-	public IntStream positionsForClosingMill(StoneColor color) {
-		return positions().filter(p -> canMillBeClosedAt(p, color));
+	public IntStream positionsForClosingMill(StoneType type) {
+		return positions().filter(p -> canMillBeClosedAt(p, type));
 	}
 
-	public boolean canMillBeClosedAt(int p, StoneColor color) {
+	public boolean canMillBeClosedAt(int p, StoneType type) {
 		if (hasStoneAt(p)) {
 			return false;
 		}
 		int[] row = POSSIBLE_MILLS[p];
 		int h1 = row[0], h2 = row[1];
-		if (hasStoneAt(h1, color) && hasStoneAt(h2, color)) {
+		if (hasStoneAt(h1, type) && hasStoneAt(h2, type)) {
 			return true;
 		}
 		int v1 = row[2], v2 = row[3];
-		if (hasStoneAt(v1, color) && hasStoneAt(v2, color)) {
+		if (hasStoneAt(v1, type) && hasStoneAt(v2, type)) {
 			return true;
 		}
 		return false;
 	}
 
-	public IntStream positionsForOpeningTwoMills(StoneColor color) {
-		return positions().filter(p -> canTwoMillsBeOpenedAt(p, color));
+	public IntStream positionsForOpeningTwoMills(StoneType type) {
+		return positions().filter(p -> canTwoMillsBeOpenedAt(p, type));
 	}
 
-	public boolean canTwoMillsBeOpenedAt(int p, StoneColor color) {
+	public boolean canTwoMillsBeOpenedAt(int p, StoneType type) {
 		if (hasStoneAt(p)) {
 			return false;
 		}
 		int[] row = POSSIBLE_MILLS[p];
 		int h1 = row[0], h2 = row[1], v1 = row[2], v2 = row[3];
-		return (hasStoneAt(h1, color) && isEmpty(h2) || isEmpty(h1) && hasStoneAt(h2, color))
-				&& (hasStoneAt(v1, color) && isEmpty(v2) || isEmpty(v1) && hasStoneAt(v2, color));
+		return (hasStoneAt(h1, type) && isEmpty(h2) || isEmpty(h1) && hasStoneAt(h2, type))
+				&& (hasStoneAt(v1, type) && isEmpty(v2) || isEmpty(v1) && hasStoneAt(v2, type));
 	}
 
 }

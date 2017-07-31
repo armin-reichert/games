@@ -16,10 +16,15 @@ import java.util.stream.Stream;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
-import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.board.BoardGraph;
+import de.amr.games.muehle.board.StoneType;
 
-public class BoardEntity extends GameEntity {
+/**
+ * Board user interface.
+ * 
+ * @author Armin Reichert
+ */
+public class Board extends GameEntity {
 
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
@@ -27,27 +32,27 @@ public class BoardEntity extends GameEntity {
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	private final Board board;
-	private StoneEntity[] stones;
+	private final BoardGraph board;
+	private Stone[] stones;
 	private int width;
 	private int height;
 	private int posRadius;
 	private boolean showPositionNumbers;
 
-	public BoardEntity(Board board, int w, int h) {
+	public Board(BoardGraph board, int w, int h) {
 		this.board = board;
 		width = w;
 		height = h;
 		posRadius = w / 60;
-		stones = new StoneEntity[Board.NUM_POS];
-		StoneEntity.radius = width / 24;
+		stones = new Stone[BoardGraph.NUM_POS];
+		Stone.radius = width / 24;
 	}
 
-	public Board getBoard() {
+	public BoardGraph getBoard() {
 		return board;
 	}
 
-	public Stream<StoneEntity> stones() {
+	public Stream<Stone> stones() {
 		return Stream.of(stones).filter(Objects::nonNull);
 	}
 
@@ -68,20 +73,20 @@ public class BoardEntity extends GameEntity {
 		return height;
 	}
 
-	public void putStoneAt(int p, StoneColor color) {
+	public void putStoneAt(int p, StoneType color) {
 		board.putStoneAt(p, color);
-		StoneEntity stone = new StoneEntity(color);
+		Stone stone = new Stone(color);
 		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
 	}
 
-	public StoneEntity getStoneAt(int p) {
+	public Stone getStoneAt(int p) {
 		return stones[p];
 	}
 
 	public void moveStone(int from, int to) {
 		board.moveStone(from, to);
-		StoneEntity stone = stones[from];
+		Stone stone = stones[from];
 		stone.tf.moveTo(centerPoint(to));
 		stones[to] = stone;
 		stones[from] = null;

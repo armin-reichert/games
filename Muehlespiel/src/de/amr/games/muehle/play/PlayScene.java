@@ -6,8 +6,8 @@ import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
-import static de.amr.games.muehle.board.StoneColor.BLACK;
-import static de.amr.games.muehle.board.StoneColor.WHITE;
+import static de.amr.games.muehle.board.StoneType.BLACK;
+import static de.amr.games.muehle.board.StoneType.WHITE;
 import static de.amr.games.muehle.play.GamePhase.GAME_OVER;
 import static de.amr.games.muehle.play.GamePhase.MOVING;
 import static de.amr.games.muehle.play.GamePhase.PLACING;
@@ -29,13 +29,13 @@ import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
-import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.Direction;
-import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.board.StoneType;
 import de.amr.games.muehle.mouse.Mouse;
-import de.amr.games.muehle.ui.BoardEntity;
+import de.amr.games.muehle.ui.Board;
 import de.amr.games.muehle.ui.Move;
-import de.amr.games.muehle.ui.StoneEntity;
+import de.amr.games.muehle.ui.Stone;
 import de.amr.games.muehle.ui.StonesPlacedIndicator;
 
 /**
@@ -50,15 +50,15 @@ public class PlayScene extends Scene<MillApp> {
 	private final PlayControl control;
 	private final Mouse mouse;
 
+	private BoardGraph boardGraph;
 	private Board board;
-	private BoardEntity boardEntity;
 	private StonesPlacedIndicator placedWhiteIndicator;
 	private StonesPlacedIndicator placedBlackIndicator;
 	private ScrollingText messageDisplay;
 
 	private Move move;
-	private StoneColor turn;
-	private StoneColor winner;
+	private StoneType turn;
+	private StoneType winner;
 	private int whiteStonesSet;
 	private int blackStonesSet;
 	private boolean mustRemoveOpponentStone;
@@ -95,7 +95,7 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					int p = tryToPlaceStone(findClickPosition());
 					if (p != -1) {
-						if (board.isPositionInsideMill(p, turn)) {
+						if (boardGraph.isPositionInsideMill(p, turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
 						} else {
@@ -111,7 +111,7 @@ public class PlayScene extends Scene<MillApp> {
 			// MOVING
 
 			state(MOVING).entry = s -> {
-				move = new Move(boardEntity, PlayScene.this::supplyMoveSpeed);
+				move = new Move(board, PlayScene.this::supplyMoveSpeed);
 				displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
 			};
 
@@ -125,7 +125,7 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					tryToMoveStone();
 					if (move.isComplete()) {
-						if (board.isPositionInsideMill(move.getTo(), turn)) {
+						if (boardGraph.isPositionInsideMill(move.getTo(), turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
 						} else {
@@ -156,7 +156,7 @@ public class PlayScene extends Scene<MillApp> {
 		mouse = new Mouse();
 		app.getShell().getCanvas().addMouseListener(mouse);
 		setBgColor(Color.WHITE);
-		board = new Board();
+		boardGraph = new BoardGraph();
 	}
 
 	@Override
@@ -176,13 +176,13 @@ public class PlayScene extends Scene<MillApp> {
 		}
 		mouse.poll();
 		control.update();
-		boardEntity.update();
+		board.update();
 	}
 
 	private void newGame() {
-		boardEntity = new BoardEntity(board, 600, 600);
-		boardEntity.hCenter(getWidth());
-		boardEntity.tf.setY(50);
+		board = new Board(boardGraph, 600, 600);
+		board.hCenter(getWidth());
+		board.tf.setY(50);
 
 		placedWhiteIndicator = new StonesPlacedIndicator(WHITE, NUM_STONES, () -> whiteStonesSet);
 		placedWhiteIndicator.tf.moveTo(50, getHeight() - 50);
@@ -205,51 +205,51 @@ public class PlayScene extends Scene<MillApp> {
 		turn = opponent();
 	}
 
-	private StoneColor opponent() {
+	private StoneType opponent() {
 		return turn == WHITE ? BLACK : WHITE;
 	}
 
 	// Placing
 
 	private int findClickPosition() {
-		return mouse.clicked() ? boardEntity.findPosition(mouse.getX(), mouse.getY()) : -1;
+		return mouse.clicked() ? board.findPosition(mouse.getX(), mouse.getY()) : -1;
 	}
 
 	private int tryToPlaceStone(int p) {
 		if (p == -1) {
 			return -1;
 		}
-		if (board.hasStoneAt(p)) {
+		if (boardGraph.hasStoneAt(p)) {
 			LOG.info("An Mausklick-Position liegt bereits ein Stein");
 			return -1;
 		}
 		if (turn == WHITE) {
-			boardEntity.putStoneAt(p, WHITE);
+			board.putStoneAt(p, WHITE);
 			whiteStonesSet += 1;
 		} else {
-			boardEntity.putStoneAt(p, BLACK);
+			board.putStoneAt(p, BLACK);
 			blackStonesSet += 1;
 		}
 		return p;
 	}
 
-	private boolean tryToRemoveStone(int p, StoneColor color) {
+	private boolean tryToRemoveStone(int p, StoneType color) {
 		if (p == -1) {
 			return false;
 		}
-		if (!board.hasStoneAt(p)) {
+		if (!boardGraph.hasStoneAt(p)) {
 			LOG.info("Kein Stein an Klickposition");
 			return false;
 		}
-		if (board.getStoneAt(p) != color) {
+		if (boardGraph.getStoneAt(p) != color) {
 			LOG.info("Stein an Klickposition besitzt die falsche Farbe");
 			return false;
 		}
-		if (board.isPositionInsideMill(p, color) && !board.areAllStonesInsideMill(color)) {
+		if (boardGraph.isPositionInsideMill(p, color) && !boardGraph.areAllStonesInsideMill(color)) {
 			LOG.info("Stein darf nicht aus Mühle entfernt werden, weil anderer Stein außerhalb Mühle existiert");
 			return false;
 		}
-		boardEntity.removeStoneAt(p);
+		board.removeStoneAt(p);
 		LOG.info(turn + " hat gegnerischen Stein weggenommen");
 		return true;
 	}
@@ -257,7 +257,7 @@ public class PlayScene extends Scene<MillApp> {
 	// Moving
 
 	private boolean canJump() {
-		return board.stones(turn).count() == 3;
+		return boardGraph.stones(turn).count() == 3;
 	}
 
 	private void tryToMoveStone() {
@@ -274,16 +274,16 @@ public class PlayScene extends Scene<MillApp> {
 		if (!mouse.clicked())
 			return;
 
-		int from = boardEntity.findPosition(mouse.getX(), mouse.getY());
+		int from = board.findPosition(mouse.getX(), mouse.getY());
 		if (from == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return;
 		}
-		if (!canJump() && !board.hasEmptyNeighbor(from)) {
+		if (!canJump() && !boardGraph.hasEmptyNeighbor(from)) {
 			LOG.info("Stein an dieser Position kann nicht ziehen");
 			return;
 		}
-		StoneEntity stone = boardEntity.getStoneAt(from);
+		Stone stone = board.getStoneAt(from);
 		if (stone == null) {
 			LOG.info("Kein Stein an Klickposition gefunden");
 			return;
@@ -297,26 +297,26 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void supplyMoveEndPosition() {
 		// unique target position?
-		if (!canJump() && board.emptyNeighbors(move.getFrom()).count() == 1) {
-			move.setTo(board.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
+		if (!canJump() && boardGraph.emptyNeighbors(move.getFrom()).count() == 1) {
+			move.setTo(boardGraph.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
 			return;
 		}
 		// cursor key pressed?
 		Direction dir = supplyMoveDirection();
 		if (dir != null) {
-			int to = board.neighbor(move.getFrom(), dir);
-			if (to != -1 && board.isEmpty(to)) {
+			int to = boardGraph.neighbor(move.getFrom(), dir);
+			if (to != -1 && boardGraph.isEmpty(to)) {
 				move.setTo(to);
 				return;
 			}
 		}
 		// target position selected with mouse click?
 		if (mouse.clicked()) {
-			int to = boardEntity.findPosition(mouse.getX(), mouse.getY());
-			if (to == -1 || board.hasStoneAt(to)) {
+			int to = board.findPosition(mouse.getX(), mouse.getY());
+			if (to == -1 || boardGraph.hasStoneAt(to)) {
 				return;
 			}
-			if (canJump() || board.areNeighbors(move.getFrom(), to)) {
+			if (canJump() || boardGraph.areNeighbors(move.getFrom(), to)) {
 				move.setTo(to);
 				return;
 			}
@@ -337,19 +337,19 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private double supplyMoveSpeed() {
-		Vector2 centerFrom = boardEntity.centerPoint(move.getFrom());
-		Vector2 centerTo = boardEntity.centerPoint(move.getTo());
+		Vector2 centerFrom = board.centerPoint(move.getFrom());
+		Vector2 centerTo = board.centerPoint(move.getTo());
 		return dist(centerFrom, centerTo) / app.pulse.secToTicks(app.settings.getAsFloat("seconds-per-move"));
 	}
 
 	private boolean isGameOver() {
-		if (board.stones(turn).count() == 2) {
+		if (boardGraph.stones(turn).count() == 2) {
 			return true;
 		}
 		if (canJump()) {
 			return false;
 		}
-		return board.cannotMoveStones(turn);
+		return boardGraph.cannotMoveStones(turn);
 	}
 
 	// Drawing
@@ -358,7 +358,7 @@ public class PlayScene extends Scene<MillApp> {
 	public void draw(Graphics2D g) {
 		g.setColor(getBgColor());
 		g.fillRect(0, 0, getWidth(), getHeight());
-		boardEntity.draw(g);
+		board.draw(g);
 		drawStateInformation(g);
 	}
 
@@ -399,60 +399,61 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
-	private void markPositionsOpeningTwoMills(Graphics2D g, StoneColor stoneColor, Color color) {
-		board.positionsForOpeningTwoMills(stoneColor).forEach(p -> markPosition(g, p, color, 10));
+	private void markPositionsOpeningTwoMills(Graphics2D g, StoneType stoneType, Color color) {
+		boardGraph.positionsForOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color, 10));
 	}
 
-	private void markPositionsClosingMills(Graphics2D g, StoneColor stoneColor, Color color) {
-		board.positionsForClosingMill(stoneColor).forEach(p -> markPosition(g, p, color, 10));
+	private void markPositionsClosingMills(Graphics2D g, StoneType stoneType, Color color) {
+		boardGraph.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color, 10));
 	}
 
 	private void markPositionFixingOpponent(Graphics2D g, Color color) {
-		if (board.positionsWithEmptyNeighbor(opponent()).count() == 1) {
-			int singleFreePosition = board.positionsWithEmptyNeighbor(opponent()).findFirst().getAsInt();
-			if (board.neighbors(singleFreePosition).anyMatch(p -> board.getStoneAt(p) == turn)) {
+		if (boardGraph.positionsWithEmptyNeighbor(opponent()).count() == 1) {
+			int singleFreePosition = boardGraph.positionsWithEmptyNeighbor(opponent()).findFirst().getAsInt();
+			if (boardGraph.neighbors(singleFreePosition).anyMatch(p -> boardGraph.getStoneAt(p) == turn)) {
 				markPosition(g, singleFreePosition, color, 10);
 			}
 		}
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g) {
-		IntStream startPositions = canJump() ? board.positions(turn) : board.positionsWithEmptyNeighbor(turn);
+		IntStream startPositions = canJump() ? boardGraph.positions(turn) : boardGraph.positionsWithEmptyNeighbor(turn);
 		startPositions.forEach(p -> markPosition(g, p, Color.GREEN, 10));
 		startPositions.close();
 	}
 
 	private void markRemovableStones(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		StoneColor colorToRemove = opponent();
-		boolean allInMill = board.areAllStonesInsideMill(colorToRemove);
-		board.positions(colorToRemove).filter(p -> allInMill || !board.isPositionInsideMill(p, opponent())).forEach(p -> {
-			StoneEntity stone = boardEntity.getStoneAt(p);
-			g.translate(boardEntity.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
-					boardEntity.tf.getY() + stone.tf.getY() - stone.getHeight() / 2);
-			g.setColor(Color.RED);
-			g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-			g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-			g.translate(-boardEntity.tf.getX() - stone.tf.getX() + stone.getWidth() / 2,
-					-boardEntity.tf.getY() - stone.tf.getY() + stone.getHeight() / 2);
-		});
+		StoneType colorToRemove = opponent();
+		boolean allInMill = boardGraph.areAllStonesInsideMill(colorToRemove);
+		boardGraph.positions(colorToRemove).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, opponent()))
+				.forEach(p -> {
+					Stone stone = board.getStoneAt(p);
+					g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
+							board.tf.getY() + stone.tf.getY() - stone.getHeight() / 2);
+					g.setColor(Color.RED);
+					g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+					g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+					g.translate(-board.tf.getX() - stone.tf.getX() + stone.getWidth() / 2,
+							-board.tf.getY() - stone.tf.getY() + stone.getHeight() / 2);
+				});
 	}
 
 	private void markPosition(Graphics2D g, int p, Color color, int markerSize) {
-		Vector2 center = boardEntity.centerPoint(p);
-		g.translate(boardEntity.tf.getX(), boardEntity.tf.getY());
+		Vector2 center = board.centerPoint(p);
+		g.translate(board.tf.getX(), board.tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
 		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
-		g.translate(-boardEntity.tf.getX(), -boardEntity.tf.getY());
+		g.translate(-board.tf.getX(), -board.tf.getY());
 	}
 
-	private void highlightStone(Graphics2D g, StoneEntity stone) {
-		g.translate(stone.tf.getX() - StoneEntity.radius, stone.tf.getY() - StoneEntity.radius);
+	private void highlightStone(Graphics2D g, Stone stone) {
+		g.translate(stone.tf.getX() - Stone.radius, stone.tf.getY() - Stone.radius);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setStroke(new BasicStroke(4));
-		g.drawOval(0, 0, 2 * StoneEntity.radius, 2 * StoneEntity.radius);
-		g.translate(-stone.tf.getX() + StoneEntity.radius, -stone.tf.getY() + StoneEntity.radius);
+		g.drawOval(0, 0, 2 * Stone.radius, 2 * Stone.radius);
+		g.translate(-stone.tf.getX() + Stone.radius, -stone.tf.getY() + Stone.radius);
 	}
 }
