@@ -9,8 +9,8 @@ import static de.amr.games.muehle.board.Direction.WEST;
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static de.amr.games.muehle.play.GamePhase.GAME_OVER;
+import static de.amr.games.muehle.play.GamePhase.MOVING;
 import static de.amr.games.muehle.play.GamePhase.PLACING;
-import static de.amr.games.muehle.play.GamePhase.PLAYING;
 import static de.amr.games.muehle.play.GamePhase.STARTED;
 import static java.lang.Math.round;
 
@@ -77,10 +77,11 @@ public class PlayScene extends Scene<MillApp> {
 			// PLACING
 
 			state(PLACING).entry = s -> {
-				turn = WHITE;
 				whiteStonesSet = 0;
 				blackStonesSet = 0;
 				mustRemoveOppositeStone = false;
+				turn = WHITE;
+				displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
 			};
 
 			state(PLACING).update = s -> {
@@ -88,9 +89,9 @@ public class PlayScene extends Scene<MillApp> {
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
 						nextTurn();
+						displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
 					}
 				} else {
-					displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
 					int p = tryToPlaceStone(findClickPosition());
 					if (p != -1) {
 						if (board.isPositionInsideMill(p, turn)) {
@@ -98,21 +99,22 @@ public class PlayScene extends Scene<MillApp> {
 							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
 						} else {
 							nextTurn();
+							displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
 						}
 					}
 				}
 			};
 
-			change(PLACING, PLAYING, () -> blackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
+			change(PLACING, MOVING, () -> blackStonesSet == NUM_STONES && !mustRemoveOppositeStone);
 
 			// MOVING
 
-			state(PLAYING).entry = s -> {
+			state(MOVING).entry = s -> {
 				move = new Move(board, PlayScene.this::supplyMoveSpeed);
 				displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
 			};
 
-			state(PLAYING).update = s -> {
+			state(MOVING).update = s -> {
 				if (mustRemoveOppositeStone) {
 					if (tryToRemoveStone(findClickPosition(), oppositeTurn())) {
 						mustRemoveOppositeStone = false;
@@ -134,7 +136,7 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLAYING, GAME_OVER, PlayScene.this::isGameOver);
+			change(MOVING, GAME_OVER, PlayScene.this::isGameOver);
 
 			// GAME_OVER
 
@@ -379,7 +381,7 @@ public class PlayScene extends Scene<MillApp> {
 			return;
 		}
 
-		if (control.is(PLAYING)) {
+		if (control.is(MOVING)) {
 			if (move.getFrom() == -1) {
 				markPossibleMoveStarts(g);
 				if (assistantOn) {
