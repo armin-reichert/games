@@ -51,7 +51,7 @@ public class DrawTestScene extends Scene<DrawTestApp> {
 			randomColor = !randomColor;
 		}
 		if (Mouse.pressed() || Mouse.dragged()) {
-			pen.setColor(randomColor ? randomColor() : Color.WHITE);
+			pen.setColor(randomColor ? randomColor() : Color.RED);
 			pen.fillOval(Mouse.getX(), Mouse.getY(), penWidth, penWidth);
 		}
 	}
