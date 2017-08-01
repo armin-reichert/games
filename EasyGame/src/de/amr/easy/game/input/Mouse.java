@@ -1,17 +1,38 @@
 package de.amr.easy.game.input;
 
+import java.awt.event.MouseEvent;
+
 public class Mouse {
 
 	public static boolean clicked() {
-		return MouseHandler.INSTANCE.clicked();
+		return MouseHandler.INSTANCE.clicked;
+	}
+
+	public static boolean pressed() {
+		return MouseHandler.INSTANCE.pressed;
+	}
+
+	public static boolean released() {
+		return MouseHandler.INSTANCE.released;
 	}
 
 	public static int getX() {
-		return MouseHandler.INSTANCE.getX();
+		return MouseHandler.INSTANCE.x;
 	}
 
 	public static int getY() {
-		return MouseHandler.INSTANCE.getY();
+		return MouseHandler.INSTANCE.y;
 	}
 
+	public static boolean isLeftButton() {
+		return MouseHandler.INSTANCE.button == MouseEvent.BUTTON1;
+	}
+
+	public static boolean isMiddleButton() {
+		return MouseHandler.INSTANCE.button == MouseEvent.BUTTON2;
+	}
+
+	public static boolean isRightButton() {
+		return MouseHandler.INSTANCE.button == MouseEvent.BUTTON3;
+	}
 }

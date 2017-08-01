@@ -16,59 +16,55 @@ public enum MouseHandler implements MouseListener {
 		INSTANCE._poll();
 	}
 
-	private MouseEvent event;
+	boolean clicked;
+	boolean pressed;
+	boolean released;
+	int x;
+	int y;
+	int button;
 
-	private boolean clicked;
-	private int x;
-	private int y;
+	private boolean clickedDetected;
+	private boolean pressedDetected;
+	private boolean releasedDetected;
+	private MouseEvent event;
 
 	@Override
 	public synchronized void mouseClicked(MouseEvent event) {
 		this.event = event;
+		clickedDetected = true;
+	}
+
+	@Override
+	public synchronized void mousePressed(MouseEvent event) {
+		this.event = event;
+		pressedDetected = true;
+	}
+
+	@Override
+	public synchronized void mouseReleased(MouseEvent event) {
+		this.event = event;
+		releasedDetected = true;
+	}
+
+	@Override
+	public synchronized void mouseEntered(MouseEvent event) {
+		this.event = event;
+	}
+
+	@Override
+	public synchronized void mouseExited(MouseEvent event) {
+		this.event = event;
 	}
 
 	private synchronized void _poll() {
-		clicked = event != null;
-		if (clicked) {
-			x = event.getX();
-			y = event.getY();
-		}
+		clicked = clickedDetected;
+		pressed = pressedDetected;
+		released = releasedDetected;
+		x = event != null ? event.getX() : -1;
+		y = event != null ? event.getY() : -1;
+
+		button = event != null ? event.getButton() : -1;
+		clickedDetected = pressedDetected = releasedDetected = false;
 		event = null;
-	}
-
-	public boolean clicked() {
-		return clicked;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 };
