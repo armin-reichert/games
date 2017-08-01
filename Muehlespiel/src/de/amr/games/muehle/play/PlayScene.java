@@ -26,6 +26,7 @@ import java.util.stream.IntStream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
@@ -191,7 +192,6 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void readInput() {
-		app.mouse.poll();
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
 			control.init();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_H)) {
@@ -215,7 +215,7 @@ public class PlayScene extends Scene<MillApp> {
 	// Placing
 
 	private int findClickPosition() {
-		return app.mouse.clicked() ? board.findPosition(app.mouse.getX(), app.mouse.getY()) : -1;
+		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : -1;
 	}
 
 	private int tryToPlaceStone(int p) {
@@ -274,10 +274,10 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void supplyMoveStartPosition() {
-		if (!app.mouse.clicked())
+		if (!Mouse.clicked())
 			return;
 
-		int from = board.findPosition(app.mouse.getX(), app.mouse.getY());
+		int from = board.findPosition(Mouse.getX(), Mouse.getY());
 		if (from == -1) {
 			LOG.info("Keine Brettposition zu Klickposition gefunden");
 			return;
@@ -314,8 +314,8 @@ public class PlayScene extends Scene<MillApp> {
 			}
 		}
 		// target position selected with mouse click?
-		if (app.mouse.clicked()) {
-			int to = board.findPosition(app.mouse.getX(), app.mouse.getY());
+		if (Mouse.clicked()) {
+			int to = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (to == -1 || boardGraph.hasStoneAt(to)) {
 				return;
 			}

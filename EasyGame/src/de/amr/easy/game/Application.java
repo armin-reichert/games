@@ -18,14 +18,15 @@ import de.amr.easy.game.config.AppSettings;
 import de.amr.easy.game.entity.EntitySet;
 import de.amr.easy.game.entity.collision.CollisionHandler;
 import de.amr.easy.game.input.KeyboardHandler;
+import de.amr.easy.game.input.MouseHandler;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.ui.ApplicationShell;
 import de.amr.easy.game.view.DefaultView;
 import de.amr.easy.game.view.View;
 
 /**
- * Application base class. To start an application, create an application instance, define its
- * settings in the constructor and call the {@link #launch(Application)} method.
+ * Application base class. To start an application, create an application instance, define its settings in the
+ * constructor and call the {@link #launch(Application)} method.
  * <p>
  * Example:
  * <p>
@@ -50,8 +51,8 @@ import de.amr.easy.game.view.View;
 public abstract class Application {
 
 	/**
-	 * Starts the given application inside a window or in full-screen mode according to the settings
-	 * defined after its creation.
+	 * Starts the given application inside a window or in full-screen mode according to the settings defined after its
+	 * creation.
 	 * 
 	 * @param app
 	 *          the application
@@ -143,6 +144,7 @@ public abstract class Application {
 
 	private void update() {
 		KeyboardHandler.poll();
+		MouseHandler.poll();
 		if (keyDown(PAUSE_TOGGLE_KEY[0]) && keyPressedOnce(PAUSE_TOGGLE_KEY[1])) {
 			pause(!paused);
 		}
@@ -197,8 +199,7 @@ public abstract class Application {
 	}
 
 	/**
-	 * Returns the default view which is displayed in case no view has been created so far or no view
-	 * is selected.
+	 * Returns the default view which is displayed in case no view has been created so far or no view is selected.
 	 * 
 	 * @return the default view
 	 */

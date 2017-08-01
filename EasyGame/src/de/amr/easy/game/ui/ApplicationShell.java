@@ -27,11 +27,12 @@ import javax.swing.JFrame;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.input.KeyboardHandler;
+import de.amr.easy.game.input.MouseHandler;
 import de.amr.easy.game.view.Drawable;
 
 /**
- * The application shell provides the window or the full-screen display where the current scene of
- * the application is shown.
+ * The application shell provides the window or the full-screen display where the current scene of the application is
+ * shown.
  * 
  * @author Armin Reichert
  */
@@ -172,6 +173,9 @@ public class ApplicationShell implements PropertyChangeListener {
 		canvas.setBackground(app.settings.bgColor);
 		canvas.setIgnoreRepaint(true);
 		canvas.setFocusable(false);
+
+		MouseHandler.handleMouseEventsFor(canvas);
+
 		return canvas;
 	}
 

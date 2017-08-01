@@ -3,7 +3,6 @@ package de.amr.games.muehle;
 import java.util.ResourceBundle;
 
 import de.amr.easy.game.Application;
-import de.amr.games.muehle.mouse.Mouse;
 import de.amr.games.muehle.play.PlayScene;
 
 /**
@@ -13,7 +12,6 @@ import de.amr.games.muehle.play.PlayScene;
  */
 public class MillApp extends Application {
 
-	public final Mouse mouse = new Mouse(); // TODO: belongs into framework
 	public final ResourceBundle messages;
 
 	public static void main(String[] args) {
@@ -31,7 +29,6 @@ public class MillApp extends Application {
 
 	@Override
 	public void init() {
-		getShell().getCanvas().addMouseListener(mouse);
 		selectView(new PlayScene(this));
 	}
 }
