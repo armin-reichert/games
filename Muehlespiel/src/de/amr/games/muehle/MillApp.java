@@ -30,6 +30,5 @@ public class MillApp extends Application {
 	@Override
 	public void init() {
 		selectView(new PlayScene(this));
-		// selectView(new MouseTestScene(this));
 	}
 }

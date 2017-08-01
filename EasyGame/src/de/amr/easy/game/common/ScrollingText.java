@@ -36,6 +36,10 @@ public class ScrollingText extends GameEntity {
 		this("");
 	}
 
+	public String getText() {
+		return String.join("\n", lines);
+	}
+
 	public void setText(String text) {
 		this.lines = text.split("\n");
 		imageNeedsUpdate = true;
@@ -107,10 +111,10 @@ public class ScrollingText extends GameEntity {
 	}
 
 	@Override
-	public void draw(Graphics2D pen) {
+	public void draw(Graphics2D g) {
 		if (imageNeedsUpdate) {
 			updateImage();
 		}
-		super.draw(pen);
+		super.draw(g);
 	}
 }

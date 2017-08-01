@@ -16,6 +16,14 @@ public class Mouse {
 		return MouseHandler.INSTANCE.released;
 	}
 
+	public static boolean moved() {
+		return MouseHandler.INSTANCE.moved;
+	}
+
+	public static boolean dragged() {
+		return MouseHandler.INSTANCE.dragged;
+	}
+
 	public static int getX() {
 		return MouseHandler.INSTANCE.x;
 	}
