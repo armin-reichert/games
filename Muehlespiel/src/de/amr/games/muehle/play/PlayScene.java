@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.stream.IntStream;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.ScrollingText;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
@@ -158,6 +159,9 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
+
+		Assets.storeFont("message-font", "fonts/Cookie-Regular.ttf", 40, Font.PLAIN);
+
 		boardGraph = new BoardGraph();
 
 		board = new Board(boardGraph, 600, 600);
@@ -172,8 +176,8 @@ public class PlayScene extends Scene<MillApp> {
 
 		messageDisplay = new ScrollingText();
 		messageDisplay.setColor(Color.BLUE);
-		messageDisplay.setFont(new Font("Arial Black", Font.PLAIN, 20));
-		messageDisplay.tf.moveTo(0, getHeight() - 50);
+		messageDisplay.setFont(Assets.font("message-font"));
+		messageDisplay.tf.moveTo(0, getHeight() - 80);
 
 		control.setLogger(LOG);
 		control.init();
