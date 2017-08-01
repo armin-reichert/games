@@ -84,25 +84,25 @@ public class PlayScene extends Scene<MillApp> {
 				blackStonesPlaced = 0;
 				mustRemoveOpponentStone = false;
 				turn = WHITE;
-				displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
+				displayMessage(whitesTurn() ? "white_must_place" : "black_must_place");
 			};
 
 			state(PLACING).update = s -> {
 				if (mustRemoveOpponentStone) {
-					if (tryToRemoveStone(findClickPosition(), opponent())) {
+					if (tryToRemoveStone(opponent())) {
 						mustRemoveOpponentStone = false;
-						nextTurn();
-						displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
+						changeTurn();
+						displayMessage(whitesTurn() ? "white_must_place" : "black_must_place");
 					}
 				} else {
-					int p = tryToPlaceStone(findClickPosition());
+					int p = tryToPlaceStone();
 					if (p != -1) {
 						if (boardGraph.isPositionInsideMill(p, turn)) {
 							mustRemoveOpponentStone = true;
-							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
+							displayMessage(whitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
-							nextTurn();
-							displayMessage(turn == WHITE ? "white_must_place" : "black_must_place");
+							changeTurn();
+							displayMessage(whitesTurn() ? "white_must_place" : "black_must_place");
 						}
 					}
 				}
@@ -114,25 +114,25 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING).entry = s -> {
 				move = new Move(board, PlayScene.this::supplyMoveSpeed);
-				displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
+				displayMessage(whitesTurn() ? "white_at_move" : "black_at_move");
 			};
 
 			state(MOVING).update = s -> {
 				if (mustRemoveOpponentStone) {
-					if (tryToRemoveStone(findClickPosition(), opponent())) {
+					if (tryToRemoveStone(opponent())) {
 						mustRemoveOpponentStone = false;
-						nextTurn();
-						displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
+						changeTurn();
+						displayMessage(whitesTurn() ? "white_at_move" : "black_at_move");
 					}
 				} else {
 					tryToMoveStone();
 					if (move.isComplete()) {
 						if (boardGraph.isPositionInsideMill(move.getTo(), turn)) {
 							mustRemoveOpponentStone = true;
-							displayMessage(turn == WHITE ? "white_must_take" : "black_must_take");
+							displayMessage(whitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
-							nextTurn();
-							displayMessage(turn == WHITE ? "white_at_move" : "black_at_move");
+							changeTurn();
+							displayMessage(whitesTurn() ? "white_at_move" : "black_at_move");
 						}
 						move.reset();
 					}
@@ -204,12 +204,16 @@ public class PlayScene extends Scene<MillApp> {
 		messageDisplay.setText(MessageFormat.format(app.messages.getString(text), args));
 	}
 
-	private void nextTurn() {
+	private boolean whitesTurn() {
+		return turn == WHITE;
+	}
+
+	private void changeTurn() {
 		turn = opponent();
 	}
 
 	private StoneType opponent() {
-		return turn == WHITE ? BLACK : WHITE;
+		return whitesTurn() ? BLACK : WHITE;
 	}
 
 	// Placing
@@ -218,7 +222,8 @@ public class PlayScene extends Scene<MillApp> {
 		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : -1;
 	}
 
-	private int tryToPlaceStone(int p) {
+	private int tryToPlaceStone() {
+		int p = findClickPosition();
 		if (p == -1) {
 			return -1;
 		}
@@ -226,7 +231,7 @@ public class PlayScene extends Scene<MillApp> {
 			LOG.info("An Mausklick-Position liegt bereits ein Stein");
 			return -1;
 		}
-		if (turn == WHITE) {
+		if (whitesTurn()) {
 			board.putStoneAt(p, WHITE);
 			whiteStonesPlaced += 1;
 		} else {
@@ -236,7 +241,8 @@ public class PlayScene extends Scene<MillApp> {
 		return p;
 	}
 
-	private boolean tryToRemoveStone(int p, StoneType color) {
+	private boolean tryToRemoveStone(StoneType color) {
+		int p = findClickPosition();
 		if (p == -1) {
 			return false;
 		}
@@ -372,7 +378,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (control.is(PLACING)) {
 			whiteStonesPlacedCounter.draw(g);
 			blackStonesPlacedCounter.draw(g);
-			highlightStone(g, turn == WHITE ? whiteStonesPlacedCounter : blackStonesPlacedCounter, Color.GREEN);
+			highlightStone(g, whitesTurn() ? whiteStonesPlacedCounter : blackStonesPlacedCounter, Color.GREEN);
 			if (control.mustRemoveOpponentStone) {
 				markRemovableStones(g, opponent());
 			} else if (assistantOn) {
