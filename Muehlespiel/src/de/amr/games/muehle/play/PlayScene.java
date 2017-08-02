@@ -12,15 +12,12 @@ import static de.amr.games.muehle.play.GamePhase.GAME_OVER;
 import static de.amr.games.muehle.play.GamePhase.MOVING;
 import static de.amr.games.muehle.play.GamePhase.PLACING;
 import static de.amr.games.muehle.play.GamePhase.STARTED;
-import static java.lang.Math.round;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
-import java.util.stream.IntStream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.ScrollingText;
@@ -51,8 +48,8 @@ public class PlayScene extends Scene<MillApp> {
 
 	private BoardGraph boardGraph;
 	private Board board;
-	private StonesCounter whiteStonesRemainingDisplay;
-	private StonesCounter blackStonesRemainingDisplay;
+	private StonesCounter whiteStonesToPlaceDisplay;
+	private StonesCounter blackStonesToPlaceDisplay;
 	private ScrollingText messageDisplay;
 	private Move move;
 	private StoneType turn;
@@ -160,11 +157,11 @@ public class PlayScene extends Scene<MillApp> {
 		board.hCenter(getWidth());
 		board.tf.setY(50);
 
-		whiteStonesRemainingDisplay = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
-		whiteStonesRemainingDisplay.tf.moveTo(50, getHeight() - 50);
+		whiteStonesToPlaceDisplay = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
+		whiteStonesToPlaceDisplay.tf.moveTo(50, getHeight() - 50);
 
-		blackStonesRemainingDisplay = new StonesCounter(BLACK, () -> NUM_STONES - blackStonesPlaced);
-		blackStonesRemainingDisplay.tf.moveTo(getWidth() - 50, getHeight() - 50);
+		blackStonesToPlaceDisplay = new StonesCounter(BLACK, () -> NUM_STONES - blackStonesPlaced);
+		blackStonesToPlaceDisplay.tf.moveTo(getWidth() - 50, getHeight() - 50);
 
 		messageDisplay = new ScrollingText();
 		messageDisplay.setColor(Color.BLUE);
@@ -206,8 +203,8 @@ public class PlayScene extends Scene<MillApp> {
 	private void setPlaceTurn(StoneType type) {
 		turn = type;
 		displayMessage(isWhitesTurn() ? "white_must_place" : "black_must_place");
-		whiteStonesRemainingDisplay.setHighlighted(isWhitesTurn());
-		blackStonesRemainingDisplay.setHighlighted(!isWhitesTurn());
+		whiteStonesToPlaceDisplay.setHighlighted(isWhitesTurn());
+		blackStonesToPlaceDisplay.setHighlighted(!isWhitesTurn());
 	}
 
 	private void setMoveTurn(StoneType type) {
@@ -378,78 +375,41 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawStateSpecificInformation(Graphics2D g) {
-
-		if (control.is(PLACING)) {
-			whiteStonesRemainingDisplay.draw(g);
-			blackStonesRemainingDisplay.draw(g);
-			if (control.mustRemoveOpponentStone) {
-				markRemovableStones(g, opponent());
-			} else if (assistantOn) {
-				markPositionsClosingMill(g, turn, Color.GREEN);
-				markPositionsOpeningTwoMills(g, turn, Color.YELLOW);
-				markPositionsClosingMill(g, opponent(), Color.RED);
-			}
-		} else if (control.is(MOVING)) {
-			if (move.getFrom() == -1) {
-				markPossibleMoveStarts(g);
-				if (assistantOn) {
-					markPositionFixingOpponent(g, Color.RED);
-				}
-			} else {
-				markPosition(g, move.getFrom(), Color.ORANGE, 10);
-			}
-			if (control.mustRemoveOpponentStone) {
-				markRemovableStones(g, opponent());
-			}
+		switch (control.stateID()) {
+		case PLACING:
+			drawPlacingInfo(g);
+			break;
+		case MOVING:
+			drawMovingInfo(g);
+			break;
+		default:
+			break;
 		}
 	}
 
-	private void markPositionsOpeningTwoMills(Graphics2D g, StoneType stoneType, Color color) {
-		boardGraph.positionsForOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color, 10));
-	}
-
-	private void markPositionsClosingMill(Graphics2D g, StoneType stoneType, Color color) {
-		boardGraph.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color, 10));
-	}
-
-	private void markPositionFixingOpponent(Graphics2D g, Color color) {
-		if (boardGraph.positionsWithEmptyNeighbor(opponent()).count() == 1) {
-			int singleFreePosition = boardGraph.positionsWithEmptyNeighbor(opponent()).findFirst().getAsInt();
-			if (boardGraph.neighbors(singleFreePosition).anyMatch(p -> boardGraph.getStoneAt(p) == turn)) {
-				markPosition(g, singleFreePosition, color, 10);
-			}
+	private void drawPlacingInfo(Graphics2D g) {
+		whiteStonesToPlaceDisplay.draw(g);
+		blackStonesToPlaceDisplay.draw(g);
+		if (control.mustRemoveOpponentStone) {
+			board.markRemovableStones(g, opponent());
+		} else if (assistantOn) {
+			board.markPositionsClosingMill(g, turn, Color.GREEN);
+			board.markPositionsOpeningTwoMills(g, turn, Color.YELLOW);
+			board.markPositionsClosingMill(g, opponent(), Color.RED);
 		}
 	}
 
-	private void markPossibleMoveStarts(Graphics2D g) {
-		IntStream startPositions = canJump() ? boardGraph.positions(turn) : boardGraph.positionsWithEmptyNeighbor(turn);
-		startPositions.forEach(p -> markPosition(g, p, Color.GREEN, 10));
-		startPositions.close();
+	private void drawMovingInfo(Graphics2D g) {
+		if (move.getFrom() == -1) {
+			board.markPossibleMoveStarts(g, turn, canJump());
+			if (assistantOn) {
+				board.markPositionFixingOpponent(g, turn, opponent(), Color.RED);
+			}
+		} else {
+			board.markPosition(g, move.getFrom(), Color.ORANGE);
+		}
+		if (control.mustRemoveOpponentStone) {
+			board.markRemovableStones(g, opponent());
+		}
 	}
-
-	private void markRemovableStones(Graphics2D g, StoneType stoneType) {
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		boolean allInMill = boardGraph.areAllStonesInsideMill(stoneType);
-		boardGraph.positions(stoneType).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, stoneType))
-				.forEach(p -> {
-					Stone stone = board.getStoneAt(p);
-					g.translate(board.tf.getX() + stone.tf.getX() - stone.getWidth() / 2,
-							board.tf.getY() + stone.tf.getY() - stone.getHeight() / 2);
-					g.setColor(Color.RED);
-					g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-					g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-					g.translate(-board.tf.getX() - stone.tf.getX() + stone.getWidth() / 2,
-							-board.tf.getY() - stone.tf.getY() + stone.getHeight() / 2);
-				});
-	}
-
-	private void markPosition(Graphics2D g, int p, Color color, int markerSize) {
-		Vector2 center = board.centerPoint(p);
-		g.translate(board.tf.getX(), board.tf.getY());
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(color);
-		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
-		g.translate(-board.tf.getX(), -board.tf.getY());
-	}
-
 }

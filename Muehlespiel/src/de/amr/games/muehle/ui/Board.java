@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -154,4 +155,52 @@ public class Board extends GameEntity {
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
+	public void markPosition(Graphics2D g, int p, Color color) {
+		int markerSize = posRadius / 2;
+		Vector2 center = centerPoint(p);
+		g.translate(tf.getX(), tf.getY());
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setColor(color);
+		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
+		g.translate(-tf.getX(), -tf.getY());
+	}
+
+	public void markPositionsOpeningTwoMills(Graphics2D g, StoneType stoneType, Color color) {
+		boardGraph.positionsForOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
+	}
+
+	public void markPositionsClosingMill(Graphics2D g, StoneType stoneType, Color color) {
+		boardGraph.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
+	}
+
+	public void markPositionFixingOpponent(Graphics2D g, StoneType either, StoneType other, Color color) {
+		if (boardGraph.positionsWithEmptyNeighbor(other).count() == 1) {
+			int singleFreePosition = boardGraph.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
+			if (boardGraph.neighbors(singleFreePosition).anyMatch(p -> boardGraph.getStoneAt(p) == either)) {
+				markPosition(g, singleFreePosition, color);
+			}
+		}
+	}
+
+	public void markPossibleMoveStarts(Graphics2D g, StoneType type, boolean canJump) {
+		IntStream startPositions = canJump ? boardGraph.positions(type) : boardGraph.positionsWithEmptyNeighbor(type);
+		startPositions.forEach(p -> markPosition(g, p, Color.GREEN));
+		startPositions.close();
+	}
+
+	public void markRemovableStones(Graphics2D g, StoneType stoneType) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		boolean allInMill = boardGraph.areAllStonesInsideMill(stoneType);
+		boardGraph.positions(stoneType).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, stoneType))
+				.forEach(p -> {
+					Stone stone = getStoneAt(p);
+					float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
+					float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
+					g.translate(offsetX, offsetY);
+					g.setColor(Color.RED);
+					g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+					g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+					g.translate(-offsetX, -offsetY);
+				});
+	}
 }
