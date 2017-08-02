@@ -22,10 +22,10 @@ public class Move {
 	public Move(Board boardEntity, DoubleSupplier speedSupplier) {
 		this.boardEntity = boardEntity;
 		this.speedSupplier = speedSupplier;
-		reset();
+		clear();
 	}
 
-	public void reset() {
+	public void clear() {
 		from = -1;
 		to = -1;
 		moving = false;
