@@ -2,6 +2,7 @@ package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2.dist;
+import static de.amr.games.muehle.MillApp.messages;
 import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
@@ -197,7 +198,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private String msg(String key, Object... args) {
-		return MessageFormat.format(app.messages.getString(key), args);
+		return MessageFormat.format(messages.getString(key), args);
 	}
 
 	private void displayMessage(String key, Object... args) {

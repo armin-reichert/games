@@ -1,5 +1,6 @@
 package de.amr.games.muehle;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import de.amr.easy.game.Application;
@@ -12,14 +13,18 @@ import de.amr.games.muehle.play.PlayScene;
  */
 public class MillApp extends Application {
 
-	public final ResourceBundle messages;
+	public static ResourceBundle messages;
 
 	public static void main(String[] args) {
+		Locale locale = Locale.getDefault();
+		if (args.length > 0) {
+			locale = new Locale(args[0]);
+		}
+		messages = ResourceBundle.getBundle("de.amr.games.muehle.Messages", locale);
 		launch(new MillApp());
 	}
 
 	public MillApp() {
-		messages = ResourceBundle.getBundle("de.amr.games.muehle.Messages");
 		settings.title = messages.getString("title");
 		settings.width = 800;
 		settings.height = 800;
