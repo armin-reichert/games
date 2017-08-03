@@ -9,13 +9,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.KeyEvent;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.StoneType;
@@ -56,13 +54,6 @@ public class Board extends GameEntity {
 
 	public Stream<Stone> stones() {
 		return Stream.of(stones).filter(Objects::nonNull);
-	}
-
-	@Override
-	public void update() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
-			showPositionNumbers = !showPositionNumbers;
-		}
 	}
 
 	@Override
@@ -116,6 +107,14 @@ public class Board extends GameEntity {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
 		return findNearestPosition(boardX, boardY, getWidth() / 18);
+	}
+
+	public void showPositionNumbers() {
+		showPositionNumbers = true;
+	}
+
+	public void togglePositionNumbers() {
+		showPositionNumbers = !showPositionNumbers;
 	}
 
 	@Override

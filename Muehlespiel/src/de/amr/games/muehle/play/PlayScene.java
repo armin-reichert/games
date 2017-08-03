@@ -185,7 +185,6 @@ public class PlayScene extends Scene<MillApp> {
 	public void update() {
 		readInput();
 		control.update();
-		board.update();
 	}
 
 	private void readInput() {
@@ -194,6 +193,8 @@ public class PlayScene extends Scene<MillApp> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
 			assistantOn = !assistantOn;
 			LOG.info(msg(assistantOn ? "assistant_on" : "assistant_off"));
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
+			board.togglePositionNumbers();
 		}
 	}
 

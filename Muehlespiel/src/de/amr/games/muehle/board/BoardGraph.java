@@ -52,7 +52,7 @@ public class BoardGraph {
 	/*
 	 * Auxiliary tables storing the horizontal and vertical mill partner positions.
 	 */
-	private static final int[][] H_MILL_PARTNERS = {
+	private static final int[][] H_MILL = {
 			/*@formatter:off*/
 			{ 1, 2 },	
 			{ 0, 2 },
@@ -81,7 +81,7 @@ public class BoardGraph {
 			/*@formatter:on*/
 	};
 
-	private static final int[][] V_MILL_PARTNERS = {
+	private static final int[][] V_MILL = {
 			/*@formatter:off*/
 			{ 9, 21 },	
 			{ 4, 7 },
@@ -413,8 +413,8 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 
-		return IntStream.of(p, H_MILL_PARTNERS[p][0], H_MILL_PARTNERS[p][1]).allMatch(q -> content[q] == type)
-				|| IntStream.of(p, V_MILL_PARTNERS[p][0], V_MILL_PARTNERS[p][1]).allMatch(q -> content[q] == type);
+		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> content[q] == type)
+				|| IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> content[q] == type);
 	}
 
 	/**
@@ -448,8 +448,8 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 
-		return content[p] == null && (content[H_MILL_PARTNERS[p][0]] == type && content[H_MILL_PARTNERS[p][1]] == type
-				|| content[V_MILL_PARTNERS[p][0]] == type && content[V_MILL_PARTNERS[p][1]] == type);
+		return content[p] == null && (content[H_MILL[p][0]] == type && content[H_MILL[p][1]] == type
+				|| content[V_MILL[p][0]] == type && content[V_MILL[p][1]] == type);
 	}
 
 	/**
@@ -477,8 +477,8 @@ public class BoardGraph {
 		if (content[p] != null) {
 			return false;
 		}
-		int h1 = H_MILL_PARTNERS[p][0], h2 = H_MILL_PARTNERS[p][1];
-		int v1 = V_MILL_PARTNERS[p][0], v2 = V_MILL_PARTNERS[p][1];
+		int h1 = H_MILL[p][0], h2 = H_MILL[p][1];
+		int v1 = V_MILL[p][0], v2 = V_MILL[p][1];
 		return (content[h1] == type && content[h2] == null || content[h1] == null && content[h2] == type)
 				&& (content[v1] == type && content[v2] == null || content[v1] == null && content[v2] == type);
 	}
