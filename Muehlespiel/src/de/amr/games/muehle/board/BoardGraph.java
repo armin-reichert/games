@@ -247,7 +247,6 @@ public class BoardGraph {
 	 * @return a stream of the positions which carry a stone of the given type and which have an empty neighbor position
 	 */
 	public IntStream positionsWithEmptyNeighbor(StoneType type) {
-		Objects.requireNonNull(type);
 		return positions(type).filter(this::hasEmptyNeighbor);
 	}
 
@@ -283,7 +282,7 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 		if (content[p] != null) {
-			throw new IllegalStateException("Zielposition muss leer sein");
+			throw new IllegalStateException("Position where stone is placed must be empty");
 		}
 		content[p] = type;
 	}
@@ -312,10 +311,10 @@ public class BoardGraph {
 	 */
 	public void moveStone(int from, int to) {
 		if (content[from] == null) {
-			throw new IllegalStateException("Startposition muss einen Stein enthalten");
+			throw new IllegalStateException("Position from where stone is moved must not be empty");
 		}
 		if (content[to] != null) {
-			throw new IllegalStateException("Zielposition muss leer sein");
+			throw new IllegalStateException("Position where stone is moved to must be empty");
 		}
 		content[to] = content[from];
 		content[from] = null;
@@ -385,9 +384,6 @@ public class BoardGraph {
 	 * @return if there is a stone at this position and this stone can move to some neighbor position
 	 */
 	public boolean canMoveStoneFrom(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
 		return hasStoneAt(p) && hasEmptyNeighbor(p);
 	}
 
@@ -405,7 +401,6 @@ public class BoardGraph {
 	// Mill related methods
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param type
@@ -418,36 +413,29 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 
-		return IntStream.of(p, H_MILL_PARTNERS[p][0], H_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type)
-				|| IntStream.of(p, V_MILL_PARTNERS[p][0], V_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type);
+		return IntStream.of(p, H_MILL_PARTNERS[p][0], H_MILL_PARTNERS[p][1]).allMatch(q -> content[q] == type)
+				|| IntStream.of(p, V_MILL_PARTNERS[p][0], V_MILL_PARTNERS[p][1]).allMatch(q -> content[q] == type);
 	}
 
 	/**
-	 * 
 	 * @param type
 	 *          a stone type
 	 * @return if all stones of the given type are inside some mill
 	 */
 	public boolean areAllStonesInsideMill(StoneType type) {
-		Objects.requireNonNull(type);
-
 		return positions(type).allMatch(p -> isPositionInsideMill(p, type));
 	}
 
 	/**
-	 * 
 	 * @param type
 	 *          a stone type
 	 * @return a stream of all positions which would close a mill when a stone of the given type would be placed there
 	 */
 	public IntStream positionsForClosingMill(StoneType type) {
-		Objects.requireNonNull(type);
-
 		return positions().filter(p -> canMillBeClosedAt(p, type));
 	}
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param type
@@ -460,26 +448,20 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 
-		if (hasStoneAt(p)) {
-			return false;
-		}
-		return getStoneAt(H_MILL_PARTNERS[p][0]) == type && getStoneAt(H_MILL_PARTNERS[p][1]) == type
-				|| getStoneAt(V_MILL_PARTNERS[p][0]) == type && getStoneAt(V_MILL_PARTNERS[p][1]) == type;
+		return content[p] == null && (content[H_MILL_PARTNERS[p][0]] == type && content[H_MILL_PARTNERS[p][1]] == type
+				|| content[V_MILL_PARTNERS[p][0]] == type && content[V_MILL_PARTNERS[p][1]] == type);
 	}
 
 	/**
-	 * 
 	 * @param type
 	 *          a stone type
 	 * @return a stream of all positions where placing a stone of the given type would open two mills
 	 */
 	public IntStream positionsForOpeningTwoMills(StoneType type) {
-		Objects.requireNonNull(type);
 		return positions().filter(p -> canTwoMillsBeOpenedAt(p, type));
 	}
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param type
@@ -492,12 +474,12 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 
-		if (hasStoneAt(p)) {
+		if (content[p] != null) {
 			return false;
 		}
 		int h1 = H_MILL_PARTNERS[p][0], h2 = H_MILL_PARTNERS[p][1];
 		int v1 = V_MILL_PARTNERS[p][0], v2 = V_MILL_PARTNERS[p][1];
-		return (hasStoneAt(h1, type) && isEmpty(h2) || isEmpty(h1) && hasStoneAt(h2, type))
-				&& (hasStoneAt(v1, type) && isEmpty(v2) || isEmpty(v1) && hasStoneAt(v2, type));
+		return (content[h1] == type && content[h2] == null || content[h1] == null && content[h2] == type)
+				&& (content[v1] == type && content[v2] == null || content[v1] == null && content[v2] == type);
 	}
 }
