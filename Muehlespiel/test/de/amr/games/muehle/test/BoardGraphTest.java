@@ -4,6 +4,7 @@ import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
+import static de.amr.games.muehle.board.StoneType.WHITE;
 import static org.junit.Assert.assertTrue;
 
 import java.util.stream.IntStream;
@@ -87,6 +88,25 @@ public class BoardGraphTest {
 		assertTrue(board.neighbor(13, SOUTH) == 20);
 		assertTrue(board.neighbor(14, NORTH) == 2);
 		assertTrue(board.neighbor(14, SOUTH) == 23);
+	}
+
+	@Test
+	public void testHorizontalMill() {
+		filledBoard.putStoneAt(0, WHITE);
+		filledBoard.putStoneAt(1, WHITE);
+		filledBoard.putStoneAt(2, WHITE);
+		assertTrue(IntStream.of(0, 1, 2).allMatch(p -> filledBoard.isPositionInsideMill(p, WHITE)));
+		assertTrue(IntStream.range(3, 24).noneMatch(p -> filledBoard.isPositionInsideMill(p, WHITE)));
+	}
+
+	@Test
+	public void testVerticalMill() {
+		filledBoard.putStoneAt(3, WHITE);
+		filledBoard.putStoneAt(10, WHITE);
+		filledBoard.putStoneAt(18, WHITE);
+		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> filledBoard.isPositionInsideMill(p, WHITE)));
+		assertTrue(IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18))
+				.noneMatch(p -> filledBoard.isPositionInsideMill(p, WHITE)));
 	}
 
 }

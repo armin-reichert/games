@@ -418,8 +418,8 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(type);
 
-		return Stream.of(p, H_MILL_PARTNERS[p][0], H_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type)
-				|| Stream.of(p, V_MILL_PARTNERS[p][0], V_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type);
+		return IntStream.of(p, H_MILL_PARTNERS[p][0], H_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type)
+				|| IntStream.of(p, V_MILL_PARTNERS[p][0], V_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type);
 	}
 
 	/**
