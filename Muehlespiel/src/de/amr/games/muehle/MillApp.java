@@ -3,7 +3,6 @@ package de.amr.games.muehle;
 import java.util.ResourceBundle;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.muehle.play.PlayScene;
 
 /**
@@ -24,7 +23,7 @@ public class MillApp extends Application {
 		settings.title = messages.getString("title");
 		settings.width = 800;
 		settings.height = 800;
-		settings.fullScreenMode = FullScreen.Mode(1024, 768, 32);
+		settings.fullScreenMode = null;
 		settings.set("seconds-per-move", 1f);
 		pulse.setFrequency(25);
 	}

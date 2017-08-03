@@ -1,10 +1,5 @@
 package de.amr.games.muehle.board;
 
-import static de.amr.games.muehle.board.Direction.EAST;
-import static de.amr.games.muehle.board.Direction.NORTH;
-import static de.amr.games.muehle.board.Direction.SOUTH;
-import static de.amr.games.muehle.board.Direction.WEST;
-
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -55,35 +50,63 @@ public class BoardGraph {
 	};
 
 	/*
-	 * Auxiliary table storing the horizontal and vertical mill partner positions.
+	 * Auxiliary tables storing the horizontal and vertical mill partner positions.
 	 */
-	private static final int[][] POSSIBLE_MILLS = {
+	private static final int[][] H_MILL_PARTNERS = {
 			/*@formatter:off*/
-			/* h1, h2, v1, v2 */
-			{ 1, 2, 9, 21 },	
-			{ 0, 2, 4, 7 },
-			{ 0, 1, 14, 23 },
-			{ 4, 5, 10, 18 },
-			{ 3, 5, 1, 7 },
-			{ 3, 4, 13, 20 },
-			{ 7, 8, 11, 15 },
-			{ 6, 8, 1, 4 },
-			{ 6, 7, 12, 17 },
-			{ 10, 11, 0, 21 },
-			{ 9, 11, 3, 18 },
-			{ 9, 10, 6, 15 },
-			{ 13, 14, 8, 17 },
-			{ 12, 14, 5, 20 },
-			{ 12, 13, 2, 23 },
-			{ 16, 17, 6, 11 }, 
-			{ 15, 17, 19, 22 },
-			{ 15, 16, 8, 12 },
-			{ 19, 20, 3, 10 },
-			{ 18, 20, 16, 22 },
-			{ 18, 19, 5, 13 },
-			{ 22, 23, 0, 9 },
-			{ 21, 23, 16, 19 },
-			{ 21, 22, 2, 14 }
+			{ 1, 2 },	
+			{ 0, 2 },
+			{ 0, 1 },
+			{ 4, 5 },
+			{ 3, 5 },
+			{ 3, 4 },
+			{ 7, 8 },
+			{ 6, 8 },
+			{ 6, 7 },
+			{ 10, 11 },
+			{ 9, 11 },
+			{ 9, 10 },
+			{ 13, 14 },
+			{ 12, 14 },
+			{ 12, 13 },
+			{ 16, 17 }, 
+			{ 15, 17 },
+			{ 15, 16 },
+			{ 19, 20 },
+			{ 18, 20 },
+			{ 18, 19 },
+			{ 22, 23 },
+			{ 21, 23 },
+			{ 21, 22 }
+			/*@formatter:on*/
+	};
+
+	private static final int[][] V_MILL_PARTNERS = {
+			/*@formatter:off*/
+			{ 9, 21 },	
+			{ 4, 7 },
+			{ 14, 23 },
+			{ 10, 18 },
+			{ 1, 7 },
+			{ 13, 20 },
+			{ 11, 15 },
+			{ 1, 4 },
+			{ 12, 17 },
+			{ 0, 21 },
+			{ 3, 18 },
+			{ 6, 15 },
+			{ 8, 17 },
+			{ 5, 20 },
+			{ 2, 23 },
+			{ 6, 11 }, 
+			{ 19, 22 },
+			{ 8, 12 },
+			{ 3, 10 },
+			{ 16, 22 },
+			{ 5, 13 },
+			{ 0, 9 },
+			{ 16, 19 },
+			{ 2, 14 }
 			/*@formatter:on*/
 	};
 
@@ -132,11 +155,6 @@ public class BoardGraph {
 		}
 		Objects.requireNonNull(dir);
 		return NEIGHBORS[p][dir.ordinal()];
-	}
-
-	private int neighbor(int p, Direction dir, StoneType type) {
-		int n = neighbor(p, dir);
-		return n != -1 && hasStoneAt(n) && getStoneAt(n) == type ? n : -1;
 	}
 
 	/**
@@ -399,7 +417,9 @@ public class BoardGraph {
 			throw new IllegalArgumentException();
 		}
 		Objects.requireNonNull(type);
-		return findContainingMill(p, type, true) != null || findContainingMill(p, type, false) != null;
+
+		return Stream.of(p, H_MILL_PARTNERS[p][0], H_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type)
+				|| Stream.of(p, V_MILL_PARTNERS[p][0], V_MILL_PARTNERS[p][1]).allMatch(q -> getStoneAt(q) == type);
 	}
 
 	/**
@@ -410,58 +430,8 @@ public class BoardGraph {
 	 */
 	public boolean areAllStonesInsideMill(StoneType type) {
 		Objects.requireNonNull(type);
+
 		return positions(type).allMatch(p -> isPositionInsideMill(p, type));
-	}
-
-	/**
-	 * 
-	 * @param p
-	 *          a valid position
-	 * @param type
-	 *          a stone type
-	 * @param horizontal
-	 * @return the horizontal mill (if existing) of stones of the given type containing the given position, or
-	 *         <code>null</code> if there is no such mill
-	 */
-	public Mill findContainingMill(int p, StoneType type, boolean horizontal) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(type);
-
-		StoneType stone = getStoneAt(p);
-		if (stone == null || stone != type) {
-			return null;
-		}
-
-		Direction left = horizontal ? WEST : NORTH;
-		Direction right = horizontal ? EAST : SOUTH;
-		int q, r;
-		// p -> q -> r
-		q = neighbor(p, right, type);
-		if (q != -1) {
-			r = neighbor(q, right, type);
-			if (r != -1) {
-				return new Mill(p, q, r, horizontal);
-			}
-		}
-		// q <- p -> r
-		q = neighbor(p, left, type);
-		if (q != -1) {
-			r = neighbor(p, right, type);
-			if (r != -1) {
-				return new Mill(q, p, r, horizontal);
-			}
-		}
-		// q <- r <- p
-		r = neighbor(p, left, type);
-		if (r != -1) {
-			q = neighbor(r, left, type);
-			if (q != -1) {
-				return new Mill(q, r, p, horizontal);
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -472,6 +442,7 @@ public class BoardGraph {
 	 */
 	public IntStream positionsForClosingMill(StoneType type) {
 		Objects.requireNonNull(type);
+
 		return positions().filter(p -> canMillBeClosedAt(p, type));
 	}
 
@@ -492,16 +463,8 @@ public class BoardGraph {
 		if (hasStoneAt(p)) {
 			return false;
 		}
-		int[] row = POSSIBLE_MILLS[p];
-		int h1 = row[0], h2 = row[1];
-		if (hasStoneAt(h1, type) && hasStoneAt(h2, type)) {
-			return true;
-		}
-		int v1 = row[2], v2 = row[3];
-		if (hasStoneAt(v1, type) && hasStoneAt(v2, type)) {
-			return true;
-		}
-		return false;
+		return getStoneAt(H_MILL_PARTNERS[p][0]) == type && getStoneAt(H_MILL_PARTNERS[p][1]) == type
+				|| getStoneAt(V_MILL_PARTNERS[p][0]) == type && getStoneAt(V_MILL_PARTNERS[p][1]) == type;
 	}
 
 	/**
@@ -532,8 +495,8 @@ public class BoardGraph {
 		if (hasStoneAt(p)) {
 			return false;
 		}
-		int[] row = POSSIBLE_MILLS[p];
-		int h1 = row[0], h2 = row[1], v1 = row[2], v2 = row[3];
+		int h1 = H_MILL_PARTNERS[p][0], h2 = H_MILL_PARTNERS[p][1];
+		int v1 = V_MILL_PARTNERS[p][0], v2 = V_MILL_PARTNERS[p][1];
 		return (hasStoneAt(h1, type) && isEmpty(h2) || isEmpty(h1) && hasStoneAt(h2, type))
 				&& (hasStoneAt(v1, type) && isEmpty(v2) || isEmpty(v1) && hasStoneAt(v2, type));
 	}
