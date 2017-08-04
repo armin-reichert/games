@@ -167,10 +167,10 @@ public class PlayScene extends Scene<MillApp> {
 		board.tf.setY(50);
 
 		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
-		whiteStonesToPlaceCounter.tf.moveTo(50, getHeight() - 50);
+		whiteStonesToPlaceCounter.tf.moveTo(80, getHeight() - 50);
 
 		blackStonesToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - blackStonesPlaced);
-		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 50, getHeight() - 50);
+		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 80, getHeight() - 50);
 
 		Font msgFont = Assets.storeFont("message-font", "fonts/Cookie-Regular.ttf", 40, Font.PLAIN);
 		messageDisplay = new ScrollingText();
@@ -313,7 +313,7 @@ public class PlayScene extends Scene<MillApp> {
 			LOG.info(msg("stone_at_position_not_existing", from));
 			return;
 		}
-		if (turn != stone.getColor()) {
+		if (turn != stone.getType()) {
 			LOG.info(msg("stone_at_position_wrong_color", from));
 			return;
 		}

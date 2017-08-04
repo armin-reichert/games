@@ -34,18 +34,29 @@ public class StonesCounter extends Stone {
 
 	@Override
 	public void draw(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		int numStones = stoneCountSupplier.getAsInt();
+		int delta = 5;
+		int xOffset = delta * (numStones - 1), yOffset = -delta * (numStones - 1);
+		for (int i = 0; i < numStones - 1; ++i) {
+			g.translate(xOffset, yOffset);
+			super.draw(g);
+			g.translate(-xOffset, -yOffset);
+			xOffset -= delta;
+			yOffset += delta;
+		}
+
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
-		g.setColor(getColor() == StoneType.WHITE ? Color.BLACK : Color.WHITE);
-		int fontSize = getHeight() / 2;
-		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, fontSize));
-		String text = String.valueOf(stoneCountSupplier.getAsInt());
-		g.drawString(text, -fontSize / 4, fontSize / 4);
+		g.setColor(getType() == StoneType.WHITE ? Color.BLACK : Color.WHITE);
+		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, getHeight() * 3 / 4));
+		String text = String.valueOf(numStones);
+		int width = g.getFontMetrics().stringWidth(text);
+		g.drawString(text, -width / 2, getHeight() / 4);
 		if (highlighted) {
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g.setColor(Color.GREEN);
 			g.setStroke(new BasicStroke(4));
-			int radius = Stone.radius;
 			g.drawOval(-radius, -radius, 2 * radius, 2 * radius);
 		}
 		g.translate(-tf.getX(), -tf.getY());
