@@ -95,7 +95,8 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> {
 				if (mustRemoveOpponentStone) {
-					if (tryToRemoveStone(opponent())) {
+					boolean removed = tryToRemoveStone(opponent());
+					if (removed) {
 						mustRemoveOpponentStone = false;
 						setPlacingTurn(opponent());
 					}
