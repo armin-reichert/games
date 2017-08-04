@@ -160,6 +160,8 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
+		Font msgFont = Assets.storeFont("message-font", "fonts/Cookie-Regular.ttf", 40, Font.PLAIN);
+
 		boardGraph = new BoardGraph();
 
 		board = new Board(boardGraph, 600, 600);
@@ -167,12 +169,13 @@ public class PlayScene extends Scene<MillApp> {
 		board.tf.setY(50);
 
 		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
-		whiteStonesToPlaceCounter.tf.moveTo(80, getHeight() - 50);
+		whiteStonesToPlaceCounter.tf.moveTo(40, getHeight() - 50);
+		whiteStonesToPlaceCounter.init();
 
 		blackStonesToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - blackStonesPlaced);
 		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 80, getHeight() - 50);
+		blackStonesToPlaceCounter.init();
 
-		Font msgFont = Assets.storeFont("message-font", "fonts/Cookie-Regular.ttf", 40, Font.PLAIN);
 		messageDisplay = new ScrollingText();
 		messageDisplay.setColor(Color.BLUE);
 		messageDisplay.setFont(msgFont);
@@ -218,8 +221,8 @@ public class PlayScene extends Scene<MillApp> {
 	private void setPlacingTurn(StoneType type) {
 		turn = type;
 		displayMessage(isWhitesTurn() ? "white_must_place" : "black_must_place");
-		whiteStonesToPlaceCounter.setHighlighted(isWhitesTurn());
-		blackStonesToPlaceCounter.setHighlighted(!isWhitesTurn());
+		whiteStonesToPlaceCounter.setSelected(isWhitesTurn());
+		blackStonesToPlaceCounter.setSelected(!isWhitesTurn());
 	}
 
 	private void setMovingTurn(StoneType type) {

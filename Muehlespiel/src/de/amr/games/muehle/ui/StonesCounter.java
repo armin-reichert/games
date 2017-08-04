@@ -1,12 +1,14 @@
 package de.amr.games.muehle.ui;
 
-import java.awt.BasicStroke;
+import static de.amr.games.muehle.board.StoneType.WHITE;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.function.IntSupplier;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.games.muehle.board.StoneType;
 
 /**
@@ -16,7 +18,8 @@ import de.amr.games.muehle.board.StoneType;
  */
 public class StonesCounter extends Stone {
 
-	private boolean highlighted;
+	private Font textFont;
+	private boolean selected;
 	private IntSupplier stoneCountSupplier;
 
 	public StonesCounter(StoneType stoneType, IntSupplier stoneCountSupplier) {
@@ -24,12 +27,17 @@ public class StonesCounter extends Stone {
 		this.stoneCountSupplier = stoneCountSupplier;
 	}
 
-	public void setHighlighted(boolean highlighted) {
-		this.highlighted = highlighted;
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 
-	public boolean isHighlighted() {
-		return highlighted;
+	public boolean isSelected() {
+		return selected;
+	}
+
+	@Override
+	public void init() {
+		textFont = Assets.storeFont("stone-counter-font", "fonts/Cookie-Regular.ttf", getHeight(), Font.BOLD);
 	}
 
 	@Override
@@ -46,19 +54,13 @@ public class StonesCounter extends Stone {
 			xOffset -= delta;
 			yOffset += delta;
 		}
-
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
-		g.setColor(getType() == StoneType.WHITE ? Color.BLACK : Color.WHITE);
-		g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, getHeight() * 3 / 4));
+		g.setColor(selected ? Color.RED : getType() == WHITE ? Color.BLACK : Color.WHITE);
+		g.setFont(textFont);
 		String text = String.valueOf(numStones);
 		int width = g.getFontMetrics().stringWidth(text);
 		g.drawString(text, -width / 2, getHeight() / 4);
-		if (highlighted) {
-			g.setColor(Color.GREEN);
-			g.setStroke(new BasicStroke(4));
-			g.drawOval(-radius, -radius, 2 * radius, 2 * radius);
-		}
 		g.translate(-tf.getX(), -tf.getY());
 	}
 }
