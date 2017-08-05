@@ -155,7 +155,7 @@ public class Board extends GameEntity {
 	}
 
 	public void markPosition(Graphics2D g, int p, Color color) {
-		int markerSize = posRadius * 8 / 5;
+		int markerSize = posRadius * 8 / 10;
 		Vector2 center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

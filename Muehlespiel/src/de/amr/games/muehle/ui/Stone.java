@@ -21,9 +21,9 @@ public class Stone extends GameEntity {
 
 	static {
 		FILL.put(WHITE, new Color(255, 248, 220));
-		FILL.put(BLACK, Color.DARK_GRAY);
+		FILL.put(BLACK, Color.BLACK);
 		EDGE.put(WHITE, new Color(255, 248, 220).darker());
-		EDGE.put(BLACK, Color.BLACK);
+		EDGE.put(BLACK, Color.DARK_GRAY);
 	}
 
 	private StoneType type;
@@ -48,13 +48,17 @@ public class Stone extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
+		int diameter = 2 * radius;
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.translate(tf.getX() - radius, tf.getY() - radius);
 		g.setColor(FILL.get(type));
-		g.fillOval(0, 0, 2 * radius, 2 * radius);
-		g.setStroke(new BasicStroke(2));
+		g.fillOval(0, 0, diameter, diameter);
+		g.setStroke(new BasicStroke(3));
 		g.setColor(EDGE.get(type));
-		g.drawOval(0, 0, 2 * radius, 2 * radius);
+		g.setStroke(new BasicStroke(2));
+		g.drawOval(0, 0, diameter, diameter);
+		g.drawOval(diameter / 6, diameter / 6, 2 * diameter / 3, 2 * diameter / 3);
+		g.drawOval(diameter / 3, diameter / 3, diameter / 3, diameter / 3);
 		g.translate(-tf.getX() + radius, -tf.getY() + radius);
 	}
 }

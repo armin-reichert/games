@@ -173,13 +173,13 @@ public class PlayScene extends Scene<MillApp> {
 		whiteStonesToPlaceCounter.init();
 
 		blackStonesToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - blackStonesPlaced);
-		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 80, getHeight() - 50);
+		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 100, getHeight() - 50);
 		blackStonesToPlaceCounter.init();
 
 		messageDisplay = new ScrollingText();
 		messageDisplay.setColor(Color.BLUE);
 		messageDisplay.setFont(msgFont);
-		messageDisplay.tf.moveTo(0, getHeight() - 80);
+		messageDisplay.tf.moveTo(0, getHeight() - 90);
 
 		control.setLogger(LOG);
 		control.init();
