@@ -266,11 +266,11 @@ public class PlayScene extends Scene<MillApp> {
 			return false;
 		}
 		if (!boardGraph.hasStoneAt(p)) {
-			LOG.info(msg("stone_at_position_not_existing"));
+			LOG.info(msg("stone_at_position_not_existing", p));
 			return false;
 		}
 		if (boardGraph.getStoneAt(p) != color) {
-			LOG.info(msg("stone_at_position_wrong_color"));
+			LOG.info(msg("stone_at_position_wrong_color", p));
 			return false;
 		}
 		if (boardGraph.isPositionInsideMill(p, color) && !boardGraph.areAllStonesInsideMill(color)) {
