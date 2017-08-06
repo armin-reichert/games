@@ -19,6 +19,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import de.amr.easy.game.assets.Assets;
@@ -96,11 +97,10 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> {
 				if (mustRemoveOpponentStone) {
-					boolean removed = tryToRemoveStone(opponent());
-					if (removed) {
+					tryToRemoveStone(opponent()).ifPresent(pos -> {
 						mustRemoveOpponentStone = false;
 						setPlacingTurn(opponent());
-					}
+					});
 				} else {
 					OptionalInt optPos = tryToPlaceStone();
 					if (optPos.isPresent()) {
@@ -126,15 +126,14 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING).update = s -> {
 				if (mustRemoveOpponentStone) {
-					boolean removed = tryToRemoveStone(opponent());
-					if (removed) {
+					tryToRemoveStone(opponent()).ifPresent(pos -> {
 						mustRemoveOpponentStone = false;
 						setMovingTurn(opponent());
-					}
+					});
 				} else {
 					tryToMoveStone();
 					if (move.isComplete()) {
-						if (boardGraph.isPositionInsideMill(move.getTo(), turn)) {
+						if (boardGraph.isPositionInsideMill(move.getTo().getAsInt(), turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
@@ -237,144 +236,142 @@ public class PlayScene extends Scene<MillApp> {
 		displayMessage(winner == WHITE ? "white_wins" : "black_wins");
 	}
 
-	// Placing
-
-	private OptionalInt findClickPosition() {
-		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
-	}
-
-	private OptionalInt tryToPlaceStone() {
-		OptionalInt optPos = findClickPosition();
-		if (optPos.isPresent()) {
-			int pos = optPos.getAsInt();
-			if (boardGraph.hasStoneAt(pos)) {
-				LOG.info(msg("stone_at_position", pos));
-				return OptionalInt.empty();
-			}
-			if (isWhitesTurn()) {
-				board.putStoneAt(pos, WHITE);
-				whiteStonesPlaced += 1;
-			} else {
-				board.putStoneAt(pos, BLACK);
-				blackStonesPlaced += 1;
-			}
-		}
-		return optPos;
-	}
-
-	private boolean tryToRemoveStone(StoneType color) {
-		OptionalInt optPos = findClickPosition();
-		if (optPos.isPresent()) {
-			int pos = optPos.getAsInt();
-			if (!boardGraph.hasStoneAt(pos)) {
-				LOG.info(msg("stone_at_position_not_existing", pos));
-				return false;
-			}
-			if (boardGraph.getStoneAt(pos) != color) {
-				LOG.info(msg("stone_at_position_wrong_color", pos));
-				return false;
-			}
-			if (boardGraph.isPositionInsideMill(pos, color) && !boardGraph.areAllStonesInsideMill(color)) {
-				LOG.info(msg("stone_cannot_be_removed_from_mill"));
-				return false;
-			}
-			board.removeStoneAt(pos);
-			LOG.info(isWhitesTurn() ? msg("white_took_stone") : msg("black_took_stone"));
-			return true;
-		}
-		return false;
-	}
-
-	// Moving
-
 	private boolean canJump() {
 		return boardGraph.stoneCount(turn) == 3;
 	}
 
+	// Placing stones
+
+	private OptionalInt findMouseClickPosition() {
+		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
+	}
+
+	private OptionalInt tryToPlaceStone() {
+		OptionalInt optClickPosition = findMouseClickPosition();
+		if (optClickPosition.isPresent()) {
+			int clickPosition = optClickPosition.getAsInt();
+			if (boardGraph.hasStoneAt(clickPosition)) {
+				LOG.info(msg("stone_at_position", clickPosition));
+				return OptionalInt.empty();
+			}
+			if (isWhitesTurn()) {
+				board.putStoneAt(clickPosition, WHITE);
+				whiteStonesPlaced += 1;
+			} else {
+				board.putStoneAt(clickPosition, BLACK);
+				blackStonesPlaced += 1;
+			}
+		}
+		return optClickPosition;
+	}
+
+	private OptionalInt tryToRemoveStone(StoneType color) {
+		OptionalInt optClickPosition = findMouseClickPosition();
+		if (optClickPosition.isPresent()) {
+			int clickPosition = optClickPosition.getAsInt();
+			if (!boardGraph.hasStoneAt(clickPosition)) {
+				LOG.info(msg("stone_at_position_not_existing", clickPosition));
+			} else if (boardGraph.getStoneAt(clickPosition) != color) {
+				LOG.info(msg("stone_at_position_wrong_color", clickPosition));
+			} else if (boardGraph.isPositionInsideMill(clickPosition, color) && !boardGraph.areAllStonesInsideMill(color)) {
+				LOG.info(msg("stone_cannot_be_removed_from_mill"));
+			} else {
+				board.removeStoneAt(clickPosition);
+				LOG.info(isWhitesTurn() ? msg("white_took_stone") : msg("black_took_stone"));
+				return optClickPosition;
+			}
+		}
+		return OptionalInt.empty();
+	}
+
+	// Moving stones
+
 	private void tryToMoveStone() {
-		if (move.getFrom() == -1) {
-			supplyMoveStartPosition();
-		} else if (move.getTo() == -1) {
-			supplyMoveEndPosition();
+		if (!move.getFrom().isPresent()) {
+			supplyMoveStartPosition().ifPresent(from -> move.setFrom(from));
+		} else if (!move.getTo().isPresent()) {
+			supplyMoveEndPosition().ifPresent(to -> move.setTo(to));
 		} else {
 			move.execute();
 		}
 	}
 
-	private void supplyMoveStartPosition() {
-		if (!Mouse.clicked())
-			return;
-
-		OptionalInt optPos = board.findPosition(Mouse.getX(), Mouse.getY());
-		if (!optPos.isPresent()) {
-			LOG.info(msg("no_position_identified"));
-			return;
-		}
-		int pos = optPos.getAsInt();
-		if (!canJump() && !boardGraph.hasEmptyNeighbor(pos)) {
-			LOG.info(msg("stone_at_position_cannot_move", pos));
-			return;
-		}
-		Stone stone = board.getStoneAt(pos);
-		if (stone == null) {
-			LOG.info(msg("stone_at_position_not_existing", pos));
-			return;
-		}
-		if (turn != stone.getType()) {
-			LOG.info(msg("stone_at_position_wrong_color", pos));
-			return;
-		}
-		move.setFrom(pos);
-	}
-
-	private void supplyMoveEndPosition() {
-		// unique target position?
-		if (!canJump() && boardGraph.emptyNeighbors(move.getFrom()).count() == 1) {
-			move.setTo(boardGraph.emptyNeighbors(move.getFrom()).findFirst().getAsInt());
-			return;
-		}
-		// cursor key pressed?
-		Direction dir = supplyMoveDirection();
-		if (dir != null) {
-			OptionalInt to = boardGraph.neighbor(move.getFrom(), dir);
-			if (to.isPresent() && boardGraph.isEmpty(to.getAsInt())) {
-				move.setTo(to.getAsInt());
-				return;
-			}
-		}
-		// target position selected with mouse click?
+	private OptionalInt supplyMoveStartPosition() {
 		if (Mouse.clicked()) {
-			OptionalInt to = board.findPosition(Mouse.getX(), Mouse.getY());
-			if (!to.isPresent()) {
-				return;
-			}
-			int pos = to.getAsInt();
-			if (boardGraph.hasStoneAt(pos)) {
-				return;
-			}
-			if (canJump() || boardGraph.areNeighbors(move.getFrom(), pos)) {
-				move.setTo(pos);
-				return;
+			OptionalInt optStartPosition = board.findPosition(Mouse.getX(), Mouse.getY());
+			if (optStartPosition.isPresent()) {
+				int from = optStartPosition.getAsInt();
+				if (!canJump() && !boardGraph.hasEmptyNeighbor(from)) {
+					LOG.info(msg("stone_at_position_cannot_move", from));
+				} else {
+					Optional<Stone> optStone = board.getStoneAt(from);
+					if (!optStone.isPresent()) {
+						LOG.info(msg("stone_at_position_not_existing", from));
+					} else if (turn != optStone.get().getType()) {
+						LOG.info(msg("stone_at_position_wrong_color", from));
+					}
+					return optStartPosition;
+				}
 			}
 		}
+		return OptionalInt.empty();
 	}
 
-	private Direction supplyMoveDirection() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
-			return NORTH;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
-			return EAST;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
-			return SOUTH;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
-			return WEST;
+	private OptionalInt supplyMoveEndPosition() {
+		if (!move.getFrom().isPresent()) {
+			return OptionalInt.empty();
 		}
-		return null;
+		int from = move.getFrom().getAsInt();
+
+		// if target position is unique, use it
+		if (!canJump() && boardGraph.emptyNeighbors(from).count() == 1) {
+			return boardGraph.emptyNeighbors(from).findFirst();
+		}
+
+		// if move direction specified and position in that direction is empty, use it
+		Optional<Direction> optMoveDirection = supplyMoveDirection();
+		if (optMoveDirection.isPresent()) {
+			Direction dir = optMoveDirection.get();
+			OptionalInt optNeighbor = boardGraph.neighbor(from, dir);
+			if (optNeighbor.isPresent()) {
+				int neighbor = optNeighbor.getAsInt();
+				if (boardGraph.isEmpty(neighbor)) {
+					return OptionalInt.of(neighbor);
+				}
+			}
+		}
+
+		// if target position selected with mouse click and can move to that position, use it
+		if (Mouse.clicked()) {
+			OptionalInt optClickPos = board.findPosition(Mouse.getX(), Mouse.getY());
+			if (optClickPos.isPresent()) {
+				int clickPos = optClickPos.getAsInt();
+				if (!boardGraph.hasStoneAt(clickPos) && (canJump() || boardGraph.areNeighbors(from, clickPos))) {
+					return OptionalInt.of(clickPos);
+				}
+			}
+		}
+
+		// no end position
+		return OptionalInt.empty();
+	}
+
+	private Optional<Direction> supplyMoveDirection() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
+			return Optional.of(NORTH);
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
+			return Optional.of(EAST);
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
+			return Optional.of(SOUTH);
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
+			return Optional.of(WEST);
+		}
+		return Optional.empty();
 	}
 
 	private double supplyMoveSpeed() {
-		Vector2 centerFrom = board.centerPoint(move.getFrom());
-		Vector2 centerTo = board.centerPoint(move.getTo());
+		Vector2 centerFrom = board.centerPoint(move.getFrom().getAsInt());
+		Vector2 centerTo = board.centerPoint(move.getTo().getAsInt());
 		return dist(centerFrom, centerTo) / app.pulse.secToTicks(app.settings.getAsFloat("seconds-per-move"));
 	}
 
@@ -416,13 +413,13 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawMovingInfo(Graphics2D g) {
-		if (move.getFrom() == -1) {
+		if (move.getFrom().isPresent()) {
+			board.markPosition(g, move.getFrom().getAsInt(), Color.ORANGE);
+		} else {
 			board.markPossibleMoveStarts(g, turn, canJump());
 			if (assistantOn) {
 				board.markPositionFixingOpponent(g, turn, opponent(), Color.RED);
 			}
-		} else {
-			board.markPosition(g, move.getFrom(), Color.ORANGE);
 		}
 		if (control.mustRemoveOpponentStone) {
 			board.markRemovableStones(g, opponent());

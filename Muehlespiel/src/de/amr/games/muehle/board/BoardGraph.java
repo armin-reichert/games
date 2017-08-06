@@ -217,7 +217,7 @@ public class BoardGraph {
 	 * @param q
 	 *          a valid position
 	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are
-	 *         neighbors,
+	 *         neighbors
 	 */
 	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);

@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -79,8 +80,8 @@ public class Board extends GameEntity {
 		stones[p] = stone;
 	}
 
-	public Stone getStoneAt(int p) {
-		return stones[p];
+	public Optional<Stone> getStoneAt(int p) {
+		return stones[p] == null ? Optional.empty() : Optional.of(stones[p]);
 	}
 
 	public void moveStone(int from, int to) {
@@ -193,7 +194,7 @@ public class Board extends GameEntity {
 		boolean allInMill = boardGraph.areAllStonesInsideMill(stoneType);
 		boardGraph.positions(stoneType).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, stoneType))
 				.forEach(p -> {
-					Stone stone = getStoneAt(p);
+					Stone stone = getStoneAt(p).get();
 					float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
 					float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
 					g.translate(offsetX, offsetY);

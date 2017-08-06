@@ -5,6 +5,7 @@ import static de.amr.easy.game.Application.LOG;
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.DoubleSupplier;
 
 import de.amr.easy.game.math.Vector2;
@@ -37,16 +38,16 @@ public class Move {
 		from = p;
 	}
 
-	public int getFrom() {
-		return from;
+	public OptionalInt getFrom() {
+		return from == -1 ? OptionalInt.empty() : OptionalInt.of(from);
 	}
 
 	public void setTo(int p) {
 		to = p;
 	}
 
-	public int getTo() {
-		return to;
+	public OptionalInt getTo() {
+		return to == -1 ? OptionalInt.empty() : OptionalInt.of(to);
 	}
 
 	public boolean isComplete() {
@@ -62,19 +63,21 @@ public class Move {
 	}
 
 	private void move() {
-		Stone stone = boardEntity.getStoneAt(from);
-		if (!moving) {
-			stone.tf.setVelocity(computeVelocity());
-			LOG.info("Starting move from " + from + " to " + to + " towards "
-					+ boardEntity.getBoardGraph().getDirection(from, to));
-			moving = true;
-		}
-		stone.tf.move();
-		if (isEndPositionReached()) {
-			moving = false;
-			complete = true;
-			boardEntity.moveStone(from, to);
-		}
+		boardEntity.getStoneAt(from).ifPresent(stone -> {
+			if (!moving) {
+				supplyVelocity().ifPresent(velocity -> stone.tf.setVelocity(velocity));
+				LOG.info("Starting move from " + from + " to " + to + " towards "
+						+ boardEntity.getBoardGraph().getDirection(from, to));
+				moving = true;
+			}
+			stone.tf.move();
+			if (isEndPositionReached()) {
+				stone.tf.setVelocity(0, 0);
+				moving = false;
+				complete = true;
+				boardEntity.moveStone(from, to);
+			}
+		});
 	}
 
 	private void jump() {
@@ -85,7 +88,7 @@ public class Move {
 	}
 
 	private boolean isEndPositionReached() {
-		Stone stone = boardEntity.getStoneAt(from);
+		Stone stone = boardEntity.getStoneAt(from).get();
 		Vector2 center = boardEntity.centerPoint(to);
 		Vector2 velocity = new Vector2(stone.tf.getVelocityX(), stone.tf.getVelocityY());
 		float speed = velocity.length();
@@ -93,21 +96,21 @@ public class Move {
 		return spot.contains(new Point(center.roundedX(), center.roundedY()));
 	}
 
-	private Vector2 computeVelocity() {
+	private Optional<Vector2> supplyVelocity() {
 		Optional<Direction> direction = boardEntity.getBoardGraph().getDirection(from, to);
 		if (direction.isPresent()) {
 			float speed = (float) speedSupplier.getAsDouble();
 			switch (direction.get()) {
 			case NORTH:
-				return new Vector2(0, -speed);
+				return Optional.of(new Vector2(0, -speed));
 			case EAST:
-				return new Vector2(speed, 0);
+				return Optional.of(new Vector2(speed, 0));
 			case SOUTH:
-				return new Vector2(0, speed);
+				return Optional.of(new Vector2(0, speed));
 			case WEST:
-				return new Vector2(-speed, 0);
+				return Optional.of(new Vector2(-speed, 0));
 			}
 		}
-		return new Vector2(0, 0);
+		return Optional.empty();
 	}
 }
