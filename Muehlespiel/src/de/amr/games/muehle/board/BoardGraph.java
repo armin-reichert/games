@@ -8,9 +8,27 @@ import java.util.stream.Stream;
  * The board data model as an undirected oriented graph. Each node has at most one neighbor in one of the four
  * directions. Nodes are numbered row-wise top to bottom.
  *
- * @author Armin Reichert & Peter und Anna Schillo
+ * @author Armin Reichert, Peter & Anna Schillo
  */
 public class BoardGraph {
+
+	private static void checkPosition(int p) {
+		if (p < 0 || p >= NUM_POS) {
+			throw new IllegalArgumentException("Illegal position: " + p);
+		}
+	}
+
+	private static void checkStoneType(StoneType type) {
+		if (type == null) {
+			throw new IllegalArgumentException("Illegal stone type: " + type);
+		}
+	}
+
+	private static void checkDirection(Direction dir) {
+		if (dir == null) {
+			throw new IllegalArgumentException("Illegal direction: " + dir);
+		}
+	}
 
 	/** The number of positions (nodes). */
 	public static final int NUM_POS = 24;
@@ -135,9 +153,7 @@ public class BoardGraph {
 	 * @return a stream of the neighbor positions
 	 */
 	public IntStream neighbors(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		return IntStream.of(NEIGHBORS[p]).filter(n -> n != -1);
 	}
 
@@ -150,10 +166,8 @@ public class BoardGraph {
 	 * @return the neighbor in the given position or <code>-1</code>
 	 */
 	public int neighbor(int p, Direction dir) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(dir);
+		checkPosition(p);
+		checkDirection(dir);
 		return NEIGHBORS[p][dir.ordinal()];
 	}
 
@@ -164,9 +178,7 @@ public class BoardGraph {
 	 * @return a stream of the empty neighbor positions of p
 	 */
 	public IntStream emptyNeighbors(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		return neighbors(p).filter(this::isEmpty);
 	}
 
@@ -177,9 +189,7 @@ public class BoardGraph {
 	 * @return if the position p has an empy neighbor position
 	 */
 	public boolean hasEmptyNeighbor(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		return neighbors(p).anyMatch(this::isEmpty);
 	}
 
@@ -192,12 +202,8 @@ public class BoardGraph {
 	 * @return if the given positions are neighbors
 	 */
 	public boolean areNeighbors(int p, int q) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		if (q == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
+		checkPosition(q);
 		return neighbors(p).anyMatch(n -> n == q);
 	}
 
@@ -211,12 +217,8 @@ public class BoardGraph {
 	 *         otherwise <code>-1</code>
 	 */
 	public Direction getDirection(int p, int q) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		if (q == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
+		checkPosition(q);
 		return Stream.of(Direction.values()).filter(dir -> neighbor(p, dir) == q).findFirst().orElse(null);
 	}
 
@@ -236,7 +238,7 @@ public class BoardGraph {
 	 * @return a stream of the positions containing a stone of the given type
 	 */
 	public IntStream positions(StoneType type) {
-		Objects.requireNonNull(type);
+		checkStoneType(type);
 		return positions().filter(p -> content[p] == type);
 	}
 
@@ -264,7 +266,7 @@ public class BoardGraph {
 	 * @return the number of stones of the given type on the board
 	 */
 	public long stoneCount(StoneType type) {
-		Objects.requireNonNull(type);
+		checkStoneType(type);
 		return Stream.of(content).filter(stone -> stone == type).count();
 	}
 
@@ -277,10 +279,8 @@ public class BoardGraph {
 	 *          a stone type
 	 */
 	public void putStoneAt(int p, StoneType type) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(type);
+		checkPosition(p);
+		checkStoneType(type);
 		if (content[p] != null) {
 			throw new IllegalStateException("Position where stone is placed must be empty");
 		}
@@ -294,9 +294,7 @@ public class BoardGraph {
 	 *          a valid position
 	 */
 	public void removeStoneAt(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		content[p] = null;
 	}
 
@@ -310,6 +308,8 @@ public class BoardGraph {
 	 *          the target position
 	 */
 	public void moveStone(int from, int to) {
+		checkPosition(from);
+		checkPosition(to);
 		if (content[from] == null) {
 			throw new IllegalStateException("Position from where stone is moved must not be empty");
 		}
@@ -327,9 +327,7 @@ public class BoardGraph {
 	 * @return the content at this position or <code>null</code>
 	 */
 	public StoneType getStoneAt(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		return content[p];
 	}
 
@@ -340,9 +338,7 @@ public class BoardGraph {
 	 * @return if the position is empty
 	 */
 	public boolean isEmpty(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		return content[p] == null;
 	}
 
@@ -353,9 +349,7 @@ public class BoardGraph {
 	 * @return if there is a stone at the position
 	 */
 	public boolean hasStoneAt(int p) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
+		checkPosition(p);
 		return content[p] != null;
 	}
 
@@ -368,10 +362,8 @@ public class BoardGraph {
 	 * @return if there is a stone of the given type at this position
 	 */
 	public boolean hasStoneAt(int p, StoneType type) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(type);
+		checkPosition(p);
+		checkStoneType(type);
 		return content[p] == type;
 	}
 
@@ -394,7 +386,7 @@ public class BoardGraph {
 	 * @return if no stone of the given type can move to some neighbor position
 	 */
 	public boolean cannotMoveStones(StoneType type) {
-		Objects.requireNonNull(type);
+		checkStoneType(type);
 		return positions(type).allMatch(p -> emptyNeighbors(p).count() == 0);
 	}
 
@@ -408,11 +400,8 @@ public class BoardGraph {
 	 * @return if the given position is inside a mill of stones of the given type
 	 */
 	public boolean isPositionInsideMill(int p, StoneType type) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(type);
-
+		checkPosition(p);
+		checkStoneType(type);
 		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> content[q] == type)
 				|| IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> content[q] == type);
 	}
@@ -443,11 +432,8 @@ public class BoardGraph {
 	 * @return if a mill of stones of the given type could be closed when placing a stone on the given position
 	 */
 	public boolean canMillBeClosedAt(int p, StoneType type) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(type);
-
+		checkPosition(p);
+		checkStoneType(type);
 		return content[p] == null && (content[H_MILL[p][0]] == type && content[H_MILL[p][1]] == type
 				|| content[V_MILL[p][0]] == type && content[V_MILL[p][1]] == type);
 	}
@@ -469,11 +455,8 @@ public class BoardGraph {
 	 * @return if placing a stone of the given type at the given positions would open two mills
 	 */
 	public boolean canTwoMillsBeOpenedAt(int p, StoneType type) {
-		if (p == -1) {
-			throw new IllegalArgumentException();
-		}
-		Objects.requireNonNull(type);
-
+		checkPosition(p);
+		checkStoneType(type);
 		if (content[p] != null) {
 			return false;
 		}
