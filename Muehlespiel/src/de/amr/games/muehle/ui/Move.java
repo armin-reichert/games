@@ -4,6 +4,7 @@ import static de.amr.easy.game.Application.LOG;
 
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import de.amr.easy.game.math.Vector2;
@@ -64,8 +65,8 @@ public class Move {
 		Stone stone = boardEntity.getStoneAt(from);
 		if (!moving) {
 			stone.tf.setVelocity(computeVelocity());
-			LOG.info(
-					"Starting move from " + from + " to " + to + " towards " + boardEntity.getBoardGraph().getDirection(from, to));
+			LOG.info("Starting move from " + from + " to " + to + " towards "
+					+ boardEntity.getBoardGraph().getDirection(from, to));
 			moving = true;
 		}
 		stone.tf.move();
@@ -93,19 +94,20 @@ public class Move {
 	}
 
 	private Vector2 computeVelocity() {
-		Direction direction = boardEntity.getBoardGraph().getDirection(from, to);
-		float speed = (float) speedSupplier.getAsDouble();
-		switch (direction) {
-		case NORTH:
-			return new Vector2(0, -speed);
-		case EAST:
-			return new Vector2(speed, 0);
-		case SOUTH:
-			return new Vector2(0, speed);
-		case WEST:
-			return new Vector2(-speed, 0);
-		default:
-			return new Vector2(0, 0);
+		Optional<Direction> direction = boardEntity.getBoardGraph().getDirection(from, to);
+		if (direction.isPresent()) {
+			float speed = (float) speedSupplier.getAsDouble();
+			switch (direction.get()) {
+			case NORTH:
+				return new Vector2(0, -speed);
+			case EAST:
+				return new Vector2(speed, 0);
+			case SOUTH:
+				return new Vector2(0, speed);
+			case WEST:
+				return new Vector2(-speed, 0);
+			}
 		}
+		return new Vector2(0, 0);
 	}
 }

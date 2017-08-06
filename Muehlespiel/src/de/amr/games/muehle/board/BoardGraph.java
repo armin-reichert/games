@@ -1,6 +1,7 @@
 package de.amr.games.muehle.board;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -215,17 +216,19 @@ public class BoardGraph {
 	 *          a valid position
 	 * @param q
 	 *          a valid position
-	 * @return the direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are neighbors,
-	 *         otherwise <code>-1</code>
+	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are
+	 *         neighbors,
 	 */
-	public Direction getDirection(int p, int q) {
+	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
 		checkPosition(q);
 		/*@formatter:off*/
 		return Stream.of(Direction.values())
-			.filter(dir -> neighbor(p, dir).isPresent())
-			.filter(dir -> neighbor(p, dir).getAsInt() == q)
-			.findFirst().orElse(null);
+			.filter(dir -> {
+				OptionalInt neighbor = neighbor(p, dir);
+				return neighbor.isPresent() && neighbor.getAsInt() == q;
+			})
+			.findFirst();
 		/*@formatter:off*/
 	}
 
