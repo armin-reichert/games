@@ -1,6 +1,7 @@
 package de.amr.games.muehle.board;
 
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -163,12 +164,13 @@ public class BoardGraph {
 	 *          a valid position
 	 * @param dir
 	 *          a valid direction
-	 * @return the neighbor in the given position or <code>-1</code>
+	 * @return the (optional) neighbor in the given direction
 	 */
-	public int neighbor(int p, Direction dir) {
+	public OptionalInt neighbor(int p, Direction dir) {
 		checkPosition(p);
 		checkDirection(dir);
-		return NEIGHBORS[p][dir.ordinal()];
+		int q = NEIGHBORS[p][dir.ordinal()];
+		return q != -1 ? OptionalInt.of(q) : OptionalInt.empty();
 	}
 
 	/**
@@ -219,7 +221,12 @@ public class BoardGraph {
 	public Direction getDirection(int p, int q) {
 		checkPosition(p);
 		checkPosition(q);
-		return Stream.of(Direction.values()).filter(dir -> neighbor(p, dir) == q).findFirst().orElse(null);
+		/*@formatter:off*/
+		return Stream.of(Direction.values())
+			.filter(dir -> neighbor(p, dir).isPresent())
+			.filter(dir -> neighbor(p, dir).getAsInt() == q)
+			.findFirst().orElse(null);
+		/*@formatter:off*/
 	}
 
 	// Stone assignment related methods:

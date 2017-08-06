@@ -336,9 +336,9 @@ public class PlayScene extends Scene<MillApp> {
 		// cursor key pressed?
 		Direction dir = supplyMoveDirection();
 		if (dir != null) {
-			int to = boardGraph.neighbor(move.getFrom(), dir);
-			if (to != -1 && boardGraph.isEmpty(to)) {
-				move.setTo(to);
+			OptionalInt to = boardGraph.neighbor(move.getFrom(), dir);
+			if (to.isPresent() && boardGraph.isEmpty(to.getAsInt())) {
+				move.setTo(to.getAsInt());
 				return;
 			}
 		}
