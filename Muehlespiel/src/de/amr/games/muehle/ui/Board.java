@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -99,11 +100,11 @@ public class Board extends GameEntity {
 		return new Vector2(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
 	}
 
-	public int findNearestPosition(int x, int y, int radius) {
-		return boardGraph.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst().orElse(-1);
+	public OptionalInt findNearestPosition(int x, int y, int radius) {
+		return boardGraph.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
 	}
 
-	public int findPosition(int x, int y) {
+	public OptionalInt findPosition(int x, int y) {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
 		return findNearestPosition(boardX, boardY, getWidth() / 18);
