@@ -50,7 +50,7 @@ public class Board extends GameEntity {
 		Stone.radius = width / 24;
 	}
 
-	public BoardGraph getBoardGraph() {
+	public BoardGraph getModel() {
 		return boardGraph;
 	}
 

@@ -120,7 +120,7 @@ public class PlayScene extends Scene<MillApp> {
 			// MOVING
 
 			state(MOVING).entry = s -> {
-				move = new Move(board, PlayScene.this::supplyMoveSpeed);
+				move = new Move(board, PlayScene.this::supplyMoveSpeed, PlayScene.this::canJump);
 				setMovingTurn(turn);
 			};
 
@@ -139,7 +139,7 @@ public class PlayScene extends Scene<MillApp> {
 						} else {
 							setMovingTurn(opponent());
 						}
-						move.clear();
+						move.init();
 					}
 				}
 			};
@@ -292,7 +292,7 @@ public class PlayScene extends Scene<MillApp> {
 		} else if (!move.getTo().isPresent()) {
 			supplyMoveEndPosition().ifPresent(to -> move.setTo(to));
 		} else {
-			move.execute();
+			move.update();
 		}
 	}
 
@@ -309,8 +309,9 @@ public class PlayScene extends Scene<MillApp> {
 						LOG.info(msg("stone_at_position_not_existing", from));
 					} else if (turn != optStone.get().getType()) {
 						LOG.info(msg("stone_at_position_wrong_color", from));
+					} else {
+						return optStartPosition;
 					}
-					return optStartPosition;
 				}
 			}
 		}

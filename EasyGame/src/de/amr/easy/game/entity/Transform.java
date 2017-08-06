@@ -71,6 +71,10 @@ public class Transform {
 		return velocity.y;
 	}
 
+	public Vector2 getVelocity() {
+		return new Vector2(velocity);
+	}
+
 	public double getRotation() {
 		return rotation;
 	}

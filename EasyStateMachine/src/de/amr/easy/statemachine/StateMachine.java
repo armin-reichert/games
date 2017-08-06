@@ -86,8 +86,7 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Initializes this state machine by switching to the initial state and executing an optional
-	 * entry action.
+	 * Initializes this state machine by switching to the initial state and executing an optional entry action.
 	 */
 	public void init() {
 		currentStateID = initialStateID;
@@ -149,8 +148,7 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Returns the current state object. This is needed for example to set the duration of a timed
-	 * state.
+	 * Returns the current state object. This is needed for example to set the duration of a timed state.
 	 * 
 	 * @return the current state object
 	 */
@@ -162,8 +160,7 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Returns the state with the given ID. If this state is accessed for the first time, it will be
-	 * created.
+	 * Returns the state with the given ID. If this state is accessed for the first time, it will be created.
 	 * 
 	 * @param stateID
 	 *          a state ID
@@ -178,8 +175,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines the state with the given ID by the given state object which may be an instance of a
-	 * specialized state subclass. This is useful if the state object itself needs "state".
+	 * Defines the state with the given ID by the given state object which may be an instance of a specialized state
+	 * subclass. This is useful if the state object itself needs "state".
 	 * 
 	 * @param stateID
 	 *          some state ID
@@ -242,8 +239,8 @@ public class StateMachine<StateID, Input> {
 		if (action != null) {
 			executeTransitionAction(action, stateBefore, state());
 		}
-		state().doEntry();
 		traceStateEntry();
+		state().doEntry();
 	}
 
 	private void executeTransitionAction(TransitionAction action, State from, State to) {
@@ -310,9 +307,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given condition
-	 * holds. If the transition is executed the given action is also executed. This happens before the
-	 * new state is entered.
+	 * Defines a transition between the given states which can be fired only if the given condition holds. If the
+	 * transition is executed the given action is also executed. This happens before the new state is entered.
 	 * 
 	 * @param from
 	 *          the source state
@@ -328,8 +324,7 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given condition
-	 * holds.
+	 * Defines a transition between the given states which can be fired only if the given condition holds.
 	 * 
 	 * @param from
 	 *          the source state
@@ -355,8 +350,7 @@ public class StateMachine<StateID, Input> {
 	};
 
 	/**
-	 * Defines a transition between the given states which can be fired if the source state got a
-	 * timeout.
+	 * Defines a transition between the given states which can be fired if the source state got a timeout.
 	 * 
 	 * @param from
 	 *          the source state
@@ -368,8 +362,7 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired if the source state got a
-	 * timeout.
+	 * Defines a transition between the given states which can be fired if the source state got a timeout.
 	 * 
 	 * @param from
 	 *          the source state
@@ -383,8 +376,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the given input (event).
+	 * Defines a transition between the given states which can be fired only if the given input (event) equals the given
+	 * input (event).
 	 * 
 	 * @param input
 	 *          the current input (event)
@@ -398,8 +391,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the current input (event) and the given condition holds.
+	 * Defines a transition between the given states which can be fired only if the given input (event) equals the current
+	 * input (event) and the given condition holds.
 	 * 
 	 * @param input
 	 *          the current input (event)
@@ -415,9 +408,8 @@ public class StateMachine<StateID, Input> {
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the current input (event). If the transition fires, the given action is
-	 * executed.
+	 * Defines a transition between the given states which can be fired only if the given input (event) equals the current
+	 * input (event). If the transition fires, the given action is executed.
 	 * 
 	 * @param input
 	 *          the current input (event)
@@ -426,17 +418,16 @@ public class StateMachine<StateID, Input> {
 	 * @param to
 	 *          the target state
 	 * @param action
-	 *          some action method. When calling the action, the first parameter contains the old
-	 *          state and the second parameter the new state after the transition has fired
+	 *          some action method. When calling the action, the first parameter contains the old state and the second
+	 *          parameter the new state after the transition has fired
 	 */
 	public void changeOnInput(Input input, StateID from, StateID to, InputTransitionAction<Input> action) {
 		addTransition(from, to, () -> input.equals(inputQ.peek()), action);
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the current input (event). If the transition fires, the given action is
-	 * executed.
+	 * Defines a transition between the given states which can be fired only if the given input (event) equals the current
+	 * input (event). If the transition fires, the given action is executed.
 	 * 
 	 * @param input
 	 *          the current input (event)
@@ -447,8 +438,8 @@ public class StateMachine<StateID, Input> {
 	 * @param condition
 	 *          some condition
 	 * @param action
-	 *          some action method. When calling the action, the first parameter contains the old
-	 *          state and the second parameter the new state after the transition has fired
+	 *          some action method. When calling the action, the first parameter contains the old state and the second
+	 *          parameter the new state after the transition has fired
 	 */
 	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition,
 			InputTransitionAction<Input> action) {
