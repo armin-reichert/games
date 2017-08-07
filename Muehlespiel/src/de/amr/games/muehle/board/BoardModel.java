@@ -271,7 +271,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if no stone of the given type can move to some neighbor position
 	 */
-	public boolean cannotMoveStones(StoneType type) {
+	public boolean cannotMoveAnyStone(StoneType type) {
 		checkStoneType(type);
 		return positions(type).allMatch(p -> emptyNeighbors(p).count() == 0);
 	}

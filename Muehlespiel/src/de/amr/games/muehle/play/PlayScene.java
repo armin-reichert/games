@@ -19,6 +19,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -47,6 +49,14 @@ public class PlayScene extends Scene<MillApp> {
 
 	private static final int NUM_STONES = 9;
 
+	private static final EnumMap<Direction, Integer> DIRECTION_KEYS = new EnumMap<>(Direction.class);
+	static {
+		DIRECTION_KEYS.put(NORTH, KeyEvent.VK_UP);
+		DIRECTION_KEYS.put(EAST, KeyEvent.VK_RIGHT);
+		DIRECTION_KEYS.put(SOUTH, KeyEvent.VK_DOWN);
+		DIRECTION_KEYS.put(WEST, KeyEvent.VK_LEFT);
+	}
+
 	private final PlayControl control;
 
 	private BoardModel boardModel;
@@ -64,7 +74,7 @@ public class PlayScene extends Scene<MillApp> {
 	/* A finite-state machine which controls the play scene */
 	private class PlayControl extends StateMachine<GamePhase, String> {
 
-		private boolean mustRemoveOpponentStone;
+		private boolean mustRemoveStoneOfOpponent;
 
 		public PlayControl() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTED);
@@ -81,50 +91,48 @@ public class PlayScene extends Scene<MillApp> {
 				board.clear();
 				whiteStonesPlaced = 0;
 				blackStonesPlaced = 0;
-				mustRemoveOpponentStone = false;
-				setPlacingTurn(WHITE);
+				mustRemoveStoneOfOpponent = false;
+				turnPlacingTo(WHITE);
 			};
 
 			state(PLACING).update = s -> {
-				if (mustRemoveOpponentStone) {
+				if (mustRemoveStoneOfOpponent) {
 					tryToRemoveStone(opponent()).ifPresent(pos -> {
-						mustRemoveOpponentStone = false;
-						setPlacingTurn(opponent());
+						mustRemoveStoneOfOpponent = false;
+						turnPlacingTo(opponent());
 					});
 				} else {
 					tryToPlaceStone().ifPresent(pos -> {
 						if (boardModel.isPositionInsideMill(pos, turn)) {
-							mustRemoveOpponentStone = true;
+							mustRemoveStoneOfOpponent = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
-							setPlacingTurn(opponent());
+							turnPlacingTo(opponent());
 						}
 					});
 				}
 			};
 
-			change(PLACING, MOVING, () -> blackStonesPlaced == NUM_STONES && !mustRemoveOpponentStone);
+			change(PLACING, MOVING, () -> blackStonesPlaced == NUM_STONES && !mustRemoveStoneOfOpponent);
 
 			// MOVING
 
-			state(MOVING).entry = s -> {
-				setMovingTurn(turn);
-			};
+			state(MOVING).entry = s -> turnMovingTo(turn);
 
 			state(MOVING).update = s -> {
-				if (mustRemoveOpponentStone) {
+				if (mustRemoveStoneOfOpponent) {
 					tryToRemoveStone(opponent()).ifPresent(pos -> {
-						mustRemoveOpponentStone = false;
-						setMovingTurn(opponent());
+						mustRemoveStoneOfOpponent = false;
+						turnMovingTo(opponent());
 					});
 				} else {
 					move.update();
 					if (move.isComplete()) {
 						if (boardModel.isPositionInsideMill(move.getTo().getAsInt(), turn)) {
-							mustRemoveOpponentStone = true;
+							mustRemoveStoneOfOpponent = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
-							setMovingTurn(opponent());
+							turnMovingTo(opponent());
 						}
 						move.init();
 					}
@@ -156,8 +164,7 @@ public class PlayScene extends Scene<MillApp> {
 		board.hCenter(getWidth());
 		board.tf.setY(50);
 
-		move = new Move(board, this::supplyMoveStartPosition, this::supplyMoveEndPosition, this::supplyMoveSpeed,
-				this::canJump);
+		move = new Move(board, this::supplyMoveStart, this::supplyMoveEnd, this::supplyMoveSpeed, this::canJump);
 
 		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
 		whiteStonesToPlaceCounter.tf.moveTo(40, getHeight() - 50);
@@ -209,14 +216,14 @@ public class PlayScene extends Scene<MillApp> {
 		return turn == WHITE ? BLACK : WHITE;
 	}
 
-	private void setPlacingTurn(StoneType type) {
+	private void turnPlacingTo(StoneType type) {
 		turn = type;
-		displayMessage(isWhitesTurn() ? "white_must_place" : "black_must_place");
 		whiteStonesToPlaceCounter.setSelected(isWhitesTurn());
 		blackStonesToPlaceCounter.setSelected(!isWhitesTurn());
+		displayMessage(isWhitesTurn() ? "white_must_place" : "black_must_place");
 	}
 
-	private void setMovingTurn(StoneType type) {
+	private void turnMovingTo(StoneType type) {
 		turn = type;
 		displayMessage(isWhitesTurn() ? "white_must_move" : "black_must_move");
 	}
@@ -227,7 +234,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		return boardModel.stoneCount(turn) == 2 || (!canJump() && boardModel.cannotMoveStones(turn));
+		return boardModel.stoneCount(turn) < 3 || (!canJump() && boardModel.cannotMoveAnyStone(turn));
 	}
 
 	private boolean canJump() {
@@ -246,17 +253,18 @@ public class PlayScene extends Scene<MillApp> {
 			int clickPosition = optClickPosition.getAsInt();
 			if (boardModel.hasStoneAt(clickPosition)) {
 				LOG.info(msg("stone_at_position", clickPosition));
-				return OptionalInt.empty();
-			}
-			if (isWhitesTurn()) {
-				board.putStoneAt(clickPosition, WHITE);
-				whiteStonesPlaced += 1;
 			} else {
-				board.putStoneAt(clickPosition, BLACK);
-				blackStonesPlaced += 1;
+				if (isWhitesTurn()) {
+					board.putStoneAt(clickPosition, WHITE);
+					whiteStonesPlaced += 1;
+				} else {
+					board.putStoneAt(clickPosition, BLACK);
+					blackStonesPlaced += 1;
+				}
+				return optClickPosition;
 			}
 		}
-		return optClickPosition;
+		return OptionalInt.empty();
 	}
 
 	private OptionalInt tryToRemoveStone(StoneType color) {
@@ -280,7 +288,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving stones
 
-	private OptionalInt supplyMoveStartPosition() {
+	private OptionalInt supplyMoveStart() {
 		if (Mouse.clicked()) {
 			OptionalInt optStartPosition = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optStartPosition.isPresent()) {
@@ -304,10 +312,7 @@ public class PlayScene extends Scene<MillApp> {
 		return OptionalInt.empty();
 	}
 
-	private OptionalInt supplyMoveEndPosition() {
-		if (!move.getFrom().isPresent()) {
-			return OptionalInt.empty();
-		}
+	private OptionalInt supplyMoveEnd() {
 		int from = move.getFrom().getAsInt();
 
 		// if target position is unique, use it
@@ -315,7 +320,7 @@ public class PlayScene extends Scene<MillApp> {
 			return boardModel.emptyNeighbors(from).findFirst();
 		}
 
-		// if move direction specified and position in that direction is empty, use it
+		// if move direction was specified and board position in that direction is empty, use it
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
 			Direction dir = optMoveDirection.get();
@@ -328,32 +333,28 @@ public class PlayScene extends Scene<MillApp> {
 			}
 		}
 
-		// if target position selected with mouse click and can move to that position, use it
+		// if target position was selected with mouse click and move to that position is possible, use it
 		if (Mouse.clicked()) {
 			OptionalInt optClickPos = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optClickPos.isPresent()) {
 				int clickPos = optClickPos.getAsInt();
 				if (!boardModel.hasStoneAt(clickPos) && (canJump() || boardModel.areNeighbors(from, clickPos))) {
-					return OptionalInt.of(clickPos);
+					return optClickPos;
 				}
 			}
 		}
 
-		// no end position
+		// no move end position could be determined
 		return OptionalInt.empty();
 	}
 
 	private Optional<Direction> supplyMoveDirection() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_UP)) {
-			return Optional.of(NORTH);
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_RIGHT)) {
-			return Optional.of(EAST);
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_DOWN)) {
-			return Optional.of(SOUTH);
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_LEFT)) {
-			return Optional.of(WEST);
-		}
-		return Optional.empty();
+		/*@formatter:off*/
+		return DIRECTION_KEYS.entrySet().stream()
+			.filter(e -> Keyboard.keyPressedOnce(e.getValue()))
+			.map(Map.Entry::getKey)
+			.findAny();
+		/*@formatter:on*/
 	}
 
 	private double supplyMoveSpeed() {
@@ -390,7 +391,7 @@ public class PlayScene extends Scene<MillApp> {
 	private void drawPlacingInfo(Graphics2D g) {
 		whiteStonesToPlaceCounter.draw(g);
 		blackStonesToPlaceCounter.draw(g);
-		if (control.mustRemoveOpponentStone) {
+		if (control.mustRemoveStoneOfOpponent) {
 			board.markRemovableStones(g, opponent());
 		} else if (assistantOn) {
 			board.markPositionsClosingMill(g, turn, Color.GREEN);
@@ -408,7 +409,7 @@ public class PlayScene extends Scene<MillApp> {
 				board.markPositionFixingOpponent(g, turn, opponent(), Color.RED);
 			}
 		}
-		if (control.mustRemoveOpponentStone) {
+		if (control.mustRemoveStoneOfOpponent) {
 			board.markRemovableStones(g, opponent());
 		}
 	}
