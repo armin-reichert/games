@@ -164,7 +164,7 @@ public class PlayScene extends Scene<MillApp> {
 		board.hCenter(getWidth());
 		board.tf.setY(50);
 
-		move = new Move(board, this::supplyMoveStart, this::supplyMoveEnd, this::supplyMoveSpeed, this::canJump);
+		move = new Move(board, this::supplyMoveStart, this::supplyMoveEnd, this::supplyMoveVelocity, this::canJump);
 
 		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
 		whiteStonesToPlaceCounter.tf.moveTo(40, getHeight() - 50);
@@ -357,10 +357,22 @@ public class PlayScene extends Scene<MillApp> {
 		/*@formatter:on*/
 	}
 
-	private double supplyMoveSpeed() {
-		Vector2 centerFrom = board.centerPoint(move.getFrom().getAsInt());
-		Vector2 centerTo = board.centerPoint(move.getTo().getAsInt());
-		return dist(centerFrom, centerTo) / app.pulse.secToTicks(app.settings.getAsFloat("seconds-per-move"));
+	private Vector2 supplyMoveVelocity() {
+		int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+		float speed = dist(board.centerPoint(from), board.centerPoint(to))
+				/ app.pulse.secToTicks(app.settings.getAsFloat("seconds-per-move"));
+		Direction dir = board.getModel().getDirection(from, to).get();
+		switch (dir) {
+		case NORTH:
+			return new Vector2(0, -speed);
+		case EAST:
+			return new Vector2(speed, 0);
+		case SOUTH:
+			return new Vector2(0, speed);
+		case WEST:
+			return new Vector2(-speed, 0);
+		}
+		return Vector2.nullVector();
 	}
 
 	// Drawing

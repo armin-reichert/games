@@ -13,7 +13,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.OptionalInt;
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.math.Vector2;
@@ -32,7 +31,7 @@ public class Move {
 	private final Supplier<OptionalInt> fromSupplier;
 	private final Supplier<OptionalInt> toSupplier;
 	private final BooleanSupplier canJumpSupplier;
-	private final DoubleSupplier speedSupplier;
+	private final Supplier<Vector2> velocitySupplier;
 	private final MoveControl control;
 
 	private int from;
@@ -49,17 +48,17 @@ public class Move {
 	 *          supplies the position from where the move starts
 	 * @param toSupplier
 	 *          supplies the position where the move ends
-	 * @param speedSupplier
-	 *          supplies the move speed
+	 * @param velocitySupplier
+	 *          supplies the move velocity
 	 * @param canJumpSupplier
 	 *          tells if the move may be a jump
 	 */
 	public Move(Board board, Supplier<OptionalInt> fromSupplier, Supplier<OptionalInt> toSupplier,
-			DoubleSupplier speedSupplier, BooleanSupplier canJumpSupplier) {
+			Supplier<Vector2> velocitySupplier, BooleanSupplier canJumpSupplier) {
 		this.board = board;
 		this.fromSupplier = fromSupplier;
 		this.toSupplier = toSupplier;
-		this.speedSupplier = speedSupplier;
+		this.velocitySupplier = velocitySupplier;
 		this.canJumpSupplier = canJumpSupplier;
 		control = new MoveControl();
 		control.setLogger(LOG);
@@ -89,7 +88,7 @@ public class Move {
 			state(MOVING).entry = s -> {
 				Direction dir = board.getModel().getDirection(from, to).get();
 				stone = board.getStoneAt(from).get();
-				stone.tf.setVelocity(computeVelocity(dir));
+				stone.tf.setVelocity(velocitySupplier.get());
 				Vector2 toVector = board.centerPoint(to);
 				toPoint = new Point2D.Float(toVector.x, toVector.y);
 				LOG.info(format("Moving from %d to %d towards %s", from, to, dir));
@@ -143,20 +142,5 @@ public class Move {
 		float speed = stone.tf.getVelocity().length();
 		Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
 		return stoneSpot.contains(toPoint);
-	}
-
-	private Vector2 computeVelocity(Direction dir) {
-		float speed = (float) speedSupplier.getAsDouble();
-		switch (dir) {
-		case NORTH:
-			return new Vector2(0, -speed);
-		case EAST:
-			return new Vector2(speed, 0);
-		case SOUTH:
-			return new Vector2(0, speed);
-		case WEST:
-			return new Vector2(-speed, 0);
-		}
-		return Vector2.nullVector();
 	}
 }

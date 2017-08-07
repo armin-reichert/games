@@ -257,16 +257,6 @@ public class BoardModel extends BoardGraph {
 
 	/**
 	 * 
-	 * @param p
-	 *          a valid position
-	 * @return if there is a stone at this position and this stone can move to some neighbor position
-	 */
-	public boolean canMoveStoneFrom(int p) {
-		return hasStoneAt(p) && hasEmptyNeighbor(p);
-	}
-
-	/**
-	 * 
 	 * @param type
 	 *          a stone type
 	 * @return if no stone of the given type can move to some neighbor position
@@ -329,8 +319,8 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return a stream of all positions where placing a stone of the given type would open two mills
 	 */
-	public IntStream positionsForOpeningTwoMills(StoneType type) {
-		return positions().filter(p -> canTwoMillsBeOpenedAt(p, type));
+	public IntStream positionsOpeningTwoMills(StoneType type) {
+		return positions().filter(p -> canOpenedTwoMillsAt(p, type));
 	}
 
 	/**
@@ -340,7 +330,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if placing a stone of the given type at the given positions would open two mills
 	 */
-	public boolean canTwoMillsBeOpenedAt(int p, StoneType type) {
+	public boolean canOpenedTwoMillsAt(int p, StoneType type) {
 		checkPosition(p);
 		checkStoneType(type);
 		if (content[p] != null) {

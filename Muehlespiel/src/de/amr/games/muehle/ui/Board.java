@@ -167,7 +167,7 @@ public class Board extends GameEntity {
 	}
 
 	public void markPositionsOpeningTwoMills(Graphics2D g, StoneType stoneType, Color color) {
-		model.positionsForOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
+		model.positionsOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markPositionsClosingMill(Graphics2D g, StoneType stoneType, Color color) {
