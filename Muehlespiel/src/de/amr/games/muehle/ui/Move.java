@@ -143,22 +143,17 @@ public class Move {
 	}
 
 	private Vector2 computeVelocity(Direction dir) {
-		Vector2 v = Vector2.nullVector();
 		float speed = (float) speedSupplier.getAsDouble();
 		switch (dir) {
 		case NORTH:
-			v = new Vector2(0, -speed);
-			break;
+			return new Vector2(0, -speed);
 		case EAST:
-			v = new Vector2(speed, 0);
-			break;
+			return new Vector2(speed, 0);
 		case SOUTH:
-			v = new Vector2(0, speed);
-			break;
+			return new Vector2(0, speed);
 		case WEST:
-			v = new Vector2(-speed, 0);
-			break;
+			return new Vector2(-speed, 0);
 		}
-		return v;
+		return Vector2.nullVector();
 	}
 }
