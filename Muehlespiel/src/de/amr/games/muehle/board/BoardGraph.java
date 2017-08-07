@@ -13,18 +13,6 @@ import java.util.stream.Stream;
  */
 public class BoardGraph {
 
-	protected static void checkPosition(int p) {
-		if (p < 0 || p >= NUM_POS) {
-			throw new IllegalArgumentException("Illegal position: " + p);
-		}
-	}
-
-	protected static void checkDirection(Direction dir) {
-		if (dir == null) {
-			throw new IllegalArgumentException("Illegal direction: " + dir);
-		}
-	}
-
 	/** The number of positions (nodes). */
 	public static final int NUM_POS = 24;
 
@@ -62,10 +50,16 @@ public class BoardGraph {
 		/*@formatter:on*/
 	};
 
-	/**
-	 * Constructs an empty board.
-	 */
-	public BoardGraph() {
+	protected static void checkPosition(int p) {
+		if (p < 0 || p >= NUM_POS) {
+			throw new IllegalArgumentException("Illegal position: " + p);
+		}
+	}
+
+	protected static void checkDirection(Direction dir) {
+		if (dir == null) {
+			throw new IllegalArgumentException("Illegal direction: " + dir);
+		}
 	}
 
 	/**
@@ -82,7 +76,7 @@ public class BoardGraph {
 	 */
 	public IntStream neighbors(int p) {
 		checkPosition(p);
-		return IntStream.of(NEIGHBORS[p]).filter(n -> n != -1);
+		return IntStream.of(NEIGHBORS[p]).filter(q -> q != -1);
 	}
 
 	/**
@@ -126,13 +120,6 @@ public class BoardGraph {
 	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
 		checkPosition(q);
-		/*@formatter:off*/
-		return Stream.of(Direction.values())
-			.filter(dir -> {
-				OptionalInt neighbor = neighbor(p, dir);
-				return neighbor.isPresent() && neighbor.getAsInt() == q;
-			})
-			.findFirst();
-		/*@formatter:off*/
+		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q).findFirst();
 	}
 }
