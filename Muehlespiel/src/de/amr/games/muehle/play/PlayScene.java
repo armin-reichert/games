@@ -108,7 +108,6 @@ public class PlayScene extends Scene<MillApp> {
 			// MOVING
 
 			state(MOVING).entry = s -> {
-				move = new Move(board, PlayScene.this::supplyMoveSpeed, PlayScene.this::canJump);
 				setMovingTurn(turn);
 			};
 
@@ -119,15 +118,16 @@ public class PlayScene extends Scene<MillApp> {
 						setMovingTurn(opponent());
 					});
 				} else {
-					tryToMoveStone().ifPresent(to -> {
-						if (boardGraph.isPositionInsideMill(to, turn)) {
+					move.update();
+					if (move.isComplete()) {
+						if (boardGraph.isPositionInsideMill(move.getTo().getAsInt(), turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
 							setMovingTurn(opponent());
 						}
 						move.init();
-					});
+					}
 				}
 			};
 
@@ -155,6 +155,9 @@ public class PlayScene extends Scene<MillApp> {
 		board = new Board(boardGraph, 600, 600);
 		board.hCenter(getWidth());
 		board.tf.setY(50);
+
+		move = new Move(board, this::supplyMoveStartPosition, this::supplyMoveEndPosition, this::supplyMoveSpeed,
+				this::canJump);
 
 		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - whiteStonesPlaced);
 		whiteStonesToPlaceCounter.tf.moveTo(40, getHeight() - 50);
@@ -260,7 +263,7 @@ public class PlayScene extends Scene<MillApp> {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
-			if (!boardGraph.hasStoneAt(clickPosition)) {
+			if (boardGraph.isEmpty(clickPosition)) {
 				LOG.info(msg("stone_at_position_not_existing", clickPosition));
 			} else if (boardGraph.getStoneAt(clickPosition) != color) {
 				LOG.info(msg("stone_at_position_wrong_color", clickPosition));
@@ -277,23 +280,14 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving stones
 
-	private OptionalInt tryToMoveStone() {
-		if (!move.getFrom().isPresent()) {
-			supplyMoveStartPosition().ifPresent(from -> move.setFrom(from));
-		} else if (!move.getTo().isPresent()) {
-			supplyMoveEndPosition().ifPresent(to -> move.setTo(to));
-		} else {
-			move.update();
-		}
-		return move.isComplete() ? move.getTo() : OptionalInt.empty();
-	}
-
 	private OptionalInt supplyMoveStartPosition() {
 		if (Mouse.clicked()) {
 			OptionalInt optStartPosition = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optStartPosition.isPresent()) {
 				int from = optStartPosition.getAsInt();
-				if (!canJump() && !boardGraph.hasEmptyNeighbor(from)) {
+				if (boardGraph.isEmpty(from)) {
+					LOG.info(msg("stone_at_position_not_existing", from));
+				} else if (!canJump() && !boardGraph.hasEmptyNeighbor(from)) {
 					LOG.info(msg("stone_at_position_cannot_move", from));
 				} else {
 					Optional<Stone> optStone = board.getStoneAt(from);

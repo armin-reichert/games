@@ -14,6 +14,7 @@ import java.awt.geom.Ellipse2D;
 import java.util.OptionalInt;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.statemachine.StateMachine;
@@ -27,6 +28,8 @@ import de.amr.games.muehle.board.Direction;
 public class Move {
 
 	private final Board board;
+	private final Supplier<OptionalInt> fromSupplier;
+	private final Supplier<OptionalInt> toSupplier;
 	private final BooleanSupplier canJumpSupplier;
 	private final DoubleSupplier speedSupplier;
 	private final MoveControl control;
@@ -34,7 +37,33 @@ public class Move {
 	private int from;
 	private int to;
 	private Vector2 toCoordinate;
-	private Stone affectedStone;
+	private Stone stone;
+
+	/**
+	 * Constructs an initial move.
+	 * 
+	 * @param board
+	 *          the board where the move is executed
+	 * @param fromSupplier
+	 *          supplies the position from where the move starts
+	 * @param toSupplier
+	 *          supplies the position where the move ends
+	 * @param speedSupplier
+	 *          supplies the move speed
+	 * @param canJumpSupplier
+	 *          tells if the move may be a jump
+	 */
+	public Move(Board board, Supplier<OptionalInt> fromSupplier, Supplier<OptionalInt> toSupplier,
+			DoubleSupplier speedSupplier, BooleanSupplier canJumpSupplier) {
+		this.board = board;
+		this.fromSupplier = fromSupplier;
+		this.toSupplier = toSupplier;
+		this.speedSupplier = speedSupplier;
+		this.canJumpSupplier = canJumpSupplier;
+		control = new MoveControl();
+		control.setLogger(LOG);
+		init();
+	}
 
 	public enum MoveState {
 		INITIAL, KNOWS_FROM, KNOWS_TO, MOVING, JUMPING, COMPLETE;
@@ -47,46 +76,37 @@ public class Move {
 
 			state(INITIAL).entry = s -> clear();
 
-			change(INITIAL, KNOWS_FROM, () -> from != -1);
+			change(INITIAL, KNOWS_FROM, () -> fromSupplier.get().isPresent(), (s, t) -> from = fromSupplier.get().getAsInt());
 
-			change(KNOWS_FROM, KNOWS_TO, () -> to != -1);
+			change(KNOWS_FROM, KNOWS_TO, () -> toSupplier.get().isPresent(), (s, t) -> to = toSupplier.get().getAsInt());
 
 			change(KNOWS_TO, MOVING, () -> board.getModel().areNeighbors(from, to));
 
 			change(KNOWS_TO, JUMPING, canJumpSupplier::getAsBoolean);
 
 			state(MOVING).entry = s -> {
-				affectedStone = board.getStoneAt(from).get();
 				Direction dir = board.getModel().getDirection(from, to).get();
-				affectedStone.tf.setVelocity(supplyVelocity(dir));
+				stone = board.getStoneAt(from).get();
+				stone.tf.setVelocity(computeVelocity(dir));
+				toCoordinate = board.centerPoint(to);
 				LOG.info(format("Starting move from %d to %d towards %s", from, to, dir));
 			};
 
-			state(MOVING).update = s -> affectedStone.tf.move();
+			state(MOVING).update = s -> stone.tf.move();
 
 			change(MOVING, COMPLETE, () -> isEndPositionReached());
 
+			state(MOVING).exit = s -> stone.tf.setVelocity(0, 0);
+
 			state(JUMPING).entry = s -> {
-				affectedStone = board.getStoneAt(from).get();
+				stone = board.getStoneAt(from).get();
 				LOG.info(format("Jumping from %d to %d", from, to));
 			};
 
 			change(JUMPING, COMPLETE);
 
-			state(COMPLETE).entry = s -> {
-				affectedStone.tf.setVelocity(0, 0);
-				board.moveStone(from, to);
-			};
+			state(COMPLETE).entry = s -> board.moveStone(from, to);
 		}
-	}
-
-	public Move(Board board, DoubleSupplier speedSupplier, BooleanSupplier canJumpSupplier) {
-		this.board = board;
-		this.speedSupplier = speedSupplier;
-		this.canJumpSupplier = canJumpSupplier;
-		control = new MoveControl();
-		control.setLogger(LOG);
-		init();
 	}
 
 	public void init() {
@@ -97,19 +117,8 @@ public class Move {
 		control.update();
 	}
 
-	public void setFrom(int p) {
-		from = p;
-		control.update();
-	}
-
 	public OptionalInt getFrom() {
 		return from == -1 ? OptionalInt.empty() : OptionalInt.of(from);
-	}
-
-	public void setTo(int p) {
-		to = p;
-		toCoordinate = board.centerPoint(to);
-		control.update();
 	}
 
 	public OptionalInt getTo() {
@@ -124,17 +133,16 @@ public class Move {
 		from = -1;
 		to = -1;
 		toCoordinate = null;
-		affectedStone = null;
+		stone = null;
 	}
 
 	private boolean isEndPositionReached() {
-		float speed = affectedStone.tf.getVelocity().length();
-		Ellipse2D targetSpot = new Ellipse2D.Float(affectedStone.tf.getX() - speed, affectedStone.tf.getY() - speed,
-				2 * speed, 2 * speed);
+		float speed = stone.tf.getVelocity().length();
+		Ellipse2D targetSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
 		return targetSpot.contains(new Point(toCoordinate.roundedX(), toCoordinate.roundedY()));
 	}
 
-	private Vector2 supplyVelocity(Direction dir) {
+	private Vector2 computeVelocity(Direction dir) {
 		Vector2 v = Vector2.nullVector();
 		float speed = (float) speedSupplier.getAsDouble();
 		switch (dir) {
