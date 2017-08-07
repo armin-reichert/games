@@ -103,7 +103,7 @@ public class BoardModel extends BoardGraph {
 	 * 
 	 * @param p
 	 *          a valid position
-	 * @return if the position p has an empy neighbor position
+	 * @return if the position p has an empty neighbor position
 	 */
 	public boolean hasEmptyNeighbor(int p) {
 		checkPosition(p);
@@ -271,9 +271,9 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if no stone of the given type can move to some neighbor position
 	 */
-	public boolean cannotMoveAnyStone(StoneType type) {
+	public boolean isTrapped(StoneType type) {
 		checkStoneType(type);
-		return positions(type).allMatch(p -> emptyNeighbors(p).count() == 0);
+		return positions(type).noneMatch(p -> hasEmptyNeighbor(p));
 	}
 
 	// Mill related methods

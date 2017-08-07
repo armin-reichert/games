@@ -234,7 +234,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		return boardModel.stoneCount(turn) < 3 || (!canJump() && boardModel.cannotMoveAnyStone(turn));
+		return boardModel.stoneCount(turn) < 3 || (!canJump() && boardModel.isTrapped(turn));
 	}
 
 	private boolean canJump() {

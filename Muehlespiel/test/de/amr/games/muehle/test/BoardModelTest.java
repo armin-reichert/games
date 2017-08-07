@@ -4,6 +4,7 @@ import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
+import static de.amr.games.muehle.board.StoneType.BLACK;
 import static de.amr.games.muehle.board.StoneType.WHITE;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +28,11 @@ public class BoardModelTest {
 	public void setUp() {
 		board = new BoardModel();
 		filledBoard = new BoardModel();
+	}
+
+	@After
+	public void cleanUp() {
+		filledBoard.clear();
 	}
 
 	@Test
@@ -125,6 +132,15 @@ public class BoardModelTest {
 		assertTrue(board.neighbor(13, SOUTH).getAsInt() == 20);
 		assertTrue(board.neighbor(14, NORTH).getAsInt() == 2);
 		assertTrue(board.neighbor(14, SOUTH).getAsInt() == 23);
+	}
+
+	@Test
+	public void testTrapped() {
+		filledBoard.putStoneAt(0, WHITE);
+		filledBoard.putStoneAt(1, BLACK);
+		filledBoard.putStoneAt(9, BLACK);
+		assertTrue(filledBoard.isTrapped(WHITE));
+		assertTrue(!filledBoard.hasEmptyNeighbor(0));
 	}
 
 	@Test
