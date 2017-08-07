@@ -9,8 +9,8 @@ import static de.amr.games.muehle.ui.Move.MoveState.KNOWS_TO;
 import static de.amr.games.muehle.ui.Move.MoveState.MOVING;
 import static java.lang.String.format;
 
-import java.awt.Point;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.OptionalInt;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -21,7 +21,8 @@ import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Direction;
 
 /**
- * A move animation in the board UI.
+ * Move of a stone on the board. Controls the different phases of a move like getting start and target position,
+ * determining if moving or jumping and animating the move. The move life-cycle is controlled by a finite state machine.
  * 
  * @author Armin Reichert
  */
@@ -36,7 +37,7 @@ public class Move {
 
 	private int from;
 	private int to;
-	private Vector2 toCoordinate;
+	private Point2D toPoint;
 	private Stone stone;
 
 	/**
@@ -89,8 +90,9 @@ public class Move {
 				Direction dir = board.getModel().getDirection(from, to).get();
 				stone = board.getStoneAt(from).get();
 				stone.tf.setVelocity(computeVelocity(dir));
-				toCoordinate = board.centerPoint(to);
-				LOG.info(format("Starting move from %d to %d towards %s", from, to, dir));
+				Vector2 toVector = board.centerPoint(to);
+				toPoint = new Point2D.Float(toVector.x, toVector.y);
+				LOG.info(format("Moving from %d to %d towards %s", from, to, dir));
 			};
 
 			state(MOVING).update = s -> stone.tf.move();
@@ -133,14 +135,14 @@ public class Move {
 	private void clear() {
 		from = -1;
 		to = -1;
-		toCoordinate = null;
+		toPoint = null;
 		stone = null;
 	}
 
 	private boolean isEndPositionReached() {
 		float speed = stone.tf.getVelocity().length();
-		Ellipse2D targetSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-		return targetSpot.contains(new Point(toCoordinate.roundedX(), toCoordinate.roundedY()));
+		Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
+		return stoneSpot.contains(toPoint);
 	}
 
 	private Vector2 computeVelocity(Direction dir) {
