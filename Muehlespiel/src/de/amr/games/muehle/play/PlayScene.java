@@ -30,7 +30,7 @@ import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
-import de.amr.games.muehle.board.BoardGraph;
+import de.amr.games.muehle.board.BoardModel;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.StoneType;
 import de.amr.games.muehle.ui.Board;
@@ -49,7 +49,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	private final PlayControl control;
 
-	private BoardGraph boardGraph;
+	private BoardModel boardModel;
 	private Board board;
 	private StonesCounter whiteStonesToPlaceCounter;
 	private StonesCounter blackStonesToPlaceCounter;
@@ -93,7 +93,7 @@ public class PlayScene extends Scene<MillApp> {
 					});
 				} else {
 					tryToPlaceStone().ifPresent(pos -> {
-						if (boardGraph.isPositionInsideMill(pos, turn)) {
+						if (boardModel.isPositionInsideMill(pos, turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
@@ -120,7 +120,7 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					move.update();
 					if (move.isComplete()) {
-						if (boardGraph.isPositionInsideMill(move.getTo().getAsInt(), turn)) {
+						if (boardModel.isPositionInsideMill(move.getTo().getAsInt(), turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
@@ -150,9 +150,9 @@ public class PlayScene extends Scene<MillApp> {
 	public void init() {
 		Font msgFont = Assets.storeFont("message-font", "fonts/Cookie-Regular.ttf", 40, Font.PLAIN);
 
-		boardGraph = new BoardGraph();
+		boardModel = new BoardModel();
 
-		board = new Board(boardGraph, 600, 600);
+		board = new Board(boardModel, 600, 600);
 		board.hCenter(getWidth());
 		board.tf.setY(50);
 
@@ -227,11 +227,11 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private boolean isGameOver() {
-		return boardGraph.stoneCount(turn) == 2 || (!canJump() && boardGraph.cannotMoveStones(turn));
+		return boardModel.stoneCount(turn) == 2 || (!canJump() && boardModel.cannotMoveStones(turn));
 	}
 
 	private boolean canJump() {
-		return boardGraph.stoneCount(turn) == 3;
+		return boardModel.stoneCount(turn) == 3;
 	}
 
 	// Placing stones
@@ -244,7 +244,7 @@ public class PlayScene extends Scene<MillApp> {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
-			if (boardGraph.hasStoneAt(clickPosition)) {
+			if (boardModel.hasStoneAt(clickPosition)) {
 				LOG.info(msg("stone_at_position", clickPosition));
 				return OptionalInt.empty();
 			}
@@ -263,11 +263,11 @@ public class PlayScene extends Scene<MillApp> {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
-			if (boardGraph.isEmpty(clickPosition)) {
+			if (boardModel.isEmpty(clickPosition)) {
 				LOG.info(msg("stone_at_position_not_existing", clickPosition));
-			} else if (boardGraph.getStoneAt(clickPosition) != color) {
+			} else if (boardModel.getStoneAt(clickPosition) != color) {
 				LOG.info(msg("stone_at_position_wrong_color", clickPosition));
-			} else if (boardGraph.isPositionInsideMill(clickPosition, color) && !boardGraph.areAllStonesInsideMill(color)) {
+			} else if (boardModel.isPositionInsideMill(clickPosition, color) && !boardModel.areAllStonesInsideMill(color)) {
 				LOG.info(msg("stone_cannot_be_removed_from_mill"));
 			} else {
 				board.removeStoneAt(clickPosition);
@@ -285,9 +285,9 @@ public class PlayScene extends Scene<MillApp> {
 			OptionalInt optStartPosition = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optStartPosition.isPresent()) {
 				int from = optStartPosition.getAsInt();
-				if (boardGraph.isEmpty(from)) {
+				if (boardModel.isEmpty(from)) {
 					LOG.info(msg("stone_at_position_not_existing", from));
-				} else if (!canJump() && !boardGraph.hasEmptyNeighbor(from)) {
+				} else if (!canJump() && !boardModel.hasEmptyNeighbor(from)) {
 					LOG.info(msg("stone_at_position_cannot_move", from));
 				} else {
 					Optional<Stone> optStone = board.getStoneAt(from);
@@ -311,18 +311,18 @@ public class PlayScene extends Scene<MillApp> {
 		int from = move.getFrom().getAsInt();
 
 		// if target position is unique, use it
-		if (!canJump() && boardGraph.emptyNeighbors(from).count() == 1) {
-			return boardGraph.emptyNeighbors(from).findFirst();
+		if (!canJump() && boardModel.emptyNeighbors(from).count() == 1) {
+			return boardModel.emptyNeighbors(from).findFirst();
 		}
 
 		// if move direction specified and position in that direction is empty, use it
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
 			Direction dir = optMoveDirection.get();
-			OptionalInt optNeighbor = boardGraph.neighbor(from, dir);
+			OptionalInt optNeighbor = boardModel.neighbor(from, dir);
 			if (optNeighbor.isPresent()) {
 				int neighbor = optNeighbor.getAsInt();
-				if (boardGraph.isEmpty(neighbor)) {
+				if (boardModel.isEmpty(neighbor)) {
 					return OptionalInt.of(neighbor);
 				}
 			}
@@ -333,7 +333,7 @@ public class PlayScene extends Scene<MillApp> {
 			OptionalInt optClickPos = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optClickPos.isPresent()) {
 				int clickPos = optClickPos.getAsInt();
-				if (!boardGraph.hasStoneAt(clickPos) && (canJump() || boardGraph.areNeighbors(from, clickPos))) {
+				if (!boardModel.hasStoneAt(clickPos) && (canJump() || boardModel.areNeighbors(from, clickPos))) {
 					return OptionalInt.of(clickPos);
 				}
 			}

@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
-import de.amr.games.muehle.board.BoardGraph;
+import de.amr.games.muehle.board.BoardModel;
 import de.amr.games.muehle.board.StoneType;
 
 /**
@@ -33,7 +33,7 @@ public class Board extends GameEntity {
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	private final BoardGraph boardGraph;
+	private final BoardModel model;
 	private final int width;
 	private final int height;
 	private final int posRadius;
@@ -41,17 +41,17 @@ public class Board extends GameEntity {
 	private boolean showPositionNumbers;
 	private Stone[] stones;
 
-	public Board(BoardGraph boardGraph, int w, int h) {
-		this.boardGraph = boardGraph;
+	public Board(BoardModel model, int w, int h) {
+		this.model = model;
 		width = w;
 		height = h;
 		posRadius = w / 60;
-		stones = new Stone[BoardGraph.NUM_POS];
+		stones = new Stone[BoardModel.NUM_POS];
 		Stone.radius = width / 24;
 	}
 
-	public BoardGraph getModel() {
-		return boardGraph;
+	public BoardModel getModel() {
+		return model;
 	}
 
 	public Stream<Stone> stones() {
@@ -69,12 +69,12 @@ public class Board extends GameEntity {
 	}
 
 	public void clear() {
-		boardGraph.clear();
-		stones = new Stone[BoardGraph.NUM_POS];
+		model.clear();
+		stones = new Stone[BoardModel.NUM_POS];
 	}
 
 	public void putStoneAt(int p, StoneType color) {
-		boardGraph.putStoneAt(p, color);
+		model.putStoneAt(p, color);
 		Stone stone = new Stone(color);
 		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
@@ -85,7 +85,7 @@ public class Board extends GameEntity {
 	}
 
 	public void moveStone(int from, int to) {
-		boardGraph.moveStone(from, to);
+		model.moveStone(from, to);
 		Stone stone = stones[from];
 		stone.tf.moveTo(centerPoint(to));
 		stones[to] = stone;
@@ -93,7 +93,7 @@ public class Board extends GameEntity {
 	}
 
 	public void removeStoneAt(int p) {
-		boardGraph.removeStoneAt(p);
+		model.removeStoneAt(p);
 		stones[p] = null;
 	}
 
@@ -102,7 +102,7 @@ public class Board extends GameEntity {
 	}
 
 	public OptionalInt findNearestPosition(int x, int y, int radius) {
-		return boardGraph.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
+		return model.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
@@ -131,9 +131,9 @@ public class Board extends GameEntity {
 		// Lines
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		boardGraph.positions().forEach(p -> {
+		model.positions().forEach(p -> {
 			Vector2 centerFrom = centerPoint(p);
-			boardGraph.neighbors(p).forEach(q -> {
+			model.neighbors(p).forEach(q -> {
 				Vector2 centerTo = centerPoint(q);
 				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(), centerTo.roundedY());
 			});
@@ -142,7 +142,7 @@ public class Board extends GameEntity {
 		// Positions
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		boardGraph.positions().forEach(p -> {
+		model.positions().forEach(p -> {
 			Vector2 center = centerPoint(p);
 			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
 			if (showPositionNumbers) {
@@ -167,32 +167,32 @@ public class Board extends GameEntity {
 	}
 
 	public void markPositionsOpeningTwoMills(Graphics2D g, StoneType stoneType, Color color) {
-		boardGraph.positionsForOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
+		model.positionsForOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markPositionsClosingMill(Graphics2D g, StoneType stoneType, Color color) {
-		boardGraph.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
+		model.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markPositionFixingOpponent(Graphics2D g, StoneType either, StoneType other, Color color) {
-		if (boardGraph.positionsWithEmptyNeighbor(other).count() == 1) {
-			int singleFreePosition = boardGraph.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (boardGraph.neighbors(singleFreePosition).anyMatch(p -> boardGraph.getStoneAt(p) == either)) {
+		if (model.positionsWithEmptyNeighbor(other).count() == 1) {
+			int singleFreePosition = model.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
+			if (model.neighbors(singleFreePosition).anyMatch(p -> model.getStoneAt(p) == either)) {
 				markPosition(g, singleFreePosition, color);
 			}
 		}
 	}
 
 	public void markPossibleMoveStarts(Graphics2D g, StoneType type, boolean canJump) {
-		IntStream startPositions = canJump ? boardGraph.positions(type) : boardGraph.positionsWithEmptyNeighbor(type);
+		IntStream startPositions = canJump ? model.positions(type) : model.positionsWithEmptyNeighbor(type);
 		startPositions.forEach(p -> markPosition(g, p, Color.GREEN));
 		startPositions.close();
 	}
 
 	public void markRemovableStones(Graphics2D g, StoneType stoneType) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		boolean allInMill = boardGraph.areAllStonesInsideMill(stoneType);
-		boardGraph.positions(stoneType).filter(p -> allInMill || !boardGraph.isPositionInsideMill(p, stoneType))
+		boolean allInMill = model.areAllStonesInsideMill(stoneType);
+		model.positions(stoneType).filter(p -> allInMill || !model.isPositionInsideMill(p, stoneType))
 				.forEach(p -> {
 					Stone stone = getStoneAt(p).get();
 					float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;

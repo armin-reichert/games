@@ -14,23 +14,23 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.amr.games.muehle.board.BoardGraph;
+import de.amr.games.muehle.board.BoardModel;
 import de.amr.games.muehle.board.Direction;
 
-public class BoardGraphTest {
+public class BoardModelTest {
 
-	private BoardGraph board;
-	private BoardGraph filledBoard;
+	private BoardModel board;
+	private BoardModel filledBoard;
 
 	@Before
 	public void setUp() {
-		board = new BoardGraph();
-		filledBoard = new BoardGraph();
+		board = new BoardModel();
+		filledBoard = new BoardModel();
 	}
 
 	@Test
 	public void testCreation() {
-		assertTrue(BoardGraph.NUM_POS == board.positions().count());
+		assertTrue(BoardModel.NUM_POS == board.positions().count());
 		assertTrue(0 == board.stoneCount());
 	}
 
