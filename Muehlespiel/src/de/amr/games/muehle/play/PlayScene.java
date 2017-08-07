@@ -66,16 +66,6 @@ public class PlayScene extends Scene<MillApp> {
 
 		private boolean mustRemoveOpponentStone;
 
-		private boolean isGameOver() {
-			if (boardGraph.stoneCount(turn) == 2) {
-				return true;
-			}
-			if (canJump()) {
-				return false;
-			}
-			return boardGraph.cannotMoveStones(turn);
-		}
-
 		public PlayControl() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTED);
 
@@ -102,16 +92,14 @@ public class PlayScene extends Scene<MillApp> {
 						setPlacingTurn(opponent());
 					});
 				} else {
-					OptionalInt optPos = tryToPlaceStone();
-					if (optPos.isPresent()) {
-						int pos = optPos.getAsInt();
+					tryToPlaceStone().ifPresent(pos -> {
 						if (boardGraph.isPositionInsideMill(pos, turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
 							setPlacingTurn(opponent());
 						}
-					}
+					});
 				}
 			};
 
@@ -131,20 +119,19 @@ public class PlayScene extends Scene<MillApp> {
 						setMovingTurn(opponent());
 					});
 				} else {
-					tryToMoveStone();
-					if (move.isComplete()) {
-						if (boardGraph.isPositionInsideMill(move.getTo().getAsInt(), turn)) {
+					tryToMoveStone().ifPresent(to -> {
+						if (boardGraph.isPositionInsideMill(to, turn)) {
 							mustRemoveOpponentStone = true;
 							displayMessage(isWhitesTurn() ? "white_must_take" : "black_must_take");
 						} else {
 							setMovingTurn(opponent());
 						}
 						move.init();
-					}
+					});
 				}
 			};
 
-			change(MOVING, GAME_OVER, this::isGameOver);
+			change(MOVING, GAME_OVER, PlayScene.this::isGameOver);
 
 			// GAME_OVER
 
@@ -236,6 +223,10 @@ public class PlayScene extends Scene<MillApp> {
 		displayMessage(winner == WHITE ? "white_wins" : "black_wins");
 	}
 
+	private boolean isGameOver() {
+		return boardGraph.stoneCount(turn) == 2 || (!canJump() && boardGraph.cannotMoveStones(turn));
+	}
+
 	private boolean canJump() {
 		return boardGraph.stoneCount(turn) == 3;
 	}
@@ -286,7 +277,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	// Moving stones
 
-	private void tryToMoveStone() {
+	private OptionalInt tryToMoveStone() {
 		if (!move.getFrom().isPresent()) {
 			supplyMoveStartPosition().ifPresent(from -> move.setFrom(from));
 		} else if (!move.getTo().isPresent()) {
@@ -294,6 +285,7 @@ public class PlayScene extends Scene<MillApp> {
 		} else {
 			move.update();
 		}
+		return move.isComplete() ? move.getTo() : OptionalInt.empty();
 	}
 
 	private OptionalInt supplyMoveStartPosition() {

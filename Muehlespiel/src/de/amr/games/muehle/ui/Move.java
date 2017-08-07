@@ -33,7 +33,8 @@ public class Move {
 
 	private int from;
 	private int to;
-	private Stone movedStone;
+	private Vector2 toCoordinate;
+	private Stone affectedStone;
 
 	public enum MoveState {
 		INITIAL, KNOWS_FROM, KNOWS_TO, MOVING, JUMPING, COMPLETE;
@@ -55,25 +56,25 @@ public class Move {
 			change(KNOWS_TO, JUMPING, canJumpSupplier::getAsBoolean);
 
 			state(MOVING).entry = s -> {
-				movedStone = board.getStoneAt(from).get();
+				affectedStone = board.getStoneAt(from).get();
 				Direction dir = board.getModel().getDirection(from, to).get();
-				movedStone.tf.setVelocity(supplyVelocity(dir));
+				affectedStone.tf.setVelocity(supplyVelocity(dir));
 				LOG.info(format("Starting move from %d to %d towards %s", from, to, dir));
 			};
 
-			state(MOVING).update = s -> movedStone.tf.move();
+			state(MOVING).update = s -> affectedStone.tf.move();
 
 			change(MOVING, COMPLETE, () -> isEndPositionReached());
 
 			state(JUMPING).entry = s -> {
-				movedStone = board.getStoneAt(from).get();
+				affectedStone = board.getStoneAt(from).get();
 				LOG.info(format("Jumping from %d to %d", from, to));
 			};
 
 			change(JUMPING, COMPLETE);
 
 			state(COMPLETE).entry = s -> {
-				movedStone.tf.setVelocity(0, 0);
+				affectedStone.tf.setVelocity(0, 0);
 				board.moveStone(from, to);
 			};
 		}
@@ -107,6 +108,7 @@ public class Move {
 
 	public void setTo(int p) {
 		to = p;
+		toCoordinate = board.centerPoint(to);
 		control.update();
 	}
 
@@ -121,15 +123,15 @@ public class Move {
 	private void clear() {
 		from = -1;
 		to = -1;
-		movedStone = null;
+		toCoordinate = null;
+		affectedStone = null;
 	}
 
 	private boolean isEndPositionReached() {
-		Vector2 center = board.centerPoint(to);
-		float speed = movedStone.tf.getVelocity().length();
-		Ellipse2D targetSpot = new Ellipse2D.Float(movedStone.tf.getX() - speed, movedStone.tf.getY() - speed, 2 * speed,
-				2 * speed);
-		return targetSpot.contains(new Point(center.roundedX(), center.roundedY()));
+		float speed = affectedStone.tf.getVelocity().length();
+		Ellipse2D targetSpot = new Ellipse2D.Float(affectedStone.tf.getX() - speed, affectedStone.tf.getY() - speed,
+				2 * speed, 2 * speed);
+		return targetSpot.contains(new Point(toCoordinate.roundedX(), toCoordinate.roundedY()));
 	}
 
 	private Vector2 supplyVelocity(Direction dir) {
