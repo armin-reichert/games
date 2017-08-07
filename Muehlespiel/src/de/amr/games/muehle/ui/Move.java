@@ -69,6 +69,7 @@ public class Move {
 		INITIAL, KNOWS_FROM, KNOWS_TO, MOVING, JUMPING, COMPLETE;
 	};
 
+	/** Finite state machine controlling the move */
 	private class MoveControl extends StateMachine<MoveState, Object> {
 
 		public MoveControl() {
@@ -117,16 +118,16 @@ public class Move {
 		control.update();
 	}
 
+	public boolean isComplete() {
+		return control.is(COMPLETE);
+	}
+
 	public OptionalInt getFrom() {
 		return from == -1 ? OptionalInt.empty() : OptionalInt.of(from);
 	}
 
 	public OptionalInt getTo() {
 		return to == -1 ? OptionalInt.empty() : OptionalInt.of(to);
-	}
-
-	public boolean isComplete() {
-		return control.is(COMPLETE);
 	}
 
 	private void clear() {
