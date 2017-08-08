@@ -100,7 +100,7 @@ public class InteractivePlayer implements Player {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
-			if (board.getModel().isEmpty(clickPosition)) {
+			if (board.getModel().isEmptyPosition(clickPosition)) {
 				LOG.info(app.msg("stone_at_position_not_existing", clickPosition));
 			} else if (board.getModel().getStoneAt(clickPosition) != otherColor) {
 				LOG.info(app.msg("stone_at_position_wrong_color", clickPosition));
@@ -150,7 +150,7 @@ public class InteractivePlayer implements Player {
 			OptionalInt optNeighbor = board.getModel().neighbor(from, dir);
 			if (optNeighbor.isPresent()) {
 				int neighbor = optNeighbor.getAsInt();
-				if (board.getModel().isEmpty(neighbor)) {
+				if (board.getModel().isEmptyPosition(neighbor)) {
 					return optNeighbor;
 				}
 			}
@@ -160,7 +160,7 @@ public class InteractivePlayer implements Player {
 			OptionalInt optClickPos = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optClickPos.isPresent()) {
 				int clickPos = optClickPos.getAsInt();
-				if (board.getModel().isEmpty(clickPos) && (canJump() || board.getModel().areNeighbors(from, clickPos))) {
+				if (board.getModel().isEmptyPosition(clickPos) && (canJump() || board.getModel().areNeighbors(from, clickPos))) {
 					return optClickPos;
 				}
 			}

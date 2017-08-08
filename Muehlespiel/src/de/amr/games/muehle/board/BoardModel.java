@@ -96,7 +96,7 @@ public class BoardModel extends BoardGraph {
 	 */
 	public IntStream emptyNeighbors(int p) {
 		checkPosition(p);
-		return neighbors(p).filter(this::isEmpty);
+		return neighbors(p).filter(this::isEmptyPosition);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class BoardModel extends BoardGraph {
 	 */
 	public boolean hasEmptyNeighbor(int p) {
 		checkPosition(p);
-		return neighbors(p).anyMatch(this::isEmpty);
+		return neighbors(p).anyMatch(this::isEmptyPosition);
 	}
 
 	/**
@@ -223,7 +223,7 @@ public class BoardModel extends BoardGraph {
 	 *          a valid position
 	 * @return if the position is empty
 	 */
-	public boolean isEmpty(int p) {
+	public boolean isEmptyPosition(int p) {
 		checkPosition(p);
 		return content[p] == null;
 	}
