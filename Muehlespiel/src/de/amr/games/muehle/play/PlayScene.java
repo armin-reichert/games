@@ -293,19 +293,15 @@ public class PlayScene extends Scene<MillApp> {
 			OptionalInt optStartPosition = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optStartPosition.isPresent()) {
 				int from = optStartPosition.getAsInt();
-				if (boardModel.isEmpty(from)) {
+				Optional<Stone> optStone = board.getStoneAt(from);
+				if (!optStone.isPresent()) {
 					LOG.info(msg("stone_at_position_not_existing", from));
+				} else if (turn != optStone.get().getType()) {
+					LOG.info(msg("stone_at_position_wrong_color", from));
 				} else if (!canJump() && !boardModel.hasEmptyNeighbor(from)) {
 					LOG.info(msg("stone_at_position_cannot_move", from));
 				} else {
-					Optional<Stone> optStone = board.getStoneAt(from);
-					if (!optStone.isPresent()) {
-						LOG.info(msg("stone_at_position_not_existing", from));
-					} else if (turn != optStone.get().getType()) {
-						LOG.info(msg("stone_at_position_wrong_color", from));
-					} else {
-						return optStartPosition;
-					}
+					return optStartPosition;
 				}
 			}
 		}
