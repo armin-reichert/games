@@ -13,6 +13,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.OptionalInt;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.math.Vector2;
@@ -29,7 +30,7 @@ public class Move {
 
 	private final Board board;
 	private final Supplier<OptionalInt> fromSupplier;
-	private final Supplier<OptionalInt> toSupplier;
+	private final Function<Integer, OptionalInt> toSupplier;
 	private final BooleanSupplier canJumpSupplier;
 	private final Supplier<Vector2> velocitySupplier;
 	private final MoveControl control;
@@ -53,7 +54,7 @@ public class Move {
 	 * @param canJumpSupplier
 	 *          tells if the move may be a jump
 	 */
-	public Move(Board board, Supplier<OptionalInt> fromSupplier, Supplier<OptionalInt> toSupplier,
+	public Move(Board board, Supplier<OptionalInt> fromSupplier, Function<Integer, OptionalInt> toSupplier,
 			Supplier<Vector2> velocitySupplier, BooleanSupplier canJumpSupplier) {
 		this.board = board;
 		this.fromSupplier = fromSupplier;
@@ -79,7 +80,8 @@ public class Move {
 
 			change(INITIAL, KNOWS_FROM, () -> fromSupplier.get().isPresent(), (s, t) -> from = fromSupplier.get().getAsInt());
 
-			change(KNOWS_FROM, KNOWS_TO, () -> toSupplier.get().isPresent(), (s, t) -> to = toSupplier.get().getAsInt());
+			change(KNOWS_FROM, KNOWS_TO, () -> toSupplier.apply(from).isPresent(),
+					(s, t) -> to = toSupplier.apply(from).getAsInt());
 
 			change(KNOWS_TO, MOVING, () -> board.getModel().areNeighbors(from, to));
 

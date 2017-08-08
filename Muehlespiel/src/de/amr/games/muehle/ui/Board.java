@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
 import de.amr.games.muehle.board.BoardModel;
-import de.amr.games.muehle.board.StoneType;
+import de.amr.games.muehle.board.StoneColor;
 
 /**
  * Board user interface.
@@ -73,7 +73,7 @@ public class Board extends GameEntity {
 		stones = new Stone[BoardModel.NUM_POS];
 	}
 
-	public void putStoneAt(int p, StoneType color) {
+	public void putStoneAt(int p, StoneColor color) {
 		model.putStoneAt(p, color);
 		Stone stone = new Stone(color);
 		stone.tf.moveTo(centerPoint(p));
@@ -166,15 +166,15 @@ public class Board extends GameEntity {
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	public void markPositionsOpeningTwoMills(Graphics2D g, StoneType stoneType, Color color) {
+	public void markPositionsOpeningTwoMills(Graphics2D g, StoneColor stoneType, Color color) {
 		model.positionsOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
 	}
 
-	public void markPositionsClosingMill(Graphics2D g, StoneType stoneType, Color color) {
+	public void markPositionsClosingMill(Graphics2D g, StoneColor stoneType, Color color) {
 		model.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
 	}
 
-	public void markPositionFixingOpponent(Graphics2D g, StoneType either, StoneType other, Color color) {
+	public void markPositionFixingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {
 		if (model.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = model.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
 			if (model.neighbors(singleFreePosition).anyMatch(p -> model.getStoneAt(p) == either)) {
@@ -183,13 +183,13 @@ public class Board extends GameEntity {
 		}
 	}
 
-	public void markPossibleMoveStarts(Graphics2D g, StoneType type, boolean canJump) {
+	public void markPossibleMoveStarts(Graphics2D g, StoneColor type, boolean canJump) {
 		IntStream startPositions = canJump ? model.positions(type) : model.positionsWithEmptyNeighbor(type);
 		startPositions.forEach(p -> markPosition(g, p, Color.GREEN));
 		startPositions.close();
 	}
 
-	public void markRemovableStones(Graphics2D g, StoneType stoneType) {
+	public void markRemovableStones(Graphics2D g, StoneColor stoneType) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		boolean allInMill = model.areAllStonesInsideMill(stoneType);
 		model.positions(stoneType).filter(p -> allInMill || !model.isPositionInsideMill(p, stoneType))

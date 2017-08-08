@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  */
 public class BoardModel extends BoardGraph {
 
-	protected static void checkStoneType(StoneType type) {
+	protected static void checkStoneType(StoneColor type) {
 		if (type == null) {
 			throw new IllegalArgumentException("Illegal stone type: " + type);
 		}
@@ -79,13 +79,13 @@ public class BoardModel extends BoardGraph {
 	};
 
 	/* Stone content */
-	private StoneType[] content;
+	private StoneColor[] content;
 
 	/**
 	 * Constructs an empty board.
 	 */
 	public BoardModel() {
-		content = new StoneType[NUM_POS];
+		content = new StoneColor[NUM_POS];
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class BoardModel extends BoardGraph {
 	 * Clears the board.
 	 */
 	public void clear() {
-		content = new StoneType[NUM_POS];
+		content = new StoneColor[NUM_POS];
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return a stream of the positions containing a stone of the given type
 	 */
-	public IntStream positions(StoneType type) {
+	public IntStream positions(StoneColor type) {
 		checkStoneType(type);
 		return positions().filter(p -> content[p] == type);
 	}
@@ -134,7 +134,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return a stream of the positions which carry a stone of the given type and which have an empty neighbor position
 	 */
-	public IntStream positionsWithEmptyNeighbor(StoneType type) {
+	public IntStream positionsWithEmptyNeighbor(StoneColor type) {
 		return positions(type).filter(this::hasEmptyNeighbor);
 	}
 
@@ -151,7 +151,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return the number of stones of the given type on the board
 	 */
-	public long stoneCount(StoneType type) {
+	public long stoneCount(StoneColor type) {
 		checkStoneType(type);
 		return Stream.of(content).filter(stone -> stone == type).count();
 	}
@@ -164,7 +164,7 @@ public class BoardModel extends BoardGraph {
 	 * @param type
 	 *          a stone type
 	 */
-	public void putStoneAt(int p, StoneType type) {
+	public void putStoneAt(int p, StoneColor type) {
 		checkPosition(p);
 		checkStoneType(type);
 		if (content[p] != null) {
@@ -212,7 +212,7 @@ public class BoardModel extends BoardGraph {
 	 *          a valid position
 	 * @return the content at this position or <code>null</code>
 	 */
-	public StoneType getStoneAt(int p) {
+	public StoneColor getStoneAt(int p) {
 		checkPosition(p);
 		return content[p];
 	}
@@ -247,7 +247,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if there is a stone of the given type at this position
 	 */
-	public boolean hasStoneAt(int p, StoneType type) {
+	public boolean hasStoneAt(int p, StoneColor type) {
 		checkPosition(p);
 		checkStoneType(type);
 		return content[p] == type;
@@ -261,7 +261,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if no stone of the given type can move to some neighbor position
 	 */
-	public boolean isTrapped(StoneType type) {
+	public boolean isTrapped(StoneColor type) {
 		checkStoneType(type);
 		return positions(type).noneMatch(p -> hasEmptyNeighbor(p));
 	}
@@ -275,7 +275,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if the given position is inside a mill of stones of the given type
 	 */
-	public boolean isPositionInsideMill(int p, StoneType type) {
+	public boolean isPositionInsideMill(int p, StoneColor type) {
 		checkPosition(p);
 		checkStoneType(type);
 		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> content[q] == type)
@@ -287,7 +287,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if all stones of the given type are inside some mill
 	 */
-	public boolean areAllStonesInsideMill(StoneType type) {
+	public boolean areAllStonesInsideMill(StoneColor type) {
 		return positions(type).allMatch(p -> isPositionInsideMill(p, type));
 	}
 
@@ -296,7 +296,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return a stream of all positions which would close a mill when a stone of the given type would be placed there
 	 */
-	public IntStream positionsForClosingMill(StoneType type) {
+	public IntStream positionsForClosingMill(StoneColor type) {
 		return positions().filter(p -> canMillBeClosedAt(p, type));
 	}
 
@@ -307,7 +307,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if a mill of stones of the given type could be closed when placing a stone on the given position
 	 */
-	public boolean canMillBeClosedAt(int p, StoneType type) {
+	public boolean canMillBeClosedAt(int p, StoneColor type) {
 		checkPosition(p);
 		checkStoneType(type);
 		return content[p] == null && (content[H_MILL[p][0]] == type && content[H_MILL[p][1]] == type
@@ -319,7 +319,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return a stream of all positions where placing a stone of the given type would open two mills
 	 */
-	public IntStream positionsOpeningTwoMills(StoneType type) {
+	public IntStream positionsOpeningTwoMills(StoneColor type) {
 		return positions().filter(p -> canOpenedTwoMillsAt(p, type));
 	}
 
@@ -330,7 +330,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if placing a stone of the given type at the given positions would open two mills
 	 */
-	public boolean canOpenedTwoMillsAt(int p, StoneType type) {
+	public boolean canOpenedTwoMillsAt(int p, StoneColor type) {
 		checkPosition(p);
 		checkStoneType(type);
 		if (content[p] != null) {

@@ -1,7 +1,7 @@
 package de.amr.games.muehle.ui;
 
-import static de.amr.games.muehle.board.StoneType.BLACK;
-import static de.amr.games.muehle.board.StoneType.WHITE;
+import static de.amr.games.muehle.board.StoneColor.BLACK;
+import static de.amr.games.muehle.board.StoneColor.WHITE;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -10,14 +10,14 @@ import java.awt.RenderingHints;
 import java.util.EnumMap;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.games.muehle.board.StoneType;
+import de.amr.games.muehle.board.StoneColor;
 
 public class Stone extends GameEntity {
 
 	public static int radius = 20;
 
-	private static final EnumMap<StoneType, Color> FILL = new EnumMap<>(StoneType.class);
-	private static final EnumMap<StoneType, Color> EDGE = new EnumMap<>(StoneType.class);
+	private static final EnumMap<StoneColor, Color> FILL = new EnumMap<>(StoneColor.class);
+	private static final EnumMap<StoneColor, Color> EDGE = new EnumMap<>(StoneColor.class);
 
 	static {
 		FILL.put(WHITE, new Color(255, 248, 220));
@@ -26,14 +26,14 @@ public class Stone extends GameEntity {
 		EDGE.put(BLACK, Color.DARK_GRAY);
 	}
 
-	private StoneType type;
+	private StoneColor color;
 
-	public Stone(StoneType type) {
-		this.type = type;
+	public Stone(StoneColor color) {
+		this.color = color;
 	}
 
-	public StoneType getType() {
-		return type;
+	public StoneColor getColor() {
+		return color;
 	}
 
 	@Override
@@ -51,10 +51,10 @@ public class Stone extends GameEntity {
 		int diameter = 2 * radius;
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.translate(tf.getX() - radius, tf.getY() - radius);
-		g.setColor(FILL.get(type));
+		g.setColor(FILL.get(color));
 		g.fillOval(0, 0, diameter, diameter);
 		g.setStroke(new BasicStroke(3));
-		g.setColor(EDGE.get(type));
+		g.setColor(EDGE.get(color));
 		g.setStroke(new BasicStroke(2));
 		g.drawOval(0, 0, diameter, diameter);
 		g.drawOval(diameter / 6, diameter / 6, 2 * diameter / 3, 2 * diameter / 3);

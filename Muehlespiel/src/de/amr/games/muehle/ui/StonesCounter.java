@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.function.IntSupplier;
 
-import de.amr.games.muehle.board.StoneType;
+import de.amr.games.muehle.board.StoneColor;
 
 /**
  * Visual indicator of a number of stones.
@@ -19,8 +19,8 @@ public class StonesCounter extends Stone {
 	private boolean selected;
 	private IntSupplier stoneCountSupplier;
 
-	public StonesCounter(StoneType stoneType, IntSupplier stoneCountSupplier) {
-		super(stoneType);
+	public StonesCounter(StoneColor color, IntSupplier stoneCountSupplier) {
+		super(color);
 		this.stoneCountSupplier = stoneCountSupplier;
 	}
 

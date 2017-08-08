@@ -4,8 +4,8 @@ import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
-import static de.amr.games.muehle.board.StoneType.BLACK;
-import static de.amr.games.muehle.board.StoneType.WHITE;
+import static de.amr.games.muehle.board.StoneColor.BLACK;
+import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static org.junit.Assert.assertTrue;
 
 import java.util.OptionalInt;
