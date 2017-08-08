@@ -22,7 +22,7 @@ public class RandomPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public OptionalInt supplyRemovePosition(StoneColor opponentColor) {
+	public OptionalInt supplyRemovalPosition(StoneColor opponentColor) {
 		return random(model.positions().filter(p -> model.getStoneAt(p) == opponentColor));
 	}
 

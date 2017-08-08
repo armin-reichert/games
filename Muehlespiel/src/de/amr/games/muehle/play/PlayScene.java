@@ -188,10 +188,6 @@ public class PlayScene extends Scene<MillApp> {
 		messageDisplay.setText(app.msg(key, args));
 	}
 
-	private Move newMove(Player player) {
-		return new Move(board, player::supplyMoveStartPosition, player::supplyMoveEndPosition, this::supplyMoveVelocity, player::canJump);
-	}
-
 	private void switchTo(Player player) {
 		current = player;
 		other = player == white ? black : white;
@@ -205,41 +201,42 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignMovingTo(Player player) {
-		move = newMove(player);
-		message(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
 		switchTo(player);
+		move = new Move(board, current::supplyMoveStartPosition, current::supplyMoveEndPosition, this::supplyMoveVelocity,
+				current::canJump);
+		message(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
 	}
 
 	private OptionalInt tryToPlaceStone(Player player) {
-		OptionalInt optClickPosition = player.supplyPlacePosition();
-		if (optClickPosition.isPresent()) {
-			int clickPosition = optClickPosition.getAsInt();
-			if (board.getModel().hasStoneAt(clickPosition)) {
-				LOG.info(app.msg("stone_at_position", clickPosition));
+		OptionalInt optPlacePosition = player.supplyPlacePosition();
+		if (optPlacePosition.isPresent()) {
+			int placePosition = optPlacePosition.getAsInt();
+			if (board.getModel().hasStoneAt(placePosition)) {
+				LOG.info(app.msg("stone_at_position", placePosition));
 			} else {
-				board.putStoneAt(clickPosition, player.getColor());
+				board.putStoneAt(placePosition, player.getColor());
 				player.stonePlaced();
-				return optClickPosition;
+				return optPlacePosition;
 			}
 		}
 		return OptionalInt.empty();
 	}
 
 	private OptionalInt tryToRemoveStone(Player player, StoneColor otherColor) {
-		OptionalInt optClickPosition = player.supplyRemovePosition(otherColor);
-		if (optClickPosition.isPresent()) {
-			int clickPosition = optClickPosition.getAsInt();
-			if (board.getModel().isEmptyPosition(clickPosition)) {
-				LOG.info(app.msg("stone_at_position_not_existing", clickPosition));
-			} else if (board.getModel().getStoneAt(clickPosition) != otherColor) {
-				LOG.info(app.msg("stone_at_position_wrong_color", clickPosition));
-			} else if (board.getModel().isPositionInsideMill(clickPosition, otherColor)
+		OptionalInt optRemovalPosition = player.supplyRemovalPosition(otherColor);
+		if (optRemovalPosition.isPresent()) {
+			int removalPosition = optRemovalPosition.getAsInt();
+			if (board.getModel().isEmptyPosition(removalPosition)) {
+				LOG.info(app.msg("stone_at_position_not_existing", removalPosition));
+			} else if (board.getModel().getStoneAt(removalPosition) != otherColor) {
+				LOG.info(app.msg("stone_at_position_wrong_color", removalPosition));
+			} else if (board.getModel().isPositionInsideMill(removalPosition, otherColor)
 					&& !board.getModel().areAllStonesInsideMill(otherColor)) {
 				LOG.info(app.msg("stone_cannot_be_removed_from_mill"));
 			} else {
-				board.removeStoneAt(clickPosition);
+				board.removeStoneAt(removalPosition);
 				LOG.info(app.msg(player.getColor() == WHITE ? "white_took_stone" : "black_took_stone"));
-				return optClickPosition;
+				return optRemovalPosition;
 			}
 		}
 		return OptionalInt.empty();

@@ -23,7 +23,7 @@ public interface Player {
 
 	public OptionalInt supplyPlacePosition();
 
-	public OptionalInt supplyRemovePosition(StoneColor otherColor);
+	public OptionalInt supplyRemovalPosition(StoneColor otherColor);
 
 	public OptionalInt supplyMoveStartPosition();
 
