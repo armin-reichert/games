@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.common.ScrollingText;
+import de.amr.easy.game.common.TextArea;
 
 /**
  * This view is displayed for an application if no view is selected.
@@ -15,11 +15,11 @@ import de.amr.easy.game.common.ScrollingText;
 public class DefaultView implements View {
 
 	private final Application app;
-	private final ScrollingText text;
+	private final TextArea text;
 
 	public DefaultView(Application app) {
 		this.app = app;
-		text = new ScrollingText();
+		text = new TextArea();
 	}
 
 	@Override

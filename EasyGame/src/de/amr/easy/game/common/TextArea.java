@@ -16,7 +16,7 @@ import de.amr.easy.game.sprite.Sprite;
  * 
  * @author Armin Reichert
  */
-public class ScrollingText extends GameEntity {
+public class TextArea extends GameEntity {
 
 	private String[] lines;
 	private float lineSpacing;
@@ -24,7 +24,7 @@ public class ScrollingText extends GameEntity {
 	private Font font;
 	private boolean imageNeedsUpdate;
 
-	public ScrollingText(String text) {
+	public TextArea(String text) {
 		setText(text);
 		setScrollSpeed(0);
 		setFont(new Font("Sans", Font.PLAIN, 40));
@@ -32,7 +32,7 @@ public class ScrollingText extends GameEntity {
 		setLineSpacing(1.5f);
 	}
 
-	public ScrollingText() {
+	public TextArea() {
 		this("");
 	}
 

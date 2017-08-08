@@ -15,7 +15,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.common.ScrollingText;
+import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
@@ -47,7 +47,7 @@ public class PlayScene extends Scene<MillApp> {
 	private Player other;
 	private StonesCounter whiteStillToPlaceCounter;
 	private StonesCounter blackStillToPlaceCounter;
-	private ScrollingText messageDisplay;
+	private TextArea messageDisplay;
 	private boolean assistantOn;
 
 	/* A finite-state machine which controls the play scene */
@@ -156,7 +156,7 @@ public class PlayScene extends Scene<MillApp> {
 		blackStillToPlaceCounter.tf.moveTo(getWidth() - 100, getHeight() - 50);
 		blackStillToPlaceCounter.init();
 
-		messageDisplay = new ScrollingText();
+		messageDisplay = new TextArea();
 		messageDisplay.setColor(Color.BLUE);
 		messageDisplay.setFont(msgFont);
 		messageDisplay.tf.moveTo(0, getHeight() - 90);

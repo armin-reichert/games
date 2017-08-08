@@ -5,13 +5,13 @@ import static java.lang.String.format;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.common.ScrollingText;
+import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.Scene;
 
 public class MouseTestScene extends Scene<MouseTestApp> {
 
-	private ScrollingText messageDisplay;
+	private TextArea messageDisplay;
 
 	public MouseTestScene(MouseTestApp app) {
 		super(app);
@@ -20,7 +20,7 @@ public class MouseTestScene extends Scene<MouseTestApp> {
 
 	@Override
 	public void init() {
-		messageDisplay = new ScrollingText();
+		messageDisplay = new TextArea();
 	}
 
 	@Override

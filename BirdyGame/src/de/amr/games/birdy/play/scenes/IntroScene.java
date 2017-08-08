@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.PumpingImage;
-import de.amr.easy.game.common.ScrollingText;
+import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.City;
@@ -35,7 +35,7 @@ public class IntroScene extends Scene<BirdyGame> {
 	private final StateMachine<State, Object> control;
 	private City city;
 	private PumpingImage gameTitleImage;
-	private ScrollingText creditsText;
+	private TextArea creditsText;
 
 	public IntroScene(BirdyGame app) {
 		super(app);
@@ -77,7 +77,7 @@ public class IntroScene extends Scene<BirdyGame> {
 		gameTitleImage.setScale(3);
 		gameTitleImage.visibility = () -> control.is(ShowGameTitle);
 
-		creditsText = new ScrollingText(CREDITS_TEXT);
+		creditsText = new TextArea(CREDITS_TEXT);
 		creditsText.setFont(Assets.font("Pacifico-Regular"));
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
 		creditsText.visibility = () -> control.is(ShowCredits, Wait);
