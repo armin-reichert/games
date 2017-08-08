@@ -36,6 +36,7 @@ import de.amr.games.muehle.ui.StonesCounter;
 public class PlayScene extends Scene<MillApp> {
 
 	private static final int NUM_STONES = 9;
+	private static final float MOVE_SECONDS = 1.5f;
 
 	private final PlayControl control;
 	private Board board;
@@ -195,22 +196,21 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignPlacingTo(Player player) {
+		whiteStillToPlaceCounter.setSelected(player.getColor() == WHITE);
+		blackStillToPlaceCounter.setSelected(player.getColor() == BLACK);
+		displayMessage(player.getColor() == WHITE ? "white_must_place" : "black_must_place");
 		switchTo(player);
-		whiteStillToPlaceCounter.setSelected(current.getColor() == WHITE);
-		blackStillToPlaceCounter.setSelected(current.getColor() == BLACK);
-		displayMessage(current.getColor() == WHITE ? "white_must_place" : "black_must_place");
 	}
 
 	private void assignMovingTo(Player player) {
-		switchTo(player);
 		move = newMove(player);
-		displayMessage(current.getColor() == WHITE ? "white_must_move" : "black_must_move");
+		displayMessage(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
+		switchTo(player);
 	}
 
 	private Vector2 supplyMoveVelocity() {
 		int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
-		float speed = dist(board.centerPoint(from), board.centerPoint(to))
-				/ app.pulse.secToTicks(app.settings.getAsFloat("seconds-per-move"));
+		float speed = dist(board.centerPoint(from), board.centerPoint(to)) / app.pulse.secToTicks(MOVE_SECONDS);
 		Direction dir = board.getModel().getDirection(from, to).get();
 		switch (dir) {
 		case NORTH:
