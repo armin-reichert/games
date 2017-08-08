@@ -36,6 +36,11 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
+	public void stonePlaced() {
+		stonesPlaced += 1;
+	}
+
+	@Override
 	public boolean canJump() {
 		return model.stoneCount(color) == 3;
 	}

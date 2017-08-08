@@ -5,7 +5,6 @@ import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
-import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -53,43 +52,17 @@ public class InteractivePlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public OptionalInt tryToPlaceStone() {
-		OptionalInt optClickPosition = findMouseClickPosition();
-		if (optClickPosition.isPresent()) {
-			int clickPosition = optClickPosition.getAsInt();
-			if (model.hasStoneAt(clickPosition)) {
-				LOG.info(app.msg("stone_at_position", clickPosition));
-			} else {
-				board.putStoneAt(clickPosition, color);
-				stonesPlaced += 1;
-				return optClickPosition;
-			}
-		}
-		return OptionalInt.empty();
+	public OptionalInt supplyPlacePosition() {
+		return findMouseClickPosition();
 	}
 
 	@Override
-	public OptionalInt tryToRemoveStone(StoneColor otherColor) {
-		OptionalInt optClickPosition = findMouseClickPosition();
-		if (optClickPosition.isPresent()) {
-			int clickPosition = optClickPosition.getAsInt();
-			if (model.isEmptyPosition(clickPosition)) {
-				LOG.info(app.msg("stone_at_position_not_existing", clickPosition));
-			} else if (model.getStoneAt(clickPosition) != otherColor) {
-				LOG.info(app.msg("stone_at_position_wrong_color", clickPosition));
-			} else if (model.isPositionInsideMill(clickPosition, otherColor) && !model.areAllStonesInsideMill(otherColor)) {
-				LOG.info(app.msg("stone_cannot_be_removed_from_mill"));
-			} else {
-				board.removeStoneAt(clickPosition);
-				LOG.info(app.msg(color == WHITE ? "white_took_stone" : "black_took_stone"));
-				return optClickPosition;
-			}
-		}
-		return OptionalInt.empty();
+	public OptionalInt supplyRemovePosition(StoneColor opponentColor) {
+		return findMouseClickPosition();
 	}
 
 	@Override
-	public OptionalInt supplyMoveStart() {
+	public OptionalInt supplyMoveStartPosition() {
 		if (Mouse.clicked()) {
 			OptionalInt optStartPosition = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optStartPosition.isPresent()) {
@@ -110,7 +83,7 @@ public class InteractivePlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public OptionalInt supplyMoveEnd(int from) {
+	public OptionalInt supplyMoveEndPosition(int from) {
 		// if target position is unique, use it
 		if (!canJump() && model.emptyNeighbors(from).count() == 1) {
 			return model.emptyNeighbors(from).findFirst();

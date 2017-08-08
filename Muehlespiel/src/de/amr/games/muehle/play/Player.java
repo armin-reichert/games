@@ -15,16 +15,18 @@ public interface Player {
 
 	public StoneColor getColor();
 
+	public void stonePlaced();
+
 	public int getStonesPlaced();
 
 	public boolean canJump();
 
-	public OptionalInt tryToPlaceStone();
+	public OptionalInt supplyPlacePosition();
 
-	public OptionalInt tryToRemoveStone(StoneColor opponentColor);
+	public OptionalInt supplyRemovePosition(StoneColor otherColor);
 
-	public OptionalInt supplyMoveStart();
+	public OptionalInt supplyMoveStartPosition();
 
-	public OptionalInt supplyMoveEnd(int from);
+	public OptionalInt supplyMoveEndPosition(int from);
 
 }

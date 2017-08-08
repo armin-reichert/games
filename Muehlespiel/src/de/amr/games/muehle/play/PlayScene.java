@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.OptionalInt;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
@@ -81,12 +82,12 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> {
 				if (mustRemoveStoneOfOpponent) {
-					current.tryToRemoveStone(other.getColor()).ifPresent(pos -> {
+					tryToRemoveStone(current, other.getColor()).ifPresent(pos -> {
 						mustRemoveStoneOfOpponent = false;
 						assignPlacingTo(other);
 					});
 				} else {
-					current.tryToPlaceStone().ifPresent(pos -> {
+					tryToPlaceStone(current).ifPresent(pos -> {
 						if (board.getModel().isPositionInsideMill(pos, current.getColor())) {
 							mustRemoveStoneOfOpponent = true;
 							message(current.getColor() == WHITE ? "white_must_take" : "black_must_take");
@@ -105,7 +106,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING).update = s -> {
 				if (mustRemoveStoneOfOpponent) {
-					current.tryToRemoveStone(other.getColor()).ifPresent(pos -> {
+					tryToRemoveStone(current, other.getColor()).ifPresent(pos -> {
 						mustRemoveStoneOfOpponent = false;
 						assignMovingTo(other);
 					});
@@ -188,7 +189,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private Move newMove(Player player) {
-		return new Move(board, player::supplyMoveStart, player::supplyMoveEnd, this::supplyMoveVelocity, player::canJump);
+		return new Move(board, player::supplyMoveStartPosition, player::supplyMoveEndPosition, this::supplyMoveVelocity, player::canJump);
 	}
 
 	private void switchTo(Player player) {
@@ -207,6 +208,41 @@ public class PlayScene extends Scene<MillApp> {
 		move = newMove(player);
 		message(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
 		switchTo(player);
+	}
+
+	private OptionalInt tryToPlaceStone(Player player) {
+		OptionalInt optClickPosition = player.supplyPlacePosition();
+		if (optClickPosition.isPresent()) {
+			int clickPosition = optClickPosition.getAsInt();
+			if (board.getModel().hasStoneAt(clickPosition)) {
+				LOG.info(app.msg("stone_at_position", clickPosition));
+			} else {
+				board.putStoneAt(clickPosition, player.getColor());
+				player.stonePlaced();
+				return optClickPosition;
+			}
+		}
+		return OptionalInt.empty();
+	}
+
+	private OptionalInt tryToRemoveStone(Player player, StoneColor otherColor) {
+		OptionalInt optClickPosition = player.supplyRemovePosition(otherColor);
+		if (optClickPosition.isPresent()) {
+			int clickPosition = optClickPosition.getAsInt();
+			if (board.getModel().isEmptyPosition(clickPosition)) {
+				LOG.info(app.msg("stone_at_position_not_existing", clickPosition));
+			} else if (board.getModel().getStoneAt(clickPosition) != otherColor) {
+				LOG.info(app.msg("stone_at_position_wrong_color", clickPosition));
+			} else if (board.getModel().isPositionInsideMill(clickPosition, otherColor)
+					&& !board.getModel().areAllStonesInsideMill(otherColor)) {
+				LOG.info(app.msg("stone_cannot_be_removed_from_mill"));
+			} else {
+				board.removeStoneAt(clickPosition);
+				LOG.info(app.msg(player.getColor() == WHITE ? "white_took_stone" : "black_took_stone"));
+				return optClickPosition;
+			}
+		}
+		return OptionalInt.empty();
 	}
 
 	private Vector2 supplyMoveVelocity() {

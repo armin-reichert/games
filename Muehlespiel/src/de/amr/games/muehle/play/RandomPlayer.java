@@ -17,29 +17,22 @@ public class RandomPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public OptionalInt tryToPlaceStone() {
-		OptionalInt optPos = random(model.positions().filter(model::isEmptyPosition));
-		optPos.ifPresent(p -> {
-			board.putStoneAt(p, color);
-			stonesPlaced += 1;
-		});
-		return optPos;
+	public OptionalInt supplyPlacePosition() {
+		return random(model.positions().filter(model::isEmptyPosition));
 	}
 
 	@Override
-	public OptionalInt tryToRemoveStone(StoneColor opponentColor) {
-		OptionalInt optPos = random(model.positions().filter(p -> model.getStoneAt(p) == opponentColor));
-		optPos.ifPresent(p -> board.removeStoneAt(p));
-		return optPos;
+	public OptionalInt supplyRemovePosition(StoneColor opponentColor) {
+		return random(model.positions().filter(p -> model.getStoneAt(p) == opponentColor));
 	}
 
 	@Override
-	public OptionalInt supplyMoveStart() {
+	public OptionalInt supplyMoveStartPosition() {
 		return random(model.positions().filter(p -> model.getStoneAt(p) == color).filter(model::hasEmptyNeighbor));
 	}
 
 	@Override
-	public OptionalInt supplyMoveEnd(int from) {
+	public OptionalInt supplyMoveEndPosition(int from) {
 		return canJump() ? random(model.positions().filter(model::isEmptyPosition))
 				: random(model.neighbors(from).filter(model::isEmptyPosition));
 	}
