@@ -29,7 +29,7 @@ import de.amr.games.muehle.ui.Stone;
  * 
  * @author Armin Reichert
  */
-public class InteractivePlayer implements Player {
+public class InteractivePlayer extends AbstractPlayer {
 
 	private static final EnumMap<Direction, Integer> DIRECTION_KEYS = new EnumMap<>(Direction.class);
 	static {
@@ -48,35 +48,8 @@ public class InteractivePlayer implements Player {
 		/*@formatter:on*/
 	}
 
-	private final MillApp app;
-	private final Board board;
-	private final StoneColor color;
-	private int stonesPlaced;
-
 	public InteractivePlayer(MillApp app, Board board, StoneColor color) {
-		this.app = app;
-		this.board = board;
-		this.color = color;
-	}
-
-	@Override
-	public void init() {
-		stonesPlaced = 0;
-	}
-
-	@Override
-	public int getStonesPlaced() {
-		return stonesPlaced;
-	}
-
-	@Override
-	public StoneColor getColor() {
-		return color;
-	}
-
-	@Override
-	public boolean canJump() {
-		return board.getModel().stoneCount(color) == 3;
+		super(app, board, color);
 	}
 
 	@Override
@@ -84,7 +57,7 @@ public class InteractivePlayer implements Player {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
-			if (board.getModel().hasStoneAt(clickPosition)) {
+			if (model.hasStoneAt(clickPosition)) {
 				LOG.info(app.msg("stone_at_position", clickPosition));
 			} else {
 				board.putStoneAt(clickPosition, color);
@@ -100,12 +73,11 @@ public class InteractivePlayer implements Player {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
-			if (board.getModel().isEmptyPosition(clickPosition)) {
+			if (model.isEmptyPosition(clickPosition)) {
 				LOG.info(app.msg("stone_at_position_not_existing", clickPosition));
-			} else if (board.getModel().getStoneAt(clickPosition) != otherColor) {
+			} else if (model.getStoneAt(clickPosition) != otherColor) {
 				LOG.info(app.msg("stone_at_position_wrong_color", clickPosition));
-			} else if (board.getModel().isPositionInsideMill(clickPosition, otherColor)
-					&& !board.getModel().areAllStonesInsideMill(otherColor)) {
+			} else if (model.isPositionInsideMill(clickPosition, otherColor) && !model.areAllStonesInsideMill(otherColor)) {
 				LOG.info(app.msg("stone_cannot_be_removed_from_mill"));
 			} else {
 				board.removeStoneAt(clickPosition);
@@ -127,7 +99,7 @@ public class InteractivePlayer implements Player {
 					LOG.info(app.msg("stone_at_position_not_existing", from));
 				} else if (optStone.get().getColor() != color) {
 					LOG.info(app.msg("stone_at_position_wrong_color", from));
-				} else if (!canJump() && !board.getModel().hasEmptyNeighbor(from)) {
+				} else if (!canJump() && !model.hasEmptyNeighbor(from)) {
 					LOG.info(app.msg("stone_at_position_cannot_move", from));
 				} else {
 					return optStartPosition;
@@ -140,17 +112,17 @@ public class InteractivePlayer implements Player {
 	@Override
 	public OptionalInt supplyMoveEnd(int from) {
 		// if target position is unique, use it
-		if (!canJump() && board.getModel().emptyNeighbors(from).count() == 1) {
-			return board.getModel().emptyNeighbors(from).findFirst();
+		if (!canJump() && model.emptyNeighbors(from).count() == 1) {
+			return model.emptyNeighbors(from).findFirst();
 		}
 		// if move direction was specified and board position in that direction is empty, use it
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
 			Direction dir = optMoveDirection.get();
-			OptionalInt optNeighbor = board.getModel().neighbor(from, dir);
+			OptionalInt optNeighbor = model.neighbor(from, dir);
 			if (optNeighbor.isPresent()) {
 				int neighbor = optNeighbor.getAsInt();
-				if (board.getModel().isEmptyPosition(neighbor)) {
+				if (model.isEmptyPosition(neighbor)) {
 					return optNeighbor;
 				}
 			}
@@ -160,7 +132,7 @@ public class InteractivePlayer implements Player {
 			OptionalInt optClickPos = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optClickPos.isPresent()) {
 				int clickPos = optClickPos.getAsInt();
-				if (board.getModel().isEmptyPosition(clickPos) && (canJump() || board.getModel().areNeighbors(from, clickPos))) {
+				if (model.isEmptyPosition(clickPos) && (canJump() || model.areNeighbors(from, clickPos))) {
 					return optClickPos;
 				}
 			}
