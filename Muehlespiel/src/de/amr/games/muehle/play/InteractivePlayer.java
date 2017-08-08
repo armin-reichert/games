@@ -39,6 +39,15 @@ public class InteractivePlayer implements Player {
 		DIRECTION_KEYS.put(WEST, VK_LEFT);
 	}
 
+	private static Optional<Direction> supplyMoveDirection() {
+		/*@formatter:off*/
+		return DIRECTION_KEYS.entrySet().stream()
+			.filter(e -> Keyboard.keyPressedOnce(e.getValue()))
+			.map(Map.Entry::getKey)
+			.findAny();
+		/*@formatter:on*/
+	}
+
 	private final MillApp app;
 	private final Board board;
 	private final StoneColor color;
@@ -87,16 +96,16 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public OptionalInt tryToRemoveStone(StoneColor opponentColor) {
+	public OptionalInt tryToRemoveStone(StoneColor otherColor) {
 		OptionalInt optClickPosition = findMouseClickPosition();
 		if (optClickPosition.isPresent()) {
 			int clickPosition = optClickPosition.getAsInt();
 			if (board.getModel().isEmpty(clickPosition)) {
 				LOG.info(app.msg("stone_at_position_not_existing", clickPosition));
-			} else if (board.getModel().getStoneAt(clickPosition) != opponentColor) {
+			} else if (board.getModel().getStoneAt(clickPosition) != otherColor) {
 				LOG.info(app.msg("stone_at_position_wrong_color", clickPosition));
-			} else if (board.getModel().isPositionInsideMill(clickPosition, opponentColor)
-					&& !board.getModel().areAllStonesInsideMill(opponentColor)) {
+			} else if (board.getModel().isPositionInsideMill(clickPosition, otherColor)
+					&& !board.getModel().areAllStonesInsideMill(otherColor)) {
 				LOG.info(app.msg("stone_cannot_be_removed_from_mill"));
 			} else {
 				board.removeStoneAt(clickPosition);
@@ -116,7 +125,7 @@ public class InteractivePlayer implements Player {
 				Optional<Stone> optStone = board.getStoneAt(from);
 				if (!optStone.isPresent()) {
 					LOG.info(app.msg("stone_at_position_not_existing", from));
-				} else if (color != optStone.get().getColor()) {
+				} else if (optStone.get().getColor() != color) {
 					LOG.info(app.msg("stone_at_position_wrong_color", from));
 				} else if (!canJump() && !board.getModel().hasEmptyNeighbor(from)) {
 					LOG.info(app.msg("stone_at_position_cannot_move", from));
@@ -142,7 +151,7 @@ public class InteractivePlayer implements Player {
 			if (optNeighbor.isPresent()) {
 				int neighbor = optNeighbor.getAsInt();
 				if (board.getModel().isEmpty(neighbor)) {
-					return OptionalInt.of(neighbor);
+					return optNeighbor;
 				}
 			}
 		}
@@ -151,7 +160,7 @@ public class InteractivePlayer implements Player {
 			OptionalInt optClickPos = board.findPosition(Mouse.getX(), Mouse.getY());
 			if (optClickPos.isPresent()) {
 				int clickPos = optClickPos.getAsInt();
-				if (!board.getModel().hasStoneAt(clickPos) && (canJump() || board.getModel().areNeighbors(from, clickPos))) {
+				if (board.getModel().isEmpty(clickPos) && (canJump() || board.getModel().areNeighbors(from, clickPos))) {
 					return optClickPos;
 				}
 			}
@@ -162,14 +171,5 @@ public class InteractivePlayer implements Player {
 
 	private OptionalInt findMouseClickPosition() {
 		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
-	}
-
-	private Optional<Direction> supplyMoveDirection() {
-		/*@formatter:off*/
-		return DIRECTION_KEYS.entrySet().stream()
-			.filter(e -> Keyboard.keyPressedOnce(e.getValue()))
-			.map(Map.Entry::getKey)
-			.findAny();
-		/*@formatter:on*/
 	}
 }

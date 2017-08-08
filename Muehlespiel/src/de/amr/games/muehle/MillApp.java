@@ -2,6 +2,7 @@ package de.amr.games.muehle;
 
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import de.amr.easy.game.Application;
@@ -37,6 +38,10 @@ public class MillApp extends Application {
 	}
 
 	public String msg(String key, Object... args) {
-		return MessageFormat.format(messages.getString(key), args);
+		try {
+			return MessageFormat.format(messages.getString(key), args);
+		} catch (MissingResourceException e) {
+			return "MISSING RESOURCE: " + key;
+		}
 	}
 }
