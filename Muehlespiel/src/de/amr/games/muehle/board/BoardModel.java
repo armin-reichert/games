@@ -300,6 +300,27 @@ public class BoardModel extends BoardGraph {
 		return positions().filter(p -> canMillBeClosedAt(p, type));
 	}
 
+	public IntStream positionsForOpeningMill(StoneColor color) {
+		return positions().filter(p -> canMillBeOpenedAt(p, color));
+	}
+
+	public boolean canMillBeOpenedAt(int p, StoneColor color) {
+		checkPosition(p);
+		checkStoneType(color);
+		if (content[p] != null) {
+			return false;
+		}
+		int h1 = H_MILL[p][0], h2 = H_MILL[p][1];
+		if (content[h1] == color && content[h2] == null || content[h2] == color && content[h1] == null) {
+			return true;
+		}
+		int v1 = V_MILL[p][0], v2 = V_MILL[p][1];
+		if (content[v1] == color && content[v2] == null || content[v2] == color && content[v1] == null) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * @param p
 	 *          a valid position
@@ -320,7 +341,7 @@ public class BoardModel extends BoardGraph {
 	 * @return a stream of all positions where placing a stone of the given type would open two mills
 	 */
 	public IntStream positionsOpeningTwoMills(StoneColor type) {
-		return positions().filter(p -> canOpenedTwoMillsAt(p, type));
+		return positions().filter(p -> canOpenTwoMillsAt(p, type));
 	}
 
 	/**
@@ -330,7 +351,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return if placing a stone of the given type at the given positions would open two mills
 	 */
-	public boolean canOpenedTwoMillsAt(int p, StoneColor type) {
+	public boolean canOpenTwoMillsAt(int p, StoneColor type) {
 		checkPosition(p);
 		checkStoneType(type);
 		if (content[p] != null) {
@@ -341,4 +362,15 @@ public class BoardModel extends BoardGraph {
 		return (content[h1] == type && content[h2] == null || content[h1] == null && content[h2] == type)
 				&& (content[v1] == type && content[v2] == null || content[v1] == null && content[v2] == type);
 	}
+
+	public int[] getHMillPartners(int p) {
+		checkPosition(p);
+		return H_MILL[p];
+	}
+
+	public int[] getVMillPartners(int p) {
+		checkPosition(p);
+		return V_MILL[p];
+	}
+
 }

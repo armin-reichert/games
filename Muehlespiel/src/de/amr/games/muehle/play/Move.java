@@ -58,7 +58,7 @@ public class Move {
 		this.board = board;
 		this.velocitySupplier = velocitySupplier;
 		control = new MoveControl();
-		control.setLogger(LOG);
+		// control.setLogger(LOG);
 		init();
 	}
 

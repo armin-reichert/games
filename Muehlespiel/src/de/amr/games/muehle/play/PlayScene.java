@@ -147,7 +147,8 @@ public class PlayScene extends Scene<MillApp> {
 
 		white = new InteractivePlayer(app, board, WHITE);
 		// black = new InteractivePlayer(app, board, BLACK);
-		black = new RandomPlayer(app, board, BLACK);
+		// black = new RandomPlayer(app, board, BLACK);
+		black = new StrackPlayer(app, board, BLACK);
 
 		whiteStillToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - white.getStonesPlaced());
 		whiteStillToPlaceCounter.tf.moveTo(40, getHeight() - 50);
@@ -162,7 +163,7 @@ public class PlayScene extends Scene<MillApp> {
 		messageDisplay.setFont(msgFont);
 		messageDisplay.tf.moveTo(0, getHeight() - 90);
 
-		control.setLogger(LOG);
+		// control.setLogger(LOG);
 		control.init();
 	}
 
@@ -233,7 +234,7 @@ public class PlayScene extends Scene<MillApp> {
 				LOG.info(app.msg("stone_cannot_be_removed_from_mill"));
 			} else {
 				board.removeStoneAt(removalPosition);
-				LOG.info(app.msg(player.getColor() == WHITE ? "white_took_stone" : "black_took_stone"));
+				LOG.info(app.msg(player.getColor() == WHITE ? "white_took_stone" : "black_took_stone", removalPosition));
 				return optRemovalPosition;
 			}
 		}
