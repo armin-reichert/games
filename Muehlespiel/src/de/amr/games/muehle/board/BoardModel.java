@@ -336,6 +336,35 @@ public class BoardModel extends BoardGraph {
 	}
 
 	/**
+	 * 
+	 * @param from
+	 *          move start position
+	 * @param to
+	 *          move end position
+	 * @param color
+	 *          stone color
+	 * @return if a mill of the given color is closed when moving a stone of the given color from the start to the end
+	 *         position
+	 */
+	public boolean canCloseMill(int from, int to, StoneColor color) {
+		if (isEmptyPosition(to) && areNeighbors(from, to)) {
+			Direction dir = getDirection(from, to).get();
+			if (dir == Direction.NORTH || dir == Direction.SOUTH) {
+				int[] h = H_MILL[to];
+				if (getStoneAt(h[0]) == color && getStoneAt(h[1]) == color) {
+					return true;
+				}
+			} else {
+				int[] v = V_MILL[to];
+				if (getStoneAt(v[0]) == color && getStoneAt(v[1]) == color) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @param type
 	 *          a stone type
 	 * @return a stream of all positions where placing a stone of the given type would open two mills
@@ -362,15 +391,4 @@ public class BoardModel extends BoardGraph {
 		return (content[h1] == type && content[h2] == null || content[h1] == null && content[h2] == type)
 				&& (content[v1] == type && content[v2] == null || content[v1] == null && content[v2] == type);
 	}
-
-	public int[] getHMillPartners(int p) {
-		checkPosition(p);
-		return H_MILL[p];
-	}
-
-	public int[] getVMillPartners(int p) {
-		checkPosition(p);
-		return V_MILL[p];
-	}
-
 }

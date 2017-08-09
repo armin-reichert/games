@@ -5,6 +5,7 @@ import static de.amr.easy.game.Application.LOG;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Direction;
@@ -64,7 +65,7 @@ public class StrackPlayer extends AbstractPlayer {
 		}
 
 		// Finde Position, an der im nächsten Schritt 2 Mühlen geöffnet werden könnten
-		OptionalInt twoMillsLater = findTwoMillsLaterPosition();
+		OptionalInt twoMillsLater = randomElement(findTwoMillsLaterPositions());
 		if (twoMillsLater.isPresent()) {
 			reason("Setze an Position %d, weil später evtl. 2 eigene Mühlen geöffnet werden könnten", twoMillsLater);
 			return twoMillsLater;
@@ -83,8 +84,8 @@ public class StrackPlayer extends AbstractPlayer {
 		return randomFreePos;
 	}
 
-	private OptionalInt findTwoMillsLaterPosition() {
-		return randomElement(model.positions().filter(model::isEmptyPosition).filter(this::isTwoMillsLaterPosition));
+	private IntStream findTwoMillsLaterPositions() {
+		return model.positions().filter(model::isEmptyPosition).filter(this::isTwoMillsLaterPosition);
 	}
 
 	private boolean isTwoMillsLaterPosition(int p) {
@@ -120,29 +121,12 @@ public class StrackPlayer extends AbstractPlayer {
 	@Override
 	public OptionalInt supplyMoveEndPosition(int from) {
 		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
-		OptionalInt millClosingPos = randomElement(model.positionsForClosingMill(color).filter(p -> canCloseMill(from, p)));
+		OptionalInt millClosingPos = randomElement(
+				model.positionsForClosingMill(color).filter(to -> model.canCloseMill(from, to, color)));
 		if (millClosingPos.isPresent()) {
 			reason("Ziehe an Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
 		}
 		return randomElement(model.emptyNeighbors(from));
-	}
-
-	private boolean canCloseMill(int from, int to) {
-		if (model.isEmptyPosition(to) && model.areNeighbors(from, to)) {
-			Direction dir = model.getDirection(from, to).get();
-			if (dir == Direction.NORTH || dir == Direction.SOUTH) {
-				int[] hPartners = model.getHMillPartners(to);
-				if (model.getStoneAt(hPartners[0]) == color && model.getStoneAt(hPartners[1]) == color) {
-					return true;
-				}
-			} else {
-				int[] vPartners = model.getVMillPartners(to);
-				if (model.getStoneAt(vPartners[0]) == color && model.getStoneAt(vPartners[1]) == color) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 }
