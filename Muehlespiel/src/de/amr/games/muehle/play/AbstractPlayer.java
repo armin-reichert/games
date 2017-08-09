@@ -55,6 +55,12 @@ public abstract class AbstractPlayer implements Player {
 		return model.stoneCount(color) == 3;
 	}
 
+	/**
+	 * 
+	 * @param stream
+	 *          stream of ints
+	 * @return random element from given stream
+	 */
 	protected OptionalInt randomElement(IntStream stream) {
 		int[] array = stream.toArray();
 		return array.length == 0 ? OptionalInt.empty() : OptionalInt.of(array[rand.nextInt(array.length)]);

@@ -24,10 +24,10 @@ public class StrackPlayer extends AbstractPlayer {
 	@Override
 	public OptionalInt supplyPlacePosition() {
 
+		// Fallback: Zufällige freie Position
 		final OptionalInt randomFreePos = randomElement(model.positions().filter(p -> model.isEmptyPosition(p)));
 
 		// Wenn noch kein Stein meiner Farbe gesetzt ist, dann zufällig:
-
 		if (model.positions(color).count() == 0) {
 			reason("Setze an Position %d, weil noch kein Stein meiner Farbe gesetzt wurde", randomFreePos);
 			return randomFreePos;
@@ -36,30 +36,28 @@ public class StrackPlayer extends AbstractPlayer {
 		// Es gibt schon mindestens einen Stein meiner Farbe auf dem Brett.
 
 		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
-
-		OptionalInt millClosingPos = model.positionsForClosingMill(color).findAny();
+		OptionalInt millClosingPos = randomElement(model.positionsForClosingMill(color));
 		if (millClosingPos.isPresent()) {
 			reason("Setze an Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
 		}
 
 		// Finde gegnerische Position, an der Mühle geschlossen werden kann:
-
-		OptionalInt otherMillClosingPos = model.positionsForClosingMill(otherColor).findAny();
+		OptionalInt otherMillClosingPos = randomElement(model.positionsForClosingMill(otherColor));
 		if (otherMillClosingPos.isPresent()) {
 			reason("Setze an Position %d, weil gegnerische Mühle verhindert wird", otherMillClosingPos);
 			return otherMillClosingPos;
 		}
 
 		// Finde Position, an der 2 eigene Mühlen geöffnet werden können
-		OptionalInt twoMillsOpeningPos = model.positionsOpeningTwoMills(color).findAny();
+		OptionalInt twoMillsOpeningPos = randomElement(model.positionsOpeningTwoMills(color));
 		if (twoMillsOpeningPos.isPresent()) {
 			reason("Setze an Position %d, weil zwei eigene Mühlen geöffnet werden", twoMillsOpeningPos);
 			return twoMillsOpeningPos;
 		}
 
-		// Finde Position, an der eigene Mühle geöffnet werden kann
-		OptionalInt millOpeningPos = model.positionsForOpeningMill(color).findAny();
+		// Finde Position, an der eine eigene Mühle geöffnet werden kann
+		OptionalInt millOpeningPos = randomElement(model.positionsForOpeningMill(color));
 		if (millOpeningPos.isPresent()) {
 			reason("Setze an Position %d, weil eigene Mühle geöffnet wird", millOpeningPos);
 			return millOpeningPos;
@@ -72,22 +70,21 @@ public class StrackPlayer extends AbstractPlayer {
 			return twoMillsLater;
 		}
 
-		// Falls eine freie Position neben einem Stein meiner Farbe existiert, verwende sie:
-
-		OptionalInt myColorPosWithFreeNeighbor = model.positions(color).filter(p -> model.hasEmptyNeighbor(p)).findAny();
-		if (myColorPosWithFreeNeighbor.isPresent()) {
-			OptionalInt freePos = model.emptyNeighbors(myColorPosWithFreeNeighbor.getAsInt()).findAny();
-			reason("Setze an Position %d, weil es eine freie Position neben eigenem Stein ist", freePos);
-			return freePos;
+		// Finde eine freie Position neben einem Stein meiner Farbe
+		OptionalInt posWithFreeNeighbor = randomElement(model.positions(color).filter(p -> model.hasEmptyNeighbor(p)));
+		if (posWithFreeNeighbor.isPresent()) {
+			OptionalInt neighbor = randomElement(model.emptyNeighbors(posWithFreeNeighbor.getAsInt()));
+			reason("Setze an Position %d, weil es eine freie Position neben eigenem Stein ist", neighbor);
+			return neighbor;
 		}
 
-		// Sonst
+		// Fallback
 		reason("Setze an Position %d, weil kein Spezialfall zutraf", randomFreePos);
 		return randomFreePos;
 	}
 
 	private OptionalInt findTwoMillsLaterPosition() {
-		return model.positions().filter(p -> model.isEmptyPosition(p)).filter(this::isTwoMillsLaterPosition).findAny();
+		return randomElement(model.positions().filter(model::isEmptyPosition).filter(this::isTwoMillsLaterPosition));
 	}
 
 	private boolean isTwoMillsLaterPosition(int p) {
@@ -123,7 +120,7 @@ public class StrackPlayer extends AbstractPlayer {
 	@Override
 	public OptionalInt supplyMoveEndPosition(int from) {
 		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
-		OptionalInt millClosingPos = model.positionsForClosingMill(color).filter(p -> canCloseMill(from, p)).findAny();
+		OptionalInt millClosingPos = randomElement(model.positionsForClosingMill(color).filter(p -> canCloseMill(from, p)));
 		if (millClosingPos.isPresent()) {
 			reason("Ziehe an Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
@@ -148,5 +145,4 @@ public class StrackPlayer extends AbstractPlayer {
 		}
 		return false;
 	}
-
 }
