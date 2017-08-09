@@ -8,6 +8,11 @@ import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.ui.Board;
 
+/**
+ * A slightly smart random player.
+ * 
+ * @author Armin Reichert
+ */
 public class RandomPlayer extends AbstractPlayer {
 
 	private final Random rand = new Random();
@@ -18,27 +23,27 @@ public class RandomPlayer extends AbstractPlayer {
 
 	@Override
 	public OptionalInt supplyPlacePosition() {
-		return random(model.positions().filter(model::isEmptyPosition));
+		return randomElement(model.positions().filter(model::isEmptyPosition));
 	}
 
 	@Override
-	public OptionalInt supplyRemovalPosition(StoneColor opponentColor) {
-		return random(model.positions().filter(p -> model.getStoneAt(p) == opponentColor));
+	public OptionalInt supplyRemovalPosition(StoneColor otherColor) {
+		return randomElement(model.positions().filter(p -> model.getStoneAt(p) == otherColor));
 	}
 
 	@Override
 	public OptionalInt supplyMoveStartPosition() {
-		return random(model.positions().filter(p -> model.getStoneAt(p) == color).filter(model::hasEmptyNeighbor));
+		return randomElement(model.positions().filter(p -> model.getStoneAt(p) == color).filter(model::hasEmptyNeighbor));
 	}
 
 	@Override
 	public OptionalInt supplyMoveEndPosition(int from) {
-		return canJump() ? random(model.positions().filter(model::isEmptyPosition))
-				: random(model.neighbors(from).filter(model::isEmptyPosition));
+		return canJump() ? randomElement(model.positions().filter(model::isEmptyPosition))
+				: randomElement(model.neighbors(from).filter(model::isEmptyPosition));
 	}
 
-	private OptionalInt random(IntStream stream) {
-		int[] elements = stream.toArray();
-		return elements.length == 0 ? OptionalInt.empty() : OptionalInt.of(elements[rand.nextInt(elements.length)]);
+	private OptionalInt randomElement(IntStream stream) {
+		int[] array = stream.toArray();
+		return array.length == 0 ? OptionalInt.empty() : OptionalInt.of(array[rand.nextInt(array.length)]);
 	}
 }

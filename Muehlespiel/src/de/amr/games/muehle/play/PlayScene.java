@@ -26,7 +26,6 @@ import de.amr.games.muehle.board.BoardModel;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.ui.Board;
-import de.amr.games.muehle.ui.Move;
 import de.amr.games.muehle.ui.StonesCounter;
 
 /**
@@ -201,10 +200,9 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignMovingTo(Player player) {
-		switchTo(player);
-		move = new Move(board, current::supplyMoveStartPosition, current::supplyMoveEndPosition, this::supplyMoveVelocity,
-				current::canJump);
+		move = new Move(app, board, player, this::supplyMoveVelocity);
 		message(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
+		switchTo(player);
 	}
 
 	private OptionalInt tryToPlaceStone(Player player) {
