@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Direction;
+import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.ui.Board;
 import de.amr.games.muehle.ui.Stone;
 
@@ -30,7 +30,6 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class Move {
 
-	private final MillApp app;
 	private final Player player;
 	private final Board board;
 	private final Supplier<Vector2> velocitySupplier;
@@ -44,16 +43,13 @@ public class Move {
 	/**
 	 * Constructs an initial move.
 	 * 
-	 * @param app
-	 *          the application
 	 * @player the player who makes this move
 	 * @param board
 	 *          the board where the move is executed
 	 * @param velocitySupplier
 	 *          supplies the move velocity
 	 */
-	public Move(MillApp app, Board board, Player player, Supplier<Vector2> velocitySupplier) {
-		this.app = app;
+	public Move(Board board, Player player, Supplier<Vector2> velocitySupplier) {
 		this.player = player;
 		this.board = board;
 		this.velocitySupplier = velocitySupplier;
@@ -139,11 +135,11 @@ public class Move {
 		int from = optFrom.getAsInt();
 		Optional<Stone> optStone = board.getStoneAt(from);
 		if (!optStone.isPresent()) {
-			LOG.info(app.msg("stone_at_position_not_existing", from));
+			LOG.info(Messages.text("stone_at_position_not_existing", from));
 		} else if (optStone.get().getColor() != player.getColor()) {
-			LOG.info(app.msg("stone_at_position_wrong_color", from));
+			LOG.info(Messages.text("stone_at_position_wrong_color", from));
 		} else if (!player.canJump() && !board.getModel().hasEmptyNeighbor(from)) {
-			LOG.info(app.msg("stone_at_position_cannot_move", from));
+			LOG.info(Messages.text("stone_at_position_cannot_move", from));
 		} else {
 			return true;
 		}

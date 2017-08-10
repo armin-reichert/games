@@ -6,12 +6,12 @@ import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -27,8 +27,8 @@ public class BoardModelTest {
 	private BoardModel emptyBoard;
 	private BoardModel board;
 
-	private boolean containsExactly(IntStream stream, int... numbers) {
-		return stream.boxed().collect(Collectors.toSet()).equals(new HashSet<>(Arrays.asList(numbers)));
+	private static boolean containsExactly(IntStream stream, int... numbers) {
+		return stream.boxed().collect(toSet()).equals(new HashSet<>(asList(numbers)));
 	}
 
 	@Before
