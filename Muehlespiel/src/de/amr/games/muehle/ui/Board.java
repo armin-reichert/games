@@ -171,7 +171,7 @@ public class Board extends GameEntity {
 	}
 
 	public void markPositionsClosingMill(Graphics2D g, StoneColor stoneType, Color color) {
-		model.positionsForClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
+		model.positionsClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markPositionFixingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {

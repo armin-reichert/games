@@ -1,6 +1,9 @@
 package de.amr.games.muehle.board;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -296,12 +299,21 @@ public class BoardModel extends BoardGraph {
 	 *          a stone type
 	 * @return a stream of all positions which would close a mill when a stone of the given type would be placed there
 	 */
-	public IntStream positionsForClosingMill(StoneColor type) {
+	public IntStream positionsClosingMill(StoneColor type) {
 		return positions().filter(p -> canMillBeClosedAt(p, type));
 	}
 
-	public IntStream positionsForOpeningMill(StoneColor color) {
+	public IntStream positionsOpeningMill(StoneColor color) {
 		return positions().filter(p -> canMillBeOpenedAt(p, color));
+	}
+
+	/**
+	 * @param type
+	 *          a stone type
+	 * @return a stream of all positions where placing a stone of the given type would open two mills
+	 */
+	public IntStream positionsOpeningTwoMills(StoneColor type) {
+		return positions().filter(p -> canTwoMillsBeOpenedAt(p, type));
 	}
 
 	public boolean canMillBeOpenedAt(int p, StoneColor color) {
@@ -336,6 +348,24 @@ public class BoardModel extends BoardGraph {
 	}
 
 	/**
+	 * @param p
+	 *          a valid position
+	 * @param type
+	 *          a stone type
+	 * @return if placing a stone of the given type at the given positions would open two mills
+	 */
+	public boolean canTwoMillsBeOpenedAt(int p, StoneColor type) {
+		checkPosition(p);
+		checkStoneType(type);
+		if (content[p] != null) {
+			return false;
+		}
+		int h1 = H_MILL[p][0], h2 = H_MILL[p][1], v1 = V_MILL[p][0], v2 = V_MILL[p][1];
+		return (content[h1] == type && content[h2] == null || content[h1] == null && content[h2] == type)
+				&& (content[v1] == type && content[v2] == null || content[v1] == null && content[v2] == type);
+	}
+
+	/**
 	 * 
 	 * @param from
 	 *          move start position
@@ -365,30 +395,44 @@ public class BoardModel extends BoardGraph {
 	}
 
 	/**
-	 * @param type
-	 *          a stone type
-	 * @return a stream of all positions where placing a stone of the given type would open two mills
+	 * 
+	 * @param color
+	 *          stone color
+	 * @return positions where by placing a stone two mills of the same color could be opened later
 	 */
-	public IntStream positionsOpeningTwoMills(StoneColor type) {
-		return positions().filter(p -> canOpenTwoMillsAt(p, type));
+	public IntStream twoMillsLaterPositions(StoneColor color) {
+		return positions().filter(this::isEmptyPosition).filter(p -> isTwoMillsLaterPosition(p, color));
 	}
 
 	/**
+	 * 
 	 * @param p
-	 *          a valid position
-	 * @param type
-	 *          a stone type
-	 * @return if placing a stone of the given type at the given positions would open two mills
+	 *          board position
+	 * @param color
+	 *          stone color
+	 * @return if by placing a stone of the given color at the position later two mills could be opened
 	 */
-	public boolean canOpenTwoMillsAt(int p, StoneColor type) {
-		checkPosition(p);
-		checkStoneType(type);
-		if (content[p] != null) {
-			return false;
+	public boolean isTwoMillsLaterPosition(int p, StoneColor color) {
+		Set<Integer> candidates = new HashSet<>();
+		neighbors(p).filter(this::isEmptyPosition).forEach(q -> neighbors(q).forEach(candidates::add));
+		candidates.remove(p);
+		for (int q : candidates) {
+			if (getStoneAt(q) == color) {
+				if (areTwoMillsPossibleLater(p, q, color)) {
+					return true;
+				}
+			}
 		}
-		int h1 = H_MILL[p][0], h2 = H_MILL[p][1];
-		int v1 = V_MILL[p][0], v2 = V_MILL[p][1];
-		return (content[h1] == type && content[h2] == null || content[h1] == null && content[h2] == type)
-				&& (content[v1] == type && content[v2] == null || content[v1] == null && content[v2] == type);
+		return false;
+	}
+
+	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
+		int commonNeighbor = neighbors(p).filter(n -> areNeighbors(n, q)).findFirst().getAsInt();
+		Direction dir1 = getDirection(p, commonNeighbor).get();
+		OptionalInt otherNeighbor1 = neighbor(p, dir1.opposite());
+		Direction dir2 = getDirection(q, commonNeighbor).get();
+		OptionalInt otherNeighbor2 = neighbor(q, dir2.opposite());
+		return (otherNeighbor1.isPresent() && otherNeighbor2.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt())
+				&& isEmptyPosition(otherNeighbor2.getAsInt()));
 	}
 }

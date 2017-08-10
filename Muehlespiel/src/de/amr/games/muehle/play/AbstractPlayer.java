@@ -66,4 +66,7 @@ public abstract class AbstractPlayer implements Player {
 		return array.length == 0 ? OptionalInt.empty() : OptionalInt.of(array[rand.nextInt(array.length)]);
 	}
 
+	protected String getName() {
+		return color == WHITE ? "Weiß" : "Schwarz";
+	}
 }
