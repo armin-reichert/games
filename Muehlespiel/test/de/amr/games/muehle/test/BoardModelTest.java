@@ -9,7 +9,6 @@ import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
@@ -29,8 +28,7 @@ public class BoardModelTest {
 	private BoardModel board;
 
 	private boolean containsExactly(IntStream stream, int... numbers) {
-		Collection<Integer> streamNumbers = stream.boxed().collect(Collectors.toSet());
-		return streamNumbers.equals(new HashSet<>(Arrays.asList(numbers)));
+		return stream.boxed().collect(Collectors.toSet()).equals(new HashSet<>(Arrays.asList(numbers)));
 	}
 
 	@Before
