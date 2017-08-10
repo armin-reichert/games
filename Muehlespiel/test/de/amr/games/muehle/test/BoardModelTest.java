@@ -8,7 +8,11 @@ import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -160,6 +164,21 @@ public class BoardModelTest {
 		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> filledBoard.isPositionInsideMill(p, WHITE)));
 		assertTrue(IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18))
 				.noneMatch(p -> filledBoard.isPositionInsideMill(p, WHITE)));
+	}
+
+	@Test
+	public void testDist2Positions() {
+		Collection<Integer> positions = board.distance2Positions(13).boxed().collect(Collectors.toSet());
+		assertTrue(positions.equals(new HashSet<>(Arrays.asList(2, 4, 8, 17, 19, 23))));
+	}
+
+	@Test
+	public void testTwoMillsLater() {
+		filledBoard.putStoneAt(13, WHITE);
+		Collection<Integer> positions = filledBoard.positionsOpeningTwoMillsLater(WHITE).boxed()
+				.collect(Collectors.toSet());
+		assertTrue(positions.equals(new HashSet<>(Arrays.asList(2, 4, 8, 17, 19, 23))));
+
 	}
 
 }

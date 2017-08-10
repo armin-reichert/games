@@ -67,7 +67,7 @@ public class StrackPlayer extends AbstractPlayer {
 		}
 
 		// Finde Position, an der im nächsten Schritt 2 eigene Mühlen geöffnet werden könnten
-		OptionalInt twoMillsLater = randomElement(model.twoMillsLaterPositions(color));
+		OptionalInt twoMillsLater = randomElement(model.positionsOpeningTwoMillsLater(color));
 		if (twoMillsLater.isPresent()) {
 			reason("Setze Stein auf Position %d, weil später evtl. 2 eigene Mühlen geöffnet werden könnten", twoMillsLater);
 			return twoMillsLater;

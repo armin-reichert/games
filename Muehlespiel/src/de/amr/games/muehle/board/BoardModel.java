@@ -1,9 +1,7 @@
 package de.amr.games.muehle.board;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.OptionalInt;
-import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -400,8 +398,8 @@ public class BoardModel extends BoardGraph {
 	 *          stone color
 	 * @return positions where by placing a stone two mills of the same color could be opened later
 	 */
-	public IntStream twoMillsLaterPositions(StoneColor color) {
-		return positions().filter(this::isEmptyPosition).filter(p -> isTwoMillsLaterPosition(p, color));
+	public IntStream positionsOpeningTwoMillsLater(StoneColor color) {
+		return positions().filter(this::isEmptyPosition).filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
 	}
 
 	/**
@@ -412,27 +410,28 @@ public class BoardModel extends BoardGraph {
 	 *          stone color
 	 * @return if by placing a stone of the given color at the position later two mills could be opened
 	 */
-	public boolean isTwoMillsLaterPosition(int p, StoneColor color) {
-		Set<Integer> candidates = new HashSet<>();
-		neighbors(p).filter(this::isEmptyPosition).forEach(q -> neighbors(q).forEach(candidates::add));
-		candidates.remove(p);
-		for (int q : candidates) {
-			if (getStoneAt(q) == color) {
-				if (areTwoMillsPossibleLater(p, q, color)) {
-					return true;
-				}
-			}
-		}
-		return false;
+	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
+		return distance2Positions(p).filter(q -> getStoneAt(q) == color)
+				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
+	}
+
+	public IntStream distance2Positions(int p) {
+		return neighbors(p).flatMap(this::neighbors).distinct().filter(q -> q != p);
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
 		int commonNeighbor = neighbors(p).filter(n -> areNeighbors(n, q)).findFirst().getAsInt();
 		Direction dir1 = getDirection(p, commonNeighbor).get();
 		OptionalInt otherNeighbor1 = neighbor(p, dir1.opposite());
+		if (!otherNeighbor1.isPresent()) {
+			otherNeighbor1 = neighbor(commonNeighbor, dir1);
+		}
 		Direction dir2 = getDirection(q, commonNeighbor).get();
 		OptionalInt otherNeighbor2 = neighbor(q, dir2.opposite());
-		return (otherNeighbor1.isPresent() && otherNeighbor2.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt())
-				&& isEmptyPosition(otherNeighbor2.getAsInt()));
+		if (!otherNeighbor2.isPresent()) {
+			otherNeighbor2 = neighbor(commonNeighbor, dir2);
+		}
+		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt()) && otherNeighbor2.isPresent()
+				&& isEmptyPosition(otherNeighbor2.getAsInt());
 	}
 }
