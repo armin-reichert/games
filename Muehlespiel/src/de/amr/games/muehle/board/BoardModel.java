@@ -315,7 +315,7 @@ public class BoardModel extends BoardGraph {
 	 * @return a stream of all positions where a mill of the given color could be closed
 	 */
 	public IntStream positionsClosingMill(StoneColor color) {
-		return positions().filter(p -> canMillBeClosedAt(p, color));
+		return positions().filter(p -> isMillClosingPosition(p, color));
 	}
 
 	/**
@@ -399,9 +399,9 @@ public class BoardModel extends BoardGraph {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if a mill of the given color would be closed by placing a stone of that color at the given position
+	 * @return if a mill of the given color is closed by placing a stone of that color at the given position
 	 */
-	public boolean canMillBeClosedAt(int p, StoneColor color) {
+	public boolean isMillClosingPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
 		return content[p] == null && (content[H_MILL[p][0]] == color && content[H_MILL[p][1]] == color
@@ -418,7 +418,7 @@ public class BoardModel extends BoardGraph {
 	 * @return if a mill of the given color is closed when moving a stone of the given color from the start to the end
 	 *         position
 	 */
-	public boolean isMillClosedWhenMoving(int from, int to, StoneColor color) {
+	public boolean isMillClosedByMove(int from, int to, StoneColor color) {
 		checkPosition(from);
 		checkPosition(to);
 		checkStoneColor(color);
@@ -453,8 +453,7 @@ public class BoardModel extends BoardGraph {
 	 * @return if by placing a stone of the given color at the position later two mills could be opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
-		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color)
-				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
+		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color).anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {

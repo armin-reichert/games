@@ -191,4 +191,22 @@ public class BoardModelTest {
 		board.putStoneAt(13, WHITE);
 		assertTrue(sameElements(board.positionsOpeningTwoMillsLater(WHITE), IntStream.of(2, 4, 8, 17, 19, 23)));
 	}
+
+	@Test
+	public void testMillClosingPositions() {
+		board.putStoneAt(9, WHITE);
+		board.putStoneAt(21, WHITE);
+		board.putStoneAt(11, WHITE);
+		board.putStoneAt(23, WHITE);
+		board.positions().forEach(p -> {
+			assertTrue((p == 0 || p == 10 || p == 22) == board.isMillClosingPosition(p, WHITE));
+		});
+		board.putStoneAt(3, WHITE);
+		assertTrue(board.isMillClosedByMove(3, 10, WHITE));
+		board.putStoneAt(18, WHITE);
+		assertTrue(board.isMillClosedByMove(18, 10, WHITE));
+		board.putStoneAt(19, WHITE);
+		assertTrue(board.isMillClosedByMove(19, 22, WHITE));
+	}
+
 }

@@ -93,14 +93,26 @@ public class StrackPlayer extends AbstractPlayer {
 
 	@Override
 	public OptionalInt supplyMoveStartPosition() {
-		return randomElement(model.positions(color).filter(model::hasEmptyNeighbor));
+		OptionalInt randomPos = randomElement(model.positions(color).filter(model::hasEmptyNeighbor));
+
+		// Finde eine Position, von der aus eine Mühle geschlossen werden kann
+		OptionalInt millClosingFrom = randomElement(model.positions(color).filter(p -> canCloseMillFrom(p)));
+		if (millClosingFrom.isPresent()) {
+			return millClosingFrom;
+		}
+
+		return randomPos;
+	}
+
+	private boolean canCloseMillFrom(int p) {
+		return model.neighbors(p).anyMatch(q -> model.isMillClosingPosition(q, color));
 	}
 
 	@Override
 	public OptionalInt supplyMoveEndPosition(int from) {
-		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
+		// Suche freie Position, an der Mühle geschlossen werden kann:
 		OptionalInt millClosingPos = randomElement(
-				model.positionsClosingMill(color).filter(to -> model.isMillClosedWhenMoving(from, to, color)));
+				model.positions().filter(model::isEmptyPosition).filter(to -> model.isMillClosedByMove(from, to, color)));
 		if (millClosingPos.isPresent()) {
 			reason("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
