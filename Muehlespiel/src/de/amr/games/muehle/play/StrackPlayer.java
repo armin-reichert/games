@@ -100,7 +100,7 @@ public class StrackPlayer extends AbstractPlayer {
 	public OptionalInt supplyMoveEndPosition(int from) {
 		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
 		OptionalInt millClosingPos = randomElement(
-				model.positionsClosingMill(color).filter(to -> model.canCloseMill(from, to, color)));
+				model.positionsClosingMill(color).filter(to -> model.isMillClosedWhenMoving(from, to, color)));
 		if (millClosingPos.isPresent()) {
 			reason("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;

@@ -6,11 +6,9 @@ import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -27,8 +25,8 @@ public class BoardModelTest {
 	private BoardModel emptyBoard;
 	private BoardModel board;
 
-	private static boolean containsExactly(IntStream stream, int... numbers) {
-		return stream.boxed().collect(toSet()).equals(new HashSet<>(asList(numbers)));
+	private static boolean equalElements(IntStream stream, IntStream other) {
+		return stream.boxed().collect(toSet()).equals(other.boxed().collect(toSet()));
 	}
 
 	@Before
@@ -58,6 +56,11 @@ public class BoardModelTest {
 				}
 			});
 		});
+	}
+
+	@Test
+	public void testDist2Positions() {
+		assertTrue(equalElements(emptyBoard.distance2Positions(13), IntStream.of(2, 4, 8, 17, 19, 23)));
 	}
 
 	@Test
@@ -143,6 +146,17 @@ public class BoardModelTest {
 	}
 
 	@Test
+	public void testClear() {
+		assertTrue(board.positions(WHITE).count() + board.positions(BLACK).count() == 0);
+		board.positions().forEach(p -> board.putStoneAt(p, WHITE));
+		assertTrue(board.positions(WHITE).count() == BoardModel.NUM_POS);
+		assertTrue(board.positions(BLACK).count() == 0);
+		board.clear();
+		assertTrue(board.positions(WHITE).count() == 0);
+		assertTrue(board.positions(BLACK).count() == 0);
+	}
+
+	@Test
 	public void testTrapped() {
 		board.putStoneAt(0, WHITE);
 		board.putStoneAt(1, BLACK);
@@ -156,8 +170,8 @@ public class BoardModelTest {
 		board.putStoneAt(0, WHITE);
 		board.putStoneAt(1, WHITE);
 		board.putStoneAt(2, WHITE);
-		assertTrue(IntStream.of(0, 1, 2).allMatch(p -> board.isPositionInsideMill(p, WHITE)));
-		assertTrue(IntStream.range(3, 24).noneMatch(p -> board.isPositionInsideMill(p, WHITE)));
+		assertTrue(IntStream.of(0, 1, 2).allMatch(p -> board.isPositionInHorizontalMill(p, WHITE)));
+		assertTrue(IntStream.range(3, 24).noneMatch(p -> board.isPositionInHorizontalMill(p, WHITE)));
 	}
 
 	@Test
@@ -165,19 +179,14 @@ public class BoardModelTest {
 		board.putStoneAt(3, WHITE);
 		board.putStoneAt(10, WHITE);
 		board.putStoneAt(18, WHITE);
-		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> board.isPositionInsideMill(p, WHITE)));
+		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> board.isPositionInVerticalMill(p, WHITE)));
 		assertTrue(IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18))
-				.noneMatch(p -> board.isPositionInsideMill(p, WHITE)));
-	}
-
-	@Test
-	public void testDist2Positions() {
-		assertTrue(containsExactly(emptyBoard.distance2Positions(13), 2, 4, 8, 17, 19, 23));
+				.noneMatch(p -> board.isPositionInVerticalMill(p, WHITE)));
 	}
 
 	@Test
 	public void testTwoMillsLater() {
 		board.putStoneAt(13, WHITE);
-		assertTrue(containsExactly(board.positionsOpeningTwoMillsLater(WHITE), 2, 4, 8, 17, 19, 23));
+		assertTrue(equalElements(board.positionsOpeningTwoMillsLater(WHITE), IntStream.of(2, 4, 8, 17, 19, 23)));
 	}
 }

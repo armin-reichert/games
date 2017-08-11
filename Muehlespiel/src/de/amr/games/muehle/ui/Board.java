@@ -191,8 +191,8 @@ public class Board extends GameEntity {
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneType) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		boolean allInMill = model.areAllStonesInsideMill(stoneType);
-		model.positions(stoneType).filter(p -> allInMill || !model.isPositionInsideMill(p, stoneType))
+		boolean allInMill = model.areAllStonesInMills(stoneType);
+		model.positions(stoneType).filter(p -> allInMill || !model.isPositionInMill(p, stoneType))
 				.forEach(p -> {
 					Stone stone = getStoneAt(p).get();
 					float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
