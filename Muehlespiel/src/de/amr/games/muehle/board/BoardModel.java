@@ -270,7 +270,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if the given position is inside a horizontal mill of the given color
 	 */
-	public boolean isPositionInHorizontalMill(int p, StoneColor color) {
+	public boolean inHorizontalMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
 		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> content[q] == color);
@@ -283,7 +283,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if the given position is inside a vertical mill of the given color
 	 */
-	public boolean isPositionInVerticalMill(int p, StoneColor color) {
+	public boolean inVerticalMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
 		return IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> content[q] == color);
@@ -296,8 +296,8 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if the given position is inside a mill of the given color
 	 */
-	public boolean isPositionInMill(int p, StoneColor color) {
-		return isPositionInHorizontalMill(p, color) || isPositionInVerticalMill(p, color);
+	public boolean inMill(int p, StoneColor color) {
+		return inHorizontalMill(p, color) || inVerticalMill(p, color);
 	}
 
 	/**
@@ -305,8 +305,8 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if all stones of the given color are inside some mill
 	 */
-	public boolean areAllStonesInMills(StoneColor color) {
-		return positions(color).allMatch(p -> isPositionInMill(p, color));
+	public boolean allStonesInMills(StoneColor color) {
+		return positions(color).allMatch(p -> inMill(p, color));
 	}
 
 	/**
@@ -453,18 +453,8 @@ public class BoardModel extends BoardGraph {
 	 * @return if by placing a stone of the given color at the position later two mills could be opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
-		return distance2Positions(p).filter(q -> getStoneAt(q) == color)
+		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color)
 				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
-	}
-
-	/**
-	 * @param p
-	 *          valid position
-	 * @return stream of all positions which have distance 2 from given position
-	 */
-	public IntStream distance2Positions(int p) {
-		checkPosition(p);
-		return neighbors(p).flatMap(this::neighbors).distinct().filter(q -> q != p);
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {

@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
+import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.BoardModel;
 import de.amr.games.muehle.board.StoneColor;
 
@@ -46,7 +47,7 @@ public class Board extends GameEntity {
 		width = w;
 		height = h;
 		posRadius = w / 60;
-		stones = new Stone[BoardModel.NUM_POS];
+		stones = new Stone[BoardGraph.NUM_POS];
 		Stone.radius = width / 24;
 	}
 
@@ -70,7 +71,7 @@ public class Board extends GameEntity {
 
 	public void clear() {
 		model.clear();
-		stones = new Stone[BoardModel.NUM_POS];
+		stones = new Stone[BoardGraph.NUM_POS];
 	}
 
 	public void putStoneAt(int p, StoneColor color) {
@@ -191,8 +192,8 @@ public class Board extends GameEntity {
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneType) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		boolean allInMill = model.areAllStonesInMills(stoneType);
-		model.positions(stoneType).filter(p -> allInMill || !model.isPositionInMill(p, stoneType))
+		boolean allInMill = model.allStonesInMills(stoneType);
+		model.positions(stoneType).filter(p -> allInMill || !model.inMill(p, stoneType))
 				.forEach(p -> {
 					Stone stone = getStoneAt(p).get();
 					float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;

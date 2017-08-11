@@ -95,6 +95,16 @@ public class BoardGraph {
 	}
 
 	/**
+	 * @param p
+	 *          valid position
+	 * @return stream of all positions which have distance 2 from given position
+	 */
+	public IntStream nextToNeighbors(int p) {
+		checkPosition(p);
+		return neighbors(p).flatMap(this::neighbors).distinct().filter(q -> q != p);
+	}
+
+	/**
 	 * 
 	 * @param p
 	 *          a valid position

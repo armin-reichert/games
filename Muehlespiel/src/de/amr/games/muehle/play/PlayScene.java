@@ -88,7 +88,7 @@ public class PlayScene extends Scene<MillApp> {
 					});
 				} else {
 					tryToPlaceStone(current).ifPresent(pos -> {
-						if (board.getModel().isPositionInMill(pos, current.getColor())) {
+						if (board.getModel().inMill(pos, current.getColor())) {
 							mustRemoveStoneOfOpponent = true;
 							showMessage(current.getColor() == WHITE ? "white_must_take" : "black_must_take");
 						} else {
@@ -113,7 +113,7 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					move.update();
 					if (move.isComplete()) {
-						if (board.getModel().isPositionInMill(move.getTo().getAsInt(), current.getColor())) {
+						if (board.getModel().inMill(move.getTo().getAsInt(), current.getColor())) {
 							mustRemoveStoneOfOpponent = true;
 							showMessage(current.getColor() == WHITE ? "white_must_take" : "black_must_take");
 						} else {
@@ -230,8 +230,8 @@ public class PlayScene extends Scene<MillApp> {
 				LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
 			} else if (board.getModel().getStoneAt(removalPosition) != otherColor) {
 				LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
-			} else if (board.getModel().isPositionInMill(removalPosition, otherColor)
-					&& !board.getModel().areAllStonesInMills(otherColor)) {
+			} else if (board.getModel().inMill(removalPosition, otherColor)
+					&& !board.getModel().allStonesInMills(otherColor)) {
 				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				board.removeStoneAt(removalPosition);
