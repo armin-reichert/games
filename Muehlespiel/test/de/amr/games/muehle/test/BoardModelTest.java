@@ -169,21 +169,25 @@ public class BoardModelTest {
 
 	@Test
 	public void testHorizontalMill() {
+		assertTrue(board.areHMillPositions(0, 1, 2));
 		board.putStoneAt(0, WHITE);
 		board.putStoneAt(1, WHITE);
 		board.putStoneAt(2, WHITE);
-		assertTrue(IntStream.of(0, 1, 2).allMatch(p -> board.inHorizontalMill(p, WHITE)));
-		assertTrue(IntStream.range(3, 24).noneMatch(p -> board.inHorizontalMill(p, WHITE)));
+		assertTrue(IntStream.of(0, 1, 2).allMatch(p -> board.inHMill(p, WHITE)));
+		assertTrue(IntStream.range(3, 24).noneMatch(p -> board.inHMill(p, WHITE)));
+		assertTrue(board.hasHMill(0, 1, 2, WHITE));
 	}
 
 	@Test
 	public void testVerticalMill() {
+		assertTrue(board.areVMillPositions(3, 10, 18));
 		board.putStoneAt(3, WHITE);
 		board.putStoneAt(10, WHITE);
 		board.putStoneAt(18, WHITE);
-		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> board.inVerticalMill(p, WHITE)));
+		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> board.inVMill(p, WHITE)));
 		assertTrue(IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18))
-				.noneMatch(p -> board.inVerticalMill(p, WHITE)));
+				.noneMatch(p -> board.inVMill(p, WHITE)));
+		assertTrue(board.hasVMill(3, 10, 18, WHITE));
 	}
 
 	@Test

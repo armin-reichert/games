@@ -22,67 +22,6 @@ public class BoardModel extends BoardGraph {
 		}
 	}
 
-	/*
-	 * Auxiliary tables storing the horizontal and vertical mill partner positions.
-	 */
-	private static final int[][] H_MILL = {
-			/*@formatter:off*/
-			{ 1, 2 },	
-			{ 0, 2 },
-			{ 0, 1 },
-			{ 4, 5 },
-			{ 3, 5 },
-			{ 3, 4 },
-			{ 7, 8 },
-			{ 6, 8 },
-			{ 6, 7 },
-			{ 10, 11 },
-			{ 9, 11 },
-			{ 9, 10 },
-			{ 13, 14 },
-			{ 12, 14 },
-			{ 12, 13 },
-			{ 16, 17 }, 
-			{ 15, 17 },
-			{ 15, 16 },
-			{ 19, 20 },
-			{ 18, 20 },
-			{ 18, 19 },
-			{ 22, 23 },
-			{ 21, 23 },
-			{ 21, 22 }
-			/*@formatter:on*/
-	};
-
-	private static final int[][] V_MILL = {
-			/*@formatter:off*/
-			{ 9, 21 },	
-			{ 4, 7 },
-			{ 14, 23 },
-			{ 10, 18 },
-			{ 1, 7 },
-			{ 13, 20 },
-			{ 11, 15 },
-			{ 1, 4 },
-			{ 12, 17 },
-			{ 0, 21 },
-			{ 3, 18 },
-			{ 6, 15 },
-			{ 8, 17 },
-			{ 5, 20 },
-			{ 2, 23 },
-			{ 6, 11 }, 
-			{ 19, 22 },
-			{ 8, 12 },
-			{ 3, 10 },
-			{ 16, 22 },
-			{ 5, 13 },
-			{ 0, 9 },
-			{ 16, 19 },
-			{ 2, 14 }
-			/*@formatter:on*/
-	};
-
 	/* Stone content */
 	private StoneColor[] content;
 
@@ -258,10 +197,48 @@ public class BoardModel extends BoardGraph {
 	 */
 	public boolean isTrapped(StoneColor color) {
 		checkStoneColor(color);
-		return positions(color).noneMatch(p -> hasEmptyNeighbor(p));
+		return positions(color).noneMatch(this::hasEmptyNeighbor);
 	}
 
 	// Mill related methods
+
+	/**
+	 * @param p
+	 *          a valid position
+	 * @param q
+	 *          a valid position
+	 * @param r
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given positions form a horizontal mill of the given color
+	 */
+	public boolean hasHMill(int p, int q, int r, StoneColor color) {
+		checkPosition(p);
+		checkPosition(q);
+		checkPosition(r);
+		checkStoneColor(color);
+		return areHMillPositions(p, q, r) && IntStream.of(p, q, r).allMatch(pos -> content[pos] == color);
+	}
+
+	/**
+	 * @param p
+	 *          a valid position
+	 * @param q
+	 *          a valid position
+	 * @param r
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given positions form a vertical mill of the given color
+	 */
+	public boolean hasVMill(int p, int q, int r, StoneColor color) {
+		checkPosition(p);
+		checkPosition(q);
+		checkPosition(r);
+		checkStoneColor(color);
+		return areVMillPositions(p, q, r) && IntStream.of(p, q, r).allMatch(pos -> content[pos] == color);
+	}
 
 	/**
 	 * @param p
@@ -270,7 +247,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if the given position is inside a horizontal mill of the given color
 	 */
-	public boolean inHorizontalMill(int p, StoneColor color) {
+	public boolean inHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
 		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> content[q] == color);
@@ -283,7 +260,7 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if the given position is inside a vertical mill of the given color
 	 */
-	public boolean inVerticalMill(int p, StoneColor color) {
+	public boolean inVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
 		return IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> content[q] == color);
@@ -297,7 +274,7 @@ public class BoardModel extends BoardGraph {
 	 * @return if the given position is inside a mill of the given color
 	 */
 	public boolean inMill(int p, StoneColor color) {
-		return inHorizontalMill(p, color) || inVerticalMill(p, color);
+		return inHMill(p, color) || inVMill(p, color);
 	}
 
 	/**
@@ -343,10 +320,10 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if placing a stone of the given color at the given position opens a horizontal mill
 	 */
-	public boolean isHorizontalMillOpenedAt(int p, StoneColor color) {
+	public boolean isHMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXXXMillOpenedAt(p, color, H_MILL);
+		return isXMillOpenedAt(p, color, H_MILL);
 	}
 
 	/**
@@ -356,13 +333,13 @@ public class BoardModel extends BoardGraph {
 	 *          a stone color
 	 * @return if placing a stone of the given color at the given position opens a vertical mill
 	 */
-	public boolean isVerticalMillOpenedAt(int p, StoneColor color) {
+	public boolean isVMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXXXMillOpenedAt(p, color, V_MILL);
+		return isXMillOpenedAt(p, color, V_MILL);
 	}
 
-	private boolean isXXXMillOpenedAt(int p, StoneColor color, int[][] mill) {
+	private boolean isXMillOpenedAt(int p, StoneColor color, int[][] mill) {
 		int q = mill[p][0], r = mill[p][1];
 		return content[p] == null
 				&& (content[q] == color && content[r] == null || content[q] == color && content[r] == null);
@@ -378,7 +355,7 @@ public class BoardModel extends BoardGraph {
 	public boolean isMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isHorizontalMillOpenedAt(p, color) || isVerticalMillOpenedAt(p, color);
+		return isHMillOpenedAt(p, color) || isVMillOpenedAt(p, color);
 	}
 
 	/**
@@ -391,7 +368,7 @@ public class BoardModel extends BoardGraph {
 	public boolean areTwoMillsOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isHorizontalMillOpenedAt(p, color) && isVerticalMillOpenedAt(p, color);
+		return isHMillOpenedAt(p, color) && isVMillOpenedAt(p, color);
 	}
 
 	/**

@@ -50,6 +50,67 @@ public class BoardGraph {
 		/*@formatter:on*/
 	};
 
+	/*
+	 * Auxiliary tables storing the horizontal and vertical mill partner positions.
+	 */
+	protected static final int[][] H_MILL = {
+			/*@formatter:off*/
+			{ 1, 2 },	
+			{ 0, 2 },
+			{ 0, 1 },
+			{ 4, 5 },
+			{ 3, 5 },
+			{ 3, 4 },
+			{ 7, 8 },
+			{ 6, 8 },
+			{ 6, 7 },
+			{ 10, 11 },
+			{ 9, 11 },
+			{ 9, 10 },
+			{ 13, 14 },
+			{ 12, 14 },
+			{ 12, 13 },
+			{ 16, 17 }, 
+			{ 15, 17 },
+			{ 15, 16 },
+			{ 19, 20 },
+			{ 18, 20 },
+			{ 18, 19 },
+			{ 22, 23 },
+			{ 21, 23 },
+			{ 21, 22 }
+			/*@formatter:on*/
+	};
+
+	protected static final int[][] V_MILL = {
+			/*@formatter:off*/
+			{ 9, 21 },	
+			{ 4, 7 },
+			{ 14, 23 },
+			{ 10, 18 },
+			{ 1, 7 },
+			{ 13, 20 },
+			{ 11, 15 },
+			{ 1, 4 },
+			{ 12, 17 },
+			{ 0, 21 },
+			{ 3, 18 },
+			{ 6, 15 },
+			{ 8, 17 },
+			{ 5, 20 },
+			{ 2, 23 },
+			{ 6, 11 }, 
+			{ 19, 22 },
+			{ 8, 12 },
+			{ 3, 10 },
+			{ 16, 22 },
+			{ 5, 13 },
+			{ 0, 9 },
+			{ 16, 19 },
+			{ 2, 14 }
+			/*@formatter:on*/
+	};
+
 	protected static void checkPosition(int p) {
 		if (p < 0 || p >= NUM_POS) {
 			throw new IllegalArgumentException("Illegal position: " + p);
@@ -132,4 +193,41 @@ public class BoardGraph {
 		checkPosition(q);
 		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q).findFirst();
 	}
+
+	/**
+	 * @param p
+	 *          a valid position
+	 * @param q
+	 *          a valid position
+	 * @param r
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given positions belong to the same horizontal mill
+	 */
+	public boolean areHMillPositions(int p, int q, int r) {
+		checkPosition(p);
+		checkPosition(q);
+		checkPosition(r);
+		return (q == H_MILL[p][0] && r == H_MILL[p][1] || r == H_MILL[p][0] && q == H_MILL[p][1]);
+	}
+
+	/**
+	 * @param p
+	 *          a valid position
+	 * @param q
+	 *          a valid position
+	 * @param r
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given positions belong to the same vertical mill
+	 */
+	public boolean areVMillPositions(int p, int q, int r) {
+		checkPosition(p);
+		checkPosition(q);
+		checkPosition(r);
+		return (q == V_MILL[p][0] && r == V_MILL[p][1] || r == V_MILL[p][0] && q == V_MILL[p][1]);
+	}
+
 }
