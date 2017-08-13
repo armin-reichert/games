@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
-public class BoardModel extends BoardGraph {
+public class Board extends BoardGraph {
 
 	protected static void checkStoneColor(StoneColor color) {
 		if (color == null) {
@@ -28,7 +28,7 @@ public class BoardModel extends BoardGraph {
 	/**
 	 * Constructs an empty board.
 	 */
-	public BoardModel() {
+	public Board() {
 		content = new StoneColor[NUM_POS];
 	}
 

@@ -1,11 +1,11 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.player;
 
 import java.util.OptionalInt;
 
 import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.ui.Board;
 
 /**
  * A slightly smart random player.

@@ -17,12 +17,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.amr.games.muehle.board.BoardGraph;
-import de.amr.games.muehle.board.BoardModel;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 
 public class BoardModelTest {
 
-	private BoardModel board;
+	private Board board;
 
 	private static boolean sameElements(IntStream stream, IntStream other) {
 		return stream.boxed().collect(toSet()).equals(other.boxed().collect(toSet()));
@@ -32,7 +32,7 @@ public class BoardModelTest {
 
 	@Before
 	public void setUp() {
-		board = new BoardModel();
+		board = new Board();
 	}
 
 	@After

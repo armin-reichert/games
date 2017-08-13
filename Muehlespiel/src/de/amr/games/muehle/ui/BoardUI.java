@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
 import de.amr.games.muehle.board.BoardGraph;
-import de.amr.games.muehle.board.BoardModel;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
@@ -26,7 +26,7 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class Board extends GameEntity {
+public class BoardUI extends GameEntity {
 
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
@@ -34,7 +34,7 @@ public class Board extends GameEntity {
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	private final BoardModel model;
+	private final Board model;
 	private final int width;
 	private final int height;
 	private final int posRadius;
@@ -42,7 +42,7 @@ public class Board extends GameEntity {
 	private boolean showPositionNumbers;
 	private Stone[] stones;
 
-	public Board(BoardModel model, int w, int h) {
+	public BoardUI(Board model, int w, int h) {
 		this.model = model;
 		width = w;
 		height = h;
@@ -51,7 +51,7 @@ public class Board extends GameEntity {
 		Stone.radius = width / 24;
 	}
 
-	public BoardModel getModel() {
+	public Board getModel() {
 		return model;
 	}
 

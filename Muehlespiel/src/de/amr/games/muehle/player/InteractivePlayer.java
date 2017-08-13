@@ -1,4 +1,4 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.player;
 
 import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
@@ -17,10 +17,11 @@ import java.util.OptionalInt;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.ui.Board;
+import de.amr.games.muehle.ui.BoardUI;
 
 /**
  * A player using mouse and keyboard for placing and moving stones.
@@ -37,10 +38,12 @@ public class InteractivePlayer extends AbstractPlayer {
 		STEERING.put(WEST, VK_LEFT);
 	}
 
+	private BoardUI boardUI;
 	private Move move;
 
-	public InteractivePlayer(MillApp app, Board board, StoneColor color) {
+	public InteractivePlayer(MillApp app, BoardUI boardUI, Board board, StoneColor color) {
 		super(app, board, color);
+		this.boardUI = boardUI;
 		move = new Move();
 	}
 
@@ -93,6 +96,6 @@ public class InteractivePlayer extends AbstractPlayer {
 	}
 
 	private OptionalInt supplyMouseClickBoardPosition() {
-		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
+		return Mouse.clicked() ? boardUI.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }

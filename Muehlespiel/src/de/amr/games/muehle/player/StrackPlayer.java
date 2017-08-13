@@ -1,4 +1,4 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.player;
 
 import static de.amr.easy.game.Application.LOG;
 import static java.lang.String.format;
@@ -6,9 +6,9 @@ import static java.lang.String.format;
 import java.util.OptionalInt;
 
 import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.ui.Board;
 
 /**
  * Peter aka "Strack"'s player.

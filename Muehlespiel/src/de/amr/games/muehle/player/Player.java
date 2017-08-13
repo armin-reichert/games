@@ -1,4 +1,4 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.player;
 
 import java.util.OptionalInt;
 

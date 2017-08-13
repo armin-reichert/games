@@ -19,7 +19,8 @@ import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.ui.Board;
+import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
 
 /**
@@ -32,7 +33,7 @@ public class MoveControl {
 
 	private static final float MOVE_SECONDS = .75f;
 
-	private final Board board;
+	private final BoardUI board;
 	private final Player player;
 	private final Pulse pulse;
 	private final FSM control;
@@ -51,7 +52,7 @@ public class MoveControl {
 	 * @param pulse
 	 *          the pulse of the application
 	 */
-	public MoveControl(Board board, Player player, Pulse pulse) {
+	public MoveControl(BoardUI board, Player player, Pulse pulse) {
 		this.board = board;
 		this.player = player;
 		this.pulse = pulse;
