@@ -18,7 +18,7 @@ public interface Player {
 
 	public void stonePlaced();
 
-	public int getStonesPlaced();
+	public int getNumStonesPlaced();
 
 	public boolean canJump();
 

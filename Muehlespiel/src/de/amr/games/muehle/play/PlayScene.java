@@ -99,7 +99,7 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			};
 
-			change(PLACING, MOVING, () -> black.getStonesPlaced() == NUM_STONES && !mustRemoveStoneOfOpponent);
+			change(PLACING, MOVING, () -> black.getNumStonesPlaced() == NUM_STONES && !mustRemoveStoneOfOpponent);
 
 			// MOVING
 
@@ -149,17 +149,17 @@ public class PlayScene extends Scene<MillApp> {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 
-		white = new InteractivePlayer(app, boardUI, board, WHITE);
+		white = new InteractivePlayer(boardUI, WHITE);
 
-		// black = new InteractivePlayer(app, boardUI, board, BLACK);
-		// black = new RandomPlayer(app, board, BLACK);
-		black = new SmartPlayer(app, board, BLACK);
+		// black = new InteractivePlayer(boardUI, BLACK);
+		// black = new RandomPlayer(board, BLACK);
+		black = new SmartPlayer(board, BLACK);
 
-		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - white.getStonesPlaced());
+		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - white.getNumStonesPlaced());
 		whiteStonesToPlaceCounter.tf.moveTo(40, getHeight() - 50);
 		whiteStonesToPlaceCounter.init();
 
-		blackStonesToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - black.getStonesPlaced());
+		blackStonesToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - black.getNumStonesPlaced());
 		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 100, getHeight() - 50);
 		blackStonesToPlaceCounter.init();
 

@@ -16,8 +16,6 @@ import java.util.OptionalInt;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
-import de.amr.games.muehle.MillApp;
-import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
@@ -41,8 +39,8 @@ public class InteractivePlayer extends AbstractPlayer {
 	private BoardUI boardUI;
 	private Move move;
 
-	public InteractivePlayer(MillApp app, BoardUI boardUI, Board board, StoneColor color) {
-		super(app, board, color);
+	public InteractivePlayer(BoardUI boardUI, StoneColor color) {
+		super(boardUI.getModel(), color);
 		this.boardUI = boardUI;
 		move = new Move();
 	}
@@ -74,13 +72,13 @@ public class InteractivePlayer extends AbstractPlayer {
 
 	private OptionalInt supplyMoveEndPosition() {
 		// if end position is uniquely determined, use it
-		if (!canJump() && model.emptyNeighbors(move.from).count() == 1) {
-			return model.emptyNeighbors(move.from).findFirst();
+		if (!canJump() && board.emptyNeighbors(move.from).count() == 1) {
+			return board.emptyNeighbors(move.from).findFirst();
 		}
 		// if move direction has been specified, use position in that direction
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
-			return model.neighbor(move.from, optMoveDirection.get());
+			return board.neighbor(move.from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
 		return supplyMouseClickBoardPosition();

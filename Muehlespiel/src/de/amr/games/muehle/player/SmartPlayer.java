@@ -5,7 +5,6 @@ import static java.lang.String.format;
 
 import java.util.OptionalInt;
 
-import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
@@ -19,8 +18,8 @@ public class SmartPlayer extends AbstractPlayer {
 
 	private Move move;
 
-	public SmartPlayer(MillApp app, Board board, StoneColor color) {
-		super(app, board, color);
+	public SmartPlayer(Board board, StoneColor color) {
+		super(board, color);
 		clearMove();
 	}
 
@@ -32,10 +31,10 @@ public class SmartPlayer extends AbstractPlayer {
 	public OptionalInt supplyPlacePosition() {
 
 		// Fallback: Zufällige freie Position
-		final OptionalInt randomFreePos = randomElement(model.positions().filter(model::isEmptyPosition));
+		final OptionalInt randomFreePos = randomElement(board.positions().filter(board::isEmptyPosition));
 
 		// Wenn noch kein Stein meiner Farbe gesetzt ist, dann zufällig:
-		if (model.positions(color).count() == 0) {
+		if (board.positions(color).count() == 0) {
 			reason("Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde", randomFreePos);
 			return randomFreePos;
 		}
@@ -43,44 +42,44 @@ public class SmartPlayer extends AbstractPlayer {
 		// Es gibt schon mindestens einen Stein meiner Farbe auf dem Brett.
 
 		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
-		OptionalInt millClosingPos = randomElement(model.positionsClosingMill(color));
+		OptionalInt millClosingPos = randomElement(board.positionsClosingMill(color));
 		if (millClosingPos.isPresent()) {
 			reason("Setze Stein auf Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
 		}
 
 		// Finde gegnerische Position, an der Mühle geschlossen werden kann:
-		OptionalInt otherMillClosingPos = randomElement(model.positionsClosingMill(otherColor));
+		OptionalInt otherMillClosingPos = randomElement(board.positionsClosingMill(otherColor));
 		if (otherMillClosingPos.isPresent()) {
 			reason("Setze Stein auf Position %d, weil gegnerische Mühle verhindert wird", otherMillClosingPos);
 			return otherMillClosingPos;
 		}
 
 		// Finde Position, an der 2 eigene Mühlen geöffnet werden können
-		OptionalInt twoMillsOpeningPos = randomElement(model.positionsOpeningTwoMills(color));
+		OptionalInt twoMillsOpeningPos = randomElement(board.positionsOpeningTwoMills(color));
 		if (twoMillsOpeningPos.isPresent()) {
 			reason("Setze Stein auf Position %d, weil zwei eigene Mühlen geöffnet werden", twoMillsOpeningPos);
 			return twoMillsOpeningPos;
 		}
 
 		// Finde Position, an der eine eigene Mühle geöffnet werden kann
-		OptionalInt millOpeningPos = randomElement(model.positionsOpeningMill(color));
+		OptionalInt millOpeningPos = randomElement(board.positionsOpeningMill(color));
 		if (millOpeningPos.isPresent()) {
 			reason("Setze Stein auf Position %d, weil eigene Mühle geöffnet wird", millOpeningPos);
 			return millOpeningPos;
 		}
 
 		// Finde Position, an der im nächsten Schritt 2 eigene Mühlen geöffnet werden könnten
-		OptionalInt twoMillsLater = randomElement(model.positionsOpeningTwoMillsLater(color));
+		OptionalInt twoMillsLater = randomElement(board.positionsOpeningTwoMillsLater(color));
 		if (twoMillsLater.isPresent()) {
 			reason("Setze Stein auf Position %d, weil später evtl. 2 eigene Mühlen geöffnet werden könnten", twoMillsLater);
 			return twoMillsLater;
 		}
 
 		// Finde eine freie Position neben einem Stein meiner Farbe
-		OptionalInt posWithFreeNeighbor = randomElement(model.positions(color).filter(model::hasEmptyNeighbor));
+		OptionalInt posWithFreeNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
 		if (posWithFreeNeighbor.isPresent()) {
-			OptionalInt neighbor = randomElement(model.emptyNeighbors(posWithFreeNeighbor.getAsInt()));
+			OptionalInt neighbor = randomElement(board.emptyNeighbors(posWithFreeNeighbor.getAsInt()));
 			reason("Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist", neighbor);
 			return neighbor;
 		}
@@ -92,7 +91,7 @@ public class SmartPlayer extends AbstractPlayer {
 
 	@Override
 	public OptionalInt supplyRemovalPosition(StoneColor otherColor) {
-		return randomElement(model.positions(otherColor));
+		return randomElement(board.positions(otherColor));
 	}
 
 	@Override
@@ -104,11 +103,11 @@ public class SmartPlayer extends AbstractPlayer {
 	public Move supplyMove() {
 		if (move.from == -1) {
 			// Finde eine Position, von der aus eine Mühle geschlossen werden kann
-			OptionalInt millClosingFrom = randomElement(model.positions(color).filter(p -> canCloseMillFrom(p)));
+			OptionalInt millClosingFrom = randomElement(board.positions(color).filter(p -> canCloseMillFrom(p)));
 			millClosingFrom.ifPresent(p -> move.from = p);
 			if (move.from == -1) {
 				// Fallback
-				OptionalInt moveStartPos = randomElement(model.positions(color).filter(model::hasEmptyNeighbor));
+				OptionalInt moveStartPos = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
 				moveStartPos.ifPresent(p -> move.from = p);
 			}
 		} else {
@@ -121,15 +120,15 @@ public class SmartPlayer extends AbstractPlayer {
 	private OptionalInt supplyMoveEndPosition() {
 		// Suche freie Position, an der Mühle geschlossen werden kann:
 		OptionalInt millClosingPos = randomElement(
-				model.positions().filter(model::isEmptyPosition).filter(to -> model.isMillClosedByMove(move.from, to, color)));
+				board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByMove(move.from, to, color)));
 		if (millClosingPos.isPresent()) {
 			reason("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
 		}
-		return randomElement(model.emptyNeighbors(move.from));
+		return randomElement(board.emptyNeighbors(move.from));
 	}
 
 	private boolean canCloseMillFrom(int p) {
-		return model.neighbors(p).anyMatch(q -> model.isMillClosingPosition(q, color));
+		return board.neighbors(p).anyMatch(q -> board.isMillClosingPosition(q, color));
 	}
 }

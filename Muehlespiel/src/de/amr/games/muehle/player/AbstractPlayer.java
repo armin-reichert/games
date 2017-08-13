@@ -7,29 +7,26 @@ import java.util.OptionalInt;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 
 public abstract class AbstractPlayer implements Player {
 
 	protected final Random rand = new Random();
-	protected final MillApp app;
-	protected final Board model;
+	protected final Board board;
 	protected final StoneColor color;
 	protected final StoneColor otherColor;
-	protected int stonesPlaced;
+	protected int numStonesPlaced;
 
-	public AbstractPlayer(MillApp app, Board board, StoneColor color) {
-		this.app = app;
-		this.model = board;
+	public AbstractPlayer(Board board, StoneColor color) {
+		this.board = board;
 		this.color = color;
 		this.otherColor = (color == WHITE ? BLACK : WHITE);
 	}
 
 	@Override
 	public void init() {
-		stonesPlaced = 0;
+		numStonesPlaced = 0;
 	}
 
 	@Override
@@ -38,18 +35,18 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public int getStonesPlaced() {
-		return stonesPlaced;
+	public int getNumStonesPlaced() {
+		return numStonesPlaced;
 	}
 
 	@Override
 	public void stonePlaced() {
-		stonesPlaced += 1;
+		numStonesPlaced += 1;
 	}
 
 	@Override
 	public boolean canJump() {
-		return model.stoneCount(color) == 3;
+		return board.stoneCount(color) == 3;
 	}
 
 	@Override
@@ -57,17 +54,16 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	/**
-	 * 
 	 * @param stream
-	 *          stream of ints
+	 *          stream of integers
 	 * @return random element from given stream
 	 */
 	protected OptionalInt randomElement(IntStream stream) {
-		int[] array = stream.toArray();
-		return array.length == 0 ? OptionalInt.empty() : OptionalInt.of(array[rand.nextInt(array.length)]);
+		int[] elements = stream.toArray();
+		return elements.length == 0 ? OptionalInt.empty() : OptionalInt.of(elements[rand.nextInt(elements.length)]);
 	}
 
 	protected String getName() {
-		return color == WHITE ? "Weiß" : "Schwarz";
+		return getClass().getSimpleName() + "(" + (color == WHITE ? "Weiß" : "Schwarz") + ")";
 	}
 }
