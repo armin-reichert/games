@@ -65,16 +65,14 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		init();
 	}
 
-	private void clear() {
-		move = null;
-		player.clearMove();
-	}
-
 	private void defineStateMachine() {
 
 		// INITIAL
 
-		state(INITIAL).entry = s -> clear();
+		state(INITIAL).entry = s -> {
+			move = null;
+			player.clearMove();
+		};
 
 		change(INITIAL, READING_MOVE);
 
@@ -84,9 +82,9 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		change(READING_MOVE, INITIAL, () -> hasMoveStartPosition() && !isMoveStartPossible());
 
-		change(READING_MOVE, INITIAL, () -> hasMovePositions() && !isMovePossible());
+		change(READING_MOVE, INITIAL, () -> hasBothMovePositions() && !isMovePossible());
 
-		change(READING_MOVE, GOT_VALID_MOVE, () -> hasMovePositions() && isMovePossible());
+		change(READING_MOVE, GOT_VALID_MOVE, () -> hasBothMovePositions() && isMovePossible());
 
 		// GOT_VALID_MOVE
 
@@ -111,7 +109,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG.info(format("Jumping from %d to %d", move.from, move.to));
+		state(JUMPING).entry = s -> LOG.info(format("Jumping from position %d to position  %d", move.from, move.to));
 
 		change(JUMPING, FINISHED);
 
@@ -132,7 +130,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		return move != null && board.isValidPosition(move.from);
 	}
 
-	private boolean hasMovePositions() {
+	private boolean hasBothMovePositions() {
 		return hasMoveStartPosition() && board.isValidPosition(move.to);
 	}
 
