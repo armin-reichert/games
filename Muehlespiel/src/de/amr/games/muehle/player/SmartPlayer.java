@@ -15,11 +15,11 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert, Peter Schillo
  */
-public class StrackPlayer extends AbstractPlayer {
+public class SmartPlayer extends AbstractPlayer {
 
 	private Move move;
 
-	public StrackPlayer(MillApp app, Board board, StoneColor color) {
+	public SmartPlayer(MillApp app, Board board, StoneColor color) {
 		super(app, board, color);
 		clearMove();
 	}

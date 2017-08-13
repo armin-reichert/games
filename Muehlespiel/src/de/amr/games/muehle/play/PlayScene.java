@@ -26,6 +26,7 @@ import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.player.SmartPlayer;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.StonesCounter;
 
@@ -46,8 +47,8 @@ public class PlayScene extends Scene<MillApp> {
 	private Player black;
 	private Player current;
 	private Player other;
-	private StonesCounter whiteStillToPlaceCounter;
-	private StonesCounter blackStillToPlaceCounter;
+	private StonesCounter whiteStonesToPlaceCounter;
+	private StonesCounter blackStonesToPlaceCounter;
 	private TextArea messageDisplay;
 	private boolean assistantOn;
 
@@ -112,8 +113,8 @@ public class PlayScene extends Scene<MillApp> {
 					});
 				} else {
 					moveControl.update();
-					if (moveControl.isAnimationComplete()) {
-						Move move = moveControl.getMove();
+					if (moveControl.is(MoveState.FINISHED)) {
+						Move move = moveControl.getMove().get();
 						if (board.inMill(move.to, current.getColor())) {
 							mustRemoveStoneOfOpponent = true;
 							showMessage(current.getColor() == WHITE ? "white_must_take" : "black_must_take");
@@ -149,17 +150,18 @@ public class PlayScene extends Scene<MillApp> {
 		boardUI.tf.setY(50);
 
 		white = new InteractivePlayer(app, boardUI, board, WHITE);
-		black = new InteractivePlayer(app, boardUI, board, BLACK);
+
+		// black = new InteractivePlayer(app, boardUI, board, BLACK);
 		// black = new RandomPlayer(app, board, BLACK);
-		// black = new StrackPlayer(app, board, BLACK);
+		black = new SmartPlayer(app, board, BLACK);
 
-		whiteStillToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - white.getStonesPlaced());
-		whiteStillToPlaceCounter.tf.moveTo(40, getHeight() - 50);
-		whiteStillToPlaceCounter.init();
+		whiteStonesToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - white.getStonesPlaced());
+		whiteStonesToPlaceCounter.tf.moveTo(40, getHeight() - 50);
+		whiteStonesToPlaceCounter.init();
 
-		blackStillToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - black.getStonesPlaced());
-		blackStillToPlaceCounter.tf.moveTo(getWidth() - 100, getHeight() - 50);
-		blackStillToPlaceCounter.init();
+		blackStonesToPlaceCounter = new StonesCounter(BLACK, () -> NUM_STONES - black.getStonesPlaced());
+		blackStonesToPlaceCounter.tf.moveTo(getWidth() - 100, getHeight() - 50);
+		blackStonesToPlaceCounter.init();
 
 		messageDisplay = new TextArea();
 		messageDisplay.setColor(Color.BLUE);
@@ -197,8 +199,8 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignPlacingTo(Player player) {
-		whiteStillToPlaceCounter.setSelected(player.getColor() == WHITE);
-		blackStillToPlaceCounter.setSelected(player.getColor() == BLACK);
+		whiteStonesToPlaceCounter.setSelected(player.getColor() == WHITE);
+		blackStonesToPlaceCounter.setSelected(player.getColor() == BLACK);
 		showMessage(player.getColor() == WHITE ? "white_must_place" : "black_must_place");
 		switchTo(player);
 	}
@@ -269,8 +271,8 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawPlacingInfo(Graphics2D g) {
-		whiteStillToPlaceCounter.draw(g);
-		blackStillToPlaceCounter.draw(g);
+		whiteStonesToPlaceCounter.draw(g);
+		blackStonesToPlaceCounter.draw(g);
 		if (control.mustRemoveStoneOfOpponent) {
 			boardUI.markRemovableStones(g, other.getColor());
 		} else if (assistantOn) {
@@ -282,7 +284,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void drawMovingInfo(Graphics2D g) {
 		if (moveControl.isMoveStartPossible()) {
-			Move move = moveControl.getMove();
+			Move move = moveControl.getMove().get();
 			boardUI.markPosition(g, move.from, Color.ORANGE);
 		} else {
 			boardUI.markPossibleMoveStarts(g, current.getColor(), current.canJump());
