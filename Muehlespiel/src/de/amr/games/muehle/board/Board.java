@@ -22,8 +22,7 @@ public class Board extends BoardGraph {
 		}
 	}
 
-	/* Stone content */
-	private StoneColor[] content;
+	private final StoneColor[] content;
 
 	/**
 	 * Constructs an empty board.
@@ -36,11 +35,10 @@ public class Board extends BoardGraph {
 	 * Clears the board.
 	 */
 	public void clear() {
-		content = new StoneColor[NUM_POS];
+		positions().forEach(p -> content[p] = null);
 	}
 
 	/**
-	 * 
 	 * @param color
 	 *          a stone color
 	 * @return a stream of the positions with a stone of the given color
@@ -51,7 +49,7 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * @return the number of stones on the board
+	 * @return the number of stones
 	 */
 	public long stoneCount() {
 		return Stream.of(content).filter(Objects::nonNull).count();
@@ -148,7 +146,6 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param type

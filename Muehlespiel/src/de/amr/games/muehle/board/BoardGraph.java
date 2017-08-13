@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * The board data model as an undirected oriented graph. Each node has at most one neighbor in one of the four
+ * The board as an undirected oriented graph. Each board position (node) has at most one neighbor in one of the four
  * directions. Nodes are numbered row-wise top to bottom.
  *
  * @author Armin Reichert, Peter & Anna Schillo
@@ -151,7 +151,6 @@ public class BoardGraph {
 	}
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param dir
@@ -176,7 +175,6 @@ public class BoardGraph {
 	}
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param q
@@ -190,7 +188,6 @@ public class BoardGraph {
 	}
 
 	/**
-	 * 
 	 * @param p
 	 *          a valid position
 	 * @param q
