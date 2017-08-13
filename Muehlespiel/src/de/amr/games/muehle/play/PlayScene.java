@@ -1,7 +1,6 @@
 package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.easy.game.math.Vector2.dist;
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static de.amr.games.muehle.play.GamePhase.GAME_OVER;
@@ -18,12 +17,10 @@ import java.util.OptionalInt;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.BoardModel;
-import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -38,7 +35,6 @@ import de.amr.games.muehle.ui.StonesCounter;
 public class PlayScene extends Scene<MillApp> {
 
 	private static final int NUM_STONES = 9;
-	private static final float MOVE_SECONDS = .75f;
 
 	private final PlayControl control;
 	private Board board;
@@ -204,7 +200,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignMovingTo(Player player) {
-		moveControl = new MoveControl(board, player, this::supplyMoveVelocity);
+		moveControl = new MoveControl(board, player, app.pulse);
 		showMessage(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
 		switchTo(player);
 	}
@@ -242,23 +238,6 @@ public class PlayScene extends Scene<MillApp> {
 			}
 		}
 		return OptionalInt.empty();
-	}
-
-	private Vector2 supplyMoveVelocity() {
-		Move move = moveControl.getMove();
-		float speed = dist(board.centerPoint(move.from), board.centerPoint(move.to)) / app.pulse.secToTicks(MOVE_SECONDS);
-		Direction dir = board.getModel().getDirection(move.from, move.to).get();
-		switch (dir) {
-		case NORTH:
-			return new Vector2(0, -speed);
-		case EAST:
-			return new Vector2(speed, 0);
-		case SOUTH:
-			return new Vector2(0, speed);
-		case WEST:
-			return new Vector2(-speed, 0);
-		}
-		return Vector2.nullVector();
 	}
 
 	// Drawing

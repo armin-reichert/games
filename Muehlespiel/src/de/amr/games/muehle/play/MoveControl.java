@@ -1,6 +1,7 @@
 package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.math.Vector2.dist;
 import static de.amr.games.muehle.play.MoveControl.MoveState.COMPLETE;
 import static de.amr.games.muehle.play.MoveControl.MoveState.GOT_VALID_MOVE;
 import static de.amr.games.muehle.play.MoveControl.MoveState.JUMPING;
@@ -11,10 +12,11 @@ import static java.lang.String.format;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.ui.Board;
@@ -28,9 +30,11 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MoveControl {
 
-	private final Player player;
+	private static final float MOVE_SECONDS = .75f;
+
 	private final Board board;
-	private final Supplier<Vector2> velocitySupplier;
+	private final Player player;
+	private final Pulse pulse;
 	private final FSM control;
 
 	private Move move;
@@ -40,16 +44,17 @@ public class MoveControl {
 	/**
 	 * Constructs an initial move.
 	 * 
-	 * @player the player who makes this move
+	 * @param player
+	 *          the player who makes this move
 	 * @param board
 	 *          the board where the move is executed
-	 * @param velocitySupplier
-	 *          supplies the move velocity
+	 * @param pulse
+	 *          the pulse of the application
 	 */
-	public MoveControl(Board board, Player player, Supplier<Vector2> velocitySupplier) {
-		this.player = player;
+	public MoveControl(Board board, Player player, Pulse pulse) {
 		this.board = board;
-		this.velocitySupplier = velocitySupplier;
+		this.player = player;
+		this.pulse = pulse;
 		control = new FSM();
 		init();
 	}
@@ -81,7 +86,7 @@ public class MoveControl {
 			state(MOVING).entry = s -> {
 				board.getModel().getDirection(move.from, move.to).ifPresent(dir -> {
 					stone = board.getStoneAt(move.from).get();
-					stone.tf.setVelocity(velocitySupplier.get());
+					stone.tf.setVelocity(supplyMoveVelocity());
 					Vector2 toVector = board.centerPoint(move.to);
 					toPoint = new Point2D.Float(toVector.x, toVector.y);
 					LOG.info(format("Moving from %d to %d towards %s", move.from, move.to, dir));
@@ -156,6 +161,22 @@ public class MoveControl {
 		toPoint = null;
 		stone = null;
 		player.clearMove();
+	}
+
+	private Vector2 supplyMoveVelocity() {
+		float speed = dist(board.centerPoint(move.from), board.centerPoint(move.to)) / pulse.secToTicks(MOVE_SECONDS);
+		Direction dir = board.getModel().getDirection(move.from, move.to).get();
+		switch (dir) {
+		case NORTH:
+			return new Vector2(0, -speed);
+		case EAST:
+			return new Vector2(speed, 0);
+		case SOUTH:
+			return new Vector2(0, speed);
+		case WEST:
+			return new Vector2(-speed, 0);
+		}
+		return Vector2.nullVector();
 	}
 
 	private boolean isEndPositionReached() {
