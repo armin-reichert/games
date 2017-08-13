@@ -131,6 +131,16 @@ public class BoardGraph {
 	}
 
 	/**
+	 * 
+	 * @param p
+	 *          a number
+	 * @return if the given number denotes a valid board position
+	 */
+	public boolean isValidPosition(int p) {
+		return 0 <= p && p < NUM_POS;
+	}
+
+	/**
 	 * @param p
 	 *          a valid position
 	 * @return a stream of the neighbor positions

@@ -2,6 +2,7 @@ package de.amr.games.muehle.play;
 
 import java.util.OptionalInt;
 
+import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
@@ -25,8 +26,7 @@ public interface Player {
 
 	public OptionalInt supplyRemovalPosition(StoneColor otherColor);
 
-	public OptionalInt supplyMoveStartPosition();
+	public Move supplyMove();
 
-	public OptionalInt supplyMoveEndPosition(int from);
-
+	public void clearMove();
 }

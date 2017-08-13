@@ -55,6 +55,10 @@ public abstract class AbstractPlayer implements Player {
 		return model.stoneCount(color) == 3;
 	}
 
+	@Override
+	public void clearMove() {
+	}
+
 	/**
 	 * 
 	 * @param stream

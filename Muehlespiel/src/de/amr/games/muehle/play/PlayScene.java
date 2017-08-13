@@ -24,6 +24,7 @@ import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.BoardModel;
 import de.amr.games.muehle.board.Direction;
+import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.ui.Board;
@@ -41,7 +42,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	private final PlayControl control;
 	private Board board;
-	private Move move;
+	private MoveControl moveControl;
 	private Player white;
 	private Player black;
 	private Player current;
@@ -111,9 +112,10 @@ public class PlayScene extends Scene<MillApp> {
 						assignMovingTo(other);
 					});
 				} else {
-					move.update();
-					if (move.isComplete()) {
-						if (board.getModel().inMill(move.getTo().getAsInt(), current.getColor())) {
+					moveControl.update();
+					if (moveControl.isAnimationComplete()) {
+						Move move = moveControl.getMove();
+						if (board.getModel().inMill(move.to, current.getColor())) {
 							mustRemoveStoneOfOpponent = true;
 							showMessage(current.getColor() == WHITE ? "white_must_take" : "black_must_take");
 						} else {
@@ -147,9 +149,9 @@ public class PlayScene extends Scene<MillApp> {
 		board.tf.setY(50);
 
 		white = new InteractivePlayer(app, board, WHITE);
-		// black = new InteractivePlayer(app, board, BLACK);
+		black = new InteractivePlayer(app, board, BLACK);
 		// black = new RandomPlayer(app, board, BLACK);
-		black = new StrackPlayer(app, board, BLACK);
+		// black = new StrackPlayer(app, board, BLACK);
 
 		whiteStillToPlaceCounter = new StonesCounter(WHITE, () -> NUM_STONES - white.getStonesPlaced());
 		whiteStillToPlaceCounter.tf.moveTo(40, getHeight() - 50);
@@ -202,7 +204,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignMovingTo(Player player) {
-		move = new Move(board, player, this::supplyMoveVelocity);
+		moveControl = new MoveControl(board, player, this::supplyMoveVelocity);
 		showMessage(player.getColor() == WHITE ? "white_must_move" : "black_must_move");
 		switchTo(player);
 	}
@@ -235,8 +237,7 @@ public class PlayScene extends Scene<MillApp> {
 				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				board.removeStoneAt(removalPosition);
-				LOG.info(
-						Messages.text(player.getColor() == WHITE ? "white_took_stone" : "black_took_stone", removalPosition));
+				LOG.info(Messages.text(player.getColor() == WHITE ? "white_took_stone" : "black_took_stone", removalPosition));
 				return optRemovalPosition;
 			}
 		}
@@ -244,9 +245,9 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private Vector2 supplyMoveVelocity() {
-		int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
-		float speed = dist(board.centerPoint(from), board.centerPoint(to)) / app.pulse.secToTicks(MOVE_SECONDS);
-		Direction dir = board.getModel().getDirection(from, to).get();
+		Move move = moveControl.getMove();
+		float speed = dist(board.centerPoint(move.from), board.centerPoint(move.to)) / app.pulse.secToTicks(MOVE_SECONDS);
+		Direction dir = board.getModel().getDirection(move.from, move.to).get();
 		switch (dir) {
 		case NORTH:
 			return new Vector2(0, -speed);
@@ -298,8 +299,9 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawMovingInfo(Graphics2D g) {
-		if (move.getFrom().isPresent()) {
-			board.markPosition(g, move.getFrom().getAsInt(), Color.ORANGE);
+		if (moveControl.isMoveStartPossible()) {
+			Move move = moveControl.getMove();
+			board.markPosition(g, move.from, Color.ORANGE);
 		} else {
 			board.markPossibleMoveStarts(g, current.getColor(), current.canJump());
 			if (assistantOn) {

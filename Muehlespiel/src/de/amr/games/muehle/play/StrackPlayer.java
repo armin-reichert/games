@@ -6,6 +6,7 @@ import static java.lang.String.format;
 import java.util.OptionalInt;
 
 import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.ui.Board;
 
@@ -16,8 +17,11 @@ import de.amr.games.muehle.ui.Board;
  */
 public class StrackPlayer extends AbstractPlayer {
 
+	private Move move;
+
 	public StrackPlayer(MillApp app, Board board, StoneColor color) {
 		super(app, board, color);
+		clearMove();
 	}
 
 	private void reason(String msg, OptionalInt optPos) {
@@ -92,31 +96,40 @@ public class StrackPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public OptionalInt supplyMoveStartPosition() {
-		OptionalInt randomPos = randomElement(model.positions(color).filter(model::hasEmptyNeighbor));
-
-		// Finde eine Position, von der aus eine Mühle geschlossen werden kann
-		OptionalInt millClosingFrom = randomElement(model.positions(color).filter(p -> canCloseMillFrom(p)));
-		if (millClosingFrom.isPresent()) {
-			return millClosingFrom;
-		}
-
-		return randomPos;
-	}
-
-	private boolean canCloseMillFrom(int p) {
-		return model.neighbors(p).anyMatch(q -> model.isMillClosingPosition(q, color));
+	public void clearMove() {
+		move = new Move();
 	}
 
 	@Override
-	public OptionalInt supplyMoveEndPosition(int from) {
+	public Move supplyMove() {
+		if (move.from == -1) {
+			// Finde eine Position, von der aus eine Mühle geschlossen werden kann
+			OptionalInt millClosingFrom = randomElement(model.positions(color).filter(p -> canCloseMillFrom(p)));
+			millClosingFrom.ifPresent(p -> move.from = p);
+			if (move.from == -1) {
+				// Fallback
+				OptionalInt moveStartPos = randomElement(model.positions(color).filter(model::hasEmptyNeighbor));
+				moveStartPos.ifPresent(p -> move.from = p);
+			}
+		} else {
+			OptionalInt moveEndPos = supplyMoveEndPosition();
+			moveEndPos.ifPresent(p -> move.to = p);
+		}
+		return move;
+	}
+
+	private OptionalInt supplyMoveEndPosition() {
 		// Suche freie Position, an der Mühle geschlossen werden kann:
 		OptionalInt millClosingPos = randomElement(
-				model.positions().filter(model::isEmptyPosition).filter(to -> model.isMillClosedByMove(from, to, color)));
+				model.positions().filter(model::isEmptyPosition).filter(to -> model.isMillClosedByMove(move.from, to, color)));
 		if (millClosingPos.isPresent()) {
 			reason("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
 			return millClosingPos;
 		}
-		return randomElement(model.emptyNeighbors(from));
+		return randomElement(model.emptyNeighbors(move.from));
+	}
+
+	private boolean canCloseMillFrom(int p) {
+		return model.neighbors(p).anyMatch(q -> model.isMillClosingPosition(q, color));
 	}
 }

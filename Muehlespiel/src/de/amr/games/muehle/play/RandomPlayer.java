@@ -3,6 +3,7 @@ package de.amr.games.muehle.play;
 import java.util.OptionalInt;
 
 import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.ui.Board;
 
@@ -28,14 +29,15 @@ public class RandomPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public OptionalInt supplyMoveStartPosition() {
-		return randomElement(model.positions().filter(p -> model.getStoneAt(p) == color).filter(model::hasEmptyNeighbor));
-	}
-
-	@Override
-	public OptionalInt supplyMoveEndPosition(int from) {
-		return canJump() ? randomElement(model.positions().filter(model::isEmptyPosition))
-				: randomElement(model.neighbors(from).filter(model::isEmptyPosition));
+	public Move supplyMove() {
+		Move move = new Move();
+		randomElement(model.positions(color)).ifPresent(from -> {
+			move.from = from;
+			OptionalInt optTo = canJump() ? randomElement(model.positions().filter(model::isEmptyPosition))
+					: randomElement(model.neighbors(from).filter(model::isEmptyPosition));
+			optTo.ifPresent(to -> move.to = to);
+		});
+		return move;
 	}
 
 }

@@ -18,6 +18,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Direction;
+import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.ui.Board;
 
@@ -36,38 +37,50 @@ public class InteractivePlayer extends AbstractPlayer {
 		STEERING.put(WEST, VK_LEFT);
 	}
 
+	private Move move;
+
 	public InteractivePlayer(MillApp app, Board board, StoneColor color) {
 		super(app, board, color);
+		move = new Move();
 	}
 
 	@Override
 	public OptionalInt supplyPlacePosition() {
-		return supplyMouseClickPosition();
+		return supplyMouseClickBoardPosition();
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition(StoneColor opponentColor) {
-		return supplyMouseClickPosition();
+		return supplyMouseClickBoardPosition();
 	}
 
 	@Override
-	public OptionalInt supplyMoveStartPosition() {
-		return supplyMouseClickPosition();
+	public Move supplyMove() {
+		if (move.from == -1) {
+			supplyMouseClickBoardPosition().ifPresent(p -> move.from = p);
+		} else if (move.to == -1) {
+			supplyMoveEndPosition().ifPresent(p -> move.to = p);
+		}
+		return move;
 	}
 
 	@Override
-	public OptionalInt supplyMoveEndPosition(int from) {
+	public void clearMove() {
+		move = new Move();
+	}
+
+	private OptionalInt supplyMoveEndPosition() {
 		// if end position is uniquely determined, use it
-		if (!canJump() && model.emptyNeighbors(from).count() == 1) {
-			return model.emptyNeighbors(from).findFirst();
+		if (!canJump() && model.emptyNeighbors(move.from).count() == 1) {
+			return model.emptyNeighbors(move.from).findFirst();
 		}
 		// if move direction has been specified, use position in that direction
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
-			return model.neighbor(from, optMoveDirection.get());
+			return model.neighbor(move.from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
-		return supplyMouseClickPosition();
+		return supplyMouseClickBoardPosition();
 	}
 
 	private Optional<Direction> supplyMoveDirection() {
@@ -79,7 +92,7 @@ public class InteractivePlayer extends AbstractPlayer {
 		/*@formatter:on*/
 	}
 
-	private OptionalInt supplyMouseClickPosition() {
+	private OptionalInt supplyMouseClickBoardPosition() {
 		return Mouse.clicked() ? board.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }
