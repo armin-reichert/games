@@ -190,21 +190,17 @@ public class PlayScene extends Scene<MillApp> {
 		messageDisplay.setText(Messages.text(key, args));
 	}
 
-	private void switchTo(int player) {
-		turn = player;
-	}
-
 	private void assignPlacingTo(int player) {
 		stonesToPlaceCounter[0].setSelected(player == 0);
 		stonesToPlaceCounter[1].setSelected(player == 1);
 		showMessage(player == 0 ? "white_must_place" : "black_must_place");
-		switchTo(player);
+		turn = player;
 	}
 
 	private void assignMovingTo(int player) {
 		moveControl = new MoveControl(boardUI, players[player], app.pulse);
 		showMessage(player == 0 ? "white_must_move" : "black_must_move");
-		switchTo(player);
+		turn = player;
 	}
 
 	private OptionalInt tryToPlaceStone() {
@@ -235,7 +231,8 @@ public class PlayScene extends Scene<MillApp> {
 				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				boardUI.removeStoneAt(removalPosition);
-				LOG.info(Messages.text(turn == 0 ? "white_took_stone" : "black_took_stone", removalPosition));
+				LOG.info(Messages.text(turn == 0 ? "white_removed_stone_at_position" : "black_removed_stone_at_position",
+						removalPosition));
 				return optRemovalPosition;
 			}
 		}
@@ -268,23 +265,24 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void drawPlacingInfo(Graphics2D g) {
-		Stream.of(stonesToPlaceCounter).forEach(counter -> counter.draw(g));
-		if (control.mustRemoveStoneOfOpponent) {
-			boardUI.markRemovableStones(g, players[1 - turn].getColor());
-		} else if (assistantOn) {
+		if (assistantOn) {
 			boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
 			boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
 			boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
 		}
+		if (control.mustRemoveStoneOfOpponent) {
+			boardUI.markRemovableStones(g, players[1 - turn].getColor());
+		}
+		Stream.of(stonesToPlaceCounter).forEach(counter -> counter.draw(g));
 	}
 
 	private void drawMovingInfo(Graphics2D g) {
-		if (moveControl.isMoveStartPossible()) {
-			Move move = moveControl.getMove().get();
-			boardUI.markPosition(g, move.from, Color.ORANGE);
-		} else {
-			boardUI.markPossibleMoveStarts(g, players[turn].getColor(), players[turn].canJump());
-			if (assistantOn) {
+		if (assistantOn) {
+			if (moveControl.isMoveStartPossible()) {
+				Move move = moveControl.getMove().get();
+				boardUI.markPosition(g, move.from, Color.ORANGE);
+			} else {
+				boardUI.markPossibleMoveStarts(g, players[turn].getColor(), players[turn].canJump());
 				boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
 			}
 		}
