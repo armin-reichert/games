@@ -241,7 +241,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(Color.WHITE);
+		g.setColor(new Color(255, 255, 224));
 		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
 		messageArea.hCenter(getWidth());
