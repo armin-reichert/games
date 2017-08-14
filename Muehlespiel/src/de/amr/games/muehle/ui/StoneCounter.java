@@ -13,15 +13,20 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class StonesCounter extends Stone {
+public class StoneCounter extends Stone {
 
-	private Font textFont;
+	private Font font;
 	private boolean selected;
 	private IntSupplier stoneCountSupplier;
 
-	public StonesCounter(StoneColor color, IntSupplier stoneCountSupplier) {
+	public StoneCounter(StoneColor color, IntSupplier stoneCountSupplier) {
 		super(color);
+		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * Stone.radius);
 		this.stoneCountSupplier = stoneCountSupplier;
+	}
+
+	public void setFont(Font font) {
+		this.font = font;
 	}
 
 	public void setSelected(boolean selected) {
@@ -30,11 +35,6 @@ public class StonesCounter extends Stone {
 
 	public boolean isSelected() {
 		return selected;
-	}
-
-	@Override
-	public void init() {
-		textFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * Stone.radius);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class StonesCounter extends Stone {
 		if (numStones > 1) {
 			g.translate(tf.getX(), tf.getY());
 			g.setColor(selected ? Color.RED : Color.DARK_GRAY);
-			g.setFont(textFont);
+			g.setFont(font);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(text, 2 * radius, radius);
 			g.translate(-tf.getX(), -tf.getY());

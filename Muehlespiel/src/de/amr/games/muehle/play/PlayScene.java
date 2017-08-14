@@ -29,7 +29,7 @@ import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.player.SmartPlayer;
 import de.amr.games.muehle.ui.BoardUI;
-import de.amr.games.muehle.ui.StonesCounter;
+import de.amr.games.muehle.ui.StoneCounter;
 
 /**
  * The play scene of the mill game.
@@ -40,14 +40,14 @@ public class PlayScene extends Scene<MillApp> {
 
 	private static final int NUM_STONES = 9;
 
-	private final PlayControl control = new PlayControl();
+	private final FSM control = new FSM();
 	private final Board board = new Board();
 	private final Player[] players = new Player[2];
-	private final StonesCounter[] stonesToPlaceCounter = new StonesCounter[2];
+	private final StoneCounter[] stoneCounter = new StoneCounter[2];
 
 	private BoardUI boardUI;
 	private MoveControl moveControl;
-	private TextArea messageDisplay;
+	private TextArea messageArea;
 
 	private boolean assistant;
 	private int turn;
@@ -57,7 +57,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	/* A finite-state machine which controls the play scene */
-	private class PlayControl extends StateMachine<GamePhase, Object> {
+	private class FSM extends StateMachine<GamePhase, Object> {
 
 		private boolean remove;
 
@@ -66,7 +66,7 @@ public class PlayScene extends Scene<MillApp> {
 			return board.stoneCount(color) < 3 || (!players[turn].canJump() && board.isTrapped(color));
 		}
 
-		public PlayControl() {
+		public FSM() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTED);
 
 			// STARTED
@@ -140,30 +140,28 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
-		Font msgFont = Assets.storeFont("message-font", "fonts/Cookie-Regular.ttf", 36, Font.PLAIN);
+		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
 
+		// UI components
 		boardUI = new BoardUI(board, 600, 600);
+		stoneCounter[0] = new StoneCounter(WHITE, () -> NUM_STONES - players[0].getNumStonesPlaced());
+		stoneCounter[1] = new StoneCounter(BLACK, () -> NUM_STONES - players[1].getNumStonesPlaced());
+		messageArea = new TextArea();
+		messageArea.setColor(Color.BLUE);
+		messageArea.setFont(msgFont);
+
+		// Screen layout
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
+		stoneCounter[0].tf.moveTo(40, getHeight() - 50);
+		stoneCounter[1].tf.moveTo(getWidth() - 100, getHeight() - 50);
+		messageArea.tf.moveTo(0, getHeight() - 90);
 
+		// Players
 		players[0] = new InteractivePlayer(boardUI, WHITE);
-
 		// players[1] = new InteractivePlayer(boardUI, BLACK);
 		// players[1] = new RandomPlayer(board, BLACK);
 		players[1] = new SmartPlayer(board, BLACK);
-
-		stonesToPlaceCounter[0] = new StonesCounter(WHITE, () -> NUM_STONES - players[0].getNumStonesPlaced());
-		stonesToPlaceCounter[0].tf.moveTo(40, getHeight() - 50);
-		stonesToPlaceCounter[0].init();
-
-		stonesToPlaceCounter[1] = new StonesCounter(BLACK, () -> NUM_STONES - players[1].getNumStonesPlaced());
-		stonesToPlaceCounter[1].tf.moveTo(getWidth() - 100, getHeight() - 50);
-		stonesToPlaceCounter[1].init();
-
-		messageDisplay = new TextArea();
-		messageDisplay.setColor(Color.BLUE);
-		messageDisplay.setFont(msgFont);
-		messageDisplay.tf.moveTo(0, getHeight() - 90);
 
 		// control.setLogger(LOG);
 		control.init();
@@ -187,12 +185,12 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void showMessage(String key, Object... args) {
-		messageDisplay.setText(Messages.text(key, args));
+		messageArea.setText(Messages.text(key, args));
 	}
 
 	private void assignPlacingTo(int player) {
-		stonesToPlaceCounter[0].setSelected(player == 0);
-		stonesToPlaceCounter[1].setSelected(player == 1);
+		stoneCounter[0].setSelected(player == 0);
+		stoneCounter[1].setSelected(player == 1);
 		showMessage(player == 0 ? "white_must_place" : "black_must_place");
 		turn = player;
 	}
@@ -246,8 +244,8 @@ public class PlayScene extends Scene<MillApp> {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
-		messageDisplay.hCenter(getWidth());
-		messageDisplay.draw(g);
+		messageArea.hCenter(getWidth());
+		messageArea.draw(g);
 		drawStateSpecificInfo(g);
 	}
 
@@ -273,7 +271,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (control.remove) {
 			boardUI.markRemovableStones(g, players[1 - turn].getColor());
 		}
-		Stream.of(stonesToPlaceCounter).forEach(counter -> counter.draw(g));
+		Stream.of(stoneCounter).forEach(counter -> counter.draw(g));
 	}
 
 	private void drawMovingInfo(Graphics2D g) {

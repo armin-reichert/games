@@ -61,7 +61,7 @@ public enum Assets {
 		}
 	}
 
-	private static Font readFont(String path) {
+	private static Font readTrueTypeFont(String path) {
 		try (InputStream fontStream = toInputStream(path)) {
 			return Font.createFont(Font.TRUETYPE_FONT, fontStream);
 		} catch (Exception e) {
@@ -165,9 +165,30 @@ public enum Assets {
 	 *          font style
 	 * @return font as specified
 	 */
-	public static Font storeFont(String key, String fontName, float size, int style) {
+	public static Font storeTrueTypeFont(String key, String fontName, int style, float size) {
 		if (!OBJ.fonts.containsKey(key)) {
-			Font font = readFont(fontName).deriveFont(style, size);
+			Font font = readTrueTypeFont(fontName).deriveFont(style, size);
+			OBJ.fonts.put(key, font);
+		}
+		return OBJ.fonts.get(key);
+	}
+
+	/**
+	 * Stores the font derived from the given base font and given size and style under the given key.
+	 * 
+	 * @param key
+	 *          key under which the font my be accessed
+	 * @param font
+	 *          font from which this font is derived
+	 * @param size
+	 *          font size
+	 * @param style
+	 *          font style
+	 * @return derived font
+	 */
+	public static Font storeFont(String key, Font baseFont, int style, float size) {
+		if (!OBJ.fonts.containsKey(key)) {
+			Font font = baseFont.deriveFont(style, size);
 			OBJ.fonts.put(key, font);
 		}
 		return OBJ.fonts.get(key);
@@ -188,8 +209,8 @@ public enum Assets {
 	}
 
 	/**
-	 * Returns the image with the given path. If the image is requested for the first time, it is
-	 * loaded from the specified path.
+	 * Returns the image with the given path. If the image is requested for the first time, it is loaded from the
+	 * specified path.
 	 * 
 	 * @param path
 	 *          path under assets folder or key in assets map

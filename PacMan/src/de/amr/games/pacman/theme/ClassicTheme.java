@@ -141,7 +141,7 @@ public class ClassicTheme extends PacManTheme {
 		lifeSprite.scale(SPRITE_SIZE, SPRITE_SIZE);
 
 		// Text display
-		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		Assets.storeTrueTypeFont("textFont", "fonts/arcadeclassic.ttf", Font.PLAIN, TILE_SIZE * 1.5f);
 		textFont = Assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}

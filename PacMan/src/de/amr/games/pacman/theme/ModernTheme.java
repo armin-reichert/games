@@ -109,7 +109,7 @@ public class ModernTheme extends PacManTheme {
 		pillSprite = new Sprite(tile(modernTileSheet, 2, 9)).scale(TILE_SIZE, TILE_SIZE);
 
 		// Text display
-		Assets.storeFont("textFont", "fonts/arcadeclassic.ttf", TILE_SIZE * 1.5f, Font.PLAIN);
+		Assets.storeTrueTypeFont("textFont", "fonts/arcadeclassic.ttf", Font.PLAIN, TILE_SIZE * 1.5f);
 		textFont = Assets.font("textFont");
 		hudColor = Color.YELLOW;
 	}
