@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * The board data model with stone allocation and mill-related predicates.
+ * Represents the board, provides information about the board content and mill-related functionality.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
@@ -22,20 +22,32 @@ public class Board extends BoardGraph {
 		}
 	}
 
-	private final StoneColor[] content;
+	private final StoneColor[] c;
+
+	private void set(int p, StoneColor color) {
+		c[p] = color;
+	}
+
+	private StoneColor get(int p) {
+		return c[p];
+	}
+
+	private boolean has(int p, StoneColor color) {
+		return c[p] == color;
+	}
 
 	/**
 	 * Constructs an empty board.
 	 */
 	public Board() {
-		content = new StoneColor[NUM_POS];
+		c = new StoneColor[NUM_POS];
 	}
 
 	/**
 	 * Clears the board.
 	 */
 	public void clear() {
-		positions().forEach(p -> content[p] = null);
+		positions().forEach(p -> set(p, null));
 	}
 
 	/**
@@ -45,14 +57,14 @@ public class Board extends BoardGraph {
 	 */
 	public IntStream positions(StoneColor color) {
 		checkStoneColor(color);
-		return positions().filter(p -> content[p] == color);
+		return positions().filter(p -> has(p, color));
 	}
 
 	/**
 	 * @return the number of stones
 	 */
 	public long stoneCount() {
-		return Stream.of(content).filter(Objects::nonNull).count();
+		return Stream.of(c).filter(Objects::nonNull).count();
 	}
 
 	/**
@@ -62,7 +74,7 @@ public class Board extends BoardGraph {
 	 */
 	public long stoneCount(StoneColor color) {
 		checkStoneColor(color);
-		return Stream.of(content).filter(c -> c == color).count();
+		return Stream.of(c).filter(c -> c == color).count();
 	}
 
 	/**
@@ -76,10 +88,10 @@ public class Board extends BoardGraph {
 	public void putStoneAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		if (content[p] != null) {
+		if (!has(p, null)) {
 			throw new IllegalStateException("Position where stone is placed must be empty");
 		}
-		content[p] = color;
+		set(p, color);
 	}
 
 	/**
@@ -90,7 +102,7 @@ public class Board extends BoardGraph {
 	 */
 	public void removeStoneAt(int p) {
 		checkPosition(p);
-		content[p] = null;
+		set(p, null);
 	}
 
 	/**
@@ -105,14 +117,14 @@ public class Board extends BoardGraph {
 	public void moveStone(int from, int to) {
 		checkPosition(from);
 		checkPosition(to);
-		if (content[from] == null) {
+		if (has(from, null)) {
 			throw new IllegalStateException("Position from where stone is moved must not be empty");
 		}
-		if (content[to] != null) {
+		if (!has(to, null)) {
 			throw new IllegalStateException("Position where stone is moved to must be empty");
 		}
-		content[to] = content[from];
-		content[from] = null;
+		set(to, get(from));
+		set(from, null);
 	}
 
 	/**
@@ -122,7 +134,7 @@ public class Board extends BoardGraph {
 	 */
 	public StoneColor getStoneAt(int p) {
 		checkPosition(p);
-		return content[p];
+		return get(p);
 	}
 
 	/**
@@ -132,7 +144,7 @@ public class Board extends BoardGraph {
 	 */
 	public boolean isEmptyPosition(int p) {
 		checkPosition(p);
-		return content[p] == null;
+		return has(p, null);
 	}
 
 	/**
@@ -142,20 +154,20 @@ public class Board extends BoardGraph {
 	 */
 	public boolean hasStoneAt(int p) {
 		checkPosition(p);
-		return content[p] != null;
+		return !has(p, null);
 	}
 
 	/**
 	 * @param p
 	 *          a valid position
-	 * @param type
-	 *          a stone type
-	 * @return if there is a stone of the given type at this position
+	 * @param color
+	 *          a stone color
+	 * @return if there is a stone of the given color at this position
 	 */
-	public boolean hasStoneAt(int p, StoneColor type) {
+	public boolean hasStoneAt(int p, StoneColor color) {
 		checkPosition(p);
-		checkStoneColor(type);
-		return content[p] == type;
+		checkStoneColor(color);
+		return has(p, color);
 	}
 
 	/**
@@ -215,7 +227,7 @@ public class Board extends BoardGraph {
 		checkPosition(q);
 		checkPosition(r);
 		checkStoneColor(color);
-		return areHMillPositions(p, q, r) && IntStream.of(p, q, r).allMatch(pos -> content[pos] == color);
+		return areHMillPositions(p, q, r) && IntStream.of(p, q, r).allMatch(pos -> has(pos, color));
 	}
 
 	/**
@@ -234,7 +246,7 @@ public class Board extends BoardGraph {
 		checkPosition(q);
 		checkPosition(r);
 		checkStoneColor(color);
-		return areVMillPositions(p, q, r) && IntStream.of(p, q, r).allMatch(pos -> content[pos] == color);
+		return areVMillPositions(p, q, r) && IntStream.of(p, q, r).allMatch(pos -> has(pos, color));
 	}
 
 	/**
@@ -247,7 +259,7 @@ public class Board extends BoardGraph {
 	public boolean inHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> content[q] == color);
+		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> has(q, color));
 	}
 
 	/**
@@ -260,7 +272,7 @@ public class Board extends BoardGraph {
 	public boolean inVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> content[q] == color);
+		return IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> has(q, color));
 	}
 
 	/**
@@ -338,8 +350,7 @@ public class Board extends BoardGraph {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return content[p] == null
-				&& (content[q] == color && content[r] == null || content[q] == color && content[r] == null);
+		return has(p, null) && (has(q, color) && has(r, null) || has(q, color) && has(r, null));
 	}
 
 	/**
@@ -378,8 +389,8 @@ public class Board extends BoardGraph {
 	public boolean isMillClosingPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return content[p] == null && (content[H_MILL[p][0]] == color && content[H_MILL[p][1]] == color
-				|| content[V_MILL[p][0]] == color && content[V_MILL[p][1]] == color);
+		return has(p, null) && (has(H_MILL[p][0], color) && has(H_MILL[p][1], color)
+				|| has(V_MILL[p][0], color) && has(V_MILL[p][1], color));
 	}
 
 	/**
@@ -396,14 +407,14 @@ public class Board extends BoardGraph {
 		checkPosition(from);
 		checkPosition(to);
 		checkStoneColor(color);
-		if (hasStoneAt(from, color) && isEmptyPosition(to)) {
+		if (has(from, color) && has(to, null)) {
 			Optional<Direction> optDir = getDirection(from, to);
 			if (optDir.isPresent()) {
 				Direction dir = optDir.get();
 				if (dir == NORTH || dir == SOUTH) {
-					return getStoneAt(H_MILL[to][0]) == color && getStoneAt(H_MILL[to][1]) == color;
+					return has(H_MILL[to][0], color) && has(H_MILL[to][1], color);
 				} else {
-					return getStoneAt(V_MILL[to][0]) == color && getStoneAt(V_MILL[to][1]) == color;
+					return has(V_MILL[to][0], color) && has(V_MILL[to][1], color);
 				}
 			}
 		}

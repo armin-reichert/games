@@ -56,7 +56,7 @@ public class PlayScene extends Scene<MillApp> {
 		super(app);
 	}
 
-	/* A finite-state machine which controls the play scene */
+	/** A finite-state machine for controlling the game play. */
 	private class FSM extends StateMachine<GamePhase, Object> {
 
 		private boolean remove;
