@@ -3,7 +3,6 @@ package de.amr.games.muehle.play;
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2.dist;
 import static de.amr.games.muehle.play.MoveState.FINISHED;
-import static de.amr.games.muehle.play.MoveState.GOT_VALID_MOVE;
 import static de.amr.games.muehle.play.MoveState.INITIAL;
 import static de.amr.games.muehle.play.MoveState.JUMPING;
 import static de.amr.games.muehle.play.MoveState.MOVING;
@@ -84,19 +83,15 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		change(READING_MOVE, INITIAL, () -> hasBothMovePositions() && !isMovePossible());
 
-		change(READING_MOVE, GOT_VALID_MOVE, () -> hasBothMovePositions() && isMovePossible());
+		change(READING_MOVE, JUMPING, () -> hasBothMovePositions() && isMovePossible() && player.canJump());
 
-		// GOT_VALID_MOVE
-
-		change(GOT_VALID_MOVE, MOVING, () -> board.areNeighbors(move.from, move.to));
-
-		change(GOT_VALID_MOVE, JUMPING, player::canJump);
+		change(READING_MOVE, MOVING, () -> hasBothMovePositions() && isMovePossible());
 
 		// MOVING
 
 		state(MOVING).entry = s -> {
 			board.getDirection(move.from, move.to).ifPresent(moveDir -> {
-				getMovedStone().ifPresent(stone -> stone.tf.setVelocity(computeMoveVelocity()));
+				getMovedStone().ifPresent(stone -> stone.tf.setVelocity(computeMoveVelocity(moveDir)));
 				LOG.info(format("Moving stone from position %d to position %d towards %s", move.from, move.to, moveDir));
 			});
 		};
@@ -153,9 +148,8 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		return false;
 	}
 
-	private Vector2 computeMoveVelocity() {
+	private Vector2 computeMoveVelocity(Direction dir) {
 		float speed = dist(boardUI.centerPoint(move.from), boardUI.centerPoint(move.to)) / pulse.secToTicks(MOVE_TIME_SEC);
-		Direction dir = board.getDirection(move.from, move.to).get();
 		switch (dir) {
 		case NORTH:
 			return new Vector2(0, -speed);
