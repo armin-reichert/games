@@ -320,7 +320,7 @@ public class Board extends BoardGraph {
 	public boolean isHMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXMillOpenedAt(p, color, H_MILL);
+		return isXMillOpenedAt(p, color, H_MILL[p]);
 	}
 
 	/**
@@ -333,11 +333,11 @@ public class Board extends BoardGraph {
 	public boolean isVMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXMillOpenedAt(p, color, V_MILL);
+		return isXMillOpenedAt(p, color, V_MILL[p]);
 	}
 
-	private boolean isXMillOpenedAt(int p, StoneColor color, int[][] mill) {
-		int q = mill[p][0], r = mill[p][1];
+	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
+		int q = mill[0], r = mill[1];
 		return content[p] == null
 				&& (content[q] == color && content[r] == null || content[q] == color && content[r] == null);
 	}

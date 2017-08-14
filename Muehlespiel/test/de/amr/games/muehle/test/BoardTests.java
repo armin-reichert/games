@@ -16,11 +16,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.Direction;
 
-public class BoardModelTest {
+public class BoardTests {
 
 	private Board board;
 
@@ -171,6 +171,8 @@ public class BoardModelTest {
 	public void testHorizontalMill() {
 		assertTrue(board.areHMillPositions(0, 1, 2));
 		board.putStoneAt(0, WHITE);
+		assertTrue(board.isHMillOpenedAt(1, WHITE));
+		assertTrue(board.isHMillOpenedAt(2, WHITE));
 		board.putStoneAt(1, WHITE);
 		board.putStoneAt(2, WHITE);
 		assertTrue(IntStream.of(0, 1, 2).allMatch(p -> board.inHMill(p, WHITE)));
@@ -182,11 +184,13 @@ public class BoardModelTest {
 	public void testVerticalMill() {
 		assertTrue(board.areVMillPositions(3, 10, 18));
 		board.putStoneAt(3, WHITE);
+		assertTrue(board.isVMillOpenedAt(10, WHITE));
+		assertTrue(board.isVMillOpenedAt(18, WHITE));
 		board.putStoneAt(10, WHITE);
 		board.putStoneAt(18, WHITE);
 		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> board.inVMill(p, WHITE)));
-		assertTrue(IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18))
-				.noneMatch(p -> board.inVMill(p, WHITE)));
+		assertTrue(
+				IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18)).noneMatch(p -> board.inVMill(p, WHITE)));
 		assertTrue(board.hasVMill(3, 10, 18, WHITE));
 	}
 

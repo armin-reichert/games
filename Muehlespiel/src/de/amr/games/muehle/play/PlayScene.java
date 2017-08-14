@@ -246,36 +246,29 @@ public class PlayScene extends Scene<MillApp> {
 		boardUI.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		drawStateSpecificInfo(g);
-	}
-
-	private void drawStateSpecificInfo(Graphics2D g) {
-		switch (control.stateID()) {
-		case PLACING:
-			drawPlacingInfo(g);
-			break;
-		case MOVING:
-			drawMovingInfo(g);
-			break;
-		default:
-			break;
+		// state-specific drawing:
+		if (control.is(PLACING)) {
+			drawPlacingSpecific(g);
+		} else if (control.is(MOVING)) {
+			drawMovingSpecific(g);
 		}
 	}
 
-	private void drawPlacingInfo(Graphics2D g) {
-		if (assistant) {
+	private void drawPlacingSpecific(Graphics2D g) {
+		if (control.remove) {
+			boardUI.markRemovableStones(g, players[1 - turn].getColor());
+		} else if (assistant) {
 			boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
 			boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
 			boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
 		}
-		if (control.remove) {
-			boardUI.markRemovableStones(g, players[1 - turn].getColor());
-		}
 		Stream.of(stoneCounter).forEach(counter -> counter.draw(g));
 	}
 
-	private void drawMovingInfo(Graphics2D g) {
-		if (assistant) {
+	private void drawMovingSpecific(Graphics2D g) {
+		if (control.remove) {
+			boardUI.markRemovableStones(g, players[1 - turn].getColor());
+		} else if (assistant) {
 			if (moveControl.isMoveStartPossible()) {
 				Move move = moveControl.getMove().get();
 				boardUI.markPosition(g, move.from, Color.ORANGE);
@@ -283,9 +276,6 @@ public class PlayScene extends Scene<MillApp> {
 				boardUI.markPossibleMoveStarts(g, players[turn].getColor(), players[turn].canJump());
 				boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
 			}
-		}
-		if (control.remove) {
-			boardUI.markRemovableStones(g, players[1 - turn].getColor());
 		}
 	}
 }
