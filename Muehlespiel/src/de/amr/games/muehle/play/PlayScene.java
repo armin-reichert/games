@@ -17,9 +17,10 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
-import de.amr.easy.game.view.Drawable;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
@@ -140,9 +141,16 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
-	private class Assistant implements Drawable {
+	/**
+	 * Draws hints for placing or moving on the board.
+	 */
+	private class Assistant extends GameEntity {
 
 		private boolean enabled;
+
+		public Assistant() {
+			setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
+		}
 
 		public void toggle() {
 			setEnabled(!enabled);
@@ -158,6 +166,7 @@ public class PlayScene extends Scene<MillApp> {
 			if (!enabled) {
 				return;
 			}
+			super.draw(g);
 			if (control.is(PLACING)) {
 				boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
 				boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
@@ -195,6 +204,8 @@ public class PlayScene extends Scene<MillApp> {
 		stoneCounter[0].tf.moveTo(40, getHeight() - 50);
 		stoneCounter[1].tf.moveTo(getWidth() - 100, getHeight() - 50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
+		assistant.hCenter(getWidth());
+		assistant.tf.setY(getHeight() / 2 - assistant.getHeight());
 
 		// Players
 		players[0] = new InteractivePlayer(boardUI, WHITE);
@@ -281,7 +292,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(new Color(255, 255, 224));
+		g.setColor(BoardUI.BOARD_COLOR);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
 		assistant.draw(g);

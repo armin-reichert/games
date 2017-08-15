@@ -27,6 +27,8 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public class BoardUI extends GameEntity {
 
+	public static final Color BOARD_COLOR = new Color(255, 255, 224);
+
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
 	 */
@@ -129,7 +131,7 @@ public class BoardUI extends GameEntity {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		// Background
-		g.setColor(new Color(255, 255, 224));
+		g.setColor(BOARD_COLOR);
 		g.fillRect(0, 0, width, height);
 
 		// Lines
