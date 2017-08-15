@@ -12,13 +12,12 @@ import java.awt.RenderingHints;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2;
-import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
@@ -34,25 +33,25 @@ public class BoardUI extends GameEntity {
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	private final Board model;
+	private final Board board;
 	private final int width;
 	private final int height;
 	private final int posRadius;
-
+	private final int stoneRadius;
 	private boolean showPositionNumbers;
 	private Stone[] stones;
 
-	public BoardUI(Board model, int w, int h) {
-		this.model = model;
-		width = w;
-		height = h;
-		posRadius = w / 60;
+	public BoardUI(Board board, int width, int height) {
+		this.board = board;
+		this.width = width;
+		this.height = height;
+		posRadius = width / 60;
+		stoneRadius = width / 24;
 		stones = new Stone[BoardGraph.NUM_POS];
-		Stone.radius = width / 24;
 	}
 
-	public Board getModel() {
-		return model;
+	public Board getBoard() {
+		return board;
 	}
 
 	public Stream<Stone> stones() {
@@ -69,14 +68,18 @@ public class BoardUI extends GameEntity {
 		return height;
 	}
 
+	public int getStoneRadius() {
+		return stoneRadius;
+	}
+
 	public void clear() {
-		model.clear();
+		board.clear();
 		stones = new Stone[BoardGraph.NUM_POS];
 	}
 
 	public void putStoneAt(int p, StoneColor color) {
-		model.putStoneAt(p, color);
-		Stone stone = new Stone(color);
+		board.putStoneAt(p, color);
+		Stone stone = new Stone(color, stoneRadius);
 		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
 	}
@@ -86,7 +89,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void moveStone(int from, int to) {
-		model.moveStone(from, to);
+		board.moveStone(from, to);
 		Stone stone = stones[from];
 		stone.tf.moveTo(centerPoint(to));
 		stones[to] = stone;
@@ -94,7 +97,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void removeStoneAt(int p) {
-		model.removeStoneAt(p);
+		board.removeStoneAt(p);
 		stones[p] = null;
 	}
 
@@ -103,7 +106,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public OptionalInt findNearestPosition(int x, int y, int radius) {
-		return model.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
+		return board.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
@@ -132,9 +135,9 @@ public class BoardUI extends GameEntity {
 		// Lines
 		g.setColor(Color.BLACK);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		model.positions().forEach(p -> {
+		board.positions().forEach(p -> {
 			Vector2 centerFrom = centerPoint(p);
-			model.neighbors(p).forEach(q -> {
+			board.neighbors(p).forEach(q -> {
 				Vector2 centerTo = centerPoint(q);
 				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(), centerTo.roundedY());
 			});
@@ -143,7 +146,7 @@ public class BoardUI extends GameEntity {
 		// Positions
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		model.positions().forEach(p -> {
+		board.positions().forEach(p -> {
 			Vector2 center = centerPoint(p);
 			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
 			if (showPositionNumbers) {
@@ -167,42 +170,41 @@ public class BoardUI extends GameEntity {
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	public void markPositionsOpeningTwoMills(Graphics2D g, StoneColor stoneType, Color color) {
-		model.positionsOpeningTwoMills(stoneType).forEach(p -> markPosition(g, p, color));
+	public void markPositionsOpeningTwoMills(Graphics2D g, StoneColor stoneColor, Color color) {
+		board.positionsOpeningTwoMills(stoneColor).forEach(p -> markPosition(g, p, color));
 	}
 
-	public void markPositionsClosingMill(Graphics2D g, StoneColor stoneType, Color color) {
-		model.positionsClosingMill(stoneType).forEach(p -> markPosition(g, p, color));
+	public void markPositionsClosingMill(Graphics2D g, StoneColor stoneColor, Color color) {
+		board.positionsClosingMill(stoneColor).forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markPositionFixingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {
-		if (model.positionsWithEmptyNeighbor(other).count() == 1) {
-			int singleFreePosition = model.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (model.neighbors(singleFreePosition).anyMatch(p -> model.getStoneAt(p) == either)) {
+		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
+			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
+			if (board.neighbors(singleFreePosition).anyMatch(p -> board.getStoneAt(p) == either)) {
 				markPosition(g, singleFreePosition, color);
 			}
 		}
 	}
 
-	public void markPossibleMoveStarts(Graphics2D g, StoneColor type, boolean canJump) {
-		IntStream startPositions = canJump ? model.positions(type) : model.positionsWithEmptyNeighbor(type);
-		startPositions.forEach(p -> markPosition(g, p, Color.GREEN));
-		startPositions.close();
+	public void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, boolean canJump) {
+		(canJump ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
+				.forEach(p -> markPosition(g, p, Color.GREEN));
 	}
 
-	public void markRemovableStones(Graphics2D g, StoneColor stoneType) {
+	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		boolean allInMill = model.allStonesInMills(stoneType);
-		model.positions(stoneType).filter(p -> allInMill || !model.inMill(p, stoneType))
+		board.positions(stoneColor).filter(p -> board.allStonesInMills(stoneColor) || !board.inMill(p, stoneColor))
 				.forEach(p -> {
-					Stone stone = getStoneAt(p).get();
-					float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
-					float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
-					g.translate(offsetX, offsetY);
-					g.setColor(Color.RED);
-					g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-					g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-					g.translate(-offsetX, -offsetY);
+					getStoneAt(p).ifPresent(stone -> {
+						float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
+						float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
+						g.translate(offsetX, offsetY);
+						g.setColor(Color.RED);
+						g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+						g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+						g.translate(-offsetX, -offsetY);
+					});
 				});
 	}
 }

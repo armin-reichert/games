@@ -35,9 +35,9 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 	private final BoardUI boardUI;
 	private final Board board;
-	private final Player player;
 	private final Pulse pulse;
 
+	private Player player;
 	private Move move;
 
 	/**
@@ -45,23 +45,15 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	 * 
 	 * @param boardUI
 	 *          the board UI where the move is displayed
-	 * @param player
-	 *          the player who makes this move
 	 * @param pulse
 	 *          the pulse of the application
 	 */
-	public MoveControl(BoardUI boardUI, Player player, Pulse pulse) {
+	public MoveControl(BoardUI boardUI, Pulse pulse) {
 		super("Move Control", MoveState.class, READING_MOVE);
-
 		this.boardUI = boardUI;
-		this.board = boardUI.getModel();
-		this.player = player;
+		this.board = boardUI.getBoard();
 		this.pulse = pulse;
-
 		defineStateMachine();
-		setLogger(LOG);
-
-		init();
 	}
 
 	private void defineStateMachine() {
@@ -111,6 +103,15 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		// FINISHED
 
 		state(FINISHED).entry = s -> boardUI.moveStone(move.from, move.to);
+	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
+		init();
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 
 	private Optional<Stone> getMovedStone() {

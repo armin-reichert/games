@@ -9,19 +9,19 @@ import java.util.function.IntSupplier;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
- * Visual indicator of a number of stones.
+ * Visual representation of a stack of stones.
  * 
  * @author Armin Reichert
  */
-public class StoneCounter extends Stone {
+public class StoneStack extends Stone {
 
 	private Font font;
 	private boolean selected;
 	private IntSupplier stoneCountSupplier;
 
-	public StoneCounter(StoneColor color, IntSupplier stoneCountSupplier) {
-		super(color);
-		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * Stone.radius);
+	public StoneStack(StoneColor color, int radius, IntSupplier stoneCountSupplier) {
+		super(color, radius);
+		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * radius);
 		this.stoneCountSupplier = stoneCountSupplier;
 	}
 

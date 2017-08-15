@@ -40,7 +40,7 @@ public class InteractivePlayer extends AbstractPlayer {
 	private Move move;
 
 	public InteractivePlayer(BoardUI boardUI, StoneColor color) {
-		super(boardUI.getModel(), color);
+		super(boardUI.getBoard(), color);
 		this.boardUI = boardUI;
 		move = new Move();
 	}

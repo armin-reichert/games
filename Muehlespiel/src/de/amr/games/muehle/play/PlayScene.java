@@ -29,7 +29,7 @@ import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.player.SmartPlayer;
 import de.amr.games.muehle.ui.BoardUI;
-import de.amr.games.muehle.ui.StoneCounter;
+import de.amr.games.muehle.ui.StoneStack;
 
 /**
  * The play scene of the mill game.
@@ -43,7 +43,7 @@ public class PlayScene extends Scene<MillApp> {
 	private final FSM control = new FSM();
 	private final Board board = new Board();
 	private final Player[] players = new Player[2];
-	private final StoneCounter[] stoneCounter = new StoneCounter[2];
+	private final StoneStack[] stoneCounter = new StoneStack[2];
 
 	private BoardUI boardUI;
 	private MoveControl moveControl;
@@ -145,8 +145,10 @@ public class PlayScene extends Scene<MillApp> {
 
 		// UI components
 		boardUI = new BoardUI(board, 600, 600);
-		stoneCounter[0] = new StoneCounter(WHITE, () -> NUM_STONES - players[0].getNumStonesPlaced());
-		stoneCounter[1] = new StoneCounter(BLACK, () -> NUM_STONES - players[1].getNumStonesPlaced());
+		stoneCounter[0] = new StoneStack(WHITE, boardUI.getStoneRadius(),
+				() -> NUM_STONES - players[0].getNumStonesPlaced());
+		stoneCounter[1] = new StoneStack(BLACK, boardUI.getStoneRadius(),
+				() -> NUM_STONES - players[1].getNumStonesPlaced());
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);
@@ -164,6 +166,8 @@ public class PlayScene extends Scene<MillApp> {
 		// players[1] = new RandomPlayer(board, BLACK);
 		players[1] = new SmartPlayer(board, BLACK);
 
+		moveControl = new MoveControl(boardUI, app.pulse);
+		moveControl.setLogger(LOG);
 		// control.setLogger(LOG);
 		control.init();
 	}
@@ -197,7 +201,7 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	private void assignMovingTo(int player) {
-		moveControl = new MoveControl(boardUI, players[player], app.pulse);
+		moveControl.setPlayer(players[player]);
 		showMessage(player == 0 ? "white_must_move" : "black_must_move");
 		turn = player;
 	}

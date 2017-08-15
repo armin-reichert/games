@@ -12,9 +12,12 @@ import java.util.EnumMap;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.games.muehle.board.StoneColor;
 
+/**
+ * Visual representation of a stone.
+ * 
+ * @author Armin Reichert
+ */
 public class Stone extends GameEntity {
-
-	public static int radius = 20;
 
 	private static final EnumMap<StoneColor, Color> FILL = new EnumMap<>(StoneColor.class);
 	private static final EnumMap<StoneColor, Color> EDGE = new EnumMap<>(StoneColor.class);
@@ -26,14 +29,20 @@ public class Stone extends GameEntity {
 		EDGE.put(BLACK, Color.DARK_GRAY);
 	}
 
-	private StoneColor color;
+	protected StoneColor color;
+	protected int radius;
 
-	public Stone(StoneColor color) {
+	public Stone(StoneColor color, int radius) {
 		this.color = color;
+		this.radius = radius;
 	}
 
 	public StoneColor getColor() {
 		return color;
+	}
+
+	public int getRadius() {
+		return radius;
 	}
 
 	@Override
