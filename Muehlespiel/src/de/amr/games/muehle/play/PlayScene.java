@@ -19,6 +19,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.view.Drawable;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
@@ -46,10 +47,10 @@ public class PlayScene extends Scene<MillApp> {
 	private final StoneStack[] stoneCounter = new StoneStack[2];
 
 	private BoardUI boardUI;
+	private Assistant assistant;
 	private MoveControl moveControl;
 	private TextArea messageArea;
 
-	private boolean assistant;
 	private int turn;
 
 	public PlayScene(MillApp app) {
@@ -139,6 +140,40 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
+	private class Assistant implements Drawable {
+
+		private boolean enabled;
+
+		public void toggle() {
+			setEnabled(!enabled);
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+			LOG.info(Messages.text(enabled ? "assistant_on" : "assistant_off"));
+		}
+
+		@Override
+		public void draw(Graphics2D g) {
+			if (!enabled) {
+				return;
+			}
+			if (control.is(PLACING)) {
+				boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
+				boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
+				boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
+			} else if (control.is(MOVING)) {
+				if (moveControl.isMoveStartPossible()) {
+					Move move = moveControl.getMove().get();
+					boardUI.markPosition(g, move.from, Color.ORANGE);
+				} else {
+					boardUI.markPossibleMoveStarts(g, players[turn].getColor(), players[turn].canJump());
+					boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void init() {
 		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
@@ -152,6 +187,7 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);
+		assistant = new Assistant();
 
 		// Screen layout
 		boardUI.hCenter(getWidth());
@@ -182,8 +218,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_N)) {
 			control.init();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
-			assistant = !assistant;
-			LOG.info(Messages.text(assistant ? "assistant_on" : "assistant_off"));
+			assistant.toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			boardUI.togglePositionNumbers();
 		}
@@ -249,37 +284,17 @@ public class PlayScene extends Scene<MillApp> {
 		g.setColor(new Color(255, 255, 224));
 		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
+		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		// state-specific drawing:
 		if (control.is(PLACING)) {
-			drawPlacingSpecific(g);
+			if (control.remove) {
+				boardUI.markRemovableStones(g, players[1 - turn].getColor());
+			}
+			Stream.of(stoneCounter).forEach(counter -> counter.draw(g));
 		} else if (control.is(MOVING)) {
-			drawMovingSpecific(g);
-		}
-	}
-
-	private void drawPlacingSpecific(Graphics2D g) {
-		if (control.remove) {
-			boardUI.markRemovableStones(g, players[1 - turn].getColor());
-		} else if (assistant) {
-			boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
-			boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
-			boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
-		}
-		Stream.of(stoneCounter).forEach(counter -> counter.draw(g));
-	}
-
-	private void drawMovingSpecific(Graphics2D g) {
-		if (control.remove) {
-			boardUI.markRemovableStones(g, players[1 - turn].getColor());
-		} else if (assistant) {
-			if (moveControl.isMoveStartPossible()) {
-				Move move = moveControl.getMove().get();
-				boardUI.markPosition(g, move.from, Color.ORANGE);
-			} else {
-				boardUI.markPossibleMoveStarts(g, players[turn].getColor(), players[turn].canJump());
-				boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
+			if (control.remove) {
+				boardUI.markRemovableStones(g, players[1 - turn].getColor());
 			}
 		}
 	}

@@ -194,17 +194,18 @@ public class BoardUI extends GameEntity {
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		board.positions(stoneColor).filter(p -> board.allStonesInMills(stoneColor) || !board.inMill(p, stoneColor))
-				.forEach(p -> {
-					getStoneAt(p).ifPresent(stone -> {
-						float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
-						float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
-						g.translate(offsetX, offsetY);
-						g.setColor(Color.RED);
-						g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-						g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-						g.translate(-offsetX, -offsetY);
-					});
-				});
+		boolean allStonesInMills = board.allStonesInMills(stoneColor);
+		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor)).forEach(p -> {
+			getStoneAt(p).ifPresent(stone -> {
+				float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
+				float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
+				// draw red cross
+				g.translate(offsetX, offsetY);
+				g.setColor(Color.RED);
+				g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+				g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+				g.translate(-offsetX, -offsetY);
+			});
+		});
 	}
 }
