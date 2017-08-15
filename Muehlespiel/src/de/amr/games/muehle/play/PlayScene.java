@@ -91,8 +91,8 @@ public class PlayScene extends Scene<MillApp> {
 						assignPlacingTo(1 - turn);
 					});
 				} else {
-					tryToPlace().ifPresent(p -> {
-						if (board.inMill(p, players[turn].getColor())) {
+					tryToPlace().ifPresent(pos -> {
+						if (board.inMill(pos, players[turn].getColor())) {
 							remove = true;
 							showMessage(turn == 0 ? "white_must_take" : "black_must_take");
 						} else {
@@ -110,20 +110,21 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING).update = s -> {
 				if (remove) {
-					tryToRemove().ifPresent(p -> {
+					tryToRemove().ifPresent(pos -> {
 						remove = false;
 						assignMovingTo(1 - turn);
 					});
 				} else {
 					moveControl.update();
 					if (moveControl.is(MoveState.FINISHED)) {
-						Move move = moveControl.getMove().get();
-						if (board.inMill(move.to, players[turn].getColor())) {
-							remove = true;
-							showMessage(turn == 0 ? "white_must_take" : "black_must_take");
-						} else {
-							assignMovingTo(1 - turn);
-						}
+						moveControl.getMove().ifPresent(move -> {
+							if (board.inMill(move.to, players[turn].getColor())) {
+								remove = true;
+								showMessage(turn == 0 ? "white_must_take" : "black_must_take");
+							} else {
+								assignMovingTo(1 - turn);
+							}
+						});
 					}
 				}
 			};
