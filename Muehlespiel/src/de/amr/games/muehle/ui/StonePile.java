@@ -13,13 +13,13 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class StoneStack extends Stone {
+public class StonePile extends Stone {
 
 	private Font font;
 	private boolean selected;
 	private IntSupplier stoneCountSupplier;
 
-	public StoneStack(StoneColor color, int radius, IntSupplier stoneCountSupplier) {
+	public StonePile(StoneColor color, int radius, IntSupplier stoneCountSupplier) {
 		super(color, radius);
 		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * radius);
 		this.stoneCountSupplier = stoneCountSupplier;

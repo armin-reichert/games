@@ -5,7 +5,9 @@ import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static de.amr.games.muehle.play.GamePhase.GAME_OVER;
 import static de.amr.games.muehle.play.GamePhase.MOVING;
+import static de.amr.games.muehle.play.GamePhase.MOVING_REMOVING;
 import static de.amr.games.muehle.play.GamePhase.PLACING;
+import static de.amr.games.muehle.play.GamePhase.PLACING_REMOVING;
 import static de.amr.games.muehle.play.GamePhase.STARTED;
 
 import java.awt.Color;
@@ -31,7 +33,7 @@ import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.player.SmartPlayer;
 import de.amr.games.muehle.ui.BoardUI;
-import de.amr.games.muehle.ui.StoneStack;
+import de.amr.games.muehle.ui.StonePile;
 
 /**
  * The play scene of the mill game.
@@ -45,14 +47,12 @@ public class PlayScene extends Scene<MillApp> {
 	private final FSM control = new FSM();
 	private final Board board = new Board();
 	private final Player[] players = new Player[2];
-	private final StoneStack[] stoneCounter = new StoneStack[2];
+	private final StonePile[] stoneCounter = new StonePile[2];
 
 	private BoardUI boardUI;
 	private Assistant assistant;
 	private MoveControl moveControl;
 	private TextArea messageArea;
-
-	private int turn;
 
 	public PlayScene(MillApp app) {
 		super(app);
@@ -61,11 +61,61 @@ public class PlayScene extends Scene<MillApp> {
 	/** A finite-state machine for controlling the game play. */
 	private class FSM extends StateMachine<GamePhase, Object> {
 
-		private boolean remove;
+		private OptionalInt placedAt;
+		private OptionalInt removedAt;
+		private int turn;
 
 		private boolean isGameOver() {
 			StoneColor color = players[turn].getColor();
 			return board.stoneCount(color) < 3 || (!players[turn].canJump() && board.isTrapped(color));
+		}
+
+		private void assignPlacingTo(int player) {
+			placedAt = OptionalInt.empty();
+			stoneCounter[0].setSelected(player == 0);
+			stoneCounter[1].setSelected(player == 1);
+			showMessage(player == 0 ? "white_must_place" : "black_must_place");
+			turn = player;
+		}
+
+		private void assignMovingTo(int player) {
+			moveControl.setPlayer(players[player]);
+			showMessage(player == 0 ? "white_must_move" : "black_must_move");
+			turn = player;
+		}
+
+		private void tryToPlace() {
+			OptionalInt optPlacePosition = players[turn].supplyPlacePosition();
+			if (optPlacePosition.isPresent()) {
+				int placePosition = optPlacePosition.getAsInt();
+				if (board.hasStoneAt(placePosition)) {
+					LOG.info(Messages.text("stone_at_position", placePosition));
+				} else {
+					boardUI.putStoneAt(placePosition, players[turn].getColor());
+					players[turn].stonePlaced();
+					placedAt = optPlacePosition;
+				}
+			}
+		}
+
+		private void tryToRemove() {
+			StoneColor otherColor = players[1 - turn].getColor();
+			OptionalInt optRemovalPosition = players[turn].supplyRemovalPosition(otherColor);
+			if (optRemovalPosition.isPresent()) {
+				int removalPosition = optRemovalPosition.getAsInt();
+				if (board.isEmptyPosition(removalPosition)) {
+					LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
+				} else if (board.getStoneAt(removalPosition) != otherColor) {
+					LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
+				} else if (board.inMill(removalPosition, otherColor) && !board.allStonesInMills(otherColor)) {
+					LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
+				} else {
+					boardUI.removeStoneAt(removalPosition);
+					LOG.info(Messages.text(turn == 0 ? "white_removed_stone_at_position" : "black_removed_stone_at_position",
+							removalPosition));
+					removedAt = optRemovalPosition;
+				}
+			}
 		}
 
 		public FSM() {
@@ -77,59 +127,50 @@ public class PlayScene extends Scene<MillApp> {
 
 			change(STARTED, PLACING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
-			// PLACING
-
-			state(PLACING).entry = s -> {
-				remove = false;
+			state(STARTED).exit = s -> {
 				boardUI.clear();
 				Stream.of(players).forEach(Player::init);
 				assignPlacingTo(0);
 			};
 
-			state(PLACING).update = s -> {
-				if (remove) {
-					tryToRemove().ifPresent(pos -> {
-						remove = false;
-						assignPlacingTo(1 - turn);
-					});
-				} else {
-					tryToPlace().ifPresent(pos -> {
-						if (board.inMill(pos, players[turn].getColor())) {
-							remove = true;
-							showMessage(turn == 0 ? "white_must_take" : "black_must_take");
-						} else {
-							assignPlacingTo(1 - turn);
-						}
-					});
-				}
-			};
+			// PLACING
 
-			change(PLACING, MOVING, () -> players[1].getNumStonesPlaced() == NUM_STONES && !remove);
+			state(PLACING).update = s -> tryToPlace();
+
+			change(PLACING, MOVING, () -> players[1].getNumStonesPlaced() == NUM_STONES, (s, t) -> assignMovingTo(1 - turn));
+
+			change(PLACING, PLACING_REMOVING,
+					() -> placedAt.isPresent() && board.inMill(placedAt.getAsInt(), players[turn].getColor()),
+					(s, t) -> showMessage(turn == 0 ? "white_must_take" : "black_must_take"));
+
+			change(PLACING, PLACING, () -> placedAt.isPresent(), (s, t) -> assignPlacingTo(1 - turn));
+
+			// PLACING_REMOVING_STONE
+
+			state(PLACING_REMOVING).entry = s -> removedAt = OptionalInt.empty();
+
+			state(PLACING_REMOVING).update = s -> tryToRemove();
+
+			change(PLACING_REMOVING, PLACING, () -> removedAt.isPresent(), (s, t) -> assignPlacingTo(1 - turn));
 
 			// MOVING
 
-			state(MOVING).entry = s -> assignMovingTo(turn);
+			state(MOVING).update = s -> moveControl.update();
 
-			state(MOVING).update = s -> {
-				if (remove) {
-					tryToRemove().ifPresent(pos -> {
-						remove = false;
-						assignMovingTo(1 - turn);
-					});
-				} else {
-					moveControl.update();
-					if (moveControl.is(MoveState.FINISHED)) {
-						moveControl.getMove().ifPresent(move -> {
-							if (board.inMill(move.to, players[turn].getColor())) {
-								remove = true;
-								showMessage(turn == 0 ? "white_must_take" : "black_must_take");
-							} else {
-								assignMovingTo(1 - turn);
-							}
-						});
-					}
-				}
-			};
+			change(MOVING, MOVING_REMOVING,
+					() -> moveControl.is(MoveState.FINISHED)
+							&& board.inMill(moveControl.getMove().get().to, players[turn].getColor()),
+					(s, t) -> showMessage(turn == 0 ? "white_must_take" : "black_must_take"));
+
+			change(MOVING, MOVING, () -> moveControl.is(MoveState.FINISHED), (s, t) -> assignMovingTo(1 - turn));
+
+			// MOVING_REMOVING_STONE
+
+			state(MOVING_REMOVING).entry = s -> removedAt = OptionalInt.empty();
+
+			state(MOVING_REMOVING).update = s -> tryToRemove();
+
+			change(MOVING_REMOVING, MOVING, () -> removedAt.isPresent(), (s, t) -> assignMovingTo(1 - turn));
 
 			change(MOVING, GAME_OVER, this::isGameOver);
 
@@ -168,16 +209,17 @@ public class PlayScene extends Scene<MillApp> {
 			}
 			super.draw(g);
 			if (control.is(PLACING)) {
-				boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
-				boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
-				boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
+				boardUI.markPositionsClosingMill(g, players[control.turn].getColor(), Color.GREEN);
+				boardUI.markPositionsOpeningTwoMills(g, players[control.turn].getColor(), Color.YELLOW);
+				boardUI.markPositionsClosingMill(g, players[1 - control.turn].getColor(), Color.RED);
 			} else if (control.is(MOVING)) {
 				if (moveControl.isMoveStartPossible()) {
 					Move move = moveControl.getMove().get();
 					boardUI.markPosition(g, move.from, Color.ORANGE);
 				} else {
-					boardUI.markPossibleMoveStarts(g, players[turn].getColor(), players[turn].canJump());
-					boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
+					boardUI.markPossibleMoveStarts(g, players[control.turn].getColor(), players[control.turn].canJump());
+					boardUI.markPositionFixingOpponent(g, players[control.turn].getColor(), players[1 - control.turn].getColor(),
+							Color.RED);
 				}
 			}
 		}
@@ -189,9 +231,9 @@ public class PlayScene extends Scene<MillApp> {
 
 		// UI components
 		boardUI = new BoardUI(board, 600, 600);
-		stoneCounter[0] = new StoneStack(WHITE, boardUI.getStoneRadius(),
+		stoneCounter[0] = new StonePile(WHITE, boardUI.getStoneRadius(),
 				() -> NUM_STONES - players[0].getNumStonesPlaced());
-		stoneCounter[1] = new StoneStack(BLACK, boardUI.getStoneRadius(),
+		stoneCounter[1] = new StonePile(BLACK, boardUI.getStoneRadius(),
 				() -> NUM_STONES - players[1].getNumStonesPlaced());
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
@@ -214,8 +256,8 @@ public class PlayScene extends Scene<MillApp> {
 		players[1] = new SmartPlayer(board, BLACK);
 
 		moveControl = new MoveControl(boardUI, app.pulse);
-		moveControl.setLogger(LOG);
-		// control.setLogger(LOG);
+		// moveControl.setLogger(LOG);
+		control.setLogger(LOG);
 		control.init();
 	}
 
@@ -239,57 +281,6 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.setText(Messages.text(key, args));
 	}
 
-	private void assignPlacingTo(int player) {
-		stoneCounter[0].setSelected(player == 0);
-		stoneCounter[1].setSelected(player == 1);
-		showMessage(player == 0 ? "white_must_place" : "black_must_place");
-		turn = player;
-	}
-
-	private void assignMovingTo(int player) {
-		moveControl.setPlayer(players[player]);
-		showMessage(player == 0 ? "white_must_move" : "black_must_move");
-		turn = player;
-	}
-
-	private OptionalInt tryToPlace() {
-		OptionalInt optPlacePosition = players[turn].supplyPlacePosition();
-		if (optPlacePosition.isPresent()) {
-			int placePosition = optPlacePosition.getAsInt();
-			if (board.hasStoneAt(placePosition)) {
-				LOG.info(Messages.text("stone_at_position", placePosition));
-			} else {
-				boardUI.putStoneAt(placePosition, players[turn].getColor());
-				players[turn].stonePlaced();
-				return optPlacePosition;
-			}
-		}
-		return OptionalInt.empty();
-	}
-
-	private OptionalInt tryToRemove() {
-		StoneColor otherColor = players[1 - turn].getColor();
-		OptionalInt optRemovalPosition = players[turn].supplyRemovalPosition(otherColor);
-		if (optRemovalPosition.isPresent()) {
-			int removalPosition = optRemovalPosition.getAsInt();
-			if (board.isEmptyPosition(removalPosition)) {
-				LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
-			} else if (board.getStoneAt(removalPosition) != otherColor) {
-				LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
-			} else if (board.inMill(removalPosition, otherColor) && !board.allStonesInMills(otherColor)) {
-				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
-			} else {
-				boardUI.removeStoneAt(removalPosition);
-				LOG.info(Messages.text(turn == 0 ? "white_removed_stone_at_position" : "black_removed_stone_at_position",
-						removalPosition));
-				return optRemovalPosition;
-			}
-		}
-		return OptionalInt.empty();
-	}
-
-	// Drawing
-
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(BoardUI.BOARD_COLOR);
@@ -298,15 +289,11 @@ public class PlayScene extends Scene<MillApp> {
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (control.is(PLACING)) {
-			if (control.remove) {
-				boardUI.markRemovableStones(g, players[1 - turn].getColor());
-			}
+		if (control.is(PLACING, PLACING_REMOVING)) {
 			Stream.of(stoneCounter).forEach(counter -> counter.draw(g));
-		} else if (control.is(MOVING)) {
-			if (control.remove) {
-				boardUI.markRemovableStones(g, players[1 - turn].getColor());
-			}
+		}
+		if (control.is(PLACING_REMOVING, MOVING_REMOVING)) {
+			boardUI.markRemovableStones(g, players[1 - control.turn].getColor());
 		}
 	}
 }

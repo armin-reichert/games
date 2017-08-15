@@ -1,5 +1,5 @@
 package de.amr.games.muehle.play;
 
 public enum GamePhase {
-	STARTED, PLACING, MOVING, JUMPING, GAME_OVER
+	STARTED, PLACING, PLACING_REMOVING, MOVING, MOVING_REMOVING, JUMPING, GAME_OVER
 }
