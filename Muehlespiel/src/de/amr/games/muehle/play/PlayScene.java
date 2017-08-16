@@ -68,11 +68,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		{ // STARTING
 
-			state(STARTING).entry = s -> {
-				boardUI.clear();
-				stonesPlaced[0] = stonesPlaced[1] = 0;
-				turnPlacingTo(0);
-			};
+			state(STARTING).entry = s -> reset();
 
 			change(STARTING, PLACING);
 
@@ -80,7 +76,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> tryToPlaceStone();
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placedInMill);
+			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill);
 
 			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> switchPlacing());
 
@@ -101,9 +97,9 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING).update = s -> runStoneMove();
 
-			change(MOVING, MOVING_REMOVING, this::movedInMill);
+			change(MOVING, MOVING_REMOVING, this::movingClosedMill);
 
-			change(MOVING, MOVING, () -> moveControl.is(MoveState.FINISHED), (s, t) -> switchMoving());
+			change(MOVING, MOVING, this::isMoveFinished, (s, t) -> switchMoving());
 
 			change(MOVING, GAME_OVER, this::isGameOver);
 
@@ -123,6 +119,12 @@ public class PlayScene extends Scene<MillApp> {
 			state(GAME_OVER).entry = s -> showMessage(turn == 0 ? "black_wins" : "white_wins");
 
 			change(GAME_OVER, STARTING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		}
+
+		private void reset() {
+			boardUI.clear();
+			stonesPlaced[0] = stonesPlaced[1] = 0;
+			turnPlacingTo(0);
 		}
 
 		private boolean isGameOver() {
@@ -185,11 +187,15 @@ public class PlayScene extends Scene<MillApp> {
 			moveControl.update();
 		}
 
-		private boolean placedInMill() {
+		private boolean isMoveFinished() {
+			return moveControl.is(MoveState.FINISHED);
+		}
+
+		private boolean placingClosedMill() {
 			return board.inMill(placedAt, placedColor);
 		}
 
-		private boolean movedInMill() {
+		private boolean movingClosedMill() {
 			return moveControl.is(MoveState.FINISHED)
 					&& board.inMill(moveControl.getMove().get().to, players[turn].getColor());
 		}
