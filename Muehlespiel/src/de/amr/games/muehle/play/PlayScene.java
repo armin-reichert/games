@@ -75,10 +75,18 @@ public class PlayScene extends Scene<MillApp> {
 			showMessage(turn == 0 ? "white_must_place" : "black_must_place");
 		}
 
+		private void switchPlacing() {
+			assignPlacingTo(1 - turn);
+		}
+
 		private void assignMovingTo(int playerNumber) {
 			turn = playerNumber;
 			moveControl.setPlayer(players[turn]);
 			showMessage(turn == 0 ? "white_must_move" : "black_must_move");
+		}
+
+		private void switchMoving() {
+			assignMovingTo(1 - turn);
 		}
 
 		private void tryToPlaceStone() {
@@ -149,9 +157,9 @@ public class PlayScene extends Scene<MillApp> {
 
 			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placedInMill);
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> assignPlacingTo(1 - turn));
+			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> switchPlacing());
 
-			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, (s, t) -> assignMovingTo(1 - turn));
+			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, (s, t) -> switchMoving());
 
 			// PLACING_REMOVING_STONE
 
@@ -162,7 +170,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING_REMOVING).update = s -> tryToRemoveStone();
 
-			change(PLACING_REMOVING, PLACING, () -> removedAt != -1, (s, t) -> assignPlacingTo(1 - turn));
+			change(PLACING_REMOVING, PLACING, () -> removedAt != -1, (s, t) -> switchPlacing());
 
 			// MOVING
 
@@ -170,7 +178,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			change(MOVING, MOVING_REMOVING, this::movedInMill);
 
-			change(MOVING, MOVING, () -> moveControl.is(MoveState.FINISHED), (s, t) -> assignMovingTo(1 - turn));
+			change(MOVING, MOVING, () -> moveControl.is(MoveState.FINISHED), (s, t) -> switchMoving());
 
 			change(MOVING, GAME_OVER, this::isGameOver);
 
@@ -183,7 +191,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING_REMOVING).update = s -> tryToRemoveStone();
 
-			change(MOVING_REMOVING, MOVING, () -> removedAt != -1, (s, t) -> assignMovingTo(1 - turn));
+			change(MOVING_REMOVING, MOVING, () -> removedAt != -1, (s, t) -> switchMoving());
 
 			// GAME_OVER
 
