@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
 import de.amr.games.muehle.board.StoneColor;
@@ -13,28 +14,25 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class StonePile extends Stone {
+public class StoneCounter extends Stone {
 
 	private Font font;
-	private boolean selected;
+	private BooleanSupplier selectedSupplier;
 	private IntSupplier stoneCountSupplier;
 
-	public StonePile(StoneColor color, int radius, IntSupplier stoneCountSupplier) {
+	public StoneCounter(StoneColor color, int radius, IntSupplier stoneCountSupplier, BooleanSupplier selectedSupplier) {
 		super(color, radius);
 		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * radius);
 		this.stoneCountSupplier = stoneCountSupplier;
+		this.selectedSupplier = selectedSupplier;
 	}
 
 	public void setFont(Font font) {
 		this.font = font;
 	}
 
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
-
 	public boolean isSelected() {
-		return selected;
+		return selectedSupplier.getAsBoolean();
 	}
 
 	@Override
@@ -48,7 +46,7 @@ public class StonePile extends Stone {
 		}
 		if (numStones > 1) {
 			g.translate(tf.getX(), tf.getY());
-			g.setColor(selected ? Color.RED : Color.DARK_GRAY);
+			g.setColor(isSelected() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(font);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(text, 2 * radius, radius);

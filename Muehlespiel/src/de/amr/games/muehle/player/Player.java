@@ -16,7 +16,7 @@ public interface Player {
 
 	public StoneColor getColor();
 
-	public void stonePlaced();
+	public void stonePlacedAt(int position);
 
 	public int getNumStonesPlaced();
 

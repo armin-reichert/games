@@ -404,7 +404,7 @@ public class StateMachine<StateID, Input> {
 	 *          some condition
 	 */
 	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition) {
-		change(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()));
+		change(from, to, () -> input.equals(inputQ.peek()) && condition.getAsBoolean());
 	}
 
 	/**
@@ -443,7 +443,7 @@ public class StateMachine<StateID, Input> {
 	 */
 	public void changeOnInput(Input input, StateID from, StateID to, BooleanSupplier condition,
 			InputTransitionAction<Input> action) {
-		addTransition(from, to, () -> condition.getAsBoolean() && input.equals(inputQ.peek()), action);
+		addTransition(from, to, () -> input.equals(inputQ.peek()) && condition.getAsBoolean(), action);
 	}
 
 }

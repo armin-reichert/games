@@ -40,7 +40,7 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public void stonePlaced() {
+	public void stonePlacedAt(int position) {
 		numStonesPlaced += 1;
 	}
 
