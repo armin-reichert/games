@@ -47,6 +47,7 @@ public class PlayScene extends Scene<MillApp> {
 	private final FSM control = new FSM();
 	private final Board board = new Board();
 	private final Player[] players = new Player[2];
+	private int turn;
 	private final int[] stonesPlaced = new int[2];
 	private final StoneCounter[] stoneCounters = new StoneCounter[2];
 	private BoardUI boardUI;
@@ -64,7 +65,6 @@ public class PlayScene extends Scene<MillApp> {
 		private int placedAt;
 		private StoneColor placedColor;
 		private int removedAt;
-		private int turn;
 
 		private boolean isGameOver() {
 			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
@@ -220,17 +220,16 @@ public class PlayScene extends Scene<MillApp> {
 			}
 			super.draw(g);
 			if (control.is(PLACING)) {
-				boardUI.markPositionsClosingMill(g, players[control.turn].getColor(), Color.GREEN);
-				boardUI.markPositionsOpeningTwoMills(g, players[control.turn].getColor(), Color.YELLOW);
-				boardUI.markPositionsClosingMill(g, players[1 - control.turn].getColor(), Color.RED);
+				boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
+				boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
+				boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
 			} else if (control.is(MOVING)) {
 				if (moveControl.isMoveStartPossible()) {
 					Move move = moveControl.getMove().get();
 					boardUI.markPosition(g, move.from, Color.ORANGE);
 				} else {
-					boardUI.markPossibleMoveStarts(g, players[control.turn].getColor(), canJump(control.turn));
-					boardUI.markPositionFixingOpponent(g, players[control.turn].getColor(), players[1 - control.turn].getColor(),
-							Color.RED);
+					boardUI.markPossibleMoveStarts(g, players[turn].getColor(), canJump(turn));
+					boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
 				}
 			}
 		}
@@ -243,9 +242,9 @@ public class PlayScene extends Scene<MillApp> {
 		// UI components
 		boardUI = new BoardUI(board, 600, 600);
 		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
-				() -> control.turn == 0);
+				() -> turn == 0);
 		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[1],
-				() -> control.turn == 1);
+				() -> turn == 1);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);
@@ -312,7 +311,7 @@ public class PlayScene extends Scene<MillApp> {
 			Stream.of(stoneCounters).forEach(counter -> counter.draw(g));
 		}
 		if (control.is(PLACING_REMOVING, MOVING_REMOVING)) {
-			boardUI.markRemovableStones(g, players[1 - control.turn].getColor());
+			boardUI.markRemovableStones(g, players[1 - turn].getColor());
 		}
 	}
 }
