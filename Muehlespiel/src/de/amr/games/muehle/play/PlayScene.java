@@ -26,7 +26,6 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
@@ -44,109 +43,35 @@ public class PlayScene extends Scene<MillApp> {
 
 	private static final int NUM_STONES = 9;
 
-	private final FSM control = new FSM();
 	private final Board board = new Board();
 	private final Player[] players = new Player[2];
-	private int turn;
 	private final int[] stonesPlaced = new int[2];
 	private final StoneCounter[] stoneCounters = new StoneCounter[2];
+
+	private int turn;
+
+	// UI
 	private BoardUI boardUI;
 	private Assistant assistant;
 	private MoveControl moveControl;
 	private TextArea messageArea;
 
-	public PlayScene(MillApp app) {
-		super(app);
-	}
-
-	/** A finite-state machine for controlling the game play. */
-	private class FSM extends StateMachine<GamePhase, GameEvent> {
+	/** Finite-state-machine for game control. */
+	private final StateMachine<GamePhase, GameEvent> control = new StateMachine<GamePhase, GameEvent>(
+			"Mühlespiel-Steuerung", GamePhase.class, STARTING) {
 
 		private int placedAt;
 		private StoneColor placedColor;
 		private int removedAt;
 
-		private boolean isGameOver() {
-			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
-		}
+		/* Define the state machine: */
 
-		private void assignPlacingTo(int playerNumber) {
-			turn = playerNumber;
-			showMessage(turn == 0 ? "white_must_place" : "black_must_place");
-		}
-
-		private void switchPlacing() {
-			assignPlacingTo(1 - turn);
-		}
-
-		private void assignMovingTo(int playerNumber) {
-			turn = playerNumber;
-			moveControl.setPlayer(players[turn]);
-			showMessage(turn == 0 ? "white_must_move" : "black_must_move");
-		}
-
-		private void switchMoving() {
-			assignMovingTo(1 - turn);
-		}
-
-		private void tryToPlaceStone() {
-			players[turn].supplyPlacePosition().ifPresent(placePosition -> {
-				if (board.hasStoneAt(placePosition)) {
-					LOG.info(Messages.text("stone_at_position", placePosition));
-				} else {
-					StoneColor colorInTurn = players[turn].getColor();
-					boardUI.putStoneAt(placePosition, colorInTurn);
-					stonesPlaced[turn] += 1;
-					placedAt = placePosition;
-					placedColor = colorInTurn;
-					addInput(STONE_PLACED);
-				}
-			});
-		}
-
-		private void tryToRemoveStone() {
-			StoneColor colorToRemove = players[1 - turn].getColor();
-			players[turn].supplyRemovalPosition(colorToRemove).ifPresent(removalPosition -> {
-				if (board.isEmptyPosition(removalPosition)) {
-					LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
-				} else if (board.getStoneAt(removalPosition) != colorToRemove) {
-					LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
-				} else if (board.inMill(removalPosition, colorToRemove) && !board.allStonesInMills(colorToRemove)) {
-					LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
-				} else {
-					boardUI.removeStoneAt(removalPosition);
-					removedAt = removalPosition;
-					LOG.info(Messages.text(turn == 0 ? "white_removed_stone_at_position" : "black_removed_stone_at_position",
-							removalPosition));
-				}
-			});
-		}
-
-		private void runStoneMove() {
-			moveControl.update();
-		}
-
-		private boolean placedInMill() {
-			return board.inMill(placedAt, placedColor);
-		}
-
-		private boolean movedInMill() {
-			return moveControl.is(MoveState.FINISHED)
-					&& board.inMill(moveControl.getMove().get().to, players[turn].getColor());
-		}
-
-		/**
-		 * Create the state machine.
-		 */
-		public FSM() {
-			super("Mühlespiel-Steuerung", GamePhase.class, STARTING);
-
-			// STARTING
+		{ // STARTING
 
 			state(STARTING).entry = s -> {
 				boardUI.clear();
 				stonesPlaced[0] = stonesPlaced[1] = 0;
-				assignPlacingTo(0);
+				turnPlacingTo(0);
 			};
 
 			change(STARTING, PLACING);
@@ -199,10 +124,79 @@ public class PlayScene extends Scene<MillApp> {
 
 			change(GAME_OVER, STARTING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
-	}
+
+		private boolean isGameOver() {
+			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
+		}
+
+		private void turnPlacingTo(int playerNumber) {
+			turn = playerNumber;
+			showMessage(turn == 0 ? "white_must_place" : "black_must_place");
+		}
+
+		private void switchPlacing() {
+			turnPlacingTo(1 - turn);
+		}
+
+		private void turnMovingTo(int playerNumber) {
+			turn = playerNumber;
+			moveControl.setPlayer(players[turn]);
+			showMessage(turn == 0 ? "white_must_move" : "black_must_move");
+		}
+
+		private void switchMoving() {
+			turnMovingTo(1 - turn);
+		}
+
+		private void tryToPlaceStone() {
+			players[turn].supplyPlacePosition().ifPresent(placePosition -> {
+				if (board.hasStoneAt(placePosition)) {
+					LOG.info(Messages.text("stone_at_position", placePosition));
+				} else {
+					StoneColor colorInTurn = players[turn].getColor();
+					boardUI.putStoneAt(placePosition, colorInTurn);
+					stonesPlaced[turn] += 1;
+					placedAt = placePosition;
+					placedColor = colorInTurn;
+					addInput(STONE_PLACED);
+				}
+			});
+		}
+
+		private void tryToRemoveStone() {
+			StoneColor colorToRemove = players[1 - turn].getColor();
+			players[turn].supplyRemovalPosition(colorToRemove).ifPresent(removalPosition -> {
+				if (board.isEmptyPosition(removalPosition)) {
+					LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
+				} else if (board.getStoneAt(removalPosition) != colorToRemove) {
+					LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
+				} else if (board.inMill(removalPosition, colorToRemove) && !board.allStonesInMills(colorToRemove)) {
+					LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
+				} else {
+					boardUI.removeStoneAt(removalPosition);
+					removedAt = removalPosition;
+					LOG.info(Messages.text(turn == 0 ? "white_removed_stone_at_position" : "black_removed_stone_at_position",
+							removalPosition));
+				}
+			});
+		}
+
+		private void runStoneMove() {
+			moveControl.update();
+		}
+
+		private boolean placedInMill() {
+			return board.inMill(placedAt, placedColor);
+		}
+
+		private boolean movedInMill() {
+			return moveControl.is(MoveState.FINISHED)
+					&& board.inMill(moveControl.getMove().get().to, players[turn].getColor());
+		}
+	};
 
 	/**
-	 * Draws hints for placing or moving on the board.
+	 * Draws hints helping the current player in placing or moving.
 	 */
 	private class Assistant extends GameEntity {
 
@@ -227,20 +221,24 @@ public class PlayScene extends Scene<MillApp> {
 				return;
 			}
 			super.draw(g);
+			StoneColor stoneColor = players[turn].getColor();
 			if (control.is(PLACING)) {
-				boardUI.markPositionsClosingMill(g, players[turn].getColor(), Color.GREEN);
-				boardUI.markPositionsOpeningTwoMills(g, players[turn].getColor(), Color.YELLOW);
-				boardUI.markPositionsClosingMill(g, players[1 - turn].getColor(), Color.RED);
+				boardUI.markPositionsClosingMill(g, stoneColor, Color.GREEN);
+				boardUI.markPositionsOpeningTwoMills(g, stoneColor, Color.YELLOW);
+				boardUI.markPositionsClosingMill(g, stoneColor.other(), Color.RED);
 			} else if (control.is(MOVING)) {
 				if (moveControl.isMoveStartPossible()) {
-					Move move = moveControl.getMove().get();
-					boardUI.markPosition(g, move.from, Color.ORANGE);
+					moveControl.getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 				} else {
-					boardUI.markPossibleMoveStarts(g, players[turn].getColor(), canJump(turn));
-					boardUI.markPositionFixingOpponent(g, players[turn].getColor(), players[1 - turn].getColor(), Color.RED);
+					boardUI.markPossibleMoveStarts(g, stoneColor, canJump(turn));
+					boardUI.markPositionFixingOpponent(g, stoneColor, stoneColor.other(), Color.RED);
 				}
 			}
 		}
+	}
+
+	public PlayScene(MillApp app) {
+		super(app);
 	}
 
 	@Override
