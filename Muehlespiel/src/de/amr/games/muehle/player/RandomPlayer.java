@@ -1,5 +1,7 @@
 package de.amr.games.muehle.player;
 
+import static de.amr.games.muehle.util.Util.randomElement;
+
 import java.util.OptionalInt;
 
 import de.amr.games.muehle.board.Board;
@@ -11,10 +13,19 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class RandomPlayer extends AbstractPlayer {
+public class RandomPlayer implements Player {
+
+	private final Board board;
+	private final StoneColor color;
 
 	public RandomPlayer(Board board, StoneColor color) {
-		super(board, color);
+		this.board = board;
+		this.color = color;
+	}
+
+	@Override
+	public StoneColor getColor() {
+		return color;
 	}
 
 	@Override
@@ -28,11 +39,11 @@ public class RandomPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public Move supplyMove() {
+	public Move supplyMove(boolean canJump) {
 		Move move = new Move();
 		randomElement(board.positions(color)).ifPresent(from -> {
 			move.from = from;
-			OptionalInt optTo = canJump() ? randomElement(board.positions().filter(board::isEmptyPosition))
+			OptionalInt optTo = canJump ? randomElement(board.positions().filter(board::isEmptyPosition))
 					: randomElement(board.neighbors(from).filter(board::isEmptyPosition));
 			optTo.ifPresent(to -> move.to = to);
 		});

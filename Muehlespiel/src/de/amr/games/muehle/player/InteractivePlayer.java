@@ -16,6 +16,7 @@ import java.util.OptionalInt;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
@@ -26,7 +27,7 @@ import de.amr.games.muehle.ui.BoardUI;
  * 
  * @author Armin Reichert
  */
-public class InteractivePlayer extends AbstractPlayer {
+public class InteractivePlayer implements Player {
 
 	private static final EnumMap<Direction, Integer> STEERING = new EnumMap<>(Direction.class);
 	static {
@@ -36,13 +37,21 @@ public class InteractivePlayer extends AbstractPlayer {
 		STEERING.put(WEST, VK_LEFT);
 	}
 
+	private final Board board;
+	private final StoneColor color;
 	private BoardUI boardUI;
 	private Move move;
 
 	public InteractivePlayer(BoardUI boardUI, StoneColor color) {
-		super(boardUI.getBoard(), color);
+		this.board = boardUI.getBoard();
+		this.color = color;
 		this.boardUI = boardUI;
 		move = new Move();
+	}
+
+	@Override
+	public StoneColor getColor() {
+		return color;
 	}
 
 	@Override
@@ -56,11 +65,11 @@ public class InteractivePlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public Move supplyMove() {
+	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
 			supplyMouseClickBoardPosition().ifPresent(p -> move.from = p);
 		} else if (move.to == -1) {
-			supplyMoveEndPosition().ifPresent(p -> move.to = p);
+			supplyMoveEndPosition(canJump).ifPresent(p -> move.to = p);
 		}
 		return move;
 	}
@@ -70,9 +79,9 @@ public class InteractivePlayer extends AbstractPlayer {
 		move = new Move();
 	}
 
-	private OptionalInt supplyMoveEndPosition() {
+	private OptionalInt supplyMoveEndPosition(boolean canJump) {
 		// if end position is uniquely determined, use it
-		if (!canJump() && board.emptyNeighbors(move.from).count() == 1) {
+		if (!canJump && board.emptyNeighbors(move.from).count() == 1) {
 			return board.emptyNeighbors(move.from).findFirst();
 		}
 		// if move direction has been specified, use position in that direction

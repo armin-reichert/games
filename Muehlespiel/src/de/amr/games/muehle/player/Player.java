@@ -12,21 +12,18 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public interface Player {
 
-	public void init();
+	public default String getName() {
+		return getColor() == StoneColor.WHITE ? "Weiß" : "Schwarz";
+	}
 
 	public StoneColor getColor();
-
-	public void stonePlacedAt(int position);
-
-	public int getNumStonesPlaced();
-
-	public boolean canJump();
 
 	public OptionalInt supplyPlacePosition();
 
 	public OptionalInt supplyRemovalPosition(StoneColor otherColor);
 
-	public Move supplyMove();
+	public Move supplyMove(boolean canJump);
 
-	public void clearMove();
+	public default void clearMove() {
+	}
 }

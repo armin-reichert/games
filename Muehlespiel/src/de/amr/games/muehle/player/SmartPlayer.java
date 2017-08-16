@@ -1,6 +1,7 @@
 package de.amr.games.muehle.player;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.muehle.util.Util.randomElement;
 import static java.lang.String.format;
 
 import java.util.OptionalInt;
@@ -14,13 +15,21 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert, Peter Schillo
  */
-public class SmartPlayer extends AbstractPlayer {
+public class SmartPlayer implements Player {
 
+	private final Board board;
+	private final StoneColor color;
 	private Move move;
 
 	public SmartPlayer(Board board, StoneColor color) {
-		super(board, color);
-		clearMove();
+		this.board = board;
+		this.color = color;
+		move = new Move();
+	}
+
+	@Override
+	public StoneColor getColor() {
+		return color;
 	}
 
 	private void reason(String msg, OptionalInt optPos) {
@@ -49,7 +58,7 @@ public class SmartPlayer extends AbstractPlayer {
 		}
 
 		// Finde gegnerische Position, an der Mühle geschlossen werden kann:
-		OptionalInt otherMillClosingPos = randomElement(board.positionsClosingMill(otherColor));
+		OptionalInt otherMillClosingPos = randomElement(board.positionsClosingMill(color.other()));
 		if (otherMillClosingPos.isPresent()) {
 			reason("Setze Stein auf Position %d, weil gegnerische Mühle verhindert wird", otherMillClosingPos);
 			return otherMillClosingPos;
@@ -100,7 +109,7 @@ public class SmartPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public Move supplyMove() {
+	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
 			// Finde eine Position, von der aus eine Mühle geschlossen werden kann
 			OptionalInt millClosingFrom = randomElement(board.positions(color).filter(p -> canCloseMillFrom(p)));

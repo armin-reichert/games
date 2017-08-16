@@ -47,6 +47,7 @@ public class PlayScene extends Scene<MillApp> {
 	private final FSM control = new FSM();
 	private final Board board = new Board();
 	private final Player[] players = new Player[2];
+	private final int[] stonesPlaced = new int[2];
 	private final StoneCounter[] stoneCounters = new StoneCounter[2];
 	private BoardUI boardUI;
 	private Assistant assistant;
@@ -66,8 +67,7 @@ public class PlayScene extends Scene<MillApp> {
 		private int turn;
 
 		private boolean isGameOver() {
-			StoneColor colorInTurn = players[turn].getColor();
-			return board.stoneCount(colorInTurn) < 3 || (!players[turn].canJump() && board.isTrapped(colorInTurn));
+			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
 		}
 
 		private void assignPlacingTo(int playerNumber) {
@@ -88,16 +88,12 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					StoneColor colorInTurn = players[turn].getColor();
 					boardUI.putStoneAt(placePosition, colorInTurn);
-					players[turn].stonePlacedAt(placePosition);
+					stonesPlaced[turn] += 1;
 					placedAt = placePosition;
 					placedColor = colorInTurn;
 					addInput(STONE_PLACED);
 				}
 			});
-		}
-
-		private boolean placedInMill() {
-			return board.inMill(placedAt, placedColor);
 		}
 
 		private void tryToRemoveStone() {
@@ -122,11 +118,18 @@ public class PlayScene extends Scene<MillApp> {
 			moveControl.update();
 		}
 
+		private boolean placedInMill() {
+			return board.inMill(placedAt, placedColor);
+		}
+
 		private boolean movedInMill() {
 			return moveControl.is(MoveState.FINISHED)
 					&& board.inMill(moveControl.getMove().get().to, players[turn].getColor());
 		}
 
+		/**
+		 * Create the state machine.
+		 */
 		public FSM() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTING);
 
@@ -134,7 +137,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(STARTING).entry = s -> {
 				boardUI.clear();
-				Stream.of(players).forEach(Player::init);
+				stonesPlaced[0] = stonesPlaced[1] = 0;
 				assignPlacingTo(0);
 			};
 
@@ -148,7 +151,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> assignPlacingTo(1 - turn));
 
-			change(PLACING, MOVING, () -> players[1].getNumStonesPlaced() == NUM_STONES, (s, t) -> assignMovingTo(1 - turn));
+			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, (s, t) -> assignMovingTo(1 - turn));
 
 			// PLACING_REMOVING_STONE
 
@@ -225,7 +228,7 @@ public class PlayScene extends Scene<MillApp> {
 					Move move = moveControl.getMove().get();
 					boardUI.markPosition(g, move.from, Color.ORANGE);
 				} else {
-					boardUI.markPossibleMoveStarts(g, players[control.turn].getColor(), players[control.turn].canJump());
+					boardUI.markPossibleMoveStarts(g, players[control.turn].getColor(), canJump(control.turn));
 					boardUI.markPositionFixingOpponent(g, players[control.turn].getColor(), players[1 - control.turn].getColor(),
 							Color.RED);
 				}
@@ -239,10 +242,10 @@ public class PlayScene extends Scene<MillApp> {
 
 		// UI components
 		boardUI = new BoardUI(board, 600, 600);
-		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(),
-				() -> NUM_STONES - players[0].getNumStonesPlaced(), () -> control.turn == 0);
-		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(),
-				() -> NUM_STONES - players[1].getNumStonesPlaced(), () -> control.turn == 1);
+		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
+				() -> control.turn == 0);
+		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[1],
+				() -> control.turn == 1);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);
@@ -287,6 +290,14 @@ public class PlayScene extends Scene<MillApp> {
 
 	private void showMessage(String key, Object... args) {
 		messageArea.setText(Messages.text(key, args));
+	}
+
+	private boolean canJump(int playerNumber) {
+		return board.stoneCount(players[playerNumber].getColor()) == 3;
+	}
+
+	private boolean isTrapped(int playerNumber) {
+		return board.isTrapped(players[playerNumber].getColor());
 	}
 
 	@Override
