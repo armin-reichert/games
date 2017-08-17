@@ -29,8 +29,8 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
+import de.amr.games.muehle.player.Peter;
 import de.amr.games.muehle.player.Player;
-import de.amr.games.muehle.player.SmartPlayer;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.StoneCounter;
 
@@ -275,7 +275,7 @@ public class PlayScene extends Scene<MillApp> {
 		players[0] = new InteractivePlayer(boardUI, WHITE);
 		// players[1] = new InteractivePlayer(boardUI, BLACK);
 		// players[1] = new RandomPlayer(board, BLACK);
-		players[1] = new SmartPlayer(board, BLACK);
+		players[1] = new Peter(board, BLACK);
 
 		moveControl = new MoveControl(boardUI, app.pulse);
 		// moveControl.setLogger(LOG);

@@ -422,11 +422,25 @@ public class Board extends BoardGraph {
 	}
 
 	/**
+	 * @param p
+	 *          valid position
+	 * @param color
+	 *          stone color
+	 * @return if a mill of the given color can be closed from some neighbor position
+	 */
+	public boolean canCloseMillFrom(int p, StoneColor color) {
+		checkPosition(p);
+		checkStoneColor(color);
+		return neighbors(p).anyMatch(q -> isMillClosingPosition(q, color));
+	}
+
+	/**
 	 * @param color
 	 *          stone color
 	 * @return positions where by placing a stone two mills of the same color could be opened later
 	 */
 	public IntStream positionsOpeningTwoMillsLater(StoneColor color) {
+		checkStoneColor(color);
 		return positions().filter(this::isEmptyPosition).filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
 	}
 
@@ -438,10 +452,15 @@ public class Board extends BoardGraph {
 	 * @return if by placing a stone of the given color at the position later two mills could be opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
+		checkPosition(p);
+		checkStoneColor(color);
 		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color).anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
+		checkPosition(p);
+		checkPosition(q);
+		checkStoneColor(color);
 		int commonNeighbor = neighbors(p).filter(n -> areNeighbors(n, q)).findFirst().getAsInt();
 		Direction dir1 = getDirection(p, commonNeighbor).get();
 		OptionalInt otherNeighbor1 = neighbor(p, dir1.opposite());
