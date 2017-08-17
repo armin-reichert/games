@@ -13,7 +13,7 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public enum PlacingRule implements PositionSupplyRule {
+public enum PlacingRule implements PositionSelectionRule {
 
 	RANDOM_POSITION_BOARD_EMPTY(
 			"Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde",
@@ -48,10 +48,12 @@ public enum PlacingRule implements PositionSupplyRule {
 
 	RANDOM_FREE_POSITION(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
-			(board, color) -> randomElement(board.positions().filter(board::isEmptyPosition)));
+			(board, color) -> randomElement(board.positions().filter(board::isEmptyPosition))),
+
+	;
 
 	@Override
-	public OptionalInt supplyPosition(Board board, StoneColor color) {
+	public OptionalInt selectPosition(Board board, StoneColor color) {
 		return condition.apply(board, color) ? positionSupplier.apply(board, color) : OptionalInt.empty();
 	}
 
@@ -74,5 +76,4 @@ public enum PlacingRule implements PositionSupplyRule {
 	private final String description;
 	private final BiFunction<Board, StoneColor, OptionalInt> positionSupplier;
 	private final BiFunction<Board, StoneColor, Boolean> condition;
-
 }

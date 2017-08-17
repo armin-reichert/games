@@ -10,7 +10,10 @@ import java.util.stream.Stream;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.rules.MoveStartRule;
+import de.amr.games.muehle.rules.MoveTargetRule;
 import de.amr.games.muehle.rules.PlacingRule;
+import de.amr.games.muehle.rules.PositionSelectionRule;
 
 /**
  * A player controlled by placing and (TODO) moving / removing rules.
@@ -22,13 +25,18 @@ public class RuleBasedPlayer implements Player {
 	private final Board board;
 	private final StoneColor color;
 	private final PlacingRule[] placingRules;
+	private final MoveStartRule[] moveStartRules;
+	private final MoveTargetRule[] moveTargetRules;
 
 	private Move move;
 
-	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules) {
+	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MoveStartRule[] moveStartRules,
+			MoveTargetRule[] moveTargetRules) {
 		this.board = board;
 		this.color = color;
 		this.placingRules = placingRules;
+		this.moveStartRules = moveStartRules;
+		this.moveTargetRules = moveTargetRules;
 		move = new Move();
 	}
 
@@ -37,15 +45,21 @@ public class RuleBasedPlayer implements Player {
 		return color;
 	}
 
-	private OptionalInt tryRule(PlacingRule rule) {
-		OptionalInt optPosition = rule.supplyPosition(board, color);
+	private OptionalInt tryPlaceOrMoveStartRule(PositionSelectionRule rule) {
+		OptionalInt optPosition = rule.selectPosition(board, color);
+		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		return optPosition;
+	}
+
+	private OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
+		OptionalInt optPosition = rule.selectPosition(board, color, from);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
 	@Override
 	public OptionalInt supplyPlacePosition() {
-		return Stream.of(placingRules).map(this::tryRule).filter(OptionalInt::isPresent).findFirst().get();
+		return Stream.of(placingRules).map(this::tryPlaceOrMoveStartRule).filter(OptionalInt::isPresent).findFirst().get();
 	}
 
 	@Override
@@ -54,36 +68,23 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public void clearMove() {
-		move = new Move();
-	}
-
-	@Override
 	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
-			// Finde eine Position, von der aus eine Mühle geschlossen werden kann
-			OptionalInt millClosingFrom = randomElement(board.positions(color).filter(p -> board.canCloseMillFrom(p, color)));
-			millClosingFrom.ifPresent(p -> move.from = p);
-			if (move.from == -1) {
-				// Fallback
-				OptionalInt moveStartPos = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
-				moveStartPos.ifPresent(p -> move.from = p);
-			}
+			Stream.of(moveStartRules).map(this::tryPlaceOrMoveStartRule).filter(OptionalInt::isPresent).findFirst()
+					.ifPresent(optPos -> optPos.ifPresent(pos -> move.from = pos));
 		} else {
-			OptionalInt moveEndPos = supplyMoveEndPosition();
-			moveEndPos.ifPresent(p -> move.to = p);
+			supplyMoveEndPosition().ifPresent(p -> move.to = p);
 		}
 		return move;
 	}
 
 	private OptionalInt supplyMoveEndPosition() {
-		// Suche freie Position, an der Mühle geschlossen werden kann:
-		OptionalInt millClosingPos = randomElement(
-				board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByMove(move.from, to, color)));
-		if (millClosingPos.isPresent()) {
-			LOG.info(format("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos.getAsInt()));
-			return millClosingPos;
-		}
-		return randomElement(board.emptyNeighbors(move.from));
+		return Stream.of(moveTargetRules).map(rule -> tryMoveTargetRule(rule, move.from)).filter(OptionalInt::isPresent)
+				.findFirst().orElse(OptionalInt.empty());
+	}
+
+	@Override
+	public void clearMove() {
+		move = new Move();
 	}
 }

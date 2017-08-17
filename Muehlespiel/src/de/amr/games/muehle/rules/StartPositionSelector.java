@@ -5,9 +5,10 @@ import java.util.OptionalInt;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 
-public interface PositionSupplyRule {
+public interface StartPositionSelector {
 
-	public String getDescription();
+	public default OptionalInt selectPosition(Board board, StoneColor color) {
+		return OptionalInt.empty();
+	}
 
-	public OptionalInt supplyPosition(Board board, StoneColor color);
 }
