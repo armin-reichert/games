@@ -13,7 +13,7 @@ import de.amr.games.muehle.board.StoneColor;
 public interface Player {
 
 	public default String getName() {
-		return getColor() == StoneColor.WHITE ? "Weiß" : "Schwarz";
+		return String.format("%s(%s)", getClass().getSimpleName(), getColor() == StoneColor.WHITE ? "Weiß" : "Schwarz");
 	}
 
 	public StoneColor getColor();

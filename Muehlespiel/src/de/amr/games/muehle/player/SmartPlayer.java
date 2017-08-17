@@ -1,21 +1,41 @@
 package de.amr.games.muehle.player;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.muehle.player.PlacingRule.CLOSE_OWN_MILL;
+import static de.amr.games.muehle.player.PlacingRule.DESTROY_OPPONENT_MILL;
+import static de.amr.games.muehle.player.PlacingRule.FREE_POSITION_NEARBY_OWN_COLOR;
+import static de.amr.games.muehle.player.PlacingRule.OPEN_OWN_MILL;
+import static de.amr.games.muehle.player.PlacingRule.OPEN_TWO_OWN_MILLS;
+import static de.amr.games.muehle.player.PlacingRule.RANDOM_FREE_POSITION;
+import static de.amr.games.muehle.player.PlacingRule.RANDOM_POSITION_BOARD_EMPTY;
 import static de.amr.games.muehle.util.Util.randomElement;
 import static java.lang.String.format;
 
 import java.util.OptionalInt;
+import java.util.stream.Stream;
 
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
- * Peter aka "Strack"'s player.
+ * A smart player.
  * 
- * @author Armin Reichert, Peter Schillo
+ * @author Armin Reichert
  */
 public class SmartPlayer implements Player {
+
+	private static final PlacingRule[] PLACING_RULES = {
+		/*@formatter:off*/
+		RANDOM_POSITION_BOARD_EMPTY,
+		CLOSE_OWN_MILL,
+		DESTROY_OPPONENT_MILL, 
+		OPEN_TWO_OWN_MILLS, 
+		OPEN_OWN_MILL, 
+		FREE_POSITION_NEARBY_OWN_COLOR, 
+		RANDOM_FREE_POSITION,
+		/*@formatter:on*/
+	};
 
 	private final Board board;
 	private final StoneColor color;
@@ -32,70 +52,15 @@ public class SmartPlayer implements Player {
 		return color;
 	}
 
-	private void reason(String msg, OptionalInt optPos) {
-		LOG.info(getName() + ": " + format(msg, optPos.getAsInt()));
+	private OptionalInt tryRule(PlacingRule rule) {
+		OptionalInt optPosition = rule.getRule().supplyPosition(board, color);
+		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getRule().getReason(), pos)));
+		return optPosition;
 	}
 
 	@Override
 	public OptionalInt supplyPlacePosition() {
-
-		// Fallback: Zufällige freie Position
-		final OptionalInt randomFreePos = randomElement(board.positions().filter(board::isEmptyPosition));
-
-		// Wenn noch kein Stein meiner Farbe gesetzt ist, dann zufällig:
-		if (board.positions(color).count() == 0) {
-			reason("Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde", randomFreePos);
-			return randomFreePos;
-		}
-
-		// Es gibt schon mindestens einen Stein meiner Farbe auf dem Brett.
-
-		// Suche freie Position, an der Mühle meiner Farbe geschlossen werden kann:
-		OptionalInt millClosingPos = randomElement(board.positionsClosingMill(color));
-		if (millClosingPos.isPresent()) {
-			reason("Setze Stein auf Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
-			return millClosingPos;
-		}
-
-		// Finde gegnerische Position, an der Mühle geschlossen werden kann:
-		OptionalInt otherMillClosingPos = randomElement(board.positionsClosingMill(color.other()));
-		if (otherMillClosingPos.isPresent()) {
-			reason("Setze Stein auf Position %d, weil gegnerische Mühle verhindert wird", otherMillClosingPos);
-			return otherMillClosingPos;
-		}
-
-		// Finde Position, an der 2 eigene Mühlen geöffnet werden können
-		OptionalInt twoMillsOpeningPos = randomElement(board.positionsOpeningTwoMills(color));
-		if (twoMillsOpeningPos.isPresent()) {
-			reason("Setze Stein auf Position %d, weil zwei eigene Mühlen geöffnet werden", twoMillsOpeningPos);
-			return twoMillsOpeningPos;
-		}
-
-		// Finde Position, an der eine eigene Mühle geöffnet werden kann
-		OptionalInt millOpeningPos = randomElement(board.positionsOpeningMill(color));
-		if (millOpeningPos.isPresent()) {
-			reason("Setze Stein auf Position %d, weil eigene Mühle geöffnet wird", millOpeningPos);
-			return millOpeningPos;
-		}
-
-		// Finde Position, an der im nächsten Schritt 2 eigene Mühlen geöffnet werden könnten
-		OptionalInt twoMillsLater = randomElement(board.positionsOpeningTwoMillsLater(color));
-		if (twoMillsLater.isPresent()) {
-			reason("Setze Stein auf Position %d, weil später evtl. 2 eigene Mühlen geöffnet werden könnten", twoMillsLater);
-			return twoMillsLater;
-		}
-
-		// Finde eine freie Position neben einem Stein meiner Farbe
-		OptionalInt posWithFreeNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
-		if (posWithFreeNeighbor.isPresent()) {
-			OptionalInt neighbor = randomElement(board.emptyNeighbors(posWithFreeNeighbor.getAsInt()));
-			reason("Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist", neighbor);
-			return neighbor;
-		}
-
-		// Fallback
-		reason("Setze Stein auf Position %d, weil kein Spezialfall zutraf", randomFreePos);
-		return randomFreePos;
+		return Stream.of(PLACING_RULES).map(this::tryRule).filter(OptionalInt::isPresent).findFirst().get();
 	}
 
 	@Override
@@ -131,7 +96,7 @@ public class SmartPlayer implements Player {
 		OptionalInt millClosingPos = randomElement(
 				board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByMove(move.from, to, color)));
 		if (millClosingPos.isPresent()) {
-			reason("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos);
+			LOG.info(format("Ziehe Stein zu Position %d, weil eigene Mühle geschlossen wird", millClosingPos));
 			return millClosingPos;
 		}
 		return randomElement(board.emptyNeighbors(move.from));

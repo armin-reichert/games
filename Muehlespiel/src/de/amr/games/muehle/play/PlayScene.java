@@ -279,7 +279,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		moveControl = new MoveControl(boardUI, app.pulse);
 		// moveControl.setLogger(LOG);
-		control.setLogger(LOG);
+		// control.setLogger(LOG);
 		control.init();
 	}
 
