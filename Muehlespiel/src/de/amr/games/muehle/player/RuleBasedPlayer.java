@@ -45,7 +45,7 @@ public class RuleBasedPlayer implements Player {
 		return color;
 	}
 
-	private OptionalInt tryPlaceOrMoveStartRule(PositionSelectionRule rule) {
+	private OptionalInt tryPlacingOrMoveStartRule(PositionSelectionRule rule) {
 		OptionalInt optPosition = rule.selectPosition(board, color);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
@@ -58,8 +58,8 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public OptionalInt supplyPlacePosition() {
-		return Stream.of(placingRules).map(this::tryPlaceOrMoveStartRule).filter(OptionalInt::isPresent).findFirst().get();
+	public OptionalInt supplyPlacingPosition() {
+		return Stream.of(placingRules).map(this::tryPlacingOrMoveStartRule).filter(OptionalInt::isPresent).findFirst().get();
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class RuleBasedPlayer implements Player {
 	@Override
 	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
-			Stream.of(moveStartRules).map(this::tryPlaceOrMoveStartRule).filter(OptionalInt::isPresent).findFirst()
+			Stream.of(moveStartRules).map(this::tryPlacingOrMoveStartRule).filter(OptionalInt::isPresent).findFirst()
 					.ifPresent(optPos -> optPos.ifPresent(pos -> move.from = pos));
 		} else {
 			supplyMoveEndPosition().ifPresent(p -> move.to = p);

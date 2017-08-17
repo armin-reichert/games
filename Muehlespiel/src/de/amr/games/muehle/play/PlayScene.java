@@ -151,7 +151,7 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		private void tryToPlaceStone() {
-			players[turn].supplyPlacePosition().ifPresent(placePosition -> {
+			players[turn].supplyPlacingPosition().ifPresent(placePosition -> {
 				if (board.hasStoneAt(placePosition)) {
 					LOG.info(Messages.text("stone_at_position", placePosition));
 				} else {

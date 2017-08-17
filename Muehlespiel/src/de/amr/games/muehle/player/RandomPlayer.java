@@ -29,7 +29,7 @@ public class RandomPlayer implements Player {
 	}
 
 	@Override
-	public OptionalInt supplyPlacePosition() {
+	public OptionalInt supplyPlacingPosition() {
 		return randomElement(board.positions().filter(board::isEmptyPosition));
 	}
 

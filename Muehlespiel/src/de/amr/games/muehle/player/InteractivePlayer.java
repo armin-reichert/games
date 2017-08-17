@@ -55,7 +55,7 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public OptionalInt supplyPlacePosition() {
+	public OptionalInt supplyPlacingPosition() {
 		return supplyMouseClickBoardPosition();
 	}
 

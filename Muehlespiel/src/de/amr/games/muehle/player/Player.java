@@ -18,7 +18,7 @@ public interface Player {
 
 	public StoneColor getColor();
 
-	public OptionalInt supplyPlacePosition();
+	public OptionalInt supplyPlacingPosition();
 
 	public OptionalInt supplyRemovalPosition(StoneColor otherColor);
 
