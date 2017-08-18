@@ -350,7 +350,7 @@ public class Board extends BoardGraph {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return has(p, null) && (has(q, color) && has(r, null) || has(q, color) && has(r, null));
+		return (has(p, null) && has(q, color) && has(r, null)) || (has(p, null) && has(q, null) && has(r, color));
 	}
 
 	/**
