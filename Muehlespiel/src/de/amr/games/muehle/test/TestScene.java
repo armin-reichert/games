@@ -6,6 +6,7 @@ import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static java.util.stream.Collectors.joining;
 
 import java.awt.Graphics2D;
+import java.util.stream.IntStream;
 
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.Scene;
@@ -62,14 +63,20 @@ public class TestScene extends Scene<MillTestApp> {
 	}
 
 	void updateStatus() {
-		LOG.info("Positions opening two white mills: "
-				+ board.positionsOpeningTwoMills(WHITE).mapToObj(String::valueOf).collect(joining(", ")));
-		LOG.info("Positions opening two black mills: "
-				+ board.positionsOpeningTwoMills(BLACK).mapToObj(String::valueOf).collect(joining(", ")));
-		LOG.info("Positions opening one white mill: "
-				+ board.positionsOpeningMill(WHITE).mapToObj(String::valueOf).collect(joining(", ")));
-		LOG.info("Positions opening one black mill: "
-				+ board.positionsOpeningMill(BLACK).mapToObj(String::valueOf).collect(joining(", ")));
+		LOG.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
+		LOG.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
+		LOG.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
+		LOG.info("Positions opening one black mill: " + toCSV(board.positionsOpeningMill(BLACK)));
+		LOG.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
+		LOG.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
+		LOG.info("Positions from where can close white mill: "
+				+ toCSV(board.positions().filter(p -> board.canCloseMillFrom(p, WHITE))));
+		LOG.info("Positions from where can close black mill: "
+				+ toCSV(board.positions().filter(p -> board.canCloseMillFrom(p, BLACK))));
+	}
+
+	String toCSV(IntStream stream) {
+		return stream.mapToObj(String::valueOf).collect(joining(", "));
 	}
 
 }

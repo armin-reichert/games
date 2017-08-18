@@ -19,8 +19,8 @@ public class Peter extends RuleBasedPlayer {
 			PlacingRules.EMPTYBOARD,
 			PlacingRules.CLOSE_MILL,
 			PlacingRules.DESTROY_MILL, 
-			PlacingRules.OPEN_TWO_MILLS, 
-			PlacingRules.OPEN_ONE_MILL, 
+			PlacingRules.OPEN_TWO_MILLS,
+			PlacingRules.OPEN_ONE_MILL,
 			PlacingRules.NEAR_OWN_COLOR, 
 			PlacingRules.RANDOM,
 			/*@formatter:on*/

@@ -236,5 +236,4 @@ public class BoardGraph {
 		checkPosition(r);
 		return (q == V_MILL[p][0] && r == V_MILL[p][1] || r == V_MILL[p][0] && q == V_MILL[p][1]);
 	}
-
 }

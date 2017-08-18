@@ -389,8 +389,15 @@ public class Board extends BoardGraph {
 	public boolean isMillClosingPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, null) && (has(H_MILL[p][0], color) && has(H_MILL[p][1], color)
-				|| has(V_MILL[p][0], color) && has(V_MILL[p][1], color));
+		return isHMillClosingPosition(p, color) || isVMillClosingPosition(p, color);
+	}
+
+	private boolean isHMillClosingPosition(int p, StoneColor color) {
+		return has(p, null) && has(H_MILL[p][0], color) && has(H_MILL[p][1], color);
+	}
+
+	private boolean isVMillClosingPosition(int p, StoneColor color) {
+		return has(p, null) && has(V_MILL[p][0], color) && has(V_MILL[p][1], color);
 	}
 
 	/**
@@ -426,12 +433,27 @@ public class Board extends BoardGraph {
 	 *          valid position
 	 * @param color
 	 *          stone color
-	 * @return if a mill of the given color can be closed from some neighbor position
+	 * @return if a mill of the given color can be closed when moving from p
 	 */
 	public boolean canCloseMillFrom(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return neighbors(p).anyMatch(q -> isMillClosingPosition(q, color));
+		return has(p, color) && (getVMillClosingNeighbors(p, color).findFirst().isPresent()
+				|| getHMillClosingNeighbors(p, color).findFirst().isPresent());
+	}
+
+	private IntStream getVMillClosingNeighbors(int p, StoneColor color) {
+		return emptyNeighbors(p).filter(n -> isVMillClosingPosition(n, color)).filter(n -> {
+			Direction dir = getDirection(n, p).get();
+			return dir == Direction.WEST || dir == Direction.EAST;
+		});
+	}
+
+	private IntStream getHMillClosingNeighbors(int p, StoneColor color) {
+		return emptyNeighbors(p).filter(n -> isHMillClosingPosition(n, color)).filter(n -> {
+			Direction dir = getDirection(n, p).get();
+			return dir == Direction.NORTH || dir == Direction.SOUTH;
+		});
 	}
 
 	/**
