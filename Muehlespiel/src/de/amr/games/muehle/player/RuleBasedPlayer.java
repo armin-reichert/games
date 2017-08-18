@@ -10,10 +10,9 @@ import java.util.stream.Stream;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.rules.MoveStartRule;
-import de.amr.games.muehle.rules.MoveTargetRule;
-import de.amr.games.muehle.rules.PlacingRule;
-import de.amr.games.muehle.rules.PositionSelectionRule;
+import de.amr.games.muehle.rules.api.MoveStartRule;
+import de.amr.games.muehle.rules.api.MoveTargetRule;
+import de.amr.games.muehle.rules.api.PlacingRule;
 
 /**
  * A player controlled by placing and (TODO) moving / removing rules.
@@ -45,21 +44,20 @@ public class RuleBasedPlayer implements Player {
 		return color;
 	}
 
-	private OptionalInt tryPlacingOrMoveStartRule(PositionSelectionRule rule) {
-		OptionalInt optPosition = rule.selectPosition(board, color);
-		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
-		return optPosition;
-	}
-
-	private OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
-		OptionalInt optPosition = rule.selectPosition(board, color, from);
-		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
-		return optPosition;
+	@Override
+	public void clearMove() {
+		move = new Move();
 	}
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return Stream.of(placingRules).map(this::tryPlacingOrMoveStartRule).filter(OptionalInt::isPresent).findFirst().get();
+		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent).findFirst().get();
+	}
+
+	private OptionalInt tryPlacingRule(PlacingRule rule) {
+		OptionalInt optPosition = rule.selectPosition(board, color);
+		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		return optPosition;
 	}
 
 	@Override
@@ -70,7 +68,7 @@ public class RuleBasedPlayer implements Player {
 	@Override
 	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
-			Stream.of(moveStartRules).map(this::tryPlacingOrMoveStartRule).filter(OptionalInt::isPresent).findFirst()
+			Stream.of(moveStartRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
 					.ifPresent(optPos -> optPos.ifPresent(pos -> move.from = pos));
 		} else {
 			supplyMoveEndPosition().ifPresent(p -> move.to = p);
@@ -83,8 +81,15 @@ public class RuleBasedPlayer implements Player {
 				.findFirst().orElse(OptionalInt.empty());
 	}
 
-	@Override
-	public void clearMove() {
-		move = new Move();
+	private OptionalInt tryMoveStartRule(MoveStartRule rule) {
+		OptionalInt optPosition = rule.selectPosition(board, color);
+		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		return optPosition;
+	}
+
+	private OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
+		OptionalInt optPosition = rule.selectPosition(board, color, from);
+		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		return optPosition;
 	}
 }

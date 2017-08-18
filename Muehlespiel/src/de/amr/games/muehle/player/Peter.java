@@ -1,26 +1,26 @@
 package de.amr.games.muehle.player;
 
-import static de.amr.games.muehle.rules.MoveStartRule.CAN_CLOSE_MILL_FROM;
-import static de.amr.games.muehle.rules.MoveStartRule.HAS_EMPTY_NEIGHBOR;
-import static de.amr.games.muehle.rules.MoveTargetRule.CLOSE_MILL;
-import static de.amr.games.muehle.rules.MoveTargetRule.RANDOM_NEIGHBOR;
-import static de.amr.games.muehle.rules.PlacingRule.CLOSE_OWN_MILL;
-import static de.amr.games.muehle.rules.PlacingRule.DESTROY_OPPONENT_MILL;
-import static de.amr.games.muehle.rules.PlacingRule.FREE_POSITION_NEARBY_OWN_COLOR;
-import static de.amr.games.muehle.rules.PlacingRule.OPEN_OWN_MILL;
-import static de.amr.games.muehle.rules.PlacingRule.OPEN_TWO_OWN_MILLS;
-import static de.amr.games.muehle.rules.PlacingRule.RANDOM_FREE_POSITION;
-import static de.amr.games.muehle.rules.PlacingRule.RANDOM_POSITION_BOARD_EMPTY;
+import static de.amr.games.muehle.rules.samples.MoveStartRules.CAN_CLOSE_MILL_FROM;
+import static de.amr.games.muehle.rules.samples.MoveStartRules.HAS_EMPTY_NEIGHBOR;
+import static de.amr.games.muehle.rules.samples.MoveTargetRules.CLOSE_MILL;
+import static de.amr.games.muehle.rules.samples.MoveTargetRules.RANDOM_NEIGHBOR;
+import static de.amr.games.muehle.rules.samples.PlacingRules.CLOSE_OWN_MILL;
+import static de.amr.games.muehle.rules.samples.PlacingRules.DESTROY_OPPONENT_MILL;
+import static de.amr.games.muehle.rules.samples.PlacingRules.FREE_POSITION_NEARBY_OWN_COLOR;
+import static de.amr.games.muehle.rules.samples.PlacingRules.OPEN_OWN_MILL;
+import static de.amr.games.muehle.rules.samples.PlacingRules.OPEN_TWO_OWN_MILLS;
+import static de.amr.games.muehle.rules.samples.PlacingRules.RANDOM_FREE_POSITION;
+import static de.amr.games.muehle.rules.samples.PlacingRules.RANDOM_POSITION_BOARD_EMPTY;
 
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.rules.MoveStartRule;
-import de.amr.games.muehle.rules.MoveTargetRule;
-import de.amr.games.muehle.rules.PlacingRule;
+import de.amr.games.muehle.rules.samples.MoveStartRules;
+import de.amr.games.muehle.rules.samples.MoveTargetRules;
+import de.amr.games.muehle.rules.samples.PlacingRules;
 
 public class Peter extends RuleBasedPlayer {
 
-	private static final PlacingRule[] PLACING_RULES = {
+	private static final PlacingRules[] PLACING_RULES = {
 			/*@formatter:off*/
 			RANDOM_POSITION_BOARD_EMPTY,
 			CLOSE_OWN_MILL,
@@ -32,14 +32,14 @@ public class Peter extends RuleBasedPlayer {
 			/*@formatter:on*/
 	};
 
-	private static final MoveStartRule[] MOVE_START_RULES = {
+	private static final MoveStartRules[] MOVE_START_RULES = {
 			/*@formatter:off*/
 			CAN_CLOSE_MILL_FROM,
 			HAS_EMPTY_NEIGHBOR,
 			/*@formatter:on*/
 	};
 
-	private static final MoveTargetRule[] MOVE_TARGET_RULES = {
+	private static final MoveTargetRules[] MOVE_TARGET_RULES = {
 			/*@formatter:off*/
 			CLOSE_MILL,
 			RANDOM_NEIGHBOR,

@@ -1,4 +1,4 @@
-package de.amr.games.muehle.rules;
+package de.amr.games.muehle.rules.api;
 
 @FunctionalInterface
 public interface TriFunction<U, V, W, R> {

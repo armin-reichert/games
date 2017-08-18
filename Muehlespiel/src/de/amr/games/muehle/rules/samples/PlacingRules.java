@@ -1,4 +1,4 @@
-package de.amr.games.muehle.rules;
+package de.amr.games.muehle.rules.samples;
 
 import static de.amr.games.muehle.util.Util.randomElement;
 
@@ -7,13 +7,14 @@ import java.util.function.BiFunction;
 
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.rules.api.PlacingRule;
 
 /**
  * Enumerates some placing rules.
  * 
  * @author Armin Reichert
  */
-public enum PlacingRule implements PositionSelectionRule {
+public enum PlacingRules implements PlacingRule {
 
 	RANDOM_POSITION_BOARD_EMPTY(
 			"Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde",
@@ -48,7 +49,7 @@ public enum PlacingRule implements PositionSelectionRule {
 
 	RANDOM_FREE_POSITION(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
-			(board, color) -> randomElement(board.positions().filter(board::isEmptyPosition))),
+			(board, color) -> randomElement(board.positions().filter(board::isEmptyPosition)))
 
 	;
 
@@ -62,14 +63,24 @@ public enum PlacingRule implements PositionSelectionRule {
 		return description;
 	}
 
-	private PlacingRule(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier,
+	@Override
+	public BiFunction<Board, StoneColor, Boolean> getCondition() {
+		return condition;
+	}
+
+	@Override
+	public BiFunction<Board, StoneColor, OptionalInt> getPositionSupplier() {
+		return positionSupplier;
+	}
+
+	private PlacingRules(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier,
 			BiFunction<Board, StoneColor, Boolean> condition) {
 		this.description = description;
 		this.positionSupplier = placingPositionSupplier;
 		this.condition = condition;
 	}
 
-	private PlacingRule(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier) {
+	private PlacingRules(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier) {
 		this(description, placingPositionSupplier, (board, color) -> true);
 	}
 
