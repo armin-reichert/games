@@ -167,8 +167,8 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		private void tryToRemoveStone() {
-			StoneColor colorToRemove = players[1 - turn].getColor();
-			players[turn].supplyRemovalPosition(colorToRemove).ifPresent(removalPosition -> {
+			players[turn].supplyRemovalPosition().ifPresent(removalPosition -> {
+				StoneColor colorToRemove = players[turn].getColor().other();
 				if (board.isEmptyPosition(removalPosition)) {
 					LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
 				} else if (board.getStoneAt(removalPosition) != colorToRemove) {

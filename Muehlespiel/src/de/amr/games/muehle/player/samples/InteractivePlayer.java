@@ -61,7 +61,7 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public OptionalInt supplyRemovalPosition(StoneColor opponentColor) {
+	public OptionalInt supplyRemovalPosition() {
 		return supplyMouseClickBoardPosition();
 	}
 

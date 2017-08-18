@@ -35,8 +35,8 @@ public class RandomPlayer implements Player {
 	}
 
 	@Override
-	public OptionalInt supplyRemovalPosition(StoneColor otherColor) {
-		return randomElement(board.positions(otherColor));
+	public OptionalInt supplyRemovalPosition() {
+		return randomElement(board.positions(color.other()));
 	}
 
 	@Override

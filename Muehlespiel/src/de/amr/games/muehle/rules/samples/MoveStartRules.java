@@ -10,11 +10,11 @@ import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.rules.api.MoveStartRule;
 
 public enum MoveStartRules implements MoveStartRule {
-	CAN_CLOSE_MILL_FROM(
+	CAN_CLOSE_MILL(
 			"Von Position %d kann eine Mühle geschlossen werden",
 			(board, color) -> randomElement(board.positions(color).filter(p -> board.canCloseMillFrom(p, color)))),
 
-	HAS_EMPTY_NEIGHBOR(
+	CAN_MOVE(
 			"Position %d besitzt freie Nachbarposition",
 			(board, color) -> randomElement(board.positions(color).filter(board::hasEmptyNeighbor)));
 

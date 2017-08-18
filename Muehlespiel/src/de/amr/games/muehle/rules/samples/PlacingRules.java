@@ -16,28 +16,28 @@ import de.amr.games.muehle.rules.api.PlacingRule;
  */
 public enum PlacingRules implements PlacingRule {
 
-	RANDOM_POSITION_BOARD_EMPTY(
+	EMPTYBOARD(
 			"Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde",
 			(board, color) -> randomElement(board.positions().filter(board::isEmptyPosition)),
 			(board, color) -> board.positions(color).count() == 0),
 
-	CLOSE_OWN_MILL(
+	CLOSE_MILL(
 			"Setze Stein auf Position %d, weil eigene Mühle geschlossen wird",
 			(board, color) -> randomElement(board.positionsClosingMill(color))),
 
-	DESTROY_OPPONENT_MILL(
+	DESTROY_MILL(
 			"Setze Stein auf Position %d, weil gegnerische Mühle verhindert wird",
 			(board, color) -> randomElement(board.positionsClosingMill(color.other()))),
 
-	OPEN_TWO_OWN_MILLS(
+	OPEN_TWO_MILLS(
 			"Setze Stein auf Position %d, weil zwei eigene Mühlen geöffnet werden",
 			(board, color) -> randomElement(board.positionsOpeningTwoMills(color))),
 
-	OPEN_OWN_MILL(
+	OPEN_ONE_MILL(
 			"Setze Stein auf Position %d, weil eigene Mühle geöffnet wird",
 			(board, color) -> randomElement(board.positionsOpeningMill(color))),
 
-	FREE_POSITION_NEARBY_OWN_COLOR(
+	NEAR_OWN_COLOR(
 			"Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist",
 			(board, color) -> {
 				OptionalInt posWithEmptyNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
@@ -47,16 +47,11 @@ public enum PlacingRules implements PlacingRule {
 				return OptionalInt.empty();
 			}),
 
-	RANDOM_FREE_POSITION(
+	RANDOM(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
 			(board, color) -> randomElement(board.positions().filter(board::isEmptyPosition)))
 
 	;
-
-	@Override
-	public OptionalInt selectPosition(Board board, StoneColor color) {
-		return condition.apply(board, color) ? positionSupplier.apply(board, color) : OptionalInt.empty();
-	}
 
 	@Override
 	public String getDescription() {

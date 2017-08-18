@@ -20,7 +20,7 @@ public interface Player {
 
 	public OptionalInt supplyPlacingPosition();
 
-	public OptionalInt supplyRemovalPosition(StoneColor otherColor);
+	public OptionalInt supplyRemovalPosition();
 
 	public Move supplyMove(boolean canJump);
 

@@ -16,7 +16,7 @@ public enum MoveTargetRules implements MoveTargetRule {
 			(board, color, from) -> randomElement(
 					board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByMove(from, to, color)))),
 
-	RANDOM_NEIGHBOR(
+	RANDOM(
 			"Position %d ist freie Nachbarposition",
 			(board, color, from) -> randomElement(board.emptyNeighbors(from)))
 
