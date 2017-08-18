@@ -19,8 +19,8 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public class Stone extends GameEntity {
 
-	private static final EnumMap<StoneColor, Color> FILL = new EnumMap<>(StoneColor.class);
-	private static final EnumMap<StoneColor, Color> EDGE = new EnumMap<>(StoneColor.class);
+	static final EnumMap<StoneColor, Color> FILL = new EnumMap<>(StoneColor.class);
+	static final EnumMap<StoneColor, Color> EDGE = new EnumMap<>(StoneColor.class);
 
 	static {
 		FILL.put(WHITE, new Color(255, 248, 220));
@@ -29,8 +29,8 @@ public class Stone extends GameEntity {
 		EDGE.put(BLACK, Color.DARK_GRAY);
 	}
 
-	protected StoneColor color;
-	protected int radius;
+	StoneColor color;
+	int radius;
 
 	public Stone(StoneColor color, int radius) {
 		this.color = color;

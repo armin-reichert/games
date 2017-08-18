@@ -16,9 +16,9 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public class StoneCounter extends Stone {
 
-	private Font font;
-	private BooleanSupplier selectedSupplier;
-	private IntSupplier stoneCountSupplier;
+	Font font;
+	BooleanSupplier selectedSupplier;
+	IntSupplier stoneCountSupplier;
 
 	public StoneCounter(StoneColor color, int radius, IntSupplier stoneCountSupplier, BooleanSupplier selectedSupplier) {
 		super(color, radius);

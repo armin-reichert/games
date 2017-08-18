@@ -30,7 +30,8 @@ import de.amr.games.muehle.ui.BoardUI;
  */
 public class InteractivePlayer implements Player {
 
-	private static final EnumMap<Direction, Integer> STEERING = new EnumMap<>(Direction.class);
+	static final EnumMap<Direction, Integer> STEERING = new EnumMap<>(Direction.class);
+
 	static {
 		STEERING.put(NORTH, VK_UP);
 		STEERING.put(EAST, VK_RIGHT);
@@ -38,10 +39,10 @@ public class InteractivePlayer implements Player {
 		STEERING.put(WEST, VK_LEFT);
 	}
 
-	private final Board board;
-	private final StoneColor color;
-	private BoardUI boardUI;
-	private Move move;
+	final Board board;
+	final StoneColor color;
+	BoardUI boardUI;
+	Move move;
 
 	public InteractivePlayer(BoardUI boardUI, StoneColor color) {
 		this.board = boardUI.getBoard();
@@ -80,7 +81,7 @@ public class InteractivePlayer implements Player {
 		move = new Move();
 	}
 
-	private OptionalInt supplyMoveEndPosition(boolean canJump) {
+	OptionalInt supplyMoveEndPosition(boolean canJump) {
 		// if end position is uniquely determined, use it
 		if (!canJump && board.emptyNeighbors(move.from).count() == 1) {
 			return board.emptyNeighbors(move.from).findFirst();
@@ -94,7 +95,7 @@ public class InteractivePlayer implements Player {
 		return supplyMouseClickBoardPosition();
 	}
 
-	private Optional<Direction> supplyMoveDirection() {
+	Optional<Direction> supplyMoveDirection() {
 		/*@formatter:off*/
 		return STEERING.entrySet().stream()
 			.filter(e -> Keyboard.keyPressedOnce(e.getValue()))
@@ -103,7 +104,7 @@ public class InteractivePlayer implements Player {
 		/*@formatter:on*/
 	}
 
-	private OptionalInt supplyMouseClickBoardPosition() {
+	OptionalInt supplyMouseClickBoardPosition() {
 		return Mouse.clicked() ? boardUI.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }

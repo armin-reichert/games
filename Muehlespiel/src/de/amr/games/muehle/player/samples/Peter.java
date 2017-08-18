@@ -14,7 +14,7 @@ import de.amr.games.muehle.rules.samples.RemovalRules;
 
 public class Peter extends RuleBasedPlayer {
 
-	private static final PlacingRule[] PLACING_RULES = {
+	static final PlacingRule[] PLACING_RULES = {
 			/*@formatter:off*/
 			PlacingRules.EMPTYBOARD,
 			PlacingRules.CLOSE_MILL,
@@ -26,21 +26,21 @@ public class Peter extends RuleBasedPlayer {
 			/*@formatter:on*/
 	};
 
-	private static final MoveStartRule[] MOVE_START_RULES = {
+	static final MoveStartRule[] MOVE_START_RULES = {
 			/*@formatter:off*/
 			MoveStartRules.CAN_CLOSE_MILL,
 			MoveStartRules.CAN_MOVE,
 			/*@formatter:on*/
 	};
 
-	private static final MoveTargetRule[] MOVE_TARGET_RULES = {
+	static final MoveTargetRule[] MOVE_TARGET_RULES = {
 			/*@formatter:off*/
 			MoveTargetRules.CLOSE_MILL,
 			MoveTargetRules.RANDOM,
 			/*@formatter:on*/
 	};
 
-	private static final RemovalRule[] REMOVAL_RULES = {
+	static final RemovalRule[] REMOVAL_RULES = {
 			/*@formatter:off*/
 			RemovalRules.RANDOM,
 			/*@formatter:on*/

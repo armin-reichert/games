@@ -32,16 +32,16 @@ public class BoardUI extends GameEntity {
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
 	 */
-	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
-	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
+	static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
+	static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	private final Board board;
-	private final int width;
-	private final int height;
-	private final int posRadius;
-	private final int stoneRadius;
-	private boolean showPositionNumbers;
-	private Stone[] stones;
+	final Board board;
+	final int width;
+	final int height;
+	final int posRadius;
+	final int stoneRadius;
+	boolean showPositionNumbers;
+	Stone[] stones;
 
 	public BoardUI(Board board, int width, int height) {
 		this.board = board;

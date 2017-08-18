@@ -16,8 +16,8 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class RandomPlayer implements Player {
 
-	private final Board board;
-	private final StoneColor color;
+	final Board board;
+	final StoneColor color;
 
 	public RandomPlayer(Board board, StoneColor color) {
 		this.board = board;
@@ -50,5 +50,4 @@ public class RandomPlayer implements Player {
 		});
 		return move;
 	}
-
 }
