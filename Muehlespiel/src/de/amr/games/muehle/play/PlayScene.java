@@ -41,30 +41,30 @@ import de.amr.games.muehle.ui.StoneCounter;
  */
 public class PlayScene extends Scene<MillApp> {
 
-	private static final int NUM_STONES = 9;
+	final int NUM_STONES = 9;
+	final FSM control = new FSM();
+	final Board board = new Board();
+	final Player[] players = new Player[2];
+	final int[] stonesPlaced = new int[2];
+	final StoneCounter[] stoneCounters = new StoneCounter[2];
 
-	private final Board board = new Board();
-	private final Player[] players = new Player[2];
-	private final int[] stonesPlaced = new int[2];
-	private final StoneCounter[] stoneCounters = new StoneCounter[2];
-
-	private int turn;
+	int turn;
 
 	// UI
-	private BoardUI boardUI;
-	private Assistant assistant;
-	private MoveControl moveControl;
-	private TextArea messageArea;
+	BoardUI boardUI;
+	Assistant assistant;
+	MoveControl moveControl;
+	TextArea messageArea;
 
 	/** Finite-state-machine for game control. */
-	private final StateMachine<GamePhase, GameEvent> control = new StateMachine<GamePhase, GameEvent>(
-			"Mühlespiel-Steuerung", GamePhase.class, STARTING) {
+	class FSM extends StateMachine<GamePhase, GameEvent> {
 
-		private int placedAt;
-		private StoneColor placedColor;
-		private int removedAt;
+		int placedAt;
+		StoneColor placedColor;
+		int removedAt;
 
-		{
+		FSM() {
+			super("Mühlespiel-Steuerung", GamePhase.class, STARTING);
 			// Define the states and transitions:
 
 			// STARTING
@@ -122,36 +122,44 @@ public class PlayScene extends Scene<MillApp> {
 			change(GAME_OVER, STARTING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
 
-		private void reset() {
+		void reset() {
 			boardUI.clear();
 			stonesPlaced[0] = stonesPlaced[1] = 0;
 			turnPlacingTo(0);
 		}
 
-		private boolean isGameOver() {
+		boolean isGameOver() {
 			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
 		}
 
-		private void turnPlacingTo(int playerNumber) {
+		boolean canJump(int playerNumber) {
+			return board.stoneCount(players[playerNumber].getColor()) == 3;
+		}
+
+		boolean isTrapped(int playerNumber) {
+			return board.isTrapped(players[playerNumber].getColor());
+		}
+
+		void turnPlacingTo(int playerNumber) {
 			turn = playerNumber;
 			showMessage(turn == 0 ? "white_must_place" : "black_must_place");
 		}
 
-		private void switchPlacing() {
+		void switchPlacing() {
 			turnPlacingTo(1 - turn);
 		}
 
-		private void turnMovingTo(int playerNumber) {
+		void turnMovingTo(int playerNumber) {
 			turn = playerNumber;
 			moveControl.setPlayer(players[turn]);
 			showMessage(turn == 0 ? "white_must_move" : "black_must_move");
 		}
 
-		private void switchMoving() {
+		void switchMoving() {
 			turnMovingTo(1 - turn);
 		}
 
-		private void tryToPlaceStone() {
+		void tryToPlaceStone() {
 			players[turn].supplyPlacingPosition().ifPresent(placePosition -> {
 				if (board.hasStoneAt(placePosition)) {
 					LOG.info(Messages.text("stone_at_position", placePosition));
@@ -166,7 +174,7 @@ public class PlayScene extends Scene<MillApp> {
 			});
 		}
 
-		private void tryToRemoveStone() {
+		void tryToRemoveStone() {
 			players[turn].supplyRemovalPosition().ifPresent(removalPosition -> {
 				StoneColor colorToRemove = players[turn].getColor().other();
 				if (board.isEmptyPosition(removalPosition)) {
@@ -184,19 +192,19 @@ public class PlayScene extends Scene<MillApp> {
 			});
 		}
 
-		private void runStoneMove() {
+		void runStoneMove() {
 			moveControl.update();
 		}
 
-		private boolean isMoveFinished() {
+		boolean isMoveFinished() {
 			return moveControl.is(MoveState.FINISHED);
 		}
 
-		private boolean placingClosedMill() {
+		boolean placingClosedMill() {
 			return board.inMill(placedAt, placedColor);
 		}
 
-		private boolean movingClosedMill() {
+		boolean movingClosedMill() {
 			return moveControl.is(MoveState.FINISHED)
 					&& board.inMill(moveControl.getMove().get().to, players[turn].getColor());
 		}
@@ -205,19 +213,19 @@ public class PlayScene extends Scene<MillApp> {
 	/**
 	 * Draws hints helping the current player in placing or moving.
 	 */
-	private class Assistant extends GameEntity {
+	class Assistant extends GameEntity {
 
-		private boolean enabled;
+		boolean enabled;
 
-		public Assistant() {
+		Assistant() {
 			setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 		}
 
-		public void toggle() {
+		void toggle() {
 			setEnabled(!enabled);
 		}
 
-		public void setEnabled(boolean enabled) {
+		void setEnabled(boolean enabled) {
 			this.enabled = enabled;
 			LOG.info(Messages.text(enabled ? "assistant_on" : "assistant_off"));
 		}
@@ -237,7 +245,7 @@ public class PlayScene extends Scene<MillApp> {
 				if (moveControl.isMoveStartPossible()) {
 					moveControl.getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 				} else {
-					boardUI.markPossibleMoveStarts(g, stoneColor, canJump(turn));
+					boardUI.markPossibleMoveStarts(g, stoneColor, control.canJump(turn));
 					boardUI.markPositionFixingOpponent(g, stoneColor, stoneColor.other(), Color.RED);
 				}
 			}
@@ -290,7 +298,7 @@ public class PlayScene extends Scene<MillApp> {
 		control.update();
 	}
 
-	private void readInput() {
+	void readInput() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_N)) {
 			control.init();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
@@ -300,16 +308,8 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	}
 
-	private void showMessage(String key, Object... args) {
+	void showMessage(String key, Object... args) {
 		messageArea.setText(Messages.text(key, args));
-	}
-
-	private boolean canJump(int playerNumber) {
-		return board.stoneCount(players[playerNumber].getColor()) == 3;
-	}
-
-	private boolean isTrapped(int playerNumber) {
-		return board.isTrapped(players[playerNumber].getColor());
 	}
 
 	@Override

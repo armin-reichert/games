@@ -24,6 +24,6 @@ public interface Player {
 
 	public Move supplyMove(boolean canJump);
 
-	public default void clearMove() {
+	public default void newMove() {
 	}
 }

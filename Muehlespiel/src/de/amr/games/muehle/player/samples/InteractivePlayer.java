@@ -76,7 +76,7 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public void clearMove() {
+	public void newMove() {
 		move = new Move();
 	}
 

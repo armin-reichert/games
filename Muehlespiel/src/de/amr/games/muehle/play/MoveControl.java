@@ -7,7 +7,6 @@ import static de.amr.games.muehle.play.MoveState.INITIAL;
 import static de.amr.games.muehle.play.MoveState.JUMPING;
 import static de.amr.games.muehle.play.MoveState.MOVING;
 import static de.amr.games.muehle.play.MoveState.READING_MOVE;
-import static java.lang.String.format;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -62,7 +61,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		state(INITIAL).entry = s -> {
 			move = null;
-			player.clearMove();
+			player.newMove();
 		};
 
 		change(INITIAL, READING_MOVE);
@@ -84,7 +83,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		state(MOVING).entry = s -> {
 			board.getDirection(move.from, move.to).ifPresent(moveDir -> {
 				getMovedStone().ifPresent(stone -> stone.tf.setVelocity(computeMoveVelocity(moveDir)));
-				LOG.info(format("Moving stone from position %d to position %d towards %s", move.from, move.to, moveDir));
+				LOG.info(Messages.text("moving_from_to_towards", move.from, move.to, moveDir));
 			});
 		};
 
@@ -96,7 +95,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG.info(format("Jumping from position %d to position  %d", move.from, move.to));
+		state(JUMPING).entry = s -> LOG.info(Messages.text("jumping_from_to", move.from, move.to));
 
 		change(JUMPING, FINISHED);
 

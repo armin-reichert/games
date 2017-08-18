@@ -47,19 +47,20 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public void clearMove() {
+	public void newMove() {
 		move = new Move();
 	}
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent).findFirst().get();
+		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
 		return Stream.of(removalRules).map(rule -> tryRemovalRule(rule, color.other())).filter(OptionalInt::isPresent)
-				.findFirst().get();
+				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	@Override
