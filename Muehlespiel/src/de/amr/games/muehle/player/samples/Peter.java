@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player;
+package de.amr.games.muehle.player.samples;
 
 import static de.amr.games.muehle.rules.samples.MoveStartRules.CAN_CLOSE_MILL_FROM;
 import static de.amr.games.muehle.rules.samples.MoveStartRules.HAS_EMPTY_NEIGHBOR;
@@ -14,6 +14,7 @@ import static de.amr.games.muehle.rules.samples.PlacingRules.RANDOM_POSITION_BOA
 
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.RuleBasedPlayer;
 import de.amr.games.muehle.rules.samples.MoveStartRules;
 import de.amr.games.muehle.rules.samples.MoveTargetRules;
 import de.amr.games.muehle.rules.samples.PlacingRules;

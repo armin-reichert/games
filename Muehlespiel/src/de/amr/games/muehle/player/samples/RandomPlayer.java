@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player;
+package de.amr.games.muehle.player.samples;
 
 import static de.amr.games.muehle.util.Util.randomElement;
 
@@ -7,6 +7,7 @@ import java.util.OptionalInt;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Player;
 
 /**
  * A slightly smart random player.

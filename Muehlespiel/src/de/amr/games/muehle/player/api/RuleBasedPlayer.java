@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player;
+package de.amr.games.muehle.player.api;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.muehle.util.Util.randomElement;

@@ -20,7 +20,7 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
 

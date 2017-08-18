@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player;
+package de.amr.games.muehle.player.samples;
 
 import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
@@ -20,6 +20,7 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.ui.BoardUI;
 
 /**
