@@ -9,16 +9,16 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.MillTestApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.ui.BoardUI;
 
-public class TestScene extends Scene<MillApp> {
+public class TestScene extends Scene<MillTestApp> {
 
 	Board board;
 	BoardUI boardUI;
 
-	public TestScene(MillApp app) {
+	public TestScene(MillTestApp app) {
 		super(app);
 	}
 

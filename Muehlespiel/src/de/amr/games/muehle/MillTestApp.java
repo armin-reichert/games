@@ -4,22 +4,22 @@ import java.util.Locale;
 
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.play.PlayScene;
+import de.amr.games.muehle.test.TestScene;
 
 /**
  * Mühlespiel aka "Nine men's morris".
  * 
  * @author Armin Reichert & Peter und Anna Schillo
  */
-public class MillApp extends Application {
+public class MillTestApp extends Application {
 
 	public static void main(String[] args) {
 		Locale locale = (args.length > 0) ? new Locale(args[0]) : Locale.getDefault();
 		Messages.load(locale);
-		launch(new MillApp());
+		launch(new MillTestApp());
 	}
 
-	public MillApp() {
+	public MillTestApp() {
 		settings.title = Messages.text("title");
 		settings.width = 800;
 		settings.height = 800;
@@ -29,6 +29,6 @@ public class MillApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new PlayScene(this));
+		selectView(new TestScene(this));
 	}
 }
