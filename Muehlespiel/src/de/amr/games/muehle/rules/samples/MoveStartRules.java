@@ -24,13 +24,8 @@ public enum MoveStartRules implements MoveStartRule {
 	}
 
 	@Override
-	public BiFunction<Board, StoneColor, OptionalInt> getPositionSupplier() {
-		return positionSupplier;
-	}
-
-	@Override
-	public BiFunction<Board, StoneColor, Boolean> getCondition() {
-		return condition;
+	public OptionalInt supplyPosition(Board board, StoneColor color) {
+		return condition.apply(board, color) ? positionSupplier.apply(board, color) : OptionalInt.empty();
 	}
 
 	private MoveStartRules(String description, BiFunction<Board, StoneColor, OptionalInt> positionSupplier,

@@ -17,18 +17,13 @@ public enum RemovalRules implements RemovalRule {
 	;
 
 	@Override
+	public OptionalInt supplyPosition(Board board, StoneColor color) {
+		return condition.apply(board, color) ? positionSupplier.apply(board, color) : OptionalInt.empty();
+	}
+
+	@Override
 	public String getDescription() {
 		return description;
-	}
-
-	@Override
-	public BiFunction<Board, StoneColor, Boolean> getCondition() {
-		return condition;
-	}
-
-	@Override
-	public BiFunction<Board, StoneColor, OptionalInt> getPositionSupplier() {
-		return positionSupplier;
 	}
 
 	private RemovalRules(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier,

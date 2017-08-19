@@ -21,18 +21,13 @@ public enum MoveTargetRules implements MoveTargetRule {
 	;
 
 	@Override
+	public OptionalInt supplyPosition(Board board, StoneColor color, int from) {
+		return condition.apply(board, color, from) ? positionSupplier.apply(board, color, from) : OptionalInt.empty();
+	}
+
+	@Override
 	public String getDescription() {
 		return description;
-	}
-
-	@Override
-	public TriFunction<Board, StoneColor, Integer, OptionalInt> getPositionSupplier() {
-		return positionSupplier;
-	}
-
-	@Override
-	public TriFunction<Board, StoneColor, Integer, Boolean> getCondition() {
-		return condition;
 	}
 
 	private MoveTargetRules(String description, TriFunction<Board, StoneColor, Integer, OptionalInt> positionSupplier,

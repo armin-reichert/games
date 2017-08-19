@@ -21,14 +21,14 @@ import de.amr.games.muehle.rules.api.RemovalRule;
  */
 public class RuleBasedPlayer implements Player {
 
-	private final Board board;
-	private final StoneColor color;
-	private final PlacingRule[] placingRules;
-	private final MoveStartRule[] moveStartRules;
-	private final MoveTargetRule[] moveTargetRules;
-	private final RemovalRule[] removalRules;
+	final Board board;
+	final StoneColor color;
+	final PlacingRule[] placingRules;
+	final MoveStartRule[] moveStartRules;
+	final MoveTargetRule[] moveTargetRules;
+	final RemovalRule[] removalRules;
 
-	private Move move;
+	Move move;
 
 	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MoveStartRule[] moveStartRules,
 			MoveTargetRule[] moveTargetRules, RemovalRule[] removalRules) {
@@ -74,31 +74,31 @@ public class RuleBasedPlayer implements Player {
 		return move;
 	}
 
-	private OptionalInt supplyMoveEndPosition() {
+	OptionalInt supplyMoveEndPosition() {
 		return Stream.of(moveTargetRules).map(rule -> tryMoveTargetRule(rule, move.from)).filter(OptionalInt::isPresent)
 				.findFirst().orElse(OptionalInt.empty());
 	}
 
-	private OptionalInt tryPlacingRule(PlacingRule rule) {
-		OptionalInt optPosition = rule.selectPosition(board, color);
+	OptionalInt tryPlacingRule(PlacingRule rule) {
+		OptionalInt optPosition = rule.supplyPosition(board, color);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
-	private OptionalInt tryRemovalRule(RemovalRule rule, StoneColor removalColor) {
-		OptionalInt optPosition = rule.selectPosition(board, removalColor);
+	OptionalInt tryRemovalRule(RemovalRule rule, StoneColor removalColor) {
+		OptionalInt optPosition = rule.supplyPosition(board, removalColor);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
-	private OptionalInt tryMoveStartRule(MoveStartRule rule) {
-		OptionalInt optPosition = rule.selectPosition(board, color);
+	OptionalInt tryMoveStartRule(MoveStartRule rule) {
+		OptionalInt optPosition = rule.supplyPosition(board, color);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
-	private OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
-		OptionalInt optPosition = rule.selectPosition(board, color, from);
+	OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
+		OptionalInt optPosition = rule.supplyPosition(board, color, from);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}

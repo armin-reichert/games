@@ -37,15 +37,13 @@ public enum PlacingRules implements PlacingRule {
 			"Setze Stein auf Position %d, weil eigene Mühle geöffnet wird",
 			(board, color) -> randomElement(board.positionsOpeningMill(color))),
 
-	NEAR_OWN_COLOR(
-			"Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist",
-			(board, color) -> {
-				OptionalInt posWithEmptyNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
-				if (posWithEmptyNeighbor.isPresent()) {
-					return randomElement(board.emptyNeighbors(posWithEmptyNeighbor.getAsInt()));
-				}
-				return OptionalInt.empty();
-			}),
+	NEAR_OWN_COLOR("Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist", (board, color) -> {
+		OptionalInt posWithEmptyNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
+		if (posWithEmptyNeighbor.isPresent()) {
+			return randomElement(board.emptyNeighbors(posWithEmptyNeighbor.getAsInt()));
+		}
+		return OptionalInt.empty();
+	}),
 
 	RANDOM(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
@@ -54,18 +52,13 @@ public enum PlacingRules implements PlacingRule {
 	;
 
 	@Override
+	public OptionalInt supplyPosition(Board board, StoneColor color) {
+		return condition.apply(board, color) ? positionSupplier.apply(board, color) : OptionalInt.empty();
+	}
+
+	@Override
 	public String getDescription() {
 		return description;
-	}
-
-	@Override
-	public BiFunction<Board, StoneColor, Boolean> getCondition() {
-		return condition;
-	}
-
-	@Override
-	public BiFunction<Board, StoneColor, OptionalInt> getPositionSupplier() {
-		return positionSupplier;
 	}
 
 	private PlacingRules(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier,
