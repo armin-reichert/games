@@ -29,7 +29,9 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.impl.InteractivePlayer;
 import de.amr.games.muehle.player.impl.Peter;
+import de.amr.games.muehle.player.impl.RandomPlayer;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.StoneCounter;
 
@@ -40,12 +42,15 @@ import de.amr.games.muehle.ui.StoneCounter;
  */
 public class PlayScene extends Scene<MillApp> {
 
-	final int NUM_STONES = 9;
-	final FSM control = new FSM();
-	final Board board = new Board();
-	final Player[] players = new Player[2];
-	final int[] stonesPlaced = new int[2];
-	final StoneCounter[] stoneCounters = new StoneCounter[2];
+	static final int NUM_STONES = 9;
+
+	FSM control = new FSM();
+	Board board = new Board();
+	Player[] whitePlayers;
+	Player[] blackPlayers;
+	Player[] players = new Player[2];
+	int[] stonesPlaced = new int[2];
+	StoneCounter[] stoneCounters = new StoneCounter[2];
 
 	int turn;
 
@@ -57,6 +62,21 @@ public class PlayScene extends Scene<MillApp> {
 
 	/** Finite-state-machine for game control. */
 	class FSM extends StateMachine<GamePhase, GameEvent> {
+
+		int waitTime;
+
+		void wait(int seconds) {
+			waitTime = app.pulse.secToTicks(seconds);
+		}
+
+		@Override
+		public void update() {
+			if (waitTime > 0) {
+				waitTime -= 1;
+			} else {
+				super.update();
+			}
+		}
 
 		int placedAt;
 		StoneColor placedColor;
@@ -118,13 +138,18 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(GAME_OVER).entry = s -> showMessage(turn == 0 ? "black_wins" : "white_wins");
 
-			change(GAME_OVER, STARTING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			change(GAME_OVER, STARTING,
+					() -> !isInteractive(players[0]) && !isInteractive(players[1]) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
 
 		void reset() {
 			boardUI.clear();
 			stonesPlaced[0] = stonesPlaced[1] = 0;
 			turnPlacingTo(0);
+		}
+
+		boolean isInteractive(Player player) {
+			return player instanceof InteractivePlayer;
 		}
 
 		boolean isGameOver() {
@@ -142,6 +167,7 @@ public class PlayScene extends Scene<MillApp> {
 		void turnPlacingTo(int playerNumber) {
 			turn = playerNumber;
 			showMessage(turn == 0 ? "white_must_place" : "black_must_place");
+			wait(players[turn] instanceof InteractivePlayer ? 0 : 1);
 		}
 
 		void switchPlacing() {
@@ -259,14 +285,14 @@ public class PlayScene extends Scene<MillApp> {
 	public void init() {
 		createUI();
 
-		players[0] =
-				// new InteractivePlayer(boardUI, WHITE);
-				new Peter(board, WHITE);
+		Player[] whitePlayers = { new InteractivePlayer(boardUI, WHITE), new RandomPlayer(board, WHITE),
+				new Peter(board, WHITE) };
 
-		players[1] =
-				// new InteractivePlayer(boardUI, BLACK);
-				// new RandomPlayer(board, BLACK);
-				new Peter(board, BLACK);
+		Player[] blackPlayers = { new InteractivePlayer(boardUI, BLACK), new RandomPlayer(board, BLACK),
+				new Peter(board, BLACK) };
+
+		players[0] = whitePlayers[2];
+		players[1] = blackPlayers[2];
 
 		// State machines
 		moveControl = new MoveControl(boardUI, app.pulse);
