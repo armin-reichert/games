@@ -1,53 +1,25 @@
 package de.amr.games.muehle.player.impl;
 
-import static de.amr.games.muehle.util.Util.randomElement;
-
-import java.util.OptionalInt;
-
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.rules.api.MoveStartRule;
+import de.amr.games.muehle.rules.api.MoveTargetRule;
+import de.amr.games.muehle.rules.api.PlacingRule;
+import de.amr.games.muehle.rules.api.RemovalRule;
+import de.amr.games.muehle.rules.impl.MoveStartRules;
+import de.amr.games.muehle.rules.impl.MoveTargetRules;
+import de.amr.games.muehle.rules.impl.PlacingRules;
+import de.amr.games.muehle.rules.impl.RemovalRules;
 
 /**
- * A slightly smart random player.
+ * A player acting randomly.
  * 
  * @author Armin Reichert
  */
-public class RandomPlayer implements Player {
-
-	final Board board;
-	final StoneColor color;
+public class RandomPlayer extends RuleBasedPlayer {
 
 	public RandomPlayer(Board board, StoneColor color) {
-		this.board = board;
-		this.color = color;
-	}
-
-	@Override
-	public StoneColor getColor() {
-		return color;
-	}
-
-	@Override
-	public OptionalInt supplyPlacingPosition() {
-		return randomElement(board.positions().filter(board::isEmptyPosition));
-	}
-
-	@Override
-	public OptionalInt supplyRemovalPosition() {
-		return randomElement(board.positions(color.other()));
-	}
-
-	@Override
-	public Move supplyMove(boolean canJump) {
-		Move move = new Move();
-		randomElement(board.positions(color)).ifPresent(from -> {
-			move.from = from;
-			OptionalInt optTo = canJump ? randomElement(board.positions().filter(board::isEmptyPosition))
-					: randomElement(board.neighbors(from).filter(board::isEmptyPosition));
-			optTo.ifPresent(to -> move.to = to);
-		});
-		return move;
+		super(board, color, new PlacingRule[] { PlacingRules.RANDOM }, new MoveStartRule[] { MoveStartRules.CAN_MOVE },
+				new MoveTargetRule[] { MoveTargetRules.RANDOM }, new RemovalRule[] { RemovalRules.RANDOM });
 	}
 }

@@ -29,7 +29,6 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.InteractivePlayer;
 import de.amr.games.muehle.player.impl.Peter;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.StoneCounter;
@@ -258,9 +257,27 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
-		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
+		createUI();
 
-		// UI components
+		players[0] =
+				// new InteractivePlayer(boardUI, WHITE);
+				new Peter(board, WHITE);
+
+		players[1] =
+				// new InteractivePlayer(boardUI, BLACK);
+				// new RandomPlayer(board, BLACK);
+				new Peter(board, BLACK);
+
+		// State machines
+		moveControl = new MoveControl(boardUI, app.pulse);
+		// moveControl.setLogger(LOG);
+		// control.setLogger(LOG);
+
+		control.init();
+	}
+
+	void createUI() {
+		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
 		boardUI = new BoardUI(board, 600, 600);
 		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
 				() -> turn == 0);
@@ -271,7 +288,7 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.setFont(msgFont);
 		assistant = new Assistant();
 
-		// Screen layout
+		// Layout
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 		stoneCounters[0].tf.moveTo(40, getHeight() - 50);
@@ -279,17 +296,6 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.tf.moveTo(0, getHeight() - 90);
 		assistant.hCenter(getWidth());
 		assistant.tf.setY(getHeight() / 2 - assistant.getHeight());
-
-		// Players
-		players[0] = new InteractivePlayer(boardUI, WHITE);
-		// players[1] = new InteractivePlayer(boardUI, BLACK);
-		// players[1] = new RandomPlayer(board, BLACK);
-		players[1] = new Peter(board, BLACK);
-
-		moveControl = new MoveControl(boardUI, app.pulse);
-		// moveControl.setLogger(LOG);
-		// control.setLogger(LOG);
-		control.init();
 	}
 
 	@Override
