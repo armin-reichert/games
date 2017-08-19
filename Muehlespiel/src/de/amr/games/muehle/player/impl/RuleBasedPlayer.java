@@ -67,12 +67,16 @@ public class RuleBasedPlayer implements Player {
 	@Override
 	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
-			Stream.of(moveStartRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
-					.orElse(OptionalInt.empty()).ifPresent(pos -> move.from = pos);
+			supplyMoveStartPosition().ifPresent(pos -> move.from = pos);
 		} else {
 			supplyMoveEndPosition().ifPresent(pos -> move.to = pos);
 		}
 		return move;
+	}
+
+	OptionalInt supplyMoveStartPosition() {
+		return Stream.of(moveStartRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	OptionalInt supplyMoveEndPosition() {
