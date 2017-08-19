@@ -13,6 +13,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.BiFunction;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
@@ -21,7 +22,6 @@ import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.ui.BoardUI;
 
 /**
  * A player using mouse and keyboard for placing and moving stones.
@@ -41,13 +41,14 @@ public class InteractivePlayer implements Player {
 
 	final Board board;
 	final StoneColor color;
-	BoardUI boardUI;
+	final BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
 	Move move;
 
-	public InteractivePlayer(BoardUI boardUI, StoneColor color) {
-		this.board = boardUI.getBoard();
+	public InteractivePlayer(Board board, StoneColor color,
+			BiFunction<Integer, Integer, OptionalInt> boardPositionFinder) {
+		this.board = board;
 		this.color = color;
-		this.boardUI = boardUI;
+		this.boardPositionFinder = boardPositionFinder;
 		move = new Move();
 	}
 
@@ -58,18 +59,18 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return supplyMouseClickBoardPosition();
+		return findClickedBoardPosition();
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return supplyMouseClickBoardPosition();
+		return findClickedBoardPosition();
 	}
 
 	@Override
 	public Move supplyMove(boolean canJump) {
 		if (move.from == -1) {
-			supplyMouseClickBoardPosition().ifPresent(p -> move.from = p);
+			findClickedBoardPosition().ifPresent(p -> move.from = p);
 		} else if (move.to == -1) {
 			supplyMoveEndPosition(canJump).ifPresent(p -> move.to = p);
 		}
@@ -92,7 +93,7 @@ public class InteractivePlayer implements Player {
 			return board.neighbor(move.from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
-		return supplyMouseClickBoardPosition();
+		return findClickedBoardPosition();
 	}
 
 	Optional<Direction> supplyMoveDirection() {
@@ -104,7 +105,7 @@ public class InteractivePlayer implements Player {
 		/*@formatter:on*/
 	}
 
-	OptionalInt supplyMouseClickBoardPosition() {
-		return Mouse.clicked() ? boardUI.findPosition(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
+	OptionalInt findClickedBoardPosition() {
+		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }

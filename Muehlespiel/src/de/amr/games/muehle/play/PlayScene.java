@@ -289,11 +289,17 @@ public class PlayScene extends Scene<MillApp> {
 	public void init() {
 		createUI();
 
-		Player[] whitePlayers = { new InteractivePlayer(boardUI, WHITE), new RandomPlayer(board, WHITE),
+		/*@formatter:off*/
+		Player[] whitePlayers = { 
+				new InteractivePlayer(board, WHITE, boardUI::findPosition),
+				new RandomPlayer(board, WHITE), 
 				new Peter(board, WHITE) };
 
-		Player[] blackPlayers = { new InteractivePlayer(boardUI, BLACK), new RandomPlayer(board, BLACK),
+		Player[] blackPlayers = { 
+				new InteractivePlayer(board, BLACK, boardUI::findPosition),
+				new RandomPlayer(board, BLACK), 
 				new Peter(board, BLACK) };
+		/*@formatter:on*/
 
 		players[0] = whitePlayers[2];
 		players[1] = blackPlayers[2];
