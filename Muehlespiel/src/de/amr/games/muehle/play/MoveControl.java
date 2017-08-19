@@ -114,7 +114,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	}
 
 	private boolean canJump() {
-		return board.stoneCount(player.getColor()) == 3;
+		return board.canJump(player.getColor());
 	}
 
 	private Optional<Stone> getMovedStone() {

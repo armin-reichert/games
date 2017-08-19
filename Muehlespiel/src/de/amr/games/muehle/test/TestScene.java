@@ -70,9 +70,9 @@ public class TestScene extends Scene<MillTestApp> {
 		LOG.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
 		LOG.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
 		LOG.info("Positions from where can close white mill: "
-				+ toCSV(board.positions().filter(p -> board.canCloseMillFrom(p, WHITE))));
+				+ toCSV(board.positions().filter(p -> board.canCloseMillMovingFrom(p, WHITE))));
 		LOG.info("Positions from where can close black mill: "
-				+ toCSV(board.positions().filter(p -> board.canCloseMillFrom(p, BLACK))));
+				+ toCSV(board.positions().filter(p -> board.canCloseMillMovingFrom(p, BLACK))));
 	}
 
 	String toCSV(IntStream stream) {

@@ -78,6 +78,16 @@ public class Board extends BoardGraph {
 	}
 
 	/**
+	 * @param color
+	 *          a stone color
+	 * @return if the player with that color can jump
+	 */
+	public boolean canJump(StoneColor color) {
+		checkStoneColor(color);
+		return stoneCount(color) == 3;
+	}
+
+	/**
 	 * Puts a stone with the given color at the given position. The position must not contain a stone already.
 	 * 
 	 * @param p
@@ -401,7 +411,7 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * @param from
+	 * @param fromMil
 	 *          move start position
 	 * @param to
 	 *          move end position
@@ -428,6 +438,13 @@ public class Board extends BoardGraph {
 		return false;
 	}
 
+	public boolean isMillClosedByJump(int from, int to, StoneColor color) {
+		checkPosition(from);
+		checkPosition(to);
+		checkStoneColor(color);
+		return has(from, color) && isMillClosingPosition(to, color);
+	}
+
 	/**
 	 * @param p
 	 *          valid position
@@ -435,7 +452,7 @@ public class Board extends BoardGraph {
 	 *          stone color
 	 * @return if a mill of the given color can be closed when moving from p
 	 */
-	public boolean canCloseMillFrom(int p, StoneColor color) {
+	public boolean canCloseMillMovingFrom(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
 		return has(p, color) && (getVMillClosingNeighbors(p, color).findFirst().isPresent()
@@ -454,6 +471,12 @@ public class Board extends BoardGraph {
 			Direction dir = getDirection(n, p).get();
 			return dir == Direction.NORTH || dir == Direction.SOUTH;
 		});
+	}
+
+	public boolean canCloseMillJumpingFrom(int from, StoneColor color) {
+		checkPosition(from);
+		checkStoneColor(color);
+		return has(from, color) && positionsClosingMill(color).findAny().isPresent();
 	}
 
 	/**

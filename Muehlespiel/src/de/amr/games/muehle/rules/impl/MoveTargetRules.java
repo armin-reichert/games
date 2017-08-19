@@ -11,12 +11,18 @@ import de.amr.games.muehle.rules.api.TriFunction;
 
 public enum MoveTargetRules implements MoveTargetRule {
 
-	CLOSE_MILL(
-			"An Position %d kann eine Mühle geschlossen werden",
-			(board, color, from) -> randomElement(
-					board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByMove(from, to, color)))),
+	CLOSE_MILL("An Position %d kann eine Mühle geschlossen werden", (board, color, from) -> {
+		return board.canJump(color)
+				? randomElement(
+						board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByJump(from, to, color)))
+				: randomElement(
+						board.positions().filter(board::isEmptyPosition).filter(to -> board.isMillClosedByMove(from, to, color)));
+	}),
 
-	RANDOM("Position %d ist freie Nachbarposition", (board, color, from) -> randomElement(board.emptyNeighbors(from)))
+	RANDOM("Position %d ist freie Nachbarposition", (board, color, from) -> {
+		return board.canJump(color) ? randomElement(board.positions().filter(board::isEmptyPosition))
+				: randomElement(board.emptyNeighbors(from));
+	})
 
 	;
 

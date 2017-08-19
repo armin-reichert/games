@@ -136,10 +136,14 @@ public class PlayScene extends Scene<MillApp> {
 
 			// GAME_OVER
 
-			state(GAME_OVER).entry = s -> showMessage(turn == 0 ? "black_wins" : "white_wins");
+			state(GAME_OVER).entry = s -> {
+				showMessage(turn == 0 ? "black_wins" : "white_wins");
+				wait(3);
+			};
 
 			change(GAME_OVER, STARTING,
 					() -> !isInteractive(players[0]) && !isInteractive(players[1]) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+
 		}
 
 		void reset() {
@@ -157,7 +161,7 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		boolean canJump(int playerNumber) {
-			return board.stoneCount(players[playerNumber].getColor()) == 3;
+			return board.canJump(players[playerNumber].getColor());
 		}
 
 		boolean isTrapped(int playerNumber) {

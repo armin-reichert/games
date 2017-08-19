@@ -12,11 +12,14 @@ import de.amr.games.muehle.rules.api.MoveStartRule;
 public enum MoveStartRules implements MoveStartRule {
 	CAN_CLOSE_MILL(
 			"Von Position %d kann eine Mühle geschlossen werden",
-			(board, color) -> randomElement(board.positions(color).filter(p -> board.canCloseMillFrom(p, color)))),
+			(board, color) -> board.canJump(color)
+					? randomElement(board.positions(color).filter(p -> board.canCloseMillJumpingFrom(p, color)))
+					: randomElement(board.positions(color).filter(p -> board.canCloseMillMovingFrom(p, color)))),
 
 	CAN_MOVE(
-			"Position %d besitzt freie Nachbarposition",
-			(board, color) -> randomElement(board.positions(color).filter(board::hasEmptyNeighbor)));
+			"Starte von Position %d, sie besitzt freie Nachbarposition",
+			(board, color) -> randomElement(
+					board.positions(color).filter(p -> board.canJump(color) || board.hasEmptyNeighbor(p))));
 
 	@Override
 	public String getDescription() {
