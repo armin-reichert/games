@@ -1,4 +1,4 @@
-package de.amr.games.muehle.rules.samples;
+package de.amr.games.muehle.rules.impl;
 
 import java.util.OptionalInt;
 import java.util.function.BiFunction;

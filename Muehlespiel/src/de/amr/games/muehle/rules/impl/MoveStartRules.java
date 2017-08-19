@@ -1,4 +1,4 @@
-package de.amr.games.muehle.rules.samples;
+package de.amr.games.muehle.rules.impl;
 
 import static de.amr.games.muehle.util.Util.randomElement;
 

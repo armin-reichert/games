@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player.api;
+package de.amr.games.muehle.player.impl;
 
 import static de.amr.easy.game.Application.LOG;
 import static java.lang.String.format;
@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.MoveStartRule;
 import de.amr.games.muehle.rules.api.MoveTargetRule;
 import de.amr.games.muehle.rules.api.PlacingRule;

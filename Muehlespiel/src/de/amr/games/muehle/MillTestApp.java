@@ -20,7 +20,7 @@ public class MillTestApp extends Application {
 	}
 
 	public MillTestApp() {
-		settings.title = Messages.text("title");
+		settings.title = "Mill Test Application";
 		settings.width = 800;
 		settings.height = 800;
 		settings.fullScreenMode = null;

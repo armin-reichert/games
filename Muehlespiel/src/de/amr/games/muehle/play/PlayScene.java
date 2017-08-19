@@ -29,8 +29,8 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.samples.InteractivePlayer;
-import de.amr.games.muehle.player.samples.Peter;
+import de.amr.games.muehle.player.impl.InteractivePlayer;
+import de.amr.games.muehle.player.impl.Peter;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.StoneCounter;
 

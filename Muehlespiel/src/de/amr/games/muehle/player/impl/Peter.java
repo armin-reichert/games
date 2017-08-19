@@ -1,16 +1,15 @@
-package de.amr.games.muehle.player.samples;
+package de.amr.games.muehle.player.impl;
 
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.player.api.RuleBasedPlayer;
 import de.amr.games.muehle.rules.api.MoveStartRule;
 import de.amr.games.muehle.rules.api.MoveTargetRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
 import de.amr.games.muehle.rules.api.RemovalRule;
-import de.amr.games.muehle.rules.samples.MoveStartRules;
-import de.amr.games.muehle.rules.samples.MoveTargetRules;
-import de.amr.games.muehle.rules.samples.PlacingRules;
-import de.amr.games.muehle.rules.samples.RemovalRules;
+import de.amr.games.muehle.rules.impl.MoveStartRules;
+import de.amr.games.muehle.rules.impl.MoveTargetRules;
+import de.amr.games.muehle.rules.impl.PlacingRules;
+import de.amr.games.muehle.rules.impl.RemovalRules;
 
 public class Peter extends RuleBasedPlayer {
 
