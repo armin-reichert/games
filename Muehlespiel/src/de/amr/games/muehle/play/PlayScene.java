@@ -15,9 +15,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
@@ -76,6 +79,7 @@ public class PlayScene extends Scene<MillApp> {
 				waitTime -= 1;
 			} else {
 				super.update();
+				assistant.update();
 			}
 		}
 
@@ -97,7 +101,8 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> tryToPlaceStone();
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill);
+			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill,
+					(e, s, t) -> assistant.playYoFine());
 
 			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> switchPlacing());
 
@@ -139,6 +144,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(GAME_OVER).entry = s -> {
 				showMessage("wins", players[1 - turn].getName());
+				assistant.playWin();
 				wait(3);
 			};
 
@@ -177,6 +183,11 @@ public class PlayScene extends Scene<MillApp> {
 
 		void switchPlacing() {
 			turnPlacingTo(1 - turn);
+			if (assistant.enabled) {
+				if (turn == 0) {
+					assistant.playPlacingHint();
+				}
+			}
 		}
 
 		void turnMovingTo(int playerNumber) {
@@ -244,10 +255,12 @@ public class PlayScene extends Scene<MillApp> {
 	 */
 	class Assistant extends GameEntity {
 
+		List<Sound> sounds;
 		boolean enabled;
 
 		Assistant() {
 			setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
+			loadSounds();
 		}
 
 		void toggle() {
@@ -260,8 +273,18 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		@Override
+		public void update() {
+			if (!enabled) {
+				return;
+			}
+		}
+
+		@Override
 		public void draw(Graphics2D g) {
 			if (!enabled) {
+				return;
+			}
+			if (sounds.stream().noneMatch(sound -> sound.isRunning())) {
 				return;
 			}
 			super.draw(g);
@@ -279,6 +302,41 @@ public class PlayScene extends Scene<MillApp> {
 				}
 			}
 		}
+
+		void loadSounds() {
+			sounds = new ArrayList<>();
+			sounds.add(Assets.sound("sfx/gegner_muehle.mp3"));
+			sounds.add(Assets.sound("sfx/can_close_mill.mp3"));
+			sounds.add(Assets.sound("sfx/can_open_two_mills.mp3"));
+			sounds.add(Assets.sound("sfx/fine_gemacht.mp3"));
+			sounds.add(Assets.sound("sfx/win.mp3"));
+		}
+
+		void playPlacingHint() {
+			if (!control.is(PLACING)) {
+				return;
+			}
+			Player player = players[turn];
+			if (board.positions().anyMatch(p -> board.isMillClosingPosition(p, player.getColor().other()))) {
+				Assets.sound("sfx/gegner_muehle.mp3").play();
+			} else if (board.positions().anyMatch(p -> board.isMillClosingPosition(p, player.getColor()))) {
+				Assets.sound("sfx/can_close_mill.mp3").play();
+			} else if (board.positionsOpeningTwoMills(player.getColor()).findAny().isPresent()) {
+				Assets.sound("sfx/can_open_two_mills.mp3").play();
+			}
+		}
+
+		void playYoFine() {
+			if (turn == 0) {
+				Assets.sound("sfx/fine_gemacht.mp3").play();
+			}
+		}
+
+		void playWin() {
+			Assets.sound("sfx/win.mp3").play();
+
+		}
+
 	}
 
 	public PlayScene(MillApp app) {
@@ -305,8 +363,8 @@ public class PlayScene extends Scene<MillApp> {
 		};
 		/*@formatter:on*/
 
-		players[0] = whitePlayers[3];
-		players[1] = blackPlayers[2];
+		players[0] = whitePlayers[0];
+		players[1] = blackPlayers[3];
 
 		// State machines
 		moveControl = new MoveControl(boardUI, app.pulse);
