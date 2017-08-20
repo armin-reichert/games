@@ -32,6 +32,7 @@ import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.player.impl.InteractivePlayer;
 import de.amr.games.muehle.player.impl.Peter;
 import de.amr.games.muehle.player.impl.RandomPlayer;
+import de.amr.games.muehle.player.impl.Zwick;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.StoneCounter;
 
@@ -106,7 +107,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING_REMOVING).entry = s -> {
 				removedAt = -1;
-				showMessage(turn == 0 ? "white_must_take" : "black_must_take");
+				showMessage("must_take", players[turn].getName());
 			};
 
 			state(PLACING_REMOVING).update = s -> tryToRemoveStone();
@@ -127,7 +128,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING_REMOVING).entry = s -> {
 				removedAt = -1;
-				showMessage(turn == 0 ? "white_must_take" : "black_must_take");
+				showMessage("must_take", players[turn].getName());
 			};
 
 			state(MOVING_REMOVING).update = s -> tryToRemoveStone();
@@ -137,7 +138,7 @@ public class PlayScene extends Scene<MillApp> {
 			// GAME_OVER
 
 			state(GAME_OVER).entry = s -> {
-				showMessage(turn == 0 ? "black_wins" : "white_wins");
+				showMessage("wins", players[1 - turn].getName());
 				wait(3);
 			};
 
@@ -170,7 +171,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		void turnPlacingTo(int playerNumber) {
 			turn = playerNumber;
-			showMessage(turn == 0 ? "white_must_place" : "black_must_place");
+			showMessage("must_place", players[turn].getName());
 			wait(players[turn] instanceof InteractivePlayer ? 0 : 1);
 		}
 
@@ -181,7 +182,7 @@ public class PlayScene extends Scene<MillApp> {
 		void turnMovingTo(int playerNumber) {
 			turn = playerNumber;
 			moveControl.setPlayer(players[turn]);
-			showMessage(turn == 0 ? "white_must_move" : "black_must_move");
+			showMessage("must_move", players[turn].getName());
 		}
 
 		void switchMoving() {
@@ -215,8 +216,7 @@ public class PlayScene extends Scene<MillApp> {
 				} else {
 					boardUI.removeStoneAt(removalPosition);
 					removedAt = removalPosition;
-					LOG.info(Messages.text(turn == 0 ? "white_removed_stone_at_position" : "black_removed_stone_at_position",
-							removalPosition));
+					LOG.info(Messages.text("removed_stone_at_position", players[turn].getName(), removalPosition));
 				}
 			});
 		}
@@ -293,15 +293,19 @@ public class PlayScene extends Scene<MillApp> {
 		Player[] whitePlayers = { 
 				new InteractivePlayer(board, WHITE, boardUI::findPosition),
 				new RandomPlayer(board, WHITE), 
-				new Peter(board, WHITE) };
+				new Peter(board, WHITE),
+				new Zwick(board, WHITE)
+		};
 
 		Player[] blackPlayers = { 
 				new InteractivePlayer(board, BLACK, boardUI::findPosition),
 				new RandomPlayer(board, BLACK), 
-				new Peter(board, BLACK) };
+				new Peter(board, BLACK),
+				new Zwick(board, BLACK)
+		};
 		/*@formatter:on*/
 
-		players[0] = whitePlayers[2];
+		players[0] = whitePlayers[3];
 		players[1] = blackPlayers[2];
 
 		// State machines

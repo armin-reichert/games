@@ -63,11 +63,6 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public boolean canJump() {
-		return board.stoneCount(color) == 3;
-	}
-
-	@Override
 	public OptionalInt supplyPlacingPosition() {
 		return findClickedBoardPosition();
 	}

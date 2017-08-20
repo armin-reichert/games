@@ -53,11 +53,6 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public boolean canJump() {
-		return board.stoneCount(color) == 3;
-	}
-
-	@Override
 	public void newMove() {
 		move = new Move();
 	}

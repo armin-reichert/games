@@ -11,16 +11,16 @@ import de.amr.games.muehle.rules.impl.MoveTargetRules;
 import de.amr.games.muehle.rules.impl.PlacingRules;
 import de.amr.games.muehle.rules.impl.RemovalRules;
 
-public class Peter extends RuleBasedPlayer {
+public class Zwick extends RuleBasedPlayer {
 
 	static final PlacingRule[] PLACING_RULES = {
 			/*@formatter:off*/
 			PlacingRules.EMPTYBOARD,
 			PlacingRules.CLOSE_MILL,
-//			PlacingRules.DESTROY_MILL, 
-//			PlacingRules.OPEN_TWO_MILLS,
-//			PlacingRules.OPEN_ONE_MILL,
-//			PlacingRules.NEAR_OWN_COLOR, 
+			PlacingRules.DESTROY_MILL, 
+			PlacingRules.OPEN_TWO_MILLS,
+			PlacingRules.OPEN_ONE_MILL,
+			PlacingRules.NEAR_OWN_COLOR, 
 			PlacingRules.RANDOM,
 			/*@formatter:on*/
 	};
@@ -47,10 +47,12 @@ public class Peter extends RuleBasedPlayer {
 
 	@Override
 	public String getName() {
-		return "Strack";
+		return "Zwicki";
 	}
 
-	public Peter(Board board, StoneColor color) {
+	public Zwick(Board board, StoneColor color) {
 		super(board, color, PLACING_RULES, MOVE_START_RULES, MOVE_TARGET_RULES, REMOVAL_RULES);
+		// TODO Auto-generated constructor stub
 	}
+
 }
