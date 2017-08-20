@@ -7,6 +7,7 @@ import java.awt.RenderingHints;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
@@ -14,14 +15,15 @@ import de.amr.games.muehle.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class StoneCounter extends Stone {
+public class StoneCounter extends GameEntity {
 
+	Stone stone;
 	Font font;
 	BooleanSupplier selectedSupplier;
 	IntSupplier stoneCountSupplier;
 
 	public StoneCounter(StoneColor color, int radius, IntSupplier stoneCountSupplier, BooleanSupplier selectedSupplier) {
-		super(color, radius);
+		stone = new Stone(color, radius);
 		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * radius);
 		this.stoneCountSupplier = stoneCountSupplier;
 		this.selectedSupplier = selectedSupplier;
@@ -37,11 +39,12 @@ public class StoneCounter extends Stone {
 
 	@Override
 	public void draw(Graphics2D g) {
+		stone.tf.moveTo(tf.getX(), tf.getY());
 		int numStones = stoneCountSupplier.getAsInt();
 		String text = String.valueOf(numStones);
 		for (int i = numStones - 1; i >= 0; --i) {
 			g.translate(5 * i, -5 * i);
-			super.draw(g);
+			stone.draw(g);
 			g.translate(-5 * i, 5 * i);
 		}
 		if (numStones > 1) {
@@ -49,7 +52,7 @@ public class StoneCounter extends Stone {
 			g.setColor(isSelected() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(font);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(text, 2 * radius, radius);
+			g.drawString(text, 2 * stone.getRadius(), stone.getRadius());
 			g.translate(-tf.getX(), -tf.getY());
 		}
 	}

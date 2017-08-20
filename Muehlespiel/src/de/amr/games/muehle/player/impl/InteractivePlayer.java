@@ -53,6 +53,11 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
+	public String getName() {
+		return getColor().toString();
+	}
+
+	@Override
 	public Board getBoard() {
 		return board;
 	}
