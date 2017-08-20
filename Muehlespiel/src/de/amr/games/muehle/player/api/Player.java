@@ -2,6 +2,7 @@ package de.amr.games.muehle.player.api;
 
 import java.util.OptionalInt;
 
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 
@@ -16,14 +17,17 @@ public interface Player {
 		return String.format("%s(%s)", getClass().getSimpleName(), getColor() == StoneColor.WHITE ? "Weiß" : "Schwarz");
 	}
 
+	public Board getBoard();
+
 	public StoneColor getColor();
 
 	public OptionalInt supplyPlacingPosition();
 
 	public OptionalInt supplyRemovalPosition();
 
-	public Move supplyMove(boolean canJump);
+	public Move supplyMove();
 
-	public default void newMove() {
-	}
+	public void newMove();
+
+	public boolean canJump();
 }

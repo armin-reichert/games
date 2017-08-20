@@ -53,8 +53,18 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
+	public Board getBoard() {
+		return board;
+	}
+
+	@Override
 	public StoneColor getColor() {
 		return color;
+	}
+
+	@Override
+	public boolean canJump() {
+		return board.stoneCount(color) == 3;
 	}
 
 	@Override
@@ -68,11 +78,11 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public Move supplyMove(boolean canJump) {
+	public Move supplyMove() {
 		if (move.from == -1) {
 			findClickedBoardPosition().ifPresent(p -> move.from = p);
 		} else if (move.to == -1) {
-			supplyMoveEndPosition(canJump).ifPresent(p -> move.to = p);
+			supplyMoveEndPosition().ifPresent(p -> move.to = p);
 		}
 		return move;
 	}
@@ -82,9 +92,9 @@ public class InteractivePlayer implements Player {
 		move = new Move();
 	}
 
-	OptionalInt supplyMoveEndPosition(boolean canJump) {
+	OptionalInt supplyMoveEndPosition() {
 		// if end position is uniquely determined, use it
-		if (!canJump && board.emptyNeighbors(move.from).count() == 1) {
+		if (!canJump() && board.emptyNeighbors(move.from).count() == 1) {
 			return board.emptyNeighbors(move.from).findFirst();
 		}
 		// if move direction has been specified, use position in that direction

@@ -68,13 +68,13 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		// READING_MOVE
 
-		state(READING_MOVE).update = s -> move = player.supplyMove(canJump());
+		state(READING_MOVE).update = s -> move = player.supplyMove();
 
 		change(READING_MOVE, INITIAL, () -> hasMoveStartPosition() && !isMoveStartPossible());
 
 		change(READING_MOVE, INITIAL, () -> hasBothMovePositions() && !isMovePossible());
 
-		change(READING_MOVE, JUMPING, () -> hasBothMovePositions() && isMovePossible() && canJump());
+		change(READING_MOVE, JUMPING, () -> hasBothMovePositions() && isMovePossible() && player.canJump());
 
 		change(READING_MOVE, MOVING, () -> hasBothMovePositions() && isMovePossible());
 
@@ -113,10 +113,6 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		return player;
 	}
 
-	private boolean canJump() {
-		return board.canJump(player.getColor());
-	}
-
 	private Optional<Stone> getMovedStone() {
 		return boardUI.getStoneAt(move.from);
 	}
@@ -135,7 +131,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 	public boolean isMoveStartPossible() {
 		return hasMoveStartPosition() && board.getStoneAt(move.from) == player.getColor()
-				&& (canJump() || board.hasEmptyNeighbor(move.from));
+				&& (player.canJump() || board.hasEmptyNeighbor(move.from));
 	}
 
 	private boolean isMovePossible() {
@@ -143,10 +139,10 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
 		} else if (getMovedStone().get().getColor() != player.getColor()) {
 			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
-		} else if (!canJump() && !board.hasEmptyNeighbor(move.from)) {
+		} else if (!player.canJump() && !board.hasEmptyNeighbor(move.from)) {
 			LOG.info(Messages.text("stone_at_position_cannot_move", move.from));
-		} else if (board.isEmptyPosition(move.to) && (canJump() || board.areNeighbors(move.from, move.to))) {
-			return canJump() ? board.isEmptyPosition(move.to)
+		} else if (board.isEmptyPosition(move.to) && (player.canJump() || board.areNeighbors(move.from, move.to))) {
+			return player.canJump() ? board.isEmptyPosition(move.to)
 					: board.isEmptyPosition(move.to) && board.areNeighbors(move.from, move.to);
 		}
 		return false;

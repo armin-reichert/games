@@ -3,8 +3,8 @@ package de.amr.games.muehle.rules.impl;
 import java.util.OptionalInt;
 import java.util.function.BiFunction;
 
-import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.RemovalRule;
 import de.amr.games.muehle.util.Util;
 
@@ -12,13 +12,13 @@ public enum RemovalRules implements RemovalRule {
 
 	RANDOM(
 			"Entferne Stein auf zufällig gewählter Position %d",
-			(board, color) -> Util.randomElement(board.positions(color)))
+			(player, removalColor) -> Util.randomElement(player.getBoard().positions(removalColor)))
 
 	;
 
 	@Override
-	public OptionalInt supplyPosition(Board board, StoneColor color) {
-		return condition.apply(board, color) ? positionSupplier.apply(board, color) : OptionalInt.empty();
+	public OptionalInt supplyPosition(Player player, StoneColor removalColor) {
+		return condition.apply(player, removalColor) ? positionSupplier.apply(player, removalColor) : OptionalInt.empty();
 	}
 
 	@Override
@@ -26,18 +26,18 @@ public enum RemovalRules implements RemovalRule {
 		return description;
 	}
 
-	private RemovalRules(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier,
-			BiFunction<Board, StoneColor, Boolean> condition) {
+	private RemovalRules(String description, BiFunction<Player, StoneColor, OptionalInt> positionSupplier,
+			BiFunction<Player, StoneColor, Boolean> condition) {
 		this.description = description;
-		this.positionSupplier = placingPositionSupplier;
+		this.positionSupplier = positionSupplier;
 		this.condition = condition;
 	}
 
-	private RemovalRules(String description, BiFunction<Board, StoneColor, OptionalInt> placingPositionSupplier) {
-		this(description, placingPositionSupplier, (board, color) -> true);
+	private RemovalRules(String description, BiFunction<Player, StoneColor, OptionalInt> positionSupplier) {
+		this(description, positionSupplier, (player, removalColor) -> true);
 	}
 
 	private final String description;
-	private final BiFunction<Board, StoneColor, OptionalInt> positionSupplier;
-	private final BiFunction<Board, StoneColor, Boolean> condition;
+	private final BiFunction<Player, StoneColor, OptionalInt> positionSupplier;
+	private final BiFunction<Player, StoneColor, Boolean> condition;
 }

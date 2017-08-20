@@ -161,7 +161,7 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		boolean canJump(int playerNumber) {
-			return board.canJump(players[playerNumber].getColor());
+			return players[playerNumber].canJump();
 		}
 
 		boolean isTrapped(int playerNumber) {

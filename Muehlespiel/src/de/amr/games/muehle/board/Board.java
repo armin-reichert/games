@@ -78,16 +78,6 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * @param color
-	 *          a stone color
-	 * @return if the player with that color can jump
-	 */
-	public boolean canJump(StoneColor color) {
-		checkStoneColor(color);
-		return stoneCount(color) == 3;
-	}
-
-	/**
 	 * Puts a stone with the given color at the given position. The position must not contain a stone already.
 	 * 
 	 * @param p

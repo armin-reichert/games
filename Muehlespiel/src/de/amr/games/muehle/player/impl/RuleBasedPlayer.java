@@ -43,8 +43,18 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
+	public Board getBoard() {
+		return board;
+	}
+
+	@Override
 	public StoneColor getColor() {
 		return color;
+	}
+
+	@Override
+	public boolean canJump() {
+		return board.stoneCount(color) == 3;
 	}
 
 	@Override
@@ -60,12 +70,12 @@ public class RuleBasedPlayer implements Player {
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return Stream.of(removalRules).map(rule -> tryRemovalRule(rule, color.other())).filter(OptionalInt::isPresent)
-				.findFirst().orElse(OptionalInt.empty());
+		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	@Override
-	public Move supplyMove(boolean canJump) {
+	public Move supplyMove() {
 		if (move.from == -1) {
 			supplyMoveStartPosition().ifPresent(pos -> move.from = pos);
 		} else {
@@ -85,25 +95,25 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	OptionalInt tryPlacingRule(PlacingRule rule) {
-		OptionalInt optPosition = rule.supplyPosition(board, color);
+		OptionalInt optPosition = rule.supplyPosition(this);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
-	OptionalInt tryRemovalRule(RemovalRule rule, StoneColor removalColor) {
-		OptionalInt optPosition = rule.supplyPosition(board, removalColor);
+	OptionalInt tryRemovalRule(RemovalRule rule) {
+		OptionalInt optPosition = rule.supplyPosition(this, getColor().other());
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
 	OptionalInt tryMoveStartRule(MoveStartRule rule) {
-		OptionalInt optPosition = rule.supplyPosition(board, color);
+		OptionalInt optPosition = rule.supplyPosition(this);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
 	OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
-		OptionalInt optPosition = rule.supplyPosition(board, color, from);
+		OptionalInt optPosition = rule.supplyPosition(this, from);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
