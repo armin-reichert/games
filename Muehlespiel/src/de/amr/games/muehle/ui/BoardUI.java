@@ -180,7 +180,7 @@ public class BoardUI extends GameEntity {
 		board.positionsClosingMill(stoneColor).forEach(p -> markPosition(g, p, color));
 	}
 
-	public void markPositionFixingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {
+	public void markPositionTrappingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {
 		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
 			if (board.neighbors(singleFreePosition).anyMatch(p -> board.getStoneAt(p) == either)) {

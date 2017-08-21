@@ -283,7 +283,7 @@ public class PlayScene extends Scene<MillApp> {
 		};
 		/*@formatter:on*/
 
-		players[0] = whitePlayers[0];
+		players[0] = whitePlayers[2];
 		players[1] = blackPlayers[3];
 
 		assistant.setPlayers(players[0], players[1]);
@@ -297,8 +297,6 @@ public class PlayScene extends Scene<MillApp> {
 	}
 
 	void createUI() {
-		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
-
 		boardUI = new BoardUI(board, 600, 600);
 
 		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
@@ -307,6 +305,7 @@ public class PlayScene extends Scene<MillApp> {
 		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[1],
 				() -> turn == 1);
 
+		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);

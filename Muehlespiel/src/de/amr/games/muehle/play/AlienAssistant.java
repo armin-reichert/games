@@ -113,8 +113,8 @@ class AlienAssistant extends GameEntity {
 		if (scene.getMoveControl().isMoveStartPossible()) {
 			scene.getMoveControl().getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 		} else {
-			boardUI.markPossibleMoveStarts(g, movingColor, scene.getControl().canJump(scene.getTurn()));
-			boardUI.markPositionFixingOpponent(g, movingColor, movingColor.other(), Color.RED);
+			boardUI.markPossibleMoveStarts(g, movingColor, scene.getPlayerInTurn().canJump());
+			boardUI.markPositionTrappingOpponent(g, movingColor, movingColor.other(), Color.RED);
 		}
 	}
 
