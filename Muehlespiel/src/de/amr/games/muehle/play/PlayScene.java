@@ -15,16 +15,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.Scene;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
@@ -59,7 +55,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	// UI
 	BoardUI boardUI;
-	Assistant assistant;
+	AlienAssistant assistant;
 	MoveControl moveControl;
 	TextArea messageArea;
 
@@ -101,11 +97,10 @@ public class PlayScene extends Scene<MillApp> {
 			state(PLACING).update = s -> tryToPlaceStone();
 
 			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill,
-					(e, s, t) -> assistant.playYoFine());
+					(e, s, t) -> assistant.tellMillClosed());
 
 			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> {
 				switchPlacing();
-				assistant.playPlacingHint();
 			});
 
 			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, (s, t) -> switchMoving());
@@ -162,9 +157,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		void win(int winner) {
 			showMessage("wins", players[winner].getName());
-			if (assistant.enabled) {
-				assistant.playWin();
-			}
+			assistant.tellWin();
 		}
 
 		boolean isInteractive(Player player) {
@@ -204,6 +197,7 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		void tryToPlaceStone() {
+			assistant.givePlacingHint();
 			players[turn].supplyPlacingPosition().ifPresent(placePosition -> {
 				if (board.hasStoneAt(placePosition)) {
 					LOG.info(Messages.text("stone_at_position", placePosition));
@@ -214,6 +208,7 @@ public class PlayScene extends Scene<MillApp> {
 					placedAt = placePosition;
 					placedColor = colorInTurn;
 					addInput(STONE_PLACED);
+					assistant.moveHome();
 				}
 			});
 		}
@@ -253,97 +248,16 @@ public class PlayScene extends Scene<MillApp> {
 		}
 	};
 
-	/**
-	 * Draws hints helping the current player in placing or moving.
-	 */
-	class Assistant extends GameEntity {
-
-		List<String> sounds;
-		boolean enabled;
-
-		Assistant() {
-			setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
-			loadSounds();
-		}
-
-		void toggle() {
-			setEnabled(!enabled);
-			if (enabled) {
-				playYoFine();
-			}
-		}
-
-		void setEnabled(boolean enabled) {
-			this.enabled = enabled;
-			LOG.info(Messages.text(enabled ? "assistant_on" : "assistant_off"));
-		}
-
-		@Override
-		public void draw(Graphics2D g) {
-			if (!enabled) {
-				return;
-			}
-			if (sounds.stream().noneMatch(sound -> Assets.sound(sound).isRunning())) {
-				return;
-			}
-			super.draw(g);
-			StoneColor stoneColor = players[turn].getColor();
-			if (control.is(PLACING)) {
-				boardUI.markPositionsClosingMill(g, stoneColor, Color.GREEN);
-				boardUI.markPositionsOpeningTwoMills(g, stoneColor, Color.YELLOW);
-				boardUI.markPositionsClosingMill(g, stoneColor.other(), Color.RED);
-			} else if (control.is(MOVING)) {
-				if (moveControl.isMoveStartPossible()) {
-					moveControl.getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
-				} else {
-					boardUI.markPossibleMoveStarts(g, stoneColor, control.canJump(turn));
-					boardUI.markPositionFixingOpponent(g, stoneColor, stoneColor.other(), Color.RED);
-				}
-			}
-		}
-
-		void loadSounds() {
-			sounds = new ArrayList<>();
-			sounds.add("sfx/gegner_muehle.mp3");
-			sounds.add("sfx/can_close_mill.mp3");
-			sounds.add("sfx/can_open_two_mills.mp3");
-			sounds.add("sfx/fine_gemacht.mp3");
-			sounds.add("sfx/win.mp3");
-		}
-
-		void play(String sound) {
-			if (!enabled) {
-				return;
-			}
-			Assets.sound(sound).play();
-		}
-
-		void playPlacingHint() {
-			if (control.is(PLACING) && turn == 0) {
-				if (board.positions().anyMatch(p -> board.isMillClosingPosition(p, players[1].getColor()))) {
-					play("sfx/gegner_muehle.mp3");
-				} else if (board.positions().anyMatch(p -> board.isMillClosingPosition(p, players[0].getColor()))) {
-					play("sfx/can_close_mill.mp3");
-				} else if (board.positionsOpeningTwoMills(players[0].getColor()).findAny().isPresent()) {
-					play("sfx/can_open_two_mills.mp3");
-				}
-			}
-		}
-
-		void playYoFine() {
-			if (turn == 0) {
-				play("sfx/fine_gemacht.mp3");
-			}
-		}
-
-		void playWin() {
-			play("sfx/win.mp3");
-		}
-
-	}
-
 	public PlayScene(MillApp app) {
 		super(app);
+	}
+
+	Player getPlayerInTurn() {
+		return players[turn];
+	}
+
+	Player getOpponentPlayer() {
+		return players[1 - turn];
 	}
 
 	@Override
@@ -369,6 +283,8 @@ public class PlayScene extends Scene<MillApp> {
 		players[0] = whitePlayers[0];
 		players[1] = blackPlayers[3];
 
+		assistant.setPlayers(players[0], players[1]);
+
 		// State machines
 		moveControl = new MoveControl(boardUI, app.pulse);
 		// moveControl.setLogger(LOG);
@@ -379,15 +295,21 @@ public class PlayScene extends Scene<MillApp> {
 
 	void createUI() {
 		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
+
 		boardUI = new BoardUI(board, 600, 600);
+
 		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
 				() -> turn == 0);
+
 		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[1],
 				() -> turn == 1);
+
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);
-		assistant = new Assistant();
+
+		assistant = new AlienAssistant(this);
+		assistant.init();
 
 		// Layout
 		boardUI.hCenter(getWidth());
@@ -395,8 +317,7 @@ public class PlayScene extends Scene<MillApp> {
 		stoneCounters[0].tf.moveTo(40, getHeight() - 50);
 		stoneCounters[1].tf.moveTo(getWidth() - 100, getHeight() - 50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
-		assistant.hCenter(getWidth());
-		assistant.tf.setY(getHeight() / 2 - assistant.getHeight());
+		assistant.moveHome();
 	}
 
 	@Override
@@ -410,6 +331,12 @@ public class PlayScene extends Scene<MillApp> {
 			control.init();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
 			assistant.toggle();
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
+			assistant.setEnabled(true);
+			assistant.setAssistanceLevel(0);
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
+			assistant.setEnabled(true);
+			assistant.setAssistanceLevel(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			boardUI.togglePositionNumbers();
 		}
