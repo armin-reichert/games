@@ -34,6 +34,7 @@ public class StateMachine<StateID, Input> {
 	private StateID currentStateID;
 	private Optional<Logger> optLogger;
 	private int frequency = 60;
+	private int pauseTime;
 
 	/**
 	 * Creates a new state machine.
@@ -196,6 +197,10 @@ public class StateMachine<StateID, Input> {
 	 * Triggers an update (processing step) of this state machine.
 	 */
 	public void update() {
+		if (pauseTime > 0) {
+			pauseTime -= 1;
+			return;
+		}
 		if (!inputQ.isEmpty()) {
 			Optional<Transition<StateID>> transition = step();
 			Input input = inputQ.poll();
@@ -210,6 +215,13 @@ public class StateMachine<StateID, Input> {
 		} else {
 			step();
 		}
+	}
+
+	public void pause(int ticks) {
+		if (pauseTime < 0) {
+			throw new IllegalArgumentException("Negative pause time is not allowed");
+		}
+		pauseTime = ticks;
 	}
 
 	private Optional<Transition<StateID>> step() {

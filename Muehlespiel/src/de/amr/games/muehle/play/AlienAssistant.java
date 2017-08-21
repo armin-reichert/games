@@ -47,8 +47,8 @@ class AlienAssistant extends GameEntity {
 
 	AlienAssistant(PlayScene scene) {
 		this.scene = scene;
-		this.boardUI = scene.boardUI;
-		this.board = scene.board;
+		this.boardUI = scene.getBoardUI();
+		this.board = this.boardUI.getBoard();
 		this.assistanceLevel = 0;
 	}
 
@@ -95,9 +95,9 @@ class AlienAssistant extends GameEntity {
 		}
 		super.draw(g);
 		if (assistanceLevel == 1) {
-			if (scene.control.is(PLACING)) {
+			if (scene.getControl().is(PLACING)) {
 				drawPlacingHints(g, scene.getPlayerInTurn().getColor());
-			} else if (scene.control.is(MOVING)) {
+			} else if (scene.getControl().is(MOVING)) {
 				drawMovingHints(g, scene.getPlayerInTurn().getColor());
 			}
 		}
@@ -110,10 +110,10 @@ class AlienAssistant extends GameEntity {
 	}
 
 	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
-		if (scene.moveControl.isMoveStartPossible()) {
-			scene.moveControl.getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
+		if (scene.getMoveControl().isMoveStartPossible()) {
+			scene.getMoveControl().getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 		} else {
-			boardUI.markPossibleMoveStarts(g, movingColor, scene.control.canJump(scene.turn));
+			boardUI.markPossibleMoveStarts(g, movingColor, scene.getControl().canJump(scene.getTurn()));
 			boardUI.markPositionFixingOpponent(g, movingColor, movingColor.other(), Color.RED);
 		}
 	}

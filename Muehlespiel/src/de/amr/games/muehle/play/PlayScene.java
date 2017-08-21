@@ -43,44 +43,32 @@ public class PlayScene extends Scene<MillApp> {
 
 	static final int NUM_STONES = 9;
 
-	FSM control = new FSM();
-	Board board = new Board();
-	Player[] whitePlayers;
-	Player[] blackPlayers;
-	Player[] players = new Player[2];
-	int[] stonesPlaced = new int[2];
-	StoneCounter[] stoneCounters = new StoneCounter[2];
+	private FSM control = new FSM();
+	private Board board = new Board();
+	private Player[] players = new Player[2];
+	private int[] stonesPlaced = new int[2];
+	private StoneCounter[] stoneCounters = new StoneCounter[2];
 
-	int turn;
+	private int turn;
 
 	// UI
-	BoardUI boardUI;
-	AlienAssistant assistant;
-	MoveControl moveControl;
-	TextArea messageArea;
+	private BoardUI boardUI;
+	private AlienAssistant assistant;
+	private MoveControl moveControl;
+	private TextArea messageArea;
 
 	/** Finite-state-machine for game control. */
 	class FSM extends StateMachine<GamePhase, GameEvent> {
 
-		int waitTime;
-
-		void wait(int seconds) {
-			waitTime = app.pulse.secToTicks(seconds);
-		}
-
 		@Override
 		public void update() {
-			if (waitTime > 0) {
-				waitTime -= 1;
-			} else {
-				super.update();
-				assistant.update();
-			}
+			super.update();
+			assistant.update();
 		}
 
-		int placedAt;
-		StoneColor placedColor;
-		int removedAt;
+		private int placedAt;
+		private StoneColor placedColor;
+		private int removedAt;
 
 		FSM() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTING);
@@ -141,12 +129,11 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(GAME_OVER).entry = s -> {
 				win(1 - turn);
-				wait(3);
+				pause(app.pulse.secToTicks(3));
 			};
 
 			change(GAME_OVER, STARTING,
 					() -> !isInteractive(players[0]) && !isInteractive(players[1]) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-
 		}
 
 		void reset() {
@@ -179,7 +166,7 @@ public class PlayScene extends Scene<MillApp> {
 		void turnPlacingTo(int playerNumber) {
 			turn = playerNumber;
 			showMessage("must_place", players[turn].getName());
-			wait(players[turn] instanceof InteractivePlayer ? 0 : 1);
+			pause(players[turn] instanceof InteractivePlayer ? 0 : app.pulse.secToTicks(1));
 		}
 
 		void switchPlacing() {
@@ -258,6 +245,22 @@ public class PlayScene extends Scene<MillApp> {
 
 	Player getOpponentPlayer() {
 		return players[1 - turn];
+	}
+
+	BoardUI getBoardUI() {
+		return boardUI;
+	}
+
+	FSM getControl() {
+		return control;
+	}
+
+	MoveControl getMoveControl() {
+		return moveControl;
+	}
+
+	int getTurn() {
+		return turn;
 	}
 
 	@Override
@@ -358,7 +361,7 @@ public class PlayScene extends Scene<MillApp> {
 			Stream.of(stoneCounters).forEach(counter -> counter.draw(g));
 		}
 		if (control.is(PLACING_REMOVING, MOVING_REMOVING)) {
-			boardUI.markRemovableStones(g, players[1 - turn].getColor());
+			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
 		}
 	}
 }
