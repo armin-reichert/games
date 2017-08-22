@@ -52,7 +52,7 @@ public enum PlacingRules implements PlacingRule {
 	;
 
 	@Override
-	public OptionalInt supplyPosition(Player player) {
+	public OptionalInt supplyPlacingPosition(Player player) {
 		return condition.apply(player) ? positionSupplier.apply(player) : OptionalInt.empty();
 	}
 

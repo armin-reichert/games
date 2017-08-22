@@ -17,7 +17,7 @@ public enum RemovalRules implements RemovalRule {
 	;
 
 	@Override
-	public OptionalInt supplyPosition(Player player, StoneColor removalColor) {
+	public OptionalInt supplyRemovalPosition(Player player, StoneColor removalColor) {
 		return condition.apply(player, removalColor) ? positionSupplier.apply(player, removalColor) : OptionalInt.empty();
 	}
 

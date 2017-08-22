@@ -28,7 +28,7 @@ public enum MovingRules implements MovingRule {
 				? board.isMillClosedByJump(from, to, color) : board.isMillClosedByMove(from, to, color)));
 	}),
 
-	ANY_POSSIBLE_MOVE("Führe beliebigen möglichen Zug aus", player -> {
+	RANDOM("Führe beliebigen möglichen Zug aus", player -> {
 		Board board = player.getBoard();
 		StoneColor color = player.getColor();
 		return randomElement(board.positions(color).filter(p -> player.canJump() || board.hasEmptyNeighbor(p)));
@@ -56,12 +56,12 @@ public enum MovingRules implements MovingRule {
 	}
 
 	@Override
-	public OptionalInt supplyStartPosition(Player player) {
+	public OptionalInt supplyMoveStartPosition(Player player) {
 		return condition.apply(player) ? startPositionSupplier.apply(player) : OptionalInt.empty();
 	}
 
 	@Override
-	public OptionalInt supplyTargetPosition(Player player, int from) {
+	public OptionalInt supplyMoveTargetPosition(Player player, int from) {
 		return targetPositionSupplier.apply(player, from);
 	}
 

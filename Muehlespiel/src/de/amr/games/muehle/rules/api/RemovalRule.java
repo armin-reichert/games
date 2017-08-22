@@ -5,9 +5,7 @@ import java.util.OptionalInt;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.player.api.Player;
 
-public interface RemovalRule {
+public interface RemovalRule extends Rule {
 
-	public OptionalInt supplyPosition(Player player, StoneColor removalColor);
-
-	public String getDescription();
+	public OptionalInt supplyRemovalPosition(Player player, StoneColor removalColor);
 }

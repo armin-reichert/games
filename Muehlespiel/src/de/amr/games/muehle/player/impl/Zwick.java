@@ -26,7 +26,7 @@ public class Zwick extends RuleBasedPlayer {
 	static final MovingRule[] MOVING_RULES = {
 			/*@formatter:off*/
 			MovingRules.CAN_CLOSE_MILL,
-			MovingRules.ANY_POSSIBLE_MOVE,
+			MovingRules.RANDOM,
 			/*@formatter:on*/
 	};
 

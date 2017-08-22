@@ -13,6 +13,7 @@ import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
 import de.amr.games.muehle.rules.api.RemovalRule;
+import de.amr.games.muehle.rules.api.Rule;
 
 /**
  * A player controlled by rules.
@@ -87,26 +88,23 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	OptionalInt tryPlacingRule(PlacingRule rule) {
-		OptionalInt optPosition = rule.supplyPosition(this);
-		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
-		return optPosition;
+		return logRuleMatch(rule, rule.supplyPlacingPosition(this));
 	}
 
 	OptionalInt tryRemovalRule(RemovalRule rule) {
-		OptionalInt optPosition = rule.supplyPosition(this, getColor().other());
-		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
-		return optPosition;
+		return logRuleMatch(rule, rule.supplyRemovalPosition(this, getColor().other()));
 	}
 
 	OptionalInt tryMoveStartRule(MovingRule rule) {
-		OptionalInt optPosition = rule.supplyStartPosition(this);
-		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
-		return optPosition;
+		return logRuleMatch(rule, rule.supplyMoveStartPosition(this));
 	}
 
 	OptionalInt tryMoveTargetRule(MovingRule rule, int from) {
-		OptionalInt optPosition = rule.supplyTargetPosition(this, from);
-		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
-		return optPosition;
+		return logRuleMatch(rule, rule.supplyMoveTargetPosition(this, from));
+	}
+
+	OptionalInt logRuleMatch(Rule rule, OptionalInt optPos) {
+		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		return optPos;
 	}
 }

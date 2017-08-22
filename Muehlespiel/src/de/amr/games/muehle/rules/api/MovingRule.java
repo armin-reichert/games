@@ -4,12 +4,10 @@ import java.util.OptionalInt;
 
 import de.amr.games.muehle.player.api.Player;
 
-public interface MovingRule {
+public interface MovingRule extends Rule {
 
-	public String getDescription();
+	public OptionalInt supplyMoveStartPosition(Player player);
 
-	public OptionalInt supplyStartPosition(Player player);
-
-	public OptionalInt supplyTargetPosition(Player player, int from);
+	public OptionalInt supplyMoveTargetPosition(Player player, int start);
 
 }

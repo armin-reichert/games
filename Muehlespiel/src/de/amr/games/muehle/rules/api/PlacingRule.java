@@ -4,9 +4,7 @@ import java.util.OptionalInt;
 
 import de.amr.games.muehle.player.api.Player;
 
-public interface PlacingRule {
+public interface PlacingRule extends Rule {
 
-	public OptionalInt supplyPosition(Player player);
-
-	public String getDescription();
+	public OptionalInt supplyPlacingPosition(Player player);
 }
