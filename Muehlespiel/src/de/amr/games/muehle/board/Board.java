@@ -83,7 +83,7 @@ public class Board extends BoardGraph {
 	 * already.
 	 * 
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @param color
 	 *          a stone color
 	 */
@@ -131,12 +131,13 @@ public class Board extends BoardGraph {
 
 	/**
 	 * @param p
-	 *          a valid position
-	 * @return the content at this position or <code>null</code>
+	 *          a position
+	 * @return the (optional) content at this position
 	 */
-	public StoneColor getStoneAt(int p) {
+	public Optional<StoneColor> getStoneAt(int p) {
 		checkPosition(p);
-		return get(p);
+		StoneColor color = get(p);
+		return color != null ? Optional.of(color) : Optional.empty();
 	}
 
 	/**
@@ -504,7 +505,7 @@ public class Board extends BoardGraph {
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color)
+		return nextToNeighbors(p).filter(q -> get(q) == color)
 				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 

@@ -191,7 +191,8 @@ public class BoardUI extends GameEntity {
 			Color color) {
 		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (board.neighbors(singleFreePosition).anyMatch(p -> board.getStoneAt(p) == either)) {
+			if (board.neighbors(singleFreePosition).filter(board::hasStoneAt)
+					.anyMatch(p -> board.getStoneAt(p).get() == either)) {
 				markPosition(g, singleFreePosition, color);
 			}
 		}

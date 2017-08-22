@@ -131,7 +131,8 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	}
 
 	public boolean isMoveStartPossible() {
-		return hasMoveStartPosition() && board.getStoneAt(move.from) == player.getColor()
+		return hasMoveStartPosition() && board.hasStoneAt(move.from)
+				&& board.getStoneAt(move.from).get() == player.getColor()
 				&& (player.canJump() || board.hasEmptyNeighbor(move.from));
 	}
 
