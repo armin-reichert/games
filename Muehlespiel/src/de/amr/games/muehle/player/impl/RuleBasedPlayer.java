@@ -30,8 +30,8 @@ public class RuleBasedPlayer implements Player {
 
 	Move move;
 
-	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
-			RemovalRule[] removalRules) {
+	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules,
+			MovingRule[] movingRules, RemovalRule[] removalRules) {
 		this.board = board;
 		this.color = color;
 		this.placingRules = placingRules;
@@ -57,14 +57,14 @@ public class RuleBasedPlayer implements Player {
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
+		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent)
+				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
+		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent)
+				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	@Override
@@ -78,32 +78,32 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	OptionalInt supplyMoveStartPosition() {
-		return Stream.of(movingRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
+		return Stream.of(movingRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent)
+				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	OptionalInt supplyMoveEndPosition() {
-		return Stream.of(movingRules).map(rule -> tryMoveTargetRule(rule, move.from)).filter(OptionalInt::isPresent)
+		return Stream.of(movingRules).map(this::tryMoveTargetRule).filter(OptionalInt::isPresent)
 				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	OptionalInt tryPlacingRule(PlacingRule rule) {
-		return logRuleMatch(rule, rule.supplyPlacingPosition(this));
+		return logMatch(rule, rule.supplyPlacingPosition(this));
 	}
 
 	OptionalInt tryRemovalRule(RemovalRule rule) {
-		return logRuleMatch(rule, rule.supplyRemovalPosition(this, getColor().other()));
+		return logMatch(rule, rule.supplyRemovalPosition(this, getColor().other()));
 	}
 
 	OptionalInt tryMoveStartRule(MovingRule rule) {
-		return logRuleMatch(rule, rule.supplyMoveStartPosition(this));
+		return logMatch(rule, rule.supplyMoveStartPosition(this));
 	}
 
-	OptionalInt tryMoveTargetRule(MovingRule rule, int from) {
-		return logRuleMatch(rule, rule.supplyMoveTargetPosition(this, from));
+	OptionalInt tryMoveTargetRule(MovingRule rule) {
+		return logMatch(rule, rule.supplyMoveTargetPosition(this, move.from));
 	}
 
-	OptionalInt logRuleMatch(Rule rule, OptionalInt optPos) {
+	OptionalInt logMatch(Rule rule, OptionalInt optPos) {
 		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}

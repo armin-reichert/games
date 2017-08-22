@@ -17,7 +17,8 @@ public enum PlacingRules implements PlacingRule {
 
 	EMPTYBOARD(
 			"Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde",
-			player -> randomElement(player.getBoard().positions().filter(player.getBoard()::isEmptyPosition)),
+			player -> randomElement(
+					player.getBoard().positions().filter(player.getBoard()::isEmptyPosition)),
 			player -> player.getBoard().positions(player.getColor()).count() == 0),
 
 	CLOSE_MILL(
@@ -36,18 +37,21 @@ public enum PlacingRules implements PlacingRule {
 			"Setze Stein auf Position %d, weil eigene Mühle geöffnet wird",
 			player -> randomElement(player.getBoard().positionsOpeningMill(player.getColor()))),
 
-	NEAR_OWN_COLOR("Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist", player -> {
-		OptionalInt posWithEmptyNeighbor = randomElement(
-				player.getBoard().positions(player.getColor()).filter(player.getBoard()::hasEmptyNeighbor));
-		if (posWithEmptyNeighbor.isPresent()) {
-			return randomElement(player.getBoard().emptyNeighbors(posWithEmptyNeighbor.getAsInt()));
-		}
-		return OptionalInt.empty();
-	}),
+	NEAR_OWN_COLOR(
+			"Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist",
+			player -> {
+				OptionalInt posWithEmptyNeighbor = randomElement(player.getBoard()
+						.positions(player.getColor()).filter(player.getBoard()::hasEmptyNeighbor));
+				if (posWithEmptyNeighbor.isPresent()) {
+					return randomElement(player.getBoard().emptyNeighbors(posWithEmptyNeighbor.getAsInt()));
+				}
+				return OptionalInt.empty();
+			}),
 
 	RANDOM(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
-			player -> randomElement(player.getBoard().positions().filter(player.getBoard()::isEmptyPosition)))
+			player -> randomElement(
+					player.getBoard().positions().filter(player.getBoard()::isEmptyPosition)))
 
 	;
 

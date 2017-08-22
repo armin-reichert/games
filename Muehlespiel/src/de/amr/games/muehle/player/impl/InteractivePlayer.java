@@ -116,6 +116,7 @@ public class InteractivePlayer implements Player {
 	}
 
 	OptionalInt findClickedBoardPosition() {
-		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
+		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY())
+				: OptionalInt.empty();
 	}
 }

@@ -132,8 +132,8 @@ public class PlayScene extends Scene<MillApp> {
 				pause(app.pulse.secToTicks(3));
 			};
 
-			change(GAME_OVER, STARTING,
-					() -> !isInteractive(players[0]) && !isInteractive(players[1]) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			change(GAME_OVER, STARTING, () -> !isInteractive(players[0]) && !isInteractive(players[1])
+					|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
 
 		void reset() {
@@ -207,12 +207,14 @@ public class PlayScene extends Scene<MillApp> {
 					LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
 				} else if (board.getStoneAt(removalPosition) != colorToRemove) {
 					LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
-				} else if (board.inMill(removalPosition, colorToRemove) && !board.allStonesInMills(colorToRemove)) {
+				} else if (board.inMill(removalPosition, colorToRemove)
+						&& !board.allStonesInMills(colorToRemove)) {
 					LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 				} else {
 					boardUI.removeStoneAt(removalPosition);
 					removedAt = removalPosition;
-					LOG.info(Messages.text("removed_stone_at_position", players[turn].getName(), removalPosition));
+					LOG.info(
+							Messages.text("removed_stone_at_position", players[turn].getName(), removalPosition));
 				}
 			});
 		}
@@ -299,13 +301,14 @@ public class PlayScene extends Scene<MillApp> {
 	void createUI() {
 		boardUI = new BoardUI(board, 600, 600);
 
-		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
-				() -> turn == 0);
+		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(),
+				() -> NUM_STONES - stonesPlaced[0], () -> turn == 0);
 
-		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[1],
-				() -> turn == 1);
+		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(),
+				() -> NUM_STONES - stonesPlaced[1], () -> turn == 1);
 
-		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
+		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN,
+				36);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);

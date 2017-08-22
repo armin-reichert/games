@@ -32,8 +32,10 @@ public class BoardUI extends GameEntity {
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
 	 */
-	static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
-	static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
+	static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3,
+			6 };
+	static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6,
+			6 };
 
 	final Board board;
 	final int width;
@@ -108,7 +110,8 @@ public class BoardUI extends GameEntity {
 	}
 
 	public OptionalInt findNearestPosition(int x, int y, int radius) {
-		return board.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
+		return board.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius)
+				.findFirst();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
@@ -141,7 +144,8 @@ public class BoardUI extends GameEntity {
 			Vector2 centerFrom = centerPoint(p);
 			board.neighbors(p).forEach(q -> {
 				Vector2 centerTo = centerPoint(q);
-				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(), centerTo.roundedY());
+				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(),
+						centerTo.roundedY());
 			});
 		});
 
@@ -150,7 +154,8 @@ public class BoardUI extends GameEntity {
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
 		board.positions().forEach(p -> {
 			Vector2 center = centerPoint(p);
-			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
+			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius,
+					2 * posRadius);
 			if (showPositionNumbers) {
 				g.drawString(p + "", center.x + 3 * posRadius, center.y + 3 * posRadius);
 			}
@@ -168,7 +173,8 @@ public class BoardUI extends GameEntity {
 		g.translate(tf.getX(), tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
+		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize,
+				markerSize);
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
@@ -180,7 +186,8 @@ public class BoardUI extends GameEntity {
 		board.positionsClosingMill(stoneColor).forEach(p -> markPosition(g, p, color));
 	}
 
-	public void markPositionTrappingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {
+	public void markPositionTrappingOpponent(Graphics2D g, StoneColor either, StoneColor other,
+			Color color) {
 		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
 			if (board.neighbors(singleFreePosition).anyMatch(p -> board.getStoneAt(p) == either)) {
@@ -197,17 +204,18 @@ public class BoardUI extends GameEntity {
 	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		boolean allStonesInMills = board.allStonesInMills(stoneColor);
-		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor)).forEach(p -> {
-			getStoneAt(p).ifPresent(stone -> {
-				float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
-				float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
-				// draw red cross
-				g.translate(offsetX, offsetY);
-				g.setColor(Color.RED);
-				g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-				g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-				g.translate(-offsetX, -offsetY);
-			});
-		});
+		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor))
+				.forEach(p -> {
+					getStoneAt(p).ifPresent(stone -> {
+						float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
+						float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
+						// draw red cross
+						g.translate(offsetX, offsetY);
+						g.setColor(Color.RED);
+						g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+						g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+						g.translate(-offsetX, -offsetY);
+					});
+				});
 	}
 }

@@ -17,7 +17,7 @@ import de.amr.games.muehle.rules.impl.RemovalRules;
 public class RandomPlayer extends RuleBasedPlayer {
 
 	public RandomPlayer(Board board, StoneColor color) {
-		super(board, color, new PlacingRule[] { PlacingRules.RANDOM }, new MovingRule[] { MovingRules.RANDOM },
-				new RemovalRule[] { RemovalRules.RANDOM });
+		super(board, color, new PlacingRule[] { PlacingRules.RANDOM },
+				new MovingRule[] { MovingRules.RANDOM }, new RemovalRule[] { RemovalRules.RANDOM });
 	}
 }

@@ -10,7 +10,8 @@ public class Util {
 
 	public static OptionalInt randomElement(IntStream stream) {
 		int[] elements = stream.toArray();
-		return elements.length == 0 ? OptionalInt.empty() : OptionalInt.of(elements[RAND.nextInt(elements.length)]);
+		return elements.length == 0 ? OptionalInt.empty()
+				: OptionalInt.of(elements[RAND.nextInt(elements.length)]);
 	}
 
 }

@@ -198,7 +198,8 @@ public class BoardGraph {
 	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
 		checkPosition(q);
-		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q).findFirst();
+		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q)
+				.findFirst();
 	}
 
 	/**
