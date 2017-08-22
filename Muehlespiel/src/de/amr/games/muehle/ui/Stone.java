@@ -29,8 +29,8 @@ public class Stone extends GameEntity {
 		EDGE.put(BLACK, Color.DARK_GRAY);
 	}
 
-	StoneColor color;
-	int radius;
+	private StoneColor color;
+	private int radius;
 
 	public Stone(StoneColor color, int radius) {
 		this.color = color;
