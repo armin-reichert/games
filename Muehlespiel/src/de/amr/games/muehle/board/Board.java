@@ -10,7 +10,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * Represents the board, provides information about the board content and mill-related functionality.
+ * Represents the board, provides information about the board content and mill-related
+ * functionality.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
@@ -78,7 +79,8 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * Puts a stone with the given color at the given position. The position must not contain a stone already.
+	 * Puts a stone with the given color at the given position. The position must not contain a stone
+	 * already.
 	 * 
 	 * @param p
 	 *          a valid position
@@ -106,8 +108,8 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * Moves the stone from position <code>from</code> to position <code>to</code>. If the source position is empty or the
-	 * target position is not empty, an exception is thrown.
+	 * Moves the stone from position <code>from</code> to position <code>to</code>. If the source
+	 * position is empty or the target position is not empty, an exception is thrown.
 	 * 
 	 * @param from
 	 *          the source position
@@ -200,7 +202,8 @@ public class Board extends BoardGraph {
 	/**
 	 * @param color
 	 *          a stone color
-	 * @return a stream of the positions carrying a stone of the given color and having an empty neighbor position
+	 * @return a stream of the positions carrying a stone of the given color and having an empty
+	 *         neighbor position
 	 */
 	public IntStream positionsWithEmptyNeighbor(StoneColor color) {
 		return positions(color).filter(this::hasEmptyNeighbor);
@@ -266,7 +269,7 @@ public class Board extends BoardGraph {
 	public boolean inHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return IntStream.of(p, H_MILL[p][0], H_MILL[p][1]).allMatch(q -> has(q, color));
+		return IntStream.of(p, HMILL[p][0], HMILL[p][1]).allMatch(q -> has(q, color));
 	}
 
 	/**
@@ -279,7 +282,7 @@ public class Board extends BoardGraph {
 	public boolean inVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return IntStream.of(p, V_MILL[p][0], V_MILL[p][1]).allMatch(q -> has(q, color));
+		return IntStream.of(p, VMILL[p][0], VMILL[p][1]).allMatch(q -> has(q, color));
 	}
 
 	/**
@@ -339,7 +342,7 @@ public class Board extends BoardGraph {
 	public boolean isHMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXMillOpenedAt(p, color, H_MILL[p]);
+		return isXMillOpenedAt(p, color, HMILL[p]);
 	}
 
 	/**
@@ -352,7 +355,7 @@ public class Board extends BoardGraph {
 	public boolean isVMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXMillOpenedAt(p, color, V_MILL[p]);
+		return isXMillOpenedAt(p, color, VMILL[p]);
 	}
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
@@ -379,7 +382,8 @@ public class Board extends BoardGraph {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if placing a stone of the given color at the given position would open two mills of that color
+	 * @return if placing a stone of the given color at the given position would open two mills of
+	 *         that color
 	 */
 	public boolean areTwoMillsOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
@@ -392,7 +396,8 @@ public class Board extends BoardGraph {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if a mill of the given color is closed by placing a stone of that color at the given position
+	 * @return if a mill of the given color is closed by placing a stone of that color at the given
+	 *         position
 	 */
 	public boolean isMillClosingPosition(int p, StoneColor color) {
 		checkPosition(p);
@@ -401,11 +406,11 @@ public class Board extends BoardGraph {
 	}
 
 	private boolean isHMillClosingPosition(int p, StoneColor color) {
-		return has(p, null) && has(H_MILL[p][0], color) && has(H_MILL[p][1], color);
+		return has(p, null) && has(HMILL[p][0], color) && has(HMILL[p][1], color);
 	}
 
 	private boolean isVMillClosingPosition(int p, StoneColor color) {
-		return has(p, null) && has(V_MILL[p][0], color) && has(V_MILL[p][1], color);
+		return has(p, null) && has(VMILL[p][0], color) && has(VMILL[p][1], color);
 	}
 
 	/**
@@ -415,8 +420,8 @@ public class Board extends BoardGraph {
 	 *          move end position
 	 * @param color
 	 *          stone color
-	 * @return if a mill of the given color is closed when moving a stone of the given color from the start to the end
-	 *         position
+	 * @return if a mill of the given color is closed when moving a stone of the given color from the
+	 *         start to the end position
 	 */
 	public boolean isMillClosedByMove(int from, int to, StoneColor color) {
 		checkPosition(from);
@@ -427,9 +432,9 @@ public class Board extends BoardGraph {
 			if (optDir.isPresent()) {
 				Direction dir = optDir.get();
 				if (dir == NORTH || dir == SOUTH) {
-					return has(H_MILL[to][0], color) && has(H_MILL[to][1], color);
+					return has(HMILL[to][0], color) && has(HMILL[to][1], color);
 				} else {
-					return has(V_MILL[to][0], color) && has(V_MILL[to][1], color);
+					return has(VMILL[to][0], color) && has(VMILL[to][1], color);
 				}
 			}
 		}
@@ -493,7 +498,8 @@ public class Board extends BoardGraph {
 	 *          valid position
 	 * @param color
 	 *          stone color
-	 * @return if by placing a stone of the given color at the position later two mills could be opened
+	 * @return if by placing a stone of the given color at the position later two mills could be
+	 *         opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
 		checkPosition(p);

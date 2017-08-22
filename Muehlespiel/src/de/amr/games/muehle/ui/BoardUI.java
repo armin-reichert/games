@@ -30,7 +30,8 @@ public class BoardUI extends GameEntity {
 	public static final Color BOARD_COLOR = new Color(255, 255, 224);
 
 	/*
-	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
+	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6]
+	 * grid.
 	 */
 	static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3,
 			6 };

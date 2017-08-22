@@ -6,8 +6,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * The board as an undirected oriented graph. Each board position (node) has at most one neighbor in one of the four
- * directions. Nodes are numbered row-wise top to bottom.
+ * The board as an undirected oriented graph. Each board position (node) has at most one neighbor in
+ * one of the four directions. Nodes are numbered row-wise top to bottom.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
@@ -19,7 +19,8 @@ public class BoardGraph {
 	/*
 	 * An adjacency list-like representation of the board graph.
 	 * 
-	 * NEIGHBORS[p] = { neighbor(North), neighbor(East), neighbor(South), neighbor(West) }, -1 = no neighbor
+	 * NEIGHBORS[p] = {neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST)}
+	 * -1 = no neighbor
 	 */
 	protected static final int[][] NEIGHBORS = {
 		/*@formatter:off*/
@@ -51,9 +52,9 @@ public class BoardGraph {
 	};
 
 	/*
-	 * Auxiliary tables storing the horizontal and vertical mill partner positions.
+	 * Horizontal mill partner positions.
 	 */
-	protected static final int[][] H_MILL = {
+	protected static final int[][] HMILL = {
 			/*@formatter:off*/
 			{ 1, 2 },	
 			{ 0, 2 },
@@ -82,7 +83,10 @@ public class BoardGraph {
 			/*@formatter:on*/
 	};
 
-	protected static final int[][] V_MILL = {
+	/*
+	 * Vertical mill partner positions.
+	 */
+	protected static final int[][] VMILL = {
 			/*@formatter:off*/
 			{ 9, 21 },	
 			{ 4, 7 },
@@ -142,7 +146,7 @@ public class BoardGraph {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @return a stream of the neighbor positions
 	 */
 	public IntStream neighbors(int p) {
@@ -152,9 +156,9 @@ public class BoardGraph {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @param dir
-	 *          a valid direction
+	 *          a direction
 	 * @return the (optional) neighbor in the given direction
 	 */
 	public OptionalInt neighbor(int p, Direction dir) {
@@ -166,7 +170,7 @@ public class BoardGraph {
 
 	/**
 	 * @param p
-	 *          valid position
+	 *          a position
 	 * @return stream of all positions which have distance 2 from given position
 	 */
 	public IntStream nextToNeighbors(int p) {
@@ -176,9 +180,9 @@ public class BoardGraph {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @param q
-	 *          a valid position
+	 *          a position
 	 * @return if the given positions are neighbors
 	 */
 	public boolean areNeighbors(int p, int q) {
@@ -189,11 +193,11 @@ public class BoardGraph {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @param q
-	 *          a valid position
-	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are
-	 *         neighbors
+	 *          a position
+	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and
+	 *         <code>q</code> are neighbors
 	 */
 	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
@@ -204,37 +208,35 @@ public class BoardGraph {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @param q
-	 *          a valid position
+	 *          a position
 	 * @param r
-	 *          a valid position
-	 * @param color
-	 *          a stone color
-	 * @return if the given positions belong to the same horizontal mill
+	 *          a position
+	 * @return if the given positions form a horizontal mill
 	 */
 	public boolean areHMillPositions(int p, int q, int r) {
 		checkPosition(p);
 		checkPosition(q);
 		checkPosition(r);
-		return (q == H_MILL[p][0] && r == H_MILL[p][1] || r == H_MILL[p][0] && q == H_MILL[p][1]);
+		int h1 = HMILL[p][0], h2 = HMILL[p][1];
+		return h1 == q && h2 == r || h1 == r && h2 == q;
 	}
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *          a position
 	 * @param q
-	 *          a valid position
+	 *          a position
 	 * @param r
-	 *          a valid position
-	 * @param color
-	 *          a stone color
-	 * @return if the given positions belong to the same vertical mill
+	 *          a position
+	 * @return if the given positions form a vertical mill
 	 */
 	public boolean areVMillPositions(int p, int q, int r) {
 		checkPosition(p);
 		checkPosition(q);
 		checkPosition(r);
-		return (q == V_MILL[p][0] && r == V_MILL[p][1] || r == V_MILL[p][0] && q == V_MILL[p][1]);
+		int v1 = VMILL[p][0], v2 = VMILL[p][1];
+		return v1 == q && v2 == r || v1 == r && v2 == q;
 	}
 }
