@@ -10,7 +10,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * Represents the board, provides information about the board content and mill-related functionality.
+ * Represents the board, provides information about the board content and mill-related
+ * functionality.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
@@ -78,7 +79,8 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * Puts a stone with the given color at the given position. The position must not contain a stone already.
+	 * Puts a stone with the given color at the given position. The position must not contain a stone
+	 * already.
 	 * 
 	 * @param p
 	 *          a valid position
@@ -106,8 +108,8 @@ public class Board extends BoardGraph {
 	}
 
 	/**
-	 * Moves the stone from position <code>from</code> to position <code>to</code>. If the source position is empty or the
-	 * target position is not empty, an exception is thrown.
+	 * Moves the stone from position <code>from</code> to position <code>to</code>. If the source
+	 * position is empty or the target position is not empty, an exception is thrown.
 	 * 
 	 * @param from
 	 *          the source position
@@ -145,6 +147,13 @@ public class Board extends BoardGraph {
 	public boolean isEmptyPosition(int p) {
 		checkPosition(p);
 		return has(p, null);
+	}
+
+	/**
+	 * @return stream of all empty positions on the board
+	 */
+	public IntStream emptyPositions() {
+		return positions().filter(p -> has(p, null));
 	}
 
 	/**
@@ -193,7 +202,8 @@ public class Board extends BoardGraph {
 	/**
 	 * @param color
 	 *          a stone color
-	 * @return a stream of the positions carrying a stone of the given color and having an empty neighbor position
+	 * @return a stream of the positions carrying a stone of the given color and having an empty
+	 *         neighbor position
 	 */
 	public IntStream positionsWithEmptyNeighbor(StoneColor color) {
 		return positions(color).filter(this::hasEmptyNeighbor);
@@ -350,7 +360,8 @@ public class Board extends BoardGraph {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return (has(p, null) && has(q, color) && has(r, null)) || (has(p, null) && has(q, null) && has(r, color));
+		return (has(p, null) && has(q, color) && has(r, null))
+				|| (has(p, null) && has(q, null) && has(r, color));
 	}
 
 	/**
@@ -371,7 +382,8 @@ public class Board extends BoardGraph {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if placing a stone of the given color at the given position would open two mills of that color
+	 * @return if placing a stone of the given color at the given position would open two mills of
+	 *         that color
 	 */
 	public boolean areTwoMillsOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
@@ -384,7 +396,8 @@ public class Board extends BoardGraph {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if a mill of the given color is closed by placing a stone of that color at the given position
+	 * @return if a mill of the given color is closed by placing a stone of that color at the given
+	 *         position
 	 */
 	public boolean isMillClosingPosition(int p, StoneColor color) {
 		checkPosition(p);
@@ -407,8 +420,8 @@ public class Board extends BoardGraph {
 	 *          move end position
 	 * @param color
 	 *          stone color
-	 * @return if a mill of the given color is closed when moving a stone of the given color from the start to the end
-	 *         position
+	 * @return if a mill of the given color is closed when moving a stone of the given color from the
+	 *         start to the end position
 	 */
 	public boolean isMillClosedByMove(int from, int to, StoneColor color) {
 		checkPosition(from);
@@ -476,7 +489,8 @@ public class Board extends BoardGraph {
 	 */
 	public IntStream positionsOpeningTwoMillsLater(StoneColor color) {
 		checkStoneColor(color);
-		return positions().filter(this::isEmptyPosition).filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
+		return positions().filter(this::isEmptyPosition)
+				.filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
 	}
 
 	/**
@@ -484,12 +498,14 @@ public class Board extends BoardGraph {
 	 *          valid position
 	 * @param color
 	 *          stone color
-	 * @return if by placing a stone of the given color at the position later two mills could be opened
+	 * @return if by placing a stone of the given color at the position later two mills could be
+	 *         opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color).anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
+		return nextToNeighbors(p).filter(q -> getStoneAt(q) == color)
+				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
@@ -507,7 +523,7 @@ public class Board extends BoardGraph {
 		if (!otherNeighbor2.isPresent()) {
 			otherNeighbor2 = neighbor(commonNeighbor, dir2);
 		}
-		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt()) && otherNeighbor2.isPresent()
-				&& isEmptyPosition(otherNeighbor2.getAsInt());
+		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt())
+				&& otherNeighbor2.isPresent() && isEmptyPosition(otherNeighbor2.getAsInt());
 	}
 }

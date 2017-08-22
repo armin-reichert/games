@@ -10,8 +10,7 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.rules.api.MoveStartRule;
-import de.amr.games.muehle.rules.api.MoveTargetRule;
+import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
 import de.amr.games.muehle.rules.api.RemovalRule;
 
@@ -25,19 +24,17 @@ public class RuleBasedPlayer implements Player {
 	final Board board;
 	final StoneColor color;
 	final PlacingRule[] placingRules;
-	final MoveStartRule[] moveStartRules;
-	final MoveTargetRule[] moveTargetRules;
+	final MovingRule[] movingRules;
 	final RemovalRule[] removalRules;
 
 	Move move;
 
-	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MoveStartRule[] moveStartRules,
-			MoveTargetRule[] moveTargetRules, RemovalRule[] removalRules) {
+	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
+			RemovalRule[] removalRules) {
 		this.board = board;
 		this.color = color;
 		this.placingRules = placingRules;
-		this.moveStartRules = moveStartRules;
-		this.moveTargetRules = moveTargetRules;
+		this.movingRules = movingRules;
 		this.removalRules = removalRules;
 		move = new Move();
 	}
@@ -80,12 +77,12 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	OptionalInt supplyMoveStartPosition() {
-		return Stream.of(moveStartRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
+		return Stream.of(movingRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
 				.orElse(OptionalInt.empty());
 	}
 
 	OptionalInt supplyMoveEndPosition() {
-		return Stream.of(moveTargetRules).map(rule -> tryMoveTargetRule(rule, move.from)).filter(OptionalInt::isPresent)
+		return Stream.of(movingRules).map(rule -> tryMoveTargetRule(rule, move.from)).filter(OptionalInt::isPresent)
 				.findFirst().orElse(OptionalInt.empty());
 	}
 
@@ -101,14 +98,14 @@ public class RuleBasedPlayer implements Player {
 		return optPosition;
 	}
 
-	OptionalInt tryMoveStartRule(MoveStartRule rule) {
-		OptionalInt optPosition = rule.supplyPosition(this);
+	OptionalInt tryMoveStartRule(MovingRule rule) {
+		OptionalInt optPosition = rule.supplyStartPosition(this);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
 
-	OptionalInt tryMoveTargetRule(MoveTargetRule rule, int from) {
-		OptionalInt optPosition = rule.supplyPosition(this, from);
+	OptionalInt tryMoveTargetRule(MovingRule rule, int from) {
+		OptionalInt optPosition = rule.supplyTargetPosition(this, from);
 		optPosition.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPosition;
 	}
