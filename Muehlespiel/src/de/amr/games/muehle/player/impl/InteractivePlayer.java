@@ -19,8 +19,8 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
-import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
 
 /**

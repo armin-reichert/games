@@ -1,4 +1,4 @@
-package de.amr.games.muehle.board;
+package de.amr.games.muehle.player.api;
 
 /**
  * A move or jump.

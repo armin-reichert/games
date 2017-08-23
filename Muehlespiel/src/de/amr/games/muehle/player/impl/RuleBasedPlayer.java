@@ -7,8 +7,8 @@ import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.board.Move;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
