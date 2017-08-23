@@ -48,7 +48,7 @@ class AlienAssistant extends GameEntity {
 	AlienAssistant(PlayScene scene) {
 		this.scene = scene;
 		this.boardUI = scene.getBoardUI();
-		this.board = this.boardUI.getBoard();
+		this.board = this.boardUI.board();
 		this.assistanceLevel = 0;
 	}
 

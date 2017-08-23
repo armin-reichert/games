@@ -1,7 +1,6 @@
 package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.easy.game.math.Vector2.dist;
 import static de.amr.games.muehle.play.MoveState.FINISHED;
 import static de.amr.games.muehle.play.MoveState.INITIAL;
 import static de.amr.games.muehle.play.MoveState.JUMPING;
@@ -11,9 +10,9 @@ import static de.amr.games.muehle.play.MoveState.READING_MOVE;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import de.amr.easy.game.math.Vector2;
-import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
@@ -30,12 +29,9 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MoveControl extends StateMachine<MoveState, Object> {
 
-	private static final float MOVE_TIME_SEC = .75f;
-
+	private final BiFunction<Integer, Integer, Float> moveSpeed; // ticks per second
 	private final BoardUI boardUI;
 	private final Board board;
-	private final Pulse pulse;
-
 	private Player player;
 	private Move move;
 
@@ -44,14 +40,14 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	 * 
 	 * @param boardUI
 	 *          the board UI where the move is displayed
-	 * @param pulse
-	 *          the pulse of the application
+	 * @param moveSpeed
+	 *          function computing the move speed between two points
 	 */
-	public MoveControl(BoardUI boardUI, Pulse pulse) {
+	public MoveControl(BoardUI boardUI, BiFunction<Integer, Integer, Float> moveSpeed) {
 		super("Move Control", MoveState.class, READING_MOVE);
 		this.boardUI = boardUI;
-		this.board = boardUI.getBoard();
-		this.pulse = pulse;
+		this.board = boardUI.board();
+		this.moveSpeed = moveSpeed;
 		defineStateMachine();
 	}
 
@@ -82,16 +78,16 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		state(MOVING).entry = s -> {
 			board.getDirection(move.from, move.to).ifPresent(moveDir -> {
-				getMovedStone().ifPresent(stone -> stone.tf.setVelocity(computeMoveVelocity(moveDir)));
+				stoneToMove().ifPresent(stone -> stone.tf.setVelocity(computeVelocity(moveDir)));
 				LOG.info(Messages.text("moving_from_to_towards", move.from, move.to, moveDir));
 			});
 		};
 
-		state(MOVING).update = s -> getMovedStone().ifPresent(stone -> stone.tf.move());
+		state(MOVING).update = s -> stoneToMove().ifPresent(stone -> stone.tf.move());
 
-		change(MOVING, FINISHED, () -> endPositionReached());
+		change(MOVING, FINISHED, this::endPositionReached);
 
-		state(MOVING).exit = s -> getMovedStone().ifPresent(stone -> stone.tf.setVelocity(0, 0));
+		state(MOVING).exit = s -> stoneToMove().ifPresent(stone -> stone.tf.setVelocity(0, 0));
 
 		// JUMPING
 
@@ -104,17 +100,9 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		state(FINISHED).entry = s -> boardUI.moveStone(move.from, move.to);
 	}
 
-	public void setPlayer(Player player) {
+	public void controlPlayer(Player player) {
 		this.player = player;
 		init();
-	}
-
-	public Player getPlayer() {
-		return player;
-	}
-
-	private Optional<Stone> getMovedStone() {
-		return boardUI.getStoneAt(move.from);
 	}
 
 	public Optional<Move> getMove() {
@@ -136,9 +124,9 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	}
 
 	private boolean isMovePossible() {
-		if (!getMovedStone().isPresent()) {
+		if (!stoneToMove().isPresent()) {
 			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
-		} else if (getMovedStone().get().getColor() != player.getColor()) {
+		} else if (stoneToMove().get().getColor() != player.getColor()) {
 			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
 		} else if (!player.canJump() && !board.hasEmptyNeighbor(move.from)) {
 			LOG.info(Messages.text("stone_at_position_cannot_move", move.from));
@@ -149,8 +137,12 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		return false;
 	}
 
-	private Vector2 computeMoveVelocity(Direction dir) {
-		float speed = dist(boardUI.centerPoint(move.from), boardUI.centerPoint(move.to)) / pulse.secToTicks(MOVE_TIME_SEC);
+	private Optional<Stone> stoneToMove() {
+		return boardUI.stoneAt(move.from);
+	}
+
+	private Vector2 computeVelocity(Direction dir) {
+		float speed = moveSpeed.apply(move.from, move.to);
 		switch (dir) {
 		case NORTH:
 			return new Vector2(0, -speed);
@@ -161,12 +153,12 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		case WEST:
 			return new Vector2(-speed, 0);
 		}
-		return Vector2.nullVector();
+		throw new IllegalArgumentException("Illegal direction: " + dir);
 	}
 
 	private boolean endPositionReached() {
-		if (getMovedStone().isPresent()) {
-			Stone stone = getMovedStone().get();
+		if (stoneToMove().isPresent()) {
+			Stone stone = stoneToMove().get();
 			float speed = stone.tf.getVelocity().length();
 			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
 			Vector2 toCenter = boardUI.centerPoint(move.to);

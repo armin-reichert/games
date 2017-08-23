@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.MillApp;
@@ -42,6 +43,7 @@ import de.amr.games.muehle.ui.StoneCounter;
 public class PlayScene extends Scene<MillApp> {
 
 	static final int NUM_STONES = 9;
+	static final float MOVE_TIME_SEC = .5f;
 
 	private FSM control = new FSM();
 	private Board board = new Board();
@@ -175,7 +177,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		void turnMovingTo(int playerNumber) {
 			turn = playerNumber;
-			moveControl.setPlayer(players[turn]);
+			moveControl.controlPlayer(players[turn]);
 			showMessage("must_move", players[turn].getName());
 		}
 
@@ -289,7 +291,7 @@ public class PlayScene extends Scene<MillApp> {
 		assistant.setPlayers(players[0], players[1]);
 
 		// State machines
-		moveControl = new MoveControl(boardUI, app.pulse);
+		moveControl = new MoveControl(boardUI, this::computeMoveSpeed);
 		// moveControl.setLogger(LOG);
 		// control.setLogger(LOG);
 
@@ -299,10 +301,10 @@ public class PlayScene extends Scene<MillApp> {
 	void createUI() {
 		boardUI = new BoardUI(board, 600, 600);
 
-		stoneCounters[0] = new StoneCounter(WHITE, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[0],
+		stoneCounters[0] = new StoneCounter(WHITE, boardUI.stoneRadius(), () -> NUM_STONES - stonesPlaced[0],
 				() -> turn == 0);
 
-		stoneCounters[1] = new StoneCounter(BLACK, boardUI.getStoneRadius(), () -> NUM_STONES - stonesPlaced[1],
+		stoneCounters[1] = new StoneCounter(BLACK, boardUI.stoneRadius(), () -> NUM_STONES - stonesPlaced[1],
 				() -> turn == 1);
 
 		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
@@ -342,6 +344,10 @@ public class PlayScene extends Scene<MillApp> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			boardUI.togglePositionNumbers();
 		}
+	}
+
+	float computeMoveSpeed(int from, int to) {
+		return Vector2.dist(boardUI.centerPoint(from), boardUI.centerPoint(to)) / app.pulse.secToTicks(MOVE_TIME_SEC);
 	}
 
 	void showMessage(String key, Object... args) {

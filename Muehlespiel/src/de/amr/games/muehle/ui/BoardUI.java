@@ -32,27 +32,23 @@ public class BoardUI extends GameEntity {
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
 	 */
-	static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
-	static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
+	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
+	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
-	final Board board;
-	final int width;
-	final int height;
-	final int posRadius;
-	final int stoneRadius;
-	boolean showPositionNumbers;
-	Stone[] stones;
+	private final Board board;
+	private final int width;
+	private final int height;
+	private boolean positionNumbersOn;
+	private Stone[] stones;
 
 	public BoardUI(Board board, int width, int height) {
 		this.board = board;
 		this.width = width;
 		this.height = height;
-		posRadius = width / 60;
-		stoneRadius = width / 24;
 		stones = new Stone[BoardGraph.NUM_POS];
 	}
 
-	public Board getBoard() {
+	public Board board() {
 		return board;
 	}
 
@@ -70,8 +66,12 @@ public class BoardUI extends GameEntity {
 		return height;
 	}
 
-	public int getStoneRadius() {
-		return stoneRadius;
+	public int stoneRadius() {
+		return width / 24;
+	}
+
+	private int posRadius() {
+		return width / 60;
 	}
 
 	public void clear() {
@@ -81,12 +81,12 @@ public class BoardUI extends GameEntity {
 
 	public void putStoneAt(int p, StoneColor color) {
 		board.putStoneAt(p, color);
-		Stone stone = new Stone(color, stoneRadius);
+		Stone stone = new Stone(color, stoneRadius());
 		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
 	}
 
-	public Optional<Stone> getStoneAt(int p) {
+	public Optional<Stone> stoneAt(int p) {
 		return stones[p] == null ? Optional.empty() : Optional.of(stones[p]);
 	}
 
@@ -118,11 +118,11 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void showPositionNumbers() {
-		showPositionNumbers = true;
+		positionNumbersOn = true;
 	}
 
 	public void togglePositionNumbers() {
-		showPositionNumbers = !showPositionNumbers;
+		positionNumbersOn = !positionNumbersOn;
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class BoardUI extends GameEntity {
 
 		// Lines
 		g.setColor(Color.BLACK);
-		g.setStroke(new BasicStroke(posRadius / 2));
+		g.setStroke(new BasicStroke(posRadius() / 2));
 		board.positions().forEach(p -> {
 			Vector2 centerFrom = centerPoint(p);
 			board.neighbors(p).forEach(q -> {
@@ -150,9 +150,9 @@ public class BoardUI extends GameEntity {
 		g.setFont(new Font("Arial", Font.PLAIN, 20));
 		board.positions().forEach(p -> {
 			Vector2 center = centerPoint(p);
-			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
-			if (showPositionNumbers) {
-				g.drawString(p + "", center.x + 3 * posRadius, center.y + 3 * posRadius);
+			g.fillOval(center.roundedX() - posRadius(), center.roundedY() - posRadius(), 2 * posRadius(), 2 * posRadius());
+			if (positionNumbersOn) {
+				g.drawString(p + "", center.x + 3 * posRadius(), center.y + 3 * posRadius());
 			}
 		});
 
@@ -163,7 +163,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void markPosition(Graphics2D g, int p, Color color) {
-		int markerSize = posRadius * 8 / 10;
+		int markerSize = posRadius() * 8 / 10;
 		Vector2 center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -199,7 +199,7 @@ public class BoardUI extends GameEntity {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		boolean allStonesInMills = board.allStonesInMills(stoneColor);
 		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor)).forEach(p -> {
-			getStoneAt(p).ifPresent(stone -> {
+			stoneAt(p).ifPresent(stone -> {
 				float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
 				float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
 				// draw red cross
