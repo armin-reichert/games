@@ -2,9 +2,9 @@ package de.amr.demos.maze.ui;
 
 import java.awt.Color;
 
+import de.amr.demos.grid.swing.core.SwingDefaultGridRenderingModel;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.api.ObservableGrid2D;
-import de.amr.easy.grid.rendering.swing.SwingDefaultGridRenderingModel;
 
 public class GridVisualization extends SwingDefaultGridRenderingModel {
 

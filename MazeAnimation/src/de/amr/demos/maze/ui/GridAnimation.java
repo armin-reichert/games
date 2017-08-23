@@ -3,6 +3,7 @@ package de.amr.demos.maze.ui;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import de.amr.demos.grid.swing.core.SwingGridRenderer;
 import de.amr.easy.graph.api.ObservableGraph;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.api.WeightedEdge;
@@ -13,7 +14,6 @@ import de.amr.easy.graph.api.event.GraphObserver;
 import de.amr.easy.graph.api.event.GraphTraversalListener;
 import de.amr.easy.graph.api.event.VertexChangeEvent;
 import de.amr.easy.grid.api.ObservableGrid2D;
-import de.amr.easy.grid.rendering.swing.SwingGridRenderer;
 
 public class GridAnimation
 		implements GraphTraversalListener<Integer>, GraphObserver<Integer, WeightedEdge<Integer, Integer>> {
