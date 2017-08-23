@@ -30,8 +30,8 @@ public class RuleBasedPlayer implements Player {
 
 	Move move;
 
-	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules,
-			MovingRule[] movingRules, RemovalRule[] removalRules) {
+	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
+			RemovalRule[] removalRules) {
 		this.board = board;
 		this.color = color;
 		this.placingRules = placingRules;
@@ -57,14 +57,14 @@ public class RuleBasedPlayer implements Player {
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent)
-				.findFirst().orElse(OptionalInt.empty());
+		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent)
-				.findFirst().orElse(OptionalInt.empty());
+		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	@Override
@@ -78,13 +78,13 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	OptionalInt supplyMoveStartPosition() {
-		return Stream.of(movingRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent)
-				.findFirst().orElse(OptionalInt.empty());
+		return Stream.of(movingRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	OptionalInt supplyMoveEndPosition() {
-		return Stream.of(movingRules).map(this::tryMoveTargetRule).filter(OptionalInt::isPresent)
-				.findFirst().orElse(OptionalInt.empty());
+		return Stream.of(movingRules).map(this::tryMoveTargetRule).filter(OptionalInt::isPresent).findFirst()
+				.orElse(OptionalInt.empty());
 	}
 
 	OptionalInt tryPlacingRule(PlacingRule rule) {

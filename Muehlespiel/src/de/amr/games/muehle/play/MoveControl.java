@@ -74,8 +74,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		change(READING_MOVE, INITIAL, () -> hasBothMovePositions() && !isMovePossible());
 
-		change(READING_MOVE, JUMPING,
-				() -> hasBothMovePositions() && isMovePossible() && player.canJump());
+		change(READING_MOVE, JUMPING, () -> hasBothMovePositions() && isMovePossible() && player.canJump());
 
 		change(READING_MOVE, MOVING, () -> hasBothMovePositions() && isMovePossible());
 
@@ -143,8 +142,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
 		} else if (!player.canJump() && !board.hasEmptyNeighbor(move.from)) {
 			LOG.info(Messages.text("stone_at_position_cannot_move", move.from));
-		} else if (board.isEmptyPosition(move.to)
-				&& (player.canJump() || board.areNeighbors(move.from, move.to))) {
+		} else if (board.isEmptyPosition(move.to) && (player.canJump() || board.areNeighbors(move.from, move.to))) {
 			return player.canJump() ? board.isEmptyPosition(move.to)
 					: board.isEmptyPosition(move.to) && board.areNeighbors(move.from, move.to);
 		}
@@ -152,8 +150,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	}
 
 	private Vector2 computeMoveVelocity(Direction dir) {
-		float speed = dist(boardUI.centerPoint(move.from), boardUI.centerPoint(move.to))
-				/ pulse.secToTicks(MOVE_TIME_SEC);
+		float speed = dist(boardUI.centerPoint(move.from), boardUI.centerPoint(move.to)) / pulse.secToTicks(MOVE_TIME_SEC);
 		switch (dir) {
 		case NORTH:
 			return new Vector2(0, -speed);
@@ -171,8 +168,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		if (getMovedStone().isPresent()) {
 			Stone stone = getMovedStone().get();
 			float speed = stone.tf.getVelocity().length();
-			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed,
-					2 * speed, 2 * speed);
+			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
 			Vector2 toCenter = boardUI.centerPoint(move.to);
 			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
 		}

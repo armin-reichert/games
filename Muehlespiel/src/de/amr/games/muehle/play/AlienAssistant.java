@@ -90,8 +90,7 @@ class AlienAssistant extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		if (!enabled || Stream.of(SFX.values()).map(sfx -> Assets.sound(sfx.key))
-				.noneMatch(snd -> snd.isRunning())) {
+		if (!enabled || Stream.of(SFX.values()).map(sfx -> Assets.sound(sfx.key)).noneMatch(snd -> snd.isRunning())) {
 			return;
 		}
 		super.draw(g);
@@ -112,8 +111,7 @@ class AlienAssistant extends GameEntity {
 
 	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
 		if (scene.getMoveControl().isMoveStartPossible()) {
-			scene.getMoveControl().getMove()
-					.ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
+			scene.getMoveControl().getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 		} else {
 			boardUI.markPossibleMoveStarts(g, movingColor, scene.getPlayerInTurn().canJump());
 			boardUI.markPositionTrappingOpponent(g, movingColor, movingColor.other(), Color.RED);
@@ -131,15 +129,13 @@ class AlienAssistant extends GameEntity {
 			StoneColor placingColor = assistedPlayer.getColor();
 			StoneColor opponentColor = opponentPlayer.getColor();
 
-			OptionalInt optPosition = board.positions()
-					.filter(p -> board.isMillClosingPosition(p, opponentColor)).findAny();
+			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, opponentColor)).findAny();
 			if (optPosition.isPresent()) {
 				play(SFX.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
-			optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor))
-					.findAny();
+			optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor)).findAny();
 			if (optPosition.isPresent()) {
 				play(SFX.CAN_CLOSE_MILL);
 				return;

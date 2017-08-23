@@ -15,10 +15,9 @@ import de.amr.games.muehle.rules.api.PlacingRule;
  */
 public enum PlacingRules implements PlacingRule {
 
-	EMPTYBOARD(
+	FIRST_STONE_RANDOM(
 			"Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde",
-			player -> randomElement(
-					player.getBoard().positions().filter(player.getBoard()::isEmptyPosition)),
+			player -> randomElement(player.getBoard().emptyPositions()),
 			player -> player.getBoard().positions(player.getColor()).count() == 0),
 
 	CLOSE_MILL(
@@ -37,21 +36,16 @@ public enum PlacingRules implements PlacingRule {
 			"Setze Stein auf Position %d, weil eigene Mühle geöffnet wird",
 			player -> randomElement(player.getBoard().positionsOpeningMill(player.getColor()))),
 
-	NEAR_OWN_COLOR(
-			"Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist",
-			player -> {
-				OptionalInt posWithEmptyNeighbor = randomElement(player.getBoard()
-						.positions(player.getColor()).filter(player.getBoard()::hasEmptyNeighbor));
-				if (posWithEmptyNeighbor.isPresent()) {
-					return randomElement(player.getBoard().emptyNeighbors(posWithEmptyNeighbor.getAsInt()));
-				}
-				return OptionalInt.empty();
-			}),
+	NEAR_OWN_COLOR("Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist", player -> {
+		OptionalInt emptyNeighborOfOwnColor = randomElement(
+				player.getBoard().positions(player.getColor()).filter(player.getBoard()::hasEmptyNeighbor));
+		return emptyNeighborOfOwnColor.isPresent()
+				? randomElement(player.getBoard().emptyNeighbors(emptyNeighborOfOwnColor.getAsInt())) : OptionalInt.empty();
+	}),
 
 	RANDOM(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
-			player -> randomElement(
-					player.getBoard().positions().filter(player.getBoard()::isEmptyPosition)))
+			player -> randomElement(player.getBoard().emptyPositions()))
 
 	;
 
@@ -65,15 +59,15 @@ public enum PlacingRules implements PlacingRule {
 		return description;
 	}
 
-	private PlacingRules(String description, Function<Player, OptionalInt> placingPositionSupplier,
+	private PlacingRules(String description, Function<Player, OptionalInt> positionSupplier,
 			Function<Player, Boolean> condition) {
 		this.description = description;
-		this.positionSupplier = placingPositionSupplier;
+		this.positionSupplier = positionSupplier;
 		this.condition = condition;
 	}
 
-	private PlacingRules(String description, Function<Player, OptionalInt> placingPositionSupplier) {
-		this(description, placingPositionSupplier, player -> true);
+	private PlacingRules(String description, Function<Player, OptionalInt> positionSupplier) {
+		this(description, positionSupplier, player -> true);
 	}
 
 	private final String description;

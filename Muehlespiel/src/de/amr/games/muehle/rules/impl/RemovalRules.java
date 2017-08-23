@@ -18,8 +18,7 @@ public enum RemovalRules implements RemovalRule {
 
 	@Override
 	public OptionalInt supplyRemovalPosition(Player player, StoneColor removalColor) {
-		return condition.apply(player, removalColor) ? positionSupplier.apply(player, removalColor)
-				: OptionalInt.empty();
+		return condition.apply(player, removalColor) ? positionSupplier.apply(player, removalColor) : OptionalInt.empty();
 	}
 
 	@Override
@@ -27,16 +26,14 @@ public enum RemovalRules implements RemovalRule {
 		return description;
 	}
 
-	private RemovalRules(String description,
-			BiFunction<Player, StoneColor, OptionalInt> positionSupplier,
+	private RemovalRules(String description, BiFunction<Player, StoneColor, OptionalInt> positionSupplier,
 			BiFunction<Player, StoneColor, Boolean> condition) {
 		this.description = description;
 		this.positionSupplier = positionSupplier;
 		this.condition = condition;
 	}
 
-	private RemovalRules(String description,
-			BiFunction<Player, StoneColor, OptionalInt> positionSupplier) {
+	private RemovalRules(String description, BiFunction<Player, StoneColor, OptionalInt> positionSupplier) {
 		this(description, positionSupplier, (player, removalColor) -> true);
 	}
 

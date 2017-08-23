@@ -6,8 +6,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * The board as an undirected oriented graph. Each board position (node) has at most one neighbor in
- * one of the four directions. Nodes are numbered row-wise top to bottom.
+ * The board as an undirected oriented graph. Each board position (node) has at most one neighbor in one of the four
+ * directions. Nodes are numbered row-wise top to bottom.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
@@ -19,8 +19,7 @@ public class BoardGraph {
 	/*
 	 * An adjacency list-like representation of the board graph.
 	 * 
-	 * NEIGHBORS[p] = {neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST)}
-	 * -1 = no neighbor
+	 * NEIGHBORS[p] = {neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST)} -1 = no neighbor
 	 */
 	protected static final int[][] NEIGHBORS = {
 		/*@formatter:off*/
@@ -196,14 +195,13 @@ public class BoardGraph {
 	 *          a position
 	 * @param q
 	 *          a position
-	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and
-	 *         <code>q</code> are neighbors
+	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are
+	 *         neighbors
 	 */
 	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
 		checkPosition(q);
-		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q)
-				.findFirst();
+		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q).findFirst();
 	}
 
 	/**

@@ -31,17 +31,14 @@ public enum MovingRules implements MovingRule {
 	RANDOM("Führe beliebigen möglichen Zug aus", player -> {
 		Board board = player.getBoard();
 		StoneColor color = player.getColor();
-		return randomElement(
-				board.positions(color).filter(p -> player.canJump() || board.hasEmptyNeighbor(p)));
+		return randomElement(board.positions(color).filter(p -> player.canJump() || board.hasEmptyNeighbor(p)));
 	}, (player, from) -> {
 		Board board = player.getBoard();
-		return player.canJump() ? randomElement(board.emptyPositions())
-				: randomElement(board.emptyNeighbors(from));
+		return player.canJump() ? randomElement(board.emptyPositions()) : randomElement(board.emptyNeighbors(from));
 	});
 
 	private MovingRules(String description, Function<Player, OptionalInt> startPositionSupplier,
-			BiFunction<Player, Integer, OptionalInt> targetPositionSupplier,
-			Function<Player, Boolean> condition) {
+			BiFunction<Player, Integer, OptionalInt> targetPositionSupplier, Function<Player, Boolean> condition) {
 		this.description = description;
 		this.startPositionSupplier = startPositionSupplier;
 		this.targetPositionSupplier = targetPositionSupplier;

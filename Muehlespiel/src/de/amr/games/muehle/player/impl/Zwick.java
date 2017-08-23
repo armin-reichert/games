@@ -13,7 +13,7 @@ public class Zwick extends RuleBasedPlayer {
 
 	static final PlacingRule[] PLACING_RULES = {
 			/*@formatter:off*/
-			PlacingRules.EMPTYBOARD,
+			PlacingRules.FIRST_STONE_RANDOM,
 			PlacingRules.CLOSE_MILL,
 			PlacingRules.DESTROY_MILL, 
 			PlacingRules.OPEN_TWO_MILLS,

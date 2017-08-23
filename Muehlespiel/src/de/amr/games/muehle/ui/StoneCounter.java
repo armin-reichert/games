@@ -22,8 +22,7 @@ public class StoneCounter extends GameEntity {
 	BooleanSupplier selectedSupplier;
 	IntSupplier stoneCountSupplier;
 
-	public StoneCounter(StoneColor color, int radius, IntSupplier stoneCountSupplier,
-			BooleanSupplier selectedSupplier) {
+	public StoneCounter(StoneColor color, int radius, IntSupplier stoneCountSupplier, BooleanSupplier selectedSupplier) {
 		stone = new Stone(color, radius);
 		this.font = new Font(Font.MONOSPACED, Font.BOLD, 2 * radius);
 		this.stoneCountSupplier = stoneCountSupplier;
@@ -52,8 +51,7 @@ public class StoneCounter extends GameEntity {
 			g.translate(tf.getX(), tf.getY());
 			g.setColor(isSelected() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(font);
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-					RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(text, 2 * stone.getRadius(), stone.getRadius());
 			g.translate(-tf.getX(), -tf.getY());
 		}

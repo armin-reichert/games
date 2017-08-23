@@ -69,18 +69,18 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return findClickedBoardPosition();
+		return computeBoardPositionFromClickPosition();
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return findClickedBoardPosition();
+		return computeBoardPositionFromClickPosition();
 	}
 
 	@Override
 	public Move supplyMove() {
 		if (move.from == -1) {
-			findClickedBoardPosition().ifPresent(p -> move.from = p);
+			computeBoardPositionFromClickPosition().ifPresent(p -> move.from = p);
 		} else if (move.to == -1) {
 			supplyMoveEndPosition().ifPresent(p -> move.to = p);
 		}
@@ -103,7 +103,7 @@ public class InteractivePlayer implements Player {
 			return board.neighbor(move.from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
-		return findClickedBoardPosition();
+		return computeBoardPositionFromClickPosition();
 	}
 
 	Optional<Direction> supplyMoveDirection() {
@@ -115,8 +115,7 @@ public class InteractivePlayer implements Player {
 		/*@formatter:on*/
 	}
 
-	OptionalInt findClickedBoardPosition() {
-		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY())
-				: OptionalInt.empty();
+	OptionalInt computeBoardPositionFromClickPosition() {
+		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }
