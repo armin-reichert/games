@@ -224,8 +224,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 			changeOnInput(PlaySceneInput.PacManCrashed, Playing, Crashing);
 
-			change(Playing, StartingLevel, () -> board.count(Pellet) == 0 && board.count(Energizer) == 0,
-					(s, t) -> nextLevel());
+			change(Playing, StartingLevel, () -> board.count(Pellet) == 0 && board.count(Energizer) == 0, t -> nextLevel());
 
 			// Crashing
 
@@ -252,7 +251,7 @@ public class PlayScene extends Scene<PacManGame> {
 				LOG.info("Game over.");
 			};
 
-			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE), (s, t) -> app.entities.removeAll());
+			change(GameOver, Initializing, () -> Keyboard.keyPressedOnce(VK_SPACE), t -> app.entities.removeAll());
 		}
 	}
 
@@ -451,8 +450,8 @@ public class PlayScene extends Scene<PacManGame> {
 			};
 
 			// Start waiting on event:
-			ghost.control.changeOnInput(GhostEvent.WaitingStarts, GhostState.Initialized, GhostState.Waiting, (e, s, t) -> {
-				t.setDuration(model.getGhostWaitingDuration(ghost));
+			ghost.control.changeOnInput(GhostEvent.WaitingStarts, GhostState.Initialized, GhostState.Waiting, t -> {
+				t.to().setDuration(model.getGhostWaitingDuration(ghost));
 				ghost.setAnimated(true);
 			});
 
@@ -476,7 +475,7 @@ public class PlayScene extends Scene<PacManGame> {
 			// When Pac-Man gets empowered, become frightened for the same duration
 			Stream.of(GhostState.Waiting, GhostState.Scattering, GhostState.Chasing).forEach(ghostState -> {
 				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened,
-						(e, s, t) -> t.setDuration(app.pulse.secToTicks(model.getPacManAggressiveSeconds(level))));
+						t -> t.to().setDuration(app.pulse.secToTicks(model.getPacManAggressiveSeconds(level))));
 			});
 
 			// When in "frightened" state, ghosts move randomly:

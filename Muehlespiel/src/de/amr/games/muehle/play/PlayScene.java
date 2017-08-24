@@ -86,14 +86,11 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING).update = s -> tryToPlaceStone();
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill,
-					(e, s, t) -> assistant.tellMillClosed());
+			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill, t -> assistant.tellMillClosed());
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING, (e, s, t) -> {
-				switchPlacing();
-			});
+			changeOnInput(STONE_PLACED, PLACING, PLACING, t -> switchPlacing());
 
-			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, (s, t) -> switchMoving());
+			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, t -> switchMoving());
 
 			// PLACING_REMOVING_STONE
 
@@ -104,7 +101,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(PLACING_REMOVING).update = s -> tryToRemoveStone();
 
-			change(PLACING_REMOVING, PLACING, () -> removedAt != -1, (s, t) -> switchPlacing());
+			change(PLACING_REMOVING, PLACING, () -> removedAt != -1, t -> switchPlacing());
 
 			// MOVING
 
@@ -112,7 +109,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			change(MOVING, MOVING_REMOVING, this::movingClosedMill);
 
-			change(MOVING, MOVING, this::isMoveFinished, (s, t) -> switchMoving());
+			change(MOVING, MOVING, this::isMoveFinished, t -> switchMoving());
 
 			change(MOVING, GAME_OVER, this::isGameOver);
 
@@ -125,7 +122,7 @@ public class PlayScene extends Scene<MillApp> {
 
 			state(MOVING_REMOVING).update = s -> tryToRemoveStone();
 
-			change(MOVING_REMOVING, MOVING, () -> removedAt != -1, (s, t) -> switchMoving());
+			change(MOVING_REMOVING, MOVING, () -> removedAt != -1, t -> switchMoving());
 
 			// GAME_OVER
 

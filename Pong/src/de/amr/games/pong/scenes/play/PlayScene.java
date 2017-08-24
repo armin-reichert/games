@@ -45,7 +45,7 @@ public class PlayScene extends Scene<PongGame> {
 
 			// Initialized
 
-			change(Initialized, Serving, () -> true, (s, t) -> resetScores());
+			change(Initialized, Serving, () -> true, t -> resetScores());
 
 			// Serving
 
@@ -54,19 +54,19 @@ public class PlayScene extends Scene<PongGame> {
 				prepareService();
 			};
 
-			changeOnTimeout(Serving, Playing, (s, t) -> serveBall());
+			changeOnTimeout(Serving, Playing, t -> serveBall());
 
 			// Playing
 
 			state(Playing).update = s -> app.entities.all().forEach(GameEntity::update);
 
-			change(Playing, Playing, () -> leftPaddleHitsBall(), (s, t) -> bounceBallFromLeftPaddle());
+			change(Playing, Playing, () -> leftPaddleHitsBall(), t -> bounceBallFromLeftPaddle());
 
-			change(Playing, Playing, () -> rightPaddleHitsBall(), (s, t) -> bounceBallFromRightPaddle());
+			change(Playing, Playing, () -> rightPaddleHitsBall(), t -> bounceBallFromRightPaddle());
 
-			change(Playing, Serving, () -> isBallOutLeft(), (s, t) -> assignPointToRightPlayer());
+			change(Playing, Serving, () -> isBallOutLeft(), t -> assignPointToRightPlayer());
 
-			change(Playing, Serving, () -> isBallOutRight(), (s, t) -> assignPointToLeftPlayer());
+			change(Playing, Serving, () -> isBallOutRight(), t -> assignPointToLeftPlayer());
 
 			change(Playing, GameOver, () -> leftPlayerWins() || rightPlayerWins());
 

@@ -71,13 +71,13 @@ public class PlayScene extends Scene<BreakoutGame> {
 				app.entities.all().forEach(GameEntity::update);
 			};
 
-			changeOnInput(BallHitsBat, Playing, Playing, (e, s, t) -> {
+			changeOnInput(BallHitsBat, Playing, Playing, t -> {
 				ball.tf.setVelocityY(-ball.tf.getVelocityY());
 				Assets.sound("Sounds/plop.mp3").play();
 			});
 
-			changeOnInput(BallHitsBrick, Playing, Playing, (e, s, t) -> {
-				Brick brick = e.getUserData();
+			changeOnInput(BallHitsBrick, Playing, Playing, t -> {
+				Brick brick = t.getInput().get().getUserData();
 				if (brick.isDamaged()) {
 					app.entities.remove(brick);
 					app.collisionHandler.unregisterStart(ball, brick);

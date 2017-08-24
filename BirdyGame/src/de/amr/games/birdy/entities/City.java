@@ -59,9 +59,9 @@ public class City extends GameEntity {
 			app.entities.removeAll(Star.class);
 		};
 
-		control.changeOnTimeout(Night, Night, (s, t) -> {
+		control.changeOnTimeout(Night, Night, t -> {
 			replaceStars();
-			s.resetTimer();
+			t.from().resetTimer();
 		});
 
 		control.changeOnInput(SunGoesUp, Night, Day);

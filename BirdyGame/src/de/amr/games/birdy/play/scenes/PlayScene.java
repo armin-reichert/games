@@ -63,29 +63,29 @@ public class PlayScene extends Scene<BirdyGame> {
 				start();
 			};
 
-			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, (e, s, t) -> {
+			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, t -> {
 				score.points -= 3;
 				bird.tf.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				Assets.sound("sfx/hit.mp3").play();
 			});
 
-			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> score.points <= 3, (e, s, t) -> {
+			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> score.points <= 3, t -> {
 				bird.receiveEvent(BirdCrashed);
 				Assets.sound("sfx/hit.mp3").play();
 			});
 
-			changeOnInput(BirdLeftPassage, Playing, Playing, (e, s, t) -> {
+			changeOnInput(BirdLeftPassage, Playing, Playing, t -> {
 				score.points++;
 				Assets.sound("sfx/point.mp3").play();
 			});
 
-			changeOnInput(BirdTouchedGround, Playing, GameOver, (e, s, t) -> {
+			changeOnInput(BirdTouchedGround, Playing, GameOver, t -> {
 				bird.receiveEvent(BirdTouchedGround);
 				Assets.sound("music/bgmusic.mp3").stop();
 			});
 
-			changeOnInput(BirdLeftWorld, Playing, GameOver, (e, s, t) -> {
+			changeOnInput(BirdLeftWorld, Playing, GameOver, t -> {
 				bird.receiveEvent(BirdLeftWorld);
 				Assets.sound("music/bgmusic.mp3").stop();
 			});
@@ -93,7 +93,7 @@ public class PlayScene extends Scene<BirdyGame> {
 			state(GameOver).entry = s -> stop();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver, (e, s, t) -> Assets.sound("music/bgmusic.mp3").stop());
+			changeOnInput(BirdTouchedGround, GameOver, GameOver, t -> Assets.sound("music/bgmusic.mp3").stop());
 
 			state(StartingNewGame).entry = s -> app.selectView(StartScene.class);
 		}

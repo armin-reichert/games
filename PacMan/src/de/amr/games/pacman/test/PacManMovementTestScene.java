@@ -90,9 +90,7 @@ public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
 		};
 		pacMan.control.state(Aggressive).update = state -> pacMan.walk();
 		pacMan.control.changeOnTimeout(Aggressive, Peaceful);
-		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, (e, s, t) -> {
-			t.setDuration(app.pulse.secToTicks(3));
-		});
+		pacMan.control.changeOnInput(GotDrugs, Aggressive, Aggressive, t -> t.to().setDuration(app.pulse.secToTicks(3)));
 
 		// Dying
 		pacMan.control.state(Dying).entry = state -> {

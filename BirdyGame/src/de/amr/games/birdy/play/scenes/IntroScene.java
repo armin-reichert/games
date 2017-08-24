@@ -52,10 +52,10 @@ public class IntroScene extends Scene<BirdyGame> {
 		control.state(ShowCredits).update = s -> creditsText.update();
 
 		control.change(ShowCredits, Wait, () -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
-				(s, t) -> t.setDuration(app.pulse.secToTicks(2)));
+				t -> t.to().setDuration(app.pulse.secToTicks(2)));
 
 		// Wait
-		control.changeOnTimeout(Wait, ShowGameTitle, (s, t) -> t.setDuration(app.pulse.secToTicks(3)));
+		control.changeOnTimeout(Wait, ShowGameTitle, t -> t.to().setDuration(app.pulse.secToTicks(3)));
 
 		// ShowGameTitle
 		control.changeOnTimeout(ShowGameTitle, Finished);

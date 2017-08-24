@@ -86,9 +86,7 @@ public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
 			}
 		};
 
-		ghost.control.changeOnInput(RecoveringStarts, Dead, Recovering, (e, s, t) -> {
-			t.setDuration(120);
-		});
+		ghost.control.changeOnInput(RecoveringStarts, Dead, Recovering, t -> t.to().setDuration(120));
 
 		// Recovering
 		ghost.control.changeOnTimeout(Recovering, Scattering);
