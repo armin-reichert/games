@@ -1,17 +1,14 @@
 package de.amr.games.pong.scenes.menu;
 
 import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
-import static de.amr.games.pong.PongGame.PlayMode.Computer_Computer;
-import static de.amr.games.pong.PongGame.PlayMode.Computer_Player2;
-import static de.amr.games.pong.PongGame.PlayMode.Player1_Computer;
 import static de.amr.games.pong.PongGame.PlayMode.Player1_Player2;
-import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_ENTER;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.scene.Scene;
@@ -27,34 +24,24 @@ import de.amr.games.pong.scenes.play.PlayScene;
  */
 public class MenuScene extends Scene<PongGame> {
 
-	private class MenuControl extends StateMachine<PlayMode, String> {
-
-		public MenuControl() {
-			super("Pong Menu", PlayMode.class, Player1_Player2);
-			change(Player1_Player2, Player1_Computer, () -> keyPressedOnce(VK_DOWN));
-			change(Player1_Computer, Computer_Player2, () -> keyPressedOnce(VK_DOWN));
-			change(Computer_Player2, Computer_Computer, () -> keyPressedOnce(VK_DOWN));
-			change(Computer_Computer, Player1_Player2, () -> keyPressedOnce(VK_DOWN));
+	private StateMachine<PlayMode, String> createStateMachine() {
+		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);
+		PlayMode[] playModes = PlayMode.values();
+		for (int i = 0, n = playModes.length; i < n; i += 1) {
+			fsm.change(playModes[i], playModes[(i + 1) % n], () -> keyPressedOnce(KeyEvent.VK_DOWN));
+			fsm.change(playModes[i], playModes[(i - 1 + n) % n], () -> keyPressedOnce(KeyEvent.VK_UP));
 		}
+		return fsm;
+	}
 
-		@Override
-		public void update() {
-			// "Global" transition
-			if (keyPressedOnce(VK_ENTER)) {
-				app.selectView(PlayScene.class);
-			}
-			super.update();
-		}
-	};
-
-	private final MenuControl control;
+	private final StateMachine<PlayMode, String> control;
 	private Color bgColor = Color.LIGHT_GRAY;
 	private Color bgColorSelected = bgColor.darker();
 	private Color hilightColor = Color.YELLOW;
 
 	public MenuScene(PongGame app) {
 		super(app);
-		control = new MenuControl();
+		control = createStateMachine();
 		control.setLogger(Application.LOG);
 	}
 
@@ -69,6 +56,9 @@ public class MenuScene extends Scene<PongGame> {
 
 	@Override
 	public void update() {
+		if (keyPressedOnce(VK_ENTER)) {
+			app.selectView(PlayScene.class);
+		}
 		control.update();
 	}
 

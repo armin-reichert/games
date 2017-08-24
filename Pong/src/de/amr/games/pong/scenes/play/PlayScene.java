@@ -38,53 +38,46 @@ public class PlayScene extends Scene<PongGame> {
 	/**
 	 * State machine for controlling the play scene.
 	 */
-	private class PlaySceneControl extends StateMachine<PlaySceneState, PlaySceneEvent> {
+	private StateMachine<PlaySceneState, PlaySceneEvent> createStateMachine() {
 
-		public PlaySceneControl() {
-			super("PongControl", PlaySceneState.class, Initialized);
+		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl", PlaySceneState.class,
+				Initialized);
 
-			// Initialized
+		// Initialized
 
-			change(Initialized, Serving, () -> true, t -> resetScores());
+		fsm.change(Initialized, Serving, () -> true, t -> resetScores());
 
-			// Serving
+		// Serving
 
-			state(Serving).entry = s -> {
-				s.setDuration(app.pulse.secToTicks(2));
-				prepareService();
-			};
+		fsm.state(Serving).entry = s -> {
+			s.setDuration(app.pulse.secToTicks(2));
+			prepareService();
+		};
 
-			changeOnTimeout(Serving, Playing, t -> serveBall());
+		fsm.changeOnTimeout(Serving, Playing, t -> serveBall());
 
-			// Playing
+		// Playing
 
-			state(Playing).update = s -> app.entities.all().forEach(GameEntity::update);
+		fsm.state(Playing).update = s -> app.entities.all().forEach(GameEntity::update);
 
-			change(Playing, Playing, () -> leftPaddleHitsBall(), t -> bounceBallFromLeftPaddle());
+		fsm.change(Playing, Playing, () -> leftPaddleHitsBall(), t -> bounceBallFromLeftPaddle());
 
-			change(Playing, Playing, () -> rightPaddleHitsBall(), t -> bounceBallFromRightPaddle());
+		fsm.change(Playing, Playing, () -> rightPaddleHitsBall(), t -> bounceBallFromRightPaddle());
 
-			change(Playing, Serving, () -> isBallOutLeft(), t -> assignPointToRightPlayer());
+		fsm.change(Playing, Serving, () -> isBallOutLeft(), t -> assignPointToRightPlayer());
 
-			change(Playing, Serving, () -> isBallOutRight(), t -> assignPointToLeftPlayer());
+		fsm.change(Playing, Serving, () -> isBallOutRight(), t -> assignPointToLeftPlayer());
 
-			change(Playing, GameOver, () -> leftPlayerWins() || rightPlayerWins());
+		fsm.change(Playing, GameOver, () -> leftPlayerWins() || rightPlayerWins());
 
-			// GameOver
+		// GameOver
 
-			change(GameOver, Initialized, () -> keyPressedOnce(VK_SPACE));
-		}
+		fsm.change(GameOver, Initialized, () -> keyPressedOnce(VK_SPACE));
 
-		@Override
-		public void update() {
-			if (keyPressedOnce(VK_CONTROL, VK_C)) {
-				app.selectView(MenuScene.class);
-			}
-			super.update();
-		}
+		return fsm;
 	}
 
-	private final PlaySceneControl control;
+	private final StateMachine<PlaySceneState, PlaySceneEvent> control;
 	private Court court;
 	private Paddle paddleLeft;
 	private Paddle paddleRight;
@@ -93,7 +86,7 @@ public class PlayScene extends Scene<PongGame> {
 
 	public PlayScene(PongGame game) {
 		super(game);
-		control = new PlaySceneControl();
+		control = createStateMachine();
 		control.setLogger(Application.LOG);
 	}
 
@@ -127,6 +120,9 @@ public class PlayScene extends Scene<PongGame> {
 
 	@Override
 	public void update() {
+		if (keyPressedOnce(VK_CONTROL, VK_C)) {
+			app.selectView(MenuScene.class);
+		}
 		control.update();
 	}
 
