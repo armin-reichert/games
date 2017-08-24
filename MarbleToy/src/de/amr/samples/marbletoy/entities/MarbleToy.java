@@ -27,11 +27,12 @@ public class MarbleToy extends GameEntity {
 
 	private static final Font LABEL_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 18);
 
-	private final LeverControl leverControl;
-	private final MarbleRouter router;
 	public final Lever[] levers = new Lever[3];
 	private final EnumSet<RoutingPoint> auxPoints = EnumSet.of(E, F, G, H);
 	private final GameEntity marble;
+
+	private LeverControl leverControl;
+	private MarbleRouter router;
 
 	public MarbleToy(Sprite sprite, Marble marble) {
 		super(sprite);
@@ -40,10 +41,13 @@ public class MarbleToy extends GameEntity {
 		levers[0] = new Lever(178, 82);
 		levers[1] = new Lever(424, 82);
 		levers[2] = new Lever(301, 204);
-		leverControl = new LeverControl(this);
-		leverControl.setLogger(Logger.getGlobal());
 		router = new MarbleRouter(this);
 		router.setLogger(Logger.getGlobal());
+	}
+
+	public void setLeverControl(LeverControl leverControl) {
+		this.leverControl = leverControl;
+		leverControl.setLogger(Logger.getGlobal());
 	}
 
 	@Override

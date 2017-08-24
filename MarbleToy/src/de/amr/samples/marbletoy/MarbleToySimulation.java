@@ -7,6 +7,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.samples.marbletoy.entities.Marble;
 import de.amr.samples.marbletoy.entities.MarbleToy;
+import de.amr.samples.marbletoy.fsm.LeverControl;
 import de.amr.samples.marbletoy.scenes.MainScene;
 
 public class MarbleToySimulation extends Application {
@@ -25,7 +26,9 @@ public class MarbleToySimulation extends Application {
 	@Override
 	public void init() {
 		Marble marble = new Marble(new Sprite(Assets.image("marble.png")).scale(50, 50));
-		entities.add(new MarbleToy(new Sprite(Assets.image("toy.png")), marble));
+		MarbleToy toy = new MarbleToy(new Sprite(Assets.image("toy.png")), marble);
+		toy.setLeverControl(new LeverControl(toy));
+		entities.add(toy);
 		selectView(new MainScene(this));
 	}
 }

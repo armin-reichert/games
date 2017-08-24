@@ -22,10 +22,12 @@ public class MarbleToySample {
 	private final Set<String> inputs;
 	private final LeverControlMealyMachine mealy = new LeverControlMealyMachine();
 	private final Set<String> mealyAcccepted = new LinkedHashSet<>();
-	private final LeverControl fsm = new LeverControl(new MarbleToy(null, new Marble(null)));
+	private LeverControl fsm;
 	private final Set<String> fsmAccepted = new LinkedHashSet<>();
 
 	public MarbleToySample(int maxInputLength) {
+		MarbleToy toy = new MarbleToy(null, new Marble(null));
+		fsm = new LeverControl(toy);
 		inputs = createWordsIncludingLength(maxInputLength, 'A', 'B');
 		for (String input : inputs) {
 			if (mealy.process(input)) {
