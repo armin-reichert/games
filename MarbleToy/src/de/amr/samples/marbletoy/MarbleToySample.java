@@ -21,27 +21,27 @@ public class MarbleToySample {
 
 	private final Set<String> inputs;
 	private final LeverControlMealyMachine mealy = new LeverControlMealyMachine();
-	private final LeverControl leverControlFA = new LeverControl(new MarbleToy(null, new Marble(null)));
-	private final Set<String> acceptedByMealy = new LinkedHashSet<>();
-	private final Set<String> acceptedByFA = new LinkedHashSet<>();
+	private final Set<String> mealyAcccepted = new LinkedHashSet<>();
+	private final LeverControl fsm = new LeverControl(new MarbleToy(null, new Marble(null)));
+	private final Set<String> fsmAccepted = new LinkedHashSet<>();
 
 	public MarbleToySample(int maxInputLength) {
 		inputs = createWordsIncludingLength(maxInputLength, 'A', 'B');
 		for (String input : inputs) {
-			if (mealy.accepts(input)) {
-				acceptedByMealy.add(input);
+			if (mealy.process(input)) {
+				mealyAcccepted.add(input);
 			}
-			if (leverControlFA.accepts(input)) {
-				acceptedByFA.add(input);
+			if (fsm.process(input)) {
+				fsmAccepted.add(input);
 			}
 		}
 		for (String input : inputs) {
 			System.out.print(input);
 			System.out.print(" ");
-			System.out.print(acceptedByMealy.contains(input));
+			System.out.print(mealyAcccepted.contains(input));
 			System.out.print(" ");
-			System.out.print(acceptedByFA.contains(input));
-			if (acceptedByMealy.contains(input) != acceptedByFA.contains(input)) {
+			System.out.print(fsmAccepted.contains(input));
+			if (mealyAcccepted.contains(input) != fsmAccepted.contains(input)) {
 				System.out.print(" ERROR!");
 				return;
 			}

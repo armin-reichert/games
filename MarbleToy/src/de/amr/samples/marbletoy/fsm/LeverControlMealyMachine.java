@@ -1,32 +1,32 @@
 package de.amr.samples.marbletoy.fsm;
 
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LLL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LLR;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LRL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.LRR;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RLL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RLR;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RRL;
-import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID.RRR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.LLL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.LLR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.LRL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.LRR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.RLL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.RLR;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.RRL;
+import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.RRR;
 
 import java.util.function.Consumer;
 
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.easy.statemachine.Transition;
-import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.StateID;
+import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState;
 
-public class LeverControlMealyMachine extends StateMachine<StateID, Character> {
+public class LeverControlMealyMachine extends StateMachine<ToyState, Character> {
 
-	public enum StateID {
+	public enum ToyState {
 		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR;
 	};
 
 	private final StringBuilder output = new StringBuilder();
-	private final Consumer<Transition<StateID, Character>> C = t -> output.append('C');
-	private final Consumer<Transition<StateID, Character>> D = t -> output.append('D');
+	private final Consumer<Transition<ToyState, Character>> C = t -> output.append('C');
+	private final Consumer<Transition<ToyState, Character>> D = t -> output.append('D');
 
 	public LeverControlMealyMachine() {
-		super("Mealy Machine for Marble MarbleToy", StateID.class, StateID.LLL);
+		super("Mealy Machine for Marble-Toy", ToyState.class, ToyState.LLL);
 		changeOnInput('A', LLL, RLL, C);
 		changeOnInput('B', LLL, LRR, C);
 		changeOnInput('A', LLR, RLR, C);
@@ -45,13 +45,13 @@ public class LeverControlMealyMachine extends StateMachine<StateID, Character> {
 		changeOnInput('B', RRR, RLR, D);
 	}
 
-	public boolean accepts(String input) {
+	public boolean process(String input) {
 		init();
 		output.setLength(0);
-		for (int i = 0; i < input.length(); ++i) {
-			addInput(input.charAt(i));
+		input.chars().forEach(ch -> {
+			addInput((char) ch);
 			update();
-		}
+		});
 		return output.length() > 0 && output.charAt(output.length() - 1) == 'D';
 	}
 }

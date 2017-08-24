@@ -1,37 +1,37 @@
 package de.amr.samples.marbletoy.fsm;
 
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LLL;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LLL_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LLR;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LLR_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LRL;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LRL_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LRR;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.LRR_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RLL;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RLL_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RLR;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RLR_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRL;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRL_D;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRR;
-import static de.amr.samples.marbletoy.fsm.LeverControl.StateID.RRR_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LLL;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LLL_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LLR;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LLR_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LRL;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LRL_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LRR;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.LRR_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RLL;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RLL_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RLR;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RLR_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRL;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRL_D;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRR;
+import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRR_D;
 
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.entities.MarbleToy;
-import de.amr.samples.marbletoy.fsm.LeverControl.StateID;
+import de.amr.samples.marbletoy.fsm.LeverControl.ToyState;
 
-public class LeverControl extends StateMachine<StateID, Character> {
+public class LeverControl extends StateMachine<ToyState, Character> {
 
-	public enum StateID {
+	public enum ToyState {
 		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR, LLL_D, LLR_D, LRL_D, LRR_D, RLL_D, RLR_D, RRL_D, RRR_D;
 	};
 
 	public LeverControl(MarbleToy toy) {
-		super("Marble Toy Lever Control", StateID.class, LLL);
+		super("Marble Toy Lever Control", ToyState.class, LLL);
 
-		for (StateID stateID : StateID.values()) {
-			state(stateID).entry = state -> toy.updateLevers();
+		for (ToyState stateID : ToyState.values()) {
+			state(stateID).entry = state -> updateLevers(toy);
 		}
 
 		changeOnInput('A', LLL, RLL);
@@ -72,16 +72,22 @@ public class LeverControl extends StateMachine<StateID, Character> {
 		return stateID().name().endsWith("_D");
 	}
 
+	void updateLevers(MarbleToy toy) {
+		for (int i = 0; i < toy.levers.length; ++i) {
+			toy.levers[i].setPointsLeft(isRoutingLeft(i));
+		}
+	}
+
 	public boolean isRoutingLeft(int leverIndex) {
 		return stateID().name().charAt(leverIndex) == 'L';
 	}
 
-	public boolean accepts(String input) {
+	public boolean process(String input) {
 		init();
-		for (int i = 0; i < input.length(); ++i) {
-			addInput(input.charAt(i));
+		input.chars().forEach(ch -> {
+			addInput((char) ch);
 			update();
-		}
+		});
 		return isFinalState();
 	}
 }

@@ -29,7 +29,7 @@ public class MarbleToy extends GameEntity {
 
 	private final LeverControl leverControl;
 	private final MarbleRouter router;
-	private final Lever[] levers = new Lever[3];
+	public final Lever[] levers = new Lever[3];
 	private final EnumSet<RoutingPoint> auxPoints = EnumSet.of(E, F, G, H);
 	private final GameEntity marble;
 
