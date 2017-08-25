@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 import de.amr.easy.game.math.Vector2;
+import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
@@ -31,40 +32,36 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 	private final BiFunction<Integer, Integer, Float> moveSpeed; // ticks per second
 	private final BoardUI boardUI;
-	private final Board board;
-	private Player player;
-	private Move move;
+	private final Player player;
+
+	private int from, to;
 
 	/**
 	 * Constructs a move control.
 	 * 
+	 * @param player
+	 *          the player making the move
 	 * @param boardUI
-	 *          the board UI where the move is displayed
+	 *          the board UI where the move is visualized
 	 * @param moveSpeed
-	 *          function computing the move speed between two points
+	 *          function computing the move speed between two board positions
 	 */
-	public MoveControl(BoardUI boardUI, BiFunction<Integer, Integer, Float> moveSpeed) {
+	public MoveControl(Player player, BoardUI boardUI, BiFunction<Integer, Integer, Float> moveSpeed) {
 		super("Move Control", MoveState.class, READING_MOVE);
-		this.boardUI = boardUI;
-		this.board = boardUI.board();
-		this.moveSpeed = moveSpeed;
-		defineStateMachine();
-	}
 
-	private void defineStateMachine() {
+		this.player = player;
+		this.boardUI = boardUI;
+		this.moveSpeed = moveSpeed;
 
 		// INITIAL
 
-		state(INITIAL).entry = s -> {
-			move = null;
-			player.newMove();
-		};
+		state(INITIAL).entry = this::newMove;
 
 		change(INITIAL, READING_MOVE);
 
 		// READING_MOVE
 
-		state(READING_MOVE).update = s -> move = player.supplyMove();
+		state(READING_MOVE).update = this::readMove;
 
 		change(READING_MOVE, INITIAL, () -> hasMoveStartPosition() && !isMoveStartPossible());
 
@@ -76,73 +73,105 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		// MOVING
 
-		state(MOVING).entry = s -> {
-			board.getDirection(move.from, move.to).ifPresent(moveDir -> {
-				stoneToMove().ifPresent(stone -> stone.tf.setVelocity(computeVelocity(moveDir)));
-				LOG.info(Messages.text("moving_from_to_towards", move.from, move.to, moveDir));
-			});
-		};
+		state(MOVING).entry = this::startMove;
 
-		state(MOVING).update = s -> stoneToMove().ifPresent(stone -> stone.tf.move());
+		state(MOVING).update = this::moveStone;
 
-		change(MOVING, FINISHED, this::endPositionReached);
+		change(MOVING, FINISHED, this::isStoneAtTarget);
 
-		state(MOVING).exit = s -> stoneToMove().ifPresent(stone -> stone.tf.setVelocity(0, 0));
+		state(MOVING).exit = this::stopMove;
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG.info(Messages.text("jumping_from_to", move.from, move.to));
+		state(JUMPING).entry = s -> LOG.info(Messages.text("jumping_from_to", from, to));
 
 		change(JUMPING, FINISHED);
 
 		// FINISHED
 
-		state(FINISHED).entry = s -> boardUI.moveStone(move.from, move.to);
+		state(FINISHED).entry = s -> boardUI.moveStone(from, to);
 	}
 
-	public void controlPlayer(Player player) {
-		this.player = player;
-		init();
+	void newMove(State state) {
+		from = to = -1;
+		player.newMove();
+	}
+
+	void readMove(State state) {
+		Move move = player.supplyMove();
+		if (move != null) {
+			from = move.from;
+			to = move.to;
+		}
+	}
+
+	void startMove(State state) {
+		board().getDirection(from, to).ifPresent(dir -> {
+			stone().ifPresent(stone -> stone.tf.setVelocity(velocity(dir)));
+			LOG.info(Messages.text("moving_from_to_towards", from, to, dir));
+		});
+	}
+
+	void stopMove(State state) {
+		stone().ifPresent(stone -> stone.tf.setVelocity(0, 0));
+	}
+
+	void moveStone(State state) {
+		stone().ifPresent(stone -> stone.tf.move());
+	}
+
+	Board board() {
+		return boardUI.board();
 	}
 
 	public Optional<Move> getMove() {
-		return move == null ? Optional.empty() : Optional.of(move);
+		return from != -1 && to != -1 ? Optional.of(new Move(from, to)) : Optional.empty();
 	}
 
 	public boolean hasMoveStartPosition() {
-		return move != null && board.isValidPosition(move.from);
+		return board().isValidPosition(from);
 	}
 
-	private boolean hasBothMovePositions() {
-		return hasMoveStartPosition() && board.isValidPosition(move.to);
+	boolean hasBothMovePositions() {
+		return hasMoveStartPosition() && board().isValidPosition(to);
 	}
 
 	public boolean isMoveStartPossible() {
-		return hasMoveStartPosition() && board.hasStoneAt(move.from)
-				&& board.getStoneAt(move.from).get() == player.getColor()
-				&& (player.canJump() || board.hasEmptyNeighbor(move.from));
+		return hasMoveStartPosition() && board().hasStoneAt(from) && board().getStoneAt(from).get() == player.getColor()
+				&& (player.canJump() || board().hasEmptyNeighbor(from));
 	}
 
-	private boolean isMovePossible() {
-		if (!stoneToMove().isPresent()) {
-			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
-		} else if (stoneToMove().get().getColor() != player.getColor()) {
-			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
-		} else if (!player.canJump() && !board.hasEmptyNeighbor(move.from)) {
-			LOG.info(Messages.text("stone_at_position_cannot_move", move.from));
-		} else if (board.isEmptyPosition(move.to) && (player.canJump() || board.areNeighbors(move.from, move.to))) {
-			return player.canJump() ? board.isEmptyPosition(move.to)
-					: board.isEmptyPosition(move.to) && board.areNeighbors(move.from, move.to);
+	boolean isMovePossible() {
+		if (!stone().isPresent()) {
+			LOG.info(Messages.text("stone_at_position_not_existing", from));
+		} else if (stone().get().getColor() != player.getColor()) {
+			LOG.info(Messages.text("stone_at_position_wrong_color", from));
+		} else if (!player.canJump() && !board().hasEmptyNeighbor(from)) {
+			LOG.info(Messages.text("stone_at_position_cannot_move", from));
+		} else if (board().isEmptyPosition(to) && (player.canJump() || board().areNeighbors(from, to))) {
+			return player.canJump() ? board().isEmptyPosition(to)
+					: board().isEmptyPosition(to) && board().areNeighbors(from, to);
 		}
 		return false;
 	}
 
-	private Optional<Stone> stoneToMove() {
-		return boardUI.stoneAt(move.from);
+	boolean isStoneAtTarget() {
+		if (stone().isPresent()) {
+			Stone stone = stone().get();
+			float speed = stone.tf.getVelocity().length();
+			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
+			Vector2 toCenter = boardUI.centerPoint(to);
+			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
+		}
+		return false;
 	}
 
-	private Vector2 computeVelocity(Direction dir) {
-		float speed = moveSpeed.apply(move.from, move.to);
+	Optional<Stone> stone() {
+		return boardUI.stoneAt(from);
+	}
+
+	Vector2 velocity(Direction dir) {
+		float speed = moveSpeed.apply(from, to);
 		switch (dir) {
 		case NORTH:
 			return new Vector2(0, -speed);
@@ -154,16 +183,5 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 			return new Vector2(-speed, 0);
 		}
 		throw new IllegalArgumentException("Illegal direction: " + dir);
-	}
-
-	private boolean endPositionReached() {
-		if (stoneToMove().isPresent()) {
-			Stone stone = stoneToMove().get();
-			float speed = stone.tf.getVelocity().length();
-			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-			Vector2 toCenter = boardUI.centerPoint(move.to);
-			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
-		}
-		return false;
 	}
 }

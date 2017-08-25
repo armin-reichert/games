@@ -1,7 +1,10 @@
 package de.amr.games.muehle.player.impl;
 
+import static de.amr.games.muehle.board.StoneColor.WHITE;
+
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
 import de.amr.games.muehle.rules.api.RemovalRule;
@@ -38,7 +41,7 @@ public class Zwick extends RuleBasedPlayer {
 
 	@Override
 	public String getName() {
-		return "Zwicki";
+		return String.format("Zwicki (%s)", Messages.text(getColor() == WHITE ? "white" : "black"));
 	}
 
 	public Zwick(Board board, StoneColor color) {

@@ -1,7 +1,10 @@
 package de.amr.games.muehle.player.impl;
 
+import static de.amr.games.muehle.board.StoneColor.WHITE;
+
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
 import de.amr.games.muehle.rules.api.RemovalRule;
@@ -38,7 +41,7 @@ public class Peter extends RuleBasedPlayer {
 
 	@Override
 	public String getName() {
-		return "Strack";
+		return String.format("Strack (%s)", Messages.text(getColor() == WHITE ? "white" : "black"));
 	}
 
 	public Peter(Board board, StoneColor color) {

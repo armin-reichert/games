@@ -171,6 +171,9 @@ public class PlayScene extends Scene<MillApp> {
 
 		void switchPlacing(Transition<GamePhase, GameEvent> t) {
 			turnPlacingTo(1 - turn);
+			if (!isInteractive(turn)) {
+				pause(app.pulse.secToTicks(PLACING_TIME_SEC));
+			}
 		}
 
 		void onPlacingClosedMill(Transition<GamePhase, GameEvent> t) {
@@ -179,8 +182,13 @@ public class PlayScene extends Scene<MillApp> {
 
 		void turnMovingTo(int i) {
 			turn = i;
-			moveControl.controlPlayer(players[turn]);
+			moveControl = new MoveControl(players[turn], boardUI, this::computeMoveSpeed);
+			moveControl.init();
 			showMessage("must_move", players[turn].getName());
+		}
+
+		float computeMoveSpeed(int from, int to) {
+			return Vector2.dist(boardUI.centerPoint(from), boardUI.centerPoint(to)) / app.pulse.secToTicks(MOVE_TIME_SEC);
 		}
 
 		void switchMoving(Transition<GamePhase, GameEvent> t) {
@@ -199,10 +207,6 @@ public class PlayScene extends Scene<MillApp> {
 					placedAt = placePosition;
 					placedColor = colorInTurn;
 					addInput(STONE_PLACED);
-					assistant.moveHome();
-					if (!isInteractive(turn)) {
-						pause(app.pulse.secToTicks(PLACING_TIME_SEC));
-					}
 				}
 			});
 		}
@@ -233,7 +237,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		void startRemoving(State state) {
 			removedAt = -1;
-			showMessage("must_take", players[turn].getName());
+			showMessage("must_take", players[turn].getName(), players[1 - turn].getName());
 		}
 
 		void runStoneMove(State state) {
@@ -284,8 +288,14 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
+		createPlayers();
 		createUI();
 
+		// control.setLogger(LOG);
+		control.init();
+	}
+
+	private void createPlayers() {
 		/*@formatter:off*/
 		Player[] whitePlayers = { 
 				new InteractivePlayer(board, WHITE, boardUI::findPosition),
@@ -304,15 +314,6 @@ public class PlayScene extends Scene<MillApp> {
 
 		players[0] = whitePlayers[2];
 		players[1] = blackPlayers[3];
-
-		assistant.setPlayers(players[0], players[1]);
-
-		// State machines
-		moveControl = new MoveControl(boardUI, this::computeMoveSpeed);
-		// moveControl.setLogger(LOG);
-		// control.setLogger(LOG);
-
-		control.init();
 	}
 
 	void createUI() {
@@ -330,6 +331,7 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.setFont(msgFont);
 
 		assistant = new AlienAssistant(this);
+		assistant.setPlayers(players[0], players[1]);
 		assistant.init();
 
 		// Layout
@@ -361,10 +363,6 @@ public class PlayScene extends Scene<MillApp> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			boardUI.togglePositionNumbers();
 		}
-	}
-
-	float computeMoveSpeed(int from, int to) {
-		return Vector2.dist(boardUI.centerPoint(from), boardUI.centerPoint(to)) / app.pulse.secToTicks(MOVE_TIME_SEC);
 	}
 
 	void showMessage(String key, Object... args) {
