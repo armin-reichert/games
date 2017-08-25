@@ -22,7 +22,9 @@ import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2;
 import de.amr.easy.game.scene.Scene;
+import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
@@ -43,20 +45,23 @@ import de.amr.games.muehle.ui.StoneCounter;
 public class PlayScene extends Scene<MillApp> {
 
 	static final int NUM_STONES = 9;
-	static final float MOVE_TIME_SEC = .5f;
+	static final float MOVE_TIME_SEC = 0.75f;
+	static final float PLACING_TIME_SEC = 1.5f;
+	static final float REMOVAL_TIME_SEC = 1.5f;
 
-	private FSM control = new FSM();
+	// Control
+	private final FSM control = new FSM();
+	private MoveControl moveControl;
+
 	private Board board = new Board();
 	private Player[] players = new Player[2];
 	private int[] stonesPlaced = new int[2];
-	private StoneCounter[] stoneCounters = new StoneCounter[2];
-
 	private int turn;
 
 	// UI
 	private BoardUI boardUI;
+	private StoneCounter[] stoneCounters = new StoneCounter[2];
 	private AlienAssistant assistant;
-	private MoveControl moveControl;
 	private TextArea messageArea;
 
 	/** Finite-state-machine for game control. */
@@ -74,115 +79,115 @@ public class PlayScene extends Scene<MillApp> {
 
 		FSM() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTING);
-			// Define the states and transitions:
 
 			// STARTING
 
-			state(STARTING).entry = s -> reset();
+			state(STARTING).entry = this::reset;
 
 			change(STARTING, PLACING);
 
 			// PLACING
 
-			state(PLACING).update = s -> tryToPlaceStone();
+			state(PLACING).update = this::tryToPlaceStone;
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill, t -> assistant.tellMillClosed());
+			changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill, this::onPlacingClosedMill);
 
-			changeOnInput(STONE_PLACED, PLACING, PLACING, t -> switchPlacing());
+			changeOnInput(STONE_PLACED, PLACING, PLACING, this::switchPlacing);
 
-			change(PLACING, MOVING, () -> stonesPlaced[1] == NUM_STONES, t -> switchMoving());
+			change(PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
 
 			// PLACING_REMOVING_STONE
 
-			state(PLACING_REMOVING).entry = s -> {
-				removedAt = -1;
-				showMessage("must_take", players[turn].getName());
-			};
+			state(PLACING_REMOVING).entry = this::startRemoving;
 
-			state(PLACING_REMOVING).update = s -> tryToRemoveStone();
+			state(PLACING_REMOVING).update = this::tryToRemoveStone;
 
-			change(PLACING_REMOVING, PLACING, () -> removedAt != -1, t -> switchPlacing());
+			change(PLACING_REMOVING, PLACING, this::stoneRemoved, this::switchPlacing);
 
 			// MOVING
 
-			state(MOVING).update = s -> runStoneMove();
+			state(MOVING).update = this::runStoneMove;
 
 			change(MOVING, MOVING_REMOVING, this::movingClosedMill);
 
-			change(MOVING, MOVING, this::isMoveFinished, t -> switchMoving());
+			change(MOVING, MOVING, this::isMoveFinished, this::switchMoving);
 
 			change(MOVING, GAME_OVER, this::isGameOver);
 
 			// MOVING_REMOVING_STONE
 
-			state(MOVING_REMOVING).entry = s -> {
-				removedAt = -1;
-				showMessage("must_take", players[turn].getName());
-			};
+			state(MOVING_REMOVING).entry = this::startRemoving;
 
-			state(MOVING_REMOVING).update = s -> tryToRemoveStone();
+			state(MOVING_REMOVING).update = this::tryToRemoveStone;
 
-			change(MOVING_REMOVING, MOVING, () -> removedAt != -1, t -> switchMoving());
+			change(MOVING_REMOVING, MOVING, this::stoneRemoved, this::switchMoving);
 
 			// GAME_OVER
 
 			state(GAME_OVER).entry = s -> {
-				win(1 - turn);
+				announceWin(1 - turn);
 				pause(app.pulse.secToTicks(3));
 			};
 
 			change(GAME_OVER, STARTING,
-					() -> !isInteractive(players[0]) && !isInteractive(players[1]) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+					() -> !isInteractive(0) && !isInteractive(1) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
 
-		void reset() {
+		void reset(State state) {
 			boardUI.clear();
 			stonesPlaced[0] = stonesPlaced[1] = 0;
 			turnPlacingTo(0);
 		}
 
-		void win(int winner) {
-			showMessage("wins", players[winner].getName());
+		void announceWin(int i) {
+			showMessage("wins", players[i].getName());
 			assistant.tellWin();
 		}
 
-		boolean isInteractive(Player player) {
-			return player instanceof InteractivePlayer;
+		boolean allStonesPlaced() {
+			return stonesPlaced[1] == NUM_STONES;
+		}
+
+		boolean isInteractive(int i) {
+			return players[i] instanceof InteractivePlayer;
 		}
 
 		boolean isGameOver() {
 			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
 		}
 
-		boolean canJump(int playerNumber) {
-			return players[playerNumber].canJump();
+		boolean canJump(int i) {
+			return players[i].canJump();
 		}
 
-		boolean isTrapped(int playerNumber) {
-			return board.isTrapped(players[playerNumber].getColor());
+		boolean isTrapped(int i) {
+			return board.isTrapped(players[i].getColor());
 		}
 
-		void turnPlacingTo(int playerNumber) {
-			turn = playerNumber;
+		void turnPlacingTo(int i) {
+			turn = i;
 			showMessage("must_place", players[turn].getName());
-			pause(players[turn] instanceof InteractivePlayer ? 0 : app.pulse.secToTicks(1));
 		}
 
-		void switchPlacing() {
+		void switchPlacing(Transition<GamePhase, GameEvent> t) {
 			turnPlacingTo(1 - turn);
 		}
 
-		void turnMovingTo(int playerNumber) {
-			turn = playerNumber;
+		void onPlacingClosedMill(Transition<GamePhase, GameEvent> t) {
+			assistant.tellMillClosed();
+		}
+
+		void turnMovingTo(int i) {
+			turn = i;
 			moveControl.controlPlayer(players[turn]);
 			showMessage("must_move", players[turn].getName());
 		}
 
-		void switchMoving() {
+		void switchMoving(Transition<GamePhase, GameEvent> t) {
 			turnMovingTo(1 - turn);
 		}
 
-		void tryToPlaceStone() {
+		void tryToPlaceStone(State state) {
 			assistant.givePlacingHint();
 			players[turn].supplyPlacingPosition().ifPresent(placePosition -> {
 				if (board.hasStoneAt(placePosition)) {
@@ -195,11 +200,14 @@ public class PlayScene extends Scene<MillApp> {
 					placedColor = colorInTurn;
 					addInput(STONE_PLACED);
 					assistant.moveHome();
+					if (!isInteractive(turn)) {
+						pause(app.pulse.secToTicks(PLACING_TIME_SEC));
+					}
 				}
 			});
 		}
 
-		void tryToRemoveStone() {
+		void tryToRemoveStone(State state) {
 			players[turn].supplyRemovalPosition().ifPresent(removalPosition -> {
 				StoneColor colorToRemove = players[turn].getColor().other();
 				if (board.isEmptyPosition(removalPosition)) {
@@ -212,11 +220,23 @@ public class PlayScene extends Scene<MillApp> {
 					boardUI.removeStoneAt(removalPosition);
 					removedAt = removalPosition;
 					LOG.info(Messages.text("removed_stone_at_position", players[turn].getName(), removalPosition));
+					if (!isInteractive(turn)) {
+						pause(app.pulse.secToTicks(REMOVAL_TIME_SEC));
+					}
 				}
 			});
 		}
 
-		void runStoneMove() {
+		boolean stoneRemoved() {
+			return removedAt != -1;
+		}
+
+		void startRemoving(State state) {
+			removedAt = -1;
+			showMessage("must_take", players[turn].getName());
+		}
+
+		void runStoneMove(State state) {
 			moveControl.update();
 		}
 
