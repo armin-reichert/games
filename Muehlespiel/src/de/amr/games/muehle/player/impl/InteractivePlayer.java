@@ -78,13 +78,13 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public Move supplyMove() {
+	public Optional<Move> supplyMove() {
 		if (move.from == -1) {
 			computeBoardPositionFromClickPosition().ifPresent(p -> move.from = p);
 		} else if (move.to == -1) {
 			supplyMoveEndPosition().ifPresent(p -> move.to = p);
 		}
-		return move;
+		return board.isValidPosition(move.from) && board.isValidPosition(move.to) ? Optional.of(move) : Optional.empty();
 	}
 
 	@Override

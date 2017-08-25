@@ -224,9 +224,6 @@ public class PlayScene extends Scene<MillApp> {
 					boardUI.removeStoneAt(removalPosition);
 					removedAt = removalPosition;
 					LOG.info(Messages.text("removed_stone_at_position", players[turn].getName(), removalPosition));
-					if (!isInteractive(turn)) {
-						pause(app.pulse.secToTicks(REMOVAL_TIME_SEC));
-					}
 				}
 			});
 		}
@@ -380,7 +377,7 @@ public class PlayScene extends Scene<MillApp> {
 		if (control.is(PLACING, PLACING_REMOVING)) {
 			Stream.of(stoneCounters).forEach(counter -> counter.draw(g));
 		}
-		if (control.is(PLACING_REMOVING, MOVING_REMOVING)) {
+		if (control.is(PLACING_REMOVING, MOVING_REMOVING) && control.isInteractive(0) || control.isInteractive(1)) {
 			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
 		}
 	}

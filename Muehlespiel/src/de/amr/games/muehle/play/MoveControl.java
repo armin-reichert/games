@@ -98,11 +98,10 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	}
 
 	void readMove(State state) {
-		Move move = player.supplyMove();
-		if (move != null) {
+		player.supplyMove().ifPresent(move -> {
 			from = move.from;
 			to = move.to;
-		}
+		});
 	}
 
 	void startMove(State state) {

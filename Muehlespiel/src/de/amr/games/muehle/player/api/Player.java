@@ -2,6 +2,7 @@ package de.amr.games.muehle.player.api;
 
 import static java.lang.String.format;
 
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import de.amr.games.muehle.board.Board;
@@ -30,7 +31,7 @@ public interface Player {
 
 	public OptionalInt supplyRemovalPosition();
 
-	public Move supplyMove();
+	public Optional<Move> supplyMove();
 
 	public void newMove();
 }

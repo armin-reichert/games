@@ -3,6 +3,7 @@ package de.amr.games.muehle.player.impl;
 import static de.amr.easy.game.Application.LOG;
 import static java.lang.String.format;
 
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
@@ -68,13 +69,13 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public Move supplyMove() {
+	public Optional<Move> supplyMove() {
 		if (move.from == -1) {
 			supplyMoveStartPosition().ifPresent(pos -> move.from = pos);
 		} else {
 			supplyMoveEndPosition().ifPresent(pos -> move.to = pos);
 		}
-		return move;
+		return board.isValidPosition(move.from) && board.isValidPosition(move.to) ? Optional.of(move) : Optional.empty();
 	}
 
 	OptionalInt supplyMoveStartPosition() {
