@@ -14,8 +14,8 @@ import static de.amr.games.muehle.play.GamePhase.STARTING;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
@@ -29,13 +29,14 @@ import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
+import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.player.impl.InteractivePlayer;
 import de.amr.games.muehle.player.impl.Peter;
 import de.amr.games.muehle.player.impl.RandomPlayer;
 import de.amr.games.muehle.player.impl.Zwick;
 import de.amr.games.muehle.ui.BoardUI;
-import de.amr.games.muehle.ui.StoneCounter;
+import de.amr.games.muehle.ui.Stone;
 
 /**
  * The play scene of the mill game.
@@ -60,7 +61,6 @@ public class PlayScene extends Scene<MillApp> {
 
 	// UI
 	private BoardUI boardUI;
-	private StoneCounter[] stoneCounters = new StoneCounter[2];
 	private AlienAssistant assistant;
 	private TextArea messageArea;
 
@@ -106,9 +106,9 @@ public class PlayScene extends Scene<MillApp> {
 
 			// MOVING
 
-			state(MOVING).update = this::runStoneMove;
+			state(MOVING).update = this::moveStone;
 
-			change(MOVING, MOVING_REMOVING, this::movingClosedMill);
+			change(MOVING, MOVING_REMOVING, this::moveClosedMill);
 
 			change(MOVING, MOVING, this::isMoveFinished, this::switchMoving);
 
@@ -229,7 +229,7 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		boolean stoneRemoved() {
-			return removedAt != -1;
+			return board.isValidPosition(removedAt);
 		}
 
 		void startRemoving(State state) {
@@ -237,7 +237,7 @@ public class PlayScene extends Scene<MillApp> {
 			showMessage("must_take", players[turn].getName(), players[1 - turn].getName());
 		}
 
-		void runStoneMove(State state) {
+		void moveStone(State state) {
 			moveControl.update();
 		}
 
@@ -249,11 +249,15 @@ public class PlayScene extends Scene<MillApp> {
 			return board.inMill(placedAt, placedColor);
 		}
 
-		boolean movingClosedMill() {
-			return moveControl.is(MoveState.FINISHED)
-					&& board.inMill(moveControl.getMove().get().to, players[turn].getColor());
+		boolean moveClosedMill() {
+			if (isMoveFinished()) {
+				Move move = moveControl.getMove().get();
+				return board.inMill(move.to, players[turn].getColor());
+			}
+			return false;
 		}
-	};
+
+	} // FSM
 
 	public PlayScene(MillApp app) {
 		super(app);
@@ -316,12 +320,6 @@ public class PlayScene extends Scene<MillApp> {
 	void createUI() {
 		boardUI = new BoardUI(board, 600, 600);
 
-		stoneCounters[0] = new StoneCounter(WHITE, boardUI.stoneRadius(), () -> NUM_STONES - stonesPlaced[0],
-				() -> turn == 0);
-
-		stoneCounters[1] = new StoneCounter(BLACK, boardUI.stoneRadius(), () -> NUM_STONES - stonesPlaced[1],
-				() -> turn == 1);
-
 		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
@@ -334,8 +332,6 @@ public class PlayScene extends Scene<MillApp> {
 		// Layout
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
-		stoneCounters[0].tf.moveTo(40, getHeight() - 50);
-		stoneCounters[1].tf.moveTo(getWidth() - 100, getHeight() - 50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
 		assistant.moveHome();
 	}
@@ -375,10 +371,29 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (control.is(PLACING, PLACING_REMOVING)) {
-			Stream.of(stoneCounters).forEach(counter -> counter.draw(g));
+			drawStoneCount(g, NUM_STONES - stonesPlaced[0], WHITE, boardUI.stoneRadius(), turn == 0, 40, getHeight() - 50);
+			drawStoneCount(g, NUM_STONES - stonesPlaced[1], BLACK, boardUI.stoneRadius(), turn == 1, getWidth() - 100,
+					getHeight() - 50);
 		}
 		if (control.is(PLACING_REMOVING, MOVING_REMOVING) && control.isInteractive(0) || control.isInteractive(1)) {
 			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
 		}
+	}
+
+	void drawStoneCount(Graphics2D g, int numStones, StoneColor color, int radius, boolean selected, int x, int y) {
+		Stone stone = new Stone(color, radius);
+		g.translate(x, y);
+		for (int i = numStones - 1, inset = 8; i >= 0; --i) {
+			g.translate(i * inset, -i * inset);
+			stone.draw(g);
+			g.translate(-i * inset, i * inset);
+		}
+		if (numStones > 1) {
+			g.setColor(selected ? Color.RED : Color.DARK_GRAY);
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * radius));
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g.drawString(String.valueOf(numStones), 2 * radius, radius);
+		}
+		g.translate(-x, -y);
 	}
 }
