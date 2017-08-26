@@ -4,6 +4,7 @@ import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 import static de.amr.games.muehle.board.Direction.WEST;
+import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -20,6 +21,7 @@ import de.amr.easy.game.input.Mouse;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
 
@@ -54,7 +56,7 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public String getName() {
-		return getColor().toString();
+		return Messages.text(color == WHITE ? "white" : "black");
 	}
 
 	@Override

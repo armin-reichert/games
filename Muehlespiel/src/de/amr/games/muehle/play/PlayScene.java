@@ -51,7 +51,7 @@ public class PlayScene extends Scene<MillApp> {
 	static final float REMOVAL_TIME_SEC = 1.5f;
 
 	// Control
-	private final FSM control = new FSM();
+	private final GameControl control = new GameControl();
 	private MoveControl moveControl;
 
 	private Board board = new Board();
@@ -65,7 +65,7 @@ public class PlayScene extends Scene<MillApp> {
 	private TextArea messageArea;
 
 	/** Finite-state-machine for game control. */
-	class FSM extends StateMachine<GamePhase, GameEvent> {
+	class GameControl extends StateMachine<GamePhase, GameEvent> {
 
 		@Override
 		public void update() {
@@ -77,7 +77,7 @@ public class PlayScene extends Scene<MillApp> {
 		private StoneColor placedColor;
 		private int removedAt;
 
-		FSM() {
+		GameControl() {
 			super("Mühlespiel-Steuerung", GamePhase.class, STARTING);
 
 			// STARTING
@@ -275,7 +275,7 @@ public class PlayScene extends Scene<MillApp> {
 		return boardUI;
 	}
 
-	FSM getControl() {
+	GameControl getControl() {
 		return control;
 	}
 
@@ -289,14 +289,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
-		createPlayers();
-		createUI();
-
-		// control.setLogger(LOG);
-		control.init();
-	}
-
-	private void createPlayers() {
+		boardUI = new BoardUI(board, 600, 600);
 		/*@formatter:off*/
 		Player[] whitePlayers = { 
 				new InteractivePlayer(board, WHITE, boardUI::findPosition),
@@ -313,12 +306,8 @@ public class PlayScene extends Scene<MillApp> {
 		};
 		/*@formatter:on*/
 
-		players[0] = whitePlayers[2];
+		players[0] = whitePlayers[0];
 		players[1] = blackPlayers[3];
-	}
-
-	void createUI() {
-		boardUI = new BoardUI(board, 600, 600);
 
 		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
 		messageArea = new TextArea();
@@ -334,6 +323,9 @@ public class PlayScene extends Scene<MillApp> {
 		boardUI.tf.setY(50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
 		assistant.moveHome();
+
+		// control.setLogger(LOG);
+		control.init();
 	}
 
 	@Override
@@ -383,7 +375,8 @@ public class PlayScene extends Scene<MillApp> {
 	void drawStoneCount(Graphics2D g, int numStones, StoneColor color, int radius, boolean selected, int x, int y) {
 		Stone stone = new Stone(color, radius);
 		g.translate(x, y);
-		for (int i = numStones - 1, inset = 8; i >= 0; --i) {
+		int inset = 8;
+		for (int i = numStones - 1; i >= 0; --i) {
 			g.translate(i * inset, -i * inset);
 			stone.draw(g);
 			g.translate(-i * inset, i * inset);
