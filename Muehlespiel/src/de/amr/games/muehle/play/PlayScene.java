@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.util.stream.IntStream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
@@ -49,11 +50,14 @@ public class PlayScene extends Scene<MillApp> {
 	static final float MOVE_TIME_SEC = 0.75f;
 	static final float PLACING_TIME_SEC = 1.5f;
 	static final float REMOVAL_TIME_SEC = 1.5f;
+	static final Color BOARD_COLOR = new Color(255, 255, 224);
+	static final Color LINE_COLOR = Color.BLACK;
 
 	// Control
 	private final GameControl control = new GameControl();
 	private MoveControl moveControl;
 
+	// Data
 	private Board board = new Board();
 	private Player[] players = new Player[2];
 	private int[] stonesPlaced = new int[2];
@@ -61,6 +65,7 @@ public class PlayScene extends Scene<MillApp> {
 
 	// UI
 	private BoardUI boardUI;
+	private final Stone[] stamp = new Stone[2];
 	private AlienAssistant assistant;
 	private TextArea messageArea;
 
@@ -289,7 +294,12 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void init() {
-		boardUI = new BoardUI(board, 600, 600);
+
+		boardUI = new BoardUI(board, 600, 600, BOARD_COLOR, LINE_COLOR);
+
+		stamp[0] = new Stone(WHITE, boardUI.stoneRadius());
+		stamp[1] = new Stone(BLACK, boardUI.stoneRadius());
+
 		/*@formatter:off*/
 		Player[] whitePlayers = { 
 				new InteractivePlayer(board, WHITE, boardUI::findPosition),
@@ -357,36 +367,33 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(BoardUI.BOARD_COLOR);
+		g.setColor(BOARD_COLOR);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (control.is(PLACING, PLACING_REMOVING)) {
-			drawStoneCount(g, NUM_STONES - stonesPlaced[0], WHITE, boardUI.stoneRadius(), turn == 0, 40, getHeight() - 30);
-			drawStoneCount(g, NUM_STONES - stonesPlaced[1], BLACK, boardUI.stoneRadius(), turn == 1, getWidth() - 100,
-					getHeight() - 30);
+			drawStoneCounter(g, NUM_STONES - stonesPlaced[0], stamp[0], turn == 0, 40, getHeight() - 30);
+			drawStoneCounter(g, NUM_STONES - stonesPlaced[1], stamp[1], turn == 1, getWidth() - 100, getHeight() - 30);
 		}
 		if (control.is(PLACING_REMOVING, MOVING_REMOVING) && control.isInteractive(0) || control.isInteractive(1)) {
 			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
 		}
 	}
 
-	void drawStoneCount(Graphics2D g, int numStones, StoneColor color, int radius, boolean selected, int x, int y) {
-		Stone stone = new Stone(color, radius);
-		g.translate(x, y);
-		int inset = 8;
-		for (int i = numStones - 1; i >= 0; --i) {
-			g.translate(i * inset, -i * inset);
-			stone.draw(g);
-			g.translate(-i * inset, i * inset);
-		}
+	void drawStoneCounter(Graphics2D g, int numStones, Stone stamp, boolean selected, int x, int y) {
+		final int inset = 6;
+		g.translate(x + inset * numStones, y - inset * numStones);
+		IntStream.range(0, numStones).forEach(i -> {
+			stamp.draw(g);
+			g.translate(-inset, inset);
+		});
 		if (numStones > 1) {
 			g.setColor(selected ? Color.RED : Color.DARK_GRAY);
-			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * radius));
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp.getRadius()));
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(numStones), 2 * radius, radius);
+			g.drawString(String.valueOf(numStones), 2 * stamp.getRadius(), stamp.getRadius());
 		}
 		g.translate(-x, -y);
 	}

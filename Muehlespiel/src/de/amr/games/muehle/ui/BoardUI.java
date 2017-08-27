@@ -9,9 +9,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -27,8 +29,6 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public class BoardUI extends GameEntity {
 
-	public static final Color BOARD_COLOR = new Color(255, 255, 224);
-
 	/*
 	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
 	 */
@@ -38,14 +38,20 @@ public class BoardUI extends GameEntity {
 	private final Board board;
 	private final int width;
 	private final int height;
+	private final Stone[] stones;
+	private Color bgColor;
+	private Color lineColor;
+	private Font font;
 	private boolean positionNumbersOn;
-	private Stone[] stones;
 
-	public BoardUI(Board board, int width, int height) {
+	public BoardUI(Board board, int width, int height, Color bgColor, Color lineColor) {
 		this.board = board;
 		this.width = width;
 		this.height = height;
-		stones = new Stone[BoardGraph.NUM_POS];
+		this.bgColor = bgColor;
+		this.lineColor = lineColor;
+		this.font = new Font("Arial", Font.PLAIN, stoneRadius() * 9 / 10);
+		this.stones = new Stone[BoardGraph.NUM_POS];
 	}
 
 	public Board board() {
@@ -76,7 +82,7 @@ public class BoardUI extends GameEntity {
 
 	public void clear() {
 		board.clear();
-		stones = new Stone[BoardGraph.NUM_POS];
+		Arrays.fill(stones, null);
 	}
 
 	public void putStoneAt(int p, StoneColor color) {
@@ -114,7 +120,7 @@ public class BoardUI extends GameEntity {
 	public OptionalInt findPosition(int x, int y) {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
-		return findNearestPosition(boardX, boardY, getWidth() / 18);
+		return findNearestPosition(boardX, boardY, stoneRadius());
 	}
 
 	public void showPositionNumbers() {
@@ -128,37 +134,32 @@ public class BoardUI extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 		// Background
-		g.setColor(BOARD_COLOR);
+		g.setColor(bgColor);
 		g.fillRect(0, 0, width, height);
-
 		// Lines
-		g.setColor(Color.BLACK);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius() / 2));
-		board.positions().forEach(p -> {
-			Vector2 centerFrom = centerPoint(p);
-			board.neighbors(p).forEach(q -> {
-				Vector2 centerTo = centerPoint(q);
-				g.drawLine(centerFrom.roundedX(), centerFrom.roundedY(), centerTo.roundedX(), centerTo.roundedY());
+		board.positions().forEach(from -> {
+			Vector2 fromPoint = centerPoint(from);
+			board.neighbors(from).forEach(to -> {
+				Vector2 toPoint = centerPoint(to);
+				g.drawLine(fromPoint.roundedX(), fromPoint.roundedY(), toPoint.roundedX(), toPoint.roundedY());
 			});
 		});
-
 		// Positions
-		g.setColor(Color.BLACK);
-		g.setFont(new Font("Arial", Font.PLAIN, 20));
 		board.positions().forEach(p -> {
 			Vector2 center = centerPoint(p);
+			g.setColor(lineColor);
 			g.fillOval(center.roundedX() - posRadius(), center.roundedY() - posRadius(), 2 * posRadius(), 2 * posRadius());
 			if (positionNumbersOn) {
-				g.drawString(p + "", center.x + 3 * posRadius(), center.y + 3 * posRadius());
+				g.setFont(font);
+				g.drawString(String.valueOf(p), center.x + 2 * posRadius(), center.y + 4 * posRadius());
 			}
 		});
-
 		// Stones
 		stones().forEach(stone -> stone.draw(g));
-
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
@@ -172,37 +173,18 @@ public class BoardUI extends GameEntity {
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	public void markPositionsOpeningTwoMills(Graphics2D g, StoneColor stoneColor, Color color) {
-		board.positionsOpeningTwoMills(stoneColor).forEach(p -> markPosition(g, p, color));
-	}
-
-	public void markPositionsClosingMill(Graphics2D g, StoneColor stoneColor, Color color) {
-		board.positionsClosingMill(stoneColor).forEach(p -> markPosition(g, p, color));
-	}
-
-	public void markPositionTrappingOpponent(Graphics2D g, StoneColor either, StoneColor other, Color color) {
-		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
-			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (board.neighbors(singleFreePosition).filter(board::hasStoneAt)
-					.anyMatch(p -> board.getStoneAt(p).get() == either)) {
-				markPosition(g, singleFreePosition, color);
-			}
-		}
-	}
-
-	public void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, boolean canJump) {
-		(canJump ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
-				.forEach(p -> markPosition(g, p, Color.GREEN));
+	public void markPositions(Graphics2D g, IntStream positions, Color color) {
+		positions.forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		boolean allStonesInMills = board.allStonesInMills(stoneColor);
 		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor)).forEach(p -> {
 			stoneAt(p).ifPresent(stone -> {
 				float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
 				float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
 				// draw red cross
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g.translate(offsetX, offsetY);
 				g.setColor(Color.RED);
 				g.drawLine(0, 0, stone.getWidth(), stone.getHeight());

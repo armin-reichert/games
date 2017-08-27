@@ -104,17 +104,32 @@ class AlienAssistant extends GameEntity {
 	}
 
 	void drawPlacingHints(Graphics2D g, StoneColor placingColor) {
-		boardUI.markPositionsClosingMill(g, placingColor, Color.GREEN);
-		boardUI.markPositionsOpeningTwoMills(g, placingColor, Color.YELLOW);
-		boardUI.markPositionsClosingMill(g, placingColor.other(), Color.RED);
+		boardUI.markPositions(g, board.positionsClosingMill(placingColor), Color.GREEN);
+		boardUI.markPositions(g, board.positionsOpeningTwoMills(placingColor), Color.YELLOW);
+		boardUI.markPositions(g, board.positionsClosingMill(placingColor.other()), Color.RED);
 	}
 
 	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
 		if (scene.getMoveControl().isMoveStartPossible()) {
 			scene.getMoveControl().getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 		} else {
-			boardUI.markPossibleMoveStarts(g, movingColor, scene.getPlayerInTurn().canJump());
-			boardUI.markPositionTrappingOpponent(g, movingColor, movingColor.other(), Color.RED);
+			markPossibleMoveStarts(g, movingColor, scene.getPlayerInTurn().canJump());
+			markTrappingPosition(g, movingColor, movingColor.other(), Color.RED);
+		}
+	}
+
+	void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, boolean canJump) {
+		(canJump ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
+				.forEach(p -> boardUI.markPosition(g, p, Color.GREEN));
+	}
+
+	void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
+		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
+			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
+			if (board.neighbors(singleFreePosition).filter(board::hasStoneAt)
+					.anyMatch(p -> board.getStoneAt(p).get() == either)) {
+				boardUI.markPosition(g, singleFreePosition, color);
+			}
 		}
 	}
 
