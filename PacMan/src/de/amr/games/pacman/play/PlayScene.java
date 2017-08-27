@@ -132,7 +132,7 @@ public class PlayScene extends Scene<PacManGame> {
 
 		private void configureTracing() {
 			setLogger(LOG);
-			setFrequency(app.pulse.getFrequency());
+			ticksToSec = app.pulse::ticksToSec;
 			// ghostAttackTimer.setLogger(Log);
 			// pacMan.setLogger(Log);
 			ghosts.forEach(ghost -> ghost.setLogger(LOG));

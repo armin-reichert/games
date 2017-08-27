@@ -130,7 +130,7 @@ public class PacMan extends BoardMover {
 
 	public void setLogger(Logger logger) {
 		control.setLogger(logger);
-		control.setFrequency(app.pulse.getFrequency());
+		control.ticksToSec = app.pulse::ticksToSec;
 	}
 
 	public void receiveEvent(PacManEvent event) {

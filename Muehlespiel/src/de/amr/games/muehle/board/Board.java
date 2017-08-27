@@ -3,6 +3,7 @@ package de.amr.games.muehle.board;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -22,32 +23,32 @@ public class Board extends BoardGraph {
 		}
 	}
 
-	private final StoneColor[] c;
+	private final StoneColor[] content;
 
 	private void set(int p, StoneColor color) {
-		c[p] = color;
+		content[p] = color;
 	}
 
 	private StoneColor get(int p) {
-		return c[p];
+		return content[p];
 	}
 
 	private boolean has(int p, StoneColor color) {
-		return c[p] == color;
+		return content[p] == color;
 	}
 
 	/**
 	 * Constructs an empty board.
 	 */
 	public Board() {
-		c = new StoneColor[NUM_POS];
+		content = new StoneColor[NUM_POS];
 	}
 
 	/**
 	 * Clears the board.
 	 */
 	public void clear() {
-		positions().forEach(p -> set(p, null));
+		Arrays.fill(content, null);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class Board extends BoardGraph {
 	 * @return the number of stones
 	 */
 	public long stoneCount() {
-		return Stream.of(c).filter(Objects::nonNull).count();
+		return Stream.of(content).filter(Objects::nonNull).count();
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class Board extends BoardGraph {
 	 */
 	public long stoneCount(StoneColor color) {
 		checkStoneColor(color);
-		return Stream.of(c).filter(c -> c == color).count();
+		return Stream.of(content).filter(c -> c == color).count();
 	}
 
 	/**

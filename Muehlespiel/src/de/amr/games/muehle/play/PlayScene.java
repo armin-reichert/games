@@ -325,7 +325,7 @@ public class PlayScene extends Scene<MillApp> {
 		assistant.moveHome();
 
 		// control.setLogger(LOG);
-		control.setFrequency(app.pulse.getFrequency());
+		control.ticksToSec = app.pulse::ticksToSec;
 		control.init();
 	}
 

@@ -22,18 +22,18 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 public class GhostAttackTimer {
 
 	private final StateMachine<GhostAttackState, String> fsm;
-	private final Pulse motor;
+	private final Pulse pulse;
 	private int level;
 	private int wave;
 
 	private int computeFrames(int[][] times) {
 		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
 		int n = times[0].length, col = wave <= n ? wave - 1 : n - 1;
-		return motor.secToTicks(times[row][col]);
+		return pulse.secToTicks(times[row][col]);
 	}
 
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {
-		this.motor = app.pulse;
+		this.pulse = app.pulse;
 
 		fsm = new StateMachine<>("GhostAttackTimer", GhostAttackState.class, Initialized);
 
@@ -72,7 +72,7 @@ public class GhostAttackTimer {
 
 	public void setLogger(Logger logger) {
 		fsm.setLogger(logger);
-		fsm.setFrequency(motor.getFrequency());
+		fsm.ticksToSec = pulse::ticksToSec;
 	}
 
 	public void setLevel(int level) {
