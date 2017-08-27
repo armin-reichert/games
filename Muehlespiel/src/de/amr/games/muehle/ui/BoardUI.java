@@ -1,6 +1,6 @@
 package de.amr.games.muehle.ui;
 
-import static de.amr.easy.game.math.Vector2.dist;
+import static de.amr.easy.game.math.Vector2f.dist;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.StoneColor;
@@ -109,12 +109,12 @@ public class BoardUI extends GameEntity {
 		stones[p] = null;
 	}
 
-	public Vector2 centerPoint(int p) {
-		return new Vector2(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
+	public Vector2f centerPoint(int p) {
+		return Vector2f.of(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
 	}
 
 	public OptionalInt findNearestPosition(int x, int y, int radius) {
-		return board.positions().filter(p -> dist(centerPoint(p), new Vector2(x, y)) <= radius).findFirst();
+		return board.positions().filter(p -> dist(centerPoint(p), Vector2f.of(x, y)) <= radius).findFirst();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
@@ -142,15 +142,15 @@ public class BoardUI extends GameEntity {
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius() / 2));
 		board.positions().forEach(from -> {
-			Vector2 fromPoint = centerPoint(from);
+			Vector2f fromPoint = centerPoint(from);
 			board.neighbors(from).forEach(to -> {
-				Vector2 toPoint = centerPoint(to);
+				Vector2f toPoint = centerPoint(to);
 				g.drawLine(fromPoint.roundedX(), fromPoint.roundedY(), toPoint.roundedX(), toPoint.roundedY());
 			});
 		});
 		// Positions
 		board.positions().forEach(p -> {
-			Vector2 center = centerPoint(p);
+			Vector2f center = centerPoint(p);
 			g.setColor(lineColor);
 			g.fillOval(center.roundedX() - posRadius(), center.roundedY() - posRadius(), 2 * posRadius(), 2 * posRadius());
 			if (positionNumbersOn) {
@@ -165,7 +165,7 @@ public class BoardUI extends GameEntity {
 
 	public void markPosition(Graphics2D g, int p, Color color) {
 		int markerSize = posRadius() * 8 / 10;
-		Vector2 center = centerPoint(p);
+		Vector2f center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);

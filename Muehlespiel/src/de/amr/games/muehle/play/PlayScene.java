@@ -21,7 +21,7 @@ import java.util.stream.IntStream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
@@ -193,7 +193,7 @@ public class PlayScene extends Scene<MillApp> {
 		}
 
 		float computeMoveSpeed(int from, int to) {
-			return Vector2.dist(boardUI.centerPoint(from), boardUI.centerPoint(to)) / app.pulse.secToTicks(MOVE_TIME_SEC);
+			return Vector2f.dist(boardUI.centerPoint(from), boardUI.centerPoint(to)) / app.pulse.secToTicks(MOVE_TIME_SEC);
 		}
 
 		void switchMoving(Transition<GamePhase, GameEvent> t) {

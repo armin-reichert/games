@@ -66,7 +66,7 @@ import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.common.FlashText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.board.Board;
@@ -671,7 +671,7 @@ public class PlayScene extends Scene<PacManGame> {
 		}
 		FlashText.show(app, String.valueOf(object),
 				app.themeManager.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE), Color.YELLOW,
-				app.pulse.secToTicks(1), new Vector2(x, y), new Vector2(0, -0.2f));
+				app.pulse.secToTicks(1), Vector2f.of(x, y), Vector2f.of(0, -0.2f));
 	}
 
 	@Override

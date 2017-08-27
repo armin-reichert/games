@@ -1,6 +1,7 @@
 package de.amr.samples.marbletoy.router;
 
-import static de.amr.easy.game.math.Vector2.diff;
+import static de.amr.easy.game.math.Vector2f.diff;
+import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.samples.marbletoy.router.RoutingPoint.A;
 import static de.amr.samples.marbletoy.router.RoutingPoint.B;
 import static de.amr.samples.marbletoy.router.RoutingPoint.C;
@@ -15,7 +16,7 @@ import static de.amr.samples.marbletoy.router.RoutingPoint.X2;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X3;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
@@ -81,16 +82,16 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 
 	private void routeMarble(RoutingPoint from, RoutingPoint to) {
 		placeMarbleCenteredAt(from);
-		marble.tf.setVelocity(diff(to.getLocation(), from.getLocation()).normalize().times(MARBLE_SPEED));
+		marble.tf.setVelocity(smul(MARBLE_SPEED, diff(to.getLocation(), from.getLocation()).normalize()));
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {
-		Vector2 leverLocation = toy.getLever(leverIndex).getCenter();
+		Vector2f leverLocation = toy.getLever(leverIndex).getCenter();
 		return marble.getCollisionBox().contains(leverLocation.roundedX(), leverLocation.roundedY());
 	}
 
 	private boolean isMarbleAt(RoutingPoint point) {
-		Vector2 pointLocation = point.getLocation();
+		Vector2f pointLocation = point.getLocation();
 		return marble.getCollisionBox().contains(pointLocation.roundedX(), pointLocation.roundedY());
 	}
 }

@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Board;
@@ -159,7 +159,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 			Stone stone = stone().get();
 			float speed = stone.tf.getVelocity().length();
 			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-			Vector2 toCenter = boardUI.centerPoint(to);
+			Vector2f toCenter = boardUI.centerPoint(to);
 			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
 		}
 		return false;
@@ -169,17 +169,17 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		return boardUI.stoneAt(from);
 	}
 
-	Vector2 velocity(Direction dir) {
+	Vector2f velocity(Direction dir) {
 		float speed = moveSpeed.apply(from, to);
 		switch (dir) {
 		case NORTH:
-			return new Vector2(0, -speed);
+			return Vector2f.of(0, -speed);
 		case EAST:
-			return new Vector2(speed, 0);
+			return Vector2f.of(speed, 0);
 		case SOUTH:
-			return new Vector2(0, speed);
+			return Vector2f.of(0, speed);
 		case WEST:
-			return new Vector2(-speed, 0);
+			return Vector2f.of(-speed, 0);
 		}
 		throw new IllegalArgumentException("Illegal direction: " + dir);
 	}

@@ -1,6 +1,6 @@
 package de.amr.samples.marbletoy.router;
 
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 
 public enum RoutingPoint {
 	Initial(0, 0),
@@ -17,12 +17,12 @@ public enum RoutingPoint {
 	X3(301, 204);
 
 	private RoutingPoint(int x, int y) {
-		location = new Vector2(x, y);
+		location = Vector2f.of(x, y);
 	}
 
-	public Vector2 getLocation() {
+	public Vector2f getLocation() {
 		return location;
 	}
 
-	private final Vector2 location;
+	private final Vector2f location;
 }

@@ -1,5 +1,6 @@
 package de.amr.games.pacman.core.entities;
 
+import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.grid.impl.Top4.E;
 import static de.amr.easy.grid.impl.Top4.N;
 import static de.amr.easy.grid.impl.Top4.S;
@@ -22,7 +23,7 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.math.Vector2;
+import de.amr.easy.game.math.Vector2f;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 
@@ -167,7 +168,7 @@ public abstract class BoardMover extends GameEntity {
 	 * Moves entity in current move direction. Store if entity could be moved.
 	 */
 	public void move() {
-		Vector2 velocity = new Vector2(Top4.dx(moveDir), Top4.dy(moveDir)).times(speed.get());
+		Vector2f velocity = smul(speed.get(), Vector2f.of(Top4.dx(moveDir), Top4.dy(moveDir)));
 		tf.setVelocity(velocity);
 		tf.move();
 
