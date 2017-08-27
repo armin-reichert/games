@@ -374,26 +374,27 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (control.is(PLACING, PLACING_REMOVING)) {
-			drawStoneCounter(g, NUM_STONES - stonesPlaced[0], stamp[0], turn == 0, 40, getHeight() - 30);
-			drawStoneCounter(g, NUM_STONES - stonesPlaced[1], stamp[1], turn == 1, getWidth() - 100, getHeight() - 30);
+			drawStoneCounter(g, 0, 40, getHeight() - 30);
+			drawStoneCounter(g, 1, getWidth() - 100, getHeight() - 30);
 		}
 		if (control.is(PLACING_REMOVING, MOVING_REMOVING) && control.isInteractive(0) || control.isInteractive(1)) {
 			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
 		}
 	}
 
-	void drawStoneCounter(Graphics2D g, int numStones, Stone stamp, boolean selected, int x, int y) {
+	void drawStoneCounter(Graphics2D g, int i, int x, int y) {
+		final int n = NUM_STONES - stonesPlaced[i];
 		final int inset = 6;
-		g.translate(x + inset * numStones, y - inset * numStones);
-		IntStream.range(0, numStones).forEach(i -> {
-			stamp.draw(g);
+		g.translate(x + inset * n, y - inset * n);
+		IntStream.range(0, n).forEach(j -> {
+			stamp[i].draw(g);
 			g.translate(-inset, inset);
 		});
-		if (numStones > 1) {
-			g.setColor(selected ? Color.RED : Color.DARK_GRAY);
-			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp.getRadius()));
+		if (n > 1) {
+			g.setColor(turn == i ? Color.RED : Color.DARK_GRAY);
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp[i].getRadius()));
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(numStones), 2 * stamp.getRadius(), stamp.getRadius());
+			g.drawString(String.valueOf(n), 2 * stamp[i].getRadius(), stamp[i].getRadius());
 		}
 		g.translate(-x, -y);
 	}
