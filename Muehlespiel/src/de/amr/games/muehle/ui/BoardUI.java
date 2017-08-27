@@ -29,15 +29,14 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public class BoardUI extends GameEntity {
 
-	/*
-	 * (GRID_X[p], GRID_Y[p]) is the grid coordinate of position p in the board's [0..6] x [0..6] grid.
-	 */
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
 	private final Board board;
 	private final int width;
 	private final int height;
+	private final int[] xpos;
+	private final int[] ypos;
 	private final Stone[] stones;
 	private Color bgColor;
 	private Color lineColor;
@@ -48,6 +47,12 @@ public class BoardUI extends GameEntity {
 		this.board = board;
 		this.width = width;
 		this.height = height;
+		this.xpos = new int[BoardGraph.NUM_POS];
+		this.ypos = new int[BoardGraph.NUM_POS];
+		IntStream.range(0, BoardGraph.NUM_POS).forEach(p -> {
+			xpos[p] = GRID_X[p] * width / 6;
+			ypos[p] = GRID_Y[p] * height / 6;
+		});
 		this.bgColor = bgColor;
 		this.lineColor = lineColor;
 		this.font = new Font("Arial", Font.PLAIN, stoneRadius() * 9 / 10);
@@ -110,7 +115,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public Vector2f centerPoint(int p) {
-		return Vector2f.of(GRID_X[p] * width / 6, GRID_Y[p] * height / 6);
+		return Vector2f.of(xpos[p], ypos[p]);
 	}
 
 	public OptionalInt findNearestPosition(int x, int y, int radius) {
