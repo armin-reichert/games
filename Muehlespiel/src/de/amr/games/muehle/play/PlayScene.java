@@ -325,6 +325,7 @@ public class PlayScene extends Scene<MillApp> {
 		assistant.moveHome();
 
 		// control.setLogger(LOG);
+		control.setFrequency(app.pulse.getFrequency());
 		control.init();
 	}
 
@@ -363,9 +364,9 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (control.is(PLACING, PLACING_REMOVING)) {
-			drawStoneCount(g, NUM_STONES - stonesPlaced[0], WHITE, boardUI.stoneRadius(), turn == 0, 40, getHeight() - 50);
+			drawStoneCount(g, NUM_STONES - stonesPlaced[0], WHITE, boardUI.stoneRadius(), turn == 0, 40, getHeight() - 30);
 			drawStoneCount(g, NUM_STONES - stonesPlaced[1], BLACK, boardUI.stoneRadius(), turn == 1, getWidth() - 100,
-					getHeight() - 50);
+					getHeight() - 30);
 		}
 		if (control.is(PLACING_REMOVING, MOVING_REMOVING) && control.isInteractive(0) || control.isInteractive(1)) {
 			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
