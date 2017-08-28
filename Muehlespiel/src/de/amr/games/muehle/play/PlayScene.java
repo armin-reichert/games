@@ -43,7 +43,7 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 	private BoardUI boardUI;
 	private final Stone[] stamp = new Stone[2];
 	private TextArea messageArea;
-	private AlienAssistant assistant;
+	private Assistant assistant;
 
 	public PlayScene(MillApp app) {
 		super(app);
@@ -80,7 +80,7 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 		players[1] = blackPlayers[3];
 
 		gameControl = new MillGameControl(board, players, this, app.pulse);
-		assistant = new AlienAssistant(gameControl, this);
+		assistant = new Assistant(gameControl, this);
 		assistant.setPlayers(players[0], players[1]);
 		gameControl.setAssistant(assistant);
 

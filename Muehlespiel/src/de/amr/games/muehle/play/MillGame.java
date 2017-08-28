@@ -8,6 +8,8 @@ import de.amr.games.muehle.player.api.Player;
 
 public interface MillGame {
 
+	public static final int NUM_STONES = 9;
+
 	public Board getBoard();
 
 	public boolean isPlacing();

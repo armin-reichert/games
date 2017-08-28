@@ -24,21 +24,22 @@ import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.player.impl.InteractivePlayer;
 
-/** Finite-state-machine for game control. */
+/**
+ * Finite-state-machine which controls the mill game.
+ */
 public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> implements MillGame {
 
-	static final int NUM_STONES = 9;
 	static final float PLACING_TIME_SEC = 1.5f;
 	static final float REMOVAL_TIME_SEC = 1.5f;
 
-	private final Player[] players;
 	private final Board board;
-	private MoveControl moveControl;
-	private int[] stonesPlaced = new int[2];
+	private final Player[] players;
+	private final int[] stonesPlaced;
 	private final MillGameUI gameUI;
 	private final Pulse pulse;
-	private Optional<AlienAssistant> assistant;
 
+	private Optional<Assistant> assistant;
+	private MoveControl moveControl;
 	private int turn;
 	private int placedAt;
 	private StoneColor placedColor;
@@ -50,6 +51,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		this.board = board;
 		this.players = players;
+		this.stonesPlaced = new int[2];
 		this.gameUI = gameUI;
 		this.pulse = pulse;
 
@@ -109,16 +111,16 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	@Override
 	public void init() {
 		super.init();
-		assistant.ifPresent(AlienAssistant::init);
+		assistant.ifPresent(Assistant::init);
 	}
 
 	@Override
 	public void update() {
 		super.update();
-		assistant.ifPresent(AlienAssistant::update);
+		assistant.ifPresent(Assistant::update);
 	}
 
-	public void setAssistant(AlienAssistant assistant) {
+	public void setAssistant(Assistant assistant) {
 		this.assistant = Optional.of(assistant);
 	}
 

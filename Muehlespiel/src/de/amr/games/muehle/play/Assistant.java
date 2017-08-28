@@ -16,18 +16,19 @@ import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
 
 /**
- * An alien providing visual and acoustic hints to the assisted player.
+ * An assistant providing visual and acoustic hints to the assisted player.
  */
-class AlienAssistant extends GameEntity {
+class Assistant extends GameEntity {
 
-	private enum SFX {
+	/** Enumeration of used sounds */
+	private enum Sounds {
 		CAN_CLOSE_MILL("can_close_mill"),
 		CAN_OPPONENT_CLOSE_MILL("can_opponent_close_mill"),
 		CAN_OPEN_TWO_MILLS("can_open_two_mills"),
 		YO_FINE("yo_fine"),
 		WIN("win");
 
-		SFX(String key) {
+		Sounds(String key) {
 			this.key = "sfx/" + key + ".mp3";
 		}
 
@@ -35,14 +36,14 @@ class AlienAssistant extends GameEntity {
 	}
 
 	private final MillGame game;
-	private final MillGameUI gameUI;
 	private final Board board;
+	private final MillGameUI gameUI;
 	private Player assistedPlayer;
 	private Player opponentPlayer;
 	private boolean enabled;
 	private int assistanceLevel; // 0 = normal, 1 = high
 
-	AlienAssistant(MillGame game, MillGameUI gameUI) {
+	Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
 		this.gameUI = gameUI;
 		this.board = game.getBoard();
@@ -65,7 +66,8 @@ class AlienAssistant extends GameEntity {
 
 	@Override
 	public void init() {
-		Stream.of(SFX.values()).forEach(sfx -> Assets.sound(sfx.key)); // load all sounds
+		// preload sounds
+		Stream.of(Sounds.values()).forEach(snd -> Assets.sound(snd.key));
 	}
 
 	void toggle() {
@@ -82,15 +84,15 @@ class AlienAssistant extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		if (!enabled || Stream.of(SFX.values()).map(sfx -> Assets.sound(sfx.key)).noneMatch(snd -> snd.isRunning())) {
-			return;
-		}
-		super.draw(g);
-		if (assistanceLevel == 1) {
-			if (game.isPlacing()) {
-				drawPlacingHints(g, game.getPlayerInTurn().getColor());
-			} else if (game.isMoving()) {
-				drawMovingHints(g, game.getPlayerInTurn().getColor());
+		// draw assistant only if enabled and some sound is running
+		if (enabled && Stream.of(Sounds.values()).map(snd -> Assets.sound(snd.key)).anyMatch(sound -> sound.isRunning())) {
+			super.draw(g);
+			if (assistanceLevel == 1) {
+				if (game.isPlacing()) {
+					drawPlacingHints(g, game.getPlayerInTurn().getColor());
+				} else if (game.isMoving()) {
+					drawMovingHints(g, game.getPlayerInTurn().getColor());
+				}
 			}
 		}
 	}
@@ -125,9 +127,9 @@ class AlienAssistant extends GameEntity {
 		}
 	}
 
-	private void play(SFX sfx) {
+	void play(Sounds snd) {
 		if (enabled) {
-			Assets.sound(sfx.key).play();
+			Assets.sound(snd.key).play();
 		}
 	}
 
@@ -138,19 +140,19 @@ class AlienAssistant extends GameEntity {
 
 			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, opponentColor)).findAny();
 			if (optPosition.isPresent()) {
-				play(SFX.CAN_OPPONENT_CLOSE_MILL);
+				play(Sounds.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
 			optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor)).findAny();
 			if (optPosition.isPresent()) {
-				play(SFX.CAN_CLOSE_MILL);
+				play(Sounds.CAN_CLOSE_MILL);
 				return;
 			}
 
 			optPosition = board.positionsOpeningTwoMills(placingColor).findAny();
 			if (optPosition.isPresent()) {
-				play(SFX.CAN_OPEN_TWO_MILLS);
+				play(Sounds.CAN_OPEN_TWO_MILLS);
 				return;
 			}
 		}
@@ -158,16 +160,16 @@ class AlienAssistant extends GameEntity {
 
 	void tellMillClosed() {
 		if (game.getPlayerInTurn() == assistedPlayer) {
-			play(SFX.YO_FINE);
+			play(Sounds.YO_FINE);
 		}
 	}
 
 	void tellYoFine() {
-		play(SFX.YO_FINE);
+		play(Sounds.YO_FINE);
 	}
 
 	void tellWin() {
-		play(SFX.WIN);
+		play(Sounds.WIN);
 	}
 
 }
