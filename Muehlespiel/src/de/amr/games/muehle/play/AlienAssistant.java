@@ -14,7 +14,6 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.ui.BoardUI;
 
 /**
  * An alien providing visual and acoustic hints to the assisted player.
@@ -36,18 +35,19 @@ class AlienAssistant extends GameEntity {
 	}
 
 	private final MillGame game;
-	private final BoardUI boardUI;
+	private final MillGameUI gameUI;
 	private final Board board;
 	private Player assistedPlayer;
 	private Player opponentPlayer;
 	private boolean enabled;
 	private int assistanceLevel; // 0 = normal, 1 = high
 
-	AlienAssistant(MillGame game, BoardUI boardUI) {
+	AlienAssistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
-		this.boardUI = boardUI;
-		this.board = boardUI.board();
+		this.gameUI = gameUI;
+		this.board = game.getBoard();
 		this.assistanceLevel = 0;
+		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 	}
 
 	void setPlayers(Player assistedPlayer, Player opponentPlayer) {
@@ -65,7 +65,6 @@ class AlienAssistant extends GameEntity {
 
 	@Override
 	public void init() {
-		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 		Stream.of(SFX.values()).forEach(sfx -> Assets.sound(sfx.key)); // load all sounds
 	}
 
@@ -97,14 +96,14 @@ class AlienAssistant extends GameEntity {
 	}
 
 	void drawPlacingHints(Graphics2D g, StoneColor placingColor) {
-		boardUI.markPositions(g, board.positionsClosingMill(placingColor), Color.GREEN);
-		boardUI.markPositions(g, board.positionsOpeningTwoMills(placingColor), Color.YELLOW);
-		boardUI.markPositions(g, board.positionsClosingMill(placingColor.other()), Color.RED);
+		gameUI.markPositions(g, board.positionsClosingMill(placingColor), Color.GREEN);
+		gameUI.markPositions(g, board.positionsOpeningTwoMills(placingColor), Color.YELLOW);
+		gameUI.markPositions(g, board.positionsClosingMill(placingColor.other()), Color.RED);
 	}
 
 	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
 		if (game.isMoveStartPossible()) {
-			game.getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
+			game.getMove().ifPresent(move -> gameUI.markPosition(g, move.from, Color.ORANGE));
 		} else {
 			markPossibleMoveStarts(g, movingColor, game.getPlayerInTurn().canJump());
 			markTrappingPosition(g, movingColor, movingColor.other(), Color.RED);
@@ -113,7 +112,7 @@ class AlienAssistant extends GameEntity {
 
 	void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, boolean canJump) {
 		(canJump ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
-				.forEach(p -> boardUI.markPosition(g, p, Color.GREEN));
+				.forEach(p -> gameUI.markPosition(g, p, Color.GREEN));
 	}
 
 	void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
@@ -121,7 +120,7 @@ class AlienAssistant extends GameEntity {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
 			if (board.neighbors(singleFreePosition).filter(board::hasStoneAt)
 					.anyMatch(p -> board.getStoneAt(p).get() == either)) {
-				boardUI.markPosition(g, singleFreePosition, color);
+				gameUI.markPosition(g, singleFreePosition, color);
 			}
 		}
 	}
