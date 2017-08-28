@@ -1,8 +1,6 @@
 package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.muehle.play.GamePhase.MOVING;
-import static de.amr.games.muehle.play.GamePhase.PLACING;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -37,7 +35,7 @@ class AlienAssistant extends GameEntity {
 		final String key;
 	}
 
-	private final PlayScene scene;
+	private final MillGame game;
 	private final BoardUI boardUI;
 	private final Board board;
 	private Player assistedPlayer;
@@ -45,10 +43,10 @@ class AlienAssistant extends GameEntity {
 	private boolean enabled;
 	private int assistanceLevel; // 0 = normal, 1 = high
 
-	AlienAssistant(PlayScene scene) {
-		this.scene = scene;
-		this.boardUI = scene.getBoardUI();
-		this.board = this.boardUI.board();
+	AlienAssistant(MillGame game, BoardUI boardUI) {
+		this.game = game;
+		this.boardUI = boardUI;
+		this.board = boardUI.board();
 		this.assistanceLevel = 0;
 	}
 
@@ -71,11 +69,6 @@ class AlienAssistant extends GameEntity {
 		Stream.of(SFX.values()).forEach(sfx -> Assets.sound(sfx.key)); // load all sounds
 	}
 
-	void moveHome() {
-		hCenter(scene.getWidth());
-		tf.setY(scene.getHeight() / 2 - getHeight());
-	}
-
 	void toggle() {
 		setEnabled(!enabled);
 		if (enabled) {
@@ -95,10 +88,10 @@ class AlienAssistant extends GameEntity {
 		}
 		super.draw(g);
 		if (assistanceLevel == 1) {
-			if (scene.getControl().is(PLACING)) {
-				drawPlacingHints(g, scene.getPlayerInTurn().getColor());
-			} else if (scene.getControl().is(MOVING)) {
-				drawMovingHints(g, scene.getPlayerInTurn().getColor());
+			if (game.isPlacing()) {
+				drawPlacingHints(g, game.getPlayerInTurn().getColor());
+			} else if (game.isMoving()) {
+				drawMovingHints(g, game.getPlayerInTurn().getColor());
 			}
 		}
 	}
@@ -110,10 +103,10 @@ class AlienAssistant extends GameEntity {
 	}
 
 	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
-		if (scene.getMoveControl().isMoveStartPossible()) {
-			scene.getMoveControl().getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
+		if (game.isMoveStartPossible()) {
+			game.getMove().ifPresent(move -> boardUI.markPosition(g, move.from, Color.ORANGE));
 		} else {
-			markPossibleMoveStarts(g, movingColor, scene.getPlayerInTurn().canJump());
+			markPossibleMoveStarts(g, movingColor, game.getPlayerInTurn().canJump());
 			markTrappingPosition(g, movingColor, movingColor.other(), Color.RED);
 		}
 	}
@@ -140,7 +133,7 @@ class AlienAssistant extends GameEntity {
 	}
 
 	void givePlacingHint() {
-		if (enabled && scene.getPlayerInTurn() == assistedPlayer) {
+		if (enabled && game.getPlayerInTurn() == assistedPlayer) {
 			StoneColor placingColor = assistedPlayer.getColor();
 			StoneColor opponentColor = opponentPlayer.getColor();
 
@@ -165,7 +158,7 @@ class AlienAssistant extends GameEntity {
 	}
 
 	void tellMillClosed() {
-		if (scene.getPlayerInTurn() == assistedPlayer) {
+		if (game.getPlayerInTurn() == assistedPlayer) {
 			play(SFX.YO_FINE);
 		}
 	}

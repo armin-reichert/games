@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.assets.Assets;
@@ -54,7 +55,7 @@ public class PlayScene extends Scene<MillApp> {
 	static final Color LINE_COLOR = Color.BLACK;
 
 	// Control
-	private final GameControl control = new GameControl();
+	private final GameControl gameControl = new GameControl();
 	private MoveControl moveControl;
 
 	// Data
@@ -70,7 +71,7 @@ public class PlayScene extends Scene<MillApp> {
 	private TextArea messageArea;
 
 	/** Finite-state-machine for game control. */
-	class GameControl extends StateMachine<GamePhase, GameEvent> {
+	class GameControl extends StateMachine<GamePhase, GameEvent> implements MillGame {
 
 		@Override
 		public void update() {
@@ -135,7 +136,7 @@ public class PlayScene extends Scene<MillApp> {
 			};
 
 			change(GAME_OVER, STARTING,
-					() -> !isInteractive(0) && !isInteractive(1) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+					() -> !isInteractivePlayer(0) && !isInteractivePlayer(1) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		}
 
 		void reset(State state) {
@@ -153,12 +154,48 @@ public class PlayScene extends Scene<MillApp> {
 			return stonesPlaced[1] == NUM_STONES;
 		}
 
-		boolean isInteractive(int i) {
+		boolean isInteractivePlayer(int i) {
 			return players[i] instanceof InteractivePlayer;
 		}
 
-		boolean isGameOver() {
+		@Override
+		public boolean isPlacing() {
+			return is(PLACING, PLACING_REMOVING);
+		}
+
+		@Override
+		public boolean isMoving() {
+			return is(MOVING, MOVING_REMOVING);
+		}
+
+		@Override
+		public boolean isRemoving() {
+			return is(PLACING_REMOVING, MOVING_REMOVING);
+		}
+
+		@Override
+		public Player getPlayerInTurn() {
+			return players[turn];
+		}
+
+		@Override
+		public Player getPlayerNotInTurn() {
+			return players[1 - turn];
+		}
+
+		@Override
+		public boolean isGameOver() {
 			return board.stoneCount(players[turn].getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
+		}
+
+		@Override
+		public boolean isMoveStartPossible() {
+			return moveControl.isMoveStartPossible();
+		}
+
+		@Override
+		public Optional<Move> getMove() {
+			return moveControl.getMove();
 		}
 
 		boolean canJump(int i) {
@@ -176,7 +213,7 @@ public class PlayScene extends Scene<MillApp> {
 
 		void switchPlacing(Transition<GamePhase, GameEvent> t) {
 			turnPlacingTo(1 - turn);
-			if (!isInteractive(turn)) {
+			if (!isInteractivePlayer(turn)) {
 				pause(app.pulse.secToTicks(PLACING_TIME_SEC));
 			}
 		}
@@ -268,32 +305,10 @@ public class PlayScene extends Scene<MillApp> {
 		super(app);
 	}
 
-	Player getPlayerInTurn() {
-		return players[turn];
-	}
-
-	Player getOpponentPlayer() {
-		return players[1 - turn];
-	}
-
-	BoardUI getBoardUI() {
-		return boardUI;
-	}
-
-	GameControl getControl() {
-		return control;
-	}
-
-	MoveControl getMoveControl() {
-		return moveControl;
-	}
-
-	int getTurn() {
-		return turn;
-	}
-
 	@Override
 	public void init() {
+
+		setBgColor(BOARD_COLOR);
 
 		boardUI = new BoardUI(board, 600, 600, BOARD_COLOR, LINE_COLOR);
 
@@ -324,7 +339,7 @@ public class PlayScene extends Scene<MillApp> {
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(msgFont);
 
-		assistant = new AlienAssistant(this);
+		assistant = new AlienAssistant(gameControl, boardUI);
 		assistant.setPlayers(players[0], players[1]);
 		assistant.init();
 
@@ -332,22 +347,23 @@ public class PlayScene extends Scene<MillApp> {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
-		assistant.moveHome();
+		assistant.hCenter(getWidth());
+		assistant.tf.setY(getHeight() / 2 - 100);
 
 		// control.setLogger(LOG);
-		control.ticksToSec = app.pulse::ticksToSec;
-		control.init();
+		gameControl.ticksToSec = app.pulse::ticksToSec;
+		gameControl.init();
 	}
 
 	@Override
 	public void update() {
 		readInput();
-		control.update();
+		gameControl.update();
 	}
 
 	void readInput() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_N)) {
-			control.init();
+			gameControl.init();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
 			assistant.toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
@@ -367,18 +383,17 @@ public class PlayScene extends Scene<MillApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(BOARD_COLOR);
-		g.fillRect(0, 0, getWidth(), getHeight());
+		super.draw(g);
 		boardUI.draw(g);
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (control.is(PLACING, PLACING_REMOVING)) {
+		if (gameControl.isPlacing()) {
 			drawStoneCounter(g, 0, 40, getHeight() - 30);
 			drawStoneCounter(g, 1, getWidth() - 100, getHeight() - 30);
 		}
-		if (control.is(PLACING_REMOVING, MOVING_REMOVING) && control.isInteractive(0) || control.isInteractive(1)) {
-			boardUI.markRemovableStones(g, getOpponentPlayer().getColor());
+		if (gameControl.isRemoving() && gameControl.isInteractivePlayer(0) || gameControl.isInteractivePlayer(1)) {
+			boardUI.markRemovableStones(g, gameControl.getPlayerNotInTurn().getColor());
 		}
 	}
 
