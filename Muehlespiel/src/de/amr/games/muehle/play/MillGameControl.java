@@ -71,7 +71,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		change(PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
 
-		// PLACING_REMOVING_STONE
+		// PLACING_REMOVING
 
 		state(PLACING_REMOVING).entry = this::startRemoving;
 
@@ -89,7 +89,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		change(MOVING, GAME_OVER, this::isGameOver);
 
-		// MOVING_REMOVING_STONE
+		// MOVING_REMOVING
 
 		state(MOVING_REMOVING).entry = this::startRemoving;
 
@@ -132,7 +132,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	void announceWin(int i) {
 		gameUI.showMessage("wins", players[i].getName());
-		assistant.ifPresent(a -> a.tellWin());
+		assistant.ifPresent(Assistant::tellWin);
 	}
 
 	boolean allStonesPlaced() {
@@ -219,7 +219,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	void onPlacingClosedMill(Transition<MillGamePhase, MillGameEvent> t) {
-		assistant.ifPresent(a -> a.tellMillClosed());
+		assistant.ifPresent(Assistant::tellMillClosed);
 	}
 
 	void turnMovingTo(int i) {
@@ -234,7 +234,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	void tryToPlaceStone(State state) {
-		assistant.ifPresent(a -> a.givePlacingHint());
+		assistant.ifPresent(Assistant::givePlacingHint);
 		players[turn].supplyPlacingPosition().ifPresent(placePosition -> {
 			if (board.hasStoneAt(placePosition)) {
 				LOG.info(Messages.text("stone_at_position", placePosition));
