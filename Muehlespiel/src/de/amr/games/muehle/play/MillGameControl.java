@@ -45,12 +45,12 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private StoneColor placedColor;
 	private int removedAt;
 
-	public MillGameControl(Board board, Player[] players, MillGameUI gameUI, Pulse pulse) {
+	public MillGameControl(Board board, Player whitePlayer, Player blackPlayer, MillGameUI gameUI, Pulse pulse) {
 
 		super("Mühlespiel-Steuerung", MillGamePhase.class, STARTING);
 
 		this.board = board;
-		this.players = players;
+		this.players = new Player[] { whitePlayer, blackPlayer };
 		this.stonesPlaced = new int[2];
 		this.gameUI = gameUI;
 		this.pulse = pulse;

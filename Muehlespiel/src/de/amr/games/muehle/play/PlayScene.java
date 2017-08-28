@@ -41,7 +41,6 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 	private MillGameControl gameControl;
 
 	private BoardUI boardUI;
-	private final Stone[] stamp = new Stone[2];
 	private TextArea messageArea;
 	private Assistant assistant;
 
@@ -51,13 +50,11 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 
 	@Override
 	public void init() {
-		setBgColor(BOARD_COLOR);
+		setBgColor(BOARD_COLOR.darker());
 
 		Board board = new Board();
-		boardUI = new BoardUI(board, 600, 600, BOARD_COLOR, LINE_COLOR);
 
-		stamp[0] = new Stone(WHITE, boardUI.stoneRadius());
-		stamp[1] = new Stone(BLACK, boardUI.stoneRadius());
+		boardUI = new BoardUI(board, 600, 600, BOARD_COLOR, LINE_COLOR);
 
 		/*@formatter:off*/
 		Player[] whitePlayers = { 
@@ -75,19 +72,16 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 		};
 		/*@formatter:on*/
 
-		Player[] players = new Player[2];
-		players[0] = whitePlayers[0];
-		players[1] = blackPlayers[3];
+		Player whitePlayer = whitePlayers[0];
+		Player blackPlayer = blackPlayers[3];
 
-		gameControl = new MillGameControl(board, players, this, app.pulse);
-		assistant = new Assistant(gameControl, this);
-		assistant.setPlayers(players[0], players[1]);
+		gameControl = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
+		assistant = new Assistant(gameControl, whitePlayer, blackPlayer, this);
 		gameControl.setAssistant(assistant);
 
-		Font msgFont = Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
-		messageArea.setFont(msgFont);
+		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 
 		// Layout
 		boardUI.hCenter(getWidth());
@@ -185,18 +179,19 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 	}
 
 	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
+		final Stone stamp = new Stone(i == 0 ? WHITE : BLACK, boardUI.stoneRadius());
 		final int remaining = MillGameControl.NUM_STONES - gameControl.getNumStonesPlaced(i);
 		final int inset = 6;
 		g.translate(x + inset * remaining, y - inset * remaining);
 		IntStream.range(0, remaining).forEach(j -> {
-			stamp[i].draw(g);
+			stamp.draw(g);
 			g.translate(-inset, inset);
 		});
 		if (remaining > 1) {
 			g.setColor(gameControl.getTurn() == i ? Color.RED : Color.DARK_GRAY);
-			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp[i].getRadius()));
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp.getRadius()));
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(remaining), 2 * stamp[i].getRadius(), stamp[i].getRadius());
+			g.drawString(String.valueOf(remaining), 2 * stamp.getRadius(), stamp.getRadius());
 		}
 		g.translate(-x, -y);
 	}

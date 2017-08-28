@@ -43,17 +43,14 @@ class Assistant extends GameEntity {
 	private boolean enabled;
 	private int assistanceLevel; // 0 = normal, 1 = high
 
-	Assistant(MillGame game, MillGameUI gameUI) {
+	Assistant(MillGame game, Player assistedPlayer, Player opponentPlayer, MillGameUI gameUI) {
 		this.game = game;
+		this.assistedPlayer = assistedPlayer;
+		this.opponentPlayer = opponentPlayer;
 		this.gameUI = gameUI;
 		this.board = game.getBoard();
 		this.assistanceLevel = 0;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
-	}
-
-	void setPlayers(Player assistedPlayer, Player opponentPlayer) {
-		this.assistedPlayer = assistedPlayer;
-		this.opponentPlayer = opponentPlayer;
 	}
 
 	int getAssistanceLevel() {
