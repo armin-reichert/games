@@ -29,22 +29,18 @@ import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
 
 /**
- * The play scene of the mill game.
+ * The scene (UI) of the mill game.
  * 
  * @author Armin Reichert
  */
-public class PlayScene extends Scene<MillApp> implements MillGameUI {
-
-	static final Color BOARD_COLOR = new Color(255, 255, 224);
-	static final Color LINE_COLOR = Color.BLACK;
+public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 	private MillGameControl game;
-
 	private BoardUI boardUI;
 	private TextArea messageArea;
 	private Assistant assistant;
 
-	public PlayScene(MillApp app) {
+	public MillGameScene(MillApp app) {
 		super(app);
 	}
 
@@ -54,7 +50,7 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 
 		Board board = new Board();
 
-		boardUI = new BoardUI(board, 600, 600, BOARD_COLOR, LINE_COLOR);
+		boardUI = new BoardUI(board, getWidth() * 3 / 4, getHeight() * 3 / 4, BOARD_COLOR, LINE_COLOR);
 
 		/*@formatter:off*/
 		Player[] whitePlayers = { 
@@ -102,9 +98,7 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 	}
 
 	void readInput() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_N)) {
-			game.init();
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
 			assistant.toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
 			assistant.setEnabled(true);

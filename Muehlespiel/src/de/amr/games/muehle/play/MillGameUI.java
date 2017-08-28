@@ -11,6 +11,9 @@ import de.amr.games.muehle.ui.Stone;
 
 public interface MillGameUI {
 
+	static final Color BOARD_COLOR = new Color(255, 255, 224);
+	static final Color LINE_COLOR = Color.BLACK;
+
 	public void clearBoard();
 
 	public Optional<Stone> getStoneAt(int p);

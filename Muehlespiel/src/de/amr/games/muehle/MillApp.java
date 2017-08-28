@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.play.PlayScene;
+import de.amr.games.muehle.play.MillGameScene;
 
 /**
  * Mühlespiel aka "Nine men's morris".
@@ -29,6 +29,6 @@ public class MillApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new PlayScene(this));
+		selectView(new MillGameScene(this));
 	}
 }
