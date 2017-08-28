@@ -38,7 +38,7 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 	static final Color BOARD_COLOR = new Color(255, 255, 224);
 	static final Color LINE_COLOR = Color.BLACK;
 
-	private MillGameControl gameControl;
+	private MillGameControl game;
 
 	private BoardUI boardUI;
 	private TextArea messageArea;
@@ -75,9 +75,9 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 		Player whitePlayer = whitePlayers[0];
 		Player blackPlayer = blackPlayers[3];
 
-		gameControl = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
-		assistant = new Assistant(gameControl, whitePlayer, blackPlayer, this);
-		gameControl.setAssistant(assistant);
+		game = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
+		assistant = new Assistant(game, whitePlayer, blackPlayer, this);
+		game.setAssistant(assistant);
 
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
@@ -91,19 +91,19 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 		assistant.tf.setY(getHeight() / 2 - 100);
 
 		// control.setLogger(LOG);
-		gameControl.init();
+		game.init();
 		assistant.init();
 	}
 
 	@Override
 	public void update() {
 		readInput();
-		gameControl.update();
+		game.update();
 	}
 
 	void readInput() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL, KeyEvent.VK_N)) {
-			gameControl.init();
+			game.init();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
 			assistant.toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
@@ -169,18 +169,18 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (gameControl.isPlacing()) {
+		if (game.isPlacing()) {
 			drawRemainingStonesCounter(g, 0, 40, getHeight() - 30);
 			drawRemainingStonesCounter(g, 1, getWidth() - 100, getHeight() - 30);
 		}
-		if (gameControl.isRemoving() && gameControl.isInteractivePlayer(0) || gameControl.isInteractivePlayer(1)) {
-			boardUI.markRemovableStones(g, gameControl.getPlayerNotInTurn().getColor());
+		if (game.isRemoving() && game.isInteractivePlayer(0) || game.isInteractivePlayer(1)) {
+			boardUI.markRemovableStones(g, game.getPlayerNotInTurn().getColor());
 		}
 	}
 
 	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
 		final Stone stamp = new Stone(i == 0 ? WHITE : BLACK, boardUI.stoneRadius());
-		final int remaining = MillGameControl.NUM_STONES - gameControl.getNumStonesPlaced(i);
+		final int remaining = MillGame.NUM_STONES - game.getNumStonesPlaced(i);
 		final int inset = 6;
 		g.translate(x + inset * remaining, y - inset * remaining);
 		IntStream.range(0, remaining).forEach(j -> {
@@ -188,7 +188,7 @@ public class PlayScene extends Scene<MillApp> implements MillGameUI {
 			g.translate(-inset, inset);
 		});
 		if (remaining > 1) {
-			g.setColor(gameControl.getTurn() == i ? Color.RED : Color.DARK_GRAY);
+			g.setColor(game.getTurn() == i ? Color.RED : Color.DARK_GRAY);
 			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp.getRadius()));
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(String.valueOf(remaining), 2 * stamp.getRadius(), stamp.getRadius());
