@@ -88,7 +88,6 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 		// control.setLogger(LOG);
 		game.init();
-		assistant.init();
 	}
 
 	@Override
