@@ -173,7 +173,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	}
 
 	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
-		final Stone stamp = new Stone(i == 0 ? WHITE : BLACK, boardUI.stoneRadius());
+		final Stone stamp = new Stone(i == 0 ? WHITE : BLACK, boardUI.getStoneRadius());
 		final int remaining = MillGame.NUM_STONES - game.getNumStonesPlaced(i);
 		final int inset = 6;
 		g.translate(x + inset * remaining, y - inset * remaining);
