@@ -136,6 +136,14 @@ public class BoardUI extends GameEntity {
 		positionNumbersOn = !positionNumbersOn;
 	}
 
+	private void aa_on(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	}
+
+	private void aa_off(Graphics2D g) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	}
+
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
@@ -143,12 +151,11 @@ public class BoardUI extends GameEntity {
 		g.setColor(bgColor);
 		g.fillRect(0, 0, width, height);
 		// Lines
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius / 2));
 		board.positions().forEach(from -> {
 			Vector2f fromPoint = centerPoint(from);
-			board.neighbors(from).forEach(to -> {
+			board.neighbors(from).filter(to -> to > from).forEach(to -> {
 				Vector2f toPoint = centerPoint(to);
 				g.drawLine(fromPoint.roundedX(), fromPoint.roundedY(), toPoint.roundedX(), toPoint.roundedY());
 			});
@@ -157,10 +164,14 @@ public class BoardUI extends GameEntity {
 		board.positions().forEach(p -> {
 			Vector2f center = centerPoint(p);
 			g.setColor(lineColor);
+			aa_on(g);
 			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
+			aa_off(g);
 			if (positionNumbersOn) {
 				g.setFont(font);
+				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				g.drawString(String.valueOf(p), center.x + 2 * posRadius, center.y + 4 * posRadius);
+				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 			}
 		});
 		// Stones
@@ -172,9 +183,10 @@ public class BoardUI extends GameEntity {
 		int markerSize = posRadius * 8 / 10;
 		Vector2f center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
+		aa_on(g);
 		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
+		aa_off(g);
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
@@ -189,11 +201,12 @@ public class BoardUI extends GameEntity {
 				float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
 				float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
 				// draw red cross
-				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				g.translate(offsetX, offsetY);
 				g.setColor(Color.RED);
+				aa_on(g);
 				g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
 				g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+				aa_off(g);
 				g.translate(-offsetX, -offsetY);
 			});
 		});
