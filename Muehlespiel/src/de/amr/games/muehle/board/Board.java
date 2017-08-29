@@ -135,8 +135,7 @@ public class Board extends BoardGraph {
 	 */
 	public Optional<StoneColor> getStoneAt(int p) {
 		checkPosition(p);
-		StoneColor color = get(p);
-		return color != null ? Optional.of(color) : Optional.empty();
+		return Optional.ofNullable(get(p));
 	}
 
 	/**
