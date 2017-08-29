@@ -65,11 +65,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		state(PLACING).update = this::tryToPlaceStone;
 
+		change(PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
+
 		changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill, this::onPlacingClosedMill);
 
 		changeOnInput(STONE_PLACED, PLACING, PLACING, this::switchPlacing);
-
-		change(PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
 
 		// PLACING_REMOVING
 
