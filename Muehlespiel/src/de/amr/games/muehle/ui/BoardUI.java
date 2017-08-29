@@ -1,6 +1,7 @@
 package de.amr.games.muehle.ui;
 
 import static de.amr.easy.game.math.Vector2f.dist;
+import static de.amr.games.muehle.board.BoardGraph.NUM_POS;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
@@ -19,7 +20,6 @@ import java.util.stream.Stream;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.board.BoardGraph;
 import de.amr.games.muehle.board.StoneColor;
 
 /**
@@ -33,42 +33,34 @@ public class BoardUI extends GameEntity {
 	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
 
 	private final Board board;
+	private final Stone[] stones;
 	private final int width;
 	private final int height;
 	private final int posRadius;
 	private final int stoneRadius;
 	private final int[] xpos;
 	private final int[] ypos;
-	private final Stone[] stones;
-	private Color bgColor;
-	private Color lineColor;
-	private Font font;
+	private final Color bgColor;
+	private final Color lineColor;
+	private final Font font;
 	private boolean positionNumbersOn;
 
 	public BoardUI(Board board, int width, int height, Color bgColor, Color lineColor) {
 		this.board = board;
+		this.stones = new Stone[NUM_POS];
 		this.width = width;
 		this.height = height;
 		this.posRadius = width / 60;
 		this.stoneRadius = width / 24;
-		this.xpos = new int[BoardGraph.NUM_POS];
-		this.ypos = new int[BoardGraph.NUM_POS];
-		IntStream.range(0, BoardGraph.NUM_POS).forEach(p -> {
+		this.xpos = new int[NUM_POS];
+		this.ypos = new int[NUM_POS];
+		IntStream.range(0, NUM_POS).forEach(p -> {
 			xpos[p] = GRID_X[p] * width / 6;
 			ypos[p] = GRID_Y[p] * height / 6;
 		});
 		this.bgColor = bgColor;
 		this.lineColor = lineColor;
 		this.font = new Font("Arial", Font.PLAIN, stoneRadius * 9 / 10);
-		this.stones = new Stone[BoardGraph.NUM_POS];
-	}
-
-	public Board board() {
-		return board;
-	}
-
-	public Stream<Stone> stones() {
-		return Stream.of(stones).filter(Objects::nonNull);
 	}
 
 	@Override
@@ -98,7 +90,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public Optional<Stone> stoneAt(int p) {
-		return stones[p] == null ? Optional.empty() : Optional.of(stones[p]);
+		return Optional.ofNullable(stones[p]);
 	}
 
 	public void moveStone(int from, int to) {
@@ -119,7 +111,8 @@ public class BoardUI extends GameEntity {
 	}
 
 	public OptionalInt findNearestPosition(int x, int y, int radius) {
-		return board.positions().filter(p -> dist(centerPoint(p), Vector2f.of(x, y)) <= radius).findFirst();
+		Vector2f point = Vector2f.of(x, y);
+		return board.positions().filter(p -> dist(centerPoint(p), point) <= radius).findFirst();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
@@ -175,7 +168,7 @@ public class BoardUI extends GameEntity {
 			}
 		});
 		// Stones
-		stones().forEach(stone -> stone.draw(g));
+		Stream.of(stones).filter(Objects::nonNull).forEach(stone -> stone.draw(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
