@@ -35,6 +35,7 @@ public class Zwick extends RuleBasedPlayer {
 
 	static final RemovalRule[] REMOVAL_RULES = {
 			/*@formatter:off*/
+			RemovalRules.STONE_WHICH_CAN_MOVE,
 			RemovalRules.RANDOM,
 			/*@formatter:on*/
 	};

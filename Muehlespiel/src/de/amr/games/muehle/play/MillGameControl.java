@@ -235,33 +235,32 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	void tryToPlaceStone(State state) {
 		assistant.ifPresent(Assistant::givePlacingHint);
-		players[turn].supplyPlacingPosition().ifPresent(placePosition -> {
-			if (board.hasStoneAt(placePosition)) {
-				LOG.info(Messages.text("stone_at_position", placePosition));
-			} else {
-				StoneColor colorInTurn = players[turn].getColor();
-				gameUI.putStoneAt(placePosition, colorInTurn);
+		players[turn].supplyPlacingPosition().ifPresent(p -> {
+			if (board.isEmptyPosition(p)) {
+				placedAt = p;
+				placedColor = players[turn].getColor();
+				gameUI.putStoneAt(placedAt, placedColor);
 				stonesPlaced[turn] += 1;
-				placedAt = placePosition;
-				placedColor = colorInTurn;
 				addInput(STONE_PLACED);
+			} else {
+				LOG.info(Messages.text("stone_at_position", p));
 			}
 		});
 	}
 
 	void tryToRemoveStone(State state) {
-		players[turn].supplyRemovalPosition().ifPresent(removalPosition -> {
+		players[turn].supplyRemovalPosition().ifPresent(p -> {
 			StoneColor colorToRemove = players[turn].getColor().other();
-			if (board.isEmptyPosition(removalPosition)) {
-				LOG.info(Messages.text("stone_at_position_not_existing", removalPosition));
-			} else if (board.getStoneAt(removalPosition).get() != colorToRemove) {
-				LOG.info(Messages.text("stone_at_position_wrong_color", removalPosition));
-			} else if (board.inMill(removalPosition, colorToRemove) && !board.allStonesInMills(colorToRemove)) {
+			if (board.isEmptyPosition(p)) {
+				LOG.info(Messages.text("stone_at_position_not_existing", p));
+			} else if (board.getStoneAt(p).get() != colorToRemove) {
+				LOG.info(Messages.text("stone_at_position_wrong_color", p));
+			} else if (board.inMill(p, colorToRemove) && !board.allStonesInMills(colorToRemove)) {
 				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
-				gameUI.removeStoneAt(removalPosition);
-				removedAt = removalPosition;
-				LOG.info(Messages.text("removed_stone_at_position", players[turn].getName(), removalPosition));
+				gameUI.removeStoneAt(p);
+				removedAt = p;
+				LOG.info(Messages.text("removed_stone_at_position", players[turn].getName(), p));
 			}
 		});
 	}
