@@ -11,6 +11,10 @@ import de.amr.games.muehle.util.Util;
 
 public enum RemovalRules implements RemovalRule {
 
+	STONE_FROM_OPEN_MILL(
+			"Entferne Stein an Position %d, weil er Teil einer offenen Mühle ist",
+			(board, player, color) -> Util.randomElement(board.positions(color).filter(p -> board.partOfOpenMill(p, color)))),
+
 	STONE_WHICH_CAN_MOVE(
 			"Entferne Stein an Position %d, weil er bewegt werden kann",
 			(board, player, color) -> Util.randomElement(board.positions(color).filter(board::hasEmptyNeighbor))),

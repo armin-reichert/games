@@ -295,6 +295,43 @@ public class Board extends BoardGraph {
 	}
 
 	/**
+	 * @param p
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given position is part of an open mill of the given color
+	 */
+	public boolean partOfOpenMill(int p, StoneColor color) {
+		return partOfOpenHMill(p, color) || partOfOpenVMill(p, color);
+	}
+
+	/**
+	 * @param p
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given position is part of an open horizontal mill of the given color
+	 */
+	public boolean partOfOpenHMill(int p, StoneColor color) {
+		checkPosition(p);
+		checkStoneColor(color);
+		return has(p, color) && IntStream.of(HMILL[p]).filter(q -> has(q, color)).count() == 1;
+	}
+
+	/**
+	 * @param p
+	 *          a valid position
+	 * @param color
+	 *          a stone color
+	 * @return if the given position is part of an open vertical mill of the given color
+	 */
+	public boolean partOfOpenVMill(int p, StoneColor color) {
+		checkPosition(p);
+		checkStoneColor(color);
+		return has(p, color) && IntStream.of(VMILL[p]).filter(q -> has(q, color)).count() == 1;
+	}
+
+	/**
 	 * @param color
 	 *          a stone color
 	 * @return if all stones of the given color are inside some mill
