@@ -17,17 +17,21 @@ import de.amr.games.muehle.rules.api.TriFunction;
  */
 public enum RemovalRules implements RemovalRule {
 
-	STONE_FROM_OPEN_MILL(
+	STONE_IN_OPEN_MILL(
 			"Entferne Stein an Position %d, weil er Teil einer offenen Mühle ist",
-			(board, player, color) -> randomElement(board.positions(color).filter(p -> board.partOfOpenMill(p, color)))),
+			(board, player, color) -> randomElement(
+					board.positions(color).filter(p -> !board.inMill(p, color)).filter(p -> board.partOfOpenMill(p, color)))),
 
 	STONE_WHICH_CAN_MOVE(
 			"Entferne Stein an Position %d, weil er bewegt werden kann",
-			(board, player, color) -> randomElement(board.positions(color).filter(board::hasEmptyNeighbor))),
+			(board, player, color) -> randomElement(
+					board.positions(color).filter(p -> !board.inMill(p, color)).filter(board::hasEmptyNeighbor))),
 
-	RANDOM(
-			"Entferne Stein auf zufällig gewählter Position %d",
-			(board, player, color) -> randomElement(board.positions(color)))
+	RANDOM_OUTSIDE_MILL(
+			"Entferne Stein außerhalb eine Mühle an Position %d",
+			(board, player, color) -> randomElement(board.positions(color).filter(p -> !board.inMill(p, color)))),
+
+	RANDOM("Entferne Stein an Position %d", (board, player, color) -> randomElement(board.positions(color))),
 
 	;
 

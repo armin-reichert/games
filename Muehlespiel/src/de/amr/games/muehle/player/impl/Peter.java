@@ -35,6 +35,7 @@ public class Peter extends RuleBasedPlayer {
 
 	static final RemovalRule[] REMOVAL_RULES = {
 			/*@formatter:off*/
+			RemovalRules.RANDOM_OUTSIDE_MILL,
 			RemovalRules.RANDOM,
 			/*@formatter:on*/
 	};
