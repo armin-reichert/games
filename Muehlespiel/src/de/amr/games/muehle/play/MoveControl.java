@@ -87,7 +87,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG.info(Messages.text("jumping_from_to", from, to));
+		state(JUMPING).entry = s -> LOG.info(player.getName() + ": " + Messages.text("jumping_from_to", from, to));
 
 		change(JUMPING, FINISHED);
 
@@ -111,7 +111,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	void startMove(State state) {
 		board.getDirection(from, to).ifPresent(dir -> {
 			stone().ifPresent(stone -> stone.tf.setVelocity(velocity(dir)));
-			LOG.info(Messages.text("moving_from_to_towards", from, to, dir));
+			LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
 		});
 	}
 

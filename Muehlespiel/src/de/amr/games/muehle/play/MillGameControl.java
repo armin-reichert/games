@@ -67,7 +67,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		change(PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
 
-		changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::placingClosedMill, this::onPlacingClosedMill);
+		changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::isPlacingClosingMill, this::onPlacingClosedMill);
 
 		changeOnInput(STONE_PLACED, PLACING, PLACING, this::switchPlacing);
 
@@ -83,7 +83,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		state(MOVING).update = this::moveStone;
 
-		change(MOVING, MOVING_REMOVING, this::moveClosedMill);
+		change(MOVING, MOVING_REMOVING, this::isMoveClosingMill);
 
 		change(MOVING, MOVING, this::isMoveFinished, this::switchMoving);
 
@@ -225,6 +225,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	void turnMovingTo(int i) {
 		turn = i;
 		moveControl = new MoveControl(board, players[turn], gameUI, pulse);
+		// moveControl.setLogger(LOG);
 		moveControl.init();
 		gameUI.showMessage("must_move", players[turn].getName());
 	}
@@ -282,11 +283,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		return moveControl.is(MoveState.FINISHED);
 	}
 
-	boolean placingClosedMill() {
+	boolean isPlacingClosingMill() {
 		return board.inMill(placedAt, placedColor);
 	}
 
-	boolean moveClosedMill() {
+	boolean isMoveClosingMill() {
 		if (isMoveFinished()) {
 			Move move = moveControl.getMove().get();
 			return board.inMill(move.to, players[turn].getColor());

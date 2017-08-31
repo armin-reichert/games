@@ -31,7 +31,7 @@ public interface Player {
 
 	public OptionalInt supplyRemovalPosition();
 
-	public Optional<Move> supplyMove();
-
 	public void newMove();
+
+	public Optional<Move> supplyMove();
 }

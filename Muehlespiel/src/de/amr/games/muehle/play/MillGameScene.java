@@ -68,7 +68,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		};
 		/*@formatter:on*/
 
-		Player whitePlayer = whitePlayers[0];
+		Player whitePlayer = whitePlayers[2];
 		Player blackPlayer = blackPlayers[3];
 
 		game = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
@@ -86,7 +86,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		assistant.hCenter(getWidth());
 		assistant.tf.setY(getHeight() / 2 - 100);
 
-		// control.setLogger(LOG);
+		// game.setLogger(LOG);
 		game.init();
 	}
 
@@ -166,7 +166,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 			drawRemainingStonesCounter(g, 0, 40, getHeight() - 30);
 			drawRemainingStonesCounter(g, 1, getWidth() - 100, getHeight() - 30);
 		}
-		if (game.isRemoving() && game.isInteractivePlayer(0) || game.isInteractivePlayer(1)) {
+		if (game.isRemoving() && game.isInteractivePlayer(game.getTurn())) {
 			boardUI.markRemovableStones(g, game.getPlayerNotInTurn().getColor());
 		}
 	}

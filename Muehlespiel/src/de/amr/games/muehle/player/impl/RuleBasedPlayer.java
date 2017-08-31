@@ -29,8 +29,6 @@ public class RuleBasedPlayer implements Player {
 	final MovingRule[] movingRules;
 	final RemovalRule[] removalRules;
 
-	Move move;
-
 	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
 			RemovalRule[] removalRules) {
 		this.board = board;
@@ -38,7 +36,6 @@ public class RuleBasedPlayer implements Player {
 		this.placingRules = placingRules;
 		this.movingRules = movingRules;
 		this.removalRules = removalRules;
-		move = new Move();
 	}
 
 	@Override
@@ -49,11 +46,6 @@ public class RuleBasedPlayer implements Player {
 	@Override
 	public StoneColor getColor() {
 		return color;
-	}
-
-	@Override
-	public void newMove() {
-		move = new Move();
 	}
 
 	@Override
@@ -69,23 +61,13 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
+	public void newMove() {
+	}
+
+	@Override
 	public Optional<Move> supplyMove() {
-		if (move.from == -1) {
-			supplyMoveStartPosition().ifPresent(pos -> move.from = pos);
-		} else {
-			supplyMoveEndPosition().ifPresent(pos -> move.to = pos);
-		}
-		return board.isValidPosition(move.from) && board.isValidPosition(move.to) ? Optional.of(move) : Optional.empty();
-	}
-
-	OptionalInt supplyMoveStartPosition() {
-		return Stream.of(movingRules).map(this::tryMoveStartRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
-	}
-
-	OptionalInt supplyMoveEndPosition() {
-		return Stream.of(movingRules).map(this::tryMoveTargetRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
+		return Stream.of(movingRules).map(this::tryMoveRule).filter(Optional::isPresent).findFirst()
+				.orElse(Optional.empty());
 	}
 
 	OptionalInt tryPlacingRule(PlacingRule rule) {
@@ -96,16 +78,17 @@ public class RuleBasedPlayer implements Player {
 		return logMatch(rule, rule.supplyRemovalPosition(this, getColor().other()));
 	}
 
-	OptionalInt tryMoveStartRule(MovingRule rule) {
-		return logMatch(rule, rule.supplyMoveStartPosition(this));
-	}
-
-	OptionalInt tryMoveTargetRule(MovingRule rule) {
-		return logMatch(rule, rule.supplyMoveTargetPosition(this, move.from));
+	Optional<Move> tryMoveRule(MovingRule rule) {
+		return logMatch(rule, rule.supplyMove(this));
 	}
 
 	OptionalInt logMatch(Rule rule, OptionalInt optPos) {
 		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
+	}
+
+	Optional<Move> logMatch(Rule rule, Optional<Move> optMove) {
+		optMove.ifPresent(move -> LOG.info(getName() + ": " + format(rule.getDescription(), move.from, move.to)));
+		return optMove;
 	}
 }

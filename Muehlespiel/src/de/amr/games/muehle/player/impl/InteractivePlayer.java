@@ -71,27 +71,36 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return computeBoardPositionFromClickPosition();
+		return boardPositionClicked();
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return computeBoardPositionFromClickPosition();
-	}
-
-	@Override
-	public Optional<Move> supplyMove() {
-		if (move.from == -1) {
-			computeBoardPositionFromClickPosition().ifPresent(p -> move.from = p);
-		} else if (move.to == -1) {
-			supplyMoveEndPosition().ifPresent(p -> move.to = p);
-		}
-		return board.isValidPosition(move.from) && board.isValidPosition(move.to) ? Optional.of(move) : Optional.empty();
+		return boardPositionClicked();
 	}
 
 	@Override
 	public void newMove() {
 		move = new Move();
+	}
+
+	@Override
+	public Optional<Move> supplyMove() {
+		if (move.from == -1) {
+			boardPositionClicked().ifPresent(p -> {
+				if (board.hasEmptyNeighbor(p)) {
+					move.from = p;
+				}
+			});
+		} else if (move.to == -1) {
+			supplyMoveEndPosition().ifPresent(p -> move.to = p);
+			if (move.to != -1 && board.areNeighbors(move.from, move.to) && board.isEmptyPosition(move.to)) {
+				return Optional.of(move);
+			} else {
+				move.to = -1;
+			}
+		}
+		return Optional.empty();
 	}
 
 	OptionalInt supplyMoveEndPosition() {
@@ -105,7 +114,7 @@ public class InteractivePlayer implements Player {
 			return board.neighbor(move.from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
-		return computeBoardPositionFromClickPosition();
+		return boardPositionClicked();
 	}
 
 	Optional<Direction> supplyMoveDirection() {
@@ -117,7 +126,7 @@ public class InteractivePlayer implements Player {
 		/*@formatter:on*/
 	}
 
-	OptionalInt computeBoardPositionFromClickPosition() {
+	OptionalInt boardPositionClicked() {
 		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }
