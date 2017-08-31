@@ -8,28 +8,28 @@ import de.amr.games.muehle.player.api.Player;
 
 public interface MillGame {
 
-	public static final int NUM_STONES = 9;
+	static final int NUM_STONES = 9;
 
-	public Board getBoard();
+	Board getBoard();
 
-	public boolean isPlacing();
+	boolean isPlacing();
 
-	public int getNumStonesPlaced(int turn);
+	int getNumStonesPlaced(int turn);
 
-	public boolean isMoving();
+	boolean isMoving();
 
-	public boolean isRemoving();
+	boolean isRemoving();
 
-	public boolean isGameOver();
+	boolean isGameOver();
 
-	public int getTurn();
+	int getTurn();
 
-	public Player getPlayerInTurn();
+	Player getPlayerInTurn();
 
-	public Player getPlayerNotInTurn();
+	Player getPlayerNotInTurn();
 
-	public boolean isMoveStartPossible();
+	boolean isMoveStartPossible();
 
-	public Optional<Move> getMove();
+	Optional<Move> getMove();
 
 }

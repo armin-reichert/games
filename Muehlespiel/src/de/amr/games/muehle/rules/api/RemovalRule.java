@@ -7,5 +7,5 @@ import de.amr.games.muehle.player.api.Player;
 
 public interface RemovalRule extends Rule {
 
-	public OptionalInt supplyRemovalPosition(Player player, StoneColor removalColor);
+	OptionalInt supplyRemovalPosition(Player player, StoneColor removalColor);
 }

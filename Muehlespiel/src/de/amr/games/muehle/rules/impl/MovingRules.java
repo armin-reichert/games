@@ -12,6 +12,11 @@ import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.TriFunction;
 
+/**
+ * Enumerates some moving rules.
+ * 
+ * @author Armin Reichert
+ */
 public enum MovingRules implements MovingRule {
 
 	CAN_CLOSE_MILL("Durch Zug %d -> %d kann eine Mühle geschlossen werden", (board, player, color) -> {

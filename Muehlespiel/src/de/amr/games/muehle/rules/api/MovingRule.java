@@ -7,5 +7,5 @@ import de.amr.games.muehle.player.api.Player;
 
 public interface MovingRule extends Rule {
 
-	public Optional<Move> supplyMove(Player player);
+	Optional<Move> supplyMove(Player player);
 }

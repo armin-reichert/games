@@ -3,11 +3,12 @@ package de.amr.games.muehle.rules.impl;
 import static de.amr.games.muehle.util.Util.randomElement;
 
 import java.util.OptionalInt;
-import java.util.function.BiFunction;
 
 import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.PlacingRule;
+import de.amr.games.muehle.rules.api.TriFunction;
 
 /**
  * Enumerates some placing rules.
@@ -18,44 +19,43 @@ public enum PlacingRules implements PlacingRule {
 
 	FIRST_STONE_RANDOM(
 			"Setze Stein auf Position %d, weil noch kein Stein meiner Farbe gesetzt wurde",
-			(board, player) -> randomElement(board.emptyPositions()),
-			(board, player) -> board.positions(player.getColor()).count() == 0),
+			(board, player, color) -> randomElement(board.emptyPositions()),
+			(board, player, color) -> board.positions(color).count() == 0),
 
 	CLOSE_MILL(
 			"Setze Stein auf Position %d, weil eigene Mühle geschlossen wird",
-			(board, player) -> randomElement(board.positionsClosingMill(player.getColor()))),
+			(board, player, color) -> randomElement(board.positionsClosingMill(color))),
 
 	DESTROY_MILL(
 			"Setze Stein auf Position %d, weil gegnerische Mühle verhindert wird",
-			(board, player) -> randomElement(board.positionsClosingMill(player.getColor().other()))),
+			(board, player, color) -> randomElement(board.positionsClosingMill(color.other()))),
 
 	OPEN_TWO_MILLS(
 			"Setze Stein auf Position %d, weil zwei eigene Mühlen geöffnet werden",
-			(board, player) -> randomElement(board.positionsOpeningTwoMills(player.getColor()))),
+			(board, player, color) -> randomElement(board.positionsOpeningTwoMills(color))),
 
 	OPEN_ONE_MILL(
 			"Setze Stein auf Position %d, weil eigene Mühle geöffnet wird",
-			(board, player) -> randomElement(board.positionsOpeningMill(player.getColor()))),
+			(board, player, color) -> randomElement(board.positionsOpeningMill(color))),
 
 	NEAR_OWN_COLOR(
 			"Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist",
-			(board, player) -> {
-				OptionalInt emptyNeighborOfOwnColor = randomElement(
-						board.positions(player.getColor()).filter(board::hasEmptyNeighbor));
-				return emptyNeighborOfOwnColor.isPresent()
-						? randomElement(board.emptyNeighbors(emptyNeighborOfOwnColor.getAsInt())) : OptionalInt.empty();
+			(board, player, color) -> {
+				OptionalInt emptyNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
+				return emptyNeighbor.isPresent() ? randomElement(board.emptyNeighbors(emptyNeighbor.getAsInt()))
+						: OptionalInt.empty();
 			}),
 
 	RANDOM(
 			"Setze Stein auf Position %d, weil kein Spezialfall zutraf",
-			(board, player) -> randomElement(board.emptyPositions()))
+			(board, player, color) -> randomElement(board.emptyPositions()))
 
 	;
 
 	@Override
 	public OptionalInt supplyPlacingPosition(Player player) {
-		return condition.apply(player.getBoard(), player) ? positionSupplier.apply(player.getBoard(), player)
-				: OptionalInt.empty();
+		return condition.apply(player.getBoard(), player, player.getColor())
+				? positionSupplier.apply(player.getBoard(), player, player.getColor()) : OptionalInt.empty();
 	}
 
 	@Override
@@ -63,18 +63,18 @@ public enum PlacingRules implements PlacingRule {
 		return description;
 	}
 
-	private PlacingRules(String description, BiFunction<Board, Player, OptionalInt> positionSupplier,
-			BiFunction<Board, Player, Boolean> condition) {
+	private PlacingRules(String description, TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier,
+			TriFunction<Board, Player, StoneColor, Boolean> condition) {
 		this.description = description;
 		this.positionSupplier = positionSupplier;
 		this.condition = condition;
 	}
 
-	private PlacingRules(String description, BiFunction<Board, Player, OptionalInt> positionSupplier) {
-		this(description, positionSupplier, (board, player) -> true);
+	private PlacingRules(String description, TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier) {
+		this(description, positionSupplier, (board, player, color) -> true);
 	}
 
 	private final String description;
-	private final BiFunction<Board, Player, OptionalInt> positionSupplier;
-	private final BiFunction<Board, Player, Boolean> condition;
+	private final TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier;
+	private final TriFunction<Board, Player, StoneColor, Boolean> condition;
 }

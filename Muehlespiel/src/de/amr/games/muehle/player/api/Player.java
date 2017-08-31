@@ -15,23 +15,23 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public interface Player {
 
-	public default String getName() {
+	default String getName() {
 		return format("%s(%s)", getClass().getSimpleName(), getColor());
 	}
 
-	public Board getBoard();
+	Board getBoard();
 
-	public StoneColor getColor();
+	StoneColor getColor();
 
-	public default boolean canJump() {
+	default boolean canJump() {
 		return getBoard().stoneCount(getColor()) == 3;
 	}
 
-	public OptionalInt supplyPlacingPosition();
+	OptionalInt supplyPlacingPosition();
 
-	public OptionalInt supplyRemovalPosition();
+	OptionalInt supplyRemovalPosition();
 
-	public void newMove();
+	void newMove();
 
-	public Optional<Move> supplyMove();
+	Optional<Move> supplyMove();
 }

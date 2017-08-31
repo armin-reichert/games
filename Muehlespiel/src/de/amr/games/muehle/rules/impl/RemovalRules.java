@@ -10,6 +10,11 @@ import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.RemovalRule;
 import de.amr.games.muehle.rules.api.TriFunction;
 
+/**
+ * Enumerates some removal rules.
+ * 
+ * @author Armin Reichert
+ */
 public enum RemovalRules implements RemovalRule {
 
 	STONE_FROM_OPEN_MILL(
