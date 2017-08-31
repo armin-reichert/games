@@ -14,7 +14,6 @@ import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.rules.api.MovingRule;
 import de.amr.games.muehle.rules.api.PlacingRule;
 import de.amr.games.muehle.rules.api.RemovalRule;
-import de.amr.games.muehle.rules.api.Rule;
 
 /**
  * A player controlled by rules.
@@ -61,33 +60,29 @@ public class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public void newMove() {
-	}
-
-	@Override
 	public Optional<Move> supplyMove() {
 		return Stream.of(movingRules).map(this::tryMoveRule).filter(Optional::isPresent).findFirst()
 				.orElse(Optional.empty());
 	}
 
+	@Override
+	public void newMove() {
+	}
+
 	OptionalInt tryPlacingRule(PlacingRule rule) {
-		return logMatch(rule, rule.supplyPlacingPosition(this));
-	}
-
-	OptionalInt tryRemovalRule(RemovalRule rule) {
-		return logMatch(rule, rule.supplyRemovalPosition(this, getColor().other()));
-	}
-
-	Optional<Move> tryMoveRule(MovingRule rule) {
-		return logMatch(rule, rule.supplyMove(this));
-	}
-
-	OptionalInt logMatch(Rule rule, OptionalInt optPos) {
+		OptionalInt optPos = rule.supplyPlacingPosition(this);
 		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
-	Optional<Move> logMatch(Rule rule, Optional<Move> optMove) {
+	OptionalInt tryRemovalRule(RemovalRule rule) {
+		OptionalInt optPos = rule.supplyRemovalPosition(this, getColor().other());
+		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		return optPos;
+	}
+
+	Optional<Move> tryMoveRule(MovingRule rule) {
+		Optional<Move> optMove = rule.supplyMove(this);
 		optMove.ifPresent(move -> LOG.info(getName() + ": " + format(rule.getDescription(), move.from, move.to)));
 		return optMove;
 	}
