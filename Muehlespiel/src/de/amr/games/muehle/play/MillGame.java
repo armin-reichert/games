@@ -24,6 +24,8 @@ public interface MillGame {
 
 	int getTurn();
 
+	Player getPlayer(int i);
+
 	Player getPlayerInTurn();
 
 	Player getPlayerNotInTurn();

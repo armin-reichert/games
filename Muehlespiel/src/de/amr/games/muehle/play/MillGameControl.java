@@ -174,6 +174,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	@Override
+	public Player getPlayer(int i) {
+		return players[i];
+	}
+
+	@Override
 	public Player getPlayerInTurn() {
 		return players[turn];
 	}

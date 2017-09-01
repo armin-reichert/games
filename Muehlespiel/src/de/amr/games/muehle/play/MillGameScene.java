@@ -2,6 +2,7 @@ package de.amr.games.muehle.play;
 
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
+import static de.amr.games.muehle.play.MillGame.NUM_STONES;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -69,7 +70,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		/*@formatter:on*/
 
 		Player whitePlayer = whitePlayers[0];
-		Player blackPlayer = blackPlayers[0];
+		Player blackPlayer = blackPlayers[3];
 
 		game = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
 		assistant = new Assistant(game, whitePlayer, blackPlayer, this);
@@ -172,8 +173,8 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	}
 
 	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
-		final Stone stamp = new Stone(i == 0 ? WHITE : BLACK, boardUI.getStoneRadius());
-		final int remaining = MillGame.NUM_STONES - game.getNumStonesPlaced(i);
+		final Stone stamp = new Stone(game.getPlayer(i).getColor(), boardUI.getStoneRadius());
+		final int remaining = NUM_STONES - game.getNumStonesPlaced(i);
 		final int inset = 6;
 		g.translate(x + inset * remaining, y - inset * remaining);
 		IntStream.range(0, remaining).forEach(j -> {
