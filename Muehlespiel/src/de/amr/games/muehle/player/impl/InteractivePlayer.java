@@ -88,13 +88,13 @@ public class InteractivePlayer implements Player {
 	public Optional<Move> supplyMove() {
 		if (move.from == -1) {
 			boardPositionClicked().ifPresent(p -> {
-				if (board.hasEmptyNeighbor(p)) {
+				if (canJump() || board.hasEmptyNeighbor(p)) {
 					move.from = p;
 				}
 			});
 		} else if (move.to == -1) {
 			supplyMoveEndPosition().ifPresent(p -> move.to = p);
-			if (move.to != -1 && board.areNeighbors(move.from, move.to) && board.isEmptyPosition(move.to)) {
+			if (move.to != -1 && board.isEmptyPosition(move.to) && (canJump() || board.areNeighbors(move.from, move.to))) {
 				return Optional.of(move);
 			} else {
 				move.to = -1;
