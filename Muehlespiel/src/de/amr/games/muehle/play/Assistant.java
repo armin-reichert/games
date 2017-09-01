@@ -101,12 +101,8 @@ class Assistant extends GameEntity {
 	}
 
 	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
-		if (game.isMoveStartPossible()) {
-			game.getMove().ifPresent(move -> gameUI.markPosition(g, move.from, Color.ORANGE));
-		} else {
-			markPossibleMoveStarts(g, movingColor, game.getPlayerInTurn().canJump());
-			markTrappingPosition(g, movingColor, movingColor.other(), Color.RED);
-		}
+		markPossibleMoveStarts(g, movingColor, game.getPlayerInTurn().canJump());
+		markTrappingPosition(g, movingColor, movingColor.other(), Color.RED);
 	}
 
 	void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, boolean canJump) {

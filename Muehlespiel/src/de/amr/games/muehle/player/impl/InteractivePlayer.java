@@ -1,5 +1,6 @@
 package de.amr.games.muehle.player.impl;
 
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
@@ -32,26 +33,22 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class InteractivePlayer implements Player {
 
-	static final EnumMap<Direction, Integer> STEERING = new EnumMap<>(Direction.class);
-
-	static {
-		STEERING.put(NORTH, VK_UP);
-		STEERING.put(EAST, VK_RIGHT);
-		STEERING.put(SOUTH, VK_DOWN);
-		STEERING.put(WEST, VK_LEFT);
-	}
-
+	final EnumMap<Direction, Integer> steering = new EnumMap<>(Direction.class);
 	final Board board;
 	final StoneColor color;
 	final BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
-	Move move;
+	final Move move;
 
 	public InteractivePlayer(Board board, StoneColor color,
 			BiFunction<Integer, Integer, OptionalInt> boardPositionFinder) {
+		this.steering.put(NORTH, VK_UP);
+		this.steering.put(EAST, VK_RIGHT);
+		this.steering.put(SOUTH, VK_DOWN);
+		this.steering.put(WEST, VK_LEFT);
 		this.board = board;
 		this.color = color;
 		this.boardPositionFinder = boardPositionFinder;
-		move = new Move();
+		this.move = new Move();
 	}
 
 	@Override
@@ -81,20 +78,28 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public void newMove() {
-		move = new Move();
+		move.from = move.to = -1;
 	}
 
 	@Override
 	public Optional<Move> supplyMove() {
 		if (move.from == -1) {
 			boardPositionClicked().ifPresent(p -> {
-				if (canJump() || board.hasEmptyNeighbor(p)) {
+				if (board.isEmptyPosition(p)) {
+					LOG.info(Messages.text("stone_at_position_not_existing", p));
+				} else if (!board.hasStoneAt(p, color)) {
+					LOG.info(Messages.text("stone_at_position_wrong_color", p));
+				} else if (!canJump() && !board.hasEmptyNeighbor(p)) {
+					LOG.info(Messages.text("stone_at_position_cannot_move", p));
+				} else {
 					move.from = p;
+					LOG.info("Move starts from " + p);
 				}
 			});
 		} else if (move.to == -1) {
 			supplyMoveEndPosition().ifPresent(p -> move.to = p);
 			if (move.to != -1 && board.isEmptyPosition(move.to) && (canJump() || board.areNeighbors(move.from, move.to))) {
+				LOG.info("Move leads to " + move.to);
 				return Optional.of(move);
 			} else {
 				move.to = -1;
@@ -119,7 +124,7 @@ public class InteractivePlayer implements Player {
 
 	Optional<Direction> supplyMoveDirection() {
 		/*@formatter:off*/
-		return STEERING.entrySet().stream()
+		return steering.entrySet().stream()
 			.filter(e -> Keyboard.keyPressedOnce(e.getValue()))
 			.map(Map.Entry::getKey)
 			.findAny();

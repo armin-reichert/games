@@ -29,6 +29,7 @@ import de.amr.games.muehle.player.impl.InteractivePlayer;
  */
 public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> implements MillGame {
 
+	static final float MOVE_TIME_SEC = 0.75f;
 	static final float PLACING_TIME_SEC = 1.5f;
 	static final float REMOVAL_TIME_SEC = 1.5f;
 
@@ -65,11 +66,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		state(PLACING).update = this::tryToPlaceStone;
 
-		change(PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
-
 		changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::isPlacingClosingMill, this::onPlacingClosedMill);
 
-		changeOnInput(STONE_PLACED, PLACING, PLACING, this::switchPlacing);
+		changeOnInput(STONE_PLACED, PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
+
+		changeOnInput(STONE_PLACED, PLACING, PLACING, () -> !allStonesPlaced(), this::switchPlacing);
 
 		// PLACING_REMOVING
 
@@ -77,17 +78,19 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		state(PLACING_REMOVING).update = this::tryToRemoveStone;
 
+		change(PLACING_REMOVING, MOVING, () -> stoneRemoved() && allStonesPlaced(), this::switchMoving);
+
 		change(PLACING_REMOVING, PLACING, this::stoneRemoved, this::switchPlacing);
 
 		// MOVING
 
 		state(MOVING).update = this::moveStone;
 
+		change(MOVING, GAME_OVER, this::isGameOver);
+
 		change(MOVING, MOVING_REMOVING, this::isMoveClosingMill);
 
 		change(MOVING, MOVING, this::isMoveFinished, this::switchMoving);
-
-		change(MOVING, GAME_OVER, this::isGameOver);
 
 		// MOVING_REMOVING
 
@@ -194,11 +197,6 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	@Override
-	public boolean isMoveStartPossible() {
-		return moveControl.isMoveStartPossible();
-	}
-
-	@Override
 	public Optional<Move> getMove() {
 		return moveControl.getMove();
 	}
@@ -229,8 +227,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	void turnMovingTo(int i) {
 		turn = i;
-		moveControl = new MoveControl(board, players[turn], gameUI, pulse);
-		// moveControl.setLogger(LOG);
+		moveControl = new MoveControl(players[turn], gameUI, pulse, MOVE_TIME_SEC);
+		moveControl.setLogger(LOG);
 		moveControl.init();
 		gameUI.showMessage("must_move", players[turn].getName());
 	}
@@ -285,7 +283,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	boolean isMoveFinished() {
-		return moveControl.is(MoveState.FINISHED);
+		return moveControl.is(MoveState.COMPLETE);
 	}
 
 	boolean isPlacingClosingMill() {

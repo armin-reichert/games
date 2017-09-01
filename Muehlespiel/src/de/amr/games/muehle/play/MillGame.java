@@ -30,8 +30,6 @@ public interface MillGame {
 
 	Player getPlayerNotInTurn();
 
-	boolean isMoveStartPossible();
-
 	Optional<Move> getMove();
 
 }

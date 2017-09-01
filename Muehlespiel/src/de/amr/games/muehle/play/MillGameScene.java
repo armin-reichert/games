@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.input.Keyboard;
@@ -87,7 +88,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		assistant.hCenter(getWidth());
 		assistant.tf.setY(getHeight() / 2 - 100);
 
-		// game.setLogger(LOG);
+		game.setLogger(Application.LOG);
 		game.init();
 	}
 

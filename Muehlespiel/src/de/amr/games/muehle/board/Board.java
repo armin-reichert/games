@@ -315,7 +315,8 @@ public class Board extends BoardGraph {
 	public boolean partOfOpenHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, color) && IntStream.of(HMILL[p]).filter(q -> has(q, color)).count() == 1;
+		return has(p, color) && IntStream.of(HMILL[p]).filter(q -> has(q, color)).count() == 1
+				&& IntStream.of(HMILL[p]).filter(this::isEmptyPosition).count() == 1;
 	}
 
 	/**
@@ -328,7 +329,8 @@ public class Board extends BoardGraph {
 	public boolean partOfOpenVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, color) && IntStream.of(VMILL[p]).filter(q -> has(q, color)).count() == 1;
+		return has(p, color) && IntStream.of(VMILL[p]).filter(q -> has(q, color)).count() == 1
+				&& IntStream.of(VMILL[p]).filter(this::isEmptyPosition).count() == 1;
 	}
 
 	/**

@@ -2,7 +2,7 @@ package de.amr.games.muehle.play;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2f.dist;
-import static de.amr.games.muehle.play.MoveState.FINISHED;
+import static de.amr.games.muehle.play.MoveState.COMPLETE;
 import static de.amr.games.muehle.play.MoveState.INITIAL;
 import static de.amr.games.muehle.play.MoveState.JUMPING;
 import static de.amr.games.muehle.play.MoveState.MOVING;
@@ -30,32 +30,22 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MoveControl extends StateMachine<MoveState, Object> {
 
-	static final float MOVE_TIME_SEC = 0.75f;
-
-	private final Pulse pulse;
-	private final MillGameUI gameUI;
 	private final Board board;
 	private final Player player;
+	private final MillGameUI gameUI;
+	private final Pulse pulse;
+	private final float moveTimeSec;
+	private Move move;
 
-	private int from, to;
-
-	/**
-	 * Constructs a move control.
-	 * 
-	 * @param player
-	 *          the player making the move
-	 * @param gameUI
-	 *          the game UI where the move is visualized
-	 * @param pulse
-	 *          pulse driving the application
-	 */
-	public MoveControl(Board board, Player player, MillGameUI gameUI, Pulse pulse) {
-		super("Move Control", MoveState.class, READING_MOVE);
+	public MoveControl(Player player, MillGameUI gameUI, Pulse pulse, float moveTimeSec) {
+		super("Move Control", MoveState.class, INITIAL);
 
 		this.player = player;
-		this.board = board;
+		this.board = player.getBoard();
 		this.gameUI = gameUI;
 		this.pulse = pulse;
+		this.moveTimeSec = moveTimeSec;
+		this.move = null;
 
 		// INITIAL
 
@@ -67,109 +57,102 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		state(READING_MOVE).update = this::readMove;
 
-		change(READING_MOVE, INITIAL, () -> hasMoveStartPosition() && !isMoveStartPossible());
+		change(READING_MOVE, JUMPING, () -> hasMove() && player.canJump());
 
-		change(READING_MOVE, INITIAL, () -> hasBothMovePositions() && !isMovePossible());
-
-		change(READING_MOVE, JUMPING, () -> hasBothMovePositions() && isMovePossible() && player.canJump());
-
-		change(READING_MOVE, MOVING, () -> hasBothMovePositions() && isMovePossible());
+		change(READING_MOVE, MOVING, () -> hasMove());
 
 		// MOVING
 
-		state(MOVING).entry = this::startMove;
+		state(MOVING).entry = this::startMoveAnimation;
 
-		state(MOVING).update = this::moveStone;
+		state(MOVING).update = this::runMoveAnimation;
 
-		change(MOVING, FINISHED, this::isStoneAtTarget);
+		change(MOVING, COMPLETE, this::isTargetPositionReached);
 
-		state(MOVING).exit = this::stopMove;
+		state(MOVING).exit = this::stopMoveAnimation;
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG.info(player.getName() + ": " + Messages.text("jumping_from_to", from, to));
+		state(JUMPING).entry = s -> LOG
+				.info(player.getName() + ": " + Messages.text("jumping_from_to", move.from, move.to));
 
-		change(JUMPING, FINISHED);
+		change(JUMPING, COMPLETE);
 
-		// FINISHED
+		// COMPLETE
 
-		state(FINISHED).entry = s -> gameUI.moveStone(from, to);
+		state(COMPLETE).entry = s -> gameUI.moveStone(move.from, move.to);
+
+	}
+
+	public Optional<Move> getMove() {
+		return Optional.ofNullable(move);
 	}
 
 	void newMove(State state) {
-		from = to = -1;
+		move = null;
 		player.newMove();
 	}
 
 	void readMove(State state) {
 		player.supplyMove().ifPresent(move -> {
-			from = move.from;
-			to = move.to;
+			if (isMovePossible(move)) {
+				this.move = move;
+			}
 		});
 	}
 
-	void startMove(State state) {
-		board.getDirection(from, to).ifPresent(dir -> {
-			stone().ifPresent(stone -> stone.tf.setVelocity(velocity(dir)));
-			LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
+	boolean hasMove() {
+		return move != null;
+	}
+
+	void startMoveAnimation(State state) {
+		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		optStone.ifPresent(stone -> {
+			Direction dir = board.getDirection(move.from, move.to).get();
+			stone.tf.setVelocity(velocity(dir));
+			LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", move.from, move.to, dir));
 		});
 	}
 
-	void stopMove(State state) {
-		stone().ifPresent(stone -> stone.tf.setVelocity(0, 0));
+	void stopMoveAnimation(State state) {
+		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		optStone.ifPresent(stone -> stone.tf.setVelocity(0, 0));
 	}
 
-	void moveStone(State state) {
-		stone().ifPresent(stone -> stone.tf.move());
+	void runMoveAnimation(State state) {
+		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		optStone.ifPresent(stone -> stone.tf.move());
 	}
 
-	public Optional<Move> getMove() {
-		return from != -1 && to != -1 ? Optional.of(new Move(from, to)) : Optional.empty();
-	}
-
-	public boolean hasMoveStartPosition() {
-		return board.isValidPosition(from);
-	}
-
-	boolean hasBothMovePositions() {
-		return hasMoveStartPosition() && board.isValidPosition(to);
-	}
-
-	public boolean isMoveStartPossible() {
-		return hasMoveStartPosition() && board.hasStoneAt(from) && board.getStoneAt(from).get() == player.getColor()
-				&& (player.canJump() || board.hasEmptyNeighbor(from));
-	}
-
-	boolean isMovePossible() {
-		if (!stone().isPresent()) {
-			LOG.info(Messages.text("stone_at_position_not_existing", from));
-		} else if (stone().get().getColor() != player.getColor()) {
-			LOG.info(Messages.text("stone_at_position_wrong_color", from));
-		} else if (!player.canJump() && !board.hasEmptyNeighbor(from)) {
-			LOG.info(Messages.text("stone_at_position_cannot_move", from));
-		} else if (board.isEmptyPosition(to) && (player.canJump() || board.areNeighbors(from, to))) {
-			return player.canJump() ? board.isEmptyPosition(to) : board.isEmptyPosition(to) && board.areNeighbors(from, to);
+	boolean isMovePossible(Move move) {
+		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		if (!optStone.isPresent()) {
+			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
+		} else if (optStone.get().getColor() != player.getColor()) {
+			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
+		} else if (!player.canJump() && !board.hasEmptyNeighbor(move.from)) {
+			LOG.info(Messages.text("stone_at_position_cannot_move", move.from));
+		} else if (board.isEmptyPosition(move.to) && (player.canJump() || board.areNeighbors(move.from, move.to))) {
+			return player.canJump() ? board.isEmptyPosition(move.to)
+					: board.isEmptyPosition(move.to) && board.areNeighbors(move.from, move.to);
 		}
 		return false;
 	}
 
-	boolean isStoneAtTarget() {
-		if (stone().isPresent()) {
-			Stone stone = stone().get();
+	boolean isTargetPositionReached() {
+		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		if (optStone.isPresent()) {
+			Stone stone = optStone.get();
 			float speed = stone.tf.getVelocity().length();
 			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-			Vector2f toCenter = gameUI.centerPoint(to);
+			Vector2f toCenter = gameUI.centerPoint(move.to);
 			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
 		}
 		return false;
 	}
 
-	Optional<Stone> stone() {
-		return gameUI.getStoneAt(from);
-	}
-
 	Vector2f velocity(Direction dir) {
-		float speed = dist(gameUI.centerPoint(from), gameUI.centerPoint(to)) / pulse.secToTicks(MOVE_TIME_SEC);
+		float speed = dist(gameUI.centerPoint(move.from), gameUI.centerPoint(move.to)) / pulse.secToTicks(moveTimeSec);
 		switch (dir) {
 		case NORTH:
 			return Vector2f.of(0, -speed);
