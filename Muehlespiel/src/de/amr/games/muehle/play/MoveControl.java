@@ -57,9 +57,9 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		state(READING_MOVE).update = this::readMove;
 
-		change(READING_MOVE, JUMPING, () -> hasMove() && player.canJump());
+		change(READING_MOVE, JUMPING, () -> getMove().isPresent() && player.canJump());
 
-		change(READING_MOVE, MOVING, () -> hasMove());
+		change(READING_MOVE, MOVING, () -> getMove().isPresent());
 
 		// MOVING
 
@@ -101,13 +101,8 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		});
 	}
 
-	boolean hasMove() {
-		return move != null;
-	}
-
 	void startMoveAnimation(State state) {
-		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
-		optStone.ifPresent(stone -> {
+		gameUI.getStoneAt(move.from).ifPresent(stone -> {
 			Direction dir = board.getDirection(move.from, move.to).get();
 			stone.tf.setVelocity(velocity(dir));
 			LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", move.from, move.to, dir));
@@ -115,28 +110,36 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	}
 
 	void stopMoveAnimation(State state) {
-		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
-		optStone.ifPresent(stone -> stone.tf.setVelocity(0, 0));
+		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.setVelocity(0, 0));
 	}
 
 	void runMoveAnimation(State state) {
-		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
-		optStone.ifPresent(stone -> stone.tf.move());
+		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.move());
 	}
 
 	boolean isMovePossible(Move move) {
 		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
 		if (!optStone.isPresent()) {
 			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
-		} else if (optStone.get().getColor() != player.getColor()) {
-			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
-		} else if (!player.canJump() && !board.hasEmptyNeighbor(move.from)) {
-			LOG.info(Messages.text("stone_at_position_cannot_move", move.from));
-		} else if (board.isEmptyPosition(move.to) && (player.canJump() || board.areNeighbors(move.from, move.to))) {
-			return player.canJump() ? board.isEmptyPosition(move.to)
-					: board.isEmptyPosition(move.to) && board.areNeighbors(move.from, move.to);
+			return false;
 		}
-		return false;
+		Stone stone = optStone.get();
+		if (stone.getColor() != player.getColor()) {
+			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
+			return false;
+		}
+		if (!board.isEmptyPosition(move.to)) {
+			LOG.info(Messages.text("stone_at_position", move.to));
+			return false;
+		}
+		if (player.canJump()) {
+			return true;
+		}
+		if (!board.areNeighbors(move.from, move.to)) {
+			LOG.info(Messages.text("not_neighbors", move.from, move.to));
+			return false;
+		}
+		return true;
 	}
 
 	boolean isTargetPositionReached() {
