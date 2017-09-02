@@ -34,20 +34,24 @@ public class BoardUI extends GameEntity {
 
 	private final Board board;
 	private final Stone[] stones;
-	private final int width;
-	private final int height;
-	private final int posRadius;
-	private final int stoneRadius;
-	private final int[] xpos;
-	private final int[] ypos;
-	private final Color bgColor;
-	private final Color lineColor;
+	private int width;
+	private int height;
+	private int posRadius;
+	private int stoneRadius;
+	private int[] xpos;
+	private int[] ypos;
+	private Color bgColor;
+	private Color lineColor;
 	private final Font font;
 	private boolean positionNumbersOn;
 
-	public BoardUI(Board board, int width, int height, Color bgColor, Color lineColor) {
+	public BoardUI(Board board) {
 		this.board = board;
 		this.stones = new Stone[NUM_POS];
+		this.font = new Font("Arial", Font.PLAIN, stoneRadius * 9 / 10);
+	}
+
+	public void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.posRadius = width / 60;
@@ -58,9 +62,14 @@ public class BoardUI extends GameEntity {
 			xpos[p] = GRID_X[p] * width / 6;
 			ypos[p] = GRID_Y[p] * height / 6;
 		});
+	}
+
+	public void setBgColor(Color bgColor) {
 		this.bgColor = bgColor;
+	}
+
+	public void setLineColor(Color lineColor) {
 		this.lineColor = lineColor;
-		this.font = new Font("Arial", Font.PLAIN, stoneRadius * 9 / 10);
 	}
 
 	@Override

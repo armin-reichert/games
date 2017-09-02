@@ -3,6 +3,7 @@ package de.amr.games.muehle;
 import java.util.Locale;
 
 import de.amr.easy.game.Application;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
 
@@ -19,6 +20,8 @@ public class MillApp extends Application {
 		launch(new MillApp());
 	}
 
+	private Board board;
+
 	public MillApp() {
 		settings.title = Messages.text("title");
 		settings.width = 800;
@@ -29,6 +32,12 @@ public class MillApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new MillGameScene(this));
+		board = new Board();
+		MillGameScene scene = new MillGameScene(this);
+		selectView(scene);
+	}
+
+	public Board getBoard() {
+		return board;
 	}
 }

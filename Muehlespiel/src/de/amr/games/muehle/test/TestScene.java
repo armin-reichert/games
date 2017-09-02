@@ -30,7 +30,10 @@ public class TestScene extends Scene<MillTestApp> {
 	@Override
 	public void init() {
 		board = new Board();
-		boardUI = new BoardUI(board, 600, 600, BOARD_COLOR, LINE_COLOR);
+		boardUI = new BoardUI(board);
+		boardUI.setSize(600, 600);
+		boardUI.setBgColor(BOARD_COLOR);
+		boardUI.setLineColor(LINE_COLOR);
 		boardUI.showPositionNumbers();
 
 		boardUI.center(getWidth(), getHeight());

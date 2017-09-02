@@ -25,8 +25,6 @@ import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.player.impl.InteractivePlayer;
-import de.amr.games.muehle.player.impl.Peter;
-import de.amr.games.muehle.player.impl.RandomPlayer;
 import de.amr.games.muehle.player.impl.Zwick;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
@@ -38,43 +36,30 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
+	private final Board board;
+
 	private MillGameControl game;
+
 	private BoardUI boardUI;
 	private TextArea messageArea;
 	private Assistant assistant;
 
 	public MillGameScene(MillApp app) {
 		super(app);
+		this.board = app.getBoard();
+		setBgColor(BOARD_COLOR.darker());
 	}
 
 	@Override
 	public void init() {
-		setBgColor(BOARD_COLOR.darker());
 
-		Board board = new Board();
+		boardUI = new BoardUI(board);
 
-		boardUI = new BoardUI(board, getWidth() * 3 / 4, getHeight() * 3 / 4, BOARD_COLOR, LINE_COLOR);
-
-		/*@formatter:off*/
-		Player[] whitePlayers = { 
-				new InteractivePlayer(board, WHITE, boardUI::findPosition),
-				new RandomPlayer(board, WHITE), 
-				new Peter(board, WHITE),
-				new Zwick(board, WHITE)
-		};
-
-		Player[] blackPlayers = { 
-				new InteractivePlayer(board, BLACK, boardUI::findPosition),
-				new RandomPlayer(board, BLACK), 
-				new Peter(board, BLACK),
-				new Zwick(board, BLACK)
-		};
-		/*@formatter:on*/
-
-		Player whitePlayer = whitePlayers[2];
-		Player blackPlayer = blackPlayers[3];
+		Player whitePlayer = new InteractivePlayer(board, WHITE, boardUI::findPosition);
+		Player blackPlayer = new Zwick(board, BLACK);
 
 		game = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
+
 		assistant = new Assistant(game, whitePlayer, blackPlayer, this);
 		game.setAssistant(assistant);
 
@@ -83,6 +68,9 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 
 		// Layout
+		boardUI.setSize(getWidth() * 3 / 4, getHeight() * 3 / 4);
+		boardUI.setBgColor(BOARD_COLOR);
+		boardUI.setLineColor(LINE_COLOR);
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
