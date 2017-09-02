@@ -70,7 +70,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		};
 		/*@formatter:on*/
 
-		Player whitePlayer = whitePlayers[0];
+		Player whitePlayer = whitePlayers[2];
 		Player blackPlayer = blackPlayers[3];
 
 		game = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);

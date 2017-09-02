@@ -3,7 +3,6 @@ package de.amr.games.muehle.play;
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2f.dist;
 import static de.amr.games.muehle.play.MoveState.COMPLETE;
-import static de.amr.games.muehle.play.MoveState.INITIAL;
 import static de.amr.games.muehle.play.MoveState.JUMPING;
 import static de.amr.games.muehle.play.MoveState.MOVING;
 import static de.amr.games.muehle.play.MoveState.READING_MOVE;
@@ -38,7 +37,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 	private Move move;
 
 	public MoveControl(Player player, MillGameUI gameUI, Pulse pulse, float moveTimeSec) {
-		super("Move Control", MoveState.class, INITIAL);
+		super("Move Control", MoveState.class, READING_MOVE);
 
 		this.player = player;
 		this.board = player.getBoard();
@@ -47,15 +46,11 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		this.moveTimeSec = moveTimeSec;
 		this.move = null;
 
-		// INITIAL
-
-		state(INITIAL).entry = this::newMove;
-
-		change(INITIAL, READING_MOVE);
-
 		// READING_MOVE
 
-		state(READING_MOVE).update = this::readMove;
+		state(READING_MOVE).entry = this::newMove;
+
+		state(READING_MOVE).update = this::requestMoveFromPlayer;
 
 		change(READING_MOVE, JUMPING, () -> getMove().isPresent() && player.canJump());
 
@@ -93,7 +88,7 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		player.newMove();
 	}
 
-	void readMove(State state) {
+	void requestMoveFromPlayer(State state) {
 		player.supplyMove().ifPresent(move -> {
 			if (isMovePossible(move)) {
 				this.move = move;
