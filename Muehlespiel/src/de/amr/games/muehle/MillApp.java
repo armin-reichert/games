@@ -49,7 +49,7 @@ public class MillApp extends Application {
 		whitePlayer = new InteractivePlayer(board, WHITE);
 		blackPlayer = new Zwick(board, BLACK);
 
-		game = new MillGameControl(board, whitePlayer, blackPlayer, pulse);
+		game = new MillGameControl(this);
 
 		MillGameScene scene = new MillGameScene(this);
 		game.setUI(scene);
