@@ -40,9 +40,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private final Board board;
 	private final Player[] players;
 	private final int[] stonesPlaced;
-	private final MillGameUI gameUI;
 	private final Pulse pulse;
 
+	private MillGameUI gameUI;
 	private Optional<Assistant> assistant;
 	private MoveControl moveControl;
 	private int turn;
@@ -50,14 +50,13 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private StoneColor placedColor;
 	private int removedAt;
 
-	public MillGameControl(Board board, Player whitePlayer, Player blackPlayer, MillGameUI gameUI, Pulse pulse) {
+	public MillGameControl(Board board, Player whitePlayer, Player blackPlayer, Pulse pulse) {
 
 		super("Mühlespiel-Steuerung", MillGamePhase.class, STARTING);
 
 		this.board = board;
 		this.players = new Player[] { whitePlayer, blackPlayer };
 		this.stonesPlaced = new int[2];
-		this.gameUI = gameUI;
 		this.pulse = pulse;
 
 		// STARTING
@@ -113,6 +112,10 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		change(GAME_OVER, STARTING,
 				() -> !isInteractivePlayer(0) && !isInteractivePlayer(1) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+	}
+
+	public void setUI(MillGameUI gameUI) {
+		this.gameUI = gameUI;
 	}
 
 	@Override
@@ -183,6 +186,16 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	@Override
 	public Player getPlayer(int i) {
 		return players[i];
+	}
+
+	@Override
+	public Player getWhitePlayer() {
+		return players[0];
+	}
+
+	@Override
+	public Player getBlackPlayer() {
+		return players[1];
 	}
 
 	@Override

@@ -24,6 +24,10 @@ public interface MillGame {
 
 	int getTurn();
 
+	Player getWhitePlayer();
+
+	Player getBlackPlayer();
+
 	Player getPlayer(int i);
 
 	Player getPlayerInTurn();

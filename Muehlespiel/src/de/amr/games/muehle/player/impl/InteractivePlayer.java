@@ -33,22 +33,24 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class InteractivePlayer implements Player {
 
-	final EnumMap<Direction, Integer> steering = new EnumMap<>(Direction.class);
-	final Board board;
-	final StoneColor color;
-	final BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
-	final Move move;
+	private final EnumMap<Direction, Integer> steering = new EnumMap<>(Direction.class);
+	private final Board board;
+	private final StoneColor color;
+	private final Move move;
+	private BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
 
-	public InteractivePlayer(Board board, StoneColor color,
-			BiFunction<Integer, Integer, OptionalInt> boardPositionFinder) {
+	public InteractivePlayer(Board board, StoneColor color) {
 		this.steering.put(NORTH, VK_UP);
 		this.steering.put(EAST, VK_RIGHT);
 		this.steering.put(SOUTH, VK_DOWN);
 		this.steering.put(WEST, VK_LEFT);
 		this.board = board;
 		this.color = color;
-		this.boardPositionFinder = boardPositionFinder;
 		this.move = new Move();
+	}
+
+	public void setBoardPositionFinder(BiFunction<Integer, Integer, OptionalInt> boardPositionFinder) {
+		this.boardPositionFinder = boardPositionFinder;
 	}
 
 	@Override

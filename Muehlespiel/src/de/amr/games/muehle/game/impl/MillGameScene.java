@@ -1,7 +1,5 @@
 package de.amr.games.muehle.game.impl;
 
-import static de.amr.games.muehle.board.StoneColor.BLACK;
-import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static de.amr.games.muehle.game.api.MillGame.NUM_STONES;
 
 import java.awt.Color;
@@ -19,13 +17,10 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.MillApp;
-import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.player.impl.InteractivePlayer;
-import de.amr.games.muehle.player.impl.Zwick;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
 
@@ -36,38 +31,27 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
-	private final Board board;
-
-	private MillGameControl game;
-
 	private BoardUI boardUI;
 	private TextArea messageArea;
 	private Assistant assistant;
 
 	public MillGameScene(MillApp app) {
 		super(app);
-		this.board = app.getBoard();
 		setBgColor(BOARD_COLOR.darker());
 	}
 
 	@Override
 	public void init() {
 
-		boardUI = new BoardUI(board);
-
-		Player whitePlayer = new InteractivePlayer(board, WHITE, boardUI::findPosition);
-		Player blackPlayer = new Zwick(board, BLACK);
-
-		game = new MillGameControl(board, whitePlayer, blackPlayer, this, app.pulse);
-
-		assistant = new Assistant(game, whitePlayer, blackPlayer, this);
-		game.setAssistant(assistant);
-
+		// Create UI parts
+		boardUI = new BoardUI(app.getBoard());
+		assistant = new Assistant(app.getGame(), app.getWhitePlayer(), app.getBlackPlayer(), this);
+		app.getGame().setAssistant(assistant);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 
-		// Layout
+		// Configure UI parts
 		boardUI.setSize(getWidth() * 3 / 4, getHeight() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
@@ -77,14 +61,21 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		assistant.hCenter(getWidth());
 		assistant.tf.setY(getHeight() / 2 - 100);
 
-		game.setLogger(Application.LOG);
-		game.init();
+		if (app.getWhitePlayer() instanceof InteractivePlayer) {
+			((InteractivePlayer) app.getWhitePlayer()).setBoardPositionFinder(boardUI::findPosition);
+		}
+		if (app.getBlackPlayer() instanceof InteractivePlayer) {
+			((InteractivePlayer) app.getBlackPlayer()).setBoardPositionFinder(boardUI::findPosition);
+		}
+
+		app.getGame().setLogger(Application.LOG);
+		app.getGame().init();
 	}
 
 	@Override
 	public void update() {
 		readInput();
-		game.update();
+		app.getGame().update();
 	}
 
 	void readInput() {
@@ -153,18 +144,18 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (game.isPlacing()) {
+		if (app.getGame().isPlacing()) {
 			drawRemainingStonesCounter(g, 0, 40, getHeight() - 30);
 			drawRemainingStonesCounter(g, 1, getWidth() - 100, getHeight() - 30);
 		}
-		if (game.isRemoving() && game.isInteractivePlayer(game.getTurn())) {
-			boardUI.markRemovableStones(g, game.getPlayerNotInTurn().getColor());
+		if (app.getGame().isRemoving() && app.getGame().isInteractivePlayer(app.getGame().getTurn())) {
+			boardUI.markRemovableStones(g, app.getGame().getPlayerNotInTurn().getColor());
 		}
 	}
 
 	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
-		final Stone stamp = new Stone(game.getPlayer(i).getColor(), boardUI.getStoneRadius());
-		final int remaining = NUM_STONES - game.getNumStonesPlaced(i);
+		final Stone stamp = new Stone(app.getGame().getPlayer(i).getColor(), boardUI.getStoneRadius());
+		final int remaining = NUM_STONES - app.getGame().getNumStonesPlaced(i);
 		final int inset = 6;
 		g.translate(x + inset * remaining, y - inset * remaining);
 		IntStream.range(0, remaining).forEach(j -> {
@@ -172,7 +163,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 			g.translate(-inset, inset);
 		});
 		if (remaining > 1) {
-			g.setColor(game.getTurn() == i ? Color.RED : Color.DARK_GRAY);
+			g.setColor(app.getGame().getTurn() == i ? Color.RED : Color.DARK_GRAY);
 			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp.getRadius()));
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(String.valueOf(remaining), 2 * stamp.getRadius(), stamp.getRadius());
