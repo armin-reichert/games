@@ -20,7 +20,7 @@ import de.amr.games.muehle.player.api.Player;
 /**
  * An assistant providing visual and acoustic hints to the assisted player.
  */
-class Assistant extends GameEntity {
+public class Assistant extends GameEntity {
 
 	/** Enumeration of used sounds */
 	private enum Sounds {
@@ -45,10 +45,10 @@ class Assistant extends GameEntity {
 	private boolean enabled;
 	private int assistanceLevel; // 0 = normal, 1 = high
 
-	Assistant(MillGame game, Player assistedPlayer, Player opponentPlayer, MillGameUI gameUI) {
+	public Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
-		this.assistedPlayer = assistedPlayer;
-		this.opponentPlayer = opponentPlayer;
+		this.assistedPlayer = game.getWhitePlayer();
+		this.opponentPlayer = game.getBlackPlayer();
 		this.gameUI = gameUI;
 		this.board = game.getBoard();
 		this.assistanceLevel = 0;

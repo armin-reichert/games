@@ -33,7 +33,6 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 	private BoardUI boardUI;
 	private TextArea messageArea;
-	private Assistant assistant;
 
 	public MillGameScene(MillApp app) {
 		super(app);
@@ -45,8 +44,6 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 		// Create UI parts
 		boardUI = new BoardUI(app.getBoard());
-		assistant = new Assistant(app.getGame(), app.getWhitePlayer(), app.getBlackPlayer(), this);
-		app.getGame().setAssistant(assistant);
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
@@ -58,8 +55,8 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 		messageArea.tf.moveTo(0, getHeight() - 90);
-		assistant.hCenter(getWidth());
-		assistant.tf.setY(getHeight() / 2 - 100);
+		app.getAssistant().hCenter(getWidth());
+		app.getAssistant().tf.setY(getHeight() / 2 - 100);
 
 		if (app.getWhitePlayer() instanceof InteractivePlayer) {
 			((InteractivePlayer) app.getWhitePlayer()).setBoardPositionFinder(boardUI::findPosition);
@@ -80,13 +77,13 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 	void readInput() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
-			assistant.toggle();
+			app.getAssistant().toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			assistant.setEnabled(true);
-			assistant.setAssistanceLevel(0);
+			app.getAssistant().setEnabled(true);
+			app.getAssistant().setAssistanceLevel(0);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			assistant.setEnabled(true);
-			assistant.setAssistanceLevel(1);
+			app.getAssistant().setEnabled(true);
+			app.getAssistant().setAssistanceLevel(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			boardUI.togglePositionNumbers();
 		}
@@ -141,7 +138,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		boardUI.draw(g);
-		assistant.draw(g);
+		app.getAssistant().draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (app.getGame().isPlacing()) {
