@@ -40,13 +40,14 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private final Board board;
 	private final Player whitePlayer;
 	private final Player blackPlayer;
-	private final int[] stonesPlaced;
 	private final Pulse pulse;
 
 	private MillGameUI gameUI;
 	private Optional<Assistant> assistant;
 	private MoveControl moveControl;
 	private int turn;
+	private int whiteStonesPlaced;
+	private int blackStonesPlaced;
 	private int placedAt;
 	private StoneColor placedColor;
 	private int removedAt;
@@ -58,7 +59,6 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		this.board = board;
 		this.whitePlayer = whitePlayer;
 		this.blackPlayer = blackPlayer;
-		this.stonesPlaced = new int[2];
 		this.pulse = pulse;
 
 		// STARTING
@@ -138,7 +138,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	void reset(State state) {
 		gameUI.clearBoard();
-		stonesPlaced[0] = stonesPlaced[1] = 0;
+		whiteStonesPlaced = blackStonesPlaced = 0;
 		turnPlacingTo(0);
 	}
 
@@ -148,7 +148,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	boolean allStonesPlaced() {
-		return stonesPlaced[1] == NUM_STONES;
+		return blackStonesPlaced == NUM_STONES;
 	}
 
 	boolean isInteractivePlayer(int i) {
@@ -167,7 +167,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	@Override
 	public int getNumStonesPlaced(int i) {
-		return stonesPlaced[i];
+		return i == 0 ? whiteStonesPlaced : blackStonesPlaced;
 	}
 
 	@Override
@@ -263,7 +263,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 				placedAt = p;
 				placedColor = getPlayer(turn).getColor();
 				gameUI.putStoneAt(placedAt, placedColor);
-				stonesPlaced[turn] += 1;
+				if (turn == 0) {
+					whiteStonesPlaced += 1;
+				} else {
+					blackStonesPlaced += 1;
+				}
 				addInput(STONE_PLACED);
 			} else {
 				LOG.info(Messages.text("stone_at_position", p));
