@@ -1,13 +1,13 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.game.impl;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.muehle.play.MillGameEvent.STONE_PLACED;
-import static de.amr.games.muehle.play.MillGamePhase.GAME_OVER;
-import static de.amr.games.muehle.play.MillGamePhase.MOVING;
-import static de.amr.games.muehle.play.MillGamePhase.MOVING_REMOVING;
-import static de.amr.games.muehle.play.MillGamePhase.PLACING;
-import static de.amr.games.muehle.play.MillGamePhase.PLACING_REMOVING;
-import static de.amr.games.muehle.play.MillGamePhase.STARTING;
+import static de.amr.games.muehle.game.api.MillGameEvent.STONE_PLACED;
+import static de.amr.games.muehle.game.api.MillGamePhase.GAME_OVER;
+import static de.amr.games.muehle.game.api.MillGamePhase.MOVING;
+import static de.amr.games.muehle.game.api.MillGamePhase.MOVING_REMOVING;
+import static de.amr.games.muehle.game.api.MillGamePhase.PLACING;
+import static de.amr.games.muehle.game.api.MillGamePhase.PLACING_REMOVING;
+import static de.amr.games.muehle.game.api.MillGamePhase.STARTING;
 
 import java.awt.event.KeyEvent;
 import java.util.Optional;
@@ -19,6 +19,10 @@ import de.amr.easy.statemachine.StateMachine;
 import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.game.api.MillGame;
+import de.amr.games.muehle.game.api.MillGameEvent;
+import de.amr.games.muehle.game.api.MillGamePhase;
+import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;

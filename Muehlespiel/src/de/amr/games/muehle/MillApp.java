@@ -3,8 +3,8 @@ package de.amr.games.muehle;
 import java.util.Locale;
 
 import de.amr.easy.game.Application;
+import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.play.MillGameScene;
 
 /**
  * Mühlespiel aka "Nine men's morris".

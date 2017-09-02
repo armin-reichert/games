@@ -1,4 +1,4 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.game.api;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

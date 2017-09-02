@@ -1,4 +1,4 @@
-package de.amr.games.muehle.play;
+package de.amr.games.muehle.game.api;
 
 import java.util.Optional;
 
