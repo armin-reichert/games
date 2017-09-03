@@ -36,32 +36,30 @@ public class BoardUI extends GameEntity {
 	private final Stone[] stones;
 	private int width;
 	private int height;
-	private int posRadius;
-	private int stoneRadius;
+	private int rasterSize;
 	private int[] xpos;
 	private int[] ypos;
 	private Color bgColor;
 	private Color lineColor;
-	private final Font font;
+	private Font font;
 	private boolean positionNumbersOn;
 
 	public BoardUI(Board board) {
 		this.board = board;
 		this.stones = new Stone[NUM_POS];
-		this.font = new Font("Arial", Font.PLAIN, stoneRadius * 9 / 10);
 	}
 
 	public void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.posRadius = width / 60;
-		this.stoneRadius = width / 24;
+		this.rasterSize = width / 6;
 		this.xpos = new int[NUM_POS];
 		this.ypos = new int[NUM_POS];
 		IntStream.range(0, NUM_POS).forEach(p -> {
 			xpos[p] = GRID_X[p] * width / 6;
 			ypos[p] = GRID_Y[p] * height / 6;
 		});
+		this.font = new Font("Arial", Font.PLAIN, rasterSize * 9 / 40);
 	}
 
 	public void setBgColor(Color bgColor) {
@@ -83,7 +81,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public int getStoneRadius() {
-		return stoneRadius;
+		return rasterSize / 4;
 	}
 
 	public void clear() {
@@ -93,7 +91,7 @@ public class BoardUI extends GameEntity {
 
 	public void putStoneAt(int p, StoneColor color) {
 		board.putStoneAt(p, color);
-		Stone stone = new Stone(color, stoneRadius);
+		Stone stone = new Stone(color, getStoneRadius());
 		stone.tf.moveTo(centerPoint(p));
 		stones[p] = stone;
 	}
@@ -127,7 +125,7 @@ public class BoardUI extends GameEntity {
 	public OptionalInt findPosition(int x, int y) {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
-		return findNearestPosition(boardX, boardY, stoneRadius);
+		return findNearestPosition(boardX, boardY, getStoneRadius());
 	}
 
 	public void showPositionNumbers() {
@@ -148,6 +146,7 @@ public class BoardUI extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
+		final int posRadius = rasterSize / 10;
 		g.translate(tf.getX(), tf.getY());
 		// Background
 		g.setColor(bgColor);
@@ -182,7 +181,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void markPosition(Graphics2D g, int p, Color color) {
-		int markerSize = posRadius * 8 / 10;
+		int markerSize = rasterSize * 8 / 100;
 		Vector2f center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
 		g.setColor(color);
