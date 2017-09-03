@@ -59,6 +59,11 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
+	public boolean isInteractive() {
+		return true;
+	}
+
+	@Override
 	public Board getBoard() {
 		return board;
 	}

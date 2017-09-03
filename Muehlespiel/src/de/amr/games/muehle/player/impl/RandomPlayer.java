@@ -20,4 +20,9 @@ public class RandomPlayer extends RuleBasedPlayer {
 		super(board, color, new PlacingRule[] { PlacingRules.RANDOM }, new MovingRule[] { MovingRules.RANDOM },
 				new RemovalRule[] { RemovalRules.RANDOM_OUTSIDE_MILL });
 	}
+
+	@Override
+	public boolean isInteractive() {
+		return false;
+	}
 }

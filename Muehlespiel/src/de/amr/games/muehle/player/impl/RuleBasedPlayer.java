@@ -20,7 +20,7 @@ import de.amr.games.muehle.rules.api.RemovalRule;
  * 
  * @author Armin Reichert
  */
-public class RuleBasedPlayer implements Player {
+public abstract class RuleBasedPlayer implements Player {
 
 	final Board board;
 	final StoneColor color;

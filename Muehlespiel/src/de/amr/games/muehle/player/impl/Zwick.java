@@ -47,6 +47,11 @@ public class Zwick extends RuleBasedPlayer {
 		return String.format("Zwicki (%s)", Messages.text(getColor() == WHITE ? "white" : "black"));
 	}
 
+	@Override
+	public boolean isInteractive() {
+		return false;
+	}
+
 	public Zwick(Board board, StoneColor color) {
 		super(board, color, PLACING_RULES, MOVING_RULES, REMOVAL_RULES);
 	}

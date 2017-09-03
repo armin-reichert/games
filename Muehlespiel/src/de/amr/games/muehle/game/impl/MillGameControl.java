@@ -26,7 +26,6 @@ import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.InteractivePlayer;
 
 /**
  * Finite-state-machine which controls the mill game.
@@ -67,9 +66,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		changeOnInput(STONE_PLACED, PLACING, PLACING_REMOVING, this::isPlacingClosingMill, this::onPlacingClosedMill);
 
-		changeOnInput(STONE_PLACED, PLACING, MOVING, this::allStonesPlaced, this::switchMoving);
+		changeOnInput(STONE_PLACED, PLACING, MOVING, this::areAllStonesPlaced, this::switchMoving);
 
-		changeOnInput(STONE_PLACED, PLACING, PLACING, () -> !allStonesPlaced(), this::switchPlacing);
+		changeOnInput(STONE_PLACED, PLACING, PLACING, () -> !areAllStonesPlaced(), this::switchPlacing);
 
 		// PLACING_REMOVING
 
@@ -77,9 +76,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		state(PLACING_REMOVING).update = this::tryToRemoveStone;
 
-		change(PLACING_REMOVING, MOVING, () -> stoneRemoved() && allStonesPlaced(), this::switchMoving);
+		change(PLACING_REMOVING, MOVING, () -> stoneHasBeenRemoved() && areAllStonesPlaced(), this::switchMoving);
 
-		change(PLACING_REMOVING, PLACING, this::stoneRemoved, this::switchPlacing);
+		change(PLACING_REMOVING, PLACING, this::stoneHasBeenRemoved, this::switchPlacing);
 
 		// MOVING
 
@@ -97,7 +96,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 		state(MOVING_REMOVING).update = this::tryToRemoveStone;
 
-		change(MOVING_REMOVING, MOVING, this::stoneRemoved, this::switchMoving);
+		change(MOVING_REMOVING, MOVING, this::stoneHasBeenRemoved, this::switchMoving);
 
 		// GAME_OVER
 
@@ -106,8 +105,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 			pause(app.pulse.secToTicks(3));
 		};
 
-		change(GAME_OVER, STARTING,
-				() -> !isInteractivePlayer(0) && !isInteractivePlayer(1) || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		change(GAME_OVER, STARTING, () -> !getPlayer(0).isInteractive() && !getPlayer(1).isInteractive()
+				|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 	}
 
 	public void setUI(MillGameUI gameUI) {
@@ -141,12 +140,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		assistant.ifPresent(Assistant::tellWin);
 	}
 
-	boolean allStonesPlaced() {
+	private boolean areAllStonesPlaced() {
 		return blackStonesPlaced == NUM_STONES;
-	}
-
-	boolean isInteractivePlayer(int i) {
-		return getPlayer(i) instanceof InteractivePlayer;
 	}
 
 	@Override
@@ -206,7 +201,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	@Override
 	public boolean isGameOver() {
-		return getBoard().stoneCount(getPlayer(turn).getColor()) < 3 || (!canJump(turn) && isTrapped(turn));
+		return getBoard().stoneCount(getPlayerInTurn().getColor()) < 3
+				|| (!getPlayerInTurn().canJump() && getPlayerInTurn().isTrapped());
 	}
 
 	@Override
@@ -214,48 +210,40 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		return moveControl.getMove();
 	}
 
-	boolean canJump(int i) {
-		return getPlayer(i).canJump();
-	}
-
-	boolean isTrapped(int i) {
-		return getBoard().isTrapped(getPlayer(i).getColor());
-	}
-
-	void turnPlacingTo(int i) {
+	private void turnPlacingTo(int i) {
 		turn = i;
-		gameUI.showMessage("must_place", getPlayer(turn).getName());
+		gameUI.showMessage("must_place", getPlayerInTurn().getName());
 	}
 
-	void switchPlacing(Transition<MillGamePhase, MillGameEvent> t) {
+	private void switchPlacing(Transition<MillGamePhase, MillGameEvent> t) {
 		turnPlacingTo(1 - turn);
-		if (!isInteractivePlayer(turn)) {
+		if (!getPlayerInTurn().isInteractive()) {
 			pause(app.pulse.secToTicks(PLACING_TIME_SEC));
 		}
 	}
 
-	void onPlacingClosedMill(Transition<MillGamePhase, MillGameEvent> t) {
+	private void onPlacingClosedMill(Transition<MillGamePhase, MillGameEvent> t) {
 		assistant.ifPresent(Assistant::tellMillClosed);
 	}
 
-	void turnMovingTo(int i) {
+	private void turnMovingTo(int i) {
 		turn = i;
-		moveControl = new MoveControl(getPlayer(turn), gameUI, app.pulse, MOVE_TIME_SEC);
+		moveControl = new MoveControl(getPlayerInTurn(), gameUI, app.pulse, MOVE_TIME_SEC);
 		moveControl.setLogger(LOG);
 		moveControl.init();
-		gameUI.showMessage("must_move", getPlayer(turn).getName());
+		gameUI.showMessage("must_move", getPlayerInTurn().getName());
 	}
 
-	void switchMoving(Transition<MillGamePhase, MillGameEvent> t) {
+	private void switchMoving(Transition<MillGamePhase, MillGameEvent> t) {
 		turnMovingTo(1 - turn);
 	}
 
-	void tryToPlaceStone(State state) {
+	private void tryToPlaceStone(State state) {
 		assistant.ifPresent(Assistant::givePlacingHint);
-		getPlayer(turn).supplyPlacingPosition().ifPresent(p -> {
+		getPlayerInTurn().supplyPlacingPosition().ifPresent(p -> {
 			if (getBoard().isEmptyPosition(p)) {
 				placedAt = p;
-				placedColor = getPlayer(turn).getColor();
+				placedColor = getPlayerInTurn().getColor();
 				gameUI.putStoneAt(placedAt, placedColor);
 				if (turn == 0) {
 					whiteStonesPlaced += 1;
@@ -269,9 +257,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		});
 	}
 
-	void tryToRemoveStone(State state) {
-		getPlayer(turn).supplyRemovalPosition().ifPresent(p -> {
-			StoneColor colorToRemove = getPlayer(turn).getColor().other();
+	private void tryToRemoveStone(State state) {
+		getPlayerInTurn().supplyRemovalPosition().ifPresent(p -> {
+			StoneColor colorToRemove = getPlayerInTurn().getColor().other();
 			if (getBoard().isEmptyPosition(p)) {
 				LOG.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (getBoard().getStoneAt(p).get() != colorToRemove) {
@@ -281,36 +269,36 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 			} else {
 				gameUI.removeStoneAt(p);
 				removedAt = p;
-				LOG.info(Messages.text("removed_stone_at_position", getPlayer(turn).getName(), p));
+				LOG.info(Messages.text("removed_stone_at_position", getPlayerInTurn().getName(), p));
 			}
 		});
 	}
 
-	boolean stoneRemoved() {
+	private boolean stoneHasBeenRemoved() {
 		return getBoard().isValidPosition(removedAt);
 	}
 
-	void startRemoving(State state) {
+	private void startRemoving(State state) {
 		removedAt = -1;
-		gameUI.showMessage("must_take", getPlayer(turn).getName(), getPlayer(1 - turn).getName());
+		gameUI.showMessage("must_take", getPlayerInTurn().getName(), getPlayer(1 - turn).getName());
 	}
 
-	void moveStone(State state) {
+	private void moveStone(State state) {
 		moveControl.update();
 	}
 
-	boolean isMoveFinished() {
+	private boolean isMoveFinished() {
 		return moveControl.is(MoveState.COMPLETE);
 	}
 
-	boolean isPlacingClosingMill() {
+	private boolean isPlacingClosingMill() {
 		return getBoard().inMill(placedAt, placedColor);
 	}
 
-	boolean isMoveClosingMill() {
+	private boolean isMoveClosingMill() {
 		if (isMoveFinished()) {
 			Move move = moveControl.getMove().get();
-			return getBoard().inMill(move.to, getPlayer(turn).getColor());
+			return getBoard().inMill(move.to, getPlayerInTurn().getColor());
 		}
 		return false;
 	}

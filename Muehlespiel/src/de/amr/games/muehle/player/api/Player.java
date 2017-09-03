@@ -19,12 +19,18 @@ public interface Player {
 		return format("%s(%s)", getClass().getSimpleName(), getColor());
 	}
 
+	boolean isInteractive();
+
 	Board getBoard();
 
 	StoneColor getColor();
 
 	default boolean canJump() {
 		return getBoard().stoneCount(getColor()) == 3;
+	}
+
+	default boolean isTrapped() {
+		return getBoard().isTrapped(getColor());
 	}
 
 	OptionalInt supplyPlacingPosition();

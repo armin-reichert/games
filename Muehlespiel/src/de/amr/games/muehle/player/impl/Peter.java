@@ -45,6 +45,11 @@ public class Peter extends RuleBasedPlayer {
 		return String.format("Strack (%s)", Messages.text(getColor() == WHITE ? "white" : "black"));
 	}
 
+	@Override
+	public boolean isInteractive() {
+		return false;
+	}
+
 	public Peter(Board board, StoneColor color) {
 		super(board, color, PLACING_RULES, MOVING_RULES, REMOVAL_RULES);
 	}

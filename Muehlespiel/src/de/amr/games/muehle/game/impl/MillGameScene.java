@@ -145,7 +145,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 			drawRemainingStonesCounter(g, 0, 40, getHeight() - 30);
 			drawRemainingStonesCounter(g, 1, getWidth() - 100, getHeight() - 30);
 		}
-		if (app.getGame().isRemoving() && app.getGame().isInteractivePlayer(app.getGame().getTurn())) {
+		if (app.getGame().isRemoving() && app.getGame().getPlayerInTurn().isInteractive()) {
 			boardUI.markRemovableStones(g, app.getGame().getPlayerNotInTurn().getColor());
 		}
 	}
