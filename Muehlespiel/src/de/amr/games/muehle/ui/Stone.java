@@ -38,6 +38,10 @@ public class Stone extends GameEntity {
 		this.radius = radius;
 	}
 
+	public void setColor(StoneColor color) {
+		this.color = color;
+	}
+
 	public StoneColor getColor() {
 		return color;
 	}

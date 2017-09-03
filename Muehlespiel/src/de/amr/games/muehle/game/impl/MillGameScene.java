@@ -32,6 +32,8 @@ import de.amr.games.muehle.ui.Stone;
 public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 	private BoardUI boardUI;
+	private Stone counterStone;
+	private Font counterFont;
 	private TextArea messageArea;
 
 	public MillGameScene(MillApp app) {
@@ -44,17 +46,20 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 		// Create UI parts
 		boardUI = new BoardUI(app.getBoard());
-		messageArea = new TextArea();
-		messageArea.setColor(Color.BLUE);
-		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
-
-		// Configure UI parts
 		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
+
+		counterStone = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
+		counterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
+
+		messageArea = new TextArea();
+		messageArea.setColor(Color.BLUE);
+		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 		messageArea.tf.moveTo(0, getHeight() - 90);
+
 		app.getAssistant().hCenter(getWidth());
 		app.getAssistant().tf.setY(getHeight() / 2 - 100);
 
@@ -151,19 +156,20 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	}
 
 	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
-		final Stone stamp = new Stone(app.getGame().getPlayer(i).getColor(), boardUI.getStoneRadius());
-		final int remaining = NUM_STONES - app.getGame().getNumStonesPlaced(i);
+		counterStone.setColor(app.getGame().getPlayer(i).getColor());
+		final int stonesLeft = NUM_STONES - app.getGame().getNumStonesPlaced(i);
 		final int inset = 6;
-		g.translate(x + inset * remaining, y - inset * remaining);
-		IntStream.range(0, remaining).forEach(j -> {
-			stamp.draw(g);
+		g.translate(x + inset * stonesLeft, y - inset * stonesLeft);
+		IntStream.range(0, stonesLeft).forEach(j -> {
+			counterStone.draw(g);
 			g.translate(-inset, inset);
 		});
-		if (remaining > 1) {
+		if (stonesLeft > 1) {
 			g.setColor(app.getGame().getTurn() == i ? Color.RED : Color.DARK_GRAY);
-			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 2 * stamp.getRadius()));
+			g.setFont(counterFont);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(remaining), 2 * stamp.getRadius(), stamp.getRadius());
+			g.drawString(String.valueOf(stonesLeft), 2 * counterStone.getRadius(), counterStone.getRadius());
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		}
 		g.translate(-x, -y);
 	}
