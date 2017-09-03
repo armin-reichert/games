@@ -86,30 +86,22 @@ public class Assistant extends GameEntity {
 		// draw assistant only if enabled and some sound is running
 		if (enabled && Stream.of(Sounds.values()).map(snd -> Assets.sound(snd.key)).anyMatch(sound -> sound.isRunning())) {
 			super.draw(g);
-			if (assistanceLevel == 1) {
+			if (assistanceLevel == 1 && game.getPlayerInTurn().isInteractive()) {
 				if (game.isPlacing()) {
-					drawPlacingHints(g, game.getPlayerInTurn().getColor());
+					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerInTurn().getColor()), Color.GREEN);
+					gameUI.markPositions(g, board.positionsOpeningTwoMills(game.getPlayerInTurn().getColor()), Color.YELLOW);
+					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerNotInTurn().getColor()), Color.RED);
 				} else if (game.isMoving()) {
-					drawMovingHints(g, game.getPlayerInTurn().getColor());
+					markPossibleMoveStarts(g, game.getPlayerInTurn().getColor(), Color.GREEN);
+					markTrappingPosition(g, game.getPlayerInTurn().getColor(), game.getPlayerNotInTurn().getColor(), Color.RED);
 				}
 			}
 		}
 	}
 
-	void drawPlacingHints(Graphics2D g, StoneColor placingColor) {
-		gameUI.markPositions(g, board.positionsClosingMill(placingColor), Color.GREEN);
-		gameUI.markPositions(g, board.positionsOpeningTwoMills(placingColor), Color.YELLOW);
-		gameUI.markPositions(g, board.positionsClosingMill(placingColor.other()), Color.RED);
-	}
-
-	void drawMovingHints(Graphics2D g, StoneColor movingColor) {
-		markPossibleMoveStarts(g, movingColor, game.getPlayerInTurn().canJump());
-		markTrappingPosition(g, movingColor, movingColor.other(), Color.RED);
-	}
-
-	void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, boolean canJump) {
-		(canJump ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
-				.forEach(p -> gameUI.markPosition(g, p, Color.GREEN));
+	void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
+		(game.getPlayerInTurn().canJump() ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
+				.forEach(p -> gameUI.markPosition(g, p, color));
 	}
 
 	void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
