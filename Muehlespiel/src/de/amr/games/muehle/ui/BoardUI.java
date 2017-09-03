@@ -34,8 +34,7 @@ public class BoardUI extends GameEntity {
 
 	private final Board board;
 	private final Stone[] stones;
-	private int width;
-	private int height;
+	private int size;
 	private int rasterSize;
 	private int[] xpos;
 	private int[] ypos;
@@ -49,15 +48,14 @@ public class BoardUI extends GameEntity {
 		this.stones = new Stone[NUM_POS];
 	}
 
-	public void setSize(int width, int height) {
-		this.width = width;
-		this.height = height;
-		this.rasterSize = width / 6;
+	public void setSize(int size) {
+		this.size = size;
+		this.rasterSize = size / 6;
 		this.xpos = new int[NUM_POS];
 		this.ypos = new int[NUM_POS];
 		IntStream.range(0, NUM_POS).forEach(p -> {
-			xpos[p] = GRID_X[p] * width / 6;
-			ypos[p] = GRID_Y[p] * height / 6;
+			xpos[p] = GRID_X[p] * rasterSize;
+			ypos[p] = GRID_Y[p] * rasterSize;
 		});
 		this.font = new Font("Arial", Font.PLAIN, rasterSize * 9 / 40);
 	}
@@ -72,12 +70,12 @@ public class BoardUI extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return width;
+		return size;
 	}
 
 	@Override
 	public int getHeight() {
-		return height;
+		return size;
 	}
 
 	public int getStoneRadius() {
@@ -150,7 +148,7 @@ public class BoardUI extends GameEntity {
 		g.translate(tf.getX(), tf.getY());
 		// Background
 		g.setColor(bgColor);
-		g.fillRect(0, 0, width, height);
+		g.fillRect(0, 0, size, size);
 		// Lines
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius / 2));

@@ -49,7 +49,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 
 		// Configure UI parts
-		boardUI.setSize(getWidth() * 3 / 4, getHeight() * 3 / 4);
+		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
 		boardUI.hCenter(getWidth());

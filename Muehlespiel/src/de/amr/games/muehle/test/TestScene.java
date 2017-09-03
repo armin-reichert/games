@@ -31,7 +31,7 @@ public class TestScene extends Scene<MillTestApp> {
 	public void init() {
 		board = new Board();
 		boardUI = new BoardUI(board);
-		boardUI.setSize(600, 600);
+		boardUI.setSize(600);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
 		boardUI.showPositionNumbers();
