@@ -155,8 +155,13 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	@Override
-	public int getNumStonesPlaced(int i) {
-		return i == 0 ? whiteStonesPlaced : blackStonesPlaced;
+	public int getWhiteStonesPlaced() {
+		return whiteStonesPlaced;
+	}
+
+	@Override
+	public int getBlackStonesPlaced() {
+		return blackStonesPlaced;
 	}
 
 	@Override

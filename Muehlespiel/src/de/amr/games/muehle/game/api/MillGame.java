@@ -14,7 +14,9 @@ public interface MillGame {
 
 	boolean isPlacing();
 
-	int getNumStonesPlaced(int turn);
+	int getWhiteStonesPlaced();
+
+	int getBlackStonesPlaced();
 
 	boolean isMoving();
 

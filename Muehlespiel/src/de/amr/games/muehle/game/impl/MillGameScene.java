@@ -20,6 +20,7 @@ import de.amr.games.muehle.MillApp;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
+import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.player.impl.InteractivePlayer;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
@@ -32,8 +33,8 @@ import de.amr.games.muehle.ui.Stone;
 public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
 	private BoardUI boardUI;
-	private Stone counterStone;
-	private Font counterFont;
+	private Stone stoneTemplate;
+	private Font stonesCounterFont;
 	private TextArea messageArea;
 
 	public MillGameScene(MillApp app) {
@@ -44,7 +45,6 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	@Override
 	public void init() {
 
-		// Create UI parts
 		boardUI = new BoardUI(app.getBoard());
 		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
@@ -52,8 +52,8 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 
-		counterStone = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
-		counterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
+		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
+		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
 		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
@@ -147,28 +147,29 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (app.getGame().isPlacing()) {
-			drawRemainingStonesCounter(g, 0, 40, getHeight() - 30);
-			drawRemainingStonesCounter(g, 1, getWidth() - 100, getHeight() - 30);
+			drawRemainingStonesCounter(g, app.getGame().getWhitePlayer(), NUM_STONES - app.getGame().getWhiteStonesPlaced(),
+					40, getHeight() - 30);
+			drawRemainingStonesCounter(g, app.getGame().getBlackPlayer(), NUM_STONES - app.getGame().getBlackStonesPlaced(),
+					getWidth() - 100, getHeight() - 30);
 		}
 		if (app.getGame().isRemoving() && app.getGame().getPlayerInTurn().isInteractive()) {
 			boardUI.markRemovableStones(g, app.getGame().getPlayerNotInTurn().getColor());
 		}
 	}
 
-	void drawRemainingStonesCounter(Graphics2D g, int i, int x, int y) {
-		counterStone.setColor(app.getGame().getPlayer(i).getColor());
-		final int stonesLeft = NUM_STONES - app.getGame().getNumStonesPlaced(i);
+	private void drawRemainingStonesCounter(Graphics2D g, Player player, int stonesLeft, int x, int y) {
+		stoneTemplate.setColor(player.getColor());
 		final int inset = 6;
 		g.translate(x + inset * stonesLeft, y - inset * stonesLeft);
-		IntStream.range(0, stonesLeft).forEach(j -> {
-			counterStone.draw(g);
+		IntStream.range(0, stonesLeft).forEach(i -> {
+			stoneTemplate.draw(g);
 			g.translate(-inset, inset);
 		});
 		if (stonesLeft > 1) {
-			g.setColor(app.getGame().getTurn() == i ? Color.RED : Color.DARK_GRAY);
-			g.setFont(counterFont);
+			g.setColor(player == app.getGame().getPlayerInTurn() ? Color.RED : Color.DARK_GRAY);
+			g.setFont(stonesCounterFont);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(stonesLeft), 2 * counterStone.getRadius(), counterStone.getRadius());
+			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(), stoneTemplate.getRadius());
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		}
 		g.translate(-x, -y);
