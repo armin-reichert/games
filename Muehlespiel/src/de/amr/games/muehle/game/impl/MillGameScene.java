@@ -125,7 +125,7 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	}
 
 	@Override
-	public Vector2f centerPoint(int p) {
+	public Vector2f getLocation(int p) {
 		return boardUI.centerPoint(p);
 	}
 

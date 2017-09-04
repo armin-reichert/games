@@ -2,9 +2,10 @@ package de.amr.games.muehle.game.impl;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2f.dist;
+import static de.amr.games.muehle.game.impl.MoveEvent.GOT_MOVE_FROM_PLAYER;
+import static de.amr.games.muehle.game.impl.MoveState.ANIMATION;
 import static de.amr.games.muehle.game.impl.MoveState.COMPLETE;
 import static de.amr.games.muehle.game.impl.MoveState.JUMPING;
-import static de.amr.games.muehle.game.impl.MoveState.MOVING;
 import static de.amr.games.muehle.game.impl.MoveState.READING_MOVE;
 
 import java.awt.geom.Ellipse2D;
@@ -24,11 +25,11 @@ import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.ui.Stone;
 
 /**
- * A finite state machine for controlling the movement of stones.
+ * A finite state machine for controlling the animated movement of stones.
  * 
  * @author Armin Reichert
  */
-public class MoveControl extends StateMachine<MoveState, Object> {
+public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 
 	private final Board board;
 	private final Player player;
@@ -53,19 +54,19 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 
 		state(READING_MOVE).update = this::requestMoveFromPlayer;
 
-		change(READING_MOVE, JUMPING, () -> getMove().isPresent() && player.canJump());
+		changeOnInput(GOT_MOVE_FROM_PLAYER, READING_MOVE, JUMPING, player::canJump);
 
-		change(READING_MOVE, MOVING, () -> getMove().isPresent());
+		changeOnInput(GOT_MOVE_FROM_PLAYER, READING_MOVE, ANIMATION);
 
 		// MOVING
 
-		state(MOVING).entry = this::startMoveAnimation;
+		state(ANIMATION).entry = this::startAnimation;
 
-		state(MOVING).update = this::runMoveAnimation;
+		state(ANIMATION).update = this::updateAnimation;
 
-		change(MOVING, COMPLETE, this::isTargetPositionReached);
+		change(ANIMATION, COMPLETE, this::isMoveTargetReached);
 
-		state(MOVING).exit = this::stopMoveAnimation;
+		state(ANIMATION).exit = this::stopAnimation;
 
 		// JUMPING
 
@@ -84,36 +85,58 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 		return Optional.ofNullable(move);
 	}
 
-	void newMove(State state) {
+	private void newMove(State state) {
 		move = null;
 		player.newMove();
 	}
 
-	void requestMoveFromPlayer(State state) {
+	private void requestMoveFromPlayer(State state) {
 		player.supplyMove().ifPresent(move -> {
 			if (isMovePossible(move)) {
 				this.move = move;
+				addInput(GOT_MOVE_FROM_PLAYER);
 			}
 		});
 	}
 
-	void startMoveAnimation(State state) {
+	private void startAnimation(State state) {
 		gameUI.getStoneAt(move.from).ifPresent(stone -> {
+			float speed = dist(gameUI.getLocation(move.from), gameUI.getLocation(move.to)) / pulse.secToTicks(moveTimeSec);
 			Direction dir = board.getDirection(move.from, move.to).get();
-			stone.tf.setVelocity(velocity(dir));
+			if (dir == Direction.NORTH) {
+				stone.tf.setVelocity(0, -speed);
+			} else if (dir == Direction.EAST) {
+				stone.tf.setVelocity(speed, 0);
+			} else if (dir == Direction.SOUTH) {
+				stone.tf.setVelocity(0, speed);
+			} else if (dir == Direction.WEST) {
+				stone.tf.setVelocity(-speed, 0);
+			}
 			LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", move.from, move.to, dir));
 		});
 	}
 
-	void stopMoveAnimation(State state) {
-		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.setVelocity(0, 0));
-	}
-
-	void runMoveAnimation(State state) {
+	private void updateAnimation(State state) {
 		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.move());
 	}
 
-	boolean isMovePossible(Move move) {
+	private void stopAnimation(State state) {
+		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.setVelocity(0, 0));
+	}
+
+	private boolean isMoveTargetReached() {
+		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		if (optStone.isPresent()) {
+			Stone stone = optStone.get();
+			float speed = stone.tf.getVelocity().length();
+			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
+			Vector2f toCenter = gameUI.getLocation(move.to);
+			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
+		}
+		return false;
+	}
+
+	private boolean isMovePossible(Move move) {
 		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
 		if (!optStone.isPresent()) {
 			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
@@ -136,32 +159,5 @@ public class MoveControl extends StateMachine<MoveState, Object> {
 			return false;
 		}
 		return true;
-	}
-
-	boolean isTargetPositionReached() {
-		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
-		if (optStone.isPresent()) {
-			Stone stone = optStone.get();
-			float speed = stone.tf.getVelocity().length();
-			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-			Vector2f toCenter = gameUI.centerPoint(move.to);
-			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
-		}
-		return false;
-	}
-
-	Vector2f velocity(Direction dir) {
-		float speed = dist(gameUI.centerPoint(move.from), gameUI.centerPoint(move.to)) / pulse.secToTicks(moveTimeSec);
-		switch (dir) {
-		case NORTH:
-			return Vector2f.of(0, -speed);
-		case EAST:
-			return Vector2f.of(speed, 0);
-		case SOUTH:
-			return Vector2f.of(0, speed);
-		case WEST:
-			return Vector2f.of(-speed, 0);
-		}
-		throw new IllegalArgumentException("Illegal direction: " + dir);
 	}
 }

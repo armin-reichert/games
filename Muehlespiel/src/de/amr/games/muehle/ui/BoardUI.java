@@ -34,10 +34,10 @@ public class BoardUI extends GameEntity {
 
 	private final Board board;
 	private final Stone[] stones;
+	private final int[] xpos;
+	private final int[] ypos;
 	private int size;
 	private int rasterSize;
-	private int[] xpos;
-	private int[] ypos;
 	private Color bgColor;
 	private Color lineColor;
 	private Font font;
@@ -46,13 +46,13 @@ public class BoardUI extends GameEntity {
 	public BoardUI(Board board) {
 		this.board = board;
 		this.stones = new Stone[NUM_POS];
+		this.xpos = new int[NUM_POS];
+		this.ypos = new int[NUM_POS];
 	}
 
 	public void setSize(int size) {
 		this.size = size;
 		this.rasterSize = size / 6;
-		this.xpos = new int[NUM_POS];
-		this.ypos = new int[NUM_POS];
 		IntStream.range(0, NUM_POS).forEach(p -> {
 			xpos[p] = GRID_X[p] * rasterSize;
 			ypos[p] = GRID_Y[p] * rasterSize;

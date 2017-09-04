@@ -26,7 +26,7 @@ public interface MillGameUI {
 
 	void showMessage(String key, Object... args);
 
-	Vector2f centerPoint(int p);
+	Vector2f getLocation(int p);
 
 	void markPosition(Graphics2D g, int p, Color color);
 
