@@ -47,6 +47,7 @@ public class MillApp extends Application {
 
 		whitePlayer = new InteractivePlayer(board, WHITE);
 		// whitePlayer = new Peter(board, WHITE);
+
 		// blackPlayer = new Zwick(board, BLACK);
 		blackPlayer = new InteractivePlayer(board, BLACK);
 

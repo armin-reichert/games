@@ -147,9 +147,9 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (app.getGame().isPlacing()) {
-			drawRemainingStonesCounter(g, app.getGame().getWhitePlayer(), NUM_STONES - app.getGame().getWhiteStonesPlaced(),
+			drawRemainingStonesCounter(g, app.getGame().getWhitePlayer(), NUM_STONES - app.getGame().numWhiteStonesPlaced(),
 					40, getHeight() - 30);
-			drawRemainingStonesCounter(g, app.getGame().getBlackPlayer(), NUM_STONES - app.getGame().getBlackStonesPlaced(),
+			drawRemainingStonesCounter(g, app.getGame().getBlackPlayer(), NUM_STONES - app.getGame().numBlackStonesPlaced(),
 					getWidth() - 100, getHeight() - 30);
 		}
 		if (app.getGame().isRemoving() && app.getGame().getPlayerInTurn().isInteractive()) {

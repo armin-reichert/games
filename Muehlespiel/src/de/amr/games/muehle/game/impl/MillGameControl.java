@@ -34,10 +34,6 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> implements MillGame {
 
-	static final float MOVE_TIME_SEC = 0.75f;
-	static final float PLACING_TIME_SEC = 1.5f;
-	static final float REMOVAL_TIME_SEC = 1.5f;
-
 	private final MillApp app;
 
 	private MillGameUI gameUI;
@@ -46,6 +42,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private int turn;
 	private int whiteStonesPlaced;
 	private int blackStonesPlaced;
+
+	private float moveTimeSeconds = 0.75f;
+	private float placingTimeSeconds = 1.5f;
 
 	public MillGameControl(MillApp app) {
 
@@ -125,7 +124,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	public void setAssistant(Assistant assistant) {
-		this.assistant = Optional.of(assistant);
+		this.assistant = Optional.ofNullable(assistant);
 	}
 
 	private void reset(State state) {
@@ -154,12 +153,12 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	@Override
-	public int getWhiteStonesPlaced() {
+	public int numWhiteStonesPlaced() {
 		return whiteStonesPlaced;
 	}
 
 	@Override
-	public int getBlackStonesPlaced() {
+	public int numBlackStonesPlaced() {
 		return blackStonesPlaced;
 	}
 
@@ -171,16 +170,6 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	@Override
 	public boolean isRemoving() {
 		return is(PLACING_REMOVING, MOVING_REMOVING);
-	}
-
-	@Override
-	public int getTurn() {
-		return turn;
-	}
-
-	@Override
-	public Player getPlayer(int i) {
-		return i == 0 ? getWhitePlayer() : getBlackPlayer();
 	}
 
 	@Override
@@ -209,9 +198,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 				|| (!getPlayerInTurn().canJump() && getPlayerInTurn().isTrapped());
 	}
 
-	@Override
-	public Optional<Move> getMove() {
-		return moveAnimation.getMove();
+	private Player getPlayer(int i) {
+		return i == 0 ? getWhitePlayer() : getBlackPlayer();
 	}
 
 	private void turnPlacingTo(int i) {
@@ -222,7 +210,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private void switchPlacing(Transition<MillGamePhase, MillGameEvent> t) {
 		turnPlacingTo(1 - turn);
 		if (!getPlayerInTurn().isInteractive()) {
-			pause(app.pulse.secToTicks(PLACING_TIME_SEC));
+			pause(app.pulse.secToTicks(placingTimeSeconds));
 		}
 	}
 
@@ -232,7 +220,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void turnMovingTo(int i) {
 		turn = i;
-		moveAnimation = new MoveControl(getPlayerInTurn(), gameUI, app.pulse, MOVE_TIME_SEC);
+		moveAnimation = new MoveControl(getPlayerInTurn(), gameUI, app.pulse, moveTimeSeconds);
 		moveAnimation.setLogger(LOG);
 		moveAnimation.init();
 		gameUI.showMessage("must_move", getPlayerInTurn().getName());

@@ -1,9 +1,6 @@
 package de.amr.games.muehle.game.api;
 
-import java.util.Optional;
-
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.player.api.Move;
 import de.amr.games.muehle.player.api.Player;
 
 public interface MillGame {
@@ -12,11 +9,11 @@ public interface MillGame {
 
 	Board getBoard();
 
+	int numWhiteStonesPlaced();
+
+	int numBlackStonesPlaced();
+
 	boolean isPlacing();
-
-	int getWhiteStonesPlaced();
-
-	int getBlackStonesPlaced();
 
 	boolean isMoving();
 
@@ -24,18 +21,11 @@ public interface MillGame {
 
 	boolean isGameOver();
 
-	int getTurn();
-
 	Player getWhitePlayer();
 
 	Player getBlackPlayer();
 
-	Player getPlayer(int i);
-
 	Player getPlayerInTurn();
 
 	Player getPlayerNotInTurn();
-
-	Optional<Move> getMove();
-
 }
