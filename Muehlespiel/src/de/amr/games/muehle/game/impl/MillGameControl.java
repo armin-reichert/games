@@ -46,8 +46,6 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private int turn;
 	private int whiteStonesPlaced;
 	private int blackStonesPlaced;
-	private int placedAt;
-	private StoneColor placedColor;
 
 	public MillGameControl(MillApp app) {
 
@@ -130,13 +128,13 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		this.assistant = Optional.of(assistant);
 	}
 
-	void reset(State state) {
+	private void reset(State state) {
 		gameUI.clearBoard();
 		whiteStonesPlaced = blackStonesPlaced = 0;
 		turnPlacingTo(0);
 	}
 
-	void announceWin(int i) {
+	private void announceWin(int i) {
 		gameUI.showMessage("wins", getPlayer(i).getName());
 		assistant.ifPresent(Assistant::tellWin);
 	}
@@ -246,10 +244,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void tryToPlaceStone(State state) {
 		assistant.ifPresent(Assistant::givePlacingHint);
-		getPlayerInTurn().supplyPlacingPosition().ifPresent(p -> {
-			if (getBoard().isEmptyPosition(p)) {
-				placedAt = p;
-				placedColor = getPlayerInTurn().getColor();
+		getPlayerInTurn().supplyPlacingPosition().ifPresent(placedAt -> {
+			if (getBoard().isEmptyPosition(placedAt)) {
+				StoneColor placedColor = getPlayerInTurn().getColor();
 				gameUI.putStoneAt(placedAt, placedColor);
 				if (turn == 0) {
 					whiteStonesPlaced += 1;
@@ -262,7 +259,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 					addInput(STONE_PLACED);
 				}
 			} else {
-				LOG.info(Messages.text("stone_at_position", p));
+				LOG.info(Messages.text("stone_at_position", placedAt));
 			}
 		});
 	}
