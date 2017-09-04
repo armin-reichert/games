@@ -38,8 +38,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private MillGameUI gameUI;
 	private Optional<Assistant> assistant;
-	private MoveControl moveAnimation;
-	private int turn;
+	private MoveControl moveControl;
+	private boolean whitesTurn;
 	private int whiteStonesPlaced;
 	private int blackStonesPlaced;
 
@@ -99,11 +99,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		// GAME_OVER
 
 		state(GAME_OVER).entry = s -> {
-			announceWin(1 - turn);
+			announceWinner(getPlayerNotInTurn());
 			pause(app.pulse.secToTicks(3));
 		};
 
-		change(GAME_OVER, STARTING, () -> !getPlayer(0).isInteractive() && !getPlayer(1).isInteractive()
+		change(GAME_OVER, STARTING, () -> !getWhitePlayer().isInteractive() && !getBlackPlayer().isInteractive()
 				|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 	}
 
@@ -130,11 +130,11 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private void reset(State state) {
 		gameUI.clearBoard();
 		whiteStonesPlaced = blackStonesPlaced = 0;
-		turnPlacingTo(0);
+		turnPlacingToWhite(true);
 	}
 
-	private void announceWin(int i) {
-		gameUI.showMessage("wins", getPlayer(i).getName());
+	private void announceWinner(Player winner) {
+		gameUI.showMessage("wins", winner.getName());
 		assistant.ifPresent(Assistant::tellWin);
 	}
 
@@ -184,12 +184,12 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	@Override
 	public Player getPlayerInTurn() {
-		return getPlayer(turn);
+		return whitesTurn ? getWhitePlayer() : getBlackPlayer();
 	}
 
 	@Override
 	public Player getPlayerNotInTurn() {
-		return getPlayer(1 - turn);
+		return whitesTurn ? getBlackPlayer() : getWhitePlayer();
 	}
 
 	@Override
@@ -198,17 +198,13 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 				|| (!getPlayerInTurn().canJump() && getPlayerInTurn().isTrapped());
 	}
 
-	private Player getPlayer(int i) {
-		return i == 0 ? getWhitePlayer() : getBlackPlayer();
-	}
-
-	private void turnPlacingTo(int i) {
-		turn = i;
+	private void turnPlacingToWhite(boolean whitesTurn) {
+		this.whitesTurn = whitesTurn;
 		gameUI.showMessage("must_place", getPlayerInTurn().getName());
 	}
 
 	private void switchPlacing(Transition<MillGamePhase, MillGameEvent> t) {
-		turnPlacingTo(1 - turn);
+		turnPlacingToWhite(!whitesTurn);
 		if (!getPlayerInTurn().isInteractive()) {
 			pause(app.pulse.secToTicks(placingTimeSeconds));
 		}
@@ -218,16 +214,16 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		assistant.ifPresent(Assistant::tellMillClosed);
 	}
 
-	private void turnMovingTo(int i) {
-		turn = i;
-		moveAnimation = new MoveControl(getPlayerInTurn(), gameUI, app.pulse, moveTimeSeconds);
-		moveAnimation.setLogger(LOG);
-		moveAnimation.init();
+	private void turnMovingToWhite(boolean whitesTurn) {
+		this.whitesTurn = whitesTurn;
+		moveControl = new MoveControl(getPlayerInTurn(), gameUI, app.pulse, moveTimeSeconds);
+		moveControl.setLogger(LOG);
+		moveControl.init();
 		gameUI.showMessage("must_move", getPlayerInTurn().getName());
 	}
 
 	private void switchMoving(Transition<MillGamePhase, MillGameEvent> t) {
-		turnMovingTo(1 - turn);
+		turnMovingToWhite(!whitesTurn);
 	}
 
 	private void tryToPlaceStone(State state) {
@@ -236,7 +232,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 			if (getBoard().isEmptyPosition(placedAt)) {
 				StoneColor placedColor = getPlayerInTurn().getColor();
 				gameUI.putStoneAt(placedAt, placedColor);
-				if (turn == 0) {
+				if (whitesTurn) {
 					whiteStonesPlaced += 1;
 				} else {
 					blackStonesPlaced += 1;
@@ -274,16 +270,16 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	private void updateMoveAnimation(State state) {
-		moveAnimation.update();
+		moveControl.update();
 	}
 
 	private boolean isMoveAnimationComplete() {
-		return moveAnimation.is(MoveState.COMPLETE);
+		return moveControl.is(MoveState.COMPLETE);
 	}
 
 	private boolean isMillClosedByMove() {
 		if (isMoveAnimationComplete()) {
-			Move move = moveAnimation.getMove().get();
+			Move move = moveControl.getMove().get();
 			return getBoard().inMill(move.to, getPlayerInTurn().getColor());
 		}
 		return false;
