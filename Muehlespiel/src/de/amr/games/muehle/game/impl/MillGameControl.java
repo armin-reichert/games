@@ -269,7 +269,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void tryToRemoveStone(State state) {
 		getPlayerInTurn().supplyRemovalPosition().ifPresent(p -> {
-			StoneColor colorToRemove = getPlayerInTurn().getColor().other();
+			StoneColor colorToRemove = getPlayerNotInTurn().getColor();
 			if (getBoard().isEmptyPosition(p)) {
 				LOG.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (getBoard().getStoneAt(p).get() != colorToRemove) {

@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.api.Player;
 import de.amr.games.muehle.ui.Stone;
 
 public interface MillGameUI {
@@ -33,5 +34,7 @@ public interface MillGameUI {
 	void markPositions(Graphics2D g, IntStream positions, Color color);
 
 	void toggleBoardPositionNumbers();
+
+	void playerChanged(Player player);
 
 }

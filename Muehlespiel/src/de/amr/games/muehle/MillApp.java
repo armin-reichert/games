@@ -27,6 +27,7 @@ public class MillApp extends Application {
 	}
 
 	private Board board;
+	private MillGameScene gameScene;
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private MillGameControl game;
@@ -45,19 +46,21 @@ public class MillApp extends Application {
 		board = new Board();
 		game = new MillGameControl(this);
 
-		whitePlayer = new InteractivePlayer(board, WHITE);
-		// = new Peter(board, WHITE);
+		gameScene = new MillGameScene(this);
+		game.setUI(gameScene);
 
-		blackPlayer = new InteractivePlayer(board, BLACK);
-		// = new Zwick(board, BLACK);
-
-		MillGameScene scene = new MillGameScene(this);
-		game.setUI(scene);
-
-		assistant = new Assistant(game, scene);
+		assistant = new Assistant(game, gameScene);
 		game.setAssistant(assistant);
 
-		selectView(scene);
+		setWhitePlayer(new InteractivePlayer(board, WHITE));
+		// setWhitePlayer(new Peter(board, WHITE));
+
+		setBlackPlayer(new InteractivePlayer(board, BLACK));
+		// setBlackPlayer(new Zwick(board, BLACK));
+
+		assistant.setAssistedPlayer(getWhitePlayer());
+
+		selectView(gameScene);
 	}
 
 	public Board getBoard() {
@@ -70,6 +73,8 @@ public class MillApp extends Application {
 
 	public void setWhitePlayer(Player whitePlayer) {
 		this.whitePlayer = whitePlayer;
+		gameScene.playerChanged(whitePlayer);
+
 	}
 
 	public Player getBlackPlayer() {
@@ -78,6 +83,7 @@ public class MillApp extends Application {
 
 	public void setBlackPlayer(Player blackPlayer) {
 		this.blackPlayer = blackPlayer;
+		gameScene.playerChanged(blackPlayer);
 	}
 
 	public MillGameControl getGame() {

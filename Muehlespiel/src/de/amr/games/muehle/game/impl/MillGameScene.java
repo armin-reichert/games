@@ -30,20 +30,21 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 
-	private BoardUI boardUI;
+	private final BoardUI boardUI;
+	private final TextArea messageArea;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
-	private TextArea messageArea;
 
 	public MillGameScene(MillApp app) {
 		super(app);
 		setBgColor(BOARD_COLOR.darker());
+		boardUI = new BoardUI(app.getBoard());
+		messageArea = new TextArea();
 	}
 
 	@Override
 	public void init() {
 
-		boardUI = new BoardUI(app.getBoard());
 		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
@@ -63,7 +64,6 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
-		messageArea = new TextArea();
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 		messageArea.tf.moveTo(0, getHeight() - 90);
@@ -128,6 +128,13 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	@Override
 	public void toggleBoardPositionNumbers() {
 		boardUI.togglePositionNumbers();
+	}
+
+	@Override
+	public void playerChanged(Player player) {
+		if (player instanceof InteractivePlayer) {
+			((InteractivePlayer) player).setBoardPositionFinder(boardUI::findPosition);
+		}
 	}
 
 	@Override

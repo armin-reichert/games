@@ -41,18 +41,19 @@ public class Assistant extends GameEntity {
 	private final Board board;
 	private final MillGameUI gameUI;
 	private Player assistedPlayer;
-	private Player opponentPlayer;
 	private boolean enabled;
 	private int assistanceLevel; // 1 = normal, 2 = high
 
 	public Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
-		this.assistedPlayer = game.getWhitePlayer();
-		this.opponentPlayer = game.getBlackPlayer();
 		this.gameUI = gameUI;
 		this.board = game.getBoard();
 		this.assistanceLevel = 1;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
+	}
+
+	public void setAssistedPlayer(Player assistedPlayer) {
+		this.assistedPlayer = assistedPlayer;
 	}
 
 	public int getAssistanceLevel() {
@@ -71,14 +72,14 @@ public class Assistant extends GameEntity {
 
 	public void toggle() {
 		setEnabled(!enabled);
-		if (enabled) {
-			tellYoFine();
-		}
 	}
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 		LOG.info(Messages.text(enabled ? "assistant_on" : "assistant_off"));
+		if (enabled) {
+			tellYoFine();
+		}
 	}
 
 	@Override
@@ -123,9 +124,9 @@ public class Assistant extends GameEntity {
 	public void givePlacingHint() {
 		if (enabled && game.getPlayerInTurn() == assistedPlayer) {
 			StoneColor placingColor = assistedPlayer.getColor();
-			StoneColor opponentColor = opponentPlayer.getColor();
 
-			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, opponentColor)).findAny();
+			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor.other()))
+					.findAny();
 			if (optPosition.isPresent()) {
 				play(Sounds.CAN_OPPONENT_CLOSE_MILL);
 				return;
