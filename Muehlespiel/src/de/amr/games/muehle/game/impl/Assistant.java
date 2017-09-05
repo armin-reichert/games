@@ -45,7 +45,6 @@ public class Assistant extends GameEntity {
 	private final MillGame game;
 	private final Board board;
 	private final MillGameUI gameUI;
-	private Player assistedPlayer;
 	private int assistanceLevel; // 0 = off, 1 = normal, 2 = high
 
 	public Assistant(MillGame game, MillGameUI gameUI) {
@@ -54,10 +53,6 @@ public class Assistant extends GameEntity {
 		this.board = game.getBoard();
 		this.assistanceLevel = 0;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
-	}
-
-	public void setAssistedPlayer(Player assistedPlayer) {
-		this.assistedPlayer = assistedPlayer;
 	}
 
 	public int getAssistanceLevel() {
@@ -94,7 +89,7 @@ public class Assistant extends GameEntity {
 					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerInTurn().getColor()), Color.GREEN);
 					gameUI.markPositions(g, board.positionsOpeningTwoMills(game.getPlayerInTurn().getColor()), Color.YELLOW);
 					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerNotInTurn().getColor()), Color.RED);
-				} else if (game.isMoving()) {
+				} else if (game.isMoving() && game.getPlayerInTurn().isInteractive()) {
 					markPossibleMoveStarts(g, game.getPlayerInTurn().getColor(), Color.GREEN);
 					markTrappingPosition(g, game.getPlayerInTurn().getColor(), game.getPlayerNotInTurn().getColor(), Color.RED);
 				}
@@ -123,9 +118,9 @@ public class Assistant extends GameEntity {
 		}
 	}
 
-	public void givePlacingHint() {
-		if (assistanceLevel > 0 && game.getPlayerInTurn() == assistedPlayer) {
-			StoneColor placingColor = assistedPlayer.getColor();
+	public void givePlacingHint(Player player) {
+		if (assistanceLevel > 0) {
+			StoneColor placingColor = player.getColor();
 
 			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor.other()))
 					.findAny();
@@ -149,16 +144,14 @@ public class Assistant extends GameEntity {
 	}
 
 	public void tellMillClosed() {
-		if (game.getPlayerInTurn() == assistedPlayer) {
-			play(SoundID.YO_FINE);
-		}
+		play(SoundID.YO_FINE);
 	}
 
 	public void tellYoFine() {
 		play(SoundID.YO_FINE);
 	}
 
-	public void tellWin() {
+	public void tellWin(Player player) {
 		play(SoundID.WIN);
 	}
 

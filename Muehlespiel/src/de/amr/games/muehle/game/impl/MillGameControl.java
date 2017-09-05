@@ -37,7 +37,8 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private final MillApp app;
 
 	private MillGameUI gameUI;
-	private Optional<Assistant> assistant;
+	private Optional<Assistant> optAssistant;
+	private Player assistedPlayer;
 	private MoveControl moveControl;
 	private boolean whitesTurn;
 	private int whiteStonesPlaced;
@@ -114,30 +115,31 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	@Override
 	public void init() {
 		super.init();
-		assistant.ifPresent(Assistant::init);
+		optAssistant.ifPresent(Assistant::init);
+		assistedPlayer = getWhitePlayer();
 	}
 
 	@Override
 	public void update() {
 		readInput();
 		super.update();
-		assistant.ifPresent(Assistant::update);
+		optAssistant.ifPresent(Assistant::update);
 	}
 
 	private void readInput() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
-			assistant.ifPresent(Assistant::toggle);
+			optAssistant.ifPresent(Assistant::toggle);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			assistant.ifPresent(assist -> assist.setAssistanceLevel(1));
+			optAssistant.ifPresent(assist -> assist.setAssistanceLevel(1));
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			assistant.ifPresent(assist -> assist.setAssistanceLevel(2));
+			optAssistant.ifPresent(assist -> assist.setAssistanceLevel(2));
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			gameUI.toggleBoardPositionNumbers();
 		}
 	}
 
 	public void setAssistant(Assistant assistant) {
-		this.assistant = Optional.ofNullable(assistant);
+		this.optAssistant = Optional.ofNullable(assistant);
 	}
 
 	private void reset(State state) {
@@ -148,7 +150,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void announceWinner(Player winner) {
 		gameUI.showMessage("wins", winner.getName());
-		assistant.ifPresent(Assistant::tellWin);
+		optAssistant.ifPresent(assistant -> assistant.tellWin(winner));
 	}
 
 	private boolean areAllStonesPlaced() {
@@ -224,7 +226,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	private void onMillClosedByPlacing(Transition<MillGamePhase, MillGameEvent> t) {
-		assistant.ifPresent(Assistant::tellMillClosed);
+		if (assistedPlayer == getPlayerInTurn()) {
+			optAssistant.ifPresent(assistant -> assistant.tellMillClosed());
+		}
 	}
 
 	private void turnMovingToWhite(boolean whitesTurn) {
@@ -240,7 +244,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	}
 
 	private void tryToPlaceStone(State state) {
-		assistant.ifPresent(Assistant::givePlacingHint);
+		if (assistedPlayer == getPlayerInTurn()) {
+			optAssistant.ifPresent(assistant -> assistant.givePlacingHint(assistedPlayer));
+		}
 		getPlayerInTurn().supplyPlacingPosition().ifPresent(placedAt -> {
 			if (getBoard().isEmptyPosition(placedAt)) {
 				StoneColor placedColor = getPlayerInTurn().getColor();
