@@ -128,15 +128,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
 			assistant.ifPresent(Assistant::toggle);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			assistant.ifPresent(assist -> {
-				assist.setEnabled(true);
-				assist.setAssistanceLevel(1);
-			});
+			assistant.ifPresent(assist -> assist.setAssistanceLevel(1));
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			assistant.ifPresent(assist -> {
-				assist.setEnabled(true);
-				assist.setAssistanceLevel(2);
-			});
+			assistant.ifPresent(assist -> assist.setAssistanceLevel(2));
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			gameUI.toggleBoardPositionNumbers();
 		}

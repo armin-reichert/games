@@ -41,14 +41,13 @@ public class Assistant extends GameEntity {
 	private final Board board;
 	private final MillGameUI gameUI;
 	private Player assistedPlayer;
-	private boolean enabled;
-	private int assistanceLevel; // 1 = normal, 2 = high
+	private int assistanceLevel; // 0 = off, 1 = normal, 2 = high
 
 	public Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
 		this.gameUI = gameUI;
 		this.board = game.getBoard();
-		this.assistanceLevel = 1;
+		this.assistanceLevel = 0;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 	}
 
@@ -62,6 +61,12 @@ public class Assistant extends GameEntity {
 
 	public void setAssistanceLevel(int level) {
 		assistanceLevel = level;
+		if (assistanceLevel > 0) {
+			LOG.info(Messages.text("assistant_on"));
+			tellYoFine();
+		} else {
+			LOG.info(Messages.text("assistant_off"));
+		}
 	}
 
 	@Override
@@ -71,21 +76,14 @@ public class Assistant extends GameEntity {
 	}
 
 	public void toggle() {
-		setEnabled(!enabled);
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-		LOG.info(Messages.text(enabled ? "assistant_on" : "assistant_off"));
-		if (enabled) {
-			tellYoFine();
-		}
+		setAssistanceLevel(assistanceLevel > 0 ? 0 : 1);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		// draw assistant only if enabled and some sound is running
-		if (enabled && Stream.of(Sounds.values()).map(snd -> Assets.sound(snd.key)).anyMatch(sound -> sound.isRunning())) {
+		if (assistanceLevel > 0
+				&& Stream.of(Sounds.values()).map(snd -> Assets.sound(snd.key)).anyMatch(sound -> sound.isRunning())) {
 			super.draw(g);
 			if (assistanceLevel == 2 && game.getPlayerInTurn().isInteractive()) {
 				if (game.isPlacing()) {
@@ -116,13 +114,13 @@ public class Assistant extends GameEntity {
 	}
 
 	private void play(Sounds snd) {
-		if (enabled) {
+		if (assistanceLevel > 0) {
 			Assets.sound(snd.key).play();
 		}
 	}
 
 	public void givePlacingHint() {
-		if (enabled && game.getPlayerInTurn() == assistedPlayer) {
+		if (assistanceLevel > 0 && game.getPlayerInTurn() == assistedPlayer) {
 			StoneColor placingColor = assistedPlayer.getColor();
 
 			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor.other()))
