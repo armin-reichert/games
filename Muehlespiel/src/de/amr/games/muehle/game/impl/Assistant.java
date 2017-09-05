@@ -8,6 +8,7 @@ import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.muehle.board.Board;
@@ -22,19 +23,23 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class Assistant extends GameEntity {
 
-	/** Enumeration of used sounds */
-	private enum Sounds {
+	/** Enumeration of IDs of usable sounds */
+	private enum SoundID {
 		CAN_CLOSE_MILL("can_close_mill"),
 		CAN_OPPONENT_CLOSE_MILL("can_opponent_close_mill"),
 		CAN_OPEN_TWO_MILLS("can_open_two_mills"),
 		YO_FINE("yo_fine"),
 		WIN("win");
 
-		Sounds(String key) {
+		private SoundID(String key) {
 			this.key = "sfx/" + key + ".mp3";
 		}
 
-		final String key;
+		public Sound sound() {
+			return Assets.sound(key);
+		}
+
+		private final String key;
 	}
 
 	private final MillGame game;
@@ -72,7 +77,7 @@ public class Assistant extends GameEntity {
 	@Override
 	public void init() {
 		// preload sounds
-		Stream.of(Sounds.values()).forEach(snd -> Assets.sound(snd.key));
+		Stream.of(SoundID.values()).forEach(SoundID::sound);
 	}
 
 	public void toggle() {
@@ -82,8 +87,7 @@ public class Assistant extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		// draw assistant only if enabled and some sound is running
-		if (assistanceLevel > 0
-				&& Stream.of(Sounds.values()).map(snd -> Assets.sound(snd.key)).anyMatch(sound -> sound.isRunning())) {
+		if (assistanceLevel > 0 && Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
 			if (assistanceLevel == 2 && game.getPlayerInTurn().isInteractive()) {
 				if (game.isPlacing()) {
@@ -113,9 +117,9 @@ public class Assistant extends GameEntity {
 		}
 	}
 
-	private void play(Sounds snd) {
+	private void play(SoundID soundID) {
 		if (assistanceLevel > 0) {
-			Assets.sound(snd.key).play();
+			soundID.sound().play();
 		}
 	}
 
@@ -126,19 +130,19 @@ public class Assistant extends GameEntity {
 			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor.other()))
 					.findAny();
 			if (optPosition.isPresent()) {
-				play(Sounds.CAN_OPPONENT_CLOSE_MILL);
+				play(SoundID.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
 			optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor)).findAny();
 			if (optPosition.isPresent()) {
-				play(Sounds.CAN_CLOSE_MILL);
+				play(SoundID.CAN_CLOSE_MILL);
 				return;
 			}
 
 			optPosition = board.positionsOpeningTwoMills(placingColor).findAny();
 			if (optPosition.isPresent()) {
-				play(Sounds.CAN_OPEN_TWO_MILLS);
+				play(SoundID.CAN_OPEN_TWO_MILLS);
 				return;
 			}
 		}
@@ -146,16 +150,16 @@ public class Assistant extends GameEntity {
 
 	public void tellMillClosed() {
 		if (game.getPlayerInTurn() == assistedPlayer) {
-			play(Sounds.YO_FINE);
+			play(SoundID.YO_FINE);
 		}
 	}
 
 	public void tellYoFine() {
-		play(Sounds.YO_FINE);
+		play(SoundID.YO_FINE);
 	}
 
 	public void tellWin() {
-		play(Sounds.WIN);
+		play(SoundID.WIN);
 	}
 
 }
