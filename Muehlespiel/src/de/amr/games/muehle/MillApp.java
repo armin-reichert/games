@@ -12,8 +12,7 @@ import de.amr.games.muehle.game.impl.MillGameControl;
 import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.Peter;
-import de.amr.games.muehle.player.impl.Zwick;
+import de.amr.games.muehle.player.impl.InteractivePlayer;
 
 /**
  * Mühlespiel aka "Nine men's morris".
@@ -43,16 +42,14 @@ public class MillApp extends Application {
 	@Override
 	public void init() {
 		pulse.setFrequency(25);
-
 		board = new Board();
-
-		// whitePlayer = new InteractivePlayer(board, WHITE);
-		whitePlayer = new Peter(board, WHITE);
-
-		blackPlayer = new Zwick(board, BLACK);
-		// blackPlayer = new InteractivePlayer(board, BLACK);
-
 		game = new MillGameControl(this);
+
+		whitePlayer = new InteractivePlayer(board, WHITE);
+		// = new Peter(board, WHITE);
+
+		blackPlayer = new InteractivePlayer(board, BLACK);
+		// = new Zwick(board, BLACK);
 
 		MillGameScene scene = new MillGameScene(this);
 		game.setUI(scene);
@@ -71,8 +68,16 @@ public class MillApp extends Application {
 		return whitePlayer;
 	}
 
+	public void setWhitePlayer(Player whitePlayer) {
+		this.whitePlayer = whitePlayer;
+	}
+
 	public Player getBlackPlayer() {
 		return blackPlayer;
+	}
+
+	public void setBlackPlayer(Player blackPlayer) {
+		this.blackPlayer = blackPlayer;
 	}
 
 	public MillGameControl getGame() {

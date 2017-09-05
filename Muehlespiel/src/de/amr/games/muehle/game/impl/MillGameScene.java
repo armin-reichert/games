@@ -6,14 +6,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.KeyEvent;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.MillApp;
@@ -52,6 +50,16 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 
+		if (app.getWhitePlayer() instanceof InteractivePlayer) {
+			InteractivePlayer ip = (InteractivePlayer) app.getWhitePlayer();
+			ip.setBoardPositionFinder(boardUI::findPosition);
+		}
+
+		if (app.getBlackPlayer() instanceof InteractivePlayer) {
+			InteractivePlayer ip = (InteractivePlayer) app.getBlackPlayer();
+			ip.setBoardPositionFinder(boardUI::findPosition);
+		}
+
 		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
@@ -63,35 +71,13 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 		app.getAssistant().hCenter(getWidth());
 		app.getAssistant().tf.setY(getHeight() / 2 - 100);
 
-		if (app.getWhitePlayer() instanceof InteractivePlayer) {
-			((InteractivePlayer) app.getWhitePlayer()).setBoardPositionFinder(boardUI::findPosition);
-		}
-		if (app.getBlackPlayer() instanceof InteractivePlayer) {
-			((InteractivePlayer) app.getBlackPlayer()).setBoardPositionFinder(boardUI::findPosition);
-		}
-
 		app.getGame().setLogger(Application.LOG);
 		app.getGame().init();
 	}
 
 	@Override
 	public void update() {
-		readInput();
 		app.getGame().update();
-	}
-
-	void readInput() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
-			app.getAssistant().toggle();
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			app.getAssistant().setEnabled(true);
-			app.getAssistant().setAssistanceLevel(1);
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			app.getAssistant().setEnabled(true);
-			app.getAssistant().setAssistanceLevel(2);
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
-			boardUI.togglePositionNumbers();
-		}
 	}
 
 	@Override
@@ -137,6 +123,11 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 	@Override
 	public void markPositions(Graphics2D g, IntStream positions, Color color) {
 		boardUI.markPositions(g, positions, color);
+	}
+
+	@Override
+	public void toggleBoardPositionNumbers() {
+		boardUI.togglePositionNumbers();
 	}
 
 	@Override

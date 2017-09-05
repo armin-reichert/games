@@ -32,4 +32,6 @@ public interface MillGameUI {
 
 	void markPositions(Graphics2D g, IntStream positions, Color color);
 
+	void toggleBoardPositionNumbers();
+
 }
