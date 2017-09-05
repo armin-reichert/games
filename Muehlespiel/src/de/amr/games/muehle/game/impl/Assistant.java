@@ -43,7 +43,7 @@ public class Assistant extends GameEntity {
 	private Player assistedPlayer;
 	private Player opponentPlayer;
 	private boolean enabled;
-	private int assistanceLevel; // 0 = normal, 1 = high
+	private int assistanceLevel; // 1 = normal, 2 = high
 
 	public Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
@@ -51,16 +51,16 @@ public class Assistant extends GameEntity {
 		this.opponentPlayer = game.getBlackPlayer();
 		this.gameUI = gameUI;
 		this.board = game.getBoard();
-		this.assistanceLevel = 0;
+		this.assistanceLevel = 1;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 	}
 
-	int getAssistanceLevel() {
+	public int getAssistanceLevel() {
 		return assistanceLevel;
 	}
 
-	void setAssistanceLevel(int level) {
-		assistanceLevel = level % 2;
+	public void setAssistanceLevel(int level) {
+		assistanceLevel = level;
 	}
 
 	@Override
@@ -69,14 +69,14 @@ public class Assistant extends GameEntity {
 		Stream.of(Sounds.values()).forEach(snd -> Assets.sound(snd.key));
 	}
 
-	void toggle() {
+	public void toggle() {
 		setEnabled(!enabled);
 		if (enabled) {
 			tellYoFine();
 		}
 	}
 
-	void setEnabled(boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 		LOG.info(Messages.text(enabled ? "assistant_on" : "assistant_off"));
 	}
@@ -86,7 +86,7 @@ public class Assistant extends GameEntity {
 		// draw assistant only if enabled and some sound is running
 		if (enabled && Stream.of(Sounds.values()).map(snd -> Assets.sound(snd.key)).anyMatch(sound -> sound.isRunning())) {
 			super.draw(g);
-			if (assistanceLevel == 1 && game.getPlayerInTurn().isInteractive()) {
+			if (assistanceLevel == 2 && game.getPlayerInTurn().isInteractive()) {
 				if (game.isPlacing()) {
 					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerInTurn().getColor()), Color.GREEN);
 					gameUI.markPositions(g, board.positionsOpeningTwoMills(game.getPlayerInTurn().getColor()), Color.YELLOW);
@@ -99,12 +99,12 @@ public class Assistant extends GameEntity {
 		}
 	}
 
-	void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
+	private void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
 		(game.getPlayerInTurn().canJump() ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
 				.forEach(p -> gameUI.markPosition(g, p, color));
 	}
 
-	void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
+	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
 		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
 			if (board.neighbors(singleFreePosition).filter(board::hasStoneAt)
@@ -114,13 +114,13 @@ public class Assistant extends GameEntity {
 		}
 	}
 
-	void play(Sounds snd) {
+	private void play(Sounds snd) {
 		if (enabled) {
 			Assets.sound(snd.key).play();
 		}
 	}
 
-	void givePlacingHint() {
+	public void givePlacingHint() {
 		if (enabled && game.getPlayerInTurn() == assistedPlayer) {
 			StoneColor placingColor = assistedPlayer.getColor();
 			StoneColor opponentColor = opponentPlayer.getColor();
@@ -145,17 +145,17 @@ public class Assistant extends GameEntity {
 		}
 	}
 
-	void tellMillClosed() {
+	public void tellMillClosed() {
 		if (game.getPlayerInTurn() == assistedPlayer) {
 			play(Sounds.YO_FINE);
 		}
 	}
 
-	void tellYoFine() {
+	public void tellYoFine() {
 		play(Sounds.YO_FINE);
 	}
 
-	void tellWin() {
+	public void tellWin() {
 		play(Sounds.WIN);
 	}
 

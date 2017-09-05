@@ -12,7 +12,8 @@ import de.amr.games.muehle.game.impl.MillGameControl;
 import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.InteractivePlayer;
+import de.amr.games.muehle.player.impl.Peter;
+import de.amr.games.muehle.player.impl.Zwick;
 
 /**
  * Mühlespiel aka "Nine men's morris".
@@ -45,11 +46,11 @@ public class MillApp extends Application {
 
 		board = new Board();
 
-		whitePlayer = new InteractivePlayer(board, WHITE);
-		// whitePlayer = new Peter(board, WHITE);
+		// whitePlayer = new InteractivePlayer(board, WHITE);
+		whitePlayer = new Peter(board, WHITE);
 
-		// blackPlayer = new Zwick(board, BLACK);
-		blackPlayer = new InteractivePlayer(board, BLACK);
+		blackPlayer = new Zwick(board, BLACK);
+		// blackPlayer = new InteractivePlayer(board, BLACK);
 
 		game = new MillGameControl(this);
 

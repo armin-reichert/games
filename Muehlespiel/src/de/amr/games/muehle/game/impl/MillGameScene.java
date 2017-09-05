@@ -85,10 +85,10 @@ public class MillGameScene extends Scene<MillApp> implements MillGameUI {
 			app.getAssistant().toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
 			app.getAssistant().setEnabled(true);
-			app.getAssistant().setAssistanceLevel(0);
+			app.getAssistant().setAssistanceLevel(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
 			app.getAssistant().setEnabled(true);
-			app.getAssistant().setAssistanceLevel(1);
+			app.getAssistant().setAssistanceLevel(2);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			boardUI.togglePositionNumbers();
 		}
