@@ -18,7 +18,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.easy.statemachine.Transition;
-import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.game.api.MillGame;
@@ -34,7 +34,7 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> implements MillGame {
 
-	private final MillApp app;
+	private final MillGameApp app;
 
 	private MillGameUI gameUI;
 	private Optional<Assistant> optAssistant;
@@ -47,7 +47,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private float moveTimeSeconds = 0.75f;
 	private float placingTimeSeconds = 1.5f;
 
-	public MillGameControl(MillApp app) {
+	public MillGameControl(MillGameApp app) {
 
 		super("MillGameControl", MillGamePhase.class, STARTING);
 

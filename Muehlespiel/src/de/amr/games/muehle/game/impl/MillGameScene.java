@@ -14,7 +14,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.muehle.MillApp;
+import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
@@ -28,14 +28,14 @@ import de.amr.games.muehle.ui.Stone;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene extends Scene<MillApp> implements MillGameUI {
+public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
-	public MillGameScene(MillApp app) {
+	public MillGameScene(MillGameApp app) {
 		super(app);
 		setBgColor(BOARD_COLOR.darker());
 		boardUI = new BoardUI(app.getBoard());

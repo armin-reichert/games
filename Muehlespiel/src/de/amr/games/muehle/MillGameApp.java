@@ -20,11 +20,11 @@ import de.amr.games.muehle.player.impl.Zwick;
  * 
  * @author Armin Reichert & Peter und Anna Schillo
  */
-public class MillApp extends Application {
+public class MillGameApp extends Application {
 
 	public static void main(String[] args) {
 		Messages.load((args.length > 0) ? new Locale(args[0]) : Locale.getDefault());
-		launch(new MillApp());
+		launch(new MillGameApp());
 	}
 
 	private Board board;
@@ -34,7 +34,7 @@ public class MillApp extends Application {
 	private MillGameControl game;
 	private Assistant assistant;
 
-	public MillApp() {
+	public MillGameApp() {
 		settings.title = Messages.text("title");
 		settings.width = 800;
 		settings.height = 800;
