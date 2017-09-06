@@ -48,7 +48,7 @@ public class Assistant extends GameEntity {
 	private final MillGame game;
 	private final MillGameUI gameUI;
 
-	private HelpLevel helpLevel; // 0 = off, 1 = normal, 2 = high
+	private HelpLevel helpLevel;
 
 	public Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
@@ -57,17 +57,17 @@ public class Assistant extends GameEntity {
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 	}
 
-	public HelpLevel getAssistanceLevel() {
+	public HelpLevel getHelpLevel() {
 		return helpLevel;
 	}
 
 	public void setHelpLevel(HelpLevel level) {
 		helpLevel = level;
-		if (helpLevel != HelpLevel.OFF) {
-			LOG.info(Messages.text("assistant_on"));
-			tellYoFine();
-		} else {
+		if (helpLevel == HelpLevel.OFF) {
 			LOG.info(Messages.text("assistant_off"));
+		} else {
+			tellYoFine();
+			LOG.info(Messages.text("assistant_on"));
 		}
 	}
 
@@ -83,9 +83,8 @@ public class Assistant extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		// draw assistant only if enabled and some sound is running
-		if (helpLevel != HelpLevel.OFF
-				&& Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
+		// draw assistant only if any sound is running
+		if (helpLevel != HelpLevel.OFF && Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
 			if (helpLevel == HelpLevel.HIGH && game.getPlayerInTurn().isInteractive()) {
 				if (game.isPlacing()) {
@@ -94,7 +93,7 @@ public class Assistant extends GameEntity {
 							Color.YELLOW);
 					gameUI.markPositions(g, game.getBoard().positionsClosingMill(game.getPlayerNotInTurn().getColor()),
 							Color.RED);
-				} else if (game.isMoving() && game.getPlayerInTurn().isInteractive()) {
+				} else if (game.isMoving()) {
 					markPossibleMoveStarts(g, game.getPlayerInTurn().getColor(), Color.GREEN);
 					markTrappingPosition(g, game.getPlayerInTurn().getColor(), game.getPlayerNotInTurn().getColor(), Color.RED);
 				}
