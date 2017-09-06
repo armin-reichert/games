@@ -11,7 +11,7 @@ import de.amr.games.muehle.game.impl.MillGameControl;
 import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.InteractivePlayer;
+import de.amr.games.muehle.player.impl.Peter;
 import de.amr.games.muehle.player.impl.Zwick;
 
 /**
@@ -52,8 +52,8 @@ public class MillGameApp extends Application {
 		gameScene = new MillGameScene(this);
 		game.setUI(gameScene);
 
-		setWhitePlayer(new InteractivePlayer(board, WHITE));
-		// setWhitePlayer(new Peter(board, WHITE));
+		// setWhitePlayer(new InteractivePlayer(board, WHITE));
+		setWhitePlayer(new Peter(board, WHITE));
 
 		// setBlackPlayer(new InteractivePlayer(board, BLACK));
 		setBlackPlayer(new Zwick(board, BLACK));

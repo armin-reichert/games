@@ -11,7 +11,6 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.game.api.MillGame;
 import de.amr.games.muehle.game.api.MillGameUI;
@@ -23,7 +22,11 @@ import de.amr.games.muehle.player.api.Player;
  */
 public class Assistant extends GameEntity {
 
-	/** Enumeration of IDs of usable sounds */
+	public enum HelpLevel {
+		OFF, NORMAL, HIGH
+	}
+
+	/** Enumeration type for sound IDs */
 	private enum SoundID {
 		CAN_CLOSE_MILL("can_close_mill"),
 		CAN_OPPONENT_CLOSE_MILL("can_opponent_close_mill"),
@@ -31,37 +34,36 @@ public class Assistant extends GameEntity {
 		YO_FINE("yo_fine"),
 		WIN("win");
 
-		private SoundID(String key) {
-			this.key = "sfx/" + key + ".mp3";
+		private SoundID(String baseName) {
+			assetsPath = "sfx/" + baseName + ".mp3";
 		}
 
 		public Sound sound() {
-			return Assets.sound(key);
+			return Assets.sound(assetsPath);
 		}
 
-		private final String key;
+		private final String assetsPath;
 	}
 
 	private final MillGame game;
-	private final Board board;
 	private final MillGameUI gameUI;
-	private int assistanceLevel; // 0 = off, 1 = normal, 2 = high
+
+	private HelpLevel helpLevel; // 0 = off, 1 = normal, 2 = high
 
 	public Assistant(MillGame game, MillGameUI gameUI) {
 		this.game = game;
 		this.gameUI = gameUI;
-		this.board = game.getBoard();
-		this.assistanceLevel = 0;
+		this.helpLevel = HelpLevel.OFF;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 	}
 
-	public int getAssistanceLevel() {
-		return assistanceLevel;
+	public HelpLevel getAssistanceLevel() {
+		return helpLevel;
 	}
 
-	public void setAssistanceLevel(int level) {
-		assistanceLevel = level;
-		if (assistanceLevel > 0) {
+	public void setHelpLevel(HelpLevel level) {
+		helpLevel = level;
+		if (helpLevel != HelpLevel.OFF) {
 			LOG.info(Messages.text("assistant_on"));
 			tellYoFine();
 		} else {
@@ -76,19 +78,22 @@ public class Assistant extends GameEntity {
 	}
 
 	public void toggle() {
-		setAssistanceLevel(assistanceLevel > 0 ? 0 : 1);
+		setHelpLevel(helpLevel == HelpLevel.OFF ? HelpLevel.NORMAL : HelpLevel.OFF);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		// draw assistant only if enabled and some sound is running
-		if (assistanceLevel > 0 && Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
+		if (helpLevel != HelpLevel.OFF
+				&& Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
-			if (assistanceLevel == 2 && game.getPlayerInTurn().isInteractive()) {
+			if (helpLevel == HelpLevel.HIGH && game.getPlayerInTurn().isInteractive()) {
 				if (game.isPlacing()) {
-					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerInTurn().getColor()), Color.GREEN);
-					gameUI.markPositions(g, board.positionsOpeningTwoMills(game.getPlayerInTurn().getColor()), Color.YELLOW);
-					gameUI.markPositions(g, board.positionsClosingMill(game.getPlayerNotInTurn().getColor()), Color.RED);
+					gameUI.markPositions(g, game.getBoard().positionsClosingMill(game.getPlayerInTurn().getColor()), Color.GREEN);
+					gameUI.markPositions(g, game.getBoard().positionsOpeningTwoMills(game.getPlayerInTurn().getColor()),
+							Color.YELLOW);
+					gameUI.markPositions(g, game.getBoard().positionsClosingMill(game.getPlayerNotInTurn().getColor()),
+							Color.RED);
 				} else if (game.isMoving() && game.getPlayerInTurn().isInteractive()) {
 					markPossibleMoveStarts(g, game.getPlayerInTurn().getColor(), Color.GREEN);
 					markTrappingPosition(g, game.getPlayerInTurn().getColor(), game.getPlayerNotInTurn().getColor(), Color.RED);
@@ -98,44 +103,45 @@ public class Assistant extends GameEntity {
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
-		(game.getPlayerInTurn().canJump() ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
-				.forEach(p -> gameUI.markPosition(g, p, color));
+		(game.getPlayerInTurn().canJump() ? game.getBoard().positions(stoneColor)
+				: game.getBoard().positionsWithEmptyNeighbor(stoneColor)).forEach(p -> gameUI.markPosition(g, p, color));
 	}
 
 	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
-		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
-			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (board.neighbors(singleFreePosition).filter(board::hasStoneAt)
-					.anyMatch(p -> board.getStoneAt(p).get() == either)) {
+		if (game.getBoard().positionsWithEmptyNeighbor(other).count() == 1) {
+			int singleFreePosition = game.getBoard().positionsWithEmptyNeighbor(other).findFirst().getAsInt();
+			if (game.getBoard().neighbors(singleFreePosition).filter(game.getBoard()::hasStoneAt)
+					.anyMatch(p -> game.getBoard().getStoneAt(p).get() == either)) {
 				gameUI.markPosition(g, singleFreePosition, color);
 			}
 		}
 	}
 
 	private void play(SoundID soundID) {
-		if (assistanceLevel > 0) {
+		if (helpLevel != HelpLevel.OFF) {
 			soundID.sound().play();
 		}
 	}
 
 	public void givePlacingHint(Player player) {
-		if (assistanceLevel > 0) {
+		if (helpLevel != HelpLevel.OFF) {
 			StoneColor placingColor = player.getColor();
 
-			OptionalInt optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor.other()))
-					.findAny();
+			OptionalInt optPosition = game.getBoard().positions()
+					.filter(p -> game.getBoard().isMillClosingPosition(p, placingColor.other())).findAny();
 			if (optPosition.isPresent()) {
 				play(SoundID.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
-			optPosition = board.positions().filter(p -> board.isMillClosingPosition(p, placingColor)).findAny();
+			optPosition = game.getBoard().positions().filter(p -> game.getBoard().isMillClosingPosition(p, placingColor))
+					.findAny();
 			if (optPosition.isPresent()) {
 				play(SoundID.CAN_CLOSE_MILL);
 				return;
 			}
 
-			optPosition = board.positionsOpeningTwoMills(placingColor).findAny();
+			optPosition = game.getBoard().positionsOpeningTwoMills(placingColor).findAny();
 			if (optPosition.isPresent()) {
 				play(SoundID.CAN_OPEN_TWO_MILLS);
 				return;
