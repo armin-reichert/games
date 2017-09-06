@@ -12,7 +12,6 @@ import static de.amr.games.muehle.game.api.MillGamePhase.PLACING_REMOVING;
 import static de.amr.games.muehle.game.api.MillGamePhase.STARTING;
 
 import java.awt.event.KeyEvent;
-import java.util.Optional;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.statemachine.State;
@@ -37,13 +36,12 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private final MillGameApp app;
 
 	private MillGameUI gameUI;
-	private Optional<Assistant> optAssistant;
+	private Assistant assistant;
 	private Player assistedPlayer;
 	private MoveControl moveControl;
 	private boolean whitesTurn;
 	private int whiteStonesPlaced;
 	private int blackStonesPlaced;
-
 	private float moveTimeSeconds = 0.75f;
 	private float placingTimeSeconds = 1.5f;
 
@@ -112,10 +110,18 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		this.gameUI = gameUI;
 	}
 
+	public void setMoveTimeSeconds(float moveTimeSeconds) {
+		this.moveTimeSeconds = moveTimeSeconds;
+	}
+
+	public void setPlacingTimeSeconds(float placingTimeSeconds) {
+		this.placingTimeSeconds = placingTimeSeconds;
+	}
+
 	@Override
 	public void init() {
 		super.init();
-		optAssistant.ifPresent(Assistant::init);
+		assistant.init();
 		assistedPlayer = getWhitePlayer();
 	}
 
@@ -123,23 +129,23 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	public void update() {
 		readInput();
 		super.update();
-		optAssistant.ifPresent(Assistant::update);
+		assistant.update();
 	}
 
 	private void readInput() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_A)) {
-			optAssistant.ifPresent(Assistant::toggle);
+			assistant.toggle();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			optAssistant.ifPresent(assist -> assist.setAssistanceLevel(1));
+			assistant.setAssistanceLevel(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			optAssistant.ifPresent(assist -> assist.setAssistanceLevel(2));
+			assistant.setAssistanceLevel(2);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			gameUI.toggleBoardPositionNumbers();
 		}
 	}
 
 	public void setAssistant(Assistant assistant) {
-		this.optAssistant = Optional.ofNullable(assistant);
+		this.assistant = assistant;
 	}
 
 	private void reset(State state) {
@@ -150,7 +156,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void announceWinner(Player winner) {
 		gameUI.showMessage("wins", winner.getName());
-		optAssistant.ifPresent(assistant -> assistant.tellWin(winner));
+		assistant.tellWin(winner);
 	}
 
 	private boolean areAllStonesPlaced() {
@@ -227,7 +233,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void onMillClosedByPlacing(Transition<MillGamePhase, MillGameEvent> t) {
 		if (assistedPlayer == getPlayerInTurn()) {
-			optAssistant.ifPresent(assistant -> assistant.tellMillClosed());
+			assistant.tellMillClosed();
 		}
 	}
 
@@ -245,7 +251,7 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 
 	private void tryToPlaceStone(State state) {
 		if (assistedPlayer == getPlayerInTurn()) {
-			optAssistant.ifPresent(assistant -> assistant.givePlacingHint(assistedPlayer));
+			assistant.givePlacingHint(assistedPlayer);
 		}
 		getPlayerInTurn().supplyPlacingPosition().ifPresent(placedAt -> {
 			if (getBoard().isEmptyPosition(placedAt)) {

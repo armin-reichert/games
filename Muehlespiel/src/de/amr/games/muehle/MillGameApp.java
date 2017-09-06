@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.game.impl.Assistant;
 import de.amr.games.muehle.game.impl.MillGameControl;
 import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
@@ -32,26 +31,26 @@ public class MillGameApp extends Application {
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private MillGameControl game;
-	private Assistant assistant;
 
 	public MillGameApp() {
 		settings.title = Messages.text("title");
 		settings.width = 800;
 		settings.height = 800;
 		settings.fullScreenMode = null;
+		pulse.setFrequency(25);
 	}
 
 	@Override
 	public void init() {
-		pulse.setFrequency(25);
+
 		board = new Board();
+
 		game = new MillGameControl(this);
+		game.setMoveTimeSeconds(0.75f);
+		game.setPlacingTimeSeconds(1.5f);
 
 		gameScene = new MillGameScene(this);
 		game.setUI(gameScene);
-
-		assistant = new Assistant(game, gameScene);
-		game.setAssistant(assistant);
 
 		setWhitePlayer(new InteractivePlayer(board, WHITE));
 		// setWhitePlayer(new Peter(board, WHITE));
@@ -87,9 +86,5 @@ public class MillGameApp extends Application {
 
 	public MillGameControl getGame() {
 		return game;
-	}
-
-	public Assistant getAssistant() {
-		return assistant;
 	}
 }
