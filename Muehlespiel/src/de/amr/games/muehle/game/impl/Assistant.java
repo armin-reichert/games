@@ -4,7 +4,7 @@ import static de.amr.easy.game.Application.LOG;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.OptionalInt;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -124,24 +124,26 @@ public class Assistant extends GameEntity {
 
 	public void givePlacingHint(Player player) {
 		if (helpLevel != HelpLevel.OFF) {
-			StoneColor placingColor = player.getColor();
+			IntStream positions;
+			StoneColor color = player.getColor();
 
-			OptionalInt optPosition = game.getBoard().positions()
-					.filter(p -> game.getBoard().isMillClosingPosition(p, placingColor.other())).findAny();
-			if (optPosition.isPresent()) {
+			// can opponent close mill?
+			positions = game.getBoard().positions().filter(p -> game.getBoard().isMillClosingPosition(p, color.other()));
+			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
-			optPosition = game.getBoard().positions().filter(p -> game.getBoard().isMillClosingPosition(p, placingColor))
-					.findAny();
-			if (optPosition.isPresent()) {
+			// can close own mill?
+			positions = game.getBoard().positions().filter(p -> game.getBoard().isMillClosingPosition(p, color));
+			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_CLOSE_MILL);
 				return;
 			}
 
-			optPosition = game.getBoard().positionsOpeningTwoMills(placingColor).findAny();
-			if (optPosition.isPresent()) {
+			// can open two mills at once?
+			positions = game.getBoard().positionsOpeningTwoMills(color);
+			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_OPEN_TWO_MILLS);
 				return;
 			}
