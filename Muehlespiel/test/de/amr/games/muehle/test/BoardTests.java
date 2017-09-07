@@ -169,7 +169,7 @@ public class BoardTests {
 
 	@Test
 	public void testHorizontalMill() {
-		assertTrue(board.areHMillPositions(0, 1, 2));
+		assertTrue(board.inRow(0, 1, 2));
 		board.putStoneAt(0, WHITE);
 		assertTrue(board.isHMillOpenedAt(1, WHITE));
 		assertTrue(board.isHMillOpenedAt(2, WHITE));
@@ -182,7 +182,7 @@ public class BoardTests {
 
 	@Test
 	public void testVerticalMill() {
-		assertTrue(board.areVMillPositions(3, 10, 18));
+		assertTrue(board.inCol(3, 10, 18));
 		board.putStoneAt(3, WHITE);
 		assertTrue(board.isVMillOpenedAt(10, WHITE));
 		assertTrue(board.isVMillOpenedAt(18, WHITE));

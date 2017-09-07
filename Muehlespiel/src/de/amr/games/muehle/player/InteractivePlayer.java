@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player.impl;
+package de.amr.games.muehle.player;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.muehle.board.Direction.EAST;
@@ -23,8 +23,6 @@ import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Move;
-import de.amr.games.muehle.player.api.Player;
 
 /**
  * A player using mouse and keyboard for placing and moving stones.

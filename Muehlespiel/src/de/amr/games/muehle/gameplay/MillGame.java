@@ -1,7 +1,7 @@
-package de.amr.games.muehle.game.api;
+package de.amr.games.muehle.gameplay;
 
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.Player;
 
 public interface MillGame {
 

@@ -1,6 +1,6 @@
-package de.amr.games.muehle.game.impl;
+package de.amr.games.muehle.gameplay;
 
-import static de.amr.games.muehle.game.api.MillGame.NUM_STONES;
+import static de.amr.games.muehle.gameplay.MillGame.NUM_STONES;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,12 +14,10 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.common.TextArea;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.InteractivePlayer;
+import de.amr.games.muehle.player.InteractivePlayer;
+import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
 

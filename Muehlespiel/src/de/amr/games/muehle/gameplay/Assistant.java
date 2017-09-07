@@ -1,4 +1,4 @@
-package de.amr.games.muehle.game.impl;
+package de.amr.games.muehle.gameplay;
 
 import static de.amr.easy.game.Application.LOG;
 
@@ -12,10 +12,8 @@ import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.game.api.MillGame;
-import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.Player;
 
 /**
  * An assistant providing visual and acoustic hints to the assisted player.

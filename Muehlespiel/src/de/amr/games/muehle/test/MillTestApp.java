@@ -1,10 +1,9 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.test;
 
 import java.util.Locale;
 
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.test.TestScene;
 
 /**
  * Mühlespiel aka "Nine men's morris".

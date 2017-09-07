@@ -51,9 +51,9 @@ public class BoardGraph {
 	};
 
 	/*
-	 * Horizontal mill partner positions.
+	 * Horizontal neighbor positions.
 	 */
-	protected static final int[][] HMILL = {
+	protected static final int[][] ROW_NEIGHBORS = {
 			/*@formatter:off*/
 			{ 1, 2 },	
 			{ 0, 2 },
@@ -83,9 +83,9 @@ public class BoardGraph {
 	};
 
 	/*
-	 * Vertical mill partner positions.
+	 * Vertical neighbor positions.
 	 */
-	protected static final int[][] VMILL = {
+	protected static final int[][] COL_NEIGHBORS = {
 			/*@formatter:off*/
 			{ 9, 21 },	
 			{ 4, 7 },
@@ -211,13 +211,13 @@ public class BoardGraph {
 	 *          a position
 	 * @param r
 	 *          a position
-	 * @return if the given positions form a horizontal mill
+	 * @return if the given positions form a row
 	 */
-	public boolean areHMillPositions(int p, int q, int r) {
+	public boolean inRow(int p, int q, int r) {
 		checkPosition(p);
 		checkPosition(q);
 		checkPosition(r);
-		int h1 = HMILL[p][0], h2 = HMILL[p][1];
+		int h1 = ROW_NEIGHBORS[p][0], h2 = ROW_NEIGHBORS[p][1];
 		return h1 == q && h2 == r || h1 == r && h2 == q;
 	}
 
@@ -228,13 +228,13 @@ public class BoardGraph {
 	 *          a position
 	 * @param r
 	 *          a position
-	 * @return if the given positions form a vertical mill
+	 * @return if the given positions form a column
 	 */
-	public boolean areVMillPositions(int p, int q, int r) {
+	public boolean inCol(int p, int q, int r) {
 		checkPosition(p);
 		checkPosition(q);
 		checkPosition(r);
-		int v1 = VMILL[p][0], v2 = VMILL[p][1];
+		int v1 = COL_NEIGHBORS[p][0], v2 = COL_NEIGHBORS[p][1];
 		return v1 == q && v2 == r || v1 == r && v2 == q;
 	}
 }

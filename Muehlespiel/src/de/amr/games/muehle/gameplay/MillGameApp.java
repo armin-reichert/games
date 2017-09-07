@@ -1,4 +1,4 @@
-package de.amr.games.muehle;
+package de.amr.games.muehle.gameplay;
 
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
@@ -7,12 +7,10 @@ import java.util.Locale;
 
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.game.impl.MillGameControl;
-import de.amr.games.muehle.game.impl.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.player.impl.InteractivePlayer;
-import de.amr.games.muehle.player.impl.Zwick;
+import de.amr.games.muehle.player.InteractivePlayer;
+import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.player.Zwick;
 
 /**
  * Mühlespiel aka "Nine men's morris".
@@ -26,11 +24,16 @@ public class MillGameApp extends Application {
 		launch(new MillGameApp());
 	}
 
+	// Model
 	private Board board;
+
+	// UI
 	private MillGameScene gameScene;
+
+	// Controller
+	private MillGameControl game;
 	private Player whitePlayer;
 	private Player blackPlayer;
-	private MillGameControl game;
 
 	public MillGameApp() {
 		settings.title = Messages.text("title");

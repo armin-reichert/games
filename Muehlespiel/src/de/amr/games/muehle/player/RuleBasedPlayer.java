@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player.impl;
+package de.amr.games.muehle.player;
 
 import static de.amr.easy.game.Application.LOG;
 import static java.lang.String.format;
@@ -9,11 +9,9 @@ import java.util.stream.Stream;
 
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.player.api.Move;
-import de.amr.games.muehle.player.api.Player;
-import de.amr.games.muehle.rules.api.MovingRule;
-import de.amr.games.muehle.rules.api.PlacingRule;
-import de.amr.games.muehle.rules.api.RemovalRule;
+import de.amr.games.muehle.rules.MovingRule;
+import de.amr.games.muehle.rules.PlacingRule;
+import de.amr.games.muehle.rules.RemovalRule;
 
 /**
  * A player controlled by rules.

@@ -1,12 +1,12 @@
-package de.amr.games.muehle.game.impl;
+package de.amr.games.muehle.gameplay;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2f.dist;
-import static de.amr.games.muehle.game.impl.MoveEvent.GOT_MOVE_FROM_PLAYER;
-import static de.amr.games.muehle.game.impl.MoveState.ANIMATION;
-import static de.amr.games.muehle.game.impl.MoveState.COMPLETE;
-import static de.amr.games.muehle.game.impl.MoveState.JUMPING;
-import static de.amr.games.muehle.game.impl.MoveState.READING_MOVE;
+import static de.amr.games.muehle.gameplay.MoveEvent.GOT_MOVE_FROM_PLAYER;
+import static de.amr.games.muehle.gameplay.MoveState.ANIMATION;
+import static de.amr.games.muehle.gameplay.MoveState.COMPLETE;
+import static de.amr.games.muehle.gameplay.MoveState.JUMPING;
+import static de.amr.games.muehle.gameplay.MoveState.READING_MOVE;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -18,10 +18,9 @@ import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
-import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Move;
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.Move;
+import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.ui.Stone;
 
 /**

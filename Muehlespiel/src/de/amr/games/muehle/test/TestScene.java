@@ -11,7 +11,6 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.Scene;
-import de.amr.games.muehle.MillTestApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.ui.BoardUI;
 

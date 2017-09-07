@@ -1,15 +1,15 @@
-package de.amr.games.muehle.game.impl;
+package de.amr.games.muehle.gameplay;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.muehle.game.api.MillGameEvent.STONE_PLACED;
-import static de.amr.games.muehle.game.api.MillGameEvent.STONE_PLACED_IN_MILL;
-import static de.amr.games.muehle.game.api.MillGameEvent.STONE_REMOVED;
-import static de.amr.games.muehle.game.api.MillGamePhase.GAME_OVER;
-import static de.amr.games.muehle.game.api.MillGamePhase.MOVING;
-import static de.amr.games.muehle.game.api.MillGamePhase.MOVING_REMOVING;
-import static de.amr.games.muehle.game.api.MillGamePhase.PLACING;
-import static de.amr.games.muehle.game.api.MillGamePhase.PLACING_REMOVING;
-import static de.amr.games.muehle.game.api.MillGamePhase.STARTING;
+import static de.amr.games.muehle.gameplay.MillGameEvent.STONE_PLACED;
+import static de.amr.games.muehle.gameplay.MillGameEvent.STONE_PLACED_IN_MILL;
+import static de.amr.games.muehle.gameplay.MillGameEvent.STONE_REMOVED;
+import static de.amr.games.muehle.gameplay.MillGamePhase.GAME_OVER;
+import static de.amr.games.muehle.gameplay.MillGamePhase.MOVING;
+import static de.amr.games.muehle.gameplay.MillGamePhase.MOVING_REMOVING;
+import static de.amr.games.muehle.gameplay.MillGamePhase.PLACING;
+import static de.amr.games.muehle.gameplay.MillGamePhase.PLACING_REMOVING;
+import static de.amr.games.muehle.gameplay.MillGamePhase.STARTING;
 
 import java.awt.event.KeyEvent;
 
@@ -17,16 +17,11 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.easy.statemachine.Transition;
-import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.game.api.MillGame;
-import de.amr.games.muehle.game.api.MillGameEvent;
-import de.amr.games.muehle.game.api.MillGamePhase;
-import de.amr.games.muehle.game.api.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.api.Move;
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.Move;
+import de.amr.games.muehle.player.Player;
 
 /**
  * Finite-state-machine which controls the mill game.

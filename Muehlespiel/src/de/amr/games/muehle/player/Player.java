@@ -1,4 +1,4 @@
-package de.amr.games.muehle.player.api;
+package de.amr.games.muehle.player;
 
 import static java.lang.String.format;
 

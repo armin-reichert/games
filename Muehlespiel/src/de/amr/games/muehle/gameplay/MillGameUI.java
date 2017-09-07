@@ -1,4 +1,4 @@
-package de.amr.games.muehle.game.api;
+package de.amr.games.muehle.gameplay;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.ui.Stone;
 
 public interface MillGameUI {

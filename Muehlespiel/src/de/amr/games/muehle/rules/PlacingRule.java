@@ -1,8 +1,8 @@
-package de.amr.games.muehle.rules.api;
+package de.amr.games.muehle.rules;
 
 import java.util.OptionalInt;
 
-import de.amr.games.muehle.player.api.Player;
+import de.amr.games.muehle.player.Player;
 
 public interface PlacingRule extends Rule {
 
