@@ -115,9 +115,8 @@ public class BoardUI extends GameEntity {
 	public OptionalInt findBoardPosition(int x, int y, int radius) {
 		Vector2f point = Vector2f.of(x, y);
 		/*@formatter:off*/
-		Optional<Integer> opt = board.positions()
+		Optional<Integer> opt = board.positions().boxed()
 				.filter(p -> dist(center[p], point) <= radius)
-				.boxed()
 				.collect(minBy((p1, p2) -> Float.compare(dist(center[p1], point), dist(center[p2], point))));
 		/*@formatter:on*/
 		return opt.isPresent() ? OptionalInt.of(opt.get()) : OptionalInt.empty();

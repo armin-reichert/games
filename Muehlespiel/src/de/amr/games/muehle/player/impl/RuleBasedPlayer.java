@@ -22,11 +22,11 @@ import de.amr.games.muehle.rules.api.RemovalRule;
  */
 public abstract class RuleBasedPlayer implements Player {
 
-	final Board board;
-	final StoneColor color;
-	final PlacingRule[] placingRules;
-	final MovingRule[] movingRules;
-	final RemovalRule[] removalRules;
+	private final Board board;
+	private final StoneColor color;
+	private final PlacingRule[] placingRules;
+	private final MovingRule[] movingRules;
+	private final RemovalRule[] removalRules;
 
 	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
 			RemovalRule[] removalRules) {
@@ -69,19 +69,19 @@ public abstract class RuleBasedPlayer implements Player {
 	public void newMove() {
 	}
 
-	OptionalInt tryPlacingRule(PlacingRule rule) {
+	private OptionalInt tryPlacingRule(PlacingRule rule) {
 		OptionalInt optPos = rule.supplyPlacingPosition(this);
 		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
-	OptionalInt tryRemovalRule(RemovalRule rule) {
+	private OptionalInt tryRemovalRule(RemovalRule rule) {
 		OptionalInt optPos = rule.supplyRemovalPosition(this, getColor().other());
 		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
-	Optional<Move> tryMoveRule(MovingRule rule) {
+	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
 		optMove.ifPresent(move -> LOG.info(getName() + ": " + format(rule.getDescription(), move.from, move.to)));
 		return optMove;
