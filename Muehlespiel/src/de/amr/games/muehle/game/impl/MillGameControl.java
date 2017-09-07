@@ -144,9 +144,13 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
 			assistant.setHelpLevel(Assistant.HelpLevel.HIGH);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_W)) {
-			setAssistedPlayer(getWhitePlayer());
+			if (getWhitePlayer().isInteractive()) {
+				setAssistedPlayer(getWhitePlayer());
+			}
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			setAssistedPlayer(getBlackPlayer());
+			if (getBlackPlayer().isInteractive()) {
+				setAssistedPlayer(getBlackPlayer());
+			}
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			gameUI.toggleBoardPositionNumbers();
 		}
