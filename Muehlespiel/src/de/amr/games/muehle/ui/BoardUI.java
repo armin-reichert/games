@@ -4,6 +4,7 @@ import static de.amr.easy.game.math.Vector2f.dist;
 import static de.amr.games.muehle.board.BoardGraph.NUM_POS;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
+import static java.util.stream.Collectors.minBy;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -113,13 +114,19 @@ public class BoardUI extends GameEntity {
 
 	public OptionalInt findBoardPosition(int x, int y, int radius) {
 		Vector2f point = Vector2f.of(x, y);
-		return board.positions().filter(p -> dist(center[p], point) <= radius).findFirst();
+		/*@formatter:off*/
+		Optional<Integer> opt = board.positions()
+				.filter(p -> dist(center[p], point) <= radius)
+				.boxed()
+				.collect(minBy((p1, p2) -> Float.compare(dist(center[p1], point), dist(center[p2], point))));
+		/*@formatter:on*/
+		return opt.isPresent() ? OptionalInt.of(opt.get()) : OptionalInt.empty();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
-		return findBoardPosition(boardX, boardY, getStoneRadius());
+		return findBoardPosition(boardX, boardY, gridSize / 2);
 	}
 
 	public void showPositionNumbers() {
