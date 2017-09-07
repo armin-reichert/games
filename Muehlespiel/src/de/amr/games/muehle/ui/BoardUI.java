@@ -34,10 +34,9 @@ public class BoardUI extends GameEntity {
 
 	private final Board board;
 	private final Stone[] stones;
-	private final int[] xpos;
-	private final int[] ypos;
+	private final Vector2f[] center;
 	private int size;
-	private int rasterSize;
+	private int gridSize;
 	private Color bgColor;
 	private Color lineColor;
 	private Font font;
@@ -46,18 +45,14 @@ public class BoardUI extends GameEntity {
 	public BoardUI(Board board) {
 		this.board = board;
 		this.stones = new Stone[NUM_POS];
-		this.xpos = new int[NUM_POS];
-		this.ypos = new int[NUM_POS];
+		this.center = new Vector2f[NUM_POS];
 	}
 
 	public void setSize(int size) {
 		this.size = size;
-		this.rasterSize = size / 6;
-		IntStream.range(0, NUM_POS).forEach(p -> {
-			xpos[p] = GRID_X[p] * rasterSize;
-			ypos[p] = GRID_Y[p] * rasterSize;
-		});
-		this.font = new Font("Arial", Font.PLAIN, rasterSize * 9 / 40);
+		this.gridSize = size / 6;
+		board.positions().forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
+		this.font = new Font("Arial", Font.PLAIN, gridSize * 9 / 40);
 	}
 
 	public void setBgColor(Color bgColor) {
@@ -79,7 +74,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public int getStoneRadius() {
-		return rasterSize / 4;
+		return gridSize / 4;
 	}
 
 	public void clear() {
@@ -112,10 +107,10 @@ public class BoardUI extends GameEntity {
 	}
 
 	public Vector2f centerPoint(int p) {
-		return Vector2f.of(xpos[p], ypos[p]);
+		return center[p];
 	}
 
-	public OptionalInt findNearestPosition(int x, int y, int radius) {
+	public OptionalInt findBoardPosition(int x, int y, int radius) {
 		Vector2f point = Vector2f.of(x, y);
 		return board.positions().filter(p -> dist(centerPoint(p), point) <= radius).findFirst();
 	}
@@ -123,7 +118,7 @@ public class BoardUI extends GameEntity {
 	public OptionalInt findPosition(int x, int y) {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
-		return findNearestPosition(boardX, boardY, getStoneRadius());
+		return findBoardPosition(boardX, boardY, getStoneRadius());
 	}
 
 	public void showPositionNumbers() {
@@ -144,7 +139,7 @@ public class BoardUI extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		final int posRadius = rasterSize / 10;
+		final int posRadius = gridSize / 10;
 		g.translate(tf.getX(), tf.getY());
 		// Background
 		g.setColor(bgColor);
@@ -179,7 +174,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void markPosition(Graphics2D g, int p, Color color) {
-		int markerSize = rasterSize * 8 / 100;
+		int markerSize = gridSize * 8 / 100;
 		Vector2f center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
 		g.setColor(color);

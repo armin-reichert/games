@@ -17,7 +17,7 @@ import de.amr.games.muehle.player.impl.Zwick;
 /**
  * Mühlespiel aka "Nine men's morris".
  * 
- * @author Armin Reichert & Peter und Anna Schillo
+ * @author Armin Reichert, Peter und Anna Schillo
  */
 public class MillGameApp extends Application {
 
@@ -72,7 +72,6 @@ public class MillGameApp extends Application {
 	public void setWhitePlayer(Player whitePlayer) {
 		this.whitePlayer = whitePlayer;
 		gameScene.playerChanged(whitePlayer);
-
 	}
 
 	public Player getBlackPlayer() {
