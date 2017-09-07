@@ -118,6 +118,10 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 		this.placingTimeSeconds = placingTimeSeconds;
 	}
 
+	public void setAssistedPlayer(Player assistedPlayer) {
+		this.assistedPlayer = assistedPlayer;
+	}
+
 	@Override
 	public void init() {
 		super.init();
@@ -139,6 +143,10 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 			assistant.setHelpLevel(Assistant.HelpLevel.NORMAL);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
 			assistant.setHelpLevel(Assistant.HelpLevel.HIGH);
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_W)) {
+			setAssistedPlayer(getWhitePlayer());
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
+			setAssistedPlayer(getBlackPlayer());
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			gameUI.toggleBoardPositionNumbers();
 		}
