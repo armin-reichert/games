@@ -35,12 +35,13 @@ public class BoardUI extends GameEntity {
 	private final Board board;
 	private final Stone[] stones;
 	private final Vector2f[] center;
+
 	private int size;
 	private int gridSize;
 	private Color bgColor;
 	private Color lineColor;
-	private Font font;
-	private boolean positionNumbersOn;
+	private Font numbersFont;
+	private boolean numbersOn;
 
 	public BoardUI(Board board) {
 		this.board = board;
@@ -52,7 +53,7 @@ public class BoardUI extends GameEntity {
 		this.size = size;
 		this.gridSize = size / 6;
 		board.positions().forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
-		this.font = new Font("Arial", Font.PLAIN, gridSize * 9 / 40);
+		this.numbersFont = new Font("Arial", Font.PLAIN, gridSize / 5);
 	}
 
 	public void setBgColor(Color bgColor) {
@@ -112,7 +113,7 @@ public class BoardUI extends GameEntity {
 
 	public OptionalInt findBoardPosition(int x, int y, int radius) {
 		Vector2f point = Vector2f.of(x, y);
-		return board.positions().filter(p -> dist(centerPoint(p), point) <= radius).findFirst();
+		return board.positions().filter(p -> dist(center[p], point) <= radius).findFirst();
 	}
 
 	public OptionalInt findPosition(int x, int y) {
@@ -122,11 +123,11 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void showPositionNumbers() {
-		positionNumbersOn = true;
+		numbersOn = true;
 	}
 
 	public void togglePositionNumbers() {
-		positionNumbersOn = !positionNumbersOn;
+		numbersOn = !numbersOn;
 	}
 
 	private void aa_on(Graphics2D g) {
@@ -161,8 +162,8 @@ public class BoardUI extends GameEntity {
 			aa_on(g);
 			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
 			aa_off(g);
-			if (positionNumbersOn) {
-				g.setFont(font);
+			if (numbersOn) {
+				g.setFont(numbersFont);
 				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				g.drawString(String.valueOf(p), center.x + 2 * posRadius, center.y + 4 * posRadius);
 				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
