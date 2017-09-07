@@ -19,9 +19,9 @@ public class BoardGraph {
 	/*
 	 * An adjacency list-like representation of the board graph.
 	 * 
-	 * NEIGHBORS[p] = {neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST)} -1 = no neighbor
+	 * NEIGHBOR[p] = {neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST)} -1 = no neighbor
 	 */
-	protected static final int[][] NEIGHBORS = {
+	protected static final int[][] NEIGHBOR = {
 		/*@formatter:off*/
 		{ -1, 1, 9, -1 }, 
 		{ -1, 2, 4, 0 }, 
@@ -52,8 +52,10 @@ public class BoardGraph {
 
 	/*
 	 * Horizontal neighbor positions.
+	 * 
+	 * p, ROW[p][0], ROW[p][1] form a row.
 	 */
-	protected static final int[][] ROW_NEIGHBORS = {
+	protected static final int[][] ROW = {
 			/*@formatter:off*/
 			{ 1, 2 },	
 			{ 0, 2 },
@@ -84,8 +86,10 @@ public class BoardGraph {
 
 	/*
 	 * Vertical neighbor positions.
+	 * 
+	 * p, COL[p][0], COL[p][1] form a column.
 	 */
-	protected static final int[][] COL_NEIGHBORS = {
+	protected static final int[][] COL = {
 			/*@formatter:off*/
 			{ 9, 21 },	
 			{ 4, 7 },
@@ -150,7 +154,7 @@ public class BoardGraph {
 	 */
 	public IntStream neighbors(int p) {
 		checkPosition(p);
-		return IntStream.of(NEIGHBORS[p]).filter(q -> q != -1);
+		return IntStream.of(NEIGHBOR[p]).filter(q -> q != -1);
 	}
 
 	/**
@@ -163,7 +167,7 @@ public class BoardGraph {
 	public OptionalInt neighbor(int p, Direction dir) {
 		checkPosition(p);
 		checkDirection(dir);
-		int q = NEIGHBORS[p][dir.ordinal()];
+		int q = NEIGHBOR[p][dir.ordinal()];
 		return q != -1 ? OptionalInt.of(q) : OptionalInt.empty();
 	}
 
@@ -201,7 +205,7 @@ public class BoardGraph {
 	public Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
 		checkPosition(q);
-		return Stream.of(Direction.values()).filter(dir -> NEIGHBORS[p][dir.ordinal()] == q).findFirst();
+		return Stream.of(Direction.values()).filter(dir -> NEIGHBOR[p][dir.ordinal()] == q).findFirst();
 	}
 
 	/**
@@ -217,7 +221,7 @@ public class BoardGraph {
 		checkPosition(p);
 		checkPosition(q);
 		checkPosition(r);
-		int h1 = ROW_NEIGHBORS[p][0], h2 = ROW_NEIGHBORS[p][1];
+		int h1 = ROW[p][0], h2 = ROW[p][1];
 		return h1 == q && h2 == r || h1 == r && h2 == q;
 	}
 
@@ -234,7 +238,7 @@ public class BoardGraph {
 		checkPosition(p);
 		checkPosition(q);
 		checkPosition(r);
-		int v1 = COL_NEIGHBORS[p][0], v2 = COL_NEIGHBORS[p][1];
+		int v1 = COL[p][0], v2 = COL[p][1];
 		return v1 == q && v2 == r || v1 == r && v2 == q;
 	}
 }

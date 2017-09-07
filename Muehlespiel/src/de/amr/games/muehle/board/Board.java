@@ -267,7 +267,7 @@ public class Board extends BoardGraph {
 	public boolean inHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return IntStream.of(p, ROW_NEIGHBORS[p][0], ROW_NEIGHBORS[p][1]).allMatch(q -> has(q, color));
+		return IntStream.of(p, ROW[p][0], ROW[p][1]).allMatch(q -> has(q, color));
 	}
 
 	/**
@@ -280,7 +280,7 @@ public class Board extends BoardGraph {
 	public boolean inVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return IntStream.of(p, COL_NEIGHBORS[p][0], COL_NEIGHBORS[p][1]).allMatch(q -> has(q, color));
+		return IntStream.of(p, COL[p][0], COL[p][1]).allMatch(q -> has(q, color));
 	}
 
 	/**
@@ -315,8 +315,8 @@ public class Board extends BoardGraph {
 	public boolean partOfOpenHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, color) && IntStream.of(ROW_NEIGHBORS[p]).filter(q -> has(q, color)).count() == 1
-				&& IntStream.of(ROW_NEIGHBORS[p]).filter(this::isEmptyPosition).count() == 1;
+		return has(p, color) && IntStream.of(ROW[p]).filter(q -> has(q, color)).count() == 1
+				&& IntStream.of(ROW[p]).filter(this::isEmptyPosition).count() == 1;
 	}
 
 	/**
@@ -329,8 +329,8 @@ public class Board extends BoardGraph {
 	public boolean partOfOpenVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, color) && IntStream.of(COL_NEIGHBORS[p]).filter(q -> has(q, color)).count() == 1
-				&& IntStream.of(COL_NEIGHBORS[p]).filter(this::isEmptyPosition).count() == 1;
+		return has(p, color) && IntStream.of(COL[p]).filter(q -> has(q, color)).count() == 1
+				&& IntStream.of(COL[p]).filter(this::isEmptyPosition).count() == 1;
 	}
 
 	/**
@@ -379,7 +379,7 @@ public class Board extends BoardGraph {
 	public boolean isHMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXMillOpenedAt(p, color, ROW_NEIGHBORS[p]);
+		return isXMillOpenedAt(p, color, ROW[p]);
 	}
 
 	/**
@@ -392,7 +392,7 @@ public class Board extends BoardGraph {
 	public boolean isVMillOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return isXMillOpenedAt(p, color, COL_NEIGHBORS[p]);
+		return isXMillOpenedAt(p, color, COL[p]);
 	}
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
@@ -440,11 +440,11 @@ public class Board extends BoardGraph {
 	}
 
 	private boolean isHMillClosingPosition(int p, StoneColor color) {
-		return has(p, null) && has(ROW_NEIGHBORS[p][0], color) && has(ROW_NEIGHBORS[p][1], color);
+		return has(p, null) && has(ROW[p][0], color) && has(ROW[p][1], color);
 	}
 
 	private boolean isVMillClosingPosition(int p, StoneColor color) {
-		return has(p, null) && has(COL_NEIGHBORS[p][0], color) && has(COL_NEIGHBORS[p][1], color);
+		return has(p, null) && has(COL[p][0], color) && has(COL[p][1], color);
 	}
 
 	/**
@@ -466,9 +466,9 @@ public class Board extends BoardGraph {
 			if (optDir.isPresent()) {
 				Direction dir = optDir.get();
 				if (dir == NORTH || dir == SOUTH) {
-					return has(ROW_NEIGHBORS[to][0], color) && has(ROW_NEIGHBORS[to][1], color);
+					return has(ROW[to][0], color) && has(ROW[to][1], color);
 				} else {
-					return has(COL_NEIGHBORS[to][0], color) && has(COL_NEIGHBORS[to][1], color);
+					return has(COL[to][0], color) && has(COL[to][1], color);
 				}
 			}
 		}
