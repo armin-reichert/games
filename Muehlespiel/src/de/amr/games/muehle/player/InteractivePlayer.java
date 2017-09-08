@@ -113,7 +113,7 @@ public class InteractivePlayer implements Player {
 		return Optional.empty();
 	}
 
-	OptionalInt supplyMoveEndPosition() {
+	private OptionalInt supplyMoveEndPosition() {
 		// if end position is uniquely determined, use it
 		if (!canJump() && board.emptyNeighbors(move.from).count() == 1) {
 			return board.emptyNeighbors(move.from).findFirst();
@@ -127,7 +127,7 @@ public class InteractivePlayer implements Player {
 		return boardPositionClicked();
 	}
 
-	Optional<Direction> supplyMoveDirection() {
+	private Optional<Direction> supplyMoveDirection() {
 		/*@formatter:off*/
 		return steering.entrySet().stream()
 			.filter(e -> Keyboard.keyPressedOnce(e.getValue()))
@@ -136,7 +136,7 @@ public class InteractivePlayer implements Player {
 		/*@formatter:on*/
 	}
 
-	OptionalInt boardPositionClicked() {
+	private OptionalInt boardPositionClicked() {
 		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }
