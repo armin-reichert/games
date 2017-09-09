@@ -16,17 +16,17 @@ import de.amr.games.muehle.ui.BoardUI;
 
 public class TestScene extends Scene<MillTestApp> {
 
-	private Board board;
+	private final Board board;
 	private BoardUI boardUI;
 
 	public TestScene(MillTestApp app) {
 		super(app);
+		setBgColor(MillGameUI.BOARD_COLOR);
+		board = new Board();
 	}
 
 	@Override
 	public void init() {
-		setBgColor(MillGameUI.BOARD_COLOR);
-		board = new Board();
 		boardUI = new BoardUI(board);
 		boardUI.setSize(600);
 		boardUI.setBgColor(MillGameUI.BOARD_COLOR);
@@ -37,20 +37,16 @@ public class TestScene extends Scene<MillTestApp> {
 
 	@Override
 	public void update() {
-		readInput();
+		if (Mouse.clicked()) {
+			handleMouseClick();
+			printBoardInfo();
+		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		boardUI.draw(g);
-	}
-
-	private void readInput() {
-		if (Mouse.clicked()) {
-			handleMouseClick();
-			updateStatus();
-		}
 	}
 
 	private void handleMouseClick() {
@@ -63,7 +59,7 @@ public class TestScene extends Scene<MillTestApp> {
 		});
 	}
 
-	private void updateStatus() {
+	private void printBoardInfo() {
 		LOG.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
 		LOG.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
 		LOG.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
