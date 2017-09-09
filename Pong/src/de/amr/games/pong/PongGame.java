@@ -7,7 +7,7 @@ import static java.awt.event.KeyEvent.VK_Y;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.common.Score;
+import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pong.entities.AutoPaddleLeft;
 import de.amr.games.pong.entities.AutoPaddleRight;

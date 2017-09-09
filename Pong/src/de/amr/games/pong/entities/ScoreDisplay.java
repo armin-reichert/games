@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.common.Score;
+import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
 
 public class ScoreDisplay extends GameEntity {

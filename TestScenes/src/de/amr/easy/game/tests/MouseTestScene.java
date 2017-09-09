@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.common.TextArea;
+import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.Scene;
 

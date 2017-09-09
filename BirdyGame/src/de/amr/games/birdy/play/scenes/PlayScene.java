@@ -16,7 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.common.Score;
+import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;

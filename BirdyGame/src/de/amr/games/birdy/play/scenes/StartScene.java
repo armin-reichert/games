@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
-import de.amr.easy.game.common.PumpingImage;
+import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;

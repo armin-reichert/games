@@ -63,7 +63,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
-import de.amr.easy.game.common.FlashText;
+import de.amr.easy.game.controls.FlashText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;

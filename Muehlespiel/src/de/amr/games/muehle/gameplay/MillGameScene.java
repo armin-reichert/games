@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.common.TextArea;
+import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.board.StoneColor;

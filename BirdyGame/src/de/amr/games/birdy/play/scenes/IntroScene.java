@@ -12,8 +12,8 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.common.PumpingImage;
-import de.amr.easy.game.common.TextArea;
+import de.amr.easy.game.controls.PumpingImage;
+import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.scene.Scene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.City;

@@ -7,7 +7,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.common.Score;
+import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
 
 /**
