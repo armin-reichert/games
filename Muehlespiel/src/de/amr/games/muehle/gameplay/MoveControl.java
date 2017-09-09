@@ -98,7 +98,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private void startAnimation(State state) {
-		if (move.getFrom().isPresent() && move.getTo().isPresent()) {
+		if (move.isCompletelySpecified()) {
 			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
 			gameUI.getStoneAt(from).ifPresent(stone -> {
 				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to)) / pulse.secToTicks(moveTimeSec);
@@ -126,7 +126,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private boolean isMoveTargetReached() {
-		if (move.getFrom().isPresent() && move.getTo().isPresent()) {
+		if (move.isCompletelySpecified()) {
 			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
 			Optional<Stone> optStone = gameUI.getStoneAt(from);
 			if (optStone.isPresent()) {
@@ -142,7 +142,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private boolean isMovePossible(Move move) {
-		if (!move.getFrom().isPresent() || !move.getTo().isPresent()) {
+		if (!move.isCompletelySpecified()) {
 			return false;
 		}
 		int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
