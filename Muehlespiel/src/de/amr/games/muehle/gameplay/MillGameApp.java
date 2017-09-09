@@ -8,7 +8,7 @@ import java.util.Locale;
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.msg.Messages;
-import de.amr.games.muehle.player.Peter;
+import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.player.Zwick;
 
@@ -55,8 +55,8 @@ public class MillGameApp extends Application {
 		gameScene = new MillGameScene(this);
 		game.setUI(gameScene);
 
-		// setWhitePlayer(new InteractivePlayer(board, WHITE));
-		setWhitePlayer(new Peter(board, WHITE));
+		setWhitePlayer(new InteractivePlayer(board, WHITE));
+		// setWhitePlayer(new Peter(board, WHITE));
 
 		// setBlackPlayer(new InteractivePlayer(board, BLACK));
 		setBlackPlayer(new Zwick(board, BLACK));

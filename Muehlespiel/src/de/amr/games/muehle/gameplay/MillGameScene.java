@@ -17,6 +17,7 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
+import de.amr.games.muehle.player.Move;
 import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
@@ -102,8 +103,8 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	}
 
 	@Override
-	public void moveStone(int from, int to) {
-		boardUI.moveStone(from, to);
+	public void moveStone(Move move) {
+		boardUI.moveStone(move);
 	}
 
 	@Override

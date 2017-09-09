@@ -83,12 +83,13 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public void newMove() {
-		move.from = move.to = -1;
+		move.clearFrom();
+		move.clearTo();
 	}
 
 	@Override
 	public Optional<Move> supplyMove() {
-		if (move.from == -1) {
+		if (!move.getFrom().isPresent()) {
 			boardPositionClicked().ifPresent(p -> {
 				if (board.isEmptyPosition(p)) {
 					LOG.info(Messages.text("stone_at_position_not_existing", p));
@@ -97,31 +98,36 @@ public class InteractivePlayer implements Player {
 				} else if (!canJump() && !board.hasEmptyNeighbor(p)) {
 					LOG.info(Messages.text("stone_at_position_cannot_move", p));
 				} else {
-					move.from = p;
+					move.setFrom(p);
 					LOG.info("Move starts from " + p);
 				}
 			});
-		} else if (move.to == -1) {
-			supplyMoveEndPosition().ifPresent(p -> move.to = p);
-			if (move.to != -1 && board.isEmptyPosition(move.to) && (canJump() || board.areNeighbors(move.from, move.to))) {
-				LOG.info("Move leads to " + move.to);
+		} else if (!move.getTo().isPresent()) {
+			supplyMoveEndPosition().ifPresent(p -> move.setTo(p));
+			if (move.getTo().isPresent() && board.isEmptyPosition(move.getTo().getAsInt())
+					&& (canJump() || board.areNeighbors(move.getFrom().getAsInt(), move.getTo().getAsInt()))) {
+				LOG.info("Move leads to " + move.getTo().getAsInt());
 				return Optional.of(move);
 			} else {
-				move.to = -1;
+				move.clearTo();
 			}
 		}
 		return Optional.empty();
 	}
 
 	private OptionalInt supplyMoveEndPosition() {
+		if (!move.getFrom().isPresent()) {
+			return OptionalInt.empty();
+		}
+		int from = move.getFrom().getAsInt();
 		// if end position is uniquely determined, use it
-		if (!canJump() && board.emptyNeighbors(move.from).count() == 1) {
-			return board.emptyNeighbors(move.from).findFirst();
+		if (!canJump() && board.emptyNeighbors(from).count() == 1) {
+			return board.emptyNeighbors(from).findFirst();
 		}
 		// if move direction has been specified, use position in that direction
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
-			return board.neighbor(move.from, optMoveDirection.get());
+			return board.neighbor(from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
 		return boardPositionClicked();

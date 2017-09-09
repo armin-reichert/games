@@ -81,7 +81,8 @@ public abstract class RuleBasedPlayer implements Player {
 
 	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
-		optMove.ifPresent(move -> LOG.info(getName() + ": " + format(rule.getDescription(), move.from, move.to)));
+		optMove.ifPresent(move -> LOG
+				.info(getName() + ": " + format(rule.getDescription(), move.getFrom().getAsInt(), move.getTo().getAsInt())));
 		return optMove;
 	}
 }

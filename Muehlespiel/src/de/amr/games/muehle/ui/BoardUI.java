@@ -22,6 +22,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.Move;
 
 /**
  * Board user interface.
@@ -95,12 +96,15 @@ public class BoardUI extends GameEntity {
 		return Optional.ofNullable(stones[p]);
 	}
 
-	public void moveStone(int from, int to) {
-		board.moveStone(from, to);
-		Stone stone = stones[from];
-		stone.tf.moveTo(centerPoint(to));
-		stones[to] = stone;
-		stones[from] = null;
+	public void moveStone(Move move) {
+		if (move.getFrom().isPresent() && move.getTo().isPresent()) {
+			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+			board.moveStone(from, to);
+			Stone stone = stones[from];
+			stone.tf.moveTo(centerPoint(to));
+			stones[to] = stone;
+			stones[from] = null;
+		}
 	}
 
 	public void removeStoneAt(int p) {

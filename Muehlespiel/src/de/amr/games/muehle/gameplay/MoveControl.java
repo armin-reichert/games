@@ -1,7 +1,6 @@
 package de.amr.games.muehle.gameplay;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.easy.game.math.Vector2f.dist;
 import static de.amr.games.muehle.gameplay.MoveEvent.GOT_MOVE_FROM_PLAYER;
 import static de.amr.games.muehle.gameplay.MoveState.ANIMATION;
 import static de.amr.games.muehle.gameplay.MoveState.COMPLETE;
@@ -69,14 +68,14 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG
-				.info(player.getName() + ": " + Messages.text("jumping_from_to", move.from, move.to));
+		state(JUMPING).entry = s -> LOG.info(
+				player.getName() + ": " + Messages.text("jumping_from_to", move.getFrom().getAsInt(), move.getTo().getAsInt()));
 
 		change(JUMPING, COMPLETE);
 
 		// COMPLETE
 
-		state(COMPLETE).entry = s -> gameUI.moveStone(move.from, move.to);
+		state(COMPLETE).entry = s -> gameUI.moveStone(move);
 
 	}
 
@@ -99,62 +98,73 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private void startAnimation(State state) {
-		gameUI.getStoneAt(move.from).ifPresent(stone -> {
-			float speed = dist(gameUI.getLocation(move.from), gameUI.getLocation(move.to)) / pulse.secToTicks(moveTimeSec);
-			Direction dir = board.getDirection(move.from, move.to).get();
-			if (dir == Direction.NORTH) {
-				stone.tf.setVelocity(0, -speed);
-			} else if (dir == Direction.EAST) {
-				stone.tf.setVelocity(speed, 0);
-			} else if (dir == Direction.SOUTH) {
-				stone.tf.setVelocity(0, speed);
-			} else if (dir == Direction.WEST) {
-				stone.tf.setVelocity(-speed, 0);
-			}
-			LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", move.from, move.to, dir));
-		});
+		if (move.getFrom().isPresent() && move.getTo().isPresent()) {
+			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+			gameUI.getStoneAt(from).ifPresent(stone -> {
+				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to)) / pulse.secToTicks(moveTimeSec);
+				Direction dir = board.getDirection(from, to).get();
+				if (dir == Direction.NORTH) {
+					stone.tf.setVelocity(0, -speed);
+				} else if (dir == Direction.EAST) {
+					stone.tf.setVelocity(speed, 0);
+				} else if (dir == Direction.SOUTH) {
+					stone.tf.setVelocity(0, speed);
+				} else if (dir == Direction.WEST) {
+					stone.tf.setVelocity(-speed, 0);
+				}
+				LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
+			});
+		}
 	}
 
 	private void updateAnimation(State state) {
-		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.move());
+		move.getFrom().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.move()));
 	}
 
 	private void stopAnimation(State state) {
-		gameUI.getStoneAt(move.from).ifPresent(stone -> stone.tf.setVelocity(0, 0));
+		move.getFrom().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.setVelocity(0, 0)));
 	}
 
 	private boolean isMoveTargetReached() {
-		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
-		if (optStone.isPresent()) {
-			Stone stone = optStone.get();
-			float speed = stone.tf.getVelocity().length();
-			Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed, 2 * speed);
-			Vector2f toCenter = gameUI.getLocation(move.to);
-			return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
+		if (move.getFrom().isPresent() && move.getTo().isPresent()) {
+			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+			Optional<Stone> optStone = gameUI.getStoneAt(from);
+			if (optStone.isPresent()) {
+				Stone stone = optStone.get();
+				float speed = stone.tf.getVelocity().length();
+				Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed,
+						2 * speed);
+				Vector2f toCenter = gameUI.getLocation(to);
+				return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));
+			}
 		}
 		return false;
 	}
 
 	private boolean isMovePossible(Move move) {
-		Optional<Stone> optStone = gameUI.getStoneAt(move.from);
+		if (!move.getFrom().isPresent() || !move.getTo().isPresent()) {
+			return false;
+		}
+		int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+		Optional<Stone> optStone = gameUI.getStoneAt(from);
 		if (!optStone.isPresent()) {
-			LOG.info(Messages.text("stone_at_position_not_existing", move.from));
+			LOG.info(Messages.text("stone_at_position_not_existing", from));
 			return false;
 		}
 		Stone stone = optStone.get();
 		if (stone.getColor() != player.getColor()) {
-			LOG.info(Messages.text("stone_at_position_wrong_color", move.from));
+			LOG.info(Messages.text("stone_at_position_wrong_color", from));
 			return false;
 		}
-		if (!board.isEmptyPosition(move.to)) {
-			LOG.info(Messages.text("stone_at_position", move.to));
+		if (!board.isEmptyPosition(to)) {
+			LOG.info(Messages.text("stone_at_position", to));
 			return false;
 		}
 		if (player.canJump()) {
 			return true;
 		}
-		if (!board.areNeighbors(move.from, move.to)) {
-			LOG.info(Messages.text("not_neighbors", move.from, move.to));
+		if (!board.areNeighbors(from, to)) {
+			LOG.info(Messages.text("not_neighbors", from, to));
 			return false;
 		}
 		return true;

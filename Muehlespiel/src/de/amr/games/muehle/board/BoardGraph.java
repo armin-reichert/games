@@ -118,13 +118,13 @@ public class BoardGraph {
 			/*@formatter:on*/
 	};
 
-	protected static void checkPosition(int p) {
+	public static void checkPosition(int p) {
 		if (p < 0 || p >= NUM_POS) {
 			throw new IllegalArgumentException("Illegal position: " + p);
 		}
 	}
 
-	protected static void checkDirection(Direction dir) {
+	public static void checkDirection(Direction dir) {
 		if (dir == null) {
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}

@@ -312,7 +312,9 @@ public class MillGameControl extends StateMachine<MillGamePhase, MillGameEvent> 
 	private boolean isMillClosedByMove() {
 		if (isMoveAnimationComplete()) {
 			Move move = moveControl.getMove().get();
-			return getBoard().inMill(move.to, getPlayerInTurn().getColor());
+			if (move.isCompletelySpecified()) {
+				return getBoard().inMill(move.getTo().getAsInt(), getPlayerInTurn().getColor());
+			}
 		}
 		return false;
 	}

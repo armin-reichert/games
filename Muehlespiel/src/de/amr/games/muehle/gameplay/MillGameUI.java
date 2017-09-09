@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.player.Move;
 import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.ui.Stone;
 
@@ -23,7 +24,7 @@ public interface MillGameUI {
 
 	void putStoneAt(int p, StoneColor color);
 
-	void moveStone(int from, int to);
+	void moveStone(Move move);
 
 	void showMessage(String key, Object... args);
 
