@@ -5,22 +5,19 @@ import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static java.util.stream.Collectors.joining;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.gameplay.MillGameUI;
 import de.amr.games.muehle.ui.BoardUI;
 
 public class TestScene extends Scene<MillTestApp> {
 
-	static final Color BOARD_COLOR = Color.WHITE;
-	static final Color LINE_COLOR = Color.BLACK;
-
-	Board board;
-	BoardUI boardUI;
+	private Board board;
+	private BoardUI boardUI;
 
 	public TestScene(MillTestApp app) {
 		super(app);
@@ -28,13 +25,13 @@ public class TestScene extends Scene<MillTestApp> {
 
 	@Override
 	public void init() {
+		setBgColor(MillGameUI.BOARD_COLOR);
 		board = new Board();
 		boardUI = new BoardUI(board);
 		boardUI.setSize(600);
-		boardUI.setBgColor(BOARD_COLOR);
-		boardUI.setLineColor(LINE_COLOR);
+		boardUI.setBgColor(MillGameUI.BOARD_COLOR);
+		boardUI.setLineColor(MillGameUI.LINE_COLOR);
 		boardUI.showPositionNumbers();
-
 		boardUI.center(getWidth(), getHeight());
 	}
 
@@ -45,21 +42,19 @@ public class TestScene extends Scene<MillTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(BOARD_COLOR);
-		g.fillRect(0, 0, getWidth(), getHeight());
+		super.draw(g);
 		boardUI.draw(g);
 	}
 
-	void readInput() {
+	private void readInput() {
 		if (Mouse.clicked()) {
 			handleMouseClick();
 			updateStatus();
 		}
 	}
 
-	void handleMouseClick() {
+	private void handleMouseClick() {
 		boardUI.findPosition(Mouse.getX(), Mouse.getY()).ifPresent(pos -> {
-			// LOG.info("Mouse clicked at board position " + pos);
 			if (board.isEmptyPosition(pos)) {
 				boardUI.putStoneAt(pos, Mouse.isLeftButton() ? WHITE : BLACK);
 			} else {
@@ -68,7 +63,7 @@ public class TestScene extends Scene<MillTestApp> {
 		});
 	}
 
-	void updateStatus() {
+	private void updateStatus() {
 		LOG.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
 		LOG.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
 		LOG.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
@@ -81,7 +76,7 @@ public class TestScene extends Scene<MillTestApp> {
 				+ toCSV(board.positions().filter(p -> board.canCloseMillMovingFrom(p, BLACK))));
 	}
 
-	String toCSV(IntStream stream) {
+	private String toCSV(IntStream stream) {
 		return stream.mapToObj(String::valueOf).collect(joining(", "));
 	}
 
