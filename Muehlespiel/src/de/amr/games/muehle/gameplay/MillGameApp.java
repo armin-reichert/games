@@ -7,9 +7,9 @@ import java.util.Locale;
 
 import de.amr.easy.game.Application;
 import de.amr.games.muehle.board.Board;
+import de.amr.games.muehle.gameplay.ui.MillGameScene;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
-import de.amr.games.muehle.player.Player;
 import de.amr.games.muehle.player.Zwick;
 
 /**
@@ -24,17 +24,6 @@ public class MillGameApp extends Application {
 		launch(new MillGameApp());
 	}
 
-	// Model
-	private Board board;
-
-	// UI
-	private MillGameScene gameScene;
-
-	// Controller
-	private MillGameControl game;
-	private Player whitePlayer;
-	private Player blackPlayer;
-
 	public MillGameApp() {
 		settings.title = Messages.text("title");
 		settings.width = 800;
@@ -46,47 +35,21 @@ public class MillGameApp extends Application {
 	@Override
 	public void init() {
 
-		board = new Board();
+		Board board = new Board();
 
-		game = new MillGameControl(this);
+		MillGameController game = new MillGameController(pulse, board);
 		game.setMoveTimeSeconds(0.75f);
 		game.setPlacingTimeSeconds(1.5f);
 
-		gameScene = new MillGameScene(this);
+		MillGameScene gameScene = new MillGameScene(this, game);
 		game.setUI(gameScene);
 
-		setWhitePlayer(new InteractivePlayer(board, WHITE));
-		// setWhitePlayer(new Peter(board, WHITE));
+		game.setWhitePlayer(new InteractivePlayer(board, WHITE));
+		// game.setWhitePlayer(new Peter(board, WHITE));
 
-		// setBlackPlayer(new InteractivePlayer(board, BLACK));
-		setBlackPlayer(new Zwick(board, BLACK));
+		// game.setBlackPlayer(new InteractivePlayer(board, BLACK));
+		game.setBlackPlayer(new Zwick(board, BLACK));
 
 		selectView(gameScene);
-	}
-
-	public Board getBoard() {
-		return board;
-	}
-
-	public Player getWhitePlayer() {
-		return whitePlayer;
-	}
-
-	public void setWhitePlayer(Player whitePlayer) {
-		this.whitePlayer = whitePlayer;
-		gameScene.playerChanged(whitePlayer);
-	}
-
-	public Player getBlackPlayer() {
-		return blackPlayer;
-	}
-
-	public void setBlackPlayer(Player blackPlayer) {
-		this.blackPlayer = blackPlayer;
-		gameScene.playerChanged(blackPlayer);
-	}
-
-	public MillGameControl getGame() {
-		return game;
 	}
 }

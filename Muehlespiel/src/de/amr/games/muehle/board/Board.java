@@ -532,8 +532,8 @@ public class Board {
 	 *          a stone color
 	 * @return if the given position is part of an open mill of the given color
 	 */
-	public boolean partOfOpenMill(int p, StoneColor color) {
-		return partOfOpenHMill(p, color) || partOfOpenVMill(p, color);
+	public boolean isPartOfOpenMill(int p, StoneColor color) {
+		return isPartOfOpenHMill(p, color) || isPartOfOpenVMill(p, color);
 	}
 
 	/**
@@ -543,10 +543,10 @@ public class Board {
 	 *          a stone color
 	 * @return if the given position is part of an open horizontal mill of the given color
 	 */
-	public boolean partOfOpenHMill(int p, StoneColor color) {
+	public boolean isPartOfOpenHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return partOfOpenXMill(p, color, ROW);
+		return isPartOfOpenXMill(p, color, ROW);
 	}
 
 	/**
@@ -556,13 +556,13 @@ public class Board {
 	 *          a stone color
 	 * @return if the given position is part of an open vertical mill of the given color
 	 */
-	public boolean partOfOpenVMill(int p, StoneColor color) {
+	public boolean isPartOfOpenVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return partOfOpenXMill(p, color, COL);
+		return isPartOfOpenXMill(p, color, COL);
 	}
 
-	private boolean partOfOpenXMill(int p, StoneColor color, int[][] mill) {
+	private boolean isPartOfOpenXMill(int p, StoneColor color, int[][] mill) {
 		int q = mill[p][0], r = mill[p][1];
 		return has(p, color) && has(q, color) && has(r, null) || has(p, color) && has(q, null) && has(r, color);
 	}

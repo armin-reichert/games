@@ -1,6 +1,4 @@
-package de.amr.games.muehle.gameplay;
-
-import static de.amr.games.muehle.gameplay.MillGame.NUM_STONES;
+package de.amr.games.muehle.gameplay.ui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,6 +13,8 @@ import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.board.StoneColor;
+import de.amr.games.muehle.gameplay.MillGameApp;
+import de.amr.games.muehle.gameplay.MillGameController;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Move;
@@ -29,18 +29,20 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
+	private final MillGameController controller;
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
 	private final Assistant assistant;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
-	public MillGameScene(MillGameApp app) {
+	public MillGameScene(MillGameApp app, MillGameController controller) {
 		super(app);
+		this.controller = controller;
 		setBgColor(BOARD_COLOR.darker());
-		boardUI = new BoardUI(app.getBoard());
+		boardUI = new BoardUI(controller.getBoard());
 		messageArea = new TextArea();
-		assistant = new Assistant(app.getGame(), this);
+		assistant = new Assistant(controller, this);
 	}
 
 	@Override
@@ -52,13 +54,13 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 
-		if (app.getWhitePlayer() instanceof InteractivePlayer) {
-			InteractivePlayer ip = (InteractivePlayer) app.getWhitePlayer();
+		if (controller.getWhitePlayer() instanceof InteractivePlayer) {
+			InteractivePlayer ip = (InteractivePlayer) controller.getWhitePlayer();
 			ip.setBoardPositionFinder(boardUI::findPosition);
 		}
 
-		if (app.getBlackPlayer() instanceof InteractivePlayer) {
-			InteractivePlayer ip = (InteractivePlayer) app.getBlackPlayer();
+		if (controller.getBlackPlayer() instanceof InteractivePlayer) {
+			InteractivePlayer ip = (InteractivePlayer) controller.getBlackPlayer();
 			ip.setBoardPositionFinder(boardUI::findPosition);
 		}
 
@@ -72,14 +74,14 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		assistant.hCenter(getWidth());
 		assistant.tf.setY(getHeight() / 2 - 100);
 
-		app.getGame().setAssistant(assistant);
-		app.getGame().setLogger(Application.LOG);
-		app.getGame().init();
+		controller.setAssistant(assistant);
+		controller.setLogger(Application.LOG);
+		controller.init();
 	}
 
 	@Override
 	public void update() {
-		app.getGame().update();
+		controller.update();
 	}
 
 	@Override
@@ -146,14 +148,14 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (app.getGame().isPlacing()) {
-			drawRemainingStonesCounter(g, app.getGame().getWhitePlayer(), NUM_STONES - app.getGame().numWhiteStonesPlaced(),
-					40, getHeight() - 30);
-			drawRemainingStonesCounter(g, app.getGame().getBlackPlayer(), NUM_STONES - app.getGame().numBlackStonesPlaced(),
+		if (controller.isPlacing()) {
+			drawRemainingStonesCounter(g, controller.getWhitePlayer(), 9 - controller.numWhiteStonesPlaced(), 40,
+					getHeight() - 30);
+			drawRemainingStonesCounter(g, controller.getBlackPlayer(), 9 - controller.numBlackStonesPlaced(),
 					getWidth() - 100, getHeight() - 30);
 		}
-		if (app.getGame().isRemoving() && app.getGame().getPlayerInTurn().isInteractive()) {
-			boardUI.markRemovableStones(g, app.getGame().getPlayerNotInTurn().getColor());
+		if (controller.isRemoving() && controller.getPlayerInTurn().isInteractive()) {
+			boardUI.markRemovableStones(g, controller.getPlayerNotInTurn().getColor());
 		}
 	}
 
@@ -166,7 +168,7 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 			g.translate(-inset, inset);
 		});
 		if (stonesLeft > 1) {
-			g.setColor(player == app.getGame().getPlayerInTurn() ? Color.RED : Color.DARK_GRAY);
+			g.setColor(player == controller.getPlayerInTurn() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(stonesCounterFont);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(), stoneTemplate.getRadius());

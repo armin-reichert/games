@@ -19,6 +19,7 @@ import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.Direction;
+import de.amr.games.muehle.gameplay.ui.MillGameUI;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.Move;
 import de.amr.games.muehle.player.Player;

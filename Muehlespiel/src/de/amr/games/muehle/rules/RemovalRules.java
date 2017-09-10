@@ -19,7 +19,7 @@ public enum RemovalRules implements RemovalRule {
 	STONE_IN_OPEN_MILL(
 			"Entferne Stein an Position %d, weil er Teil einer offenen Mühle ist",
 			(board, player, color) -> randomElement(
-					board.positions(color).filter(p -> !board.inMill(p, color)).filter(p -> board.partOfOpenMill(p, color)))),
+					board.positions(color).filter(p -> !board.inMill(p, color)).filter(p -> board.isPartOfOpenMill(p, color)))),
 
 	STONE_WHICH_CAN_MOVE(
 			"Entferne Stein an Position %d, weil er bewegt werden kann",

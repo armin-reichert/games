@@ -182,18 +182,18 @@ public class BoardTests {
 	public void testOpenVerticalMill() {
 		board.putStoneAt(6, WHITE);
 		board.putStoneAt(15, WHITE);
-		assertTrue(board.partOfOpenMill(6, WHITE));
-		assertTrue(board.partOfOpenMill(15, WHITE));
-		assertTrue(!board.partOfOpenMill(11, WHITE));
+		assertTrue(board.isPartOfOpenMill(6, WHITE));
+		assertTrue(board.isPartOfOpenMill(15, WHITE));
+		assertTrue(!board.isPartOfOpenMill(11, WHITE));
 	}
 
 	@Test
 	public void testOpenHorizontalMill() {
 		board.putStoneAt(6, WHITE);
 		board.putStoneAt(7, WHITE);
-		assertTrue(board.partOfOpenMill(6, WHITE));
-		assertTrue(board.partOfOpenMill(7, WHITE));
-		assertTrue(!board.partOfOpenMill(8, WHITE));
+		assertTrue(board.isPartOfOpenMill(6, WHITE));
+		assertTrue(board.isPartOfOpenMill(7, WHITE));
+		assertTrue(!board.isPartOfOpenMill(8, WHITE));
 	}
 
 	// Model tests
