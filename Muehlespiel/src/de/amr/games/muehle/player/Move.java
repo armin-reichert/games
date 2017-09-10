@@ -1,8 +1,8 @@
 package de.amr.games.muehle.player;
 
-import java.util.OptionalInt;
+import static de.amr.games.muehle.board.Board.checkPosition;
 
-import de.amr.games.muehle.board.Board;
+import java.util.OptionalInt;
 
 /**
  * A move or jump.
@@ -33,7 +33,7 @@ public class Move {
 	}
 
 	public void setFrom(int from) {
-		Board.checkPosition(from);
+		checkPosition(from);
 		this.from = from;
 	}
 
@@ -46,7 +46,7 @@ public class Move {
 	}
 
 	public void setTo(int to) {
-		Board.checkPosition(to);
+		checkPosition(to);
 		this.to = to;
 	}
 

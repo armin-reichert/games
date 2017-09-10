@@ -1,5 +1,11 @@
 package de.amr.games.muehle.test;
 
+import static de.amr.games.muehle.board.Board.NUM_POS;
+import static de.amr.games.muehle.board.Board.inCol;
+import static de.amr.games.muehle.board.Board.inRow;
+import static de.amr.games.muehle.board.Board.neighbor;
+import static de.amr.games.muehle.board.Board.neighbors;
+import static de.amr.games.muehle.board.Board.nextToNeighbors;
 import static de.amr.games.muehle.board.Board.positions;
 import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
@@ -43,15 +49,15 @@ public class BoardTests {
 
 	@Test
 	public void testCreation() {
-		assertTrue(Board.NUM_POS == positions().count());
+		assertTrue(NUM_POS == positions().count());
 	}
 
 	@Test
 	public void testNeighborSymmetry() {
 		positions().forEach(p -> {
 			Stream.of(Direction.values()).forEach(dir -> {
-				Board.neighbor(p, dir).ifPresent(q -> {
-					assertTrue(Board.neighbor(q, dir.opposite()).getAsInt() == p);
+				neighbor(p, dir).ifPresent(q -> {
+					assertTrue(neighbor(q, dir.opposite()).getAsInt() == p);
 				});
 			});
 		});
@@ -59,90 +65,90 @@ public class BoardTests {
 
 	@Test
 	public void testNextToNeighborPositions() {
-		assertTrue(sameElements(Board.nextToNeighbors(0), IntStream.of(2, 4, 10, 21)));
-		assertTrue(sameElements(Board.nextToNeighbors(6), IntStream.of(4, 8, 10, 15)));
-		assertTrue(sameElements(Board.nextToNeighbors(13), IntStream.of(2, 4, 8, 17, 19, 23)));
+		assertTrue(sameElements(nextToNeighbors(0), IntStream.of(2, 4, 10, 21)));
+		assertTrue(sameElements(nextToNeighbors(6), IntStream.of(4, 8, 10, 15)));
+		assertTrue(sameElements(nextToNeighbors(13), IntStream.of(2, 4, 8, 17, 19, 23)));
 	}
 
 	@Test
 	public void testNodeDegree() {
-		IntStream.of(0, 2, 23, 21, 3, 5, 20, 18, 6, 8, 17, 15).forEach(p -> assertTrue(2 == Board.neighbors(p).count()));
-		IntStream.of(1, 14, 22, 9, 7, 12, 16, 11).forEach(p -> assertTrue(3 == Board.neighbors(p).count()));
-		IntStream.of(4, 13, 19, 10).forEach(p -> assertTrue(4 == Board.neighbors(p).count()));
+		IntStream.of(0, 2, 23, 21, 3, 5, 20, 18, 6, 8, 17, 15).forEach(p -> assertTrue(2 == neighbors(p).count()));
+		IntStream.of(1, 14, 22, 9, 7, 12, 16, 11).forEach(p -> assertTrue(3 == neighbors(p).count()));
+		IntStream.of(4, 13, 19, 10).forEach(p -> assertTrue(4 == neighbors(p).count()));
 	}
 
 	@Test
 	public void testHorizontalNeighbors() {
-		assertTrue(Board.neighbor(1, WEST).isPresent());
-		assertTrue(Board.neighbor(1, EAST).isPresent());
-		assertTrue(Board.neighbor(4, WEST).isPresent());
-		assertTrue(Board.neighbor(4, EAST).isPresent());
-		assertTrue(Board.neighbor(7, WEST).isPresent());
-		assertTrue(Board.neighbor(7, EAST).isPresent());
-		assertTrue(Board.neighbor(10, WEST).isPresent());
-		assertTrue(Board.neighbor(10, EAST).isPresent());
-		assertTrue(Board.neighbor(13, WEST).isPresent());
-		assertTrue(Board.neighbor(13, EAST).isPresent());
-		assertTrue(Board.neighbor(16, WEST).isPresent());
-		assertTrue(Board.neighbor(16, EAST).isPresent());
-		assertTrue(Board.neighbor(19, WEST).isPresent());
-		assertTrue(Board.neighbor(19, EAST).isPresent());
-		assertTrue(Board.neighbor(22, WEST).isPresent());
-		assertTrue(Board.neighbor(22, EAST).isPresent());
+		assertTrue(neighbor(1, WEST).isPresent());
+		assertTrue(neighbor(1, EAST).isPresent());
+		assertTrue(neighbor(4, WEST).isPresent());
+		assertTrue(neighbor(4, EAST).isPresent());
+		assertTrue(neighbor(7, WEST).isPresent());
+		assertTrue(neighbor(7, EAST).isPresent());
+		assertTrue(neighbor(10, WEST).isPresent());
+		assertTrue(neighbor(10, EAST).isPresent());
+		assertTrue(neighbor(13, WEST).isPresent());
+		assertTrue(neighbor(13, EAST).isPresent());
+		assertTrue(neighbor(16, WEST).isPresent());
+		assertTrue(neighbor(16, EAST).isPresent());
+		assertTrue(neighbor(19, WEST).isPresent());
+		assertTrue(neighbor(19, EAST).isPresent());
+		assertTrue(neighbor(22, WEST).isPresent());
+		assertTrue(neighbor(22, EAST).isPresent());
 
-		assertTrue(Board.neighbor(1, WEST).getAsInt() == 0);
-		assertTrue(Board.neighbor(1, EAST).getAsInt() == 2);
-		assertTrue(Board.neighbor(4, WEST).getAsInt() == 3);
-		assertTrue(Board.neighbor(4, EAST).getAsInt() == 5);
-		assertTrue(Board.neighbor(7, WEST).getAsInt() == 6);
-		assertTrue(Board.neighbor(7, EAST).getAsInt() == 8);
-		assertTrue(Board.neighbor(10, WEST).getAsInt() == 9);
-		assertTrue(Board.neighbor(10, EAST).getAsInt() == 11);
-		assertTrue(Board.neighbor(13, WEST).getAsInt() == 12);
-		assertTrue(Board.neighbor(13, EAST).getAsInt() == 14);
-		assertTrue(Board.neighbor(16, WEST).getAsInt() == 15);
-		assertTrue(Board.neighbor(16, EAST).getAsInt() == 17);
-		assertTrue(Board.neighbor(19, WEST).getAsInt() == 18);
-		assertTrue(Board.neighbor(19, EAST).getAsInt() == 20);
-		assertTrue(Board.neighbor(22, WEST).getAsInt() == 21);
-		assertTrue(Board.neighbor(22, EAST).getAsInt() == 23);
+		assertTrue(neighbor(1, WEST).getAsInt() == 0);
+		assertTrue(neighbor(1, EAST).getAsInt() == 2);
+		assertTrue(neighbor(4, WEST).getAsInt() == 3);
+		assertTrue(neighbor(4, EAST).getAsInt() == 5);
+		assertTrue(neighbor(7, WEST).getAsInt() == 6);
+		assertTrue(neighbor(7, EAST).getAsInt() == 8);
+		assertTrue(neighbor(10, WEST).getAsInt() == 9);
+		assertTrue(neighbor(10, EAST).getAsInt() == 11);
+		assertTrue(neighbor(13, WEST).getAsInt() == 12);
+		assertTrue(neighbor(13, EAST).getAsInt() == 14);
+		assertTrue(neighbor(16, WEST).getAsInt() == 15);
+		assertTrue(neighbor(16, EAST).getAsInt() == 17);
+		assertTrue(neighbor(19, WEST).getAsInt() == 18);
+		assertTrue(neighbor(19, EAST).getAsInt() == 20);
+		assertTrue(neighbor(22, WEST).getAsInt() == 21);
+		assertTrue(neighbor(22, EAST).getAsInt() == 23);
 	}
 
 	@Test
 	public void testVerticalNeighbors() {
-		assertTrue(Board.neighbor(9, NORTH).isPresent());
-		assertTrue(Board.neighbor(9, SOUTH).isPresent());
-		assertTrue(Board.neighbor(10, NORTH).isPresent());
-		assertTrue(Board.neighbor(10, SOUTH).isPresent());
-		assertTrue(Board.neighbor(11, NORTH).isPresent());
-		assertTrue(Board.neighbor(11, SOUTH).isPresent());
-		assertTrue(Board.neighbor(4, NORTH).isPresent());
-		assertTrue(Board.neighbor(4, SOUTH).isPresent());
-		assertTrue(Board.neighbor(19, NORTH).isPresent());
-		assertTrue(Board.neighbor(19, SOUTH).isPresent());
-		assertTrue(Board.neighbor(12, NORTH).isPresent());
-		assertTrue(Board.neighbor(12, SOUTH).isPresent());
-		assertTrue(Board.neighbor(13, NORTH).isPresent());
-		assertTrue(Board.neighbor(13, SOUTH).isPresent());
-		assertTrue(Board.neighbor(14, NORTH).isPresent());
-		assertTrue(Board.neighbor(14, SOUTH).isPresent());
+		assertTrue(neighbor(9, NORTH).isPresent());
+		assertTrue(neighbor(9, SOUTH).isPresent());
+		assertTrue(neighbor(10, NORTH).isPresent());
+		assertTrue(neighbor(10, SOUTH).isPresent());
+		assertTrue(neighbor(11, NORTH).isPresent());
+		assertTrue(neighbor(11, SOUTH).isPresent());
+		assertTrue(neighbor(4, NORTH).isPresent());
+		assertTrue(neighbor(4, SOUTH).isPresent());
+		assertTrue(neighbor(19, NORTH).isPresent());
+		assertTrue(neighbor(19, SOUTH).isPresent());
+		assertTrue(neighbor(12, NORTH).isPresent());
+		assertTrue(neighbor(12, SOUTH).isPresent());
+		assertTrue(neighbor(13, NORTH).isPresent());
+		assertTrue(neighbor(13, SOUTH).isPresent());
+		assertTrue(neighbor(14, NORTH).isPresent());
+		assertTrue(neighbor(14, SOUTH).isPresent());
 
-		assertTrue(Board.neighbor(9, NORTH).getAsInt() == 0);
-		assertTrue(Board.neighbor(9, SOUTH).getAsInt() == 21);
-		assertTrue(Board.neighbor(10, NORTH).getAsInt() == 3);
-		assertTrue(Board.neighbor(10, SOUTH).getAsInt() == 18);
-		assertTrue(Board.neighbor(11, NORTH).getAsInt() == 6);
-		assertTrue(Board.neighbor(11, SOUTH).getAsInt() == 15);
-		assertTrue(Board.neighbor(4, NORTH).getAsInt() == 1);
-		assertTrue(Board.neighbor(4, SOUTH).getAsInt() == 7);
-		assertTrue(Board.neighbor(19, NORTH).getAsInt() == 16);
-		assertTrue(Board.neighbor(19, SOUTH).getAsInt() == 22);
-		assertTrue(Board.neighbor(12, NORTH).getAsInt() == 8);
-		assertTrue(Board.neighbor(12, SOUTH).getAsInt() == 17);
-		assertTrue(Board.neighbor(13, NORTH).getAsInt() == 5);
-		assertTrue(Board.neighbor(13, SOUTH).getAsInt() == 20);
-		assertTrue(Board.neighbor(14, NORTH).getAsInt() == 2);
-		assertTrue(Board.neighbor(14, SOUTH).getAsInt() == 23);
+		assertTrue(neighbor(9, NORTH).getAsInt() == 0);
+		assertTrue(neighbor(9, SOUTH).getAsInt() == 21);
+		assertTrue(neighbor(10, NORTH).getAsInt() == 3);
+		assertTrue(neighbor(10, SOUTH).getAsInt() == 18);
+		assertTrue(neighbor(11, NORTH).getAsInt() == 6);
+		assertTrue(neighbor(11, SOUTH).getAsInt() == 15);
+		assertTrue(neighbor(4, NORTH).getAsInt() == 1);
+		assertTrue(neighbor(4, SOUTH).getAsInt() == 7);
+		assertTrue(neighbor(19, NORTH).getAsInt() == 16);
+		assertTrue(neighbor(19, SOUTH).getAsInt() == 22);
+		assertTrue(neighbor(12, NORTH).getAsInt() == 8);
+		assertTrue(neighbor(12, SOUTH).getAsInt() == 17);
+		assertTrue(neighbor(13, NORTH).getAsInt() == 5);
+		assertTrue(neighbor(13, SOUTH).getAsInt() == 20);
+		assertTrue(neighbor(14, NORTH).getAsInt() == 2);
+		assertTrue(neighbor(14, SOUTH).getAsInt() == 23);
 	}
 
 	// Model tests
@@ -151,7 +157,7 @@ public class BoardTests {
 	public void testClear() {
 		assertTrue(board.positions(WHITE).count() + board.positions(BLACK).count() == 0);
 		positions().forEach(p -> board.putStoneAt(p, WHITE));
-		assertTrue(board.positions(WHITE).count() == Board.NUM_POS);
+		assertTrue(board.positions(WHITE).count() == NUM_POS);
 		assertTrue(board.positions(BLACK).count() == 0);
 		board.clear();
 		assertTrue(board.positions(WHITE).count() == 0);
@@ -169,7 +175,7 @@ public class BoardTests {
 
 	@Test
 	public void testHorizontalMill() {
-		assertTrue(Board.inRow(0, 1, 2));
+		assertTrue(inRow(0, 1, 2));
 		board.putStoneAt(0, WHITE);
 		assertTrue(board.isHMillOpenedAt(1, WHITE));
 		assertTrue(board.isHMillOpenedAt(2, WHITE));
@@ -182,7 +188,7 @@ public class BoardTests {
 
 	@Test
 	public void testVerticalMill() {
-		assertTrue(Board.inCol(3, 10, 18));
+		assertTrue(inCol(3, 10, 18));
 		board.putStoneAt(3, WHITE);
 		assertTrue(board.isVMillOpenedAt(10, WHITE));
 		assertTrue(board.isVMillOpenedAt(18, WHITE));
