@@ -93,12 +93,12 @@ public class Assistant extends GameEntity {
 			super.draw(g);
 			if (helpLevel == HelpLevel.HIGH && control.playerInTurn().isInteractive()) {
 				if (control.is(MillGamePhase.PLACING, MillGamePhase.PLACING_REMOVING)) {
-					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().getColor()), Color.GREEN);
-					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().getColor()), Color.YELLOW);
-					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().getColor()), Color.RED);
+					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().color()), Color.GREEN);
+					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().color()), Color.YELLOW);
+					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().color()), Color.RED);
 				} else if (control.is(MillGamePhase.MOVING, MillGamePhase.MOVING_REMOVING)) {
-					markPossibleMoveStarts(g, control.playerInTurn().getColor(), Color.GREEN);
-					markTrappingPosition(g, control.playerInTurn().getColor(), control.playerNotInTurn().getColor(), Color.RED);
+					markPossibleMoveStarts(g, control.playerInTurn().color(), Color.GREEN);
+					markTrappingPosition(g, control.playerInTurn().color(), control.playerNotInTurn().color(), Color.RED);
 				}
 			}
 		}
@@ -127,7 +127,7 @@ public class Assistant extends GameEntity {
 	public void givePlacingHint(Player player) {
 		if (helpLevel != HelpLevel.OFF) {
 			IntStream positions;
-			StoneColor color = player.getColor();
+			StoneColor color = player.color();
 
 			// can opponent close mill?
 			positions = positions().filter(p -> board.isMillClosingPosition(p, color.other()));

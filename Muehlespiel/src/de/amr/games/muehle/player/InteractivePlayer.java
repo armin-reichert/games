@@ -54,7 +54,7 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return Messages.text(color == WHITE ? "white" : "black");
 	}
 
@@ -64,12 +64,12 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public Board getBoard() {
+	public Board board() {
 		return board;
 	}
 
 	@Override
-	public StoneColor getColor() {
+	public StoneColor color() {
 		return color;
 	}
 

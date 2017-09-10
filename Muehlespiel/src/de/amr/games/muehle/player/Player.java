@@ -15,22 +15,22 @@ import de.amr.games.muehle.board.StoneColor;
  */
 public interface Player {
 
-	default String getName() {
-		return format("%s(%s)", getClass().getSimpleName(), getColor());
+	default String name() {
+		return format("%s(%s)", getClass().getSimpleName(), color());
 	}
 
 	boolean isInteractive();
 
-	Board getBoard();
+	Board board();
 
-	StoneColor getColor();
+	StoneColor color();
 
 	default boolean canJump() {
-		return getBoard().stoneCount(getColor()) == 3;
+		return board().stoneCount(color()) == 3;
 	}
 
 	default boolean isTrapped() {
-		return getBoard().isTrapped(getColor());
+		return board().isTrapped(color());
 	}
 
 	OptionalInt supplyPlacingPosition();

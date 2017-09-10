@@ -61,8 +61,8 @@ public enum MovingRules implements MovingRule {
 
 	@Override
 	public Optional<Move> supplyMove(Player player) {
-		return condition.apply(player.getBoard(), player, player.getColor())
-				? moveSupplier.apply(player.getBoard(), player, player.getColor()) : Optional.empty();
+		return condition.apply(player.board(), player, player.color())
+				? moveSupplier.apply(player.board(), player, player.color()) : Optional.empty();
 	}
 
 	private final String description;

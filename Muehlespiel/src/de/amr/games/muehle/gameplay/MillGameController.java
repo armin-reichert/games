@@ -125,7 +125,7 @@ public class MillGameController extends MillGameStateMachine {
 	}
 
 	private void announceWinner(Player winner) {
-		view.showMessage("wins", winner.getName());
+		view.showMessage("wins", winner.name());
 		assistant.tellWin(winner);
 	}
 
@@ -147,12 +147,12 @@ public class MillGameController extends MillGameStateMachine {
 
 	@Override
 	public boolean isGameOver() {
-		return board.stoneCount(turn.getColor()) < 3 || (!turn.canJump() && turn.isTrapped());
+		return board.stoneCount(turn.color()) < 3 || (!turn.canJump() && turn.isTrapped());
 	}
 
 	private void turnPlacingTo(Player player) {
 		turn = player;
-		view.showMessage("must_place", turn.getName());
+		view.showMessage("must_place", turn.name());
 	}
 
 	private void turnMovingTo(Player player) {
@@ -160,7 +160,7 @@ public class MillGameController extends MillGameStateMachine {
 		moveControl = new MoveControl(turn, view, pulse, moveTimeSeconds);
 		moveControl.setLogger(LOG);
 		moveControl.init();
-		view.showMessage("must_move", turn.getName());
+		view.showMessage("must_move", turn.name());
 	}
 
 	// implement methods from base class
@@ -197,7 +197,7 @@ public class MillGameController extends MillGameStateMachine {
 		}
 		turn.supplyPlacingPosition().ifPresent(placedAt -> {
 			if (board.isEmptyPosition(placedAt)) {
-				StoneColor placedColor = turn.getColor();
+				StoneColor placedColor = turn.color();
 				view.putStoneAt(placedAt, placedColor);
 				if (turn == whitePlayer) {
 					whiteStonesPlaced += 1;
@@ -218,7 +218,7 @@ public class MillGameController extends MillGameStateMachine {
 	@Override
 	protected void tryToRemoveStone(State state) {
 		turn.supplyRemovalPosition().ifPresent(p -> {
-			StoneColor colorToRemove = playerNotInTurn().getColor();
+			StoneColor colorToRemove = playerNotInTurn().color();
 			if (board.isEmptyPosition(p)) {
 				LOG.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (board.getStoneAt(p).get() != colorToRemove) {
@@ -228,14 +228,14 @@ public class MillGameController extends MillGameStateMachine {
 			} else {
 				view.removeStoneAt(p);
 				addInput(STONE_REMOVED);
-				LOG.info(Messages.text("removed_stone_at_position", turn.getName(), p));
+				LOG.info(Messages.text("removed_stone_at_position", turn.name(), p));
 			}
 		});
 	}
 
 	@Override
 	protected void startRemoving(State state) {
-		view.showMessage("must_take", turn.getName(), playerNotInTurn().getName());
+		view.showMessage("must_take", turn.name(), playerNotInTurn().name());
 	}
 
 	@Override
@@ -253,7 +253,7 @@ public class MillGameController extends MillGameStateMachine {
 		if (isMoveComplete()) {
 			Move move = moveControl.getMove().get();
 			if (move.isCompletelySpecified()) {
-				return board.inMill(move.getTo().getAsInt(), turn.getColor());
+				return board.inMill(move.getTo().getAsInt(), turn.color());
 			}
 		}
 		return false;

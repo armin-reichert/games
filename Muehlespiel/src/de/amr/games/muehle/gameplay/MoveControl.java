@@ -43,7 +43,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 		super("Move Control", MoveState.class, READING_MOVE);
 
 		this.player = player;
-		this.board = player.getBoard();
+		this.board = player.board();
 		this.gameUI = gameUI;
 		this.pulse = pulse;
 		this.moveTimeSec = moveTimeSec;
@@ -72,7 +72,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 		// JUMPING
 
 		state(JUMPING).entry = s -> LOG.info(
-				player.getName() + ": " + Messages.text("jumping_from_to", move.getFrom().getAsInt(), move.getTo().getAsInt()));
+				player.name() + ": " + Messages.text("jumping_from_to", move.getFrom().getAsInt(), move.getTo().getAsInt()));
 
 		change(JUMPING, COMPLETE);
 
@@ -115,7 +115,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 				} else if (dir == Direction.WEST) {
 					stone.tf.setVelocity(-speed, 0);
 				}
-				LOG.info(player.getName() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
+				LOG.info(player.name() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
 			});
 		}
 	}
@@ -155,7 +155,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 			return false;
 		}
 		Stone stone = optStone.get();
-		if (stone.getColor() != player.getColor()) {
+		if (stone.getColor() != player.color()) {
 			LOG.info(Messages.text("stone_at_position_wrong_color", from));
 			return false;
 		}

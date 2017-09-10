@@ -43,8 +43,8 @@ public class Zwick extends RuleBasedPlayer {
 	};
 
 	@Override
-	public String getName() {
-		return String.format("Zwicki (%s)", Messages.text(getColor() == WHITE ? "white" : "black"));
+	public String name() {
+		return String.format("Zwicki (%s)", Messages.text(color() == WHITE ? "white" : "black"));
 	}
 
 	@Override

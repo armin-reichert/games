@@ -36,12 +36,12 @@ public abstract class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public Board getBoard() {
+	public Board board() {
 		return board;
 	}
 
 	@Override
-	public StoneColor getColor() {
+	public StoneColor color() {
 		return color;
 	}
 
@@ -69,20 +69,20 @@ public abstract class RuleBasedPlayer implements Player {
 
 	private OptionalInt tryPlacingRule(PlacingRule rule) {
 		OptionalInt optPos = rule.supplyPlacingPosition(this);
-		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		optPos.ifPresent(pos -> LOG.info(name() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
 	private OptionalInt tryRemovalRule(RemovalRule rule) {
-		OptionalInt optPos = rule.supplyRemovalPosition(this, getColor().other());
-		optPos.ifPresent(pos -> LOG.info(getName() + ": " + format(rule.getDescription(), pos)));
+		OptionalInt optPos = rule.supplyRemovalPosition(this, color().other());
+		optPos.ifPresent(pos -> LOG.info(name() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
 	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
 		optMove.ifPresent(move -> LOG
-				.info(getName() + ": " + format(rule.getDescription(), move.getFrom().getAsInt(), move.getTo().getAsInt())));
+				.info(name() + ": " + format(rule.getDescription(), move.getFrom().getAsInt(), move.getTo().getAsInt())));
 		return optMove;
 	}
 }

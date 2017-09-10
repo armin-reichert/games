@@ -41,8 +41,8 @@ public class Peter extends RuleBasedPlayer {
 	};
 
 	@Override
-	public String getName() {
-		return String.format("Strack (%s)", Messages.text(getColor() == WHITE ? "white" : "black"));
+	public String name() {
+		return String.format("Strack (%s)", Messages.text(color() == WHITE ? "white" : "black"));
 	}
 
 	@Override

@@ -155,12 +155,12 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		}
 		if (control.is(MillGamePhase.MOVING_REMOVING, MillGamePhase.PLACING_REMOVING)
 				&& control.playerInTurn().isInteractive()) {
-			boardUI.markRemovableStones(g, control.playerNotInTurn().getColor());
+			boardUI.markRemovableStones(g, control.playerNotInTurn().color());
 		}
 	}
 
 	private void drawStonesLeft(Graphics2D g, Player player, int stonesLeft, int x, int y) {
-		stoneTemplate.setColor(player.getColor());
+		stoneTemplate.setColor(player.color());
 		final int inset = 6;
 		g.translate(x + inset * stonesLeft, y - inset * stonesLeft);
 		IntStream.range(0, stonesLeft).forEach(i -> {
