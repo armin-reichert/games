@@ -42,6 +42,7 @@ public class BoardUI extends GameEntity {
 
 	private int size;
 	private int gridSize;
+	private int posRadius;
 	private Color bgColor;
 	private Color lineColor;
 	private Font numbersFont;
@@ -56,8 +57,9 @@ public class BoardUI extends GameEntity {
 	public void setSize(int size) {
 		this.size = size;
 		this.gridSize = size / 6;
+		this.posRadius = size / 60;
 		positions().forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
-		this.numbersFont = new Font("Arial", Font.PLAIN, gridSize / 5);
+		this.numbersFont = new Font("Arial", Font.PLAIN, size / 30);
 	}
 
 	public void setBgColor(Color bgColor) {
@@ -152,7 +154,6 @@ public class BoardUI extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		final int posRadius = gridSize / 10;
 		g.translate(tf.getX(), tf.getY());
 		// Background
 		g.setColor(bgColor);
@@ -160,24 +161,19 @@ public class BoardUI extends GameEntity {
 		// Lines
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		positions().forEach(from -> {
-			Vector2f fromPoint = centerPoint(from);
-			neighbors(from).filter(to -> to > from).forEach(to -> {
-				Vector2f toPoint = centerPoint(to);
-				g.drawLine(fromPoint.roundedX(), fromPoint.roundedY(), toPoint.roundedX(), toPoint.roundedY());
-			});
-		});
+		positions().forEach(from -> neighbors(from).filter(to -> to > from).forEach(to -> {
+			g.drawLine(center[from].roundedX(), center[from].roundedY(), center[to].roundedX(), center[to].roundedY());
+		}));
 		// Positions
 		positions().forEach(p -> {
-			Vector2f center = centerPoint(p);
 			g.setColor(lineColor);
 			aa_on(g);
-			g.fillOval(center.roundedX() - posRadius, center.roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
+			g.fillOval(center[p].roundedX() - posRadius, center[p].roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
 			aa_off(g);
 			if (numbersOn) {
 				g.setFont(numbersFont);
 				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-				g.drawString(String.valueOf(p), center.x + 2 * posRadius, center.y + 4 * posRadius);
+				g.drawString(String.valueOf(p), center[p].x + 2 * posRadius, center[p].y + 4 * posRadius);
 				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 			}
 		});
@@ -187,12 +183,10 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void markPosition(Graphics2D g, int p, Color color) {
-		int markerSize = gridSize * 8 / 100;
-		Vector2f center = centerPoint(p);
 		g.translate(tf.getX(), tf.getY());
 		g.setColor(color);
 		aa_on(g);
-		g.fillOval(round(center.x) - markerSize / 2, round(center.y) - markerSize / 2, markerSize, markerSize);
+		g.fillOval(round(center[p].x) - posRadius / 2, round(center[p].y) - posRadius / 2, posRadius, posRadius);
 		aa_off(g);
 		g.translate(-tf.getX(), -tf.getY());
 	}
