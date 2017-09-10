@@ -19,6 +19,7 @@ import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.InteractivePlayer;
 import de.amr.games.muehle.player.Move;
 import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.statemachine.MillGamePhase;
 import de.amr.games.muehle.ui.BoardUI;
 import de.amr.games.muehle.ui.Stone;
 
@@ -29,7 +30,7 @@ import de.amr.games.muehle.ui.Stone;
  */
 public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
-	private final MillGameController controller;
+	private final MillGameController control;
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
 	private final Assistant assistant;
@@ -38,9 +39,9 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	public MillGameScene(MillGameApp app, MillGameController controller) {
 		super(app);
-		this.controller = controller;
+		this.control = controller;
 		setBgColor(BOARD_COLOR.darker());
-		boardUI = new BoardUI(controller.getBoard());
+		boardUI = new BoardUI(controller.board);
 		messageArea = new TextArea();
 		assistant = new Assistant(controller, this);
 	}
@@ -54,13 +55,13 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 
-		if (controller.getWhitePlayer() instanceof InteractivePlayer) {
-			InteractivePlayer ip = (InteractivePlayer) controller.getWhitePlayer();
+		if (control.whitePlayer() instanceof InteractivePlayer) {
+			InteractivePlayer ip = (InteractivePlayer) control.whitePlayer();
 			ip.setBoardPositionFinder(boardUI::findPosition);
 		}
 
-		if (controller.getBlackPlayer() instanceof InteractivePlayer) {
-			InteractivePlayer ip = (InteractivePlayer) controller.getBlackPlayer();
+		if (control.blackPlayer() instanceof InteractivePlayer) {
+			InteractivePlayer ip = (InteractivePlayer) control.blackPlayer();
 			ip.setBoardPositionFinder(boardUI::findPosition);
 		}
 
@@ -74,14 +75,14 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		assistant.hCenter(getWidth());
 		assistant.tf.setY(getHeight() / 2 - 100);
 
-		controller.setAssistant(assistant);
-		controller.setLogger(Application.LOG);
-		controller.init();
+		control.setAssistant(assistant);
+		control.setLogger(Application.LOG);
+		control.init();
 	}
 
 	@Override
 	public void update() {
-		controller.update();
+		control.update();
 	}
 
 	@Override
@@ -148,18 +149,17 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (controller.isPlacing()) {
-			drawRemainingStonesCounter(g, controller.getWhitePlayer(), 9 - controller.numWhiteStonesPlaced(), 40,
-					getHeight() - 30);
-			drawRemainingStonesCounter(g, controller.getBlackPlayer(), 9 - controller.numBlackStonesPlaced(),
-					getWidth() - 100, getHeight() - 30);
+		if (control.is(MillGamePhase.PLACING, MillGamePhase.PLACING_REMOVING)) {
+			drawStonesLeft(g, control.whitePlayer(), 9 - control.numWhiteStonesPlaced(), 40, getHeight() - 30);
+			drawStonesLeft(g, control.blackPlayer(), 9 - control.numBlackStonesPlaced(), getWidth() - 100, getHeight() - 30);
 		}
-		if (controller.isRemoving() && controller.getPlayerInTurn().isInteractive()) {
-			boardUI.markRemovableStones(g, controller.getPlayerNotInTurn().getColor());
+		if (control.is(MillGamePhase.MOVING_REMOVING, MillGamePhase.PLACING_REMOVING)
+				&& control.playerInTurn().isInteractive()) {
+			boardUI.markRemovableStones(g, control.playerNotInTurn().getColor());
 		}
 	}
 
-	private void drawRemainingStonesCounter(Graphics2D g, Player player, int stonesLeft, int x, int y) {
+	private void drawStonesLeft(Graphics2D g, Player player, int stonesLeft, int x, int y) {
 		stoneTemplate.setColor(player.getColor());
 		final int inset = 6;
 		g.translate(x + inset * stonesLeft, y - inset * stonesLeft);
@@ -168,7 +168,7 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 			g.translate(-inset, inset);
 		});
 		if (stonesLeft > 1) {
-			g.setColor(player == controller.getPlayerInTurn() ? Color.RED : Color.DARK_GRAY);
+			g.setColor(player == control.playerInTurn() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(stonesCounterFont);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(), stoneTemplate.getRadius());

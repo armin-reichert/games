@@ -13,10 +13,12 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.muehle.board.Board;
 import de.amr.games.muehle.board.StoneColor;
 import de.amr.games.muehle.gameplay.MillGameController;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.statemachine.MillGamePhase;
 
 /**
  * An assistant providing visual and acoustic hints to the assisted player.
@@ -46,14 +48,16 @@ public class Assistant extends GameEntity {
 		private final String assetsPath;
 	}
 
-	private final MillGameController gameController;
-	private final MillGameUI gameUI;
+	private final Board board;
+	private final MillGameController control;
+	private final MillGameUI view;
 
 	private HelpLevel helpLevel;
 
-	public Assistant(MillGameController gameController, MillGameUI gameUI) {
-		this.gameController = gameController;
-		this.gameUI = gameUI;
+	public Assistant(MillGameController control, MillGameUI view) {
+		this.control = control;
+		this.board = control.board;
+		this.view = view;
 		this.helpLevel = HelpLevel.OFF;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 	}
@@ -87,32 +91,29 @@ public class Assistant extends GameEntity {
 		// draw assistant only if any sound is running
 		if (helpLevel != HelpLevel.OFF && Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
-			if (helpLevel == HelpLevel.HIGH && gameController.getPlayerInTurn().isInteractive()) {
-				if (gameController.isPlacing()) {
-					gameUI.markPositions(g, gameController.getBoard().positionsClosingMill(gameController.getPlayerInTurn().getColor()), Color.GREEN);
-					gameUI.markPositions(g, gameController.getBoard().positionsOpeningTwoMills(gameController.getPlayerInTurn().getColor()),
-							Color.YELLOW);
-					gameUI.markPositions(g, gameController.getBoard().positionsClosingMill(gameController.getPlayerNotInTurn().getColor()),
-							Color.RED);
-				} else if (gameController.isMoving()) {
-					markPossibleMoveStarts(g, gameController.getPlayerInTurn().getColor(), Color.GREEN);
-					markTrappingPosition(g, gameController.getPlayerInTurn().getColor(), gameController.getPlayerNotInTurn().getColor(), Color.RED);
+			if (helpLevel == HelpLevel.HIGH && control.playerInTurn().isInteractive()) {
+				if (control.is(MillGamePhase.PLACING, MillGamePhase.PLACING_REMOVING)) {
+					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().getColor()), Color.GREEN);
+					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().getColor()), Color.YELLOW);
+					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().getColor()), Color.RED);
+				} else if (control.is(MillGamePhase.MOVING, MillGamePhase.MOVING_REMOVING)) {
+					markPossibleMoveStarts(g, control.playerInTurn().getColor(), Color.GREEN);
+					markTrappingPosition(g, control.playerInTurn().getColor(), control.playerNotInTurn().getColor(), Color.RED);
 				}
 			}
 		}
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
-		(gameController.getPlayerInTurn().canJump() ? gameController.getBoard().positions(stoneColor)
-				: gameController.getBoard().positionsWithEmptyNeighbor(stoneColor)).forEach(p -> gameUI.markPosition(g, p, color));
+		(control.playerInTurn().canJump() ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
+				.forEach(p -> view.markPosition(g, p, color));
 	}
 
 	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
-		if (gameController.getBoard().positionsWithEmptyNeighbor(other).count() == 1) {
-			int singleFreePosition = gameController.getBoard().positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (neighbors(singleFreePosition).filter(gameController.getBoard()::hasStoneAt)
-					.anyMatch(p -> gameController.getBoard().getStoneAt(p).get() == either)) {
-				gameUI.markPosition(g, singleFreePosition, color);
+		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
+			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
+			if (neighbors(singleFreePosition).filter(board::hasStoneAt).anyMatch(p -> board.getStoneAt(p).get() == either)) {
+				view.markPosition(g, singleFreePosition, color);
 			}
 		}
 	}
@@ -129,21 +130,21 @@ public class Assistant extends GameEntity {
 			StoneColor color = player.getColor();
 
 			// can opponent close mill?
-			positions = positions().filter(p -> gameController.getBoard().isMillClosingPosition(p, color.other()));
+			positions = positions().filter(p -> board.isMillClosingPosition(p, color.other()));
 			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
 			// can close own mill?
-			positions = positions().filter(p -> gameController.getBoard().isMillClosingPosition(p, color));
+			positions = positions().filter(p -> board.isMillClosingPosition(p, color));
 			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_CLOSE_MILL);
 				return;
 			}
 
 			// can open two mills at once?
-			positions = gameController.getBoard().positionsOpeningTwoMills(color);
+			positions = board.positionsOpeningTwoMills(color);
 			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_OPEN_TWO_MILLS);
 				return;

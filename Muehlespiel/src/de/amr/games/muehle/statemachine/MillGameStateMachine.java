@@ -48,7 +48,7 @@ public abstract class MillGameStateMachine extends StateMachine<MillGamePhase, M
 
 	protected abstract void onGameOver(State state);
 
-	protected abstract boolean newGameRequested();
+	protected abstract boolean shallStartNewGame();
 
 	public MillGameStateMachine() {
 		super("MillGameControl", MillGamePhase.class, STARTING);
@@ -101,7 +101,7 @@ public abstract class MillGameStateMachine extends StateMachine<MillGamePhase, M
 
 		state(GAME_OVER).entry = this::onGameOver;
 
-		change(GAME_OVER, STARTING, this::newGameRequested);
+		change(GAME_OVER, STARTING, this::shallStartNewGame);
 	}
 
 }

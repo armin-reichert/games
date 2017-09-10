@@ -19,8 +19,8 @@ import de.amr.games.muehle.player.Zwick;
  */
 public class MillGameApp extends Application {
 
-	public static void main(String[] args) {
-		Messages.load((args.length > 0) ? new Locale(args[0]) : Locale.getDefault());
+	public static void main(String... args) {
+		Messages.load(args.length > 0 ? new Locale(args[0]) : Locale.getDefault());
 		launch(new MillGameApp());
 	}
 
@@ -34,21 +34,21 @@ public class MillGameApp extends Application {
 
 	@Override
 	public void init() {
-
+		// Model
 		Board board = new Board();
 
-		MillGameController game = new MillGameController(pulse, board);
-		game.setMoveTimeSeconds(0.75f);
-		game.setPlacingTimeSeconds(1.5f);
+		// Controller
+		MillGameController controller = new MillGameController(pulse, board);
+		controller.setMoveTimeSeconds(0.75f);
+		controller.setPlacingTimeSeconds(1.5f);
 
-		MillGameScene gameScene = new MillGameScene(this, game);
-		game.setUI(gameScene);
+		// View
+		MillGameScene gameScene = new MillGameScene(this, controller);
+		controller.setView(gameScene);
 
-		game.setWhitePlayer(new InteractivePlayer(board, WHITE));
-		// game.setWhitePlayer(new Peter(board, WHITE));
-
-		// game.setBlackPlayer(new InteractivePlayer(board, BLACK));
-		game.setBlackPlayer(new Zwick(board, BLACK));
+		// Note: players should be created after connecting view with controller
+		controller.setWhitePlayer(new InteractivePlayer(board, WHITE));
+		controller.setBlackPlayer(new Zwick(board, BLACK));
 
 		selectView(gameScene);
 	}
