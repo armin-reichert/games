@@ -546,8 +546,7 @@ public class Board {
 	public boolean partOfOpenHMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, color) && IntStream.of(ROW[p]).filter(q -> has(q, color)).count() == 1
-				&& IntStream.of(ROW[p]).filter(this::isEmptyPosition).count() == 1;
+		return partOfOpenXMill(p, color, ROW);
 	}
 
 	/**
@@ -560,8 +559,12 @@ public class Board {
 	public boolean partOfOpenVMill(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return has(p, color) && IntStream.of(COL[p]).filter(q -> has(q, color)).count() == 1
-				&& IntStream.of(COL[p]).filter(this::isEmptyPosition).count() == 1;
+		return partOfOpenXMill(p, color, COL);
+	}
+
+	private boolean partOfOpenXMill(int p, StoneColor color, int[][] mill) {
+		int q = mill[p][0], r = mill[p][1];
+		return has(p, color) && has(q, color) && has(r, null) || has(p, color) && has(q, null) && has(r, color);
 	}
 
 	/**
@@ -628,7 +631,7 @@ public class Board {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return (has(p, null) && has(q, color) && has(r, null)) || (has(p, null) && has(q, null) && has(r, color));
+		return has(p, null) && has(q, color) && has(r, null) || has(p, null) && has(q, null) && has(r, color);
 	}
 
 	/**

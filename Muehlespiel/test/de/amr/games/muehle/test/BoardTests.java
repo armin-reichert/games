@@ -151,6 +151,51 @@ public class BoardTests {
 		assertTrue(neighbor(14, SOUTH).getAsInt() == 23);
 	}
 
+	@Test
+	public void testRows() {
+		assertTrue(inRow(0, 1, 2));
+		assertTrue(inRow(3, 4, 5));
+		assertTrue(inRow(6, 7, 8));
+		assertTrue(inRow(9, 10, 11));
+		assertTrue(inRow(12, 13, 14));
+		assertTrue(inRow(15, 16, 17));
+		assertTrue(inRow(18, 19, 20));
+		assertTrue(inRow(21, 22, 23));
+		assertTrue(inRow(0, 2, 1));
+		assertTrue(!inRow(0, 1, 3));
+	}
+
+	@Test
+	public void testCols() {
+		assertTrue(inCol(0, 9, 21));
+		assertTrue(inCol(3, 10, 18));
+		assertTrue(inCol(1, 4, 7));
+		assertTrue(inCol(16, 19, 22));
+		assertTrue(inCol(8, 12, 17));
+		assertTrue(inCol(5, 13, 20));
+		assertTrue(inCol(2, 14, 23));
+		assertTrue(inCol(0, 21, 9));
+		assertTrue(!inCol(0, 9, 10));
+	}
+
+	@Test
+	public void testOpenVerticalMill() {
+		board.putStoneAt(6, WHITE);
+		board.putStoneAt(15, WHITE);
+		assertTrue(board.partOfOpenMill(6, WHITE));
+		assertTrue(board.partOfOpenMill(15, WHITE));
+		assertTrue(!board.partOfOpenMill(11, WHITE));
+	}
+
+	@Test
+	public void testOpenHorizontalMill() {
+		board.putStoneAt(6, WHITE);
+		board.putStoneAt(7, WHITE);
+		assertTrue(board.partOfOpenMill(6, WHITE));
+		assertTrue(board.partOfOpenMill(7, WHITE));
+		assertTrue(!board.partOfOpenMill(8, WHITE));
+	}
+
 	// Model tests
 
 	@Test
