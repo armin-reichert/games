@@ -1,6 +1,8 @@
 package de.amr.games.muehle.player;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.muehle.board.Board.areNeighbors;
+import static de.amr.games.muehle.board.Board.neighbor;
 import static de.amr.games.muehle.board.Direction.EAST;
 import static de.amr.games.muehle.board.Direction.NORTH;
 import static de.amr.games.muehle.board.Direction.SOUTH;
@@ -105,7 +107,7 @@ public class InteractivePlayer implements Player {
 		} else if (!move.getTo().isPresent()) {
 			supplyMoveEndPosition().ifPresent(p -> move.setTo(p));
 			if (move.getTo().isPresent() && board.isEmptyPosition(move.getTo().getAsInt())
-					&& (canJump() || board.areNeighbors(move.getFrom().getAsInt(), move.getTo().getAsInt()))) {
+					&& (canJump() || areNeighbors(move.getFrom().getAsInt(), move.getTo().getAsInt()))) {
 				LOG.info("Move leads to " + move.getTo().getAsInt());
 				return Optional.of(move);
 			} else {
@@ -127,7 +129,7 @@ public class InteractivePlayer implements Player {
 		// if move direction has been specified, use position in that direction
 		Optional<Direction> optMoveDirection = supplyMoveDirection();
 		if (optMoveDirection.isPresent()) {
-			return board.neighbor(from, optMoveDirection.get());
+			return neighbor(from, optMoveDirection.get());
 		}
 		// use mouse click position if possible
 		return boardPositionClicked();

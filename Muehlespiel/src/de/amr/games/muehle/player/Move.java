@@ -2,7 +2,7 @@ package de.amr.games.muehle.player;
 
 import java.util.OptionalInt;
 
-import de.amr.games.muehle.board.BoardGraph;
+import de.amr.games.muehle.board.Board;
 
 /**
  * A move or jump.
@@ -33,7 +33,7 @@ public class Move {
 	}
 
 	public void setFrom(int from) {
-		BoardGraph.checkPosition(from);
+		Board.checkPosition(from);
 		this.from = from;
 	}
 
@@ -46,7 +46,7 @@ public class Move {
 	}
 
 	public void setTo(int to) {
-		BoardGraph.checkPosition(to);
+		Board.checkPosition(to);
 		this.to = to;
 	}
 
@@ -58,4 +58,5 @@ public class Move {
 	public String toString() {
 		return String.format("Move(%d -> %d)", from, to);
 	}
+
 }

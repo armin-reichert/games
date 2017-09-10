@@ -1,7 +1,9 @@
 package de.amr.games.muehle.ui;
 
 import static de.amr.easy.game.math.Vector2f.dist;
-import static de.amr.games.muehle.board.BoardGraph.NUM_POS;
+import static de.amr.games.muehle.board.Board.NUM_POS;
+import static de.amr.games.muehle.board.Board.neighbors;
+import static de.amr.games.muehle.board.Board.positions;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
 import static java.util.stream.Collectors.minBy;
@@ -54,7 +56,7 @@ public class BoardUI extends GameEntity {
 	public void setSize(int size) {
 		this.size = size;
 		this.gridSize = size / 6;
-		board.positions().forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
+		positions().forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
 		this.numbersFont = new Font("Arial", Font.PLAIN, gridSize / 5);
 	}
 
@@ -97,7 +99,7 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void moveStone(Move move) {
-		if (move.getFrom().isPresent() && move.getTo().isPresent()) {
+		if (move.isCompletelySpecified()) {
 			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
 			board.moveStone(from, to);
 			Stone stone = stones[from];
@@ -119,7 +121,7 @@ public class BoardUI extends GameEntity {
 	public OptionalInt findBoardPosition(int x, int y, int radius) {
 		Vector2f point = Vector2f.of(x, y);
 		/*@formatter:off*/
-		Optional<Integer> opt = board.positions().boxed()
+		Optional<Integer> opt = Board.positions().boxed()
 				.filter(p -> dist(center[p], point) <= radius)
 				.collect(minBy((p1, p2) -> Float.compare(dist(center[p1], point), dist(center[p2], point))));
 		/*@formatter:on*/
@@ -158,15 +160,15 @@ public class BoardUI extends GameEntity {
 		// Lines
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		board.positions().forEach(from -> {
+		positions().forEach(from -> {
 			Vector2f fromPoint = centerPoint(from);
-			board.neighbors(from).filter(to -> to > from).forEach(to -> {
+			neighbors(from).filter(to -> to > from).forEach(to -> {
 				Vector2f toPoint = centerPoint(to);
 				g.drawLine(fromPoint.roundedX(), fromPoint.roundedY(), toPoint.roundedX(), toPoint.roundedY());
 			});
 		});
 		// Positions
-		board.positions().forEach(p -> {
+		positions().forEach(p -> {
 			Vector2f center = centerPoint(p);
 			g.setColor(lineColor);
 			aa_on(g);

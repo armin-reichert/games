@@ -1,6 +1,7 @@
 package de.amr.games.muehle.test;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.muehle.board.Board.positions;
 import static de.amr.games.muehle.board.StoneColor.BLACK;
 import static de.amr.games.muehle.board.StoneColor.WHITE;
 import static java.util.stream.Collectors.joining;
@@ -67,9 +68,9 @@ public class TestScene extends Scene<MillTestApp> {
 		LOG.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
 		LOG.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
 		LOG.info("Positions from where can close white mill: "
-				+ toCSV(board.positions().filter(p -> board.canCloseMillMovingFrom(p, WHITE))));
+				+ toCSV(positions().filter(p -> board.canCloseMillMovingFrom(p, WHITE))));
 		LOG.info("Positions from where can close black mill: "
-				+ toCSV(board.positions().filter(p -> board.canCloseMillMovingFrom(p, BLACK))));
+				+ toCSV(positions().filter(p -> board.canCloseMillMovingFrom(p, BLACK))));
 	}
 
 	private String toCSV(IntStream stream) {

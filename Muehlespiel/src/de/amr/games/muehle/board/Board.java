@@ -11,17 +11,248 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * Represents the board, provides information about the board content and mill-related functionality.
+ * Represents the board as an undirected graph and provides information about the board content and mill-related
+ * functionality.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
-public class Board extends BoardGraph {
+public class Board {
 
-	protected static void checkStoneColor(StoneColor color) {
+	/** The number of positions (nodes). */
+	public static final int NUM_POS = 24;
+
+	/*
+	 * An adjacency list-like representation of the board graph.
+	 * 
+	 * NEIGHBOR[p] = { neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST) }, -1 = no neighbor
+	 */
+	private static final int[][] NEIGHBOR = {
+		/*@formatter:off*/
+		{ -1, 1, 9, -1 }, 
+		{ -1, 2, 4, 0 }, 
+		{ -1, -1, 14, 1 }, 
+		{ -1, 4, 10, -1 },
+		{ 1, 5, 7, 3 }, 
+		{ -1, -1, 13, 4 },
+		{ -1, 7, 11, -1 }, 
+		{ 4, 8, -1, 6 }, 
+		{ -1, -1, 12, 7 },
+		{ 0, 10, 21, -1 }, 
+		{ 3, 11, 18, 9 },
+		{ 6, -1, 15, 10 }, 
+		{ 8, 13, 17, -1 }, 
+		{ 5, 14, 20, 12 }, 
+		{ 2, -1, 23, 13 },
+		{ 11, 16, -1, -1 },
+		{ -1, 17, 19, 15 }, 
+		{ 12, -1, -1, 16 }, 
+		{ 10, 19, -1, -1 },
+		{ 16, 20, 22, 18 }, 
+		{ 13, -1, -1, 19 },
+		{ 9, 22, -1, -1 }, 
+		{ 19, 23, -1, 21 }, 
+		{ 14, -1, -1, 22 },
+		/*@formatter:on*/
+	};
+
+	/*
+	 * Horizontal neighbor positions.
+	 * 
+	 * The set { p, ROW[p][0], ROW[p][1] } forms a row.
+	 */
+	private static final int[][] ROW = {
+			/*@formatter:off*/
+			{ 1, 2 },	
+			{ 0, 2 },
+			{ 0, 1 },
+			{ 4, 5 },
+			{ 3, 5 },
+			{ 3, 4 },
+			{ 7, 8 },
+			{ 6, 8 },
+			{ 6, 7 },
+			{ 10, 11 },
+			{ 9, 11 },
+			{ 9, 10 },
+			{ 13, 14 },
+			{ 12, 14 },
+			{ 12, 13 },
+			{ 16, 17 }, 
+			{ 15, 17 },
+			{ 15, 16 },
+			{ 19, 20 },
+			{ 18, 20 },
+			{ 18, 19 },
+			{ 22, 23 },
+			{ 21, 23 },
+			{ 21, 22 }
+			/*@formatter:on*/
+	};
+
+	/*
+	 * Vertical neighbor positions.
+	 * 
+	 * The set { p, COL[p][0], COL[p][1] } forms a column.
+	 */
+	private static final int[][] COL = {
+			/*@formatter:off*/
+			{ 9, 21 },	
+			{ 4, 7 },
+			{ 14, 23 },
+			{ 10, 18 },
+			{ 1, 7 },
+			{ 13, 20 },
+			{ 11, 15 },
+			{ 1, 4 },
+			{ 12, 17 },
+			{ 0, 21 },
+			{ 3, 18 },
+			{ 6, 15 },
+			{ 8, 17 },
+			{ 5, 20 },
+			{ 2, 23 },
+			{ 6, 11 }, 
+			{ 19, 22 },
+			{ 8, 12 },
+			{ 3, 10 },
+			{ 16, 22 },
+			{ 5, 13 },
+			{ 0, 9 },
+			{ 16, 19 },
+			{ 2, 14 }
+			/*@formatter:on*/
+	};
+
+	public static void checkPosition(int p) {
+		if (!isValidPosition(p)) {
+			throw new IllegalArgumentException("Illegal position: " + p);
+		}
+	}
+
+	public static void checkDirection(Direction dir) {
+		if (dir == null) {
+			throw new IllegalArgumentException("Illegal direction: " + dir);
+		}
+	}
+
+	public static void checkStoneColor(StoneColor color) {
 		if (color == null) {
 			throw new IllegalArgumentException("Illegal stone color: " + color);
 		}
 	}
+
+	/**
+	 * @param p
+	 *          some number
+	 * @return if the given number denotes a valid board position
+	 */
+	public static boolean isValidPosition(int p) {
+		return 0 <= p && p < NUM_POS;
+	}
+
+	/**
+	 * @return a stream of the board positions
+	 */
+	public static IntStream positions() {
+		return IntStream.range(0, NUM_POS);
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @return a stream of the neighbor positions
+	 */
+	public static IntStream neighbors(int p) {
+		checkPosition(p);
+		return IntStream.of(NEIGHBOR[p]).filter(q -> q != -1);
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @param dir
+	 *          a direction
+	 * @return the (optional) neighbor in the given direction
+	 */
+	public static OptionalInt neighbor(int p, Direction dir) {
+		checkPosition(p);
+		checkDirection(dir);
+		int q = NEIGHBOR[p][dir.ordinal()];
+		return q != -1 ? OptionalInt.of(q) : OptionalInt.empty();
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @return stream of all positions which have distance 2 from given position
+	 */
+	public static IntStream nextToNeighbors(int p) {
+		checkPosition(p);
+		return neighbors(p).flatMap(Board::neighbors).distinct().filter(q -> q != p);
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @param q
+	 *          a position
+	 * @return if the given positions are neighbors
+	 */
+	public static boolean areNeighbors(int p, int q) {
+		checkPosition(p);
+		checkPosition(q);
+		return neighbors(p).anyMatch(n -> n == q);
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @param q
+	 *          a position
+	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are
+	 *         neighbors
+	 */
+	public static Optional<Direction> getDirection(int p, int q) {
+		checkPosition(p);
+		checkPosition(q);
+		return Stream.of(Direction.values()).filter(dir -> NEIGHBOR[p][dir.ordinal()] == q).findFirst();
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @param q
+	 *          a position
+	 * @param r
+	 *          a position
+	 * @return if the given positions form a row
+	 */
+	public static boolean inRow(int p, int q, int r) {
+		checkPosition(p);
+		checkPosition(q);
+		checkPosition(r);
+		int h1 = ROW[p][0], h2 = ROW[p][1];
+		return h1 == q && h2 == r || h1 == r && h2 == q;
+	}
+
+	/**
+	 * @param p
+	 *          a position
+	 * @param q
+	 *          a position
+	 * @param r
+	 *          a position
+	 * @return if the given positions form a column
+	 */
+	public static boolean inCol(int p, int q, int r) {
+		checkPosition(p);
+		checkPosition(q);
+		checkPosition(r);
+		int v1 = COL[p][0], v2 = COL[p][1];
+		return v1 == q && v2 == r || v1 == r && v2 == q;
+	}
+
+	// non-static content
 
 	private final StoneColor[] content;
 

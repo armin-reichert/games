@@ -1,6 +1,8 @@
 package de.amr.games.muehle.gameplay;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.muehle.board.Board.neighbors;
+import static de.amr.games.muehle.board.Board.positions;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -107,7 +109,7 @@ public class Assistant extends GameEntity {
 	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
 		if (game.getBoard().positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = game.getBoard().positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (game.getBoard().neighbors(singleFreePosition).filter(game.getBoard()::hasStoneAt)
+			if (neighbors(singleFreePosition).filter(game.getBoard()::hasStoneAt)
 					.anyMatch(p -> game.getBoard().getStoneAt(p).get() == either)) {
 				gameUI.markPosition(g, singleFreePosition, color);
 			}
@@ -126,14 +128,14 @@ public class Assistant extends GameEntity {
 			StoneColor color = player.getColor();
 
 			// can opponent close mill?
-			positions = game.getBoard().positions().filter(p -> game.getBoard().isMillClosingPosition(p, color.other()));
+			positions = positions().filter(p -> game.getBoard().isMillClosingPosition(p, color.other()));
 			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_OPPONENT_CLOSE_MILL);
 				return;
 			}
 
 			// can close own mill?
-			positions = game.getBoard().positions().filter(p -> game.getBoard().isMillClosingPosition(p, color));
+			positions = positions().filter(p -> game.getBoard().isMillClosingPosition(p, color));
 			if (positions.findAny().isPresent()) {
 				play(SoundID.CAN_CLOSE_MILL);
 				return;

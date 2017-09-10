@@ -1,6 +1,7 @@
 package de.amr.games.muehle.gameplay;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.muehle.board.Board.areNeighbors;
 import static de.amr.games.muehle.gameplay.MoveEvent.GOT_MOVE_FROM_PLAYER;
 import static de.amr.games.muehle.gameplay.MoveState.ANIMATION;
 import static de.amr.games.muehle.gameplay.MoveState.COMPLETE;
@@ -102,7 +103,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
 			gameUI.getStoneAt(from).ifPresent(stone -> {
 				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to)) / pulse.secToTicks(moveTimeSec);
-				Direction dir = board.getDirection(from, to).get();
+				Direction dir = Board.getDirection(from, to).get();
 				if (dir == Direction.NORTH) {
 					stone.tf.setVelocity(0, -speed);
 				} else if (dir == Direction.EAST) {
@@ -163,7 +164,7 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 		if (player.canJump()) {
 			return true;
 		}
-		if (!board.areNeighbors(from, to)) {
+		if (!areNeighbors(from, to)) {
 			LOG.info(Messages.text("not_neighbors", from, to));
 			return false;
 		}
