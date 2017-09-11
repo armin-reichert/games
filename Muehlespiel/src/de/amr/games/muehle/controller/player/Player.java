@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import de.amr.games.muehle.model.board.MillGameModel;
+import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 

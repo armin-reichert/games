@@ -14,7 +14,7 @@ import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.controller.move.MoveController;
 import de.amr.games.muehle.controller.move.MoveState;
 import de.amr.games.muehle.controller.player.Player;
-import de.amr.games.muehle.model.board.MillGameModel;
+import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;

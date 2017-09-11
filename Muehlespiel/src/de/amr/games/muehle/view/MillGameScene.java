@@ -17,7 +17,7 @@ import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
 import de.amr.games.muehle.controller.player.Player;
-import de.amr.games.muehle.model.board.MillGameModel;
+import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -38,14 +38,14 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
-	public MillGameScene(MillGameApp app, MillGameController controller) {
+	public MillGameScene(MillGameApp app, MillGameController control) {
 		super(app);
-		this.control = controller;
-		this.model = controller.model;
+		this.control = control;
+		this.model = control.model;
 		setBgColor(BOARD_COLOR.darker());
 		boardUI = new BoardUI(model.board);
 		messageArea = new TextArea();
-		assistant = new Assistant(controller, this);
+		assistant = new Assistant(control, this);
 	}
 
 	@Override

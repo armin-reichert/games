@@ -9,7 +9,7 @@ import de.amr.easy.game.Application;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Zwick;
-import de.amr.games.muehle.model.board.MillGameModel;
+import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.view.MillGameScene;
 

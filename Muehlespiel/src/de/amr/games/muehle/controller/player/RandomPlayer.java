@@ -1,6 +1,6 @@
 package de.amr.games.muehle.controller.player;
 
-import de.amr.games.muehle.model.board.MillGameModel;
+import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.rules.MovingRule;
 import de.amr.games.muehle.rules.MovingRules;

@@ -21,8 +21,8 @@ import java.util.function.BiFunction;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
+import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.Direction;
-import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;

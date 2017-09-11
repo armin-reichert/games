@@ -1,4 +1,6 @@
-package de.amr.games.muehle.model.board;
+package de.amr.games.muehle.model;
+
+import de.amr.games.muehle.model.board.Board;
 
 /**
  * Data model of the mill game.
