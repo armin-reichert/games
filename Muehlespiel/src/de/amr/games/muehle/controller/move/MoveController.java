@@ -18,7 +18,6 @@ import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.controller.player.Player;
-import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.model.board.Direction;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.msg.Messages;
@@ -32,7 +31,6 @@ import de.amr.games.muehle.view.Stone;
  */
 public class MoveController extends StateMachine<MoveState, MoveEvent> {
 
-	private final Board board;
 	private final Player player;
 	private final MillGameUI gameUI;
 	private final Pulse pulse;
@@ -43,7 +41,6 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 		super("Move Control", MoveState.class, READING_MOVE);
 
 		this.player = player;
-		this.board = player.board();
 		this.gameUI = gameUI;
 		this.pulse = pulse;
 		this.moveTimeSec = moveTimeSec;
@@ -159,7 +156,7 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 			LOG.info(Messages.text("stone_at_position_wrong_color", from));
 			return false;
 		}
-		if (!board.isEmptyPosition(to)) {
+		if (!player.model().board.isEmptyPosition(to)) {
 			LOG.info(Messages.text("stone_at_position", to));
 			return false;
 		}

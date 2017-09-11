@@ -21,8 +21,8 @@ import java.util.function.BiFunction;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
-import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.model.board.Direction;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -35,17 +35,17 @@ import de.amr.games.muehle.msg.Messages;
 public class InteractivePlayer implements Player {
 
 	private final EnumMap<Direction, Integer> steering = new EnumMap<>(Direction.class);
-	private final Board board;
+	private final MillGameData model;
 	private final StoneColor color;
 	private final Move move;
 	private BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
 
-	public InteractivePlayer(Board board, StoneColor color) {
+	public InteractivePlayer(MillGameData model, StoneColor color) {
 		this.steering.put(NORTH, VK_UP);
 		this.steering.put(EAST, VK_RIGHT);
 		this.steering.put(SOUTH, VK_DOWN);
 		this.steering.put(WEST, VK_LEFT);
-		this.board = board;
+		this.model = model;
 		this.color = color;
 		this.move = new Move();
 	}
@@ -65,8 +65,8 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public Board board() {
-		return board;
+	public MillGameData model() {
+		return model;
 	}
 
 	@Override
@@ -93,11 +93,11 @@ public class InteractivePlayer implements Player {
 	public Optional<Move> supplyMove() {
 		if (!move.from().isPresent()) {
 			boardPositionClicked().ifPresent(p -> {
-				if (board.isEmptyPosition(p)) {
+				if (model.board.isEmptyPosition(p)) {
 					LOG.info(Messages.text("stone_at_position_not_existing", p));
-				} else if (!board.hasStoneAt(p, color)) {
+				} else if (!model.board.hasStoneAt(p, color)) {
 					LOG.info(Messages.text("stone_at_position_wrong_color", p));
-				} else if (!canJump() && !board.hasEmptyNeighbor(p)) {
+				} else if (!canJump() && !model.board.hasEmptyNeighbor(p)) {
 					LOG.info(Messages.text("stone_at_position_cannot_move", p));
 				} else {
 					move.setFrom(p);
@@ -106,7 +106,7 @@ public class InteractivePlayer implements Player {
 			});
 		} else if (!move.to().isPresent()) {
 			supplyMoveEndPosition().ifPresent(p -> move.setTo(p));
-			if (move.to().isPresent() && board.isEmptyPosition(move.to().get())
+			if (move.to().isPresent() && model.board.isEmptyPosition(move.to().get())
 					&& (canJump() || areNeighbors(move.from().get(), move.to().get()))) {
 				LOG.info("Move leads to " + move.to().get());
 				return Optional.of(move);
@@ -123,8 +123,8 @@ public class InteractivePlayer implements Player {
 		}
 		int from = move.from().get();
 		// if end position is uniquely determined, use it
-		if (!canJump() && board.emptyNeighbors(from).count() == 1) {
-			return board.emptyNeighbors(from).findFirst();
+		if (!canJump() && model.board.emptyNeighbors(from).count() == 1) {
+			return model.board.emptyNeighbors(from).findFirst();
 		}
 		// if move direction has been specified, use position in that direction
 		Optional<Direction> optMoveDirection = supplyMoveDirection();

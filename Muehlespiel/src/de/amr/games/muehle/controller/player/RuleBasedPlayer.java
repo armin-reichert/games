@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
-import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.rules.MovingRule;
@@ -21,15 +21,15 @@ import de.amr.games.muehle.rules.RemovalRule;
  */
 public abstract class RuleBasedPlayer implements Player {
 
-	private final Board board;
+	private final MillGameData model;
 	private final StoneColor color;
 	private final PlacingRule[] placingRules;
 	private final MovingRule[] movingRules;
 	private final RemovalRule[] removalRules;
 
-	public RuleBasedPlayer(Board board, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
+	public RuleBasedPlayer(MillGameData model, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
 			RemovalRule[] removalRules) {
-		this.board = board;
+		this.model = model;
 		this.color = color;
 		this.placingRules = placingRules;
 		this.movingRules = movingRules;
@@ -37,8 +37,8 @@ public abstract class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public Board board() {
-		return board;
+	public MillGameData model() {
+		return model;
 	}
 
 	@Override
@@ -82,8 +82,8 @@ public abstract class RuleBasedPlayer implements Player {
 
 	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
-		optMove.ifPresent(
-				move -> LOG.info(name() + ": " + format(rule.getDescription(), move.from().get(), move.to().get())));
+		optMove
+				.ifPresent(move -> LOG.info(name() + ": " + format(rule.getDescription(), move.from().get(), move.to().get())));
 		return optMove;
 	}
 }

@@ -53,8 +53,8 @@ public enum PlacingRules implements PlacingRule {
 
 	@Override
 	public OptionalInt supplyPlacingPosition(Player player) {
-		return condition.apply(player.board(), player, player.color())
-				? positionSupplier.apply(player.board(), player, player.color()) : OptionalInt.empty();
+		return condition.apply(player.model().board, player, player.color())
+				? positionSupplier.apply(player.model().board, player, player.color()) : OptionalInt.empty();
 	}
 
 	@Override

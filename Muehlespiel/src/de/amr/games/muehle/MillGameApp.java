@@ -48,8 +48,8 @@ public class MillGameApp extends Application {
 		controller.setView(gameScene);
 
 		// Note: players should be created after connecting view with controller
-		controller.setWhitePlayer(new InteractivePlayer(model.board, WHITE));
-		controller.setBlackPlayer(new Zwick(model.board, BLACK));
+		controller.setWhitePlayer(new InteractivePlayer(model, WHITE));
+		controller.setBlackPlayer(new Zwick(model, BLACK));
 
 		selectView(gameScene);
 	}

@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 
@@ -22,16 +22,16 @@ public interface Player {
 
 	boolean isInteractive();
 
-	Board board();
+	MillGameData model();
 
 	StoneColor color();
 
 	default boolean canJump() {
-		return board().stoneCount(color()) == 3;
+		return model().board.stoneCount(color()) == 3;
 	}
 
 	default boolean isTrapped() {
-		return board().isTrapped(color());
+		return model().board.isTrapped(color());
 	}
 
 	OptionalInt supplyPlacingPosition();

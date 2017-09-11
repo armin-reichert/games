@@ -2,7 +2,7 @@ package de.amr.games.muehle.controller.player;
 
 import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 
-import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.rules.MovingRule;
@@ -52,7 +52,7 @@ public class Zwick extends RuleBasedPlayer {
 		return false;
 	}
 
-	public Zwick(Board board, StoneColor color) {
-		super(board, color, PLACING_RULES, MOVING_RULES, REMOVAL_RULES);
+	public Zwick(MillGameData model, StoneColor color) {
+		super(model, color, PLACING_RULES, MOVING_RULES, REMOVAL_RULES);
 	}
 }

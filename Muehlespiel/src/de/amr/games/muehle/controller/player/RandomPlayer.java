@@ -1,6 +1,6 @@
 package de.amr.games.muehle.controller.player;
 
-import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.rules.MovingRule;
 import de.amr.games.muehle.rules.MovingRules;
@@ -16,8 +16,8 @@ import de.amr.games.muehle.rules.RemovalRules;
  */
 public class RandomPlayer extends RuleBasedPlayer {
 
-	public RandomPlayer(Board board, StoneColor color) {
-		super(board, color, new PlacingRule[] { PlacingRules.RANDOM }, new MovingRule[] { MovingRules.RANDOM },
+	public RandomPlayer(MillGameData model, StoneColor color) {
+		super(model, color, new PlacingRule[] { PlacingRules.RANDOM }, new MovingRule[] { MovingRules.RANDOM },
 				new RemovalRule[] { RemovalRules.RANDOM_OUTSIDE_MILL });
 	}
 
