@@ -2,7 +2,7 @@ package de.amr.games.muehle.player;
 
 import static de.amr.games.muehle.board.Board.checkPosition;
 
-import java.util.OptionalInt;
+import java.util.Optional;
 
 /**
  * A move or jump.
@@ -11,12 +11,10 @@ import java.util.OptionalInt;
  */
 public class Move {
 
-	private int from;
-	private int to;
+	private Integer from;
+	private Integer to;
 
 	public Move() {
-		this.from = -1;
-		this.to = -1;
 	}
 
 	public Move(int from, int to) {
@@ -24,12 +22,20 @@ public class Move {
 		setTo(to);
 	}
 
-	public OptionalInt getFrom() {
-		return from == -1 ? OptionalInt.empty() : OptionalInt.of(from);
+	public void clear() {
+		from = to = null;
 	}
 
-	public void clearFrom() {
-		from = -1;
+	public Optional<Integer> from() {
+		return Optional.ofNullable(from);
+	}
+
+	public Optional<Integer> to() {
+		return Optional.ofNullable(to);
+	}
+
+	public void clearTo() {
+		to = null;
 	}
 
 	public void setFrom(int from) {
@@ -37,26 +43,17 @@ public class Move {
 		this.from = from;
 	}
 
-	public OptionalInt getTo() {
-		return to == -1 ? OptionalInt.empty() : OptionalInt.of(to);
-	}
-
-	public void clearTo() {
-		to = -1;
-	}
-
 	public void setTo(int to) {
 		checkPosition(to);
 		this.to = to;
 	}
 
-	public boolean isCompletelySpecified() {
-		return from != -1 && to != -1;
+	public boolean isPresent() {
+		return from != null && to != null;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Move(%d -> %d)", from, to);
+		return String.format("Move(%s -> %s)", String.valueOf(from), String.valueOf(to));
 	}
-
 }

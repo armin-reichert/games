@@ -71,8 +71,8 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> LOG.info(
-				player.name() + ": " + Messages.text("jumping_from_to", move.getFrom().getAsInt(), move.getTo().getAsInt()));
+		state(JUMPING).entry = s -> LOG
+				.info(player.name() + ": " + Messages.text("jumping_from_to", move.from().get(), move.to().get()));
 
 		change(JUMPING, COMPLETE);
 
@@ -101,8 +101,8 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private void startAnimation(State state) {
-		if (move.isCompletelySpecified()) {
-			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+		if (move.isPresent()) {
+			int from = move.from().get(), to = move.to().get();
 			gameUI.getStoneAt(from).ifPresent(stone -> {
 				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to)) / pulse.secToTicks(moveTimeSec);
 				Direction dir = getDirection(from, to).get();
@@ -121,16 +121,16 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private void updateAnimation(State state) {
-		move.getFrom().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.move()));
+		move.from().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.move()));
 	}
 
 	private void stopAnimation(State state) {
-		move.getFrom().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.setVelocity(0, 0)));
+		move.from().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.setVelocity(0, 0)));
 	}
 
 	private boolean isMoveTargetReached() {
-		if (move.isCompletelySpecified()) {
-			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+		if (move.isPresent()) {
+			int from = move.from().get(), to = move.to().get();
 			Optional<Stone> optStone = gameUI.getStoneAt(from);
 			if (optStone.isPresent()) {
 				Stone stone = optStone.get();
@@ -145,10 +145,10 @@ public class MoveControl extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private boolean isMovePossible(Move move) {
-		if (!move.isCompletelySpecified()) {
+		if (!move.isPresent()) {
 			return false;
 		}
-		int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+		int from = move.from().get(), to = move.to().get();
 		Optional<Stone> optStone = gameUI.getStoneAt(from);
 		if (!optStone.isPresent()) {
 			LOG.info(Messages.text("stone_at_position_not_existing", from));

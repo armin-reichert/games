@@ -101,8 +101,8 @@ public class BoardUI extends GameEntity {
 	}
 
 	public void moveStone(Move move) {
-		if (move.isCompletelySpecified()) {
-			int from = move.getFrom().getAsInt(), to = move.getTo().getAsInt();
+		if (move.isPresent()) {
+			int from = move.from().get(), to = move.to().get();
 			board.moveStone(from, to);
 			Stone stone = stones[from];
 			stone.tf.moveTo(centerPoint(to));

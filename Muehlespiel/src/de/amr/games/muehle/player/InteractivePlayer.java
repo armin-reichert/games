@@ -85,13 +85,12 @@ public class InteractivePlayer implements Player {
 
 	@Override
 	public void newMove() {
-		move.clearFrom();
-		move.clearTo();
+		move.clear();
 	}
 
 	@Override
 	public Optional<Move> supplyMove() {
-		if (!move.getFrom().isPresent()) {
+		if (!move.from().isPresent()) {
 			boardPositionClicked().ifPresent(p -> {
 				if (board.isEmptyPosition(p)) {
 					LOG.info(Messages.text("stone_at_position_not_existing", p));
@@ -104,11 +103,11 @@ public class InteractivePlayer implements Player {
 					LOG.info("Move starts from " + p);
 				}
 			});
-		} else if (!move.getTo().isPresent()) {
+		} else if (!move.to().isPresent()) {
 			supplyMoveEndPosition().ifPresent(p -> move.setTo(p));
-			if (move.getTo().isPresent() && board.isEmptyPosition(move.getTo().getAsInt())
-					&& (canJump() || areNeighbors(move.getFrom().getAsInt(), move.getTo().getAsInt()))) {
-				LOG.info("Move leads to " + move.getTo().getAsInt());
+			if (move.to().isPresent() && board.isEmptyPosition(move.to().get())
+					&& (canJump() || areNeighbors(move.from().get(), move.to().get()))) {
+				LOG.info("Move leads to " + move.to().get());
 				return Optional.of(move);
 			} else {
 				move.clearTo();
@@ -118,10 +117,10 @@ public class InteractivePlayer implements Player {
 	}
 
 	private OptionalInt supplyMoveEndPosition() {
-		if (!move.getFrom().isPresent()) {
+		if (!move.from().isPresent()) {
 			return OptionalInt.empty();
 		}
-		int from = move.getFrom().getAsInt();
+		int from = move.from().get();
 		// if end position is uniquely determined, use it
 		if (!canJump() && board.emptyNeighbors(from).count() == 1) {
 			return board.emptyNeighbors(from).findFirst();
