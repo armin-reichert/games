@@ -14,7 +14,7 @@ import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.controller.move.MoveController;
 import de.amr.games.muehle.controller.move.MoveState;
 import de.amr.games.muehle.controller.player.Player;
-import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -29,7 +29,7 @@ import de.amr.games.muehle.view.MillGameUI;
 public class MillGameController extends MillGameStateMachine {
 
 	private final Pulse pulse;
-	public final Board board;
+	public final MillGameData model;
 	private MillGameUI view;
 	private Assistant assistant;
 	private Player whitePlayer;
@@ -37,14 +37,12 @@ public class MillGameController extends MillGameStateMachine {
 	private Player turn;
 	private Player assistedPlayer;
 	private MoveController moveControl;
-	private int whiteStonesPlaced;
-	private int blackStonesPlaced;
 	private float moveTimeSeconds = 0.75f;
 	private float placingTimeSeconds = 1.5f;
 
-	public MillGameController(Pulse pulse, Board board) {
+	public MillGameController(Pulse pulse, MillGameData model) {
 		this.pulse = pulse;
-		this.board = board;
+		this.model = model;
 	}
 
 	public Player whitePlayer() {
@@ -128,14 +126,6 @@ public class MillGameController extends MillGameStateMachine {
 		assistant.tellWin(winner);
 	}
 
-	public int numWhiteStonesPlaced() {
-		return whiteStonesPlaced;
-	}
-
-	public int numBlackStonesPlaced() {
-		return blackStonesPlaced;
-	}
-
 	public Player playerInTurn() {
 		return turn;
 	}
@@ -146,7 +136,7 @@ public class MillGameController extends MillGameStateMachine {
 
 	@Override
 	public boolean isGameOver() {
-		return board.stoneCount(turn.color()) < 3 || (!turn.canJump() && turn.isTrapped());
+		return model.board.stoneCount(turn.color()) < 3 || (!turn.canJump() && turn.isTrapped());
 	}
 
 	private void turnPlacingTo(Player player) {
@@ -166,7 +156,7 @@ public class MillGameController extends MillGameStateMachine {
 
 	@Override
 	protected boolean areAllStonesPlaced() {
-		return blackStonesPlaced == 9;
+		return model.blackStonesPlaced == 9;
 	}
 
 	@Override
@@ -195,15 +185,15 @@ public class MillGameController extends MillGameStateMachine {
 			assistant.givePlacingHint(assistedPlayer);
 		}
 		turn.supplyPlacingPosition().ifPresent(placedAt -> {
-			if (board.isEmptyPosition(placedAt)) {
+			if (model.board.isEmptyPosition(placedAt)) {
 				StoneColor placedColor = turn.color();
 				view.putStoneAt(placedAt, placedColor);
 				if (turn == whitePlayer) {
-					whiteStonesPlaced += 1;
+					model.whiteStonesPlaced += 1;
 				} else {
-					blackStonesPlaced += 1;
+					model.blackStonesPlaced += 1;
 				}
-				if (board.inMill(placedAt, placedColor)) {
+				if (model.board.inMill(placedAt, placedColor)) {
 					addInput(STONE_PLACED_IN_MILL);
 				} else {
 					addInput(STONE_PLACED);
@@ -218,11 +208,11 @@ public class MillGameController extends MillGameStateMachine {
 	protected void tryToRemoveStone(State state) {
 		turn.supplyRemovalPosition().ifPresent(p -> {
 			StoneColor colorToRemove = playerNotInTurn().color();
-			if (board.isEmptyPosition(p)) {
+			if (model.board.isEmptyPosition(p)) {
 				LOG.info(Messages.text("stone_at_position_not_existing", p));
-			} else if (board.getStoneAt(p).get() != colorToRemove) {
+			} else if (model.board.getStoneAt(p).get() != colorToRemove) {
 				LOG.info(Messages.text("stone_at_position_wrong_color", p));
-			} else if (board.inMill(p, colorToRemove) && !board.allStonesInMills(colorToRemove)) {
+			} else if (model.board.inMill(p, colorToRemove) && !model.board.allStonesInMills(colorToRemove)) {
 				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				view.removeStoneAt(p);
@@ -252,7 +242,7 @@ public class MillGameController extends MillGameStateMachine {
 		if (isMoveComplete()) {
 			Move move = moveControl.getMove().get();
 			if (move.isPresent()) {
-				return board.inMill(move.to().get(), turn.color());
+				return model.board.inMill(move.to().get(), turn.color());
 			}
 		}
 		return false;
@@ -261,7 +251,7 @@ public class MillGameController extends MillGameStateMachine {
 	@Override
 	protected void resetGame(State state) {
 		view.clearBoard();
-		whiteStonesPlaced = blackStonesPlaced = 0;
+		model.whiteStonesPlaced = model.blackStonesPlaced = 0;
 		turnPlacingTo(whitePlayer);
 	}
 

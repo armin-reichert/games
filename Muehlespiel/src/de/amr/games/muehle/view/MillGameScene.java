@@ -17,6 +17,7 @@ import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
 import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Player;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -29,6 +30,8 @@ import de.amr.games.muehle.msg.Messages;
 public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	private final MillGameController control;
+	private final MillGameData model;
+
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
 	private final Assistant assistant;
@@ -38,8 +41,9 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	public MillGameScene(MillGameApp app, MillGameController controller) {
 		super(app);
 		this.control = controller;
+		this.model = controller.model;
 		setBgColor(BOARD_COLOR.darker());
-		boardUI = new BoardUI(controller.board);
+		boardUI = new BoardUI(model.board);
 		messageArea = new TextArea();
 		assistant = new Assistant(controller, this);
 	}
@@ -148,8 +152,8 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
-			drawStonesLeft(g, control.whitePlayer(), 9 - control.numWhiteStonesPlaced(), 40, getHeight() - 30);
-			drawStonesLeft(g, control.blackPlayer(), 9 - control.numBlackStonesPlaced(), getWidth() - 100, getHeight() - 30);
+			drawStonesLeft(g, control.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
+			drawStonesLeft(g, control.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
 		}
 		if (control.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
 				&& control.playerInTurn().isInteractive()) {

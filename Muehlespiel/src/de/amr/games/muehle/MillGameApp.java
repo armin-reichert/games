@@ -9,7 +9,7 @@ import de.amr.easy.game.Application;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Zwick;
-import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.view.MillGameScene;
 
@@ -36,10 +36,10 @@ public class MillGameApp extends Application {
 	@Override
 	public void init() {
 		// Model
-		Board board = new Board();
+		MillGameData model = new MillGameData();
 
 		// Controller
-		MillGameController controller = new MillGameController(pulse, board);
+		MillGameController controller = new MillGameController(pulse, model);
 		controller.setMoveTimeSeconds(0.75f);
 		controller.setPlacingTimeSeconds(1.5f);
 
@@ -48,8 +48,8 @@ public class MillGameApp extends Application {
 		controller.setView(gameScene);
 
 		// Note: players should be created after connecting view with controller
-		controller.setWhitePlayer(new InteractivePlayer(board, WHITE));
-		controller.setBlackPlayer(new Zwick(board, BLACK));
+		controller.setWhitePlayer(new InteractivePlayer(model.board, WHITE));
+		controller.setBlackPlayer(new Zwick(model.board, BLACK));
 
 		selectView(gameScene);
 	}

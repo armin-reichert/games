@@ -56,7 +56,7 @@ public class Assistant extends GameEntity {
 
 	public Assistant(MillGameController control, MillGameUI view) {
 		this.control = control;
-		this.board = control.board;
+		this.board = control.model.board;
 		this.view = view;
 		this.helpLevel = HelpLevel.OFF;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
