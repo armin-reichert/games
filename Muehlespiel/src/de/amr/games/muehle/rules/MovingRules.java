@@ -5,10 +5,10 @@ import static de.amr.games.muehle.util.Util.randomElement;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import de.amr.games.muehle.board.Board;
-import de.amr.games.muehle.board.StoneColor;
-import de.amr.games.muehle.player.Move;
-import de.amr.games.muehle.player.Player;
+import de.amr.games.muehle.controller.player.Player;
+import de.amr.games.muehle.model.board.Board;
+import de.amr.games.muehle.model.board.Move;
+import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.util.TriFunction;
 
 /**
