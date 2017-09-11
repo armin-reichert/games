@@ -51,9 +51,6 @@ public class MillGameController extends MillGameStateMachine {
 
 	public void setWhitePlayer(Player whitePlayer) {
 		this.whitePlayer = whitePlayer;
-		if (view != null) {
-			view.playerChanged(whitePlayer);
-		}
 	}
 
 	public Player blackPlayer() {
@@ -62,9 +59,6 @@ public class MillGameController extends MillGameStateMachine {
 
 	public void setBlackPlayer(Player blackPlayer) {
 		this.blackPlayer = blackPlayer;
-		if (view != null) {
-			view.playerChanged(blackPlayer);
-		}
 	}
 
 	public void setView(MillGameUI view) {
@@ -132,11 +126,6 @@ public class MillGameController extends MillGameStateMachine {
 
 	public Player playerNotInTurn() {
 		return turn == whitePlayer ? blackPlayer : whitePlayer;
-	}
-
-	@Override
-	public boolean isGameOver() {
-		return model.board.stoneCount(turn.color()) < 3 || (!turn.canJump() && turn.isTrapped());
 	}
 
 	private void turnPlacingTo(Player player) {
@@ -253,6 +242,11 @@ public class MillGameController extends MillGameStateMachine {
 		view.clearBoard();
 		model.whiteStonesPlaced = model.blackStonesPlaced = 0;
 		turnPlacingTo(whitePlayer);
+	}
+
+	@Override
+	protected boolean isGameOver() {
+		return model.board.stoneCount(turn.color()) < 3 || (!turn.canJump() && turn.isTrapped());
 	}
 
 	@Override

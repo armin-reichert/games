@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.Application;
@@ -15,7 +16,6 @@ import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
-import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Player;
 import de.amr.games.muehle.model.board.MillGameData;
 import de.amr.games.muehle.model.board.Move;
@@ -57,16 +57,6 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		boardUI.hCenter(getWidth());
 		boardUI.tf.setY(50);
 
-		if (control.whitePlayer() instanceof InteractivePlayer) {
-			InteractivePlayer ip = (InteractivePlayer) control.whitePlayer();
-			ip.setBoardPositionFinder(boardUI::findPosition);
-		}
-
-		if (control.blackPlayer() instanceof InteractivePlayer) {
-			InteractivePlayer ip = (InteractivePlayer) control.blackPlayer();
-			ip.setBoardPositionFinder(boardUI::findPosition);
-		}
-
 		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
@@ -95,6 +85,11 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	@Override
 	public Optional<Stone> getStoneAt(int p) {
 		return boardUI.stoneAt(p);
+	}
+
+	@Override
+	public OptionalInt findBoardPosition(int x, int y) {
+		return boardUI.findBoardPosition(x, y);
 	}
 
 	@Override
@@ -135,13 +130,6 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	@Override
 	public void toggleBoardPositionNumbers() {
 		boardUI.togglePositionNumbers();
-	}
-
-	@Override
-	public void playerChanged(Player player) {
-		if (player instanceof InteractivePlayer) {
-			((InteractivePlayer) player).setBoardPositionFinder(boardUI::findPosition);
-		}
 	}
 
 	@Override

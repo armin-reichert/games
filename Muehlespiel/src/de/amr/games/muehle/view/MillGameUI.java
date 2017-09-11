@@ -3,10 +3,10 @@ package de.amr.games.muehle.view;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.math.Vector2f;
-import de.amr.games.muehle.controller.player.Player;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 
@@ -18,6 +18,8 @@ public interface MillGameUI {
 	void clearBoard();
 
 	Optional<Stone> getStoneAt(int p);
+
+	OptionalInt findBoardPosition(int x, int y);
 
 	void removeStoneAt(int p);
 
@@ -34,7 +36,4 @@ public interface MillGameUI {
 	void markPositions(Graphics2D g, IntStream positions, Color color);
 
 	void toggleBoardPositionNumbers();
-
-	void playerChanged(Player player);
-
 }

@@ -51,7 +51,7 @@ public class TestScene extends Scene<MillTestApp> {
 	}
 
 	private void handleMouseClick() {
-		boardUI.findPosition(Mouse.getX(), Mouse.getY()).ifPresent(pos -> {
+		boardUI.findBoardPosition(Mouse.getX(), Mouse.getY()).ifPresent(pos -> {
 			if (board.isEmptyPosition(pos)) {
 				boardUI.putStoneAt(pos, Mouse.isLeftButton() ? WHITE : BLACK);
 			} else {

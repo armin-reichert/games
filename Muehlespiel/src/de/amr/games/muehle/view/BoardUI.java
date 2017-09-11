@@ -120,7 +120,7 @@ public class BoardUI extends GameEntity {
 		return center[p];
 	}
 
-	public OptionalInt findBoardPosition(int x, int y, int radius) {
+	public OptionalInt findNearestBoardPosition(int x, int y, int radius) {
 		Vector2f point = Vector2f.of(x, y);
 		/*@formatter:off*/
 		Optional<Integer> opt = positions().boxed()
@@ -130,10 +130,10 @@ public class BoardUI extends GameEntity {
 		return opt.isPresent() ? OptionalInt.of(opt.get()) : OptionalInt.empty();
 	}
 
-	public OptionalInt findPosition(int x, int y) {
+	public OptionalInt findBoardPosition(int x, int y) {
 		int boardX = abs(round(x - tf.getX()));
 		int boardY = abs(round(y - tf.getY()));
-		return findBoardPosition(boardX, boardY, gridSize / 2);
+		return findNearestBoardPosition(boardX, boardY, gridSize / 2);
 	}
 
 	public void showPositionNumbers() {

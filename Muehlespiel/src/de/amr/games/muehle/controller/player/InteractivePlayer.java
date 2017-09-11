@@ -40,18 +40,16 @@ public class InteractivePlayer implements Player {
 	private final Move move;
 	private BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
 
-	public InteractivePlayer(MillGameData model, StoneColor color) {
+	public InteractivePlayer(MillGameData model, BiFunction<Integer, Integer, OptionalInt> boardPositionFinder,
+			StoneColor color) {
+		this.model = model;
+		this.boardPositionFinder = boardPositionFinder;
+		this.color = color;
 		this.steering.put(NORTH, VK_UP);
 		this.steering.put(EAST, VK_RIGHT);
 		this.steering.put(SOUTH, VK_DOWN);
 		this.steering.put(WEST, VK_LEFT);
-		this.model = model;
-		this.color = color;
 		this.move = new Move();
-	}
-
-	public void setBoardPositionFinder(BiFunction<Integer, Integer, OptionalInt> boardPositionFinder) {
-		this.boardPositionFinder = boardPositionFinder;
 	}
 
 	@Override
