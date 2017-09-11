@@ -5,13 +5,13 @@ package de.amr.games.muehle.model.board;
  * 
  * @author Armin Reichert
  */
-public class MillGameData {
+public class MillGameModel {
 
 	public final Board board;
 	public int whiteStonesPlaced;
 	public int blackStonesPlaced;
 
-	public MillGameData() {
+	public MillGameModel() {
 		this.board = new Board();
 	}
 }

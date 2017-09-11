@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
-import de.amr.games.muehle.model.board.MillGameData;
+import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.rules.MovingRule;
@@ -21,13 +21,13 @@ import de.amr.games.muehle.rules.RemovalRule;
  */
 public abstract class RuleBasedPlayer implements Player {
 
-	private final MillGameData model;
+	private final MillGameModel model;
 	private final StoneColor color;
 	private final PlacingRule[] placingRules;
 	private final MovingRule[] movingRules;
 	private final RemovalRule[] removalRules;
 
-	public RuleBasedPlayer(MillGameData model, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
+	public RuleBasedPlayer(MillGameModel model, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
 			RemovalRule[] removalRules) {
 		this.model = model;
 		this.color = color;
@@ -37,7 +37,7 @@ public abstract class RuleBasedPlayer implements Player {
 	}
 
 	@Override
-	public MillGameData model() {
+	public MillGameModel model() {
 		return model;
 	}
 

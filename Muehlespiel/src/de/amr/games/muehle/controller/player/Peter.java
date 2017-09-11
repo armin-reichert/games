@@ -2,7 +2,7 @@ package de.amr.games.muehle.controller.player;
 
 import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 
-import de.amr.games.muehle.model.board.MillGameData;
+import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.rules.MovingRule;
@@ -50,7 +50,7 @@ public class Peter extends RuleBasedPlayer {
 		return false;
 	}
 
-	public Peter(MillGameData model, StoneColor color) {
+	public Peter(MillGameModel model, StoneColor color) {
 		super(model, color, PLACING_RULES, MOVING_RULES, REMOVAL_RULES);
 	}
 }

@@ -9,12 +9,12 @@ import de.amr.easy.game.Application;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Zwick;
-import de.amr.games.muehle.model.board.MillGameData;
+import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.view.MillGameScene;
 
 /**
- * Mühlespiel aka "Nine men's morris".
+ * Mühle (engl. "Nine men's morris").
  * 
  * @author Armin Reichert, Peter und Anna Schillo
  */
@@ -35,15 +35,12 @@ public class MillGameApp extends Application {
 
 	@Override
 	public void init() {
-		// Model
-		MillGameData model = new MillGameData();
+		MillGameModel model = new MillGameModel();
 
-		// Controller
 		MillGameController controller = new MillGameController(pulse, model);
 		controller.setMoveTimeSeconds(0.75f);
 		controller.setPlacingTimeSeconds(1.5f);
 
-		// View
 		MillGameScene gameScene = new MillGameScene(this, controller);
 		controller.setView(gameScene);
 

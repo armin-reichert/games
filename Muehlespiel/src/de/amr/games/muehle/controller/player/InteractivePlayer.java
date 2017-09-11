@@ -22,7 +22,7 @@ import java.util.function.BiFunction;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.games.muehle.model.board.Direction;
-import de.amr.games.muehle.model.board.MillGameData;
+import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -35,12 +35,12 @@ import de.amr.games.muehle.msg.Messages;
 public class InteractivePlayer implements Player {
 
 	private final EnumMap<Direction, Integer> steering = new EnumMap<>(Direction.class);
-	private final MillGameData model;
+	private final MillGameModel model;
 	private final StoneColor color;
 	private final Move move;
 	private BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
 
-	public InteractivePlayer(MillGameData model, BiFunction<Integer, Integer, OptionalInt> boardPositionFinder,
+	public InteractivePlayer(MillGameModel model, BiFunction<Integer, Integer, OptionalInt> boardPositionFinder,
 			StoneColor color) {
 		this.model = model;
 		this.boardPositionFinder = boardPositionFinder;
@@ -63,7 +63,7 @@ public class InteractivePlayer implements Player {
 	}
 
 	@Override
-	public MillGameData model() {
+	public MillGameModel model() {
 		return model;
 	}
 

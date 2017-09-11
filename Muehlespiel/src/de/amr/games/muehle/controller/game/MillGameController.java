@@ -14,7 +14,7 @@ import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.controller.move.MoveController;
 import de.amr.games.muehle.controller.move.MoveState;
 import de.amr.games.muehle.controller.player.Player;
-import de.amr.games.muehle.model.board.MillGameData;
+import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -29,7 +29,7 @@ import de.amr.games.muehle.view.MillGameUI;
 public class MillGameController extends MillGameStateMachine {
 
 	private final Pulse pulse;
-	public final MillGameData model;
+	public final MillGameModel model;
 	private MillGameUI view;
 	private Assistant assistant;
 	private Player whitePlayer;
@@ -40,7 +40,7 @@ public class MillGameController extends MillGameStateMachine {
 	private float moveTimeSeconds = 0.75f;
 	private float placingTimeSeconds = 1.5f;
 
-	public MillGameController(Pulse pulse, MillGameData model) {
+	public MillGameController(Pulse pulse, MillGameModel model) {
 		this.pulse = pulse;
 		this.model = model;
 	}

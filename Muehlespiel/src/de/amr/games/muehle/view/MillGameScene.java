@@ -17,7 +17,7 @@ import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
 import de.amr.games.muehle.controller.player.Player;
-import de.amr.games.muehle.model.board.MillGameData;
+import de.amr.games.muehle.model.board.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
@@ -30,7 +30,7 @@ import de.amr.games.muehle.msg.Messages;
 public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	private final MillGameController control;
-	private final MillGameData model;
+	private final MillGameModel model;
 
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
