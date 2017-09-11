@@ -6,7 +6,7 @@ import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 import java.util.Locale;
 
 import de.amr.easy.game.Application;
-import de.amr.games.muehle.controller.MillGameController;
+import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Zwick;
 import de.amr.games.muehle.model.board.Board;

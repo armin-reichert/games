@@ -13,8 +13,8 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.muehle.controller.MillGameController;
-import de.amr.games.muehle.controller.fsm.MillGamePhase;
+import de.amr.games.muehle.controller.game.MillGameController;
+import de.amr.games.muehle.controller.game.MillGameState;
 import de.amr.games.muehle.controller.player.Player;
 import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.model.board.StoneColor;
@@ -92,11 +92,11 @@ public class Assistant extends GameEntity {
 		if (helpLevel != HelpLevel.OFF && Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
 			if (helpLevel == HelpLevel.HIGH && control.playerInTurn().isInteractive()) {
-				if (control.is(MillGamePhase.PLACING, MillGamePhase.PLACING_REMOVING)) {
+				if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
 					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().color()), Color.GREEN);
 					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().color()), Color.YELLOW);
 					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().color()), Color.RED);
-				} else if (control.is(MillGamePhase.MOVING, MillGamePhase.MOVING_REMOVING)) {
+				} else if (control.is(MillGameState.MOVING, MillGameState.MOVING_REMOVING)) {
 					markPossibleMoveStarts(g, control.playerInTurn().color(), Color.GREEN);
 					markTrappingPosition(g, control.playerInTurn().color(), control.playerNotInTurn().color(), Color.RED);
 				}

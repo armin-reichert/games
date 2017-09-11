@@ -1,14 +1,14 @@
-package de.amr.games.muehle.controller.fsm;
+package de.amr.games.muehle.controller.game;
 
-import static de.amr.games.muehle.controller.fsm.MillGameEvent.STONE_PLACED;
-import static de.amr.games.muehle.controller.fsm.MillGameEvent.STONE_PLACED_IN_MILL;
-import static de.amr.games.muehle.controller.fsm.MillGameEvent.STONE_REMOVED;
-import static de.amr.games.muehle.controller.fsm.MillGamePhase.GAME_OVER;
-import static de.amr.games.muehle.controller.fsm.MillGamePhase.MOVING;
-import static de.amr.games.muehle.controller.fsm.MillGamePhase.MOVING_REMOVING;
-import static de.amr.games.muehle.controller.fsm.MillGamePhase.PLACING;
-import static de.amr.games.muehle.controller.fsm.MillGamePhase.PLACING_REMOVING;
-import static de.amr.games.muehle.controller.fsm.MillGamePhase.STARTING;
+import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
+import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
+import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
+import static de.amr.games.muehle.controller.game.MillGameState.GAME_OVER;
+import static de.amr.games.muehle.controller.game.MillGameState.MOVING;
+import static de.amr.games.muehle.controller.game.MillGameState.MOVING_REMOVING;
+import static de.amr.games.muehle.controller.game.MillGameState.PLACING;
+import static de.amr.games.muehle.controller.game.MillGameState.PLACING_REMOVING;
+import static de.amr.games.muehle.controller.game.MillGameState.STARTING;
 
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
@@ -20,19 +20,19 @@ import de.amr.easy.statemachine.Transition;
  * @author Armin Reichert
  *
  */
-public abstract class MillGameStateMachine extends StateMachine<MillGamePhase, MillGameEvent> {
+public abstract class MillGameStateMachine extends StateMachine<MillGameState, MillGameEvent> {
 
 	protected abstract void resetGame(State state);
 
 	protected abstract void tryToPlaceStone(State state);
 
-	protected abstract void onMillClosedByPlacing(Transition<MillGamePhase, MillGameEvent> change);
+	protected abstract void onMillClosedByPlacing(Transition<MillGameState, MillGameEvent> change);
 
 	protected abstract boolean areAllStonesPlaced();
 
-	protected abstract void switchMoving(Transition<MillGamePhase, MillGameEvent> change);
+	protected abstract void switchMoving(Transition<MillGameState, MillGameEvent> change);
 
-	protected abstract void switchPlacing(Transition<MillGamePhase, MillGameEvent> change);
+	protected abstract void switchPlacing(Transition<MillGameState, MillGameEvent> change);
 
 	protected abstract void startRemoving(State state);
 
@@ -51,7 +51,7 @@ public abstract class MillGameStateMachine extends StateMachine<MillGamePhase, M
 	protected abstract boolean shallStartNewGame();
 
 	public MillGameStateMachine() {
-		super("MillGameControl", MillGamePhase.class, STARTING);
+		super("MillGameControl", MillGameState.class, STARTING);
 
 		// STARTING
 

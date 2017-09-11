@@ -1,5 +1,5 @@
-package de.amr.games.muehle.controller.fsm;
+package de.amr.games.muehle.controller.game;
 
-public enum MillGamePhase {
+public enum MillGameState {
 	STARTING, PLACING, PLACING_REMOVING, MOVING, MOVING_REMOVING, JUMPING, GAME_OVER
 }

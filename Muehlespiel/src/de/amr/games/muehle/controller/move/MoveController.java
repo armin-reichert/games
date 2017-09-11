@@ -1,11 +1,11 @@
-package de.amr.games.muehle.controller;
+package de.amr.games.muehle.controller.move;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.muehle.controller.MoveEvent.GOT_MOVE_FROM_PLAYER;
-import static de.amr.games.muehle.controller.MoveState.ANIMATION;
-import static de.amr.games.muehle.controller.MoveState.COMPLETE;
-import static de.amr.games.muehle.controller.MoveState.JUMPING;
-import static de.amr.games.muehle.controller.MoveState.READING_MOVE;
+import static de.amr.games.muehle.controller.move.MoveEvent.GOT_MOVE_FROM_PLAYER;
+import static de.amr.games.muehle.controller.move.MoveState.ANIMATION;
+import static de.amr.games.muehle.controller.move.MoveState.COMPLETE;
+import static de.amr.games.muehle.controller.move.MoveState.JUMPING;
+import static de.amr.games.muehle.controller.move.MoveState.READING_MOVE;
 import static de.amr.games.muehle.model.board.Board.areNeighbors;
 import static de.amr.games.muehle.model.board.Board.getDirection;
 

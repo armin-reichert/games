@@ -1,9 +1,9 @@
-package de.amr.games.muehle.controller;
+package de.amr.games.muehle.controller.game;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.muehle.controller.fsm.MillGameEvent.STONE_PLACED;
-import static de.amr.games.muehle.controller.fsm.MillGameEvent.STONE_PLACED_IN_MILL;
-import static de.amr.games.muehle.controller.fsm.MillGameEvent.STONE_REMOVED;
+import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
+import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
+import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
 
 import java.awt.event.KeyEvent;
 
@@ -11,9 +11,8 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.Transition;
-import de.amr.games.muehle.controller.fsm.MillGameEvent;
-import de.amr.games.muehle.controller.fsm.MillGamePhase;
-import de.amr.games.muehle.controller.fsm.MillGameStateMachine;
+import de.amr.games.muehle.controller.move.MoveController;
+import de.amr.games.muehle.controller.move.MoveState;
 import de.amr.games.muehle.controller.player.Player;
 import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.model.board.Move;
@@ -171,7 +170,7 @@ public class MillGameController extends MillGameStateMachine {
 	}
 
 	@Override
-	protected void switchPlacing(Transition<MillGamePhase, MillGameEvent> change) {
+	protected void switchPlacing(Transition<MillGameState, MillGameEvent> change) {
 		turnPlacingTo(playerNotInTurn());
 		if (!turn.isInteractive()) {
 			pause(pulse.secToTicks(placingTimeSeconds));
@@ -179,14 +178,14 @@ public class MillGameController extends MillGameStateMachine {
 	}
 
 	@Override
-	protected void onMillClosedByPlacing(Transition<MillGamePhase, MillGameEvent> change) {
+	protected void onMillClosedByPlacing(Transition<MillGameState, MillGameEvent> change) {
 		if (assistedPlayer == turn) {
 			assistant.tellMillClosed();
 		}
 	}
 
 	@Override
-	protected void switchMoving(Transition<MillGamePhase, MillGameEvent> change) {
+	protected void switchMoving(Transition<MillGameState, MillGameEvent> change) {
 		turnMovingTo(playerNotInTurn());
 	}
 

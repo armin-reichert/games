@@ -13,8 +13,8 @@ import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.scene.Scene;
 import de.amr.games.muehle.MillGameApp;
-import de.amr.games.muehle.controller.MillGameController;
-import de.amr.games.muehle.controller.fsm.MillGamePhase;
+import de.amr.games.muehle.controller.game.MillGameController;
+import de.amr.games.muehle.controller.game.MillGameState;
 import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Player;
 import de.amr.games.muehle.model.board.Move;
@@ -147,11 +147,11 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (control.is(MillGamePhase.PLACING, MillGamePhase.PLACING_REMOVING)) {
+		if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
 			drawStonesLeft(g, control.whitePlayer(), 9 - control.numWhiteStonesPlaced(), 40, getHeight() - 30);
 			drawStonesLeft(g, control.blackPlayer(), 9 - control.numBlackStonesPlaced(), getWidth() - 100, getHeight() - 30);
 		}
-		if (control.is(MillGamePhase.MOVING_REMOVING, MillGamePhase.PLACING_REMOVING)
+		if (control.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
 				&& control.playerInTurn().isInteractive()) {
 			boardUI.markRemovableStones(g, control.playerNotInTurn().color());
 		}
