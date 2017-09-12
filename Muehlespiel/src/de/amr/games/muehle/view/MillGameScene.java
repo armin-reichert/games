@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
@@ -30,7 +29,7 @@ import de.amr.games.muehle.msg.Messages;
  */
 public class MillGameScene extends PassiveScene<MillGameApp> implements MillGameUI {
 
-	private final MillGameController control;
+	private final MillGameController controller;
 	private final MillGameModel model;
 
 	private final BoardUI boardUI;
@@ -40,7 +39,7 @@ public class MillGameScene extends PassiveScene<MillGameApp> implements MillGame
 
 	public MillGameScene(MillGameApp app, MillGameController control) {
 		super(app);
-		this.control = control;
+		this.controller = control;
 		this.model = control.model;
 		setBgColor(BOARD_COLOR.darker());
 		boardUI = new BoardUI(model.board);
@@ -63,16 +62,14 @@ public class MillGameScene extends PassiveScene<MillGameApp> implements MillGame
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 		messageArea.tf.moveTo(0, getHeight() - 90);
 
-		control.assistant.hCenter(getWidth());
-		control.assistant.tf.setY(getHeight() / 2 - 100);
+		controller.assistant.hCenter(getWidth());
+		controller.assistant.tf.setY(getHeight() / 2 - 100);
 
-		control.setLogger(Application.LOG);
-		control.init();
 	}
 
 	@Override
 	public Controller getController() {
-		return control;
+		return controller;
 	}
 
 	@Override
@@ -134,16 +131,16 @@ public class MillGameScene extends PassiveScene<MillGameApp> implements MillGame
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		boardUI.draw(g);
-		control.assistant.draw(g);
+		controller.assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
-		if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
-			drawStonesLeft(g, control.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
-			drawStonesLeft(g, control.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
+		if (controller.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
+			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
+			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
 		}
-		if (control.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
-				&& control.playerInTurn().isInteractive()) {
-			boardUI.markRemovableStones(g, control.playerNotInTurn().color());
+		if (controller.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
+				&& controller.playerInTurn().isInteractive()) {
+			boardUI.markRemovableStones(g, controller.playerNotInTurn().color());
 		}
 	}
 
@@ -156,7 +153,7 @@ public class MillGameScene extends PassiveScene<MillGameApp> implements MillGame
 			g.translate(-inset, inset);
 		});
 		if (stonesLeft > 1) {
-			g.setColor(player == control.playerInTurn() ? Color.RED : Color.DARK_GRAY);
+			g.setColor(player == controller.playerInTurn() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(stonesCounterFont);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(), stoneTemplate.getRadius());

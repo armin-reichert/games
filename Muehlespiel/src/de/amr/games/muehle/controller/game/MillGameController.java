@@ -39,13 +39,15 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	private Player turn;
 	private Player assistedPlayer;
 	private MoveController moveControl;
-	private float moveTimeSeconds = 0.75f;
-	private float placingTimeSeconds = 1.5f;
+	private float moveTimeSeconds;
+	private float placingTimeSeconds;
 
 	public MillGameController(Pulse pulse, MillGameModel model) {
 		this.pulse = pulse;
 		this.model = model;
 		this.assistant = new Assistant(this);
+		this.moveTimeSeconds = 0.75f;
+		this.placingTimeSeconds = 1.5f;
 	}
 
 	public Player whitePlayer() {
