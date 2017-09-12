@@ -31,6 +31,6 @@ public class BreakoutGame extends Application {
 		Assets.image("bat_blue.png");
 		Assets.sound("Sounds/plop.mp3");
 		Assets.sound("Sounds/point.mp3");
-		selectView(new PlayScene(this));
+		select(new PlayScene(this));
 	}
 }

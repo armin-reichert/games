@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import de.amr.demos.maze.MazeDemoApp;
-import de.amr.demos.maze.bfs.BFSTraversalScene;
-import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.demos.maze.ui.GridVisualization;
 import de.amr.easy.game.input.Keyboard;
@@ -76,7 +74,7 @@ public class MazeGeneration extends ActiveScene<MazeDemoApp> {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
-			app.selectView(MazeGeneration.class);
+			app.select(app.generationScene);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_PLUS)) {
 			animation.faster(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_MINUS)) {
@@ -84,9 +82,9 @@ public class MazeGeneration extends ActiveScene<MazeDemoApp> {
 		}
 		if (aborted) {
 			stopGeneration();
-			app.selectView(Menu.class);
+			app.select(app.menuScene);
 		} else if (!mazeGeneration.isAlive()) {
-			app.selectView(BFSTraversalScene.class);
+			app.select(app.traversalScene);
 		}
 	}
 

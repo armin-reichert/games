@@ -34,6 +34,8 @@ public class PongGame extends Application {
 	}
 
 	private Score scorePlayerLeft, scorePlayerRight;
+	public MenuScene menuScene;
+	public PlayScene playScene;
 
 	public PongGame() {
 		settings.title = "Pong";
@@ -66,19 +68,19 @@ public class PongGame extends Application {
 		paddleRight.setName("paddleRight");
 		entities.add(paddleRight);
 
-		addView(new MenuScene(this));
-		addView(new PlayScene(this));
-		selectView(MenuScene.class);
+		menuScene = new MenuScene(this);
+		playScene = new PlayScene(this);
+		select(menuScene);
 
 		setPlayMode(PlayMode.Player1_Player2);
 	}
 
 	public void setPlayMode(PlayMode playMode) {
-		findView(MenuScene.class).setSelectedPlayMode(playMode);
+		menuScene.setSelectedPlayMode(playMode);
 	}
 
 	public PlayMode getPlayMode() {
-		return findView(MenuScene.class).getSelectedPlayMode();
+		return menuScene.getSelectedPlayMode();
 	}
 
 	public Score getScorePlayerLeft() {

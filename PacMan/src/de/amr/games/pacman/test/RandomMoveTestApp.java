@@ -24,6 +24,6 @@ public class RandomMoveTestApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new RandomMoveTestScene(this));
+		select(new RandomMoveTestScene(this));
 	}
 }

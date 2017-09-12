@@ -33,6 +33,6 @@ public class PacManGame extends Application {
 
 	@Override
 	public void init() {
-		selectView(new PlayScene(this));
+		select(new PlayScene(this));
 	}
 }

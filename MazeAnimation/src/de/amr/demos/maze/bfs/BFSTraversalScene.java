@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.demos.maze.MazeDemoApp;
-import de.amr.demos.maze.scene.generation.MazeGeneration;
-import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
@@ -68,11 +66,11 @@ public class BFSTraversalScene extends ActiveScene<MazeDemoApp> {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
 			aborted = true;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !bfsRunner.isAlive()) {
-			app.selectView(MazeGeneration.class);
+			app.select(app.generationScene);
 		}
 		if (aborted) {
 			stopBreadthFirstTraversal();
-			app.selectView(Menu.class);
+			app.select(app.menuScene);
 		}
 	}
 

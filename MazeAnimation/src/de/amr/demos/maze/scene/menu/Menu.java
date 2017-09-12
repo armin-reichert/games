@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.amr.demos.maze.MazeDemoApp;
-import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 
@@ -36,8 +35,7 @@ public class Menu extends ActiveScene<MazeDemoApp> {
 
 	public Menu(MazeDemoApp app) {
 		super(app);
-		entries.add(
-				new MenuEntry("Press ENTER to start maze generation", VK_ENTER, () -> app.selectView(MazeGeneration.class)));
+		entries.add(new MenuEntry("Press ENTER to start maze generation", VK_ENTER, () -> app.select(app.generationScene)));
 		entries.add(new MenuEntry("Press ESCAPE to exit program", VK_ESCAPE, null));
 	}
 

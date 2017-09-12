@@ -26,7 +26,6 @@ public class InkyTestApp extends Application {
 
 	@Override
 	public void init() {
-		addView(new InkyTestScene(this));
-		selectView(InkyTestScene.class);
+		select(new InkyTestScene(this));
 	}
 }

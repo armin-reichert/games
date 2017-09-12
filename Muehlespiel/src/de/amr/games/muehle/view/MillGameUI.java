@@ -7,10 +7,11 @@ import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.math.Vector2f;
+import de.amr.easy.game.view.View;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 
-public interface MillGameUI {
+public interface MillGameUI extends View {
 
 	static final Color BOARD_COLOR = new Color(255, 255, 224);
 	static final Color LINE_COLOR = Color.BLACK;

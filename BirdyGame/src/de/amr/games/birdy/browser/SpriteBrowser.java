@@ -19,6 +19,6 @@ public class SpriteBrowser extends Application {
 	@Override
 	public void init() {
 		SpritesheetReader.extractSpriteSheet();
-		selectView(new SpriteBrowserScene(this));
+		select(new SpriteBrowserScene(this));
 	}
 }

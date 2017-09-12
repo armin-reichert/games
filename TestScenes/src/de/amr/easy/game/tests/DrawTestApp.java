@@ -16,7 +16,7 @@ public class DrawTestApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new DrawTestScene(this));
+		select(new DrawTestScene(this));
 	}
 
 }

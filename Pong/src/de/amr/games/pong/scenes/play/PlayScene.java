@@ -26,7 +26,6 @@ import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.ScoreDisplay;
-import de.amr.games.pong.scenes.menu.MenuScene;
 
 /**
  * The play scene of the "Pong" game.
@@ -121,7 +120,7 @@ public class PlayScene extends ActiveScene<PongGame> {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_CONTROL, VK_C)) {
-			app.selectView(MenuScene.class);
+			app.select(app.menuScene);
 		}
 		control.update();
 	}

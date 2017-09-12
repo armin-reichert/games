@@ -23,7 +23,7 @@ public class Diashow extends Application {
 		Assets.image("1.jpg");
 		Assets.image("2.jpg");
 		Assets.image("3.jpg");
-		addView(new DiashowScreen(this));
-		selectView(DiashowScreen.class);
+		DiashowScreen scene = new DiashowScreen(this);
+		select(scene);
 	}
 }

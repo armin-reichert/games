@@ -16,6 +16,6 @@ public class MouseTestApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new MouseTestScene(this));
+		select(new MouseTestScene(this));
 	}
 }

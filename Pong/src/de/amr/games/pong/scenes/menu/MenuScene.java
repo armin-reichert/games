@@ -15,7 +15,6 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.PongGame.PlayMode;
-import de.amr.games.pong.scenes.play.PlayScene;
 
 /**
  * The menu scene of the "Pong" game.
@@ -57,7 +56,7 @@ public class MenuScene extends ActiveScene<PongGame> {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_ENTER)) {
-			app.selectView(PlayScene.class);
+			app.select(app.playScene);
 		}
 		control.update();
 	}

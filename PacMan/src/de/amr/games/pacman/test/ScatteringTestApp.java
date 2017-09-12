@@ -24,6 +24,6 @@ public class ScatteringTestApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new ScatteringTestScene(this));
+		select(new ScatteringTestScene(this));
 	}
 }

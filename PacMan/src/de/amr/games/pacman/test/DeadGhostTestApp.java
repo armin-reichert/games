@@ -26,6 +26,6 @@ public class DeadGhostTestApp extends Application {
 
 	@Override
 	public void init() {
-		selectView(new DeadGhostTestScene(this));
+		select(new DeadGhostTestScene(this));
 	}
 }

@@ -69,7 +69,7 @@ public class StartScene extends ActiveScene<BirdyGame> {
 				displayText("readyText");
 			};
 
-			changeOnTimeout(Ready, StartPlaying, t -> app.selectView(PlayScene.class));
+			changeOnTimeout(Ready, StartPlaying, t -> app.select(app.getPlayScene()));
 
 			changeOnInput(BirdTouchedGround, Ready, GameOver, t -> displayText("title"));
 

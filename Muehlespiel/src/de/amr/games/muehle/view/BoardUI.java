@@ -2,7 +2,6 @@ package de.amr.games.muehle.view;
 
 import static de.amr.easy.game.math.Vector2f.dist;
 import static de.amr.games.muehle.model.board.Board.NUM_POS;
-import static de.amr.games.muehle.model.board.Board.neighbors;
 import static de.amr.games.muehle.model.board.Board.positions;
 import static java.lang.Math.abs;
 import static java.lang.Math.round;
@@ -161,7 +160,7 @@ public class BoardUI extends GameEntity {
 		// Lines
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius / 2));
-		positions().forEach(from -> neighbors(from).filter(to -> to > from).forEach(to -> {
+		positions().forEach(from -> Board.neighbors(from).filter(to -> to > from).forEach(to -> {
 			g.drawLine(center[from].roundedX(), center[from].roundedY(), center[to].roundedX(), center[to].roundedY());
 		}));
 		// Positions

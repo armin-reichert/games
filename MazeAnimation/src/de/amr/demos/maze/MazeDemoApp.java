@@ -7,6 +7,7 @@ import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.easy.game.Application;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.impl.ObservableGrid;
@@ -27,18 +28,19 @@ public class MazeDemoApp extends Application {
 		pulse.setFrequency(30);
 	}
 
+	public ActiveScene<MazeDemoApp> menuScene, generationScene, traversalScene;
 	private ObservableGrid<TraversalState, Integer> grid;
 	private GridAnimation animation;
 
 	@Override
 	public void init() {
-		addView(new Menu(this));
-		addView(new MazeGeneration(this));
-		addView(new BFSTraversalScene(this));
+		menuScene = new Menu(this);
+		generationScene = new MazeGeneration(this);
+		traversalScene = new BFSTraversalScene(this);
 		int cellSize = settings.getAsInt("cellSize");
 		grid = new ObservableGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
 		animation = new GridAnimation(grid, cellSize, getWidth(), getHeight());
-		selectView(Menu.class);
+		select(menuScene);
 	}
 
 	public ObservableGrid<TraversalState, Integer> getGrid() {
