@@ -28,10 +28,10 @@ import de.amr.games.muehle.view.MillGameUI;
  */
 public class MillGameController extends MillGameStateMachine {
 
-	private final Pulse pulse;
+	public final Pulse pulse;
 	public final MillGameModel model;
+	public final Assistant assistant;
 	private MillGameUI view;
-	private Assistant assistant;
 	private Player whitePlayer;
 	private Player blackPlayer;
 	private Player turn;
@@ -43,6 +43,7 @@ public class MillGameController extends MillGameStateMachine {
 	public MillGameController(Pulse pulse, MillGameModel model) {
 		this.pulse = pulse;
 		this.model = model;
+		this.assistant = new Assistant(this);
 	}
 
 	public Player whitePlayer() {
@@ -63,6 +64,7 @@ public class MillGameController extends MillGameStateMachine {
 
 	public void setView(MillGameUI view) {
 		this.view = view;
+		assistant.setView(view);
 	}
 
 	public void setMoveTimeSeconds(float moveTimeSeconds) {
@@ -109,10 +111,6 @@ public class MillGameController extends MillGameStateMachine {
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			view.toggleBoardPositionNumbers();
 		}
-	}
-
-	public void setAssistant(Assistant assistant) {
-		this.assistant = assistant;
 	}
 
 	private void announceWinner(Player winner) {

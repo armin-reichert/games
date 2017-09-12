@@ -34,7 +34,6 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
-	private final Assistant assistant;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
@@ -45,7 +44,6 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		setBgColor(BOARD_COLOR.darker());
 		boardUI = new BoardUI(model.board);
 		messageArea = new TextArea();
-		assistant = new Assistant(control, this);
 	}
 
 	@Override
@@ -64,10 +62,9 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 		messageArea.tf.moveTo(0, getHeight() - 90);
 
-		assistant.hCenter(getWidth());
-		assistant.tf.setY(getHeight() / 2 - 100);
+		control.assistant.hCenter(getWidth());
+		control.assistant.tf.setY(getHeight() / 2 - 100);
 
-		control.setAssistant(assistant);
 		control.setLogger(Application.LOG);
 		control.init();
 	}
@@ -136,7 +133,7 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		boardUI.draw(g);
-		assistant.draw(g);
+		control.assistant.draw(g);
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {

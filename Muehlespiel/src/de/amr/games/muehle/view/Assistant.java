@@ -50,16 +50,18 @@ public class Assistant extends GameEntity {
 
 	private final Board board;
 	private final MillGameController control;
-	private final MillGameUI view;
-
+	private MillGameUI view;
 	private HelpLevel helpLevel;
 
-	public Assistant(MillGameController control, MillGameUI view) {
+	public Assistant(MillGameController control) {
 		this.control = control;
 		this.board = control.model.board;
-		this.view = view;
 		this.helpLevel = HelpLevel.OFF;
 		setSprites(new Sprite(Assets.image("images/alien.png")).scale(100, 100));
+	}
+
+	public void setView(MillGameUI view) {
+		this.view = view;
 	}
 
 	public HelpLevel getHelpLevel() {
