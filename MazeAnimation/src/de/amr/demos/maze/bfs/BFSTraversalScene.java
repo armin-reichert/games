@@ -10,14 +10,14 @@ import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.graph.alg.traversal.BreadthFirstTraversal;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.graph.api.WeightedEdge;
 import de.amr.easy.grid.api.GridPosition;
 import de.amr.easy.grid.impl.ObservableGrid;
 
-public class BFSTraversalScene extends Scene<MazeDemoApp> {
+public class BFSTraversalScene extends ActiveScene<MazeDemoApp> {
 
 	private ObservableGrid<TraversalState, Integer> grid;
 	private BreadthFirstTraversal<Integer, WeightedEdge<Integer, Integer>> bfs;

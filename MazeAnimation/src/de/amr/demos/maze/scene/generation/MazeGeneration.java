@@ -12,7 +12,7 @@ import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.demos.maze.ui.GridVisualization;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.api.Grid2D;
 import de.amr.easy.grid.api.GridPosition;
@@ -31,7 +31,7 @@ import de.amr.easy.maze.alg.RecursiveDivision;
 import de.amr.easy.maze.alg.wilson.WilsonUSTHilbertCurve;
 import de.amr.easy.maze.alg.wilson.WilsonUSTNestedRectangles;
 
-public class MazeGeneration extends Scene<MazeDemoApp> {
+public class MazeGeneration extends ActiveScene<MazeDemoApp> {
 
 	private static final Logger LOG = Logger.getLogger(MazeGeneration.class.getName());
 

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
@@ -26,7 +26,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  * 
  * @author Armin Reichert
  */
-public class RandomMoveTestScene extends Scene<RandomMoveTestApp> {
+public class RandomMoveTestScene extends ActiveScene<RandomMoveTestApp> {
 
 	private final PacManTheme theme;
 	private final Random rand = new Random();

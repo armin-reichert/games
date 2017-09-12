@@ -21,7 +21,7 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.breakout.BreakoutGame;
 import de.amr.games.breakout.entities.Ball;
@@ -33,7 +33,7 @@ import de.amr.games.breakout.entities.Brick;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PlayScene extends Scene<BreakoutGame> {
+public class PlayScene extends ActiveScene<BreakoutGame> {
 
 	private final PlaySceneControl control;
 	private Bat bat;

@@ -12,7 +12,8 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.PassiveScene;
+import de.amr.easy.game.view.Controller;
 import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
@@ -27,7 +28,7 @@ import de.amr.games.muehle.msg.Messages;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
+public class MillGameScene extends PassiveScene<MillGameApp> implements MillGameUI {
 
 	private final MillGameController control;
 	private final MillGameModel model;
@@ -70,8 +71,8 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 	}
 
 	@Override
-	public void update() {
-		control.update();
+	public Controller getController() {
+		return control;
 	}
 
 	@Override

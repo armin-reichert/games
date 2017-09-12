@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.controls.TextArea;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.play.BirdyGame;
@@ -24,7 +24,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class IntroScene extends Scene<BirdyGame> {
+public class IntroScene extends ActiveScene<BirdyGame> {
 
 	private static final String CREDITS_TEXT = "Anna proudly presents\nin cooperation with\nProf. Zwickmann\nGeräteschuppen Software 2017";
 

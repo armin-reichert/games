@@ -21,14 +21,14 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.theme.ClassicTheme;
 import de.amr.games.pacman.theme.PacManTheme;
 
-public class DeadGhostTestScene extends Scene<DeadGhostTestApp> {
+public class DeadGhostTestScene extends ActiveScene<DeadGhostTestApp> {
 
 	public static final Tile GHOST_HOUSE_ENTRY = new Tile(14, 13);
 

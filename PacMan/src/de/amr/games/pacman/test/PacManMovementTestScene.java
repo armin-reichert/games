@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.State;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
@@ -46,7 +46,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  * 
  * @author Armin Reichert
  */
-public class PacManMovementTestScene extends Scene<PacManMovementTestApp> {
+public class PacManMovementTestScene extends ActiveScene<PacManMovementTestApp> {
 
 	private static final Tile PACMAN_HOME = new Tile(26, 13);
 	private static final Tile GHOST_HOUSE_LEFT = new Tile(17, 12);

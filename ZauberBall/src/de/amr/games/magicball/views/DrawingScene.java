@@ -4,11 +4,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.magicball.MagicBallApp;
 import de.amr.games.magicball.entities.Pen;
 
-public class DrawingScene extends Scene<MagicBallApp> {
+public class DrawingScene extends ActiveScene<MagicBallApp> {
 
 	private final BufferedImage image;
 	private final Pen pen;

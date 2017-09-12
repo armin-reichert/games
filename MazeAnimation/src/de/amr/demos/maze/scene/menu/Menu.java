@@ -12,9 +12,9 @@ import java.util.List;
 import de.amr.demos.maze.MazeDemoApp;
 import de.amr.demos.maze.scene.generation.MazeGeneration;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 
-public class Menu extends Scene<MazeDemoApp> {
+public class Menu extends ActiveScene<MazeDemoApp> {
 
 	private Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
 	private Color textColor = Color.BLACK;

@@ -7,9 +7,9 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 
-public class MouseTestScene extends Scene<MouseTestApp> {
+public class MouseTestScene extends ActiveScene<MouseTestApp> {
 
 	private TextArea messageDisplay;
 

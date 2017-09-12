@@ -3,9 +3,9 @@ package de.amr.games.perf;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 
-public class MainScene extends Scene<GamePerformanceApp> {
+public class MainScene extends ActiveScene<GamePerformanceApp> {
 
 	private int sampleIndex;
 	private int[] fpsValues;

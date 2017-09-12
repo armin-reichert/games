@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.timing.Pulse;
+import de.amr.easy.game.view.Controller;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.controller.move.MoveController;
@@ -26,7 +27,7 @@ import de.amr.games.muehle.view.MillGameUI;
  * 
  * @author Armin Reichert
  */
-public class MillGameController extends MillGameStateMachine {
+public class MillGameController extends MillGameStateMachine implements Controller {
 
 	public final Pulse pulse;
 	public final MillGameModel model;

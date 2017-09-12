@@ -67,7 +67,7 @@ import de.amr.easy.game.controls.FlashText;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.BonusSymbol;
@@ -90,7 +90,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  * 
  * @author Armin Reichert
  */
-public class PlayScene extends Scene<PacManGame> {
+public class PlayScene extends ActiveScene<PacManGame> {
 
 	// Prominent board locations
 	public static final Tile PACMAN_HOME = new Tile(26, 13);

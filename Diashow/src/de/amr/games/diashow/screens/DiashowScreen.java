@@ -6,10 +6,10 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.diashow.Diashow;
 
-public class DiashowScreen extends Scene<Diashow> {
+public class DiashowScreen extends ActiveScene<Diashow> {
 
 	private static final int KEY_NEXT = KeyEvent.VK_SPACE;
 

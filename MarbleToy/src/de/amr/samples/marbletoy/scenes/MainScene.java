@@ -2,11 +2,11 @@ package de.amr.samples.marbletoy.scenes;
 
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.samples.marbletoy.MarbleToySimulation;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
-public class MainScene extends Scene<MarbleToySimulation> {
+public class MainScene extends ActiveScene<MarbleToySimulation> {
 
 	private MarbleToy toy;
 

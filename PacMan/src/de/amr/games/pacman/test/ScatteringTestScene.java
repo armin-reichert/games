@@ -23,7 +23,7 @@ import java.util.List;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
@@ -38,7 +38,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  * 
  * @author Armin Reichert
  */
-public class ScatteringTestScene extends Scene<ScatteringTestApp> {
+public class ScatteringTestScene extends ActiveScene<ScatteringTestApp> {
 
 	private final PacManTheme theme;
 	private final Board board;

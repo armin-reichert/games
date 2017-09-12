@@ -11,7 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.PongGame.PlayMode;
@@ -22,7 +22,7 @@ import de.amr.games.pong.scenes.play.PlayScene;
  * 
  * @author Armin Reichert
  */
-public class MenuScene extends Scene<PongGame> {
+public class MenuScene extends ActiveScene<PongGame> {
 
 	private StateMachine<PlayMode, String> createStateMachine() {
 		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);

@@ -8,9 +8,9 @@ import java.util.Random;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 
-public class DrawTestScene extends Scene<DrawTestApp> {
+public class DrawTestScene extends ActiveScene<DrawTestApp> {
 
 	private BufferedImage drawArea;
 	private Graphics2D pen;

@@ -11,9 +11,9 @@ import java.util.List;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 
-public class SpriteBrowserScene extends Scene<SpriteBrowser> {
+public class SpriteBrowserScene extends ActiveScene<SpriteBrowser> {
 
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);
 	private final List<String> spriteNames;

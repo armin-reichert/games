@@ -17,7 +17,7 @@ import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -33,7 +33,7 @@ import de.amr.games.pacman.theme.PacManTheme;
  * 
  * @author Armin Reichert
  */
-public class BlinkyTestScene extends Scene<BlinkyTestApp> {
+public class BlinkyTestScene extends ActiveScene<BlinkyTestApp> {
 
 	private final Random rand = new Random();
 	private final PacManTheme theme;

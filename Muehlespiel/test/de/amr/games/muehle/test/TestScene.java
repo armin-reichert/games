@@ -10,12 +10,12 @@ import java.awt.Graphics2D;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.view.BoardUI;
 import de.amr.games.muehle.view.MillGameUI;
 
-public class TestScene extends Scene<MillTestApp> {
+public class TestScene extends ActiveScene<MillTestApp> {
 
 	private final Board board;
 	private BoardUI boardUI;
