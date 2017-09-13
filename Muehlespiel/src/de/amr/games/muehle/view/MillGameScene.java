@@ -48,7 +48,6 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	@Override
 	public void init() {
-
 		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
@@ -64,7 +63,6 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 		controller.assistant.hCenter(getWidth());
 		controller.assistant.tf.setY(getHeight() / 2 - 100);
-
 	}
 
 	@Override
@@ -146,9 +144,11 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	private void drawStonesLeft(Graphics2D g, Player player, int stonesLeft, int x, int y) {
 		stoneTemplate.setColor(player.color());
+		stoneTemplate.setRadius(boardUI.getStoneRadius() - stonesLeft);
 		final int inset = 6;
 		g.translate(x + inset * stonesLeft, y - inset * stonesLeft);
 		IntStream.range(0, stonesLeft).forEach(i -> {
+			stoneTemplate.setRadius(stoneTemplate.getRadius() + 1);
 			stoneTemplate.draw(g);
 			g.translate(-inset, inset);
 		});

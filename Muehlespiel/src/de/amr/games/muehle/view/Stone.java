@@ -50,6 +50,10 @@ public class Stone extends GameEntity {
 		return radius;
 	}
 
+	public void setRadius(int radius) {
+		this.radius = radius;
+	}
+
 	@Override
 	public int getWidth() {
 		return 2 * radius;
