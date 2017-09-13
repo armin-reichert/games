@@ -23,6 +23,24 @@ import de.amr.games.pong.PongGame.PlayMode;
  */
 public class MenuScene extends ActiveScene<PongGame> {
 
+	private final StateMachine<PlayMode, String> control;
+	private Color bgColor;
+	private Color bgColorSelected;
+	private Color hilightColor;
+
+	public MenuScene(PongGame app) {
+		super(app);
+		control = createStateMachine();
+		control.setLogger(Application.LOG);
+	}
+
+	@Override
+	public void init() {
+		bgColor = Color.LIGHT_GRAY;
+		bgColorSelected = bgColor.darker();
+		hilightColor = Color.YELLOW;
+	}
+
 	private StateMachine<PlayMode, String> createStateMachine() {
 		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);
 		PlayMode[] playModes = PlayMode.values();
@@ -31,17 +49,6 @@ public class MenuScene extends ActiveScene<PongGame> {
 			fsm.change(playModes[i], playModes[(i - 1 + n) % n], () -> keyPressedOnce(KeyEvent.VK_UP));
 		}
 		return fsm;
-	}
-
-	private final StateMachine<PlayMode, String> control;
-	private Color bgColor = Color.LIGHT_GRAY;
-	private Color bgColorSelected = bgColor.darker();
-	private Color hilightColor = Color.YELLOW;
-
-	public MenuScene(PongGame app) {
-		super(app);
-		control = createStateMachine();
-		control.setLogger(Application.LOG);
 	}
 
 	public PlayMode getSelectedPlayMode() {

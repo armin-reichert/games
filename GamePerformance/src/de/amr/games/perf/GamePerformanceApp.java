@@ -12,7 +12,7 @@ public class GamePerformanceApp extends Application {
 		settings.title = "Game performance measurement";
 		settings.width = 1000;
 		pulse.setLogger(LOG);
-		pulse.setFrequency(50);
+		pulse.setFrequency(60);
 	}
 
 	@Override

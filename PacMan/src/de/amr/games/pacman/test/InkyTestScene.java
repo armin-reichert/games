@@ -18,6 +18,7 @@ import java.awt.Graphics2D;
 import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -100,6 +101,11 @@ public class InkyTestScene extends ActiveScene<InkyTestApp> {
 
 		pacMan.receiveEvent(PacManEvent.StartWalking);
 	};
+
+	@Override
+	public void update() {
+		app.entities.all().forEach(GameEntity::update);
+	}
 
 	@Override
 	public void draw(Graphics2D g) {
