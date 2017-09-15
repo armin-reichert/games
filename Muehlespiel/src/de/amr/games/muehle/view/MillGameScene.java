@@ -117,7 +117,7 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	@Override
 	public void markPositions(Graphics2D g, IntStream positions, Color color) {
-		boardUI.markPositions(g, positions, color);
+		positions.forEach(p -> markPosition(g, p, color));
 	}
 
 	@Override

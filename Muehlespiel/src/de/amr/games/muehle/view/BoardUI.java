@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -188,10 +187,6 @@ public class BoardUI extends GameEntity {
 		g.fillOval(round(center[p].x) - posRadius / 2, round(center[p].y) - posRadius / 2, posRadius, posRadius);
 		aa_off(g);
 		g.translate(-tf.getX(), -tf.getY());
-	}
-
-	public void markPositions(Graphics2D g, IntStream positions, Color color) {
-		positions.forEach(p -> markPosition(g, p, color));
 	}
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
