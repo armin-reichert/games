@@ -6,8 +6,10 @@ import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
 
 import java.awt.event.KeyEvent;
+import java.util.OptionalInt;
 
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
@@ -41,6 +43,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	private MoveController moveControl;
 	private float moveTimeSeconds;
 	private float placingTimeSeconds;
+	private OptionalInt positionNearMouse;
 
 	public MillGameController(Pulse pulse, MillGameModel model) {
 		this.pulse = pulse;
@@ -48,6 +51,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 		this.assistant = new Assistant(this);
 		this.moveTimeSeconds = 0.75f;
 		this.placingTimeSeconds = 1.5f;
+		this.positionNearMouse = OptionalInt.empty();
 	}
 
 	public Player whitePlayer() {
@@ -88,6 +92,10 @@ public class MillGameController extends MillGameStateMachine implements Controll
 		this.assistedPlayer = assistedPlayer;
 	}
 
+	public OptionalInt getPositionNearMouse() {
+		return positionNearMouse;
+	}
+
 	@Override
 	public void init() {
 		super.init();
@@ -119,6 +127,9 @@ public class MillGameController extends MillGameStateMachine implements Controll
 			}
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
 			view.toggleBoardPositionNumbers();
+		}
+		if (Mouse.moved()) {
+			positionNearMouse = view.findBoardPosition(Mouse.getX(), Mouse.getY());
 		}
 	}
 

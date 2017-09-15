@@ -133,6 +133,11 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		messageArea.hCenter(getWidth());
 		messageArea.draw(g);
 		if (controller.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
+			controller.getPositionNearMouse().ifPresent(p -> {
+				if (model.board.isEmptyPosition(p)) {
+					boardUI.markPosition(g, p, Color.ORANGE);
+				}
+			});
 			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
 			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
 		}
