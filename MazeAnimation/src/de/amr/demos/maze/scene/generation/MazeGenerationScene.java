@@ -3,18 +3,14 @@ package de.amr.demos.maze.scene.generation;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import de.amr.demos.maze.MazeDemoApp;
-import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.demos.maze.ui.GridVisualization;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
-import de.amr.easy.graph.api.TraversalState;
 import de.amr.easy.grid.api.Grid2D;
 import de.amr.easy.grid.api.GridPosition;
-import de.amr.easy.grid.impl.ObservableGrid;
 import de.amr.easy.maze.alg.BinaryTree;
 import de.amr.easy.maze.alg.BinaryTreeRandom;
 import de.amr.easy.maze.alg.Eller;
@@ -29,9 +25,9 @@ import de.amr.easy.maze.alg.RecursiveDivision;
 import de.amr.easy.maze.alg.wilson.WilsonUSTHilbertCurve;
 import de.amr.easy.maze.alg.wilson.WilsonUSTNestedRectangles;
 
-public class MazeGeneration extends ActiveScene<MazeDemoApp> {
+public class MazeGenerationScene extends ActiveScene<MazeDemoApp> {
 
-	private static final Logger LOG = Logger.getLogger(MazeGeneration.class.getName());
+	private static final Logger LOG = Logger.getLogger(MazeGenerationScene.class.getName());
 
 	private static final Class<?>[] ALGORITHMS = {
 		/*@formatter:off*/
@@ -41,76 +37,69 @@ public class MazeGeneration extends ActiveScene<MazeDemoApp> {
 		/*@formatter:on*/
 	};
 
-	private ObservableGrid<TraversalState, Integer> grid;
 	private MazeAlgorithm algorithm;
-	private Integer startCell;
-	private Thread mazeGeneration;
-	private GridAnimation animation;
-	private boolean aborted;
+	private Thread thread;
+	private boolean stopped;
 
-	public MazeGeneration(MazeDemoApp game) {
+	public MazeGenerationScene(MazeDemoApp game) {
 		super(game);
 	}
 
 	@Override
 	public void init() {
-		aborted = false;
-		grid = app.getGrid();
-		animation = app.getAnimation();
-		startCell = grid.cell(GridPosition.TOP_LEFT);
-		mazeGeneration = new Thread(() -> {
+		stopped = false;
+		thread = new Thread(() -> {
 			chooseRandomAlgorithm();
-			animation.setRenderingModel(new GridVisualization(grid, app.settings.getAsInt("cellSize")));
-			animation.clearCanvas();
-			prepareGrid(algorithm);
+			app.getAnimation().setRenderingModel(
+					new GridVisualization(app.getGrid(), app.settings.getAsInt("cellSize")));
+			app.getAnimation().clearCanvas();
+			app.getGrid().clearContent();
+			app.getGrid().removeEdges();
+			Integer startCell = app.getGrid().cell(GridPosition.TOP_LEFT);
 			algorithm.accept(startCell);
 		}, "MazeGeneration");
-		mazeGeneration.start();
+		thread.start();
 		LOG.info("Maze generation screen initialized.");
 	}
 
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_CONTROL) && Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			aborted = true;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !mazeGeneration.isAlive()) {
+			stopped = true;
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER) && !thread.isAlive()) {
 			app.select(app.generationScene);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_PLUS)) {
-			animation.faster(1);
+			app.getAnimation().faster(1);
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_MINUS)) {
-			animation.slower(1);
+			app.getAnimation().slower(1);
 		}
-		if (aborted) {
+		if (stopped) {
 			stopGeneration();
 			app.select(app.menuScene);
-		} else if (!mazeGeneration.isAlive()) {
+		} else if (!thread.isAlive()) {
 			app.select(app.traversalScene);
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		animation.render(g);
+		app.getAnimation().render(g);
 	}
 
 	private void chooseRandomAlgorithm() {
 		Class<?> algorithmClass = ALGORITHMS[new Random().nextInt(ALGORITHMS.length)];
 		try {
-			algorithm = (MazeAlgorithm) algorithmClass.getConstructor(Grid2D.class).newInstance(grid);
-			LOG.info("Maze generation algorithm: " + algorithmClass);
+			algorithm = (MazeAlgorithm) algorithmClass.getConstructor(Grid2D.class)
+					.newInstance(app.getGrid());
+			LOG.info("Randomly chosen maze generation algorithm: " + algorithmClass);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void prepareGrid(Consumer<Integer> algorithm) {
-		grid.clearContent();
-		grid.removeEdges();
-	}
-
 	private void stopGeneration() {
 		LOG.info("Stopping maze generation, this may take some time...");
-		while (mazeGeneration.isAlive()) {
+		while (thread.isAlive()) {
 			/* wait for generator to finish */
 		}
 		LOG.info("Maze generation finished");

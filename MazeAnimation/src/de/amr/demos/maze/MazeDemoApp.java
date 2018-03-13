@@ -3,7 +3,7 @@ package de.amr.demos.maze;
 import java.awt.Color;
 
 import de.amr.demos.maze.bfs.BFSTraversalScene;
-import de.amr.demos.maze.scene.generation.MazeGeneration;
+import de.amr.demos.maze.scene.generation.MazeGenerationScene;
 import de.amr.demos.maze.scene.menu.Menu;
 import de.amr.demos.maze.ui.GridAnimation;
 import de.amr.easy.game.Application;
@@ -35,7 +35,7 @@ public class MazeDemoApp extends Application {
 	@Override
 	public void init() {
 		menuScene = new Menu(this);
-		generationScene = new MazeGeneration(this);
+		generationScene = new MazeGenerationScene(this);
 		traversalScene = new BFSTraversalScene(this);
 		int cellSize = settings.getAsInt("cellSize");
 		grid = new ObservableGrid<>(getWidth() / cellSize, getHeight() / cellSize, TraversalState.UNVISITED);
