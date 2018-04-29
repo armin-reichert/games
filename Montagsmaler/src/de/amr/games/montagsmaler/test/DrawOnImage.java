@@ -25,7 +25,8 @@ import javax.swing.event.MouseInputAdapter;
 public class DrawOnImage {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
+      @Override
+			public void run() {
         createAndShowGUI();
       }
     });
@@ -68,7 +69,8 @@ public class DrawOnImage {
       return button;
     }
 
-    public void actionPerformed(ActionEvent e) {
+    @Override
+		public void actionPerformed(ActionEvent e) {
       JButton button = (JButton) e.getSource();
 
       if ("Clear Drawing".equals(e.getActionCommand()))
@@ -92,7 +94,8 @@ public class DrawOnImage {
       addMouseMotionListener(ml);
     }
 
-    public void paintComponent(Graphics g) {
+    @Override
+		public void paintComponent(Graphics g) {
       super.paintComponent(g);
 
       // Custom code to support painting from the BufferedImage
@@ -132,7 +135,8 @@ public class DrawOnImage {
       private int yMin;
       private int yMax;
 
-      public void mousePressed(MouseEvent e) {
+      @Override
+			public void mousePressed(MouseEvent e) {
         startPoint = e.getPoint();
         endPoint = startPoint;
         xMin = startPoint.x;
@@ -141,7 +145,8 @@ public class DrawOnImage {
         yMax = startPoint.y;
       }
 
-      public void mouseDragged(MouseEvent e) {
+      @Override
+			public void mouseDragged(MouseEvent e) {
         // Repaint only the area affected by the mouse dragging
 
         endPoint = e.getPoint();
@@ -152,7 +157,8 @@ public class DrawOnImage {
         repaint(xMin, yMin, xMax - xMin + 1, yMax - yMin + 1);
       }
 
-      public void mouseReleased(MouseEvent e) {
+      @Override
+			public void mouseReleased(MouseEvent e) {
         // Custom code to paint the Rectangle on the BufferedImage
 
         int x = Math.min(startPoint.x, endPoint.x);

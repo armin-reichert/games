@@ -33,7 +33,8 @@ public class EnhancedFileChooser extends JFileChooser {
       bg = getBackground();
     }
 
-    public void propertyChange(PropertyChangeEvent e) {
+    @Override
+		public void propertyChange(PropertyChangeEvent e) {
       String propertyName = e.getPropertyName();
 
       // Make sure we are responding to the right event.
@@ -89,7 +90,8 @@ public class EnhancedFileChooser extends JFileChooser {
       image = image.getScaledInstance(width, height, Image.SCALE_DEFAULT);
     }
 
-    public void paintComponent(Graphics g) {
+    @Override
+		public void paintComponent(Graphics g) {
       g.setColor(bg);
 
       /*
