@@ -1,8 +1,9 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman.entities;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.board.Board;
 
 public class BoardMover extends GameEntity {
 

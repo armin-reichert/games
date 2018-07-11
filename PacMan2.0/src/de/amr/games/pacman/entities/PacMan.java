@@ -1,4 +1,4 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman.entities;
 
 import static de.amr.games.pacman.board.Tile.*;
 import static de.amr.games.pacman.board.Tile.PELLET;
@@ -16,6 +16,9 @@ import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.FoodEvent;
+import de.amr.games.pacman.board.Tile;
 
 public class PacMan extends BoardMover {
 

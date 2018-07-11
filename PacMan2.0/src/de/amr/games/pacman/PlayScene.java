@@ -1,10 +1,12 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.scene.ActiveScene;
-import de.amr.games.pacman.PacManApp;
+import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.Maze;
+import de.amr.games.pacman.entities.PacMan;
 
 public class PlayScene extends ActiveScene<PacManApp> {
 

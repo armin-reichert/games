@@ -3,7 +3,6 @@ package de.amr.games.pacman;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.board.Board;
-import de.amr.games.pacman.board.PlayScene;
 
 public class PacManApp extends Application {
 
