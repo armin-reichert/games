@@ -1,7 +1,6 @@
 package de.amr.games.pacman.board;
 
-import static de.amr.games.pacman.board.Tile.EMPTY;
-import static de.amr.games.pacman.board.Tile.ENERGIZER;
+import static de.amr.games.pacman.board.Tile.*;
 import static de.amr.games.pacman.board.Tile.PELLET;
 import static de.amr.games.pacman.board.Tile.WORMHOLE;
 
@@ -9,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.function.Consumer;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
@@ -24,9 +24,15 @@ public class PacMan extends BoardMover {
 	private Sprite[] walkingSprites = new Sprite[4];
 	private Sprite standingSprite;
 
+	public Consumer<FoodEvent> fnFoodFound;
+
 	public PacMan(Board board) {
 		super(board);
 		readSprites();
+		fnFoodFound = e -> {
+			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
+			board.setTile(e.col, e.row, Tile.EMPTY);
+		};
 	}
 
 	private void readSprites() {
@@ -43,7 +49,7 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void init() {
-		setMazePosition(5, 1);
+		setMazePosition(14, 23);
 		setSpeed(Board.TILE_SIZE / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
@@ -71,59 +77,68 @@ public class PacMan extends BoardMover {
 		return walkingSprites[moveDirection];
 	}
 
-	private void readInput() {
+	@Override
+	public void update() {
+		lookForFood();
+		readNextMoveDirection();
+		changeDirection();
+		move();
+	}
+
+	private void readNextMoveDirection() {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			nextMoveDirection = Top4.W;
+			setNextMoveDirection(Top4.W);
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			nextMoveDirection = Top4.E;
+			setNextMoveDirection(Top4.E);
 		} else if (Keyboard.keyDown(KeyEvent.VK_DOWN)) {
-			nextMoveDirection = Top4.S;
+			setNextMoveDirection(Top4.S);
 		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
-			nextMoveDirection = Top4.N;
+			setNextMoveDirection(Top4.N);
 		}
 	}
 
-	@Override
-	public void update() {
-		readInput();
-		eat();
-		moveIfPossible();
-	}
-
-	private void eat() {
+	private void lookForFood() {
 		int col = col(), row = row();
-		switch (board.getTile(col, row)) {
+		char tile = board.getTile(col, row);
+		switch (tile) {
 		case PELLET:
-			board.setTile(col, row, EMPTY);
-			break;
 		case ENERGIZER:
-			board.setTile(col, row, EMPTY);
+			fnFoodFound.accept(new FoodEvent(col, row, tile));
 			break;
-		case Tile.BONUS:
-			board.setTile(col, row, EMPTY);
+		case BONUS_APPLE:
+		case BONUS_BELL:
+		case BONUS_CHERRIES:
+		case BONUS_GALAXIAN:
+		case BONUS_GRAPES:
+		case BONUS_KEY:
+		case BONUS_PEACH:
+		case BONUS_STRAWBERRY:
+			fnFoodFound.accept(new FoodEvent(col, row, tile));
+			break;
 		default:
 			break;
 		}
 	}
 
-	private void moveIfPossible() {
-		if (nextMoveDirection != moveDirection) {
-			changeDirectionIfPossible();
-		}
+	private void move() {
 		int col = col(), row = row();
-		if (canMove(moveDirection)) {
+		if (board.getTile(col, row) == WORMHOLE) {
+			warp(col, row);
+		} else if (canMove(moveDirection)) {
 			tf.moveTo(getNewPosition(moveDirection));
-			if (board.getTile(col, row) == WORMHOLE) {
-				if (moveDirection == Top4.E && col == board.getNumCols() - 1) {
-					setMazePosition(0, row);
-				} else if (moveDirection == Top4.W && col == 0) {
-					setMazePosition(board.getNumCols() - 1, row);
-				}
-			}
 		} else {
 			// position exactly over tile
 			setMazePosition(col, row);
 		}
+	}
+
+	private void warp(int col, int row) {
+		if (moveDirection == Top4.E && col == board.getNumCols() - 1) {
+			setMazePosition(0, row);
+		} else if (moveDirection == Top4.W && col == 0) {
+			setMazePosition(board.getNumCols() - 1, row);
+		}
+		tf.moveTo(getNewPosition(moveDirection));
 	}
 
 	private Vector2f getNewPosition(int direction) {
@@ -131,7 +146,10 @@ public class PacMan extends BoardMover {
 		return Vector2f.sum(tf.getPosition(), velocity);
 	}
 
-	private void changeDirectionIfPossible() {
+	private void changeDirection() {
+		if (nextMoveDirection == moveDirection) {
+			return;
+		}
 		if (nextMoveDirection == top.inv(moveDirection) || isExactlyOverTile() && canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
 		}

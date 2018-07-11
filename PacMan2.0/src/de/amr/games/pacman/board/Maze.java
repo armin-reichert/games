@@ -1,15 +1,24 @@
 package de.amr.games.pacman.board;
 
+import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
+import static de.amr.games.pacman.board.Tile.BONUS_BELL;
+import static de.amr.games.pacman.board.Tile.BONUS_CHERRIES;
+import static de.amr.games.pacman.board.Tile.BONUS_GALAXIAN;
+import static de.amr.games.pacman.board.Tile.BONUS_GRAPES;
+import static de.amr.games.pacman.board.Tile.BONUS_KEY;
+import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
+import static de.amr.games.pacman.board.Tile.BONUS_STRAWBERRY;
 import static de.amr.games.pacman.board.Tile.ENERGIZER;
 import static de.amr.games.pacman.board.Tile.PELLET;
-import static de.amr.games.pacman.board.Tile.WALL;
-import static de.amr.games.pacman.board.Tile.WORMHOLE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
@@ -17,12 +26,20 @@ import de.amr.easy.game.entity.GameEntity;
 public class Maze extends GameEntity {
 
 	private Board board;
-	private Image mazeImage;
+	private Image maze;
+	private Map<Character, Image> bonusImages = new HashMap<>();
 
 	public Maze(Board board, int width, int height) {
 		this.board = board;
-		BufferedImage sprites = Assets.readImage("sprites.png");
-		mazeImage = sprites.getSubimage(228, 0, 224, 248).getScaledInstance(width, height, BufferedImage.SCALE_DEFAULT);
+		BufferedImage sheet = Assets.readImage("sprites.png");
+		maze = sheet.getSubimage(228, 0, 224, 248).getScaledInstance(width, height, BufferedImage.SCALE_DEFAULT);
+		int x = 488, y = 48;
+		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE, BONUS_GRAPES,
+				BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
+			bonusImages.put(bonus, sheet.getSubimage(x, y, 16, 16));
+			x += 16;
+		}
+		board.setTile(13, 17, BONUS_PEACH);
 	}
 
 	public Board getBoard() {
@@ -31,12 +48,8 @@ public class Maze extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(mazeImage, 0, 0, null);
-		for (int row = 0; row < board.getGrid().numRows(); ++row) {
-			for (int col = 0; col < board.getGrid().numCols(); ++col) {
-				drawTile(g, row, col);
-			}
-		}
+		g.drawImage(maze, 0, 0, null);
+		board.getGrid().vertices().forEach(tile -> drawTile(g, board.getGrid().row(tile), board.getGrid().col(tile)));
 	}
 
 	private void drawTile(Graphics2D g, int row, int col) {
@@ -49,26 +62,25 @@ public class Maze extends GameEntity {
 		case ENERGIZER:
 			drawEnergizer(g, row, col);
 			break;
-		case WALL:
-			// drawWall(g, row, col);
-			break;
-		case WORMHOLE:
-			drawWormhole(g, row, col);
-			break;
+		case BONUS_APPLE:
+		case BONUS_BELL:
+		case BONUS_CHERRIES:
+		case BONUS_GALAXIAN:
+		case BONUS_GRAPES:
+		case BONUS_KEY:
+		case BONUS_PEACH:
+		case BONUS_STRAWBERRY:
+			drawBonus(g, row, col, tile);
 		default:
 			break;
 		}
 		g.translate(-col * Board.TILE_SIZE, -row * Board.TILE_SIZE);
 	}
 
-	private void drawWormhole(Graphics2D g, int row, int col) {
-		g.setColor(Color.ORANGE);
-		g.fillRect(0, 0, Board.TILE_SIZE, Board.TILE_SIZE);
-	}
-
-	private void drawWall(Graphics2D g, int row, int col) {
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(0, 0, Board.TILE_SIZE, Board.TILE_SIZE);
+	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
+		g.translate(0, -Board.TILE_SIZE / 2);
+		g.drawImage(bonusImages.get(bonus), 0, 0, null);
+		g.translate(0, Board.TILE_SIZE / 2);
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {
