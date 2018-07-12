@@ -26,19 +26,13 @@ import de.amr.easy.game.entity.GameEntity;
 public class Maze extends GameEntity {
 
 	private Board board;
-	private Image maze;
-	private Map<Character, Image> bonusImages = new HashMap<>();
+	private int width;
+	private int height;
 
 	public Maze(Board board, int width, int height) {
 		this.board = board;
-		BufferedImage sheet = Assets.readImage("sprites.png");
-		maze = sheet.getSubimage(228, 0, 224, 248).getScaledInstance(width, height, BufferedImage.SCALE_DEFAULT);
-		int x = 488, y = 48;
-		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE, BONUS_GRAPES,
-				BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
-			bonusImages.put(bonus, sheet.getSubimage(x, y, 16, 16));
-			x += 16;
-		}
+		this.width = width;
+		this.height = height;
 		board.setTile(13, 17, BONUS_PEACH);
 	}
 
@@ -48,7 +42,7 @@ public class Maze extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(maze, 0, 0, null);
+		g.drawImage(SpriteSheet.get().getMazeImage(), 0, 0, width, height, null);
 		board.getGrid().vertices().forEach(tile -> drawTile(g, board.getGrid().row(tile), board.getGrid().col(tile)));
 	}
 
@@ -79,7 +73,7 @@ public class Maze extends GameEntity {
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
 		g.translate(0, -Board.TILE_SIZE / 2);
-		g.drawImage(bonusImages.get(bonus), 0, 0, null);
+		g.drawImage(SpriteSheet.get().getBonusImage(bonus), 0, 0, Board.TILE_SIZE*2, Board.TILE_SIZE*2, null);
 		g.translate(0, Board.TILE_SIZE / 2);
 	}
 

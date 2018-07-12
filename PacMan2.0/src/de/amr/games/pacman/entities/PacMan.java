@@ -1,16 +1,24 @@
 package de.amr.games.pacman.entities;
 
-import static de.amr.games.pacman.board.Tile.*;
+import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
+import static de.amr.games.pacman.board.Tile.BONUS_BELL;
+import static de.amr.games.pacman.board.Tile.BONUS_CHERRIES;
+import static de.amr.games.pacman.board.Tile.BONUS_GALAXIAN;
+import static de.amr.games.pacman.board.Tile.BONUS_GRAPES;
+import static de.amr.games.pacman.board.Tile.BONUS_KEY;
+import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
+import static de.amr.games.pacman.board.Tile.BONUS_STRAWBERRY;
+import static de.amr.games.pacman.board.Tile.ENERGIZER;
 import static de.amr.games.pacman.board.Tile.PELLET;
+import static de.amr.games.pacman.board.Tile.WALL;
 import static de.amr.games.pacman.board.Tile.WORMHOLE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.sprite.AnimationMode;
@@ -18,6 +26,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.FoodEvent;
+import de.amr.games.pacman.board.SpriteSheet;
 import de.amr.games.pacman.board.Tile;
 
 public class PacMan extends BoardMover {
@@ -39,15 +48,13 @@ public class PacMan extends BoardMover {
 	}
 
 	private void readSprites() {
-		BufferedImage sheet = Assets.readImage("sprites.png");
-		standingSprite = new Sprite(sheet.getSubimage(488, 0, 15, 15));
-		walkingSprites[Top4.E] = new Sprite(sheet.getSubimage(456, 0, 15, 15), sheet.getSubimage(472, 0, 15, 15));
-		walkingSprites[Top4.W] = new Sprite(sheet.getSubimage(456, 16, 15, 15), sheet.getSubimage(472, 16, 15, 15));
-		walkingSprites[Top4.N] = new Sprite(sheet.getSubimage(456, 32, 15, 15), sheet.getSubimage(472, 32, 15, 15));
-		walkingSprites[Top4.S] = new Sprite(sheet.getSubimage(456, 48, 15, 15), sheet.getSubimage(472, 48, 15, 15));
-		for (Sprite s : walkingSprites) {
-			s.makeAnimated(AnimationMode.CYCLIC, 100);
-		}
+		standingSprite = new Sprite(SpriteSheet.get().getPacManStanding());
+		standingSprite.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
+			walkingSprites[direction] = new Sprite(SpriteSheet.get().getPacManWalking(direction));
+			walkingSprites[direction].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+			walkingSprites[direction].makeAnimated(AnimationMode.CYCLIC, 120);
+		});
 	}
 
 	@Override
@@ -159,35 +166,30 @@ public class PacMan extends BoardMover {
 	}
 
 	private boolean canMove(int direction) {
-		int nextCol = col(), nextRow = row();
-		Vector2f newPosition;
+		int newCol = col(), newRow = row();
 		switch (direction) {
 		case Top4.W:
-			newPosition = getNewPosition(direction);
-			nextCol = Board.col(newPosition.x);
+			newCol = Board.col(getNewPosition(direction).x);
 			break;
 		case Top4.E:
-			newPosition = getNewPosition(direction);
-			nextCol = Board.col(newPosition.x + Board.TILE_SIZE);
+			newCol = Board.col(getNewPosition(direction).x + Board.TILE_SIZE);
 			break;
 		case Top4.N:
-			newPosition = getNewPosition(direction);
-			nextRow = Board.row(newPosition.y);
+			newRow = Board.row(getNewPosition(direction).y);
 			break;
 		case Top4.S:
-			newPosition = getNewPosition(direction);
-			nextRow = Board.row(newPosition.y + Board.TILE_SIZE);
+			newRow = Board.row(getNewPosition(direction).y + Board.TILE_SIZE);
 			break;
 		default:
-			throw new IllegalArgumentException("Illegal direction value: " + direction);
+			throw new IllegalArgumentException("Illegal direction: " + direction);
 		}
-		if (col() == nextCol && row() == nextRow) {
+		if (col() == newCol && row() == newRow) {
 			return true;
 		}
-		if (!board.getGrid().isValidCol(nextCol) || !board.getGrid().isValidRow(nextRow)) {
+		if (!board.getGrid().isValidCol(newCol) || !board.getGrid().isValidRow(newRow)) {
 			return false;
 		}
-		return board.getTile(nextCol, nextRow) != Tile.WALL;
+		return board.getTile(newCol, newRow) != WALL;
 	}
 
 }

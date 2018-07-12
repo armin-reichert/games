@@ -18,7 +18,7 @@ public class PacManApp extends Application {
 		settings.title = "PacMan 2.0";
 		settings.width = board.getNumCols() * Board.TILE_SIZE;
 		settings.height = board.getNumRows() * Board.TILE_SIZE;
-		settings.scale = 3f;
+		settings.scale = 1.0f;
 	}
 
 	@Override

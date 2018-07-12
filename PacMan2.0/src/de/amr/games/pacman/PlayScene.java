@@ -6,12 +6,13 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.Maze;
+import de.amr.games.pacman.board.Tile;
 import de.amr.games.pacman.entities.PacMan;
 
 public class PlayScene extends ActiveScene<PacManApp> {
 
 	private static boolean DEBUG = false;
-	
+
 	private Maze maze;
 	private PacMan pacMan;
 
@@ -30,6 +31,9 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	@Override
 	public void update() {
 		maze.update();
+		if (maze.getBoard().isEmpty()) {
+			maze.getBoard().resetContent();
+		}
 		pacMan.update();
 	}
 
