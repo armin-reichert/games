@@ -10,8 +10,6 @@ import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
 import static de.amr.games.pacman.board.Tile.BONUS_STRAWBERRY;
 import static de.amr.games.pacman.board.Tile.ENERGIZER;
 import static de.amr.games.pacman.board.Tile.PELLET;
-import static de.amr.games.pacman.board.Tile.WALL;
-import static de.amr.games.pacman.board.Tile.WORMHOLE;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -20,7 +18,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
@@ -40,7 +37,6 @@ public class PacMan extends BoardMover {
 
 	public PacMan(Board board) {
 		super(board);
-		readSprites();
 		fnFoodFound = e -> {
 			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
 			board.setTile(e.col, e.row, Tile.EMPTY);
@@ -59,7 +55,7 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void init() {
-		setMazePosition(14, 23);
+		readSprites();
 		setSpeed(Board.TILE_SIZE / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
@@ -130,66 +126,5 @@ public class PacMan extends BoardMover {
 		}
 	}
 
-	private void move() {
-		int col = col(), row = row();
-		if (board.getTile(col, row) == WORMHOLE) {
-			warp(col, row);
-		} else if (canMove(moveDirection)) {
-			tf.moveTo(getNewPosition(moveDirection));
-		} else {
-			// position exactly over tile
-			setMazePosition(col, row);
-		}
-	}
-
-	private void warp(int col, int row) {
-		if (moveDirection == Top4.E && col == board.getNumCols() - 1) {
-			setMazePosition(0, row);
-		} else if (moveDirection == Top4.W && col == 0) {
-			setMazePosition(board.getNumCols() - 1, row);
-		}
-		tf.moveTo(getNewPosition(moveDirection));
-	}
-
-	private Vector2f getNewPosition(int direction) {
-		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(top.dx(direction), top.dy(direction)));
-		return Vector2f.sum(tf.getPosition(), velocity);
-	}
-
-	private void changeDirection() {
-		if (nextMoveDirection == moveDirection) {
-			return;
-		}
-		if (nextMoveDirection == top.inv(moveDirection) || isExactlyOverTile() && canMove(nextMoveDirection)) {
-			moveDirection = nextMoveDirection;
-		}
-	}
-
-	private boolean canMove(int direction) {
-		int newCol = col(), newRow = row();
-		switch (direction) {
-		case Top4.W:
-			newCol = Board.col(getNewPosition(direction).x);
-			break;
-		case Top4.E:
-			newCol = Board.col(getNewPosition(direction).x + Board.TILE_SIZE);
-			break;
-		case Top4.N:
-			newRow = Board.row(getNewPosition(direction).y);
-			break;
-		case Top4.S:
-			newRow = Board.row(getNewPosition(direction).y + Board.TILE_SIZE);
-			break;
-		default:
-			throw new IllegalArgumentException("Illegal direction: " + direction);
-		}
-		if (col() == newCol && row() == newRow) {
-			return true;
-		}
-		if (!board.getGrid().isValidCol(newCol) || !board.getGrid().isValidRow(newRow)) {
-			return false;
-		}
-		return board.getTile(newCol, newRow) != WALL;
-	}
 
 }

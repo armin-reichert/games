@@ -1,12 +1,16 @@
 package de.amr.games.pacman;
 
+import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.Maze;
-import de.amr.games.pacman.board.Tile;
+import de.amr.games.pacman.board.SpriteSheet;
+import de.amr.games.pacman.entities.BoardMover;
+import de.amr.games.pacman.entities.Ghost;
 import de.amr.games.pacman.entities.PacMan;
 
 public class PlayScene extends ActiveScene<PacManApp> {
@@ -14,7 +18,8 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	private static boolean DEBUG = false;
 
 	private Maze maze;
-	private PacMan pacMan;
+	private BoardMover pacMan;
+	private Ghost redGhost;
 
 	public PlayScene(PacManApp app) {
 		super(app);
@@ -22,10 +27,16 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	@Override
 	public void init() {
+		app.getBoard().setTile(13, 17, BONUS_PEACH);
 		maze = new Maze(app.getBoard(), getWidth(), getHeight() - 5 * Board.TILE_SIZE);
 		pacMan = new PacMan(app.getBoard());
+		pacMan.setMazePosition(14, 23);
+		redGhost = new Ghost(app.getBoard(), SpriteSheet.RED);
+		redGhost.setMazePosition(10, 11);
+
 		maze.init();
 		pacMan.init();
+		redGhost.init();
 	}
 
 	@Override
@@ -35,6 +46,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 			maze.getBoard().resetContent();
 		}
 		pacMan.update();
+		redGhost.update();
 	}
 
 	@Override
@@ -43,6 +55,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		g.translate(0, 3 * Board.TILE_SIZE);
 		maze.draw(g);
 		pacMan.draw(g);
+		redGhost.draw(g);
 		g.translate(0, -3 * Board.TILE_SIZE);
 		if (DEBUG) {
 			drawGridLines(g);

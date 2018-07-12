@@ -13,14 +13,8 @@ import static de.amr.games.pacman.board.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 
 public class Maze extends GameEntity {
@@ -33,7 +27,6 @@ public class Maze extends GameEntity {
 		this.board = board;
 		this.width = width;
 		this.height = height;
-		board.setTile(13, 17, BONUS_PEACH);
 	}
 
 	public Board getBoard() {
@@ -48,7 +41,7 @@ public class Maze extends GameEntity {
 
 	private void drawTile(Graphics2D g, int row, int col) {
 		g.translate(col * Board.TILE_SIZE, row * Board.TILE_SIZE);
-		char tile = board.getGrid().get(board.getGrid().cell(col, row));
+		char tile = board.getTile(col, row);
 		switch (tile) {
 		case PELLET:
 			drawPellet(g, row, col);
@@ -72,26 +65,22 @@ public class Maze extends GameEntity {
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.translate(0, -Board.TILE_SIZE / 2);
-		g.drawImage(SpriteSheet.get().getBonusImage(bonus), 0, 0, Board.TILE_SIZE*2, Board.TILE_SIZE*2, null);
-		g.translate(0, Board.TILE_SIZE / 2);
+		g.drawImage(SpriteSheet.get().getBonusImage(bonus), 0, -Board.TILE_SIZE / 2, Board.TILE_SIZE * 2,
+				Board.TILE_SIZE * 2, null);
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(Color.YELLOW);
-		drawCenteredCircle(g, row, col, Board.TILE_SIZE / 8);
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		drawCircle(g, Color.YELLOW, row, col, Board.TILE_SIZE / 8);
 	}
 
 	private void drawEnergizer(Graphics2D g, int row, int col) {
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(Color.YELLOW);
-		drawCenteredCircle(g, row, col, Board.TILE_SIZE / 4);
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		drawCircle(g, Color.YELLOW, row, col, Board.TILE_SIZE / 2);
 	}
 
-	private void drawCenteredCircle(Graphics2D g, int row, int col, int r) {
+	private void drawCircle(Graphics2D g, Color color, int row, int col, int r) {
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setColor(color);
 		g.fillOval(Board.TILE_SIZE / 2 - r, Board.TILE_SIZE / 2 - r, 2 * r, 2 * r);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 }
