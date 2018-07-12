@@ -3,6 +3,7 @@ package de.amr.games.pacman.entities;
 import java.awt.Graphics2D;
 import java.util.Random;
 
+import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.easy.util.StreamUtils;
@@ -19,6 +20,7 @@ public class Ghost extends BoardMover {
 		top.dirs().forEach(dir -> {
 			spriteByDir[dir] = new Sprite(SpriteSheet.get().getGhostImagesByDirection(color, dir));
 			spriteByDir[dir].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+			spriteByDir[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 		});
 	}
 
@@ -40,13 +42,6 @@ public class Ghost extends BoardMover {
 			} while (!canMove(direction));
 			setMoveDirection(direction);
 		}
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		g.translate(-Board.TILE_SIZE / 2, -Board.TILE_SIZE / 2);
-		super.draw(g);
-		g.translate(Board.TILE_SIZE / 2, Board.TILE_SIZE / 2);
 	}
 
 	@Override

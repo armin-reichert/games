@@ -69,9 +69,7 @@ public class PacMan extends BoardMover {
 			g.fillRect(0, 0, Board.TILE_SIZE, Board.TILE_SIZE);
 			g.translate(-tf.getX(), -tf.getY());
 		} else {
-			g.translate(-Board.TILE_SIZE / 2, -Board.TILE_SIZE / 2);
 			super.draw(g);
-			g.translate(Board.TILE_SIZE / 2, Board.TILE_SIZE / 2);
 		}
 	}
 
@@ -125,6 +123,5 @@ public class PacMan extends BoardMover {
 			break;
 		}
 	}
-
 
 }

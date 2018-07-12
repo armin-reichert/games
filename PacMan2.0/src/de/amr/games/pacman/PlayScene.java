@@ -4,11 +4,13 @@ import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.OptionalInt;
 
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.Maze;
 import de.amr.games.pacman.board.SpriteSheet;
+import de.amr.games.pacman.board.Tile;
 import de.amr.games.pacman.entities.BoardMover;
 import de.amr.games.pacman.entities.Ghost;
 import de.amr.games.pacman.entities.PacMan;
@@ -20,6 +22,9 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	private Maze maze;
 	private BoardMover pacMan;
 	private Ghost redGhost;
+	private Ghost pinkGhost;
+	private Ghost blueGhost;
+	private Ghost orangeGhost;
 
 	public PlayScene(PacManApp app) {
 		super(app);
@@ -32,11 +37,29 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		pacMan = new PacMan(app.getBoard());
 		pacMan.setMazePosition(14, 23);
 		redGhost = new Ghost(app.getBoard(), SpriteSheet.RED);
-		redGhost.setMazePosition(10, 11);
+		pinkGhost = new Ghost(app.getBoard(), SpriteSheet.PINK);
+		blueGhost = new Ghost(app.getBoard(), SpriteSheet.BLUE);
+		orangeGhost = new Ghost(app.getBoard(), SpriteSheet.ORANGE);
+
+		findFreeTile().ifPresent(
+				tile -> redGhost.setMazePosition(app.getBoard().getGrid().col(tile), app.getBoard().getGrid().row(tile)));
+		findFreeTile().ifPresent(
+				tile -> pinkGhost.setMazePosition(app.getBoard().getGrid().col(tile), app.getBoard().getGrid().row(tile)));
+		findFreeTile().ifPresent(
+				tile -> blueGhost.setMazePosition(app.getBoard().getGrid().col(tile), app.getBoard().getGrid().row(tile)));
+		findFreeTile().ifPresent(
+				tile -> orangeGhost.setMazePosition(app.getBoard().getGrid().col(tile), app.getBoard().getGrid().row(tile)));
 
 		maze.init();
 		pacMan.init();
 		redGhost.init();
+		pinkGhost.init();
+		blueGhost.init();
+		orangeGhost.init();
+	}
+
+	private OptionalInt findFreeTile() {
+		return app.getBoard().getGrid().vertices().filter(v -> app.getBoard().getGrid().get(v) == Tile.EMPTY).findAny();
 	}
 
 	@Override
@@ -47,6 +70,9 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		}
 		pacMan.update();
 		redGhost.update();
+		pinkGhost.update();
+		blueGhost.update();
+		orangeGhost.update();
 	}
 
 	@Override
@@ -56,6 +82,9 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		maze.draw(g);
 		pacMan.draw(g);
 		redGhost.draw(g);
+		pinkGhost.draw(g);
+		blueGhost.draw(g);
+		orangeGhost.draw(g);
 		g.translate(0, -3 * Board.TILE_SIZE);
 		if (DEBUG) {
 			drawGridLines(g);

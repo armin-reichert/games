@@ -3,6 +3,8 @@ package de.amr.games.pacman.entities;
 import static de.amr.games.pacman.board.Tile.WALL;
 import static de.amr.games.pacman.board.Tile.WORMHOLE;
 
+import java.awt.Graphics2D;
+
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.api.Topology;
@@ -19,6 +21,13 @@ public class BoardMover extends GameEntity {
 
 	public BoardMover(Board board) {
 		this.board = board;
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		g.translate(-Board.TILE_SIZE / 2, -Board.TILE_SIZE / 2);
+		super.draw(g);
+		g.translate(Board.TILE_SIZE / 2, Board.TILE_SIZE / 2);
 	}
 
 	public void setMoveDirection(int moveDirection) {
