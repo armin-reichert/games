@@ -4,9 +4,11 @@ import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Arrays;
 import java.util.OptionalInt;
 
 import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.util.StreamUtils;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.Maze;
 import de.amr.games.pacman.board.SpriteSheet;
@@ -20,7 +22,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	private static boolean DEBUG = false;
 
 	private Maze maze;
-	private BoardMover pacMan;
+	private PacMan pacMan;
 	private Ghost redGhost;
 	private Ghost pinkGhost;
 	private Ghost blueGhost;
@@ -33,14 +35,19 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	@Override
 	public void init() {
 		app.getBoard().setTile(13, 17, BONUS_PEACH);
+		
 		maze = new Maze(app.getBoard(), getWidth(), getHeight() - 5 * Board.TILE_SIZE);
+		
 		pacMan = new PacMan(app.getBoard());
 		pacMan.setMazePosition(14, 23);
+		
 		redGhost = new Ghost(app.getBoard(), SpriteSheet.RED);
 		pinkGhost = new Ghost(app.getBoard(), SpriteSheet.PINK);
 		blueGhost = new Ghost(app.getBoard(), SpriteSheet.BLUE);
 		orangeGhost = new Ghost(app.getBoard(), SpriteSheet.ORANGE);
 
+		pacMan.enemies.addAll(Arrays.asList(redGhost, pinkGhost, blueGhost, orangeGhost));
+		
 		findFreeTile().ifPresent(
 				tile -> redGhost.setMazePosition(app.getBoard().getGrid().col(tile), app.getBoard().getGrid().row(tile)));
 		findFreeTile().ifPresent(
@@ -59,7 +66,9 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	}
 
 	private OptionalInt findFreeTile() {
-		return app.getBoard().getGrid().vertices().filter(v -> app.getBoard().getGrid().get(v) == Tile.EMPTY).findAny();
+		return StreamUtils
+				.permute(app.getBoard().getGrid().vertices().filter(v -> app.getBoard().getGrid().get(v) == Tile.EMPTY))
+				.findAny();
 	}
 
 	@Override

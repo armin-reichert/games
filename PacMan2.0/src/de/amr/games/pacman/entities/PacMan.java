@@ -14,6 +14,8 @@ import static de.amr.games.pacman.board.Tile.PELLET;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -34,12 +36,18 @@ public class PacMan extends BoardMover {
 	private Sprite standingSprite;
 
 	public Consumer<FoodEvent> fnFoodFound;
+	public Consumer<GhostEvent> fnGhostTouched;
+
+	public final List<Ghost> enemies = new ArrayList<>();
 
 	public PacMan(Board board) {
 		super(board);
 		fnFoodFound = e -> {
 			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
 			board.setTile(e.col, e.row, Tile.EMPTY);
+		};
+		fnGhostTouched = e -> {
+			System.out.println(String.format("Met ghost %s at col=%d, row=%d", e.ghost, e.col, e.row));
 		};
 	}
 
@@ -84,9 +92,16 @@ public class PacMan extends BoardMover {
 	@Override
 	public void update() {
 		lookForFood();
+		lookForEnemy();
 		readNextMoveDirection();
 		changeDirection();
 		move();
+	}
+
+	private void lookForEnemy() {
+		enemies.stream().filter(enemy -> enemy.col() == col() && enemy.row() == row()).findFirst().ifPresent(enemy -> {
+			fnGhostTouched.accept(new GhostEvent(enemy, col(), row()));
+		});
 	}
 
 	private void readNextMoveDirection() {
