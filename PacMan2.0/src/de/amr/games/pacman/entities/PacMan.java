@@ -50,10 +50,10 @@ public class PacMan extends BoardMover {
 	}
 
 	private void readSprites() {
-		standingSprite = new Sprite(SpriteSheet.get().getPacManStanding());
+		standingSprite = new Sprite(SpriteSheet.getPacManStanding());
 		standingSprite.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
 		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
-			walkingSprites[direction] = new Sprite(SpriteSheet.get().getPacManWalking(direction));
+			walkingSprites[direction] = new Sprite(SpriteSheet.getPacManWalking(direction));
 			walkingSprites[direction].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
 			walkingSprites[direction].makeAnimated(AnimationMode.CYCLIC, 120);
 		});

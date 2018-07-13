@@ -17,26 +17,25 @@ import java.awt.RenderingHints;
 
 public class Maze {
 
-	private Board board;
+	private final Board board;
 	private int width;
 	private int height;
 
-	public Maze(Board board, int width, int height) {
+	public Maze(Board board) {
 		this.board = board;
+	}
+
+	public void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
 
-	public Board getBoard() {
-		return board;
-	}
-
 	public void draw(Graphics2D g) {
-		g.drawImage(SpriteSheet.get().getMazeImage(), 0, 0, width, height, null);
-		board.getGrid().vertices().forEach(tile -> drawTile(g, board.getGrid().row(tile), board.getGrid().col(tile)));
+		g.drawImage(SpriteSheet.getMazeImage(), 0, 0, width, height, null);
+		board.positions().forEach(pos -> drawTile(g, pos.x, pos.y));
 	}
 
-	private void drawTile(Graphics2D g, int row, int col) {
+	private void drawTile(Graphics2D g, int col, int row) {
 		g.translate(col * Board.TILE_SIZE, row * Board.TILE_SIZE);
 		char tile = board.getContent(col, row);
 		switch (tile) {
@@ -62,7 +61,7 @@ public class Maze {
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(SpriteSheet.get().getBonusImage(bonus), 0, -Board.TILE_SIZE / 2, Board.TILE_SIZE * 2,
+		g.drawImage(SpriteSheet.getBonusImage(bonus), 0, -Board.TILE_SIZE / 2, Board.TILE_SIZE * 2,
 				Board.TILE_SIZE * 2, null);
 	}
 

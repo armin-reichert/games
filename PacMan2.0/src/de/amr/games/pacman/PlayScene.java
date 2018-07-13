@@ -38,7 +38,8 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	@Override
 	public void init() {
-		maze = new Maze(app.getBoard(), getWidth(), getHeight() - 5 * Board.TILE_SIZE);
+		maze = new Maze(app.getBoard());
+		maze.setSize(getWidth(), getHeight() - 5 * Board.TILE_SIZE);
 
 		redGhost = new Ghost(app.getBoard(), SpriteSheet.RED);
 		pinkGhost = new Ghost(app.getBoard(), SpriteSheet.PINK);
@@ -47,12 +48,12 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		app.entities.add(redGhost, pinkGhost, blueGhost, orangeGhost);
 		Stream.of(redGhost, pinkGhost, blueGhost, orangeGhost)
 				.forEach(ghost -> findFreePosition().ifPresent(ghost::setMazePosition));
-		
+
 		pacMan = new PacMan(app.getBoard());
 		app.entities.add(pacMan);
 		pacMan.setMazePosition(14, 23);
 		pacMan.enemies.addAll(Arrays.asList(redGhost, pinkGhost, blueGhost, orangeGhost));
-		
+
 		app.entities.all().forEach(GameEntity::init);
 	}
 
@@ -62,8 +63,8 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	@Override
 	public void update() {
-		if (maze.getBoard().isMazeEmpty()) {
-			maze.getBoard().resetContent();
+		if (app.getBoard().isMazeEmpty()) {
+			app.getBoard().resetContent();
 		}
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
 			pacMan.setNextMoveDirection(Top4.W);
@@ -79,11 +80,11 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		// first three rows reserved for HUD
-		g.translate(0, 3 * Board.TILE_SIZE);
+		// first board rows are reserved for HUD
+		g.translate(0, app.getBoard().getFirstMazeRow() * Board.TILE_SIZE);
 		maze.draw(g);
 		app.entities.all().forEach(e -> e.draw(g));
-		g.translate(0, -3 * Board.TILE_SIZE);
+		g.translate(0, -app.getBoard().getFirstMazeRow() * Board.TILE_SIZE);
 		if (DEBUG) {
 			drawGridLines(g);
 		}
@@ -91,12 +92,11 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	private void drawGridLines(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
-		for (int row = 0; row < maze.getBoard().numRows(); ++row) {
+		for (int row = 1; row < app.getBoard().numRows(); ++row) {
 			g.drawLine(0, row * Board.TILE_SIZE, getWidth(), row * Board.TILE_SIZE);
 		}
-		for (int col = 0; col < maze.getBoard().numCols(); ++col) {
+		for (int col = 1; col < app.getBoard().numCols(); ++col) {
 			g.drawLine(col * Board.TILE_SIZE, 0, col * Board.TILE_SIZE, getHeight());
 		}
 	}
-
 }

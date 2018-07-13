@@ -24,23 +24,17 @@ public class SpriteSheet {
 	public static final int BLUE = 2;
 	public static final int ORANGE = 3;
 
-	private static final SpriteSheet SHEET = new SpriteSheet();
+	private static BufferedImage sheet = Assets.readImage("sprites.png");
+	private static BufferedImage maze;
+	private static Map<Character, BufferedImage> bonusImages = new HashMap<>();
+	private static BufferedImage pacManStanding;
+	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
+	private static BufferedImage[] redGhostImages = new BufferedImage[8];
+	private static BufferedImage[] pinkGhostImages = new BufferedImage[8];
+	private static BufferedImage[] blueGhostImages = new BufferedImage[8];
+	private static BufferedImage[] orangeGhostImages = new BufferedImage[8];
 
-	public static SpriteSheet get() {
-		return SHEET;
-	}
-
-	private BufferedImage sheet = Assets.readImage("sprites.png");
-	private BufferedImage maze;
-	private Map<Character, BufferedImage> bonusImages = new HashMap<>();
-	private BufferedImage pacManStanding;
-	private BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
-	private BufferedImage[] redGhostImages = new BufferedImage[8];
-	private BufferedImage[] pinkGhostImages = new BufferedImage[8];
-	private BufferedImage[] blueGhostImages = new BufferedImage[8];
-	private BufferedImage[] orangeGhostImages = new BufferedImage[8];
-
-	private SpriteSheet() {
+	static {
 		// Maze:
 		maze = sheet.getSubimage(228, 0, 224, 248);
 		// Bonus:
@@ -80,23 +74,23 @@ public class SpriteSheet {
 		}
 	}
 
-	public BufferedImage getMazeImage() {
+	public static BufferedImage getMazeImage() {
 		return maze;
 	}
 
-	public BufferedImage getBonusImage(char bonus) {
+	public static BufferedImage getBonusImage(char bonus) {
 		return bonusImages.get(bonus);
 	}
 
-	public BufferedImage getPacManStanding() {
+	public static BufferedImage getPacManStanding() {
 		return pacManStanding;
 	}
 
-	public BufferedImage[] getPacManWalking(int direction) {
+	public static BufferedImage[] getPacManWalking(int direction) {
 		return pacManWalking[direction];
 	}
 
-	public BufferedImage[] getGhostImagesByDirection(int ghostColor, int direction) {
+	public static BufferedImage[] getGhostImagesByDirection(int ghostColor, int direction) {
 		switch (direction) {
 		case Top4.E:
 			return Arrays.copyOfRange(getGhostImages(ghostColor), 0, 2);
@@ -110,7 +104,7 @@ public class SpriteSheet {
 		throw new IllegalArgumentException("Illegal direction: " + direction);
 	}
 
-	public BufferedImage[] getGhostImages(int ghostColor) {
+	public static BufferedImage[] getGhostImages(int ghostColor) {
 		switch (ghostColor) {
 		case RED:
 			return redGhostImages;

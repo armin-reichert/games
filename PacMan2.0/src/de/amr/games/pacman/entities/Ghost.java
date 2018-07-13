@@ -9,13 +9,12 @@ import de.amr.games.pacman.board.SpriteSheet;
 
 public class Ghost extends BoardMover {
 
-	private Top4 top = new Top4();
 	private Sprite[] spriteByDir = new Sprite[4];
 
 	public Ghost(Board board, int color) {
 		super(board);
 		top.dirs().forEach(dir -> {
-			spriteByDir[dir] = new Sprite(SpriteSheet.get().getGhostImagesByDirection(color, dir));
+			spriteByDir[dir] = new Sprite(SpriteSheet.getGhostImagesByDirection(color, dir));
 			spriteByDir[dir].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
 			spriteByDir[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 		});

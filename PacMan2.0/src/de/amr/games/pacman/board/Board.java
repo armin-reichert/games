@@ -107,6 +107,10 @@ public class Board {
 		grid.set(grid.cell(col, row), c);
 	}
 
+	public Stream<Point> findPositions(char content) {
+		return grid.vertices().filter(v -> grid.get(v) == content).mapToObj(v -> new Point(grid.col(v), grid.row(v)));
+	}
+
 	public void print() {
 		IntStream.range(0, grid.numRows()).forEach(row -> {
 			IntStream.range(0, grid.numCols()).forEach(col -> {
