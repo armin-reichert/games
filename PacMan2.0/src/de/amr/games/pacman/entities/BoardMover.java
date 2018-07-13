@@ -4,6 +4,7 @@ import static de.amr.games.pacman.board.Tile.WALL;
 import static de.amr.games.pacman.board.Tile.WORMHOLE;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
@@ -40,6 +41,10 @@ public class BoardMover extends GameEntity {
 
 	public void setMazePosition(int col, int row) {
 		tf.moveTo(col * Board.TILE_SIZE, row * Board.TILE_SIZE);
+	}
+
+	public void setMazePosition(Point pos) {
+		setMazePosition(pos.x, pos.y);
 	}
 
 	@Override
@@ -92,7 +97,7 @@ public class BoardMover extends GameEntity {
 		if (!board.getGrid().isValidCol(newCol) || !board.getGrid().isValidRow(newRow)) {
 			return false;
 		}
-		return board.getTile(newCol, newRow) != WALL;
+		return board.getContent(newCol, newRow) != WALL;
 	}
 
 	public void changeDirection() {
@@ -106,7 +111,7 @@ public class BoardMover extends GameEntity {
 
 	public void move() {
 		int col = col(), row = row();
-		if (board.getTile(col, row) == WORMHOLE) {
+		if (board.getContent(col, row) == WORMHOLE) {
 			warp(col, row);
 		} else if (canMove(moveDirection)) {
 			tf.moveTo(getNewPosition(moveDirection));
@@ -116,10 +121,10 @@ public class BoardMover extends GameEntity {
 	}
 
 	public void warp(int col, int row) {
-		if (moveDirection == Top4.E && col == board.getNumCols() - 1) {
+		if (moveDirection == Top4.E && col == board.numCols() - 1) {
 			setMazePosition(1, row);
 		} else if (moveDirection == Top4.W && col == 0) {
-			setMazePosition(board.getNumCols() - 2, row);
+			setMazePosition(board.numCols() - 2, row);
 		}
 	}
 

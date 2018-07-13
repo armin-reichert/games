@@ -15,9 +15,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-import de.amr.easy.game.entity.GameEntity;
-
-public class Maze extends GameEntity {
+public class Maze {
 
 	private Board board;
 	private int width;
@@ -33,7 +31,6 @@ public class Maze extends GameEntity {
 		return board;
 	}
 
-	@Override
 	public void draw(Graphics2D g) {
 		g.drawImage(SpriteSheet.get().getMazeImage(), 0, 0, width, height, null);
 		board.getGrid().vertices().forEach(tile -> drawTile(g, board.getGrid().row(tile), board.getGrid().col(tile)));
@@ -41,7 +38,7 @@ public class Maze extends GameEntity {
 
 	private void drawTile(Graphics2D g, int row, int col) {
 		g.translate(col * Board.TILE_SIZE, row * Board.TILE_SIZE);
-		char tile = board.getTile(col, row);
+		char tile = board.getContent(col, row);
 		switch (tile) {
 		case PELLET:
 			drawPellet(g, row, col);

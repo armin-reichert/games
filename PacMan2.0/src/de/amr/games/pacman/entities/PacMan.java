@@ -13,13 +13,11 @@ import static de.amr.games.pacman.board.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
@@ -44,7 +42,7 @@ public class PacMan extends BoardMover {
 		super(board);
 		fnFoodFound = e -> {
 			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
-			board.setTile(e.col, e.row, Tile.EMPTY);
+			board.setContent(e.col, e.row, Tile.EMPTY);
 		};
 		fnGhostTouched = e -> {
 			System.out.println(String.format("Met ghost %s at col=%d, row=%d", e.ghost, e.col, e.row));
@@ -93,7 +91,6 @@ public class PacMan extends BoardMover {
 	public void update() {
 		lookForFood();
 		lookForEnemy();
-		readNextMoveDirection();
 		changeDirection();
 		move();
 	}
@@ -104,21 +101,9 @@ public class PacMan extends BoardMover {
 		});
 	}
 
-	private void readNextMoveDirection() {
-		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			setNextMoveDirection(Top4.W);
-		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			setNextMoveDirection(Top4.E);
-		} else if (Keyboard.keyDown(KeyEvent.VK_DOWN)) {
-			setNextMoveDirection(Top4.S);
-		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
-			setNextMoveDirection(Top4.N);
-		}
-	}
-
 	private void lookForFood() {
 		int col = col(), row = row();
-		char tile = board.getTile(col, row);
+		char tile = board.getContent(col, row);
 		switch (tile) {
 		case PELLET:
 		case ENERGIZER:

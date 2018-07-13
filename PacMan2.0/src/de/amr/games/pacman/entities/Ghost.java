@@ -1,8 +1,5 @@
 package de.amr.games.pacman.entities;
 
-import java.awt.Graphics2D;
-import java.util.Random;
-
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
