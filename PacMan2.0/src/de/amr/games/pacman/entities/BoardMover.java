@@ -94,7 +94,7 @@ public class BoardMover extends GameEntity {
 		if (col() == newCol && row() == newRow) {
 			return true;
 		}
-		if (!board.getGrid().isValidCol(newCol) || !board.getGrid().isValidRow(newRow)) {
+		if (!board.grid.isValidCol(newCol) || !board.grid.isValidRow(newRow)) {
 			return false;
 		}
 		return board.getContent(newCol, newRow) != WALL;

@@ -18,8 +18,8 @@ public class BoardTests {
 		Board board = new Board(data);
 		board.print();
 
-		assertEquals(28, board.getGrid().numCols());
-		assertEquals(31, board.getGrid().numRows());
+		assertEquals(28, board.grid.numCols());
+		assertEquals(31, board.grid.numRows());
 
 		assertEquals(WALL, board.getContent(0, 3));
 		assertEquals(PELLET, board.getContent(1, 4));

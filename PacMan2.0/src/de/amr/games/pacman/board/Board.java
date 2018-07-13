@@ -28,8 +28,8 @@ public class Board {
 		return new Point(col(x), row(y));
 	}
 
-	private final GridGraph<Character, Integer> grid;
-	private final Topology top = new Top4();
+	public final GridGraph<Character, Integer> grid;
+	public final Topology top = new Top4();
 	private final String mazeData;
 	private final int numRows;
 	private final int numCols;
@@ -64,10 +64,6 @@ public class Board {
 
 	public int numRows() {
 		return numRows;
-	}
-
-	public GridGraph<Character, Integer> getGrid() {
-		return grid;
 	}
 
 	public Stream<Point> positions() {
