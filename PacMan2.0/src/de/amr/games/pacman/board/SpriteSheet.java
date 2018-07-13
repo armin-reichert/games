@@ -33,6 +33,8 @@ public class SpriteSheet {
 	private static BufferedImage[] pinkGhostImages = new BufferedImage[8];
 	private static BufferedImage[] blueGhostImages = new BufferedImage[8];
 	private static BufferedImage[] orangeGhostImages = new BufferedImage[8];
+	private static BufferedImage[] frightenedGhostImages = new BufferedImage[4];
+	private static BufferedImage[] deadGhostImages = new BufferedImage[4];
 
 	static {
 		// Maze:
@@ -44,6 +46,7 @@ public class SpriteSheet {
 			bonusImages.put(bonus, sheet.getSubimage(x, y, 16, 16));
 			x += 16;
 		}
+
 		// PacMan:
 		pacManStanding = sheet.getSubimage(488, 0, 15, 15);
 		pacManWalking[Top4.E] = new BufferedImage[] { sheet.getSubimage(456, 0, 15, 15),
@@ -54,23 +57,26 @@ public class SpriteSheet {
 				sheet.getSubimage(472, 32, 15, 15) };
 		pacManWalking[Top4.S] = new BufferedImage[] { sheet.getSubimage(456, 48, 15, 15),
 				sheet.getSubimage(472, 48, 15, 15) };
+
 		// Ghosts:
 		BufferedImage ghostImages = sheet.getSubimage(456, 64, 128, 64);
-		redGhostImages = new BufferedImage[8];
 		for (int i = 0; i < 8; ++i) {
 			redGhostImages[i] = ghostImages.getSubimage(i * 16, 0, 16, 16);
 		}
-		pinkGhostImages = new BufferedImage[8];
 		for (int i = 0; i < 8; ++i) {
 			pinkGhostImages[i] = ghostImages.getSubimage(i * 16, 16, 16, 16);
 		}
-		blueGhostImages = new BufferedImage[8];
 		for (int i = 0; i < 8; ++i) {
 			blueGhostImages[i] = ghostImages.getSubimage(i * 16, 32, 16, 16);
 		}
-		orangeGhostImages = new BufferedImage[8];
 		for (int i = 0; i < 8; ++i) {
 			orangeGhostImages[i] = ghostImages.getSubimage(i * 16, 48, 16, 16);
+		}
+		for (int i = 0; i < 4; ++i) {
+			frightenedGhostImages[i] = sheet.getSubimage(584 + i * 16, 64, 16, 16);
+		}
+		for (int i = 0; i < 4; ++i) {
+			deadGhostImages[i] = sheet.getSubimage(584 + i * 16, 80, 16, 16);
 		}
 	}
 
@@ -116,5 +122,23 @@ public class SpriteSheet {
 			return orangeGhostImages;
 		}
 		throw new IllegalArgumentException("Illegal ghost color: " + ghostColor);
+	}
+
+	public static BufferedImage[] getFrightenedGhostImages() {
+		return frightenedGhostImages;
+	}
+
+	public static BufferedImage getDeadGhostImage(int direction) {
+		switch (direction) {
+		case Top4.E:
+			return deadGhostImages[0];
+		case Top4.W:
+			return deadGhostImages[1];
+		case Top4.N:
+			return deadGhostImages[2];
+		case Top4.S:
+			return deadGhostImages[3];
+		}
+		throw new IllegalArgumentException("Illegal direction: " + direction);
 	}
 }

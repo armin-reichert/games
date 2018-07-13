@@ -44,9 +44,15 @@ public class PacMan extends BoardMover {
 		fnFoodFound = e -> {
 			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
 			board.setContent(e.col, e.row, Tile.EMPTY);
+			if (e.food == Tile.ENERGIZER) {
+				enemies.forEach(enemy -> {
+					enemy.setState(Ghost.State.FRIGHTENED);
+				});
+			}
 		};
 		fnGhostTouched = e -> {
 			System.out.println(String.format("Met ghost %s at col=%d, row=%d", e.ghost, e.col, e.row));
+			e.ghost.setState(Ghost.State.DEAD);
 		};
 	}
 
