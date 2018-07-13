@@ -18,8 +18,6 @@ public class Ghost extends BoardMover {
 	private Sprite spriteFrightened;
 	private Sprite[] spriteDead = new Sprite[4];
 	private State state;
-	private long stateChangeAt;
-
 	public Ghost(Board board, int color) {
 		super(board);
 		this.color = color;
@@ -40,13 +38,13 @@ public class Ghost extends BoardMover {
 	@Override
 	public String toString() {
 		switch (color) {
-		case SpriteSheet.BLUE:
+		case SpriteSheet.BLUE_GHOST:
 			return "Inky";
-		case SpriteSheet.ORANGE:
+		case SpriteSheet.ORANGE_GHOST:
 			return "Clyde";
-		case SpriteSheet.PINK:
+		case SpriteSheet.PINK_GHOST:
 			return "Pinky";
-		case SpriteSheet.RED:
+		case SpriteSheet.RED_GHOST:
 			return "Blinky";
 		}
 		throw new IllegalArgumentException("Illegal ghost color: " + color);
@@ -102,8 +100,8 @@ public class Ghost extends BoardMover {
 		this.state = state;
 		stateChangeAt = System.currentTimeMillis();
 	}
-
-	private int secondsInState() {
-		return (int) (System.currentTimeMillis() - stateChangeAt) / 1000;
+	
+	public State getState() {
+		return state;
 	}
 }

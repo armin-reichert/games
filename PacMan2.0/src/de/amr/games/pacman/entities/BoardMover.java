@@ -19,6 +19,7 @@ public class BoardMover extends GameEntity {
 	protected int moveDirection;
 	protected int nextMoveDirection;
 	protected float speed;
+	protected long stateChangeAt;
 
 	public BoardMover(Board board) {
 		this.board = board;
@@ -131,6 +132,10 @@ public class BoardMover extends GameEntity {
 	public Vector2f getNewPosition(int direction) {
 		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(top.dx(direction), top.dy(direction)));
 		return Vector2f.sum(tf.getPosition(), velocity);
+	}
+
+	protected int secondsInState() {
+		return (int) (System.currentTimeMillis() - stateChangeAt) / 1000;
 	}
 
 }

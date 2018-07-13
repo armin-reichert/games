@@ -19,16 +19,17 @@ import de.amr.easy.grid.impl.Top4;
 
 public class SpriteSheet {
 
-	public static final int RED = 0;
-	public static final int PINK = 1;
-	public static final int BLUE = 2;
-	public static final int ORANGE = 3;
+	public static final int RED_GHOST = 0;
+	public static final int PINK_GHOST = 1;
+	public static final int BLUE_GHOST = 2;
+	public static final int ORANGE_GHOST = 3;
 
 	private static BufferedImage sheet = Assets.readImage("sprites.png");
 	private static BufferedImage maze;
 	private static Map<Character, BufferedImage> bonusImages = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
+	private static BufferedImage[] pacManDying = new BufferedImage[11];
 	private static BufferedImage[] redGhostImages = new BufferedImage[8];
 	private static BufferedImage[] pinkGhostImages = new BufferedImage[8];
 	private static BufferedImage[] blueGhostImages = new BufferedImage[8];
@@ -48,7 +49,6 @@ public class SpriteSheet {
 		}
 
 		// PacMan:
-		pacManStanding = sheet.getSubimage(488, 0, 15, 15);
 		pacManWalking[Top4.E] = new BufferedImage[] { sheet.getSubimage(456, 0, 15, 15),
 				sheet.getSubimage(472, 0, 15, 15) };
 		pacManWalking[Top4.W] = new BufferedImage[] { sheet.getSubimage(456, 16, 15, 15),
@@ -57,6 +57,10 @@ public class SpriteSheet {
 				sheet.getSubimage(472, 32, 15, 15) };
 		pacManWalking[Top4.S] = new BufferedImage[] { sheet.getSubimage(456, 48, 15, 15),
 				sheet.getSubimage(472, 48, 15, 15) };
+		pacManStanding = sheet.getSubimage(488, 0, 16, 16);
+		for (int i = 0; i < 11; ++i) {
+			pacManDying[i] = sheet.getSubimage(504 + i * 16, 0, 16, 16);
+		}
 
 		// Ghosts:
 		BufferedImage ghostImages = sheet.getSubimage(456, 64, 128, 64);
@@ -96,6 +100,10 @@ public class SpriteSheet {
 		return pacManWalking[direction];
 	}
 
+	public static BufferedImage[] getPacManDying() {
+		return pacManDying;
+	}
+
 	public static BufferedImage[] getGhostImagesByDirection(int ghostColor, int direction) {
 		switch (direction) {
 		case Top4.E:
@@ -112,13 +120,13 @@ public class SpriteSheet {
 
 	public static BufferedImage[] getGhostImages(int ghostColor) {
 		switch (ghostColor) {
-		case RED:
+		case RED_GHOST:
 			return redGhostImages;
-		case PINK:
+		case PINK_GHOST:
 			return pinkGhostImages;
-		case BLUE:
+		case BLUE_GHOST:
 			return blueGhostImages;
-		case ORANGE:
+		case ORANGE_GHOST:
 			return orangeGhostImages;
 		}
 		throw new IllegalArgumentException("Illegal ghost color: " + ghostColor);

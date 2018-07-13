@@ -30,8 +30,15 @@ public class PacMan extends BoardMover {
 
 	private static boolean DEBUG = false;
 
+	public enum State {
+		ALIVE, DYING
+	};
+
 	private Sprite[] spriteWalking = new Sprite[4];
 	private Sprite spriteStanding;
+	private Sprite spriteDying;
+
+	private State state;
 
 	public Consumer<FoodEvent> fnFoodFound;
 	public Consumer<GhostEvent> fnGhostTouched;
@@ -42,7 +49,7 @@ public class PacMan extends BoardMover {
 		super(board);
 		readSprites();
 		fnFoodFound = e -> {
-			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
+//			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
 			board.setContent(e.col, e.row, Tile.EMPTY);
 			if (e.food == Tile.ENERGIZER) {
 				enemies.forEach(enemy -> {
@@ -51,8 +58,17 @@ public class PacMan extends BoardMover {
 			}
 		};
 		fnGhostTouched = e -> {
-			System.out.println(String.format("Met ghost %s at col=%d, row=%d", e.ghost, e.col, e.row));
-			e.ghost.setState(Ghost.State.DEAD);
+			if (getState() != State.DYING) {
+				System.out.println(String.format("Met ghost %s at col=%d, row=%d", e.ghost, e.col, e.row));
+				if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
+					e.ghost.setState(Ghost.State.DEAD);
+				} else if (e.ghost.getState() == Ghost.State.DEAD) {
+					// do nothing
+				} else {
+					setState(State.DYING);
+					setSpeed(0);
+				}
+			}
 		};
 	}
 
@@ -64,6 +80,9 @@ public class PacMan extends BoardMover {
 			spriteWalking[direction].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
 			spriteWalking[direction].makeAnimated(AnimationMode.CYCLIC, 120);
 		});
+		spriteDying = new Sprite(SpriteSheet.getPacManDying());
+		spriteDying.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
 	}
 
 	@Override
@@ -71,6 +90,7 @@ public class PacMan extends BoardMover {
 		setSpeed(Board.TILE_SIZE / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
+		setState(State.ALIVE);
 	}
 
 	@Override
@@ -87,10 +107,13 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public Sprite currentSprite() {
-		if (!canMove(moveDirection)) {
-			return spriteStanding;
+		if (state == State.ALIVE) {
+			return canMove(moveDirection) ? spriteWalking[moveDirection] : spriteStanding;
 		}
-		return spriteWalking[moveDirection];
+		if (state == State.DYING) {
+			return spriteDying;
+		}
+		throw new IllegalStateException("Illegal PacMan state: " + state);
 	}
 
 	@Override
@@ -99,6 +122,23 @@ public class PacMan extends BoardMover {
 		lookForEnemy();
 		changeDirection();
 		move();
+		if (state == State.DYING) {
+			if (secondsInState() > 4) {
+				spriteDying.resetAnimation();
+				setState(State.ALIVE);
+				setMazePosition(14, 23);
+				setSpeed(Board.TILE_SIZE / 8f);
+			}
+		}
+	}
+
+	public void setState(State state) {
+		this.state = state;
+		stateChangeAt = System.currentTimeMillis();
+	}
+
+	public State getState() {
+		return state;
 	}
 
 	private void lookForEnemy() {

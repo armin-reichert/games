@@ -1,6 +1,10 @@
 package de.amr.games.pacman;
 
 import static de.amr.easy.util.StreamUtils.permute;
+import static de.amr.games.pacman.board.SpriteSheet.BLUE_GHOST;
+import static de.amr.games.pacman.board.SpriteSheet.ORANGE_GHOST;
+import static de.amr.games.pacman.board.SpriteSheet.PINK_GHOST;
+import static de.amr.games.pacman.board.SpriteSheet.RED_GHOST;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -16,7 +20,6 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.Maze;
-import de.amr.games.pacman.board.SpriteSheet;
 import de.amr.games.pacman.board.Tile;
 import de.amr.games.pacman.entities.Ghost;
 import de.amr.games.pacman.entities.PacMan;
@@ -31,30 +34,23 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	public PlayScene(PacManApp app) {
 		super(app);
+		maze = new Maze(app.board);
+		maze.setSize(getWidth(), getHeight() - 5 * Board.TILE_SIZE);
+		ghosts[RED_GHOST] = new Ghost(app.board, RED_GHOST);
+		ghosts[PINK_GHOST] = new Ghost(app.board, PINK_GHOST);
+		ghosts[BLUE_GHOST] = new Ghost(app.board, BLUE_GHOST);
+		ghosts[ORANGE_GHOST] = new Ghost(app.board, ORANGE_GHOST);
+		pacMan = new PacMan(app.board);
+		app.entities.add(pacMan);
+		app.entities.add(ghosts);
 	}
 
 	@Override
 	public void init() {
-		maze = new Maze(app.board);
-		maze.setSize(getWidth(), getHeight() - 5 * Board.TILE_SIZE);
-
-		ghosts[SpriteSheet.RED] = new Ghost(app.board, SpriteSheet.RED);
-		ghosts[SpriteSheet.PINK] = new Ghost(app.board, SpriteSheet.PINK);
-		ghosts[SpriteSheet.BLUE] = new Ghost(app.board, SpriteSheet.BLUE);
-		ghosts[SpriteSheet.ORANGE] = new Ghost(app.board, SpriteSheet.ORANGE);
-		app.entities.add(ghosts);
 		Stream.of(ghosts).forEach(ghost -> findFreePosition().ifPresent(ghost::setMazePosition));
-
-		pacMan = new PacMan(app.board);
-		app.entities.add(pacMan);
 		pacMan.setMazePosition(14, 23);
 		pacMan.enemies.addAll(Arrays.asList(ghosts));
-
 		app.entities.all().forEach(GameEntity::init);
-	}
-
-	private Optional<Point> findFreePosition() {
-		return permute(app.board.positions().filter(p -> app.board.getContent(p.x, p.y) == Tile.EMPTY)).findAny();
 	}
 
 	@Override
@@ -84,6 +80,10 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		if (DEBUG) {
 			drawGridLines(g);
 		}
+	}
+
+	private Optional<Point> findFreePosition() {
+		return permute(app.board.positions().filter(p -> app.board.getContent(p.x, p.y) == Tile.EMPTY)).findAny();
 	}
 
 	private void drawGridLines(Graphics2D g) {
