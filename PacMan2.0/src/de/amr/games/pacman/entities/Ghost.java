@@ -9,15 +9,32 @@ import de.amr.games.pacman.board.SpriteSheet;
 
 public class Ghost extends BoardMover {
 
+	private int color;
 	private Sprite[] spriteByDir = new Sprite[4];
 
 	public Ghost(Board board, int color) {
 		super(board);
+		this.color = color;
 		top.dirs().forEach(dir -> {
 			spriteByDir[dir] = new Sprite(SpriteSheet.getGhostImagesByDirection(color, dir));
 			spriteByDir[dir].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
 			spriteByDir[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 		});
+	}
+
+	@Override
+	public String toString() {
+		switch (color) {
+		case SpriteSheet.BLUE:
+			return "Inky";
+		case SpriteSheet.ORANGE:
+			return "Clyde";
+		case SpriteSheet.PINK:
+			return "Pinky";
+		case SpriteSheet.RED:
+			return "Blinky";
+		}
+		throw new IllegalArgumentException("Illegal ghost color: " + color);
 	}
 
 	@Override
@@ -43,6 +60,10 @@ public class Ghost extends BoardMover {
 	@Override
 	public Sprite currentSprite() {
 		return spriteByDir[moveDirection];
+	}
+
+	public int getColor() {
+		return color;
 	}
 
 }

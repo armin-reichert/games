@@ -10,24 +10,18 @@ public class PacManApp extends Application {
 		launch(new PacManApp());
 	}
 
-	private Board board;
-	private PlayScene scene;
+	public final Board board;
 
 	public PacManApp() {
-		board = new Board(Assets.text("maze.txt"));
 		settings.title = "PacMan 2.0";
+		board = new Board(Assets.text("maze.txt"));
 		settings.width = board.numCols() * Board.TILE_SIZE;
 		settings.height = board.numRows() * Board.TILE_SIZE;
-		settings.scale = 1.0f;
+		settings.scale = 1f;
 	}
 
 	@Override
 	public void init() {
-		scene = new PlayScene(this);
-		select(scene);
-	}
-
-	public Board getBoard() {
-		return board;
+		select(new PlayScene(this));
 	}
 }

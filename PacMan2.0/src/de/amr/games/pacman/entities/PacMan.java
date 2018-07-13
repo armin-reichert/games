@@ -30,8 +30,8 @@ public class PacMan extends BoardMover {
 
 	private static boolean DEBUG = false;
 
-	private Sprite[] walkingSprites = new Sprite[4];
-	private Sprite standingSprite;
+	private Sprite[] spriteWalking = new Sprite[4];
+	private Sprite spriteStanding;
 
 	public Consumer<FoodEvent> fnFoodFound;
 	public Consumer<GhostEvent> fnGhostTouched;
@@ -40,6 +40,7 @@ public class PacMan extends BoardMover {
 
 	public PacMan(Board board) {
 		super(board);
+		readSprites();
 		fnFoodFound = e -> {
 			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
 			board.setContent(e.col, e.row, Tile.EMPTY);
@@ -50,18 +51,17 @@ public class PacMan extends BoardMover {
 	}
 
 	private void readSprites() {
-		standingSprite = new Sprite(SpriteSheet.getPacManStanding());
-		standingSprite.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+		spriteStanding = new Sprite(SpriteSheet.getPacManStanding());
+		spriteStanding.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
 		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
-			walkingSprites[direction] = new Sprite(SpriteSheet.getPacManWalking(direction));
-			walkingSprites[direction].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
-			walkingSprites[direction].makeAnimated(AnimationMode.CYCLIC, 120);
+			spriteWalking[direction] = new Sprite(SpriteSheet.getPacManWalking(direction));
+			spriteWalking[direction].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+			spriteWalking[direction].makeAnimated(AnimationMode.CYCLIC, 120);
 		});
 	}
 
 	@Override
 	public void init() {
-		readSprites();
 		setSpeed(Board.TILE_SIZE / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
@@ -82,9 +82,9 @@ public class PacMan extends BoardMover {
 	@Override
 	public Sprite currentSprite() {
 		if (!canMove(moveDirection)) {
-			return standingSprite;
+			return spriteStanding;
 		}
-		return walkingSprites[moveDirection];
+		return spriteWalking[moveDirection];
 	}
 
 	@Override
