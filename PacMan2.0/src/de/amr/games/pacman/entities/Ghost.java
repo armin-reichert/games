@@ -1,13 +1,18 @@
 package de.amr.games.pacman.entities;
 
+import java.awt.Graphics2D;
+import java.awt.Point;
+
+import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.easy.util.StreamUtils;
 import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.SpriteSheet;
+import de.amr.games.pacman.board.Tile;
 
-public class Ghost extends BoardMover {
+public class Ghost extends BoardMover<Ghost.State> {
 
 	public enum State {
 		WALKING, FRIGHTENED, DEAD
@@ -17,21 +22,21 @@ public class Ghost extends BoardMover {
 	private Sprite[] spriteWalking = new Sprite[4];
 	private Sprite spriteFrightened;
 	private Sprite[] spriteDead = new Sprite[4];
-	private State state;
+
 	public Ghost(Board board, int color) {
 		super(board);
 		this.color = color;
 		top.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(SpriteSheet.getGhostImagesByDirection(color, dir));
-			spriteWalking[dir].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+			spriteWalking[dir].scale(Board.TS * 2, Board.TS * 2);
 			spriteWalking[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 		});
 		spriteFrightened = new Sprite(SpriteSheet.getFrightenedGhostImages());
-		spriteFrightened.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+		spriteFrightened.scale(Board.TS * 2, Board.TS * 2);
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
 		top.dirs().forEach(dir -> {
 			spriteDead[dir] = new Sprite(SpriteSheet.getDeadGhostImage(dir));
-			spriteDead[dir].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+			spriteDead[dir].scale(Board.TS * 2, Board.TS * 2);
 		});
 	}
 
@@ -54,7 +59,7 @@ public class Ghost extends BoardMover {
 	public void init() {
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
-		setSpeed(1f);
+		setSpeed(Board.TS / 16f);
 		setState(State.WALKING);
 	}
 
@@ -81,6 +86,17 @@ public class Ghost extends BoardMover {
 	}
 
 	@Override
+	public void draw(Graphics2D g) {
+		if (board.getContent(col(), row()) == Tile.GHOSTHOUSE) {
+			g.translate(Board.TS / 2, 0);
+			super.draw(g);
+			g.translate(-Board.TS / 2, 0);
+		} else {
+			super.draw(g);
+		}
+	}
+
+	@Override
 	public Sprite currentSprite() {
 		if (state == State.WALKING) {
 			return spriteWalking[moveDirection];
@@ -92,16 +108,21 @@ public class Ghost extends BoardMover {
 		throw new IllegalStateException("Illegal ghost state: " + state);
 	}
 
-	public int getColor() {
-		return color;
+	@Override
+	public boolean canMove(int direction) {
+		boolean canMove = super.canMove(direction);
+		if (!canMove) {
+			return false;
+		}
+		Vector2f newPosition = getNewPosition(direction);
+		Point newBoardPosition = Board.position(newPosition.x, newPosition.y);
+		if (board.getContent(newBoardPosition) == Tile.GHOSTHOUSE && getState() == State.DEAD) {
+			return true;
+		}
+		return true;
 	}
 
-	public void setState(State state) {
-		this.state = state;
-		stateChangeAt = System.currentTimeMillis();
-	}
-	
-	public State getState() {
-		return state;
+	public int getColor() {
+		return color;
 	}
 }

@@ -14,10 +14,10 @@ public class PacManApp extends Application {
 
 	public PacManApp() {
 		board = new Board(Assets.text("maze.txt"));
-		settings.width = board.numCols() * Board.TILE_SIZE;
-		settings.height = board.numRows() * Board.TILE_SIZE;
-		settings.scale = 1f;
-		settings.title = String.format("PacMan 2.0 (%dx%d*%.2f)", settings.width, settings.height, settings.scale);
+		settings.width = board.numCols() * Board.TS;
+		settings.height = board.numRows() * Board.TS;
+		settings.scale = 1.25f;
+		settings.title = String.format("PacMan 2.0 (%d x %d * %.2f)", settings.width, settings.height, settings.scale);
 	}
 
 	@Override

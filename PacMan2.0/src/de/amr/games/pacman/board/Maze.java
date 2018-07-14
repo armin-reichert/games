@@ -36,7 +36,7 @@ public class Maze {
 	}
 
 	private void drawTile(Graphics2D g, int col, int row) {
-		g.translate(col * Board.TILE_SIZE, row * Board.TILE_SIZE);
+		g.translate(col * Board.TS, row * Board.TS);
 		char tile = board.getContent(col, row);
 		switch (tile) {
 		case PELLET:
@@ -57,26 +57,26 @@ public class Maze {
 		default:
 			break;
 		}
-		g.translate(-col * Board.TILE_SIZE, -row * Board.TILE_SIZE);
+		g.translate(-col * Board.TS, -row * Board.TS);
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(SpriteSheet.getBonusImage(bonus), 0, -Board.TILE_SIZE / 2, Board.TILE_SIZE * 2,
-				Board.TILE_SIZE * 2, null);
+		g.drawImage(SpriteSheet.getBonusImage(bonus), 0, -Board.TS / 2, Board.TS * 2,
+				Board.TS * 2, null);
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, Board.TILE_SIZE / 8);
+		drawCircle(g, Color.YELLOW, row, col, Board.TS / 8);
 	}
 
 	private void drawEnergizer(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, Board.TILE_SIZE / 2);
+		drawCircle(g, Color.YELLOW, row, col, Board.TS / 2);
 	}
 
 	private void drawCircle(Graphics2D g, Color color, int row, int col, int r) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.fillOval(Board.TILE_SIZE / 2 - r, Board.TILE_SIZE / 2 - r, 2 * r, 2 * r);
+		g.fillOval(Board.TS / 2 - r, Board.TS / 2 - r, 2 * r, 2 * r);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 }

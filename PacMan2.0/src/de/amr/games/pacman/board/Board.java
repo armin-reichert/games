@@ -14,17 +14,18 @@ import de.amr.easy.grid.impl.Top4;
 
 public class Board {
 
-	public static final int TILE_SIZE = 16;
+	/** Tile size of the board. */
+	public static final int TS = 16;
 
 	public static int row(float y) {
-		return Math.round(y) / TILE_SIZE;
+		return Math.round(y) / TS;
 	}
 
 	public static int col(float x) {
-		return Math.round(x) / TILE_SIZE;
+		return Math.round(x) / TS;
 	}
 
-	public static Point pos(float x, float y) {
+	public static Point position(float x, float y) {
 		return new Point(col(x), row(y));
 	}
 
@@ -93,6 +94,10 @@ public class Board {
 		return grid.get(grid.cell(col, row));
 	}
 
+	public char getContent(Point position) {
+		return getContent(position.x, position.y);
+	}
+
 	public void setContent(int col, int row, char c) {
 		if (!grid.isValidCol(col)) {
 			throw new IllegalArgumentException();
@@ -103,7 +108,11 @@ public class Board {
 		grid.set(grid.cell(col, row), c);
 	}
 
-	public Stream<Point> findPositions(char content) {
+	public void setContent(Point position, char c) {
+		setContent(position.x, position.y, c);
+	}
+
+	public Stream<Point> positionsContaining(char content) {
 		return grid.vertices().filter(v -> grid.get(v) == content).mapToObj(v -> new Point(grid.col(v), grid.row(v)));
 	}
 

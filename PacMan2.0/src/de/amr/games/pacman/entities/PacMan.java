@@ -15,18 +15,21 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.board.Board;
-import de.amr.games.pacman.board.FoodEvent;
 import de.amr.games.pacman.board.SpriteSheet;
-import de.amr.games.pacman.board.Tile;
+import de.amr.games.pacman.control.BonusFoundEvent;
+import de.amr.games.pacman.control.FoodFoundEvent;
+import de.amr.games.pacman.control.GameEvent;
+import de.amr.games.pacman.control.GhostContactEvent;
+import de.amr.games.pacman.control.PacManDiedEvent;
 
-public class PacMan extends BoardMover {
+public class PacMan extends BoardMover<PacMan.State> {
 
 	private static boolean DEBUG = false;
 
@@ -34,60 +37,28 @@ public class PacMan extends BoardMover {
 		ALIVE, DYING
 	};
 
-	private Sprite[] spriteWalking = new Sprite[4];
-	private Sprite spriteStanding;
-	private Sprite spriteDying;
-
-	private State state;
-
-	public Consumer<FoodEvent> fnFoodFound;
-	public Consumer<GhostEvent> fnGhostTouched;
-
+	public final Sprite[] spriteWalking = new Sprite[4];
+	public final Sprite spriteStanding;
+	public final Sprite spriteDying;
 	public final List<Ghost> enemies = new ArrayList<>();
 
 	public PacMan(Board board) {
 		super(board);
-		readSprites();
-		fnFoodFound = e -> {
-//			System.out.println(String.format("Eat %s at col=%d, row=%d", e.food, e.col, e.row));
-			board.setContent(e.col, e.row, Tile.EMPTY);
-			if (e.food == Tile.ENERGIZER) {
-				enemies.forEach(enemy -> {
-					enemy.setState(Ghost.State.FRIGHTENED);
-				});
-			}
-		};
-		fnGhostTouched = e -> {
-			if (getState() != State.DYING) {
-				System.out.println(String.format("Met ghost %s at col=%d, row=%d", e.ghost, e.col, e.row));
-				if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
-					e.ghost.setState(Ghost.State.DEAD);
-				} else if (e.ghost.getState() == Ghost.State.DEAD) {
-					// do nothing
-				} else {
-					setState(State.DYING);
-					setSpeed(0);
-				}
-			}
-		};
-	}
-
-	private void readSprites() {
 		spriteStanding = new Sprite(SpriteSheet.getPacManStanding());
-		spriteStanding.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+		spriteStanding.scale(Board.TS * 2, Board.TS * 2);
 		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
 			spriteWalking[direction] = new Sprite(SpriteSheet.getPacManWalking(direction));
-			spriteWalking[direction].scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+			spriteWalking[direction].scale(Board.TS * 2, Board.TS * 2);
 			spriteWalking[direction].makeAnimated(AnimationMode.CYCLIC, 120);
 		});
 		spriteDying = new Sprite(SpriteSheet.getPacManDying());
-		spriteDying.scale(Board.TILE_SIZE * 2, Board.TILE_SIZE * 2);
+		spriteDying.scale(Board.TS * 2, Board.TS * 2);
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
 	}
 
 	@Override
 	public void init() {
-		setSpeed(Board.TILE_SIZE / 8f);
+		setSpeed(Board.TS / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
 		setState(State.ALIVE);
@@ -95,16 +66,17 @@ public class PacMan extends BoardMover {
 
 	@Override
 	public void update() {
-		lookForFood();
-		lookForEnemy();
-		changeDirection();
-		move();
-		if (state == State.DYING) {
+		if (state == State.ALIVE) {
+			Optional<GameEvent> discovery = inspectTile();
+			if (discovery.isPresent()) {
+				fireGameEvent(discovery.get());
+			} else {
+				changeDirection();
+				move();
+			}
+		} else if (state == State.DYING) {
 			if (secondsInState() > 3) {
-				spriteDying.resetAnimation();
-				setState(State.ALIVE);
-				setMazePosition(14, 23);
-				setSpeed(Board.TILE_SIZE / 8f);
+				fireGameEvent(new PacManDiedEvent());
 			}
 		}
 	}
@@ -114,7 +86,7 @@ public class PacMan extends BoardMover {
 		if (DEBUG) {
 			g.translate(tf.getX(), tf.getY());
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
-			g.fillRect(0, 0, Board.TILE_SIZE, Board.TILE_SIZE);
+			g.fillRect(0, 0, Board.TS, Board.TS);
 			g.translate(-tf.getX(), -tf.getY());
 		} else {
 			super.draw(g);
@@ -132,29 +104,26 @@ public class PacMan extends BoardMover {
 		throw new IllegalStateException("Illegal PacMan state: " + state);
 	}
 
-	public void setState(State state) {
-		this.state = state;
-		stateChangeAt = System.currentTimeMillis();
+	private Optional<GameEvent> inspectTile() {
+		Optional<GameEvent> ghostDiscovery = discoverGhost();
+		if (ghostDiscovery.isPresent()) {
+			return ghostDiscovery;
+		}
+		Optional<GameEvent> foodDiscovery = discoverFood();
+		if (discoverFood().isPresent()) {
+			return foodDiscovery;
+		}
+		Optional<GameEvent> bonusDiscovery = discoverBonus();
+		if (bonusDiscovery.isPresent()) {
+			return bonusDiscovery;
+		}
+		return Optional.empty();
 	}
 
-	public State getState() {
-		return state;
-	}
-
-	private void lookForEnemy() {
-		enemies.stream().filter(enemy -> enemy.col() == col() && enemy.row() == row()).findFirst().ifPresent(enemy -> {
-			fnGhostTouched.accept(new GhostEvent(enemy, col(), row()));
-		});
-	}
-
-	private void lookForFood() {
+	private Optional<GameEvent> discoverBonus() {
 		int col = col(), row = row();
-		char tile = board.getContent(col, row);
-		switch (tile) {
-		case PELLET:
-		case ENERGIZER:
-			fnFoodFound.accept(new FoodEvent(col, row, tile));
-			break;
+		char content = board.getContent(col, row);
+		switch (content) {
 		case BONUS_APPLE:
 		case BONUS_BELL:
 		case BONUS_CHERRIES:
@@ -163,11 +132,26 @@ public class PacMan extends BoardMover {
 		case BONUS_KEY:
 		case BONUS_PEACH:
 		case BONUS_STRAWBERRY:
-			fnFoodFound.accept(new FoodEvent(col, row, tile));
-			break;
+			return Optional.of(new BonusFoundEvent(this, col, row, content));
 		default:
-			break;
+			return Optional.empty();
 		}
 	}
 
+	private Optional<GameEvent> discoverFood() {
+		int col = col(), row = row();
+		char content = board.getContent(col, row);
+		switch (content) {
+		case PELLET:
+		case ENERGIZER:
+			return Optional.of(new FoodFoundEvent(this, col, row, content));
+		default:
+			return Optional.empty();
+		}
+	}
+
+	private Optional<GameEvent> discoverGhost() {
+		return enemies.stream().filter(this::collidesWith).findAny()
+				.map(ghost -> new GhostContactEvent(this, ghost, col(), row()));
+	}
 }
