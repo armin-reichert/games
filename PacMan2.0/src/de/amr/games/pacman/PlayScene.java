@@ -1,9 +1,9 @@
 package de.amr.games.pacman;
 
-import static de.amr.games.pacman.board.SpriteSheet.BLUE_GHOST;
-import static de.amr.games.pacman.board.SpriteSheet.ORANGE_GHOST;
-import static de.amr.games.pacman.board.SpriteSheet.PINK_GHOST;
-import static de.amr.games.pacman.board.SpriteSheet.RED_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.RED_GHOST;
 
 import java.awt.Color;
 import java.awt.Font;

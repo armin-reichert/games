@@ -17,7 +17,7 @@ import java.util.Map;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.grid.impl.Top4;
 
-public class SpriteSheet {
+public class Spritesheet {
 
 	public static final int RED_GHOST = 0;
 	public static final int PINK_GHOST = 1;
@@ -25,7 +25,7 @@ public class SpriteSheet {
 	public static final int ORANGE_GHOST = 3;
 
 	private static BufferedImage sheet = Assets.readImage("sprites.png");
-	private static BufferedImage maze;
+	private static BufferedImage mazeImage;
 	private static Map<Character, BufferedImage> bonusImages = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
@@ -39,13 +39,14 @@ public class SpriteSheet {
 
 	static {
 		// Maze:
-		maze = sheet.getSubimage(228, 0, 224, 248);
-		// Bonus:
-		int x = 488, y = 48;
+		mazeImage = sheet.getSubimage(228, 0, 224, 248);
+
+		// Boni:
+		int offset = 0;
 		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE, BONUS_GRAPES,
 				BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
-			bonusImages.put(bonus, sheet.getSubimage(x, y, 16, 16));
-			x += 16;
+			bonusImages.put(bonus, sheet.getSubimage(488 + offset, 48, 16, 16));
+			offset += 16;
 		}
 
 		// PacMan:
@@ -84,11 +85,11 @@ public class SpriteSheet {
 		}
 	}
 
-	public static BufferedImage getMazeImage() {
-		return maze;
+	public static BufferedImage getMaze() {
+		return mazeImage;
 	}
 
-	public static BufferedImage getBonusImage(char bonus) {
+	public static BufferedImage getBonus(char bonus) {
 		return bonusImages.get(bonus);
 	}
 
@@ -104,7 +105,7 @@ public class SpriteSheet {
 		return pacManDying;
 	}
 
-	public static BufferedImage[] getGhostImagesByDirection(int ghostColor, int direction) {
+	public static BufferedImage[] getNormalGhostImages(int ghostColor, int direction) {
 		switch (direction) {
 		case Top4.E:
 			return Arrays.copyOfRange(getGhostImages(ghostColor), 0, 2);

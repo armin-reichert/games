@@ -1,9 +1,9 @@
 package de.amr.games.pacman.control;
 
-import static de.amr.games.pacman.board.SpriteSheet.BLUE_GHOST;
-import static de.amr.games.pacman.board.SpriteSheet.ORANGE_GHOST;
-import static de.amr.games.pacman.board.SpriteSheet.PINK_GHOST;
-import static de.amr.games.pacman.board.SpriteSheet.RED_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.board.Spritesheet.RED_GHOST;
 
 import java.awt.event.KeyEvent;
 import java.util.stream.Stream;
@@ -37,7 +37,7 @@ public class PlayControl implements GameEventListener {
 		} else if (e instanceof StartLevelEvent) {
 			onNewLevel((StartLevelEvent) e);
 		} else if (e instanceof PacManDiedEvent) {
-			onPacManDied(e);
+			onPacManDied((PacManDiedEvent) e);
 		}
 	}
 
@@ -54,7 +54,7 @@ public class PlayControl implements GameEventListener {
 		scene.app.entities.all().forEach(GameEntity::update);
 	}
 
-	private void onPacManDied(GameEvent e) {
+	private void onPacManDied(PacManDiedEvent e) {
 		scene.pacMan.spriteDying.resetAnimation();
 		initEntities();
 	}
@@ -75,15 +75,14 @@ public class PlayControl implements GameEventListener {
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		String foodName = e.food == Tile.PELLET ? "pellet" : "power pill";
-		System.out.println(String.format("Found %s at col=%d, row=%d", foodName, e.col, e.row));
 		scene.board.setContent(e.col, e.row, Tile.EMPTY);
 		if (scene.board.isMazeEmpty()) {
 			onNewLevel(new StartLevelEvent(currentLevel + 1));
-		} else {
-			if (e.food == Tile.ENERGIZER) {
-				e.pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
-			}
+			return;
+		}
+		if (e.food == Tile.ENERGIZER) {
+			System.out.println(String.format("Eat energizer at col=%d, row=%d", e.col, e.row));
+			e.pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}
 	}
 
@@ -98,7 +97,7 @@ public class PlayControl implements GameEventListener {
 		scene.board.resetContent();
 		initEntities();
 	}
-	
+
 	private void initEntities() {
 		scene.ghosts[RED_GHOST].setMazePosition(13, 11);
 		scene.ghosts[BLUE_GHOST].setMazePosition(11, 14);

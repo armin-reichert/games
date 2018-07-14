@@ -31,7 +31,7 @@ public class Maze {
 	}
 
 	public void draw(Graphics2D g) {
-		g.drawImage(SpriteSheet.getMazeImage(), 0, 0, width, height, null);
+		g.drawImage(Spritesheet.getMaze(), 0, 0, width, height, null);
 		board.positions().forEach(pos -> drawTile(g, pos.x, pos.y));
 	}
 
@@ -61,7 +61,7 @@ public class Maze {
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(SpriteSheet.getBonusImage(bonus), 0, -Board.TS / 2, Board.TS * 2,
+		g.drawImage(Spritesheet.getBonus(bonus), 0, -Board.TS / 2, Board.TS * 2,
 				Board.TS * 2, null);
 	}
 

@@ -26,7 +26,7 @@ public class BoardMover<State> extends GameEntity {
 	protected int nextMoveDirection;
 	protected float speed;
 	protected State state;
-	protected long stateChangeAt;
+	protected long stateChangeTime;
 
 	public BoardMover(Board board) {
 		this.board = board;
@@ -164,8 +164,12 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public void setState(State state) {
+		State oldState = this.state;
 		this.state = state;
-		stateChangeAt = System.currentTimeMillis();
+		stateChangeTime = System.currentTimeMillis();
+		if (oldState != state) {
+			System.out.println(String.format("%s changed from %s to %s", this, oldState, state));
+		}
 	}
 
 	public State getState() {
@@ -173,7 +177,7 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public int secondsInState() {
-		return (int) (System.currentTimeMillis() - stateChangeAt) / 1000;
+		return (int) (System.currentTimeMillis() - stateChangeTime) / 1000;
 	}
 
 }

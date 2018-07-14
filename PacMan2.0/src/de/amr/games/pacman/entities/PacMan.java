@@ -22,7 +22,7 @@ import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.board.Board;
-import de.amr.games.pacman.board.SpriteSheet;
+import de.amr.games.pacman.board.Spritesheet;
 import de.amr.games.pacman.control.BonusFoundEvent;
 import de.amr.games.pacman.control.FoodFoundEvent;
 import de.amr.games.pacman.control.GameEvent;
@@ -31,6 +31,7 @@ import de.amr.games.pacman.control.PacManDiedEvent;
 
 public class PacMan extends BoardMover<PacMan.State> {
 
+	private static final int SIZE = 2 * Board.TS;
 	private static boolean DEBUG = false;
 
 	public enum State {
@@ -44,15 +45,12 @@ public class PacMan extends BoardMover<PacMan.State> {
 
 	public PacMan(Board board) {
 		super(board);
-		spriteStanding = new Sprite(SpriteSheet.getPacManStanding());
-		spriteStanding.scale(Board.TS * 2, Board.TS * 2);
+		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SIZE, SIZE);
 		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
-			spriteWalking[direction] = new Sprite(SpriteSheet.getPacManWalking(direction));
-			spriteWalking[direction].scale(Board.TS * 2, Board.TS * 2);
+			spriteWalking[direction] = new Sprite(Spritesheet.getPacManWalking(direction)).scale(SIZE, SIZE);
 			spriteWalking[direction].makeAnimated(AnimationMode.CYCLIC, 120);
 		});
-		spriteDying = new Sprite(SpriteSheet.getPacManDying());
-		spriteDying.scale(Board.TS * 2, Board.TS * 2);
+		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SIZE, SIZE);
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
 	}
 
@@ -79,6 +77,11 @@ public class PacMan extends BoardMover<PacMan.State> {
 				fireGameEvent(new PacManDiedEvent());
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "PacMan";
 	}
 
 	@Override
