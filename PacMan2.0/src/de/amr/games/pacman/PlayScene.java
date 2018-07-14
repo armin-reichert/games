@@ -41,6 +41,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		ghosts[BLUE_GHOST] = new Ghost(app.board, BLUE_GHOST);
 		ghosts[ORANGE_GHOST] = new Ghost(app.board, ORANGE_GHOST);
 		pacMan = new PacMan(app.board);
+		pacMan.enemies.addAll(Arrays.asList(ghosts));
 		app.entities.add(pacMan);
 		app.entities.add(ghosts);
 	}
@@ -49,7 +50,6 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	public void init() {
 		Stream.of(ghosts).forEach(ghost -> findFreePosition().ifPresent(ghost::setMazePosition));
 		pacMan.setMazePosition(14, 23);
-		pacMan.enemies.addAll(Arrays.asList(ghosts));
 		app.entities.all().forEach(GameEntity::init);
 	}
 
@@ -57,6 +57,8 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	public void update() {
 		if (app.board.isMazeEmpty()) {
 			app.board.resetContent();
+			init();
+			return;
 		}
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
 			pacMan.setNextMoveDirection(Top4.W);

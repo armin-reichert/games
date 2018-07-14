@@ -94,6 +94,22 @@ public class PacMan extends BoardMover {
 	}
 
 	@Override
+	public void update() {
+		lookForFood();
+		lookForEnemy();
+		changeDirection();
+		move();
+		if (state == State.DYING) {
+			if (secondsInState() > 3) {
+				spriteDying.resetAnimation();
+				setState(State.ALIVE);
+				setMazePosition(14, 23);
+				setSpeed(Board.TILE_SIZE / 8f);
+			}
+		}
+	}
+
+	@Override
 	public void draw(Graphics2D g) {
 		if (DEBUG) {
 			g.translate(tf.getX(), tf.getY());
@@ -114,22 +130,6 @@ public class PacMan extends BoardMover {
 			return spriteDying;
 		}
 		throw new IllegalStateException("Illegal PacMan state: " + state);
-	}
-
-	@Override
-	public void update() {
-		lookForFood();
-		lookForEnemy();
-		changeDirection();
-		move();
-		if (state == State.DYING) {
-			if (secondsInState() > 4) {
-				spriteDying.resetAnimation();
-				setState(State.ALIVE);
-				setMazePosition(14, 23);
-				setSpeed(Board.TILE_SIZE / 8f);
-			}
-		}
 	}
 
 	public void setState(State state) {
