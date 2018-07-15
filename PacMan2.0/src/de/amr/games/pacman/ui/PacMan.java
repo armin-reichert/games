@@ -64,7 +64,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 
 	@Override
 	public void update() {
-		if (state == State.ALIVE) {
+		if (getState() == State.ALIVE) {
 			Optional<GameEvent> discovery = inspectTile();
 			if (discovery.isPresent()) {
 				fireGameEvent(discovery.get());
@@ -72,7 +72,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 				changeDirection();
 				move();
 			}
-		} else if (state == State.DYING) {
+		} else if (getState() == State.DYING) {
 			if (secondsInState() > 3) {
 				fireGameEvent(new PacManDiedEvent());
 			}
@@ -98,13 +98,13 @@ public class PacMan extends BoardMover<PacMan.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		if (state == State.ALIVE) {
+		if (getState() == State.ALIVE) {
 			return canMove(moveDirection) ? spriteWalking[moveDirection] : spriteStanding;
 		}
-		if (state == State.DYING) {
+		if (getState() == State.DYING) {
 			return spriteDying;
 		}
-		throw new IllegalStateException("Illegal PacMan state: " + state);
+		throw new IllegalStateException("Illegal PacMan state: " + getState());
 	}
 
 	private Optional<GameEvent> inspectTile() {

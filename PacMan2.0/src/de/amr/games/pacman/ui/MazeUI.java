@@ -29,7 +29,6 @@ public class MazeUI extends GameEntity {
 
 	private final GameState gameState;
 	private final Sprite sprite;
-
 	public final PacMan pacMan;
 	public final Ghost[] ghosts = new Ghost[4];
 

@@ -70,14 +70,14 @@ public class Ghost extends BoardMover<Ghost.State> {
 
 	@Override
 	public void update() {
-		if (state == State.ATTACKING) {
+		if (getState() == State.ATTACKING) {
 			moveRandomly();
-		} else if (state == State.DEAD) {
+		} else if (getState() == State.DEAD) {
 			moveRandomly();
 			if (secondsInState() > 6) {
 				setState(State.ATTACKING);
 			}
-		} else if (state == State.FRIGHTENED) {
+		} else if (getState() == State.FRIGHTENED) {
 			moveRandomly();
 			if (secondsInState() > 3) {
 				setState(State.ATTACKING);
@@ -104,7 +104,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 			return false;
 		}
 		Vector2f newPosition = getNewPosition(direction);
-		Point newBoardPosition = position(newPosition.x, newPosition.y);
+		Point newBoardPosition = getMazePosition(newPosition.x, newPosition.y);
 		if (gameState.maze.getContent(newBoardPosition) == Tile.GHOSTHOUSE && getState() == State.DEAD) {
 			return true;
 		}
@@ -124,13 +124,13 @@ public class Ghost extends BoardMover<Ghost.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		if (state == State.ATTACKING) {
+		if (getState() == State.ATTACKING) {
 			return spriteNormal[moveDirection];
-		} else if (state == State.FRIGHTENED) {
+		} else if (getState() == State.FRIGHTENED) {
 			return spriteFrightened;
-		} else if (state == State.DEAD) {
+		} else if (getState() == State.DEAD) {
 			return spriteDead[moveDirection];
 		}
-		throw new IllegalStateException("Illegal ghost state: " + state);
+		throw new IllegalStateException("Illegal ghost state: " + getState());
 	}
 }
