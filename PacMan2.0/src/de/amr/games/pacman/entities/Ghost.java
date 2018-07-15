@@ -10,12 +10,12 @@ import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.Spritesheet;
-import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.MazeContent;
 import de.amr.games.pacman.board.Tile;
 
 public class Ghost extends BoardMover<Ghost.State> {
 
-	private static final int SIZE = Board.TS * 2;
+	private static final int SIZE = MazeContent.TS * 2;
 
 	public enum State {
 		ATTACKING, FRIGHTENED, DEAD
@@ -26,7 +26,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 	private final Sprite spriteFrightened;
 	private final Sprite[] spriteDead = new Sprite[4];
 
-	public Ghost(Board board, int color) {
+	public Ghost(MazeContent board, int color) {
 		super(board);
 		this.color = color;
 		top.dirs().forEach(dir -> {
@@ -63,7 +63,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 	public void init() {
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
-		setSpeed(Board.TS / 16f);
+		setSpeed(MazeContent.TS / 16f);
 		setState(State.ATTACKING);
 	}
 
@@ -103,7 +103,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 			return false;
 		}
 		Vector2f newPosition = getNewPosition(direction);
-		Point newBoardPosition = Board.position(newPosition.x, newPosition.y);
+		Point newBoardPosition = MazeContent.position(newPosition.x, newPosition.y);
 		if (board.getContent(newBoardPosition) == Tile.GHOSTHOUSE && getState() == State.DEAD) {
 			return true;
 		}
@@ -113,9 +113,9 @@ public class Ghost extends BoardMover<Ghost.State> {
 	@Override
 	public void draw(Graphics2D g) {
 		if (board.getContent(col(), row()) == Tile.GHOSTHOUSE) {
-			g.translate(Board.TS / 2, 0);
+			g.translate(MazeContent.TS / 2, 0);
 			super.draw(g);
-			g.translate(-Board.TS / 2, 0);
+			g.translate(-MazeContent.TS / 2, 0);
 		} else {
 			super.draw(g);
 		}

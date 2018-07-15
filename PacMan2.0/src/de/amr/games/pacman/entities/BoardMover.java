@@ -13,14 +13,14 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.MazeContent;
 import de.amr.games.pacman.control.GameEvent;
 import de.amr.games.pacman.control.GameEventListener;
 
 public class BoardMover<State> extends GameEntity {
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
-	protected final Board board;
+	protected final MazeContent board;
 	protected final Topology top = new Top4();
 	protected int moveDirection;
 	protected int nextMoveDirection;
@@ -28,7 +28,7 @@ public class BoardMover<State> extends GameEntity {
 	protected State state;
 	protected long stateChangeTime;
 
-	public BoardMover(Board board) {
+	public BoardMover(MazeContent board) {
 		this.board = board;
 	}
 
@@ -46,9 +46,9 @@ public class BoardMover<State> extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.translate(-Board.TS / 2, -Board.TS / 2);
+		g.translate(-MazeContent.TS / 2, -MazeContent.TS / 2);
 		super.draw(g);
-		g.translate(Board.TS / 2, Board.TS / 2);
+		g.translate(MazeContent.TS / 2, MazeContent.TS / 2);
 	}
 
 	public void setMoveDirection(int moveDirection) {
@@ -60,7 +60,7 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public void setMazePosition(int col, int row) {
-		tf.moveTo(col * Board.TS, row * Board.TS);
+		tf.moveTo(col * MazeContent.TS, row * MazeContent.TS);
 	}
 
 	public void setMazePosition(Point pos) {
@@ -68,35 +68,35 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public Point getMazePosition() {
-		return Board.position(tf.getX(), tf.getY());
+		return MazeContent.position(tf.getX(), tf.getY());
 	}
 
 	public boolean collidesWith(BoardMover<?> other) {
-		Rectangle2D box = new Rectangle2D.Float(tf.getX(), tf.getY(), Board.TS, Board.TS);
-		Rectangle2D otherBox = new Rectangle2D.Float(other.tf.getX(), other.tf.getY(), Board.TS, Board.TS);
+		Rectangle2D box = new Rectangle2D.Float(tf.getX(), tf.getY(), MazeContent.TS, MazeContent.TS);
+		Rectangle2D otherBox = new Rectangle2D.Float(other.tf.getX(), other.tf.getY(), MazeContent.TS, MazeContent.TS);
 		return box.intersects(otherBox);
 	}
 
 	@Override
 	public int getWidth() {
-		return Board.TS;
+		return MazeContent.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return Board.TS;
+		return MazeContent.TS;
 	}
 
 	public int row() {
-		return Board.row(tf.getY() + Board.TS / 2);
+		return MazeContent.row(tf.getY() + MazeContent.TS / 2);
 	}
 
 	public int col() {
-		return Board.col(tf.getX() + Board.TS / 2);
+		return MazeContent.col(tf.getX() + MazeContent.TS / 2);
 	}
 
 	public boolean isExactlyOverTile() {
-		return Math.round(tf.getX()) % Board.TS == 0 && Math.round(tf.getY()) % Board.TS == 0;
+		return Math.round(tf.getX()) % MazeContent.TS == 0 && Math.round(tf.getY()) % MazeContent.TS == 0;
 	}
 
 	public void setSpeed(float speed) {
@@ -107,16 +107,16 @@ public class BoardMover<State> extends GameEntity {
 		int newCol = col(), newRow = row();
 		switch (direction) {
 		case Top4.W:
-			newCol = Board.col(getNewPosition(direction).x);
+			newCol = MazeContent.col(getNewPosition(direction).x);
 			break;
 		case Top4.E:
-			newCol = Board.col(getNewPosition(direction).x + Board.TS);
+			newCol = MazeContent.col(getNewPosition(direction).x + MazeContent.TS);
 			break;
 		case Top4.N:
-			newRow = Board.row(getNewPosition(direction).y);
+			newRow = MazeContent.row(getNewPosition(direction).y);
 			break;
 		case Top4.S:
-			newRow = Board.row(getNewPosition(direction).y + Board.TS);
+			newRow = MazeContent.row(getNewPosition(direction).y + MazeContent.TS);
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + direction);

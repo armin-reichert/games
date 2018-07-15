@@ -22,7 +22,7 @@ import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.Spritesheet;
-import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.MazeContent;
 import de.amr.games.pacman.control.BonusFoundEvent;
 import de.amr.games.pacman.control.FoodFoundEvent;
 import de.amr.games.pacman.control.GameEvent;
@@ -31,7 +31,7 @@ import de.amr.games.pacman.control.PacManDiedEvent;
 
 public class PacMan extends BoardMover<PacMan.State> {
 
-	private static final int SIZE = 2 * Board.TS;
+	private static final int SIZE = 2 * MazeContent.TS;
 	private static boolean DEBUG = false;
 
 	public enum State {
@@ -43,7 +43,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 	public final Sprite spriteDying;
 	public final List<Ghost> enemies = new ArrayList<>();
 
-	public PacMan(Board board) {
+	public PacMan(MazeContent board) {
 		super(board);
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SIZE, SIZE);
 		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
@@ -56,7 +56,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 
 	@Override
 	public void init() {
-		setSpeed(Board.TS / 8f);
+		setSpeed(MazeContent.TS / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
 		setState(State.ALIVE);
@@ -89,7 +89,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 		if (DEBUG) {
 			g.translate(tf.getX(), tf.getY());
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
-			g.fillRect(0, 0, Board.TS, Board.TS);
+			g.fillRect(0, 0, MazeContent.TS, MazeContent.TS);
 			g.translate(-tf.getX(), -tf.getY());
 		} else {
 			super.draw(g);

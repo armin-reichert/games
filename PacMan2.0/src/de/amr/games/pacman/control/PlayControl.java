@@ -11,23 +11,26 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.GameState;
 import de.amr.games.pacman.board.Tile;
 import de.amr.games.pacman.entities.Ghost;
+import de.amr.games.pacman.entities.Maze;
 import de.amr.games.pacman.entities.PacMan;
 import de.amr.games.pacman.entities.PacMan.State;
 
 public class PlayControl implements GameEventListener {
 
-	private final Board board;
+	private final GameState gameState;
 	private final PacMan pacMan;
 	private final Ghost[] ghosts;
 	private int currentLevel;
 
-	public PlayControl(Board board, PacMan pacMan, Ghost[] ghosts) {
-		this.board = board;
-		this.pacMan = pacMan;
-		this.ghosts = ghosts;
+	public PlayControl(GameState gameState, Maze maze) {
+		this.gameState = gameState;
+		this.pacMan = maze.pacMan;
+		this.ghosts = maze.ghosts;
+		pacMan.addObserver(this);
+		Stream.of(ghosts).forEach(ghost -> ghost.addObserver(this));
 	}
 
 	@Override
@@ -80,8 +83,8 @@ public class PlayControl implements GameEventListener {
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		board.setContent(e.col, e.row, Tile.EMPTY);
-		if (board.isMazeEmpty()) {
+		gameState.mazeContent.setContent(e.col, e.row, Tile.EMPTY);
+		if (gameState.mazeContent.isMazeEmpty()) {
 			onNewLevel(new StartLevelEvent(currentLevel + 1));
 			return;
 		}
@@ -93,13 +96,13 @@ public class PlayControl implements GameEventListener {
 
 	private void onBonusFound(BonusFoundEvent e) {
 		System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row));
-		board.setContent(e.col, e.row, Tile.EMPTY);
+		gameState.mazeContent.setContent(e.col, e.row, Tile.EMPTY);
 	}
 
 	private void onNewLevel(StartLevelEvent e) {
 		currentLevel = e.level;
 		System.out.println("Starting level " + currentLevel);
-		board.resetContent();
+		gameState.mazeContent.resetContent();
 		initEntities();
 	}
 

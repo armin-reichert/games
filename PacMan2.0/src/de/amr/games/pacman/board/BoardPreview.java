@@ -28,11 +28,11 @@ public class BoardPreview extends JFrame {
 		SwingUtilities.invokeLater(BoardPreview::new);
 	}
 
-	private Board board;
+	private MazeContent board;
 	private int tileSize = 16;
 
 	public BoardPreview() {
-		board = new Board(Assets.text("maze.txt"));
+		board = new MazeContent(Assets.text("maze.txt"));
 		setTitle("PacMan Preview");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		GridCanvas canvas = new GridCanvas(board.grid, tileSize);

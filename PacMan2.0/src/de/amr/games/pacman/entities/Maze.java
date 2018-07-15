@@ -23,22 +23,18 @@ import java.util.Arrays;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.Spritesheet;
-import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.MazeContent;
 
 public class Maze extends GameEntity {
 
-	private final Board board;
-	private final int width;
-	private final int height;
+	private final MazeContent board;
 	private final Sprite sprite;
 
 	public final PacMan pacMan;
 	public final Ghost[] ghosts = new Ghost[4];
 
-	public Maze(Board board, int width, int height) {
+	public Maze(MazeContent board, int width, int height) {
 		this.board = board;
-		this.width = width;
-		this.height = height;
 		this.sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
 		ghosts[RED_GHOST] = new Ghost(board, RED_GHOST);
 		ghosts[PINK_GHOST] = new Ghost(board, PINK_GHOST);
@@ -64,7 +60,7 @@ public class Maze extends GameEntity {
 	}
 
 	private void drawTile(Graphics2D g, int col, int row) {
-		g.translate(col * Board.TS, row * Board.TS);
+		g.translate(col * MazeContent.TS, row * MazeContent.TS);
 		char tile = board.getContent(col, row);
 		switch (tile) {
 		case PELLET:
@@ -85,25 +81,25 @@ public class Maze extends GameEntity {
 		default:
 			break;
 		}
-		g.translate(-col * Board.TS, -row * Board.TS);
+		g.translate(-col * MazeContent.TS, -row * MazeContent.TS);
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(Spritesheet.getBonus(bonus), 0, -Board.TS / 2, Board.TS * 2, Board.TS * 2, null);
+		g.drawImage(Spritesheet.getBonus(bonus), 0, -MazeContent.TS / 2, MazeContent.TS * 2, MazeContent.TS * 2, null);
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, Board.TS / 8);
+		drawCircle(g, Color.YELLOW, row, col, MazeContent.TS / 8);
 	}
 
 	private void drawEnergizer(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, Board.TS / 2);
+		drawCircle(g, Color.YELLOW, row, col, MazeContent.TS / 2);
 	}
 
 	private void drawCircle(Graphics2D g, Color color, int row, int col, int r) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.fillOval(Board.TS / 2 - r, Board.TS / 2 - r, 2 * r, 2 * r);
+		g.fillOval(MazeContent.TS / 2 - r, MazeContent.TS / 2 - r, 2 * r, 2 * r);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 }

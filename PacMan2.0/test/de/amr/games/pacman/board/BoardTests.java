@@ -15,7 +15,7 @@ public class BoardTests {
 	@Test
 	public void testBoardLoading() {
 		String data = Assets.text("maze.txt");
-		Board board = new Board(data);
+		MazeContent board = new MazeContent(data);
 		board.print();
 
 		assertEquals(28, board.grid.numCols());

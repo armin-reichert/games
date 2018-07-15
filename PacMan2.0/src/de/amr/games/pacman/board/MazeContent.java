@@ -8,11 +8,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.graph.api.UndirectedEdge;
-import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.GridGraph;
 import de.amr.easy.grid.impl.Top4;
 
-public class Board {
+public class MazeContent {
 
 	/** Tile size of the board. */
 	public static final int TS = 16;
@@ -30,33 +29,20 @@ public class Board {
 	}
 
 	public final GridGraph<Character, Integer> grid;
-	public final Topology top = new Top4();
 	private final String mazeData;
 	private final int numRows;
 	private final int numCols;
-	private final int numMazeRows;
-	private final int firstMazeRow;
 
-	public Board(String mazeData) {
+	public MazeContent(String mazeData) {
 		this.mazeData = mazeData;
 		String[] rows = mazeData.split("\n");
-		numMazeRows = rows.length;
-		numRows = 5 + numMazeRows;
+		numRows = rows.length;
 		numCols = rows[0].length();
-		firstMazeRow = 3;
-		grid = new GridGraph<>(numCols, numMazeRows, top, EMPTY, (u, v) -> 1, UndirectedEdge::new);
+		grid = new GridGraph<>(numCols, numRows, new Top4(), EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		grid.fill();
 		grid.edges().filter(edge -> grid.get(edge.either()) == WALL || grid.get(edge.other()) == WALL)
 				.forEach(grid::removeEdge);
 		resetContent();
-	}
-
-	public int getFirstMazeRow() {
-		return firstMazeRow;
-	}
-
-	public int getLastMazeRow() {
-		return numMazeRows - firstMazeRow;
 	}
 
 	public int numCols() {
@@ -73,7 +59,7 @@ public class Board {
 
 	public void resetContent() {
 		String[] rows = mazeData.split("\n");
-		IntStream.range(0, numMazeRows).forEach(row -> {
+		IntStream.range(0, numRows).forEach(row -> {
 			IntStream.range(0, numCols).forEach(col -> {
 				grid.set(grid.cell(col, row), rows[row].charAt(col));
 			});

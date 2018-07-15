@@ -1,8 +1,7 @@
 package de.amr.games.pacman;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.assets.Assets;
-import de.amr.games.pacman.board.Board;
+import de.amr.games.pacman.board.MazeContent;
 
 public class PacManApp extends Application {
 
@@ -10,14 +9,18 @@ public class PacManApp extends Application {
 		launch(new PacManApp());
 	}
 
-	public final Board board;
+	private final GameState gameState;
 
 	public PacManApp() {
-		board = new Board(Assets.text("maze.txt"));
-		settings.width = board.numCols() * Board.TS;
-		settings.height = board.numRows() * Board.TS;
+		gameState = new GameState();
+		settings.width = gameState.mazeContent.numCols() * MazeContent.TS;
+		settings.height = (gameState.mazeContent.numRows() + 5) * MazeContent.TS;
 		settings.scale = 1.25f;
 		settings.title = String.format("PacMan 2.0 (%d x %d * %.2f)", settings.width, settings.height, settings.scale);
+	}
+
+	public GameState getGameState() {
+		return gameState;
 	}
 
 	@Override
