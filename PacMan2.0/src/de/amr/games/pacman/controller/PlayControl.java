@@ -69,15 +69,16 @@ public class PlayControl implements GameEventListener {
 
 	private void onGhostContact(GhostContactEvent e) {
 		System.out.println(String.format("Collision with %s at col=%d, row=%d", e.ghost, e.col, e.row));
-		if (e.pacMan.getState() != PacMan.State.DYING) {
+		if (pacMan.getState() != PacMan.State.DYING) {
 			if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 				e.ghost.setState(Ghost.State.DEAD);
 			} else if (e.ghost.getState() == Ghost.State.DEAD) {
 				// do nothing
 			} else {
-				e.pacMan.setState(State.DYING);
-				e.pacMan.setSpeed(0);
-				e.pacMan.enemies.forEach(enemy -> enemy.setSpeed(0));
+				pacMan.setState(State.DYING);
+				pacMan.setSpeed(0);
+				pacMan.enemies.forEach(enemy -> enemy.setSpeed(0));
+				gameState.lives -= 1;
 			}
 		}
 	}
@@ -90,7 +91,7 @@ public class PlayControl implements GameEventListener {
 		}
 		if (e.food == Tile.ENERGIZER) {
 			System.out.println(String.format("Eat energizer at col=%d, row=%d", e.col, e.row));
-			e.pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
+			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}
 	}
 
