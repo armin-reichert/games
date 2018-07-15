@@ -7,6 +7,7 @@ import static de.amr.games.pacman.model.Tile.WORMHOLE;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -15,32 +16,28 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
-import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 
+/**
+ *
+ * @param <State>
+ *          type of state
+ */
 public abstract class MazeMover<State> extends GameEntity {
 
-	protected static int row(float y) {
-		return Math.round(y) / PacManApp.TS;
-	}
+	protected final Game game;
 
-	protected static int col(float x) {
-		return Math.round(x) / PacManApp.TS;
-	}
-
-	protected static Point getMazePosition(float x, float y) {
-		return new Point(col(x), row(y));
-	}
-
-	protected final GameState gameState;
 	private State state;
+	protected long stateEntryTime;
+	
+	protected float speed;
 	protected int moveDirection;
 	protected int nextMoveDirection;
-	protected float speed;
-	protected long stateEntryTime;
 
-	protected MazeMover(GameState gameState) {
-		this.gameState = gameState;
+	protected MazeMover(Game game) {
+		Objects.requireNonNull(game);
+		this.game = game;
 	}
 
 	@Override
@@ -64,6 +61,23 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	protected abstract int getSpriteSize();
 
+	public void setState(State state) {
+		State oldState = this.state;
+		this.state = state;
+		stateEntryTime = System.currentTimeMillis();
+		if (oldState != state) {
+			System.out.println(String.format("%s changed from %s to %s", this, oldState, state));
+		}
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public int stateDurationSeconds() {
+		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
+	}
+
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
 	public void addObserver(GameEventListener observer) {
@@ -84,6 +98,18 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	public void setNextMoveDirection(int nextMoveDirection) {
 		this.nextMoveDirection = nextMoveDirection;
+	}
+
+	protected int row(float y) {
+		return Math.round(y) / PacManApp.TS;
+	}
+
+	protected int col(float x) {
+		return Math.round(x) / PacManApp.TS;
+	}
+
+	protected Point getMazePosition(float x, float y) {
+		return new Point(col(x), row(y));
 	}
 
 	public void setMazePosition(int col, int row) {
@@ -119,7 +145,7 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	public boolean canMove(int dir) {
-		Vector2f newPosition = getNewPosition(dir);
+		Vector2f newPosition = computePosition(dir);
 		int touchedCol, touchedRow;
 		switch (dir) {
 		case Top4.W:
@@ -144,7 +170,7 @@ public abstract class MazeMover<State> extends GameEntity {
 		if (col() == touchedCol && row() == touchedRow) {
 			return true;
 		}
-		return gameState.maze.getContent(touchedCol, touchedRow) != WALL;
+		return game.maze.getContent(touchedCol, touchedRow) != WALL;
 	}
 
 	public void changeDirection() {
@@ -158,42 +184,25 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	public void move() {
 		int col = col(), row = row();
-		if (gameState.maze.getContent(col, row) == WORMHOLE) {
+		if (game.maze.getContent(col, row) == WORMHOLE) {
 			warp(col, row);
 		} else if (canMove(moveDirection)) {
-			tf.moveTo(getNewPosition(moveDirection));
+			tf.moveTo(computePosition(moveDirection));
 		} else { // position exactly over tile
 			setMazePosition(col, row);
 		}
 	}
 
 	public void warp(int col, int row) {
-		if (moveDirection == Top4.E && col == gameState.maze.numCols() - 1) {
+		if (moveDirection == Top4.E && col == game.maze.numCols() - 1) {
 			setMazePosition(1, row);
 		} else if (moveDirection == Top4.W && col == 0) {
-			setMazePosition(gameState.maze.numCols() - 2, row);
+			setMazePosition(game.maze.numCols() - 2, row);
 		}
 	}
 
-	public Vector2f getNewPosition(int dir) {
+	public Vector2f computePosition(int dir) {
 		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir)));
 		return Vector2f.sum(tf.getPosition(), velocity);
-	}
-
-	public void setState(State state) {
-		State oldState = this.state;
-		this.state = state;
-		stateEntryTime = System.currentTimeMillis();
-		if (oldState != state) {
-			System.out.println(String.format("%s changed from %s to %s", this, oldState, state));
-		}
-	}
-
-	public State getState() {
-		return state;
-	}
-
-	public int stateDurationSeconds() {
-		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
 	}
 }

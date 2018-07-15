@@ -1,7 +1,7 @@
 package de.amr.games.pacman;
 
 import de.amr.easy.game.Application;
-import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.ui.PlayScene;
 
 public class PacManApp extends Application {
@@ -13,17 +13,17 @@ public class PacManApp extends Application {
 	/** Tile size of the board. */
 	public static final int TS = 16;
 
-	private final GameState gameState;
+	private final Game gameState;
 
 	public PacManApp() {
-		gameState = new GameState();
+		gameState = new Game();
 		settings.width = gameState.maze.numCols() * PacManApp.TS;
 		settings.height = (gameState.maze.numRows() + 5) * PacManApp.TS;
 		settings.scale = 1.25f;
 		settings.title = String.format("PacMan 2.0 (%d x %d * %.2f)", settings.width, settings.height, settings.scale);
 	}
 
-	public GameState getGameState() {
+	public Game getGameState() {
 		return gameState;
 	}
 

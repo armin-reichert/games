@@ -6,14 +6,14 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Game;
 
 public class StatusDisplay extends GameEntity {
 
-	private final GameState gameState;
+	private final Game gameState;
 	private final Sprite spritePacMan;
 
-	public StatusDisplay(GameState gameState) {
+	public StatusDisplay(Game gameState) {
 		this.gameState = gameState;
 		spritePacMan = new Sprite(Spritesheet.getPacManWalking(Top4.W)[1]).scale(PacManApp.TS * 2, PacManApp.TS * 2);
 	}

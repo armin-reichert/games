@@ -23,23 +23,23 @@ import java.util.Arrays;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Game;
 
 public class MazeUI extends GameEntity {
 
-	private final GameState gameState;
+	private final Game game;
 	private final Sprite sprite;
 	public final PacMan pacMan;
 	public final Ghost[] ghosts = new Ghost[4];
 
-	public MazeUI(GameState gameState, int width, int height) {
-		this.gameState = gameState;
+	public MazeUI(Game game, int width, int height) {
+		this.game = game;
 		sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
-		ghosts[RED_GHOST] = new Ghost(gameState, RED_GHOST);
-		ghosts[PINK_GHOST] = new Ghost(gameState, PINK_GHOST);
-		ghosts[BLUE_GHOST] = new Ghost(gameState, BLUE_GHOST);
-		ghosts[ORANGE_GHOST] = new Ghost(gameState, ORANGE_GHOST);
-		pacMan = new PacMan(gameState);
+		ghosts[RED_GHOST] = new Ghost(game, RED_GHOST);
+		ghosts[PINK_GHOST] = new Ghost(game, PINK_GHOST);
+		ghosts[BLUE_GHOST] = new Ghost(game, BLUE_GHOST);
+		ghosts[ORANGE_GHOST] = new Ghost(game, ORANGE_GHOST);
+		pacMan = new PacMan(game);
 		pacMan.enemies.addAll(Arrays.asList(ghosts));
 	}
 
@@ -52,7 +52,7 @@ public class MazeUI extends GameEntity {
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
-		gameState.maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
+		game.maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
 		pacMan.draw(g);
 		Arrays.stream(ghosts).forEach(e -> e.draw(g));
 		g.translate(-tf.getX(), -tf.getY());
@@ -60,7 +60,7 @@ public class MazeUI extends GameEntity {
 
 	private void drawTile(Graphics2D g, int col, int row) {
 		g.translate(col * PacManApp.TS, row * PacManApp.TS);
-		char tile = gameState.maze.getContent(col, row);
+		char tile = game.maze.getContent(col, row);
 		switch (tile) {
 		case PELLET:
 			drawPellet(g, row, col);

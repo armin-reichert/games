@@ -8,19 +8,19 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.PlayControl;
+import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.controller.StartLevelEvent;
-import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Game;
 
 public class PlayScene extends ActiveScene<PacManApp> {
 
 	private static boolean DEBUG = false;
 
-	private final GameState gameState;
+	private final Game gameState;
 	private final MazeUI maze;
 	private final HUD hud;
 	private final StatusDisplay status;
-	private final PlayControl controller;
+	private final GameController controller;
 
 	public PlayScene(PacManApp app) {
 		super(app);
@@ -35,7 +35,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		status = new StatusDisplay(gameState);
 		status.tf.moveTo(0, getHeight() - 2 * PacManApp.TS);
 
-		controller = new PlayControl(gameState, maze);
+		controller = new GameController(gameState, maze);
 	}
 
 	@Override

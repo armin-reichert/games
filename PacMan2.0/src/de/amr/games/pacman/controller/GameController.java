@@ -11,21 +11,21 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
 
-public class PlayControl implements GameEventListener {
+public class GameController implements GameEventListener {
 
-	private final GameState gameState;
+	private final Game gameState;
 	private final PacMan pacMan;
 	private final Ghost[] ghosts;
 	private int currentLevel;
 
-	public PlayControl(GameState gameState, MazeUI maze) {
+	public GameController(Game gameState, MazeUI maze) {
 		this.gameState = gameState;
 		this.pacMan = maze.pacMan;
 		this.ghosts = maze.ghosts;
@@ -68,10 +68,10 @@ public class PlayControl implements GameEventListener {
 	}
 
 	private void onGhostContact(GhostContactEvent e) {
-		System.out.println(String.format("Collision with %s at col=%d, row=%d", e.ghost, e.col, e.row));
 		if (pacMan.getState() != PacMan.State.DYING) {
 			if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 				e.ghost.setState(Ghost.State.DEAD);
+				System.out.println(String.format("Killed %s at col=%d, row=%d", e.ghost, e.col, e.row));
 			} else if (e.ghost.getState() == Ghost.State.DEAD) {
 				// do nothing
 			} else {
@@ -79,6 +79,7 @@ public class PlayControl implements GameEventListener {
 				pacMan.setSpeed(0);
 				pacMan.enemies.forEach(enemy -> enemy.setSpeed(0));
 				gameState.lives -= 1;
+				System.out.println(String.format("Got killed by %s at col=%d, row=%d", e.ghost, e.col, e.row));
 			}
 		}
 	}
