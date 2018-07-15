@@ -19,15 +19,14 @@ import de.amr.games.pacman.ui.PacMan.State;
 
 public class GameController implements GameEventListener {
 
-	private final Game gameState;
+	private final Game game;
 	private final PacMan pacMan;
 	private final Ghost[] ghosts;
-	private int currentLevel;
 
 	private Consumer<MazeMover<?>> steering = new KeyboardSteering();
 
-	public GameController(Game gameState, MazeUI maze) {
-		this.gameState = gameState;
+	public GameController(Game game, MazeUI maze) {
+		this.game = game;
 		this.pacMan = maze.pacMan;
 		this.ghosts = maze.ghosts;
 		pacMan.addObserver(this);
@@ -43,10 +42,15 @@ public class GameController implements GameEventListener {
 		} else if (e instanceof BonusFoundEvent) {
 			onBonusFound((BonusFoundEvent) e);
 		} else if (e instanceof StartLevelEvent) {
-			onNewLevel((StartLevelEvent) e);
+			onStartLevel((StartLevelEvent) e);
 		} else if (e instanceof PacManDiedEvent) {
 			onPacManDied((PacManDiedEvent) e);
 		}
+	}
+	
+	public void init() {
+		game.init();
+		initEntities();
 	}
 
 	public void update() {
@@ -71,34 +75,37 @@ public class GameController implements GameEventListener {
 				pacMan.setState(State.DYING);
 				pacMan.setSpeed(0);
 				pacMan.enemies.forEach(enemy -> enemy.setSpeed(0));
-				gameState.lives -= 1;
+				game.lives -= 1;
 				System.out.println(String.format("Got killed by %s at col=%d, row=%d", e.ghost, e.col, e.row));
 			}
 		}
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		gameState.maze.setContent(e.col, e.row, Tile.EMPTY);
-		if (gameState.maze.isMazeEmpty()) {
-			onNewLevel(new StartLevelEvent(currentLevel + 1));
+		game.maze.setContent(e.col, e.row, Tile.EMPTY);
+		if (game.maze.isMazeEmpty()) {
+			onStartLevel(new StartLevelEvent());
 			return;
 		}
 		if (e.food == Tile.ENERGIZER) {
 			System.out.println(String.format("Eat energizer at col=%d, row=%d", e.col, e.row));
+			game.score += 50;
 			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
+		} else {
+			game.score += 10;
 		}
 	}
 
 	private void onBonusFound(BonusFoundEvent e) {
 		System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row));
-		gameState.maze.setContent(e.col, e.row, Tile.EMPTY);
+		game.maze.setContent(e.col, e.row, Tile.EMPTY);
 	}
 
-	private void onNewLevel(StartLevelEvent e) {
-		currentLevel = e.level;
-		System.out.println("Starting level " + currentLevel);
-		gameState.maze.reset();
+	private void onStartLevel(StartLevelEvent e) {
+		++game.level;
+		game.maze.reset();
 		initEntities();
+		System.out.println("Started level " + game.level);
 	}
 
 	private void initEntities() {

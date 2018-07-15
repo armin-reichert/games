@@ -64,7 +64,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public void update() {
 		if (getState() == State.ALIVE) {
-			Optional<GameEvent> discovery = inspectTile();
+			Optional<GameEvent> discovery = checkCurrentTile();
 			if (discovery.isPresent()) {
 				fireGameEvent(discovery.get());
 			} else {
@@ -113,23 +113,23 @@ public class PacMan extends MazeMover<PacMan.State> {
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
 	}
 
-	private Optional<GameEvent> inspectTile() {
-		Optional<GameEvent> ghostDiscovery = discoverGhost();
-		if (ghostDiscovery.isPresent()) {
-			return ghostDiscovery;
+	private Optional<GameEvent> checkCurrentTile() {
+		Optional<GameEvent> enemy = checkEnemy();
+		if (enemy.isPresent()) {
+			return enemy;
 		}
-		Optional<GameEvent> foodDiscovery = discoverFood();
-		if (discoverFood().isPresent()) {
-			return foodDiscovery;
+		Optional<GameEvent> food = checkFood();
+		if (food.isPresent()) {
+			return food;
 		}
-		Optional<GameEvent> bonusDiscovery = discoverBonus();
-		if (bonusDiscovery.isPresent()) {
-			return bonusDiscovery;
+		Optional<GameEvent> bonus = checkBonus();
+		if (bonus.isPresent()) {
+			return bonus;
 		}
 		return Optional.empty();
 	}
 
-	private Optional<GameEvent> discoverBonus() {
+	private Optional<GameEvent> checkBonus() {
 		int col = col(), row = row();
 		char content = game.maze.getContent(col, row);
 		switch (content) {
@@ -147,7 +147,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 	}
 
-	private Optional<GameEvent> discoverFood() {
+	private Optional<GameEvent> checkFood() {
 		int col = col(), row = row();
 		char content = game.maze.getContent(col, row);
 		switch (content) {
@@ -159,8 +159,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 	}
 
-	private Optional<GameEvent> discoverGhost() {
-		return enemies.stream().filter(this::collidesWith).findAny()
+	private Optional<GameEvent> checkEnemy() {
+		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
 				.map(ghost -> new GhostContactEvent(this, ghost, col(), row()));
 	}
 }

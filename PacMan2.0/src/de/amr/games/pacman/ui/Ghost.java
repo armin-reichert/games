@@ -15,7 +15,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
 		ATTACKING, FRIGHTENED, DEAD
-	};
+	}
 
 	private final int color;
 	private final Sprite[] spriteNormal = new Sprite[4];

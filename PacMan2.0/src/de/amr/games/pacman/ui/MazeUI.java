@@ -16,11 +16,14 @@ import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
@@ -31,6 +34,7 @@ public class MazeUI extends GameEntity {
 	private final Sprite sprite;
 	public final PacMan pacMan;
 	public final Ghost[] ghosts = new Ghost[4];
+	private boolean debug;
 
 	public MazeUI(Game game, int width, int height) {
 		this.game = game;
@@ -41,6 +45,13 @@ public class MazeUI extends GameEntity {
 		ghosts[ORANGE_GHOST] = new Ghost(game, ORANGE_GHOST);
 		pacMan = new PacMan(game);
 		pacMan.enemies.addAll(Arrays.asList(ghosts));
+	}
+	
+	@Override
+	public void update() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
+			debug = !debug;
+		}
 	}
 
 	@Override
@@ -55,6 +66,9 @@ public class MazeUI extends GameEntity {
 		game.maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
 		pacMan.draw(g);
 		Arrays.stream(ghosts).forEach(e -> e.draw(g));
+		if (debug) {
+			drawDebugInfo(g);
+		}
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
@@ -100,5 +114,23 @@ public class MazeUI extends GameEntity {
 		g.setColor(color);
 		g.fillOval(PacManApp.TS / 2 - r, PacManApp.TS / 2 - r, 2 * r, 2 * r);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	}
+
+	private void drawDebugInfo(Graphics2D g) {
+		g.setColor(Color.LIGHT_GRAY);
+		for (int row = 0; row < game.maze.numRows() + 1; ++row) {
+			g.drawLine(0, row * PacManApp.TS, getWidth(), row * PacManApp.TS);
+		}
+		for (int col = 1; col < game.maze.numCols(); ++col) {
+			g.drawLine(col * PacManApp.TS, 0, col * PacManApp.TS, getHeight());
+		}
+		g.setFont(new Font("Arial Narrow", Font.PLAIN, PacManApp.TS * 40 / 100));
+		for (int row = 0; row < game.maze.numRows(); ++row) {
+			for (int col = 0; col < game.maze.numCols(); ++col) {
+				g.translate(col * PacManApp.TS, row * PacManApp.TS);
+				g.drawString(String.format("%d,%d", col, row), PacManApp.TS / 8, PacManApp.TS / 2);
+				g.translate(-col * PacManApp.TS, -row * PacManApp.TS);
+			}
+		}
 	}
 }
