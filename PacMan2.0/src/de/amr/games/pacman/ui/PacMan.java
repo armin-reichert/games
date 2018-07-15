@@ -54,14 +54,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	@Override
-	public void init() {
-		setSpeed(PacManApp.TS / 8f);
-		setMoveDirection(Top4.E);
-		setNextMoveDirection(Top4.E);
-		setState(State.ALIVE);
-	}
-
-	@Override
 	public void update() {
 		if (getState() == State.ALIVE) {
 			Optional<GameEvent> discovery = checkCurrentTile();

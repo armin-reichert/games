@@ -89,7 +89,7 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	protected void fireGameEvent(GameEvent event) {
-		observers.forEach(observer -> observer.dispatch(event));
+		observers.forEach(observer -> observer.processGameEvent(event));
 	}
 
 	public void setMoveDirection(int moveDirection) {

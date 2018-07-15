@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
@@ -34,7 +36,7 @@ public class GameController implements GameEventListener {
 	}
 
 	@Override
-	public void dispatch(GameEvent e) {
+	public void processGameEvent(GameEvent e) {
 		if (e instanceof GhostContactEvent) {
 			onGhostContact((GhostContactEvent) e);
 		} else if (e instanceof FoodFoundEvent) {
@@ -47,16 +49,41 @@ public class GameController implements GameEventListener {
 			onPacManDied((PacManDiedEvent) e);
 		}
 	}
-	
-	public void init() {
+
+	public void updateGame() {
+		steering.accept(pacMan);
+		pacMan.update();
+		Arrays.stream(ghosts).forEach(Ghost::update);
+	}
+
+	public void startGame() {
 		game.init();
 		initEntities();
 	}
 
-	public void update() {
-		steering.accept(pacMan);
-		pacMan.update();
-		Arrays.stream(ghosts).forEach(Ghost::update);
+	private void initEntities() {
+		pacMan.setMazePosition(14, 23);
+		pacMan.setSpeed(PacManApp.TS / 8f);
+		pacMan.setMoveDirection(Top4.E);
+		pacMan.setNextMoveDirection(Top4.E);
+		pacMan.setState(State.ALIVE);
+		Stream.of(ghosts).forEach(ghost -> {
+			ghost.setMoveDirection(Top4.E);
+			ghost.setNextMoveDirection(Top4.E);
+			ghost.setSpeed(PacManApp.TS / 16f);
+			ghost.setState(Ghost.State.ATTACKING);
+		});
+		ghosts[RED_GHOST].setMazePosition(13, 11);
+		ghosts[BLUE_GHOST].setMazePosition(11, 14);
+		ghosts[PINK_GHOST].setMazePosition(13, 14);
+		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
+	}
+
+	private void onStartLevel(StartLevelEvent e) {
+		++game.level;
+		game.maze.reset();
+		initEntities();
+		System.out.println("Started level " + game.level);
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
@@ -99,22 +126,5 @@ public class GameController implements GameEventListener {
 	private void onBonusFound(BonusFoundEvent e) {
 		System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row));
 		game.maze.setContent(e.col, e.row, Tile.EMPTY);
-	}
-
-	private void onStartLevel(StartLevelEvent e) {
-		++game.level;
-		game.maze.reset();
-		initEntities();
-		System.out.println("Started level " + game.level);
-	}
-
-	private void initEntities() {
-		ghosts[RED_GHOST].setMazePosition(13, 11);
-		ghosts[BLUE_GHOST].setMazePosition(11, 14);
-		ghosts[PINK_GHOST].setMazePosition(13, 14);
-		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
-		pacMan.setMazePosition(14, 23);
-		pacMan.init();
-		Stream.of(ghosts).forEach(Ghost::init);
 	}
 }

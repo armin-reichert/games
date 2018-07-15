@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.easy.util.StreamUtils;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
@@ -14,7 +13,7 @@ import de.amr.games.pacman.model.Tile;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		ATTACKING, FRIGHTENED, DEAD
+		ATTACKING, SCATTERING, FRIGHTENED, DEAD
 	}
 
 	private final int color;
@@ -57,14 +56,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	@Override
-	public void init() {
-		setMoveDirection(Top4.E);
-		setNextMoveDirection(Top4.E);
-		setSpeed(PacManApp.TS / 16f);
-		setState(State.ATTACKING);
-	}
-
-	@Override
 	public void update() {
 		if (getState() == State.ATTACKING) {
 			moveRandomly();
@@ -80,9 +71,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 			}
 		}
 	}
-	
+
 	private void moveIntoGhosthouse() {
-		moveRandomly(); //TODO
+		moveRandomly(); // TODO
 	}
 
 	private void moveRandomly() {

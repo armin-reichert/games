@@ -17,29 +17,25 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	public PlayScene(PacManApp app) {
 		super(app);
+		game = new Game();
+		hud = new HUD(game);
+		hud.tf.moveTo(0, 0);
+		maze = new MazeUI(game, getWidth(), getHeight() - 5 * PacManApp.TS);
+		maze.tf.moveTo(0, 3 * PacManApp.TS);
+		status = new StatusDisplay(game);
+		status.tf.moveTo(0, getHeight() - 2 * PacManApp.TS);
+		controller = new GameController(game, maze);
 	}
 
 	@Override
 	public void init() {
-		game = new Game();
-
-		hud = new HUD(game);
-		hud.tf.moveTo(0, 0);
-
-		maze = new MazeUI(game, getWidth(), getHeight() - 5 * PacManApp.TS);
-		maze.tf.moveTo(0, 3 * PacManApp.TS);
-
-		status = new StatusDisplay(game);
-		status.tf.moveTo(0, getHeight() - 2 * PacManApp.TS);
-
-		controller = new GameController(game, maze);
-		controller.init();
+		controller.startGame();
 	}
 
 	@Override
 	public void update() {
-		controller.update();
 		maze.update();
+		controller.updateGame();
 	}
 
 	@Override
