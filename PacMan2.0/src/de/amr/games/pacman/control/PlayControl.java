@@ -1,17 +1,17 @@
 package de.amr.games.pacman.control;
 
-import static de.amr.games.pacman.board.Spritesheet.BLUE_GHOST;
-import static de.amr.games.pacman.board.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.board.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.board.Spritesheet.RED_GHOST;
+import static de.amr.games.pacman.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.Spritesheet.RED_GHOST;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.PlayScene;
+import de.amr.games.pacman.board.Board;
 import de.amr.games.pacman.board.Tile;
 import de.amr.games.pacman.entities.Ghost;
 import de.amr.games.pacman.entities.PacMan;
@@ -19,11 +19,15 @@ import de.amr.games.pacman.entities.PacMan.State;
 
 public class PlayControl implements GameEventListener {
 
-	private final PlayScene scene;
+	private final Board board;
+	private final PacMan pacMan;
+	private final Ghost[] ghosts;
 	private int currentLevel;
 
-	public PlayControl(PlayScene scene) {
-		this.scene = scene;
+	public PlayControl(Board board, PacMan pacMan, Ghost[] ghosts) {
+		this.board = board;
+		this.pacMan = pacMan;
+		this.ghosts = ghosts;
 	}
 
 	@Override
@@ -43,19 +47,20 @@ public class PlayControl implements GameEventListener {
 
 	public void update() {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			scene.pacMan.setNextMoveDirection(Top4.W);
+			pacMan.setNextMoveDirection(Top4.W);
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			scene.pacMan.setNextMoveDirection(Top4.E);
+			pacMan.setNextMoveDirection(Top4.E);
 		} else if (Keyboard.keyDown(KeyEvent.VK_DOWN)) {
-			scene.pacMan.setNextMoveDirection(Top4.S);
+			pacMan.setNextMoveDirection(Top4.S);
 		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
-			scene.pacMan.setNextMoveDirection(Top4.N);
+			pacMan.setNextMoveDirection(Top4.N);
 		}
-		scene.app.entities.all().forEach(GameEntity::update);
+		pacMan.update();
+		Arrays.stream(ghosts).forEach(Ghost::update);
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
-		scene.pacMan.spriteDying.resetAnimation();
+		pacMan.spriteDying.resetAnimation();
 		initEntities();
 	}
 
@@ -75,8 +80,8 @@ public class PlayControl implements GameEventListener {
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		scene.board.setContent(e.col, e.row, Tile.EMPTY);
-		if (scene.board.isMazeEmpty()) {
+		board.setContent(e.col, e.row, Tile.EMPTY);
+		if (board.isMazeEmpty()) {
 			onNewLevel(new StartLevelEvent(currentLevel + 1));
 			return;
 		}
@@ -88,23 +93,23 @@ public class PlayControl implements GameEventListener {
 
 	private void onBonusFound(BonusFoundEvent e) {
 		System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row));
-		scene.board.setContent(e.col, e.row, Tile.EMPTY);
+		board.setContent(e.col, e.row, Tile.EMPTY);
 	}
 
 	private void onNewLevel(StartLevelEvent e) {
 		currentLevel = e.level;
 		System.out.println("Starting level " + currentLevel);
-		scene.board.resetContent();
+		board.resetContent();
 		initEntities();
 	}
 
 	private void initEntities() {
-		scene.ghosts[RED_GHOST].setMazePosition(13, 11);
-		scene.ghosts[BLUE_GHOST].setMazePosition(11, 14);
-		scene.ghosts[PINK_GHOST].setMazePosition(13, 14);
-		scene.ghosts[ORANGE_GHOST].setMazePosition(15, 14);
-		scene.pacMan.setMazePosition(14, 23);
-		scene.pacMan.init();
-		Stream.of(scene.ghosts).forEach(Ghost::init);
+		ghosts[RED_GHOST].setMazePosition(13, 11);
+		ghosts[BLUE_GHOST].setMazePosition(11, 14);
+		ghosts[PINK_GHOST].setMazePosition(13, 14);
+		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
+		pacMan.setMazePosition(14, 23);
+		pacMan.init();
+		Stream.of(ghosts).forEach(Ghost::init);
 	}
 }

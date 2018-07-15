@@ -1,4 +1,4 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman;
 
 import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
 import static de.amr.games.pacman.board.Tile.BONUS_BELL;

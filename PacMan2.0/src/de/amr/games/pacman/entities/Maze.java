@@ -1,5 +1,9 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman.entities;
 
+import static de.amr.games.pacman.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.Spritesheet.RED_GHOST;
 import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
 import static de.amr.games.pacman.board.Tile.BONUS_BELL;
 import static de.amr.games.pacman.board.Tile.BONUS_CHERRIES;
@@ -14,25 +18,49 @@ import static de.amr.games.pacman.board.Tile.PELLET;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.Arrays;
 
-public class Maze {
+import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.Spritesheet;
+import de.amr.games.pacman.board.Board;
+
+public class Maze extends GameEntity {
 
 	private final Board board;
-	private int width;
-	private int height;
+	private final int width;
+	private final int height;
+	private final Sprite sprite;
 
-	public Maze(Board board) {
+	public final PacMan pacMan;
+	public final Ghost[] ghosts = new Ghost[4];
+
+	public Maze(Board board, int width, int height) {
 		this.board = board;
-	}
-
-	public void setSize(int width, int height) {
 		this.width = width;
 		this.height = height;
+		this.sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
+		ghosts[RED_GHOST] = new Ghost(board, RED_GHOST);
+		ghosts[PINK_GHOST] = new Ghost(board, PINK_GHOST);
+		ghosts[BLUE_GHOST] = new Ghost(board, BLUE_GHOST);
+		ghosts[ORANGE_GHOST] = new Ghost(board, ORANGE_GHOST);
+		pacMan = new PacMan(board);
+		pacMan.enemies.addAll(Arrays.asList(ghosts));
 	}
 
+	@Override
+	public Sprite currentSprite() {
+		return sprite;
+	}
+
+	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(Spritesheet.getMaze(), 0, 0, width, height, null);
+		super.draw(g);
+		g.translate(tf.getX(), tf.getY());
 		board.positions().forEach(pos -> drawTile(g, pos.x, pos.y));
+		pacMan.draw(g);
+		Arrays.stream(ghosts).forEach(e -> e.draw(g));
+		g.translate(-tf.getX(), -tf.getY());
 	}
 
 	private void drawTile(Graphics2D g, int col, int row) {
@@ -61,8 +89,7 @@ public class Maze {
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(Spritesheet.getBonus(bonus), 0, -Board.TS / 2, Board.TS * 2,
-				Board.TS * 2, null);
+		g.drawImage(Spritesheet.getBonus(bonus), 0, -Board.TS / 2, Board.TS * 2, Board.TS * 2, null);
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {

@@ -1,10 +1,5 @@
 package de.amr.games.pacman;
 
-import static de.amr.games.pacman.board.Spritesheet.BLUE_GHOST;
-import static de.amr.games.pacman.board.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.board.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.board.Spritesheet.RED_GHOST;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -15,44 +10,41 @@ import java.util.stream.Stream;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.pacman.board.Board;
-import de.amr.games.pacman.board.Maze;
 import de.amr.games.pacman.control.PlayControl;
 import de.amr.games.pacman.control.StartLevelEvent;
-import de.amr.games.pacman.entities.Ghost;
-import de.amr.games.pacman.entities.PacMan;
+import de.amr.games.pacman.entities.HUD;
+import de.amr.games.pacman.entities.Maze;
+import de.amr.games.pacman.entities.StatusDisplay;
 
 public class PlayScene extends ActiveScene<PacManApp> {
 
 	private static boolean DEBUG = false;
 
-	private final PlayControl playControl = new PlayControl(this);
-
-	public final Board board;
-	public final Maze maze;
-	public final PacMan pacMan;
-	public final Ghost[] ghosts = new Ghost[4];
+	private final Maze maze;
+	private final HUD hud;
+	private final StatusDisplay status;
+	private final PlayControl controller;
 
 	public PlayScene(PacManApp app) {
 		super(app);
-		this.board = app.board;
-		maze = new Maze(board);
-		maze.setSize(getWidth(), getHeight() - 5 * Board.TS);
-		ghosts[RED_GHOST] = new Ghost(board, RED_GHOST);
-		ghosts[PINK_GHOST] = new Ghost(board, PINK_GHOST);
-		ghosts[BLUE_GHOST] = new Ghost(board, BLUE_GHOST);
-		ghosts[ORANGE_GHOST] = new Ghost(board, ORANGE_GHOST);
-		pacMan = new PacMan(board);
-		pacMan.enemies.addAll(Arrays.asList(ghosts));
-		app.entities.add(pacMan);
-		app.entities.add(ghosts);
 
-		pacMan.addObserver(playControl);
-		Stream.of(ghosts).forEach(ghost -> ghost.addObserver(playControl));
+		hud = new HUD();
+		hud.tf.moveTo(0, 0);
+
+		maze = new Maze(app.board, getWidth(), getHeight() - 5 * Board.TS);
+		maze.tf.moveTo(0, 3 * Board.TS);
+
+		status = new StatusDisplay();
+		status.tf.moveTo(0, getHeight() - 2 * Board.TS);
+
+		controller = new PlayControl(app.board, maze.pacMan, maze.ghosts);
+		maze.pacMan.addObserver(controller);
+		Stream.of(maze.ghosts).forEach(ghost -> ghost.addObserver(controller));
 	}
 
 	@Override
 	public void init() {
-		playControl.dispatch(new StartLevelEvent(1));
+		controller.dispatch(new StartLevelEvent(1));
 	}
 
 	@Override
@@ -60,26 +52,17 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
 			DEBUG = !DEBUG;
 		}
-		playControl.update();
+		controller.update();
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		drawHUD(g);
-		g.translate(0, app.board.getFirstMazeRow() * Board.TS);
+		hud.draw(g);
 		maze.draw(g);
-		app.entities.all().forEach(e -> e.draw(g));
-		g.translate(0, -app.board.getFirstMazeRow() * Board.TS);
-		drawStatus(g);
+		status.draw(g);
 		if (DEBUG) {
 			drawDebugInfo(g);
 		}
-	}
-
-	private void drawStatus(Graphics2D g) {
-	}
-
-	private void drawHUD(Graphics2D g) {
 	}
 
 	private void drawDebugInfo(Graphics2D g) {
