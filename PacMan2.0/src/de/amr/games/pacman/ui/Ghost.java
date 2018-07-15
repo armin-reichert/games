@@ -1,14 +1,11 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.easy.util.StreamUtils.randomElement;
-
 import java.awt.Graphics2D;
-import java.awt.Point;
 
-import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.easy.util.StreamUtils;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
@@ -72,7 +69,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		if (getState() == State.ATTACKING) {
 			moveRandomly();
 		} else if (getState() == State.DEAD) {
-			moveRandomly();
+			moveIntoGhosthouse();
 			if (stateDurationSeconds() > 6) {
 				setState(State.ATTACKING);
 			}
@@ -83,31 +80,17 @@ public class Ghost extends MazeMover<Ghost.State> {
 			}
 		}
 	}
-
-	private void moveRandomly() {
-		if (canMove(moveDirection)) {
-			move();
-		} else {
-			int direction = moveDirection;
-			do {
-				direction = randomElement(Maze.TOPOLOGY.dirs()).getAsInt();
-			} while (!canMove(direction));
-			setMoveDirection(direction);
-		}
+	
+	private void moveIntoGhosthouse() {
+		moveRandomly(); //TODO
 	}
 
-	@Override
-	public boolean canMove(int direction) {
-		boolean canMove = super.canMove(direction);
-		if (!canMove) {
-			return false;
+	private void moveRandomly() {
+		move();
+		nextMoveDirection = StreamUtils.randomElement(Maze.TOPOLOGY.dirs()).getAsInt();
+		if (isExactlyOverTile() && nextMoveDirection != Maze.TOPOLOGY.inv(moveDirection) && canMove(nextMoveDirection)) {
+			moveDirection = nextMoveDirection;
 		}
-		Vector2f newPosition = computePosition(direction);
-		Point newBoardPosition = getMazePosition(newPosition.x, newPosition.y);
-		if (game.maze.getContent(newBoardPosition) == Tile.GHOSTHOUSE && getState() == State.DEAD) {
-			return true;
-		}
-		return true;
 	}
 
 	@Override

@@ -88,11 +88,11 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, PacManApp.TS / 8);
+		drawCircle(g, Color.PINK, row, col, PacManApp.TS / 8);
 	}
 
 	private void drawEnergizer(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, PacManApp.TS / 2);
+		drawCircle(g, Color.PINK, row, col, PacManApp.TS / 2);
 	}
 
 	private void drawCircle(Graphics2D g, Color color, int row, int col, int r) {

@@ -173,15 +173,6 @@ public abstract class MazeMover<State> extends GameEntity {
 		return game.maze.getContent(touchedCol, touchedRow) != WALL;
 	}
 
-	public void changeDirection() {
-		if (nextMoveDirection == moveDirection) {
-			return;
-		}
-		if (nextMoveDirection == Maze.TOPOLOGY.inv(moveDirection) || isExactlyOverTile() && canMove(nextMoveDirection)) {
-			moveDirection = nextMoveDirection;
-		}
-	}
-
 	public void move() {
 		int col = col(), row = row();
 		if (game.maze.getContent(col, row) == WORMHOLE) {

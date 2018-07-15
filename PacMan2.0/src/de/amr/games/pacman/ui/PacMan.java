@@ -45,10 +45,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public PacMan(Game game) {
 		super(game);
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
-		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
-			spriteWalking[direction] = new Sprite(Spritesheet.getPacManWalking(direction)).scale(getSpriteSize(),
-					getSpriteSize());
-			spriteWalking[direction].makeAnimated(AnimationMode.CYCLIC, 120);
+		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(dir -> {
+			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());
+			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 120);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
@@ -69,7 +68,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 			if (discovery.isPresent()) {
 				fireGameEvent(discovery.get());
 			} else {
-				changeDirection();
+				if (nextMoveDirection != moveDirection && isExactlyOverTile() && canMove(nextMoveDirection)) {
+					moveDirection = nextMoveDirection;
+				}
 				move();
 			}
 		} else if (getState() == State.DYING) {
@@ -92,9 +93,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public void draw(Graphics2D g) {
 		if (DEBUG) {
-			g.translate(tf.getX(), tf.getY());
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
-			g.fillRect(0, 0, PacManApp.TS, PacManApp.TS);
+			g.translate(tf.getX(), tf.getY());
+			g.fillRect(0, 0, getWidth(), getHeight());
 			g.translate(-tf.getX(), -tf.getY());
 		} else {
 			super.draw(g);
