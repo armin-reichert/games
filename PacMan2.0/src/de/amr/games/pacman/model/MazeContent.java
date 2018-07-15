@@ -13,21 +13,6 @@ import de.amr.easy.grid.impl.Top4;
 
 public class MazeContent {
 
-	/** Tile size of the board. */
-	public static final int TS = 16;
-
-	public static int row(float y) {
-		return Math.round(y) / TS;
-	}
-
-	public static int col(float x) {
-		return Math.round(x) / TS;
-	}
-
-	public static Point position(float x, float y) {
-		return new Point(col(x), row(y));
-	}
-
 	public final GridGraph<Character, Integer> grid;
 	private final String mazeData;
 	private final int numRows;

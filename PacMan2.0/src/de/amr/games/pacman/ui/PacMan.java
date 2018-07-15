@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.BonusFoundEvent;
 import de.amr.games.pacman.controller.FoodFoundEvent;
 import de.amr.games.pacman.controller.GameEvent;
@@ -30,7 +31,7 @@ import de.amr.games.pacman.model.MazeContent;
 
 public class PacMan extends BoardMover<PacMan.State> {
 
-	private static final int SIZE = 2 * MazeContent.TS;
+	private static final int SIZE = 2 * PacManApp.TS;
 	private static boolean DEBUG = false;
 
 	public enum State {
@@ -55,7 +56,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 
 	@Override
 	public void init() {
-		setSpeed(MazeContent.TS / 8f);
+		setSpeed(PacManApp.TS / 8f);
 		setMoveDirection(Top4.E);
 		setNextMoveDirection(Top4.E);
 		setState(State.ALIVE);
@@ -88,7 +89,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 		if (DEBUG) {
 			g.translate(tf.getX(), tf.getY());
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
-			g.fillRect(0, 0, MazeContent.TS, MazeContent.TS);
+			g.fillRect(0, 0, PacManApp.TS, PacManApp.TS);
 			g.translate(-tf.getX(), -tf.getY());
 		} else {
 			super.draw(g);

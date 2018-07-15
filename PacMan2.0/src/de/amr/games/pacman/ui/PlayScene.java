@@ -11,7 +11,6 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.PlayControl;
 import de.amr.games.pacman.controller.StartLevelEvent;
 import de.amr.games.pacman.model.GameState;
-import de.amr.games.pacman.model.MazeContent;
 
 public class PlayScene extends ActiveScene<PacManApp> {
 
@@ -27,14 +26,14 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		super(app);
 		this.gameState = app.getGameState();
 
-		hud = new HUD();
+		hud = new HUD(gameState);
 		hud.tf.moveTo(0, 0);
 
-		maze = new Maze(gameState.mazeContent, getWidth(), getHeight() - 5 * MazeContent.TS);
-		maze.tf.moveTo(0, 3 * MazeContent.TS);
+		maze = new Maze(gameState.mazeContent, getWidth(), getHeight() - 5 * PacManApp.TS);
+		maze.tf.moveTo(0, 3 * PacManApp.TS);
 
-		status = new StatusDisplay();
-		status.tf.moveTo(0, getHeight() - 2 * MazeContent.TS);
+		status = new StatusDisplay(gameState);
+		status.tf.moveTo(0, getHeight() - 2 * PacManApp.TS);
 
 		controller = new PlayControl(gameState, maze);
 	}
@@ -65,17 +64,17 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	private void drawDebugInfo(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
 		for (int row = 1; row < gameState.mazeContent.numRows(); ++row) {
-			g.drawLine(0, row * MazeContent.TS, getWidth(), row * MazeContent.TS);
+			g.drawLine(0, row * PacManApp.TS, getWidth(), row * PacManApp.TS);
 		}
 		for (int col = 1; col < gameState.mazeContent.numCols(); ++col) {
-			g.drawLine(col * MazeContent.TS, 0, col * MazeContent.TS, getHeight());
+			g.drawLine(col * PacManApp.TS, 0, col * PacManApp.TS, getHeight());
 		}
-		g.setFont(new Font("Arial Narrow", Font.PLAIN, MazeContent.TS * 40 / 100));
+		g.setFont(new Font("Arial Narrow", Font.PLAIN, PacManApp.TS * 40 / 100));
 		for (int row = 0; row < gameState.mazeContent.numRows(); ++row) {
 			for (int col = 0; col < gameState.mazeContent.numCols(); ++col) {
-				g.translate(col * MazeContent.TS, row * MazeContent.TS);
-				g.drawString(String.format("%d,%d", col, row), MazeContent.TS / 8, MazeContent.TS / 2);
-				g.translate(-col * MazeContent.TS, -row * MazeContent.TS);
+				g.translate(col * PacManApp.TS, row * PacManApp.TS);
+				g.drawString(String.format("%d,%d", col, row), PacManApp.TS / 8, PacManApp.TS / 2);
+				g.translate(-col * PacManApp.TS, -row * PacManApp.TS);
 			}
 		}
 	}

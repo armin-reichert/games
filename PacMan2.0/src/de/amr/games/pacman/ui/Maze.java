@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.MazeContent;
 
 public class Maze extends GameEntity {
@@ -59,7 +60,7 @@ public class Maze extends GameEntity {
 	}
 
 	private void drawTile(Graphics2D g, int col, int row) {
-		g.translate(col * MazeContent.TS, row * MazeContent.TS);
+		g.translate(col * PacManApp.TS, row * PacManApp.TS);
 		char tile = board.getContent(col, row);
 		switch (tile) {
 		case PELLET:
@@ -80,25 +81,25 @@ public class Maze extends GameEntity {
 		default:
 			break;
 		}
-		g.translate(-col * MazeContent.TS, -row * MazeContent.TS);
+		g.translate(-col * PacManApp.TS, -row * PacManApp.TS);
 	}
 
 	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(Spritesheet.getBonus(bonus), 0, -MazeContent.TS / 2, MazeContent.TS * 2, MazeContent.TS * 2, null);
+		g.drawImage(Spritesheet.getBonus(bonus), 0, -PacManApp.TS / 2, PacManApp.TS * 2, PacManApp.TS * 2, null);
 	}
 
 	private void drawPellet(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, MazeContent.TS / 8);
+		drawCircle(g, Color.YELLOW, row, col, PacManApp.TS / 8);
 	}
 
 	private void drawEnergizer(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.YELLOW, row, col, MazeContent.TS / 2);
+		drawCircle(g, Color.YELLOW, row, col, PacManApp.TS / 2);
 	}
 
 	private void drawCircle(Graphics2D g, Color color, int row, int col, int r) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.fillOval(MazeContent.TS / 2 - r, MazeContent.TS / 2 - r, 2 * r, 2 * r);
+		g.fillOval(PacManApp.TS / 2 - r, PacManApp.TS / 2 - r, 2 * r, 2 * r);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 }

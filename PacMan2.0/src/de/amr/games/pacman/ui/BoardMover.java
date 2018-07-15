@@ -13,11 +13,24 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
 import de.amr.games.pacman.model.MazeContent;
 
 public class BoardMover<State> extends GameEntity {
+
+	protected static int row(float y) {
+		return Math.round(y) / PacManApp.TS;
+	}
+
+	protected static int col(float x) {
+		return Math.round(x) / PacManApp.TS;
+	}
+
+	protected static Point position(float x, float y) {
+		return new Point(col(x), row(y));
+	}
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 	protected final MazeContent board;
@@ -30,6 +43,16 @@ public class BoardMover<State> extends GameEntity {
 
 	public BoardMover(MazeContent board) {
 		this.board = board;
+	}
+
+	@Override
+	public int getWidth() {
+		return PacManApp.TS;
+	}
+
+	@Override
+	public int getHeight() {
+		return PacManApp.TS;
 	}
 
 	public void addObserver(GameEventListener observer) {
@@ -46,9 +69,9 @@ public class BoardMover<State> extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.translate(-MazeContent.TS / 2, -MazeContent.TS / 2);
+		g.translate(-PacManApp.TS / 2, -PacManApp.TS / 2);
 		super.draw(g);
-		g.translate(MazeContent.TS / 2, MazeContent.TS / 2);
+		g.translate(PacManApp.TS / 2, PacManApp.TS / 2);
 	}
 
 	public void setMoveDirection(int moveDirection) {
@@ -60,7 +83,7 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public void setMazePosition(int col, int row) {
-		tf.moveTo(col * MazeContent.TS, row * MazeContent.TS);
+		tf.moveTo(col * PacManApp.TS, row * PacManApp.TS);
 	}
 
 	public void setMazePosition(Point pos) {
@@ -68,35 +91,25 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public Point getMazePosition() {
-		return MazeContent.position(tf.getX(), tf.getY());
+		return position(tf.getX(), tf.getY());
 	}
 
 	public boolean collidesWith(BoardMover<?> other) {
-		Rectangle2D box = new Rectangle2D.Float(tf.getX(), tf.getY(), MazeContent.TS, MazeContent.TS);
-		Rectangle2D otherBox = new Rectangle2D.Float(other.tf.getX(), other.tf.getY(), MazeContent.TS, MazeContent.TS);
+		Rectangle2D box = new Rectangle2D.Float(tf.getX(), tf.getY(), PacManApp.TS, PacManApp.TS);
+		Rectangle2D otherBox = new Rectangle2D.Float(other.tf.getX(), other.tf.getY(), PacManApp.TS, PacManApp.TS);
 		return box.intersects(otherBox);
 	}
 
-	@Override
-	public int getWidth() {
-		return MazeContent.TS;
-	}
-
-	@Override
-	public int getHeight() {
-		return MazeContent.TS;
-	}
-
 	public int row() {
-		return MazeContent.row(tf.getY() + MazeContent.TS / 2);
+		return row(tf.getY() + PacManApp.TS / 2);
 	}
 
 	public int col() {
-		return MazeContent.col(tf.getX() + MazeContent.TS / 2);
+		return col(tf.getX() + PacManApp.TS / 2);
 	}
 
 	public boolean isExactlyOverTile() {
-		return Math.round(tf.getX()) % MazeContent.TS == 0 && Math.round(tf.getY()) % MazeContent.TS == 0;
+		return Math.round(tf.getX()) % PacManApp.TS == 0 && Math.round(tf.getY()) % PacManApp.TS == 0;
 	}
 
 	public void setSpeed(float speed) {
@@ -107,16 +120,16 @@ public class BoardMover<State> extends GameEntity {
 		int newCol = col(), newRow = row();
 		switch (direction) {
 		case Top4.W:
-			newCol = MazeContent.col(getNewPosition(direction).x);
+			newCol = col(getNewPosition(direction).x);
 			break;
 		case Top4.E:
-			newCol = MazeContent.col(getNewPosition(direction).x + MazeContent.TS);
+			newCol = col(getNewPosition(direction).x + PacManApp.TS);
 			break;
 		case Top4.N:
-			newRow = MazeContent.row(getNewPosition(direction).y);
+			newRow = row(getNewPosition(direction).y);
 			break;
 		case Top4.S:
-			newRow = MazeContent.row(getNewPosition(direction).y + MazeContent.TS);
+			newRow = row(getNewPosition(direction).y + PacManApp.TS);
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + direction);
