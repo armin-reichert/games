@@ -29,7 +29,7 @@ import de.amr.games.pacman.controller.GhostContactEvent;
 import de.amr.games.pacman.controller.PacManDiedEvent;
 import de.amr.games.pacman.model.GameState;
 
-public class PacMan extends BoardMover<PacMan.State> {
+public class PacMan extends MazeMover<PacMan.State> {
 
 	private static boolean DEBUG = false;
 

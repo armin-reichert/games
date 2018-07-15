@@ -14,7 +14,7 @@ import de.amr.games.pacman.model.GameState;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-public class Ghost extends BoardMover<Ghost.State> {
+public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
 		ATTACKING, FRIGHTENED, DEAD

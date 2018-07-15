@@ -6,7 +6,6 @@ import static de.amr.games.pacman.model.Tile.WORMHOLE;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.Rectangle2D;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -19,7 +18,7 @@ import de.amr.games.pacman.controller.GameEventListener;
 import de.amr.games.pacman.model.GameState;
 import de.amr.games.pacman.model.Maze;
 
-public abstract class BoardMover<State> extends GameEntity {
+public abstract class MazeMover<State> extends GameEntity {
 
 	protected static int row(float y) {
 		return Math.round(y) / PacManApp.TS;
@@ -40,7 +39,7 @@ public abstract class BoardMover<State> extends GameEntity {
 	protected float speed;
 	protected long stateEntryTime;
 
-	protected BoardMover(GameState gameState) {
+	protected MazeMover(GameState gameState) {
 		this.gameState = gameState;
 	}
 
@@ -99,10 +98,8 @@ public abstract class BoardMover<State> extends GameEntity {
 		return getMazePosition(tf.getX(), tf.getY());
 	}
 
-	public boolean collidesWith(BoardMover<?> other) {
-		Rectangle2D box = new Rectangle2D.Float(tf.getX(), tf.getY(), TS, TS);
-		Rectangle2D otherBox = new Rectangle2D.Float(other.tf.getX(), other.tf.getY(), TS, TS);
-		return box.intersects(otherBox);
+	public boolean collidesWith(MazeMover<?> other) {
+		return getCollisionBox().intersects(other.getCollisionBox());
 	}
 
 	public int row() {
