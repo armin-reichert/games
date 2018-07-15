@@ -1,7 +1,7 @@
-package de.amr.games.pacman.control;
+package de.amr.games.pacman.controller;
 
-import de.amr.games.pacman.entities.Ghost;
-import de.amr.games.pacman.entities.PacMan;
+import de.amr.games.pacman.ui.Ghost;
+import de.amr.games.pacman.ui.PacMan;
 
 public class GhostContactEvent implements GameEvent {
 

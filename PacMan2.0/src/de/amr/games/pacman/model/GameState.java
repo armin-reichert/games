@@ -1,7 +1,6 @@
-package de.amr.games.pacman;
+package de.amr.games.pacman.model;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.games.pacman.board.MazeContent;
 
 public class GameState {
 	

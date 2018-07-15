@@ -1,9 +1,9 @@
-package de.amr.games.pacman.control;
+package de.amr.games.pacman.controller;
 
-import static de.amr.games.pacman.Spritesheet.BLUE_GHOST;
-import static de.amr.games.pacman.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.Spritesheet.RED_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -11,12 +11,12 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.GameState;
-import de.amr.games.pacman.board.Tile;
-import de.amr.games.pacman.entities.Ghost;
-import de.amr.games.pacman.entities.Maze;
-import de.amr.games.pacman.entities.PacMan;
-import de.amr.games.pacman.entities.PacMan.State;
+import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.Ghost;
+import de.amr.games.pacman.ui.Maze;
+import de.amr.games.pacman.ui.PacMan;
+import de.amr.games.pacman.ui.PacMan.State;
 
 public class PlayControl implements GameEventListener {
 

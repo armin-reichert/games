@@ -1,7 +1,7 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman.model;
 
-import static de.amr.games.pacman.board.Tile.EMPTY;
-import static de.amr.games.pacman.board.Tile.WALL;
+import static de.amr.games.pacman.model.Tile.EMPTY;
+import static de.amr.games.pacman.model.Tile.WALL;
 
 import java.awt.Point;
 import java.util.stream.IntStream;

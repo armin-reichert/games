@@ -1,4 +1,4 @@
-package de.amr.games.pacman.entities;
+package de.amr.games.pacman.ui;
 
 import static de.amr.easy.util.StreamUtils.randomElement;
 
@@ -9,9 +9,8 @@ import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.Spritesheet;
-import de.amr.games.pacman.board.MazeContent;
-import de.amr.games.pacman.board.Tile;
+import de.amr.games.pacman.model.MazeContent;
+import de.amr.games.pacman.model.Tile;
 
 public class Ghost extends BoardMover<Ghost.State> {
 

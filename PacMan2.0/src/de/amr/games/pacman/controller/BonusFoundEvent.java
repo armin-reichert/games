@@ -1,6 +1,6 @@
-package de.amr.games.pacman.control;
+package de.amr.games.pacman.controller;
 
-import de.amr.games.pacman.entities.PacMan;
+import de.amr.games.pacman.ui.PacMan;
 
 public class BonusFoundEvent implements GameEvent {
 

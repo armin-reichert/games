@@ -1,7 +1,7 @@
-package de.amr.games.pacman.entities;
+package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.board.Tile.WALL;
-import static de.amr.games.pacman.board.Tile.WORMHOLE;
+import static de.amr.games.pacman.model.Tile.WALL;
+import static de.amr.games.pacman.model.Tile.WORMHOLE;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -13,9 +13,9 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.board.MazeContent;
-import de.amr.games.pacman.control.GameEvent;
-import de.amr.games.pacman.control.GameEventListener;
+import de.amr.games.pacman.controller.GameEvent;
+import de.amr.games.pacman.controller.GameEventListener;
+import de.amr.games.pacman.model.MazeContent;
 
 public class BoardMover<State> extends GameEntity {
 

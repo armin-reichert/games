@@ -1,7 +1,9 @@
 package de.amr.games.pacman;
 
 import de.amr.easy.game.Application;
-import de.amr.games.pacman.board.MazeContent;
+import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.MazeContent;
+import de.amr.games.pacman.ui.PlayScene;
 
 public class PacManApp extends Application {
 

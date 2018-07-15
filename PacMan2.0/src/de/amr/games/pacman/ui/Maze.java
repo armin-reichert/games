@@ -1,19 +1,19 @@
-package de.amr.games.pacman.entities;
+package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.Spritesheet.BLUE_GHOST;
-import static de.amr.games.pacman.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.Spritesheet.RED_GHOST;
-import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
-import static de.amr.games.pacman.board.Tile.BONUS_BELL;
-import static de.amr.games.pacman.board.Tile.BONUS_CHERRIES;
-import static de.amr.games.pacman.board.Tile.BONUS_GALAXIAN;
-import static de.amr.games.pacman.board.Tile.BONUS_GRAPES;
-import static de.amr.games.pacman.board.Tile.BONUS_KEY;
-import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
-import static de.amr.games.pacman.board.Tile.BONUS_STRAWBERRY;
-import static de.amr.games.pacman.board.Tile.ENERGIZER;
-import static de.amr.games.pacman.board.Tile.PELLET;
+import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
+import static de.amr.games.pacman.model.Tile.BONUS_BELL;
+import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
+import static de.amr.games.pacman.model.Tile.BONUS_GALAXIAN;
+import static de.amr.games.pacman.model.Tile.BONUS_GRAPES;
+import static de.amr.games.pacman.model.Tile.BONUS_KEY;
+import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
+import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
+import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.model.Tile.PELLET;
+import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -22,8 +22,7 @@ import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.Spritesheet;
-import de.amr.games.pacman.board.MazeContent;
+import de.amr.games.pacman.model.MazeContent;
 
 public class Maze extends GameEntity {
 

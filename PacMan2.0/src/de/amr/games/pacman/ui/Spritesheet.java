@@ -1,13 +1,13 @@
-package de.amr.games.pacman;
+package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
-import static de.amr.games.pacman.board.Tile.BONUS_BELL;
-import static de.amr.games.pacman.board.Tile.BONUS_CHERRIES;
-import static de.amr.games.pacman.board.Tile.BONUS_GALAXIAN;
-import static de.amr.games.pacman.board.Tile.BONUS_GRAPES;
-import static de.amr.games.pacman.board.Tile.BONUS_KEY;
-import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
-import static de.amr.games.pacman.board.Tile.BONUS_STRAWBERRY;
+import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
+import static de.amr.games.pacman.model.Tile.BONUS_BELL;
+import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
+import static de.amr.games.pacman.model.Tile.BONUS_GALAXIAN;
+import static de.amr.games.pacman.model.Tile.BONUS_GRAPES;
+import static de.amr.games.pacman.model.Tile.BONUS_KEY;
+import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
+import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;

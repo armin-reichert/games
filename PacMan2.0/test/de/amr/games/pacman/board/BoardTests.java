@@ -1,14 +1,15 @@
 package de.amr.games.pacman.board;
 
-import static de.amr.games.pacman.board.Tile.DOOR;
-import static de.amr.games.pacman.board.Tile.ENERGIZER;
-import static de.amr.games.pacman.board.Tile.PELLET;
-import static de.amr.games.pacman.board.Tile.WALL;
+import static de.amr.games.pacman.model.Tile.DOOR;
+import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.model.Tile.PELLET;
+import static de.amr.games.pacman.model.Tile.WALL;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.games.pacman.model.MazeContent;
 
 public class BoardTests {
 

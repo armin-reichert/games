@@ -1,15 +1,15 @@
-package de.amr.games.pacman.entities;
+package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.board.Tile.BONUS_APPLE;
-import static de.amr.games.pacman.board.Tile.BONUS_BELL;
-import static de.amr.games.pacman.board.Tile.BONUS_CHERRIES;
-import static de.amr.games.pacman.board.Tile.BONUS_GALAXIAN;
-import static de.amr.games.pacman.board.Tile.BONUS_GRAPES;
-import static de.amr.games.pacman.board.Tile.BONUS_KEY;
-import static de.amr.games.pacman.board.Tile.BONUS_PEACH;
-import static de.amr.games.pacman.board.Tile.BONUS_STRAWBERRY;
-import static de.amr.games.pacman.board.Tile.ENERGIZER;
-import static de.amr.games.pacman.board.Tile.PELLET;
+import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
+import static de.amr.games.pacman.model.Tile.BONUS_BELL;
+import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
+import static de.amr.games.pacman.model.Tile.BONUS_GALAXIAN;
+import static de.amr.games.pacman.model.Tile.BONUS_GRAPES;
+import static de.amr.games.pacman.model.Tile.BONUS_KEY;
+import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
+import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
+import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.model.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -21,13 +21,12 @@ import java.util.stream.Stream;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.Spritesheet;
-import de.amr.games.pacman.board.MazeContent;
-import de.amr.games.pacman.control.BonusFoundEvent;
-import de.amr.games.pacman.control.FoodFoundEvent;
-import de.amr.games.pacman.control.GameEvent;
-import de.amr.games.pacman.control.GhostContactEvent;
-import de.amr.games.pacman.control.PacManDiedEvent;
+import de.amr.games.pacman.controller.BonusFoundEvent;
+import de.amr.games.pacman.controller.FoodFoundEvent;
+import de.amr.games.pacman.controller.GameEvent;
+import de.amr.games.pacman.controller.GhostContactEvent;
+import de.amr.games.pacman.controller.PacManDiedEvent;
+import de.amr.games.pacman.model.MazeContent;
 
 public class PacMan extends BoardMover<PacMan.State> {
 

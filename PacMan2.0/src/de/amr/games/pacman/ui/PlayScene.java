@@ -1,4 +1,4 @@
-package de.amr.games.pacman;
+package de.amr.games.pacman.ui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -7,12 +7,11 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
-import de.amr.games.pacman.board.MazeContent;
-import de.amr.games.pacman.control.PlayControl;
-import de.amr.games.pacman.control.StartLevelEvent;
-import de.amr.games.pacman.entities.HUD;
-import de.amr.games.pacman.entities.Maze;
-import de.amr.games.pacman.entities.StatusDisplay;
+import de.amr.games.pacman.PacManApp;
+import de.amr.games.pacman.controller.PlayControl;
+import de.amr.games.pacman.controller.StartLevelEvent;
+import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.MazeContent;
 
 public class PlayScene extends ActiveScene<PacManApp> {
 
