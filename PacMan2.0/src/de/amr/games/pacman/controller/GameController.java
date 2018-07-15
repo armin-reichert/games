@@ -5,15 +5,14 @@ import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
+import de.amr.games.pacman.ui.MazeMover;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
@@ -24,6 +23,8 @@ public class GameController implements GameEventListener {
 	private final PacMan pacMan;
 	private final Ghost[] ghosts;
 	private int currentLevel;
+
+	private Consumer<MazeMover<?>> steering = new KeyboardSteering();
 
 	public GameController(Game gameState, MazeUI maze) {
 		this.gameState = gameState;
@@ -49,15 +50,7 @@ public class GameController implements GameEventListener {
 	}
 
 	public void update() {
-		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			pacMan.setNextMoveDirection(Top4.W);
-		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			pacMan.setNextMoveDirection(Top4.E);
-		} else if (Keyboard.keyDown(KeyEvent.VK_DOWN)) {
-			pacMan.setNextMoveDirection(Top4.S);
-		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
-			pacMan.setNextMoveDirection(Top4.N);
-		}
+		steering.accept(pacMan);
 		pacMan.update();
 		Arrays.stream(ghosts).forEach(Ghost::update);
 	}
