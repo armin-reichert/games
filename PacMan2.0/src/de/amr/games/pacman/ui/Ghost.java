@@ -16,28 +16,27 @@ import de.amr.games.pacman.model.Tile;
 
 public class Ghost extends BoardMover<Ghost.State> {
 
-	private static final int SIZE = PacManApp.TS * 2;
-
 	public enum State {
 		ATTACKING, FRIGHTENED, DEAD
 	};
 
 	private final int color;
 	private final Sprite[] spriteNormal = new Sprite[4];
-	private final Sprite spriteFrightened;
 	private final Sprite[] spriteDead = new Sprite[4];
+	private final Sprite spriteFrightened;
 
 	public Ghost(GameState gameState, int color) {
 		super(gameState);
 		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(SIZE, SIZE);
+			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
+					getSpriteSize());
 			spriteNormal[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 		});
-		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(SIZE, SIZE);
+		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(getSpriteSize(), getSpriteSize());
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(SIZE, SIZE);
+			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(getSpriteSize(), getSpriteSize());
 		});
 	}
 
@@ -113,6 +112,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 
 	@Override
 	public void draw(Graphics2D g) {
+		// TODO hack
 		if (gameState.maze.getContent(col(), row()) == Tile.GHOSTHOUSE) {
 			g.translate(PacManApp.TS / 2, 0);
 			super.draw(g);
@@ -120,6 +120,11 @@ public class Ghost extends BoardMover<Ghost.State> {
 		} else {
 			super.draw(g);
 		}
+	}
+
+	@Override
+	protected int getSpriteSize() {
+		return PacManApp.TS * 2;
 	}
 
 	@Override

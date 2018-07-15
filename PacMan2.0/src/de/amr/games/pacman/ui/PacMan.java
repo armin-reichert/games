@@ -31,7 +31,6 @@ import de.amr.games.pacman.model.GameState;
 
 public class PacMan extends BoardMover<PacMan.State> {
 
-	private static final int SIZE = 2 * PacManApp.TS;
 	private static boolean DEBUG = false;
 
 	public enum State {
@@ -45,12 +44,13 @@ public class PacMan extends BoardMover<PacMan.State> {
 
 	public PacMan(GameState gameState) {
 		super(gameState);
-		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SIZE, SIZE);
+		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(direction -> {
-			spriteWalking[direction] = new Sprite(Spritesheet.getPacManWalking(direction)).scale(SIZE, SIZE);
+			spriteWalking[direction] = new Sprite(Spritesheet.getPacManWalking(direction)).scale(getSpriteSize(),
+					getSpriteSize());
 			spriteWalking[direction].makeAnimated(AnimationMode.CYCLIC, 120);
 		});
-		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SIZE, SIZE);
+		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
 	}
 
@@ -82,6 +82,11 @@ public class PacMan extends BoardMover<PacMan.State> {
 	@Override
 	public String toString() {
 		return "PacMan";
+	}
+
+	@Override
+	protected int getSpriteSize() {
+		return PacManApp.TS * 2;
 	}
 
 	@Override

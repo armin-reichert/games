@@ -47,9 +47,10 @@ public abstract class BoardMover<State> extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		// draw sprite centered over tile
-		g.translate(-TS / 2, -TS / 2);
+		int offsetX = (getSpriteSize() - getWidth()) / 2, offsetY = (getSpriteSize() - getHeight()) / 2;
+		g.translate(-offsetX, -offsetY);
 		super.draw(g);
-		g.translate(TS / 2, TS / 2);
+		g.translate(offsetX, offsetY);
 	}
 
 	@Override
@@ -61,6 +62,8 @@ public abstract class BoardMover<State> extends GameEntity {
 	public int getHeight() {
 		return PacManApp.TS;
 	}
+
+	protected abstract int getSpriteSize();
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
