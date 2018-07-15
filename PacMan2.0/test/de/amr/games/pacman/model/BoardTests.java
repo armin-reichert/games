@@ -1,4 +1,4 @@
-package de.amr.games.pacman.board;
+package de.amr.games.pacman.model;
 
 import static de.amr.games.pacman.model.Tile.DOOR;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
