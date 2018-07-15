@@ -74,12 +74,12 @@ public class Ghost extends BoardMover<Ghost.State> {
 			moveRandomly();
 		} else if (getState() == State.DEAD) {
 			moveRandomly();
-			if (secondsInState() > 6) {
+			if (stateDurationSeconds() > 6) {
 				setState(State.ATTACKING);
 			}
 		} else if (getState() == State.FRIGHTENED) {
 			moveRandomly();
-			if (secondsInState() > 3) {
+			if (stateDurationSeconds() > 3) {
 				setState(State.ATTACKING);
 			}
 		}

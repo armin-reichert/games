@@ -4,6 +4,7 @@ import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedHashSet;
@@ -37,10 +38,18 @@ public abstract class BoardMover<State> extends GameEntity {
 	protected int moveDirection;
 	protected int nextMoveDirection;
 	protected float speed;
-	protected long stateChangeTime;
+	protected long stateEntryTime;
 
 	protected BoardMover(GameState gameState) {
 		this.gameState = gameState;
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		// draw sprite centered over tile
+		g.translate(-TS / 2, -TS / 2);
+		super.draw(g);
+		g.translate(TS / 2, TS / 2);
 	}
 
 	@Override
@@ -109,28 +118,33 @@ public abstract class BoardMover<State> extends GameEntity {
 		this.speed = speed;
 	}
 
-	public boolean canMove(int direction) {
-		int newCol = col(), newRow = row();
-		switch (direction) {
+	public boolean canMove(int dir) {
+		Vector2f newPosition = getNewPosition(dir);
+		int touchedCol, touchedRow;
+		switch (dir) {
 		case Top4.W:
-			newCol = col(getNewPosition(direction).x);
+			touchedCol = col(newPosition.x);
+			touchedRow = row();
 			break;
 		case Top4.E:
-			newCol = col(getNewPosition(direction).x + TS);
+			touchedCol = col(newPosition.x + getWidth());
+			touchedRow = row();
 			break;
 		case Top4.N:
-			newRow = row(getNewPosition(direction).y);
+			touchedCol = col();
+			touchedRow = row(newPosition.y);
 			break;
 		case Top4.S:
-			newRow = row(getNewPosition(direction).y + TS);
+			touchedCol = col();
+			touchedRow = row(newPosition.y + getHeight());
 			break;
 		default:
-			throw new IllegalArgumentException("Illegal direction: " + direction);
+			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}
-		if (col() == newCol && row() == newRow) {
+		if (col() == touchedCol && row() == touchedRow) {
 			return true;
 		}
-		return gameState.maze.getContent(newCol, newRow) != WALL;
+		return gameState.maze.getContent(touchedCol, touchedRow) != WALL;
 	}
 
 	public void changeDirection() {
@@ -161,15 +175,15 @@ public abstract class BoardMover<State> extends GameEntity {
 		}
 	}
 
-	public Vector2f getNewPosition(int direction) {
-		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(direction), Maze.TOPOLOGY.dy(direction)));
+	public Vector2f getNewPosition(int dir) {
+		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir)));
 		return Vector2f.sum(tf.getPosition(), velocity);
 	}
 
 	public void setState(State state) {
 		State oldState = this.state;
 		this.state = state;
-		stateChangeTime = System.currentTimeMillis();
+		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
 			System.out.println(String.format("%s changed from %s to %s", this, oldState, state));
 		}
@@ -179,7 +193,7 @@ public abstract class BoardMover<State> extends GameEntity {
 		return state;
 	}
 
-	public int secondsInState() {
-		return (int) (System.currentTimeMillis() - stateChangeTime) / 1000;
+	public int stateDurationSeconds() {
+		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
 	}
 }

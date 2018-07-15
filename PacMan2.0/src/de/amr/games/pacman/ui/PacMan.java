@@ -73,7 +73,7 @@ public class PacMan extends BoardMover<PacMan.State> {
 				move();
 			}
 		} else if (getState() == State.DYING) {
-			if (secondsInState() > 3) {
+			if (stateDurationSeconds() > 3) {
 				fireGameEvent(new PacManDiedEvent());
 			}
 		}
