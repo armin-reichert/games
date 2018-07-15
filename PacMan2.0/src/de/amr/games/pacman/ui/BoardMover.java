@@ -11,12 +11,12 @@ import java.util.Set;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
-import de.amr.games.pacman.model.MazeContent;
+import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Maze;
 
 public class BoardMover<State> extends GameEntity {
 
@@ -33,16 +33,15 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
-	protected final MazeContent board;
-	protected final Topology top = new Top4();
+	protected final GameState gameState;
 	protected int moveDirection;
 	protected int nextMoveDirection;
 	protected float speed;
 	protected State state;
 	protected long stateChangeTime;
 
-	public BoardMover(MazeContent board) {
-		this.board = board;
+	public BoardMover(GameState gameState) {
+		this.gameState = gameState;
 	}
 
 	@Override
@@ -137,24 +136,22 @@ public class BoardMover<State> extends GameEntity {
 		if (col() == newCol && row() == newRow) {
 			return true;
 		}
-		if (!board.grid.isValidCol(newCol) || !board.grid.isValidRow(newRow)) {
-			return false;
-		}
-		return board.getContent(newCol, newRow) != WALL;
+		return gameState.maze.getContent(newCol, newRow) != WALL;
 	}
 
 	public void changeDirection() {
 		if (nextMoveDirection == moveDirection) {
 			return;
 		}
-		if (nextMoveDirection == top.inv(moveDirection) || isExactlyOverTile() && canMove(nextMoveDirection)) {
+		if (nextMoveDirection == Maze.TOPOLOGY.inv(moveDirection)
+				|| isExactlyOverTile() && canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
 		}
 	}
 
 	public void move() {
 		int col = col(), row = row();
-		if (board.getContent(col, row) == WORMHOLE) {
+		if (gameState.maze.getContent(col, row) == WORMHOLE) {
 			warp(col, row);
 		} else if (canMove(moveDirection)) {
 			tf.moveTo(getNewPosition(moveDirection));
@@ -164,15 +161,16 @@ public class BoardMover<State> extends GameEntity {
 	}
 
 	public void warp(int col, int row) {
-		if (moveDirection == Top4.E && col == board.numCols() - 1) {
+		if (moveDirection == Top4.E && col == gameState.maze.numCols() - 1) {
 			setMazePosition(1, row);
 		} else if (moveDirection == Top4.W && col == 0) {
-			setMazePosition(board.numCols() - 2, row);
+			setMazePosition(gameState.maze.numCols() - 2, row);
 		}
 	}
 
 	public Vector2f getNewPosition(int direction) {
-		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(top.dx(direction), top.dy(direction)));
+		Vector2f velocity = Vector2f.smul(speed,
+				Vector2f.of(Maze.TOPOLOGY.dx(direction), Maze.TOPOLOGY.dy(direction)));
 		return Vector2f.sum(tf.getPosition(), velocity);
 	}
 
@@ -192,5 +190,4 @@ public class BoardMover<State> extends GameEntity {
 	public int secondsInState() {
 		return (int) (System.currentTimeMillis() - stateChangeTime) / 1000;
 	}
-
 }

@@ -10,7 +10,8 @@ import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.model.MazeContent;
+import de.amr.games.pacman.model.GameState;
+import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
 public class Ghost extends BoardMover<Ghost.State> {
@@ -26,16 +27,16 @@ public class Ghost extends BoardMover<Ghost.State> {
 	private final Sprite spriteFrightened;
 	private final Sprite[] spriteDead = new Sprite[4];
 
-	public Ghost(MazeContent board, int color) {
-		super(board);
+	public Ghost(GameState gameState, int color) {
+		super(gameState);
 		this.color = color;
-		top.dirs().forEach(dir -> {
+		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(SIZE, SIZE);
 			spriteNormal[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 		});
 		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(SIZE, SIZE);
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
-		top.dirs().forEach(dir -> {
+		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(SIZE, SIZE);
 		});
 	}
@@ -90,7 +91,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 		} else {
 			int direction = moveDirection;
 			do {
-				direction = randomElement(top.dirs()).getAsInt();
+				direction = randomElement(Maze.TOPOLOGY.dirs()).getAsInt();
 			} while (!canMove(direction));
 			setMoveDirection(direction);
 		}
@@ -104,7 +105,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 		}
 		Vector2f newPosition = getNewPosition(direction);
 		Point newBoardPosition = position(newPosition.x, newPosition.y);
-		if (board.getContent(newBoardPosition) == Tile.GHOSTHOUSE && getState() == State.DEAD) {
+		if (gameState.maze.getContent(newBoardPosition) == Tile.GHOSTHOUSE && getState() == State.DEAD) {
 			return true;
 		}
 		return true;
@@ -112,7 +113,7 @@ public class Ghost extends BoardMover<Ghost.State> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		if (board.getContent(col(), row()) == Tile.GHOSTHOUSE) {
+		if (gameState.maze.getContent(col(), row()) == Tile.GHOSTHOUSE) {
 			g.translate(PacManApp.TS / 2, 0);
 			super.draw(g);
 			g.translate(-PacManApp.TS / 2, 0);

@@ -28,14 +28,14 @@ public class BoardPreview extends JFrame {
 		SwingUtilities.invokeLater(BoardPreview::new);
 	}
 
-	private MazeContent board;
+	private Maze board;
 	private int tileSize = 16;
 
 	public BoardPreview() {
-		board = new MazeContent(Assets.text("maze.txt"));
+		board = new Maze(Assets.text("maze.txt"));
 		setTitle("PacMan Preview");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		GridCanvas canvas = new GridCanvas(board.grid, tileSize);
+		GridCanvas canvas = new GridCanvas(board.grid(), tileSize);
 		canvas.pushRenderer(createRenderer());
 		add(canvas, BorderLayout.CENTER);
 		canvas.drawGrid();
@@ -57,7 +57,7 @@ public class BoardPreview extends JFrame {
 		r.fnCellSize = () -> tileSize;
 		r.fnPassageWidth = () -> tileSize - 1;
 		r.fnPassageColor = (cell, dir) -> Color.WHITE;
-		r.fnCellBgColor = cell -> colors.getOrDefault(board.grid.get(cell), Color.BLACK);
+		r.fnCellBgColor = cell -> colors.getOrDefault(board.grid().get(cell), Color.BLACK);
 		return r;
 	}
 }

@@ -17,8 +17,8 @@ public class PacManApp extends Application {
 
 	public PacManApp() {
 		gameState = new GameState();
-		settings.width = gameState.mazeContent.numCols() * PacManApp.TS;
-		settings.height = (gameState.mazeContent.numRows() + 5) * PacManApp.TS;
+		settings.width = gameState.maze.numCols() * PacManApp.TS;
+		settings.height = (gameState.maze.numRows() + 5) * PacManApp.TS;
 		settings.scale = 1.25f;
 		settings.title = String.format("PacMan 2.0 (%d x %d * %.2f)", settings.width, settings.height, settings.scale);
 	}

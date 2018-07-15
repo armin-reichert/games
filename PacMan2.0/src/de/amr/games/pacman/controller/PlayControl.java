@@ -14,7 +14,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.GameState;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
-import de.amr.games.pacman.ui.Maze;
+import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
 
@@ -25,7 +25,7 @@ public class PlayControl implements GameEventListener {
 	private final Ghost[] ghosts;
 	private int currentLevel;
 
-	public PlayControl(GameState gameState, Maze maze) {
+	public PlayControl(GameState gameState, MazeUI maze) {
 		this.gameState = gameState;
 		this.pacMan = maze.pacMan;
 		this.ghosts = maze.ghosts;
@@ -84,8 +84,8 @@ public class PlayControl implements GameEventListener {
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		gameState.mazeContent.setContent(e.col, e.row, Tile.EMPTY);
-		if (gameState.mazeContent.isMazeEmpty()) {
+		gameState.maze.setContent(e.col, e.row, Tile.EMPTY);
+		if (gameState.maze.isMazeEmpty()) {
 			onNewLevel(new StartLevelEvent(currentLevel + 1));
 			return;
 		}
@@ -97,13 +97,13 @@ public class PlayControl implements GameEventListener {
 
 	private void onBonusFound(BonusFoundEvent e) {
 		System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row));
-		gameState.mazeContent.setContent(e.col, e.row, Tile.EMPTY);
+		gameState.maze.setContent(e.col, e.row, Tile.EMPTY);
 	}
 
 	private void onNewLevel(StartLevelEvent e) {
 		currentLevel = e.level;
 		System.out.println("Starting level " + currentLevel);
-		gameState.mazeContent.resetContent();
+		gameState.maze.reset();
 		initEntities();
 	}
 

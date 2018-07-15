@@ -8,26 +8,37 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.graph.api.UndirectedEdge;
+import de.amr.easy.grid.api.GridGraph2D;
+import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.GridGraph;
 import de.amr.easy.grid.impl.Top4;
 
-public class MazeContent {
+public class Maze {
 
-	public final GridGraph<Character, Integer> grid;
-	private final String mazeData;
+	public static final Topology TOPOLOGY = new Top4();
+
+	private final GridGraph<Character, Integer> grid;
+	private final String[] mazeData;
 	private final int numRows;
 	private final int numCols;
 
-	public MazeContent(String mazeData) {
-		this.mazeData = mazeData;
-		String[] rows = mazeData.split("\n");
-		numRows = rows.length;
-		numCols = rows[0].length();
-		grid = new GridGraph<>(numCols, numRows, new Top4(), EMPTY, (u, v) -> 1, UndirectedEdge::new);
+	public Maze(String mazeText) {
+		this.mazeData = mazeText.split("\n");
+		numRows = mazeData.length;
+		numCols = mazeData[0].length();
+		grid = new GridGraph<>(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		grid.fill();
 		grid.edges().filter(edge -> grid.get(edge.either()) == WALL || grid.get(edge.other()) == WALL)
 				.forEach(grid::removeEdge);
-		resetContent();
+		reset();
+	}
+
+	public void reset() {
+		IntStream.range(0, numRows).forEach(row -> {
+			IntStream.range(0, numCols).forEach(col -> {
+				grid.set(grid.cell(col, row), mazeData[row].charAt(col));
+			});
+		});
 	}
 
 	public int numCols() {
@@ -38,17 +49,16 @@ public class MazeContent {
 		return numRows;
 	}
 
-	public Stream<Point> positions() {
+	public GridGraph2D<Character, Integer> grid() {
+		return grid;
+	}
+
+	public Stream<Point> tiles() {
 		return grid.vertices().mapToObj(v -> new Point(grid.col(v), grid.row(v)));
 	}
 
-	public void resetContent() {
-		String[] rows = mazeData.split("\n");
-		IntStream.range(0, numRows).forEach(row -> {
-			IntStream.range(0, numCols).forEach(col -> {
-				grid.set(grid.cell(col, row), rows[row].charAt(col));
-			});
-		});
+	public Stream<Point> tilesContaining(char content) {
+		return grid.vertices().filter(v -> grid.get(v) == content).mapToObj(v -> new Point(grid.col(v), grid.row(v)));
 	}
 
 	public boolean isMazeEmpty() {
@@ -81,10 +91,6 @@ public class MazeContent {
 
 	public void setContent(Point position, char c) {
 		setContent(position.x, position.y, c);
-	}
-
-	public Stream<Point> positionsContaining(char content) {
-		return grid.vertices().filter(v -> grid.get(v) == content).mapToObj(v -> new Point(grid.col(v), grid.row(v)));
 	}
 
 	public void print() {

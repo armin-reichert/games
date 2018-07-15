@@ -23,24 +23,24 @@ import java.util.Arrays;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.model.MazeContent;
+import de.amr.games.pacman.model.GameState;
 
-public class Maze extends GameEntity {
+public class MazeUI extends GameEntity {
 
-	private final MazeContent board;
+	private final GameState gameState;
 	private final Sprite sprite;
 
 	public final PacMan pacMan;
 	public final Ghost[] ghosts = new Ghost[4];
 
-	public Maze(MazeContent board, int width, int height) {
-		this.board = board;
-		this.sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
-		ghosts[RED_GHOST] = new Ghost(board, RED_GHOST);
-		ghosts[PINK_GHOST] = new Ghost(board, PINK_GHOST);
-		ghosts[BLUE_GHOST] = new Ghost(board, BLUE_GHOST);
-		ghosts[ORANGE_GHOST] = new Ghost(board, ORANGE_GHOST);
-		pacMan = new PacMan(board);
+	public MazeUI(GameState gameState, int width, int height) {
+		this.gameState = gameState;
+		sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
+		ghosts[RED_GHOST] = new Ghost(gameState, RED_GHOST);
+		ghosts[PINK_GHOST] = new Ghost(gameState, PINK_GHOST);
+		ghosts[BLUE_GHOST] = new Ghost(gameState, BLUE_GHOST);
+		ghosts[ORANGE_GHOST] = new Ghost(gameState, ORANGE_GHOST);
+		pacMan = new PacMan(gameState);
 		pacMan.enemies.addAll(Arrays.asList(ghosts));
 	}
 
@@ -53,7 +53,7 @@ public class Maze extends GameEntity {
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
-		board.positions().forEach(pos -> drawTile(g, pos.x, pos.y));
+		gameState.maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
 		pacMan.draw(g);
 		Arrays.stream(ghosts).forEach(e -> e.draw(g));
 		g.translate(-tf.getX(), -tf.getY());
@@ -61,7 +61,7 @@ public class Maze extends GameEntity {
 
 	private void drawTile(Graphics2D g, int col, int row) {
 		g.translate(col * PacManApp.TS, row * PacManApp.TS);
-		char tile = board.getContent(col, row);
+		char tile = gameState.maze.getContent(col, row);
 		switch (tile) {
 		case PELLET:
 			drawPellet(g, row, col);

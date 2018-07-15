@@ -17,7 +17,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 	private static boolean DEBUG = false;
 
 	private final GameState gameState;
-	private final Maze maze;
+	private final MazeUI maze;
 	private final HUD hud;
 	private final StatusDisplay status;
 	private final PlayControl controller;
@@ -29,7 +29,7 @@ public class PlayScene extends ActiveScene<PacManApp> {
 		hud = new HUD(gameState);
 		hud.tf.moveTo(0, 0);
 
-		maze = new Maze(gameState.mazeContent, getWidth(), getHeight() - 5 * PacManApp.TS);
+		maze = new MazeUI(gameState, getWidth(), getHeight() - 5 * PacManApp.TS);
 		maze.tf.moveTo(0, 3 * PacManApp.TS);
 
 		status = new StatusDisplay(gameState);
@@ -63,15 +63,15 @@ public class PlayScene extends ActiveScene<PacManApp> {
 
 	private void drawDebugInfo(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
-		for (int row = 1; row < gameState.mazeContent.numRows(); ++row) {
+		for (int row = 1; row < gameState.maze.numRows(); ++row) {
 			g.drawLine(0, row * PacManApp.TS, getWidth(), row * PacManApp.TS);
 		}
-		for (int col = 1; col < gameState.mazeContent.numCols(); ++col) {
+		for (int col = 1; col < gameState.maze.numCols(); ++col) {
 			g.drawLine(col * PacManApp.TS, 0, col * PacManApp.TS, getHeight());
 		}
 		g.setFont(new Font("Arial Narrow", Font.PLAIN, PacManApp.TS * 40 / 100));
-		for (int row = 0; row < gameState.mazeContent.numRows(); ++row) {
-			for (int col = 0; col < gameState.mazeContent.numCols(); ++col) {
+		for (int row = 0; row < gameState.maze.numRows(); ++row) {
+			for (int col = 0; col < gameState.maze.numCols(); ++col) {
 				g.translate(col * PacManApp.TS, row * PacManApp.TS);
 				g.drawString(String.format("%d,%d", col, row), PacManApp.TS / 8, PacManApp.TS / 2);
 				g.translate(-col * PacManApp.TS, -row * PacManApp.TS);

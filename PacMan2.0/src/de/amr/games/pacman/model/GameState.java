@@ -4,12 +4,12 @@ import de.amr.easy.game.assets.Assets;
 
 public class GameState {
 
-	public MazeContent mazeContent;
+	public Maze maze;
 	public int level;
 	public int lives;
 
 	public GameState() {
-		mazeContent = new MazeContent(Assets.text("maze.txt"));
+		maze = new Maze(Assets.text("maze.txt"));
 		level = 1;
 		lives = 3;
 	}
