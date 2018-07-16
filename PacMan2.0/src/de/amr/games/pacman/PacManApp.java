@@ -2,8 +2,8 @@ package de.amr.games.pacman;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
+import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.PlayScene;
 
 public class PacManApp extends Application {
 
@@ -24,6 +24,6 @@ public class PacManApp extends Application {
 
 	@Override
 	public void init() {
-		select(new PlayScene(this));
+		select(new GameController(this));
 	}
 }

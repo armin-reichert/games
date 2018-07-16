@@ -1,16 +1,14 @@
 package de.amr.games.pacman.model;
 
-import de.amr.easy.game.assets.Assets;
-
 public class Game {
 
-	public Maze maze;
+	public final Maze maze;
 	public int level;
 	public int lives;
 	public int score;
 
-	public void init() {
-		maze = new Maze(Assets.text("maze.txt"));
+	public Game(String mazeData) {
+		maze = new Maze(mazeData);
 		level = 1;
 		lives = 3;
 		score = 0;

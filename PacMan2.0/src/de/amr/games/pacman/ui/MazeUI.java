@@ -10,10 +10,6 @@ import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
 import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.model.Tile.PELLET;
-import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -26,27 +22,19 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.controller.GameController;
 
 public class MazeUI extends GameEntity {
 
-	private final Game game;
+	private final GameController controller;
 	private final Sprite sprite;
-	public final PacMan pacMan;
-	public final Ghost[] ghosts = new Ghost[4];
 	private boolean debug;
 
-	public MazeUI(Game game, int width, int height) {
-		this.game = game;
+	public MazeUI(GameController controller, int width, int height) {
+		this.controller = controller;
 		sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
-		ghosts[RED_GHOST] = new Ghost(game, RED_GHOST);
-		ghosts[PINK_GHOST] = new Ghost(game, PINK_GHOST);
-		ghosts[BLUE_GHOST] = new Ghost(game, BLUE_GHOST);
-		ghosts[ORANGE_GHOST] = new Ghost(game, ORANGE_GHOST);
-		pacMan = new PacMan(game);
-		pacMan.enemies.addAll(Arrays.asList(ghosts));
 	}
-	
+
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
@@ -63,9 +51,9 @@ public class MazeUI extends GameEntity {
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
-		game.maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
-		pacMan.draw(g);
-		Arrays.stream(ghosts).forEach(e -> e.draw(g));
+		controller.getGame().maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
+		controller.getPacMan().draw(g);
+		Arrays.stream(controller.getGhosts()).forEach(ghost -> ghost.draw(g));
 		if (debug) {
 			drawDebugInfo(g);
 		}
@@ -74,7 +62,7 @@ public class MazeUI extends GameEntity {
 
 	private void drawTile(Graphics2D g, int col, int row) {
 		g.translate(col * PacManApp.TS, row * PacManApp.TS);
-		char tile = game.maze.getContent(col, row);
+		char tile = controller.getGame().maze.getContent(col, row);
 		switch (tile) {
 		case PELLET:
 			drawPellet(g, row, col);
@@ -118,15 +106,15 @@ public class MazeUI extends GameEntity {
 
 	private void drawDebugInfo(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
-		for (int row = 0; row < game.maze.numRows() + 1; ++row) {
+		for (int row = 0; row < controller.getGame().maze.numRows() + 1; ++row) {
 			g.drawLine(0, row * PacManApp.TS, getWidth(), row * PacManApp.TS);
 		}
-		for (int col = 1; col < game.maze.numCols(); ++col) {
+		for (int col = 1; col < controller.getGame().maze.numCols(); ++col) {
 			g.drawLine(col * PacManApp.TS, 0, col * PacManApp.TS, getHeight());
 		}
 		g.setFont(new Font("Arial Narrow", Font.PLAIN, PacManApp.TS * 40 / 100));
-		for (int row = 0; row < game.maze.numRows(); ++row) {
-			for (int col = 0; col < game.maze.numCols(); ++col) {
+		for (int row = 0; row < controller.getGame().maze.numRows(); ++row) {
+			for (int col = 0; col < controller.getGame().maze.numCols(); ++col) {
 				g.translate(col * PacManApp.TS, row * PacManApp.TS);
 				g.drawString(String.format("%d,%d", col, row), PacManApp.TS / 8, PacManApp.TS / 2);
 				g.translate(-col * PacManApp.TS, -row * PacManApp.TS);

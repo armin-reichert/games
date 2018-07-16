@@ -2,40 +2,37 @@ package de.amr.games.pacman.ui;
 
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.view.Controller;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameController;
-import de.amr.games.pacman.model.Game;
 
-public class PlayScene extends ActiveScene<PacManApp> {
+public class PlayScene extends Scene<PacManApp> {
 
-	private Game game;
+	private GameController controller;
 	private MazeUI maze;
 	private HUD hud;
 	private StatusDisplay status;
-	private GameController controller;
 
-	public PlayScene(PacManApp app) {
-		super(app);
-		game = new Game();
-		hud = new HUD(game);
+	public PlayScene(GameController controller) {
+		super(controller.app);
+		this.controller = controller;
+		hud = new HUD(controller.getGame());
 		hud.tf.moveTo(0, 0);
-		maze = new MazeUI(game, getWidth(), getHeight() - 5 * PacManApp.TS);
+		maze = new MazeUI(controller, getWidth(), getHeight() - 5 * PacManApp.TS);
 		maze.tf.moveTo(0, 3 * PacManApp.TS);
-		status = new StatusDisplay(game);
+		status = new StatusDisplay(controller.getGame());
 		status.tf.moveTo(0, getHeight() - 2 * PacManApp.TS);
-		controller = new GameController(game, maze);
+	}
+
+	@Override
+	public Controller getController() {
+		return controller;
 	}
 
 	@Override
 	public void init() {
-		controller.startGame();
-	}
-
-	@Override
-	public void update() {
-		maze.update();
-		controller.updateGame();
+		controller.init();
 	}
 
 	@Override

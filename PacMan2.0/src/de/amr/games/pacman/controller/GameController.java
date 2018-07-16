@@ -6,62 +6,73 @@ import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
-import de.amr.games.pacman.ui.MazeMover;
-import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
+import de.amr.games.pacman.ui.PlayScene;
 
-public class GameController implements GameEventListener {
+public class GameController implements Controller, GameEventListener {
 
-	private final Game game;
-	private final PacMan pacMan;
-	private final Ghost[] ghosts;
+	public final PacManApp app;
 
-	private Consumer<MazeMover<?>> steering = new KeyboardSteering();
+	private Game game;
+	private View currentView;
+	private PacMan pacMan;
+	private Ghost[] ghosts;
 
-	public GameController(Game game, MazeUI maze) {
-		this.game = game;
-		this.pacMan = maze.pacMan;
-		this.ghosts = maze.ghosts;
-		pacMan.addObserver(this);
-		Stream.of(ghosts).forEach(ghost -> ghost.addObserver(this));
+	public GameController(final PacManApp app) {
+		this.app = app;
+	}
+
+	public Game getGame() {
+		return game;
+	}
+
+	public PacMan getPacMan() {
+		return pacMan;
+	}
+
+	public Ghost[] getGhosts() {
+		return ghosts;
 	}
 
 	@Override
-	public void processGameEvent(GameEvent e) {
-		if (e instanceof GhostContactEvent) {
-			onGhostContact((GhostContactEvent) e);
-		} else if (e instanceof FoodFoundEvent) {
-			onFoodFound((FoodFoundEvent) e);
-		} else if (e instanceof BonusFoundEvent) {
-			onBonusFound((BonusFoundEvent) e);
-		} else if (e instanceof StartLevelEvent) {
-			onStartLevel((StartLevelEvent) e);
-		} else if (e instanceof PacManDiedEvent) {
-			onPacManDied((PacManDiedEvent) e);
-		}
+	public View currentView() {
+		return currentView;
 	}
 
-	public void updateGame() {
-		steering.accept(pacMan);
-		pacMan.update();
-		Arrays.stream(ghosts).forEach(Ghost::update);
+	@Override
+	public void init() {
+		game = new Game(Assets.text("maze.txt"));
+		currentView = new PlayScene(this);
+		startLevel();
 	}
 
-	public void startGame() {
-		game.init();
+	private void startLevel() {
+		game.maze.reset();
 		initEntities();
+		System.out.println("Started level " + game.level);
 	}
 
 	private void initEntities() {
+		ghosts = new Ghost[4];
+		ghosts[RED_GHOST] = new Ghost(game, RED_GHOST);
+		ghosts[PINK_GHOST] = new Ghost(game, PINK_GHOST);
+		ghosts[BLUE_GHOST] = new Ghost(game, BLUE_GHOST);
+		ghosts[ORANGE_GHOST] = new Ghost(game, ORANGE_GHOST);
+		pacMan = new PacMan(game);
+		pacMan.enemies.addAll(Arrays.asList(ghosts));
+		pacMan.addObserver(this);
+		Stream.of(ghosts).forEach(ghost -> ghost.addObserver(this));
 		pacMan.setMazePosition(14, 23);
 		pacMan.setSpeed(PacManApp.TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
@@ -79,15 +90,27 @@ public class GameController implements GameEventListener {
 		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
 	}
 
-	private void onStartLevel(StartLevelEvent e) {
-		++game.level;
-		game.maze.reset();
-		initEntities();
-		System.out.println("Started level " + game.level);
+	@Override
+	public void processGameEvent(GameEvent e) {
+		if (e instanceof GhostContactEvent) {
+			onGhostContact((GhostContactEvent) e);
+		} else if (e instanceof FoodFoundEvent) {
+			onFoodFound((FoodFoundEvent) e);
+		} else if (e instanceof BonusFoundEvent) {
+			onBonusFound((BonusFoundEvent) e);
+		} else if (e instanceof PacManDiedEvent) {
+			onPacManDied((PacManDiedEvent) e);
+		}
+	}
+
+	@Override
+	public void update() {
+		pacMan.update();
+		Arrays.stream(ghosts).forEach(Ghost::update);
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
-		pacMan.spriteDying.resetAnimation();
+		pacMan.spriteDying.resetAnimation(); //TODO
 		initEntities();
 	}
 
@@ -111,7 +134,8 @@ public class GameController implements GameEventListener {
 	private void onFoodFound(FoodFoundEvent e) {
 		game.maze.setContent(e.col, e.row, Tile.EMPTY);
 		if (game.maze.isMazeEmpty()) {
-			onStartLevel(new StartLevelEvent());
+			++game.level;
+			startLevel();
 			return;
 		}
 		if (e.food == Tile.ENERGIZER) {
