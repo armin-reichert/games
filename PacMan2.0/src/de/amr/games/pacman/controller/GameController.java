@@ -136,7 +136,7 @@ public class GameController implements Controller, GameEventListener {
 
 	private void onFoodFound(FoodFoundEvent e) {
 		game.maze.setContent(e.col, e.row, Tile.EMPTY);
-		if (game.maze.isMazeEmpty()) {
+		if (!game.maze.containsFood()) {
 			++game.level;
 			startLevel();
 			return;

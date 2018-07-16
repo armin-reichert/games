@@ -5,6 +5,7 @@ import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.model.Tile.PELLET;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -14,16 +15,15 @@ public class BoardTests {
 
 	@Test
 	public void testBoardLoading() {
-		String data = Assets.text("maze.txt");
-		Maze board = new Maze(data);
-		board.print();
+		Maze maze = new Maze(Assets.text("maze.txt"));
+		maze.print();
 
-		assertEquals(28, board.grid().numCols());
-		assertEquals(31, board.grid().numRows());
+		assertEquals(28, maze.numCols());
+		assertEquals(31, maze.numRows());
 
-		assertEquals(WALL, board.getContent(0, 3));
-		assertEquals(PELLET, board.getContent(1, 4));
-		assertEquals(ENERGIZER, board.getContent(1, 3));
-		assertEquals(DOOR, board.getContent(13, 12));
+		assertTrue(WALL == maze.get(maze.cell(0, 3)));
+		assertTrue(PELLET == maze.get(maze.cell(1, 4)));
+		assertTrue(ENERGIZER == maze.get(maze.cell(1, 3)));
+		assertTrue(DOOR == maze.get(maze.cell(13, 12)));
 	}
 }

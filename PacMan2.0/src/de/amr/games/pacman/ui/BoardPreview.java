@@ -1,4 +1,4 @@
-package de.amr.games.pacman.model;
+package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.model.Tile.DOOR;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
@@ -21,6 +21,7 @@ import de.amr.easy.grid.ui.swing.rendering.ConfigurableGridRenderer;
 import de.amr.easy.grid.ui.swing.rendering.GridCanvas;
 import de.amr.easy.grid.ui.swing.rendering.GridRenderer;
 import de.amr.easy.grid.ui.swing.rendering.WallPassageGridRenderer;
+import de.amr.games.pacman.model.Maze;
 
 public class BoardPreview extends JFrame {
 
@@ -28,14 +29,14 @@ public class BoardPreview extends JFrame {
 		SwingUtilities.invokeLater(BoardPreview::new);
 	}
 
-	private Maze board;
+	private Maze maze;
 	private int tileSize = 16;
 
 	public BoardPreview() {
-		board = new Maze(Assets.text("maze.txt"));
-		setTitle("PacMan Preview");
+		maze = new Maze(Assets.text("maze.txt"));
+		setTitle("Pac-Man Maze Preview");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		GridCanvas canvas = new GridCanvas(board.grid(), tileSize);
+		GridCanvas canvas = new GridCanvas(maze, tileSize);
 		canvas.pushRenderer(createRenderer());
 		add(canvas, BorderLayout.CENTER);
 		canvas.drawGrid();
@@ -57,7 +58,7 @@ public class BoardPreview extends JFrame {
 		r.fnCellSize = () -> tileSize;
 		r.fnPassageWidth = () -> tileSize - 1;
 		r.fnPassageColor = (cell, dir) -> Color.WHITE;
-		r.fnCellBgColor = cell -> colors.getOrDefault(board.grid().get(cell), Color.BLACK);
+		r.fnCellBgColor = cell -> colors.getOrDefault(maze.get(cell), Color.BLACK);
 		return r;
 	}
 }
