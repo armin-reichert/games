@@ -3,10 +3,12 @@ package de.amr.games.pacman.model;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.WALL;
 
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.graph.api.UndirectedEdge;
+import de.amr.easy.graph.impl.traversal.AStarTraversal;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.GridGraph;
 import de.amr.easy.grid.impl.Top4;
@@ -46,6 +48,10 @@ public class Maze extends GridGraph<Character, Integer> {
 		return vertices().anyMatch(v -> get(v) == Tile.PELLET || get(v) == Tile.ENERGIZER);
 	}
 
+	public int cell(Tile tile) {
+		return cell(tile.col, tile.row);
+	}
+
 	public char getContent(int col, int row) {
 		return get(cell(col, row));
 	}
@@ -60,6 +66,12 @@ public class Maze extends GridGraph<Character, Integer> {
 
 	public void setContent(Tile tile, char c) {
 		set(cell(tile.col, tile.row), c);
+	}
+
+	public List<Integer> findPath(Tile source, Tile target) {
+		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
+		pathfinder.traverseGraph(cell(source), cell(target));
+		return pathfinder.path(cell(target));
 	}
 
 	public void print() {

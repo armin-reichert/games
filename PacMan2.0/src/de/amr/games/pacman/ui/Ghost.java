@@ -12,13 +12,14 @@ import de.amr.games.pacman.model.Tile;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		ATTACKING, SCATTERING, FRIGHTENED, DEAD
+		ATTACKING, SCATTERING, FRIGHTENED, DEAD, STARRED
 	}
 
 	private final int color;
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
+	private final Sprite[] allSprites;
 
 	public Ghost(Game game, int color) {
 		super(game);
@@ -27,12 +28,16 @@ public class Ghost extends MazeMover<Ghost.State> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
 					getSpriteSize());
 			spriteNormal[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
+			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(getSpriteSize(), getSpriteSize());
 		});
 		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(getSpriteSize(), getSpriteSize());
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
-		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(getSpriteSize(), getSpriteSize());
-		});
+
+		// TODO make setAnimated(boolean) work
+		allSprites = new Sprite[spriteNormal.length + spriteDead.length + 1];
+		System.arraycopy(spriteNormal, 0, allSprites, 0, spriteNormal.length);
+		System.arraycopy(spriteDead, 0, allSprites, spriteNormal.length, spriteDead.length);
+		allSprites[allSprites.length - 1] = spriteFrightened;
 	}
 
 	public int getColor() {
@@ -56,12 +61,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public void update() {
-		move();
-		setNextMoveDirection(brain.recommendNextMoveDirection());
-		if (canMove(nextMoveDirection)) {
-			setMoveDirection(nextMoveDirection);
+		if (getState() != State.STARRED) {
+			move();
+			setNextMoveDirection(brain.recommendNextMoveDirection());
+			if (canMove(nextMoveDirection)) {
+				setMoveDirection(nextMoveDirection);
+			}
 		}
-		// TODO
 		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
 			setState(State.ATTACKING);
 		}
@@ -89,7 +95,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		if (getState() == State.ATTACKING) {
+		if (getState() == State.ATTACKING || getState() == State.STARRED) {
 			return spriteNormal[moveDirection];
 		} else if (getState() == State.FRIGHTENED) {
 			return spriteFrightened;
@@ -97,5 +103,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 			return spriteDead[moveDirection];
 		}
 		throw new IllegalStateException("Illegal ghost state: " + getState());
+	}
+
+	@Override
+	protected Sprite[] getSprites() {
+		return allSprites;
 	}
 }

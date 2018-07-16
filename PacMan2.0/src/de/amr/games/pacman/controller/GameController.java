@@ -109,7 +109,6 @@ public class GameController implements Controller, GameEventListener {
 		ghosts[BLUE_GHOST].setBrain(new InkyBrain(ghosts[BLUE_GHOST]));
 		ghosts[ORANGE_GHOST].setBrain(new ClydeBrain(ghosts[ORANGE_GHOST]));
 		pacMan.setBrain(new PacManBrain(pacMan));
-
 	}
 
 	@Override
@@ -149,7 +148,11 @@ public class GameController implements Controller, GameEventListener {
 			} else {
 				pacMan.setState(State.DYING);
 				pacMan.setSpeed(0);
-				pacMan.enemies.forEach(enemy -> enemy.setSpeed(0));
+				pacMan.enemies.forEach(enemy -> {
+					enemy.setSpeed(0);
+					enemy.setAnimated(false);
+					enemy.setState(Ghost.State.STARRED);
+				});
 				game.lives -= 1;
 				System.out.println(String.format("Got killed by %s at col=%d, row=%d", e.ghost, e.col, e.row));
 			}
