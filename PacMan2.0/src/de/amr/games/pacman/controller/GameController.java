@@ -66,28 +66,31 @@ public class GameController implements Controller, GameEventListener {
 	private void initEntities() {
 		ghosts = new Ghost[4];
 		ghosts[RED_GHOST] = new Ghost(game, RED_GHOST);
+		ghosts[RED_GHOST].setMazePosition(13, 11);
+		ghosts[RED_GHOST].setMoveDirection(Top4.E);
 		ghosts[PINK_GHOST] = new Ghost(game, PINK_GHOST);
+		ghosts[PINK_GHOST].setMazePosition(13, 14);
+		ghosts[PINK_GHOST].setMoveDirection(Top4.S);
 		ghosts[BLUE_GHOST] = new Ghost(game, BLUE_GHOST);
+		ghosts[BLUE_GHOST].setMazePosition(11, 14);
+		ghosts[BLUE_GHOST].setMoveDirection(Top4.N);
 		ghosts[ORANGE_GHOST] = new Ghost(game, ORANGE_GHOST);
+		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
+		ghosts[ORANGE_GHOST].setMoveDirection(Top4.N);
+		Stream.of(ghosts).forEach(ghost -> {
+			ghost.setSpeed(PacManApp.TS / 16f);
+			ghost.setState(Ghost.State.ATTACKING);
+			ghost.addObserver(this);
+		});
+
 		pacMan = new PacMan(game);
-		pacMan.enemies.addAll(Arrays.asList(ghosts));
-		pacMan.addObserver(this);
-		Stream.of(ghosts).forEach(ghost -> ghost.addObserver(this));
 		pacMan.setMazePosition(14, 23);
 		pacMan.setSpeed(PacManApp.TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
 		pacMan.setState(State.ALIVE);
-		Stream.of(ghosts).forEach(ghost -> {
-			ghost.setMoveDirection(Top4.E);
-			ghost.setNextMoveDirection(Top4.E);
-			ghost.setSpeed(PacManApp.TS / 16f);
-			ghost.setState(Ghost.State.ATTACKING);
-		});
-		ghosts[RED_GHOST].setMazePosition(13, 11);
-		ghosts[BLUE_GHOST].setMazePosition(11, 14);
-		ghosts[PINK_GHOST].setMazePosition(13, 14);
-		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
+		pacMan.enemies.addAll(Arrays.asList(ghosts));
+		pacMan.addObserver(this);
 	}
 
 	@Override
