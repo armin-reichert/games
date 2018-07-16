@@ -13,20 +13,18 @@ import static de.amr.games.pacman.model.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.BonusFoundEvent;
 import de.amr.games.pacman.controller.FoodFoundEvent;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GhostContactEvent;
+import de.amr.games.pacman.controller.PacManBrain;
 import de.amr.games.pacman.controller.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
@@ -39,6 +37,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		ALIVE, DYING
 	};
 
+	private PacManBrain brain;
 	public final Sprite[] spriteWalking = new Sprite[4];
 	public final Sprite spriteStanding;
 	public final Sprite spriteDying;
@@ -55,16 +54,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
 	}
 
-	private void readSteering() {
-		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			setNextMoveDirection(Top4.W);
-		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			setNextMoveDirection(Top4.E);
-		} else if (Keyboard.keyDown(KeyEvent.VK_DOWN)) {
-			setNextMoveDirection(Top4.S);
-		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
-			setNextMoveDirection(Top4.N);
-		}
+	public void setBrain(PacManBrain brain) {
+		this.brain = brain;
+	}
+
+	public Optional<PacManBrain> getBrain() {
+		return Optional.ofNullable(brain);
 	}
 
 	@Override
@@ -74,7 +69,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			if (discovery.isPresent()) {
 				fireGameEvent(discovery.get());
 			} else {
-				readSteering();
+				getBrain().ifPresent(brain -> brain.think(this));
 				if (nextMoveDirection != moveDirection && isExactlyOverTile() && canMove(nextMoveDirection)) {
 					moveDirection = nextMoveDirection;
 				}

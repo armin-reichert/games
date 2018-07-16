@@ -88,6 +88,7 @@ public class GameController implements Controller, GameEventListener {
 		});
 
 		pacMan = new PacMan(game);
+		pacMan.setBrain(new PacManBrain());
 		pacMan.setMazePosition(14, 23);
 		pacMan.setSpeed(PacManApp.TS / 8f);
 		pacMan.setMoveDirection(Top4.E);

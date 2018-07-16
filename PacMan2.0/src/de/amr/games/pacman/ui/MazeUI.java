@@ -66,7 +66,6 @@ public class MazeUI extends GameEntity {
 			break;
 		case ENERGIZER:
 			spriteEnergizer.draw(g);
-			// drawEnergizer(g);
 			break;
 		case BONUS_APPLE:
 		case BONUS_BELL:
@@ -92,14 +91,6 @@ public class MazeUI extends GameEntity {
 		g.setColor(Color.PINK);
 		g.fillRect((TS - size) / 2, (TS - size) / 2, size, size);
 	}
-
-	// private void drawEnergizer(Graphics2D g) {
-	// int size = TS * 3 / 4;
-	// g.setColor(Color.PINK);
-	// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	// g.fillOval((TS - size) / 2, (TS - size) / 2, size, size);
-	// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-	// }
 
 	private void drawDebugInfo(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
