@@ -5,7 +5,6 @@ import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
 
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,11 +17,11 @@ import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 
 /**
- *
  * @param <S>
- *          type of state
+ *          type of state, for example {@link PacMan.State}
  */
 public abstract class MazeMover<S> extends GameEntity {
 
@@ -116,19 +115,19 @@ public abstract class MazeMover<S> extends GameEntity {
 		return Math.round(x) / PacManApp.TS;
 	}
 
-	protected Point getMazePosition(float x, float y) {
-		return new Point(col(x), row(y));
+	protected Tile getMazePosition(float x, float y) {
+		return new Tile(col(x), row(y));
 	}
 
 	public void setMazePosition(int col, int row) {
 		tf.moveTo(col * TS, row * TS);
 	}
 
-	public void setMazePosition(Point pos) {
-		setMazePosition(pos.x, pos.y);
+	public void setMazePosition(Tile tile) {
+		setMazePosition(tile.col, tile.row);
 	}
 
-	public Point getMazePosition() {
+	public Tile getMazePosition() {
 		return getMazePosition(tf.getX(), tf.getY());
 	}
 

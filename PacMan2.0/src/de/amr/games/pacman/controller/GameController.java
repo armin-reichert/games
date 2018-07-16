@@ -24,7 +24,13 @@ import de.amr.games.pacman.ui.PlayScene;
 
 public class GameController implements Controller, GameEventListener {
 
-	public static boolean DEBUG;
+	private static boolean DEBUG;
+
+	public static void whenDebugging(Runnable code) {
+		if (DEBUG) {
+			code.run();
+		}
+	}
 
 	public final PacManApp app;
 
@@ -70,19 +76,15 @@ public class GameController implements Controller, GameEventListener {
 	private void initEntities() {
 		ghosts = new Ghost[4];
 		ghosts[RED_GHOST] = new Ghost(game, RED_GHOST);
-		ghosts[RED_GHOST].setBrain(new BlinkyBrain());
-		ghosts[RED_GHOST].setMazePosition(13, 11);
+		ghosts[RED_GHOST].setMazePosition(BlinkyBrain.HOME);
 		ghosts[RED_GHOST].setMoveDirection(Top4.E);
 		ghosts[PINK_GHOST] = new Ghost(game, PINK_GHOST);
-		ghosts[PINK_GHOST].setBrain(new PinkyBrain());
 		ghosts[PINK_GHOST].setMazePosition(13, 14);
 		ghosts[PINK_GHOST].setMoveDirection(Top4.S);
 		ghosts[BLUE_GHOST] = new Ghost(game, BLUE_GHOST);
-		ghosts[BLUE_GHOST].setBrain(new InkyBrain());
 		ghosts[BLUE_GHOST].setMazePosition(11, 14);
 		ghosts[BLUE_GHOST].setMoveDirection(Top4.N);
 		ghosts[ORANGE_GHOST] = new Ghost(game, ORANGE_GHOST);
-		ghosts[ORANGE_GHOST].setBrain(new ClydeBrain());
 		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
 		ghosts[ORANGE_GHOST].setMoveDirection(Top4.N);
 		Stream.of(ghosts).forEach(ghost -> {
@@ -92,7 +94,6 @@ public class GameController implements Controller, GameEventListener {
 		});
 
 		pacMan = new PacMan(game);
-		pacMan.setBrain(new PacManBrain());
 		pacMan.setMazePosition(14, 23);
 		pacMan.setSpeed(PacManApp.TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
@@ -100,6 +101,14 @@ public class GameController implements Controller, GameEventListener {
 		pacMan.setState(State.ALIVE);
 		pacMan.enemies.addAll(Arrays.asList(ghosts));
 		pacMan.addObserver(this);
+
+		// Wirf Hirn...
+		ghosts[RED_GHOST].setBrain(new BlinkyBrain(pacMan, game.maze));
+		ghosts[PINK_GHOST].setBrain(new PinkyBrain());
+		ghosts[BLUE_GHOST].setBrain(new InkyBrain());
+		ghosts[ORANGE_GHOST].setBrain(new ClydeBrain());
+		pacMan.setBrain(new PacManBrain());
+
 	}
 
 	@Override

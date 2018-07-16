@@ -26,8 +26,8 @@ public class Maze extends GridGraph<Character, Integer> {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		this.contentRows = contentRows;
 		fill();
-		edges().filter(edge -> get(edge.either()) == WALL || get(edge.other()) == WALL).forEach(this::removeEdge);
 		reset();
+		edges().filter(edge -> get(edge.either()) == WALL || get(edge.other()) == WALL).forEach(this::removeEdge);
 	}
 
 	public void reset() {

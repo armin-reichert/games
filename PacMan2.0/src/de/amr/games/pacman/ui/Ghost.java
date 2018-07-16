@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.util.StreamUtils;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.Brain;
 import de.amr.games.pacman.model.Game;
@@ -65,34 +64,17 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public void update() {
-		if (getState() == State.ATTACKING) {
-			move();
-			setNextMoveDirection(brain.recommendNextMoveDirection(this));
-			if (canMove(nextMoveDirection)) {
-				setMoveDirection(nextMoveDirection);
-			}
-		} else if (getState() == State.DEAD) {
-			moveIntoGhosthouse();
-			if (stateDurationSeconds() > 6) {
-				setState(State.ATTACKING);
-			}
-		} else if (getState() == State.FRIGHTENED) {
-			moveRandomly();
-			if (stateDurationSeconds() > 3) {
-				setState(State.ATTACKING);
-			}
-		}
-	}
-
-	private void moveIntoGhosthouse() {
-		moveRandomly(); // TODO
-	}
-
-	private void moveRandomly() {
 		move();
-		nextMoveDirection = StreamUtils.randomElement(Maze.TOPOLOGY.dirs()).getAsInt();
-		if (isExactlyOverTile() && nextMoveDirection != Maze.TOPOLOGY.inv(moveDirection) && canMove(nextMoveDirection)) {
-			moveDirection = nextMoveDirection;
+		setNextMoveDirection(brain.recommendNextMoveDirection(this));
+		if (canMove(nextMoveDirection)) {
+			setMoveDirection(nextMoveDirection);
+		}
+		//TODO
+		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
+			setState(State.ATTACKING);
+		}
+		if (getState() == State.FRIGHTENED && stateDurationSeconds() > 3) {
+			setState(State.ATTACKING);
 		}
 	}
 

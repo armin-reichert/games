@@ -12,5 +12,4 @@ public class PinkyBrain implements Brain<Ghost> {
 		return randomElement(Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(pinky.getMoveDirection())))
 				.getAsInt();
 	}
-
 }
