@@ -33,7 +33,7 @@ public class BoardPreview extends JFrame {
 	private int tileSize = 16;
 
 	public BoardPreview() {
-		maze = new Maze(Assets.text("maze.txt"));
+		maze = Maze.of(Assets.text("maze.txt"));
 		setTitle("Pac-Man Maze Preview");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		GridCanvas canvas = new GridCanvas(maze, tileSize);

@@ -17,7 +17,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationMode;
@@ -30,6 +29,7 @@ import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GhostContactEvent;
 import de.amr.games.pacman.controller.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.model.Maze;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
@@ -47,9 +47,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public PacMan(Game game) {
 		super(game);
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
-		Stream.of(Top4.E, Top4.W, Top4.N, Top4.S).forEach(dir -> {
+		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());
-			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 120);
+			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 150);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);

@@ -15,7 +15,7 @@ public class PacManApp extends Application {
 	public static final int TS = 16;
 
 	public PacManApp() {
-		Maze maze = new Maze(Assets.text("maze.txt"));
+		Maze maze = Maze.of(Assets.text("maze.txt"));
 		settings.width = maze.numCols() * PacManApp.TS;
 		settings.height = (maze.numRows() + 5) * PacManApp.TS;
 		settings.scale = 1.5f;

@@ -15,18 +15,23 @@ public class Maze extends GridGraph<Character, Integer> {
 
 	public static final Topology TOPOLOGY = new Top4();
 
-	private final String[] mazeData;
+	public static Maze of(String mazeData) {
+		String[] rows = mazeData.split("\n");
+		return new Maze(rows[0].length(), rows.length, rows);
+	}
 
-	public Maze(String mazeText) {
-		super(28, 31, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
-		mazeData = mazeText.split("\n");
+	private final String[] contentRows;
+
+	private Maze(int numCols, int numRows, String[] contentRows) {
+		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
+		this.contentRows = contentRows;
 		fill();
 		edges().filter(edge -> get(edge.either()) == WALL || get(edge.other()) == WALL).forEach(this::removeEdge);
 		reset();
 	}
 
 	public void reset() {
-		vertices().forEach(tile -> set(tile, mazeData[row(tile)].charAt(col(tile))));
+		vertices().forEach(tile -> set(tile, contentRows[row(tile)].charAt(col(tile))));
 	}
 
 	public Stream<Tile> tiles() {

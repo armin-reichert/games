@@ -10,7 +10,7 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameController;
 
 public class PlayScene extends Scene<PacManApp> {
-
+	
 	private GameController controller;
 	private MazeUI maze;
 	private HUD hud;

@@ -8,7 +8,7 @@ public class Game {
 	public int score;
 
 	public Game(String mazeData) {
-		maze = new Maze(mazeData);
+		maze = Maze.of(mazeData);
 		level = 1;
 		lives = 3;
 		score = 0;

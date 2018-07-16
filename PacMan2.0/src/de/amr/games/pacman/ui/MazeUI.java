@@ -16,11 +16,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Tile;
@@ -29,18 +27,10 @@ public class MazeUI extends GameEntity {
 
 	private final GameController controller;
 	private final Sprite sprite;
-	private boolean debug;
 
 	public MazeUI(GameController controller, int width, int height) {
 		this.controller = controller;
 		sprite = new Sprite(Spritesheet.getMaze()).scale(width, height);
-	}
-
-	@Override
-	public void update() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
-			debug = !debug;
-		}
 	}
 
 	@Override
@@ -55,7 +45,7 @@ public class MazeUI extends GameEntity {
 		controller.getGame().maze.tiles().forEach(tile -> drawTile(g, tile));
 		controller.getPacMan().draw(g);
 		Arrays.stream(controller.getGhosts()).forEach(ghost -> ghost.draw(g));
-		if (debug) {
+		if (GameController.DEBUG) {
 			drawDebugInfo(g);
 		}
 		g.translate(-tf.getX(), -tf.getY());

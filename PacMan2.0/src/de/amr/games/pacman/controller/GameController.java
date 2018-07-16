@@ -5,10 +5,12 @@ import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
@@ -21,6 +23,8 @@ import de.amr.games.pacman.ui.PacMan.State;
 import de.amr.games.pacman.ui.PlayScene;
 
 public class GameController implements Controller, GameEventListener {
+
+	public static boolean DEBUG;
 
 	public final PacManApp app;
 
@@ -108,12 +112,15 @@ public class GameController implements Controller, GameEventListener {
 
 	@Override
 	public void update() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
+			DEBUG = !DEBUG;
+		}
 		pacMan.update();
 		Arrays.stream(ghosts).forEach(Ghost::update);
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
-		pacMan.spriteDying.resetAnimation(); //TODO
+		pacMan.spriteDying.resetAnimation(); // TODO
 		initEntities();
 	}
 
