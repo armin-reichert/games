@@ -1,6 +1,7 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
+import static de.amr.games.pacman.controller.GameController.debug;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
 
@@ -65,7 +66,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			System.out.println(String.format("%s changed from %s to %s", this, oldState, state));
+			debug(() -> System.out.println(String.format("%s changed from %s to %s", this, oldState, state)));
 		}
 	}
 
