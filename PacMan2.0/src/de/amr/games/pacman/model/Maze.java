@@ -4,7 +4,6 @@ import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.WALL;
 
 import java.util.List;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import de.amr.easy.graph.api.UndirectedEdge;
@@ -27,13 +26,13 @@ public class Maze extends GridGraph<Character, Integer> {
 	private Maze(int numCols, int numRows, String[] contentRows) {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		this.contentRows = contentRows;
+		resetContent();
 		fill();
-		reset();
 		edges().filter(edge -> get(edge.either()) == WALL || get(edge.other()) == WALL).forEach(this::removeEdge);
 	}
 
-	public void reset() {
-		vertices().forEach(tile -> set(tile, contentRows[row(tile)].charAt(col(tile))));
+	public void resetContent() {
+		vertices().forEach(v -> set(v, contentRows[row(v)].charAt(col(v))));
 	}
 
 	public Stream<Tile> tiles() {
@@ -64,14 +63,5 @@ public class Maze extends GridGraph<Character, Integer> {
 		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
 		pathfinder.traverseGraph(cell(source), cell(target));
 		return pathfinder.path(cell(target));
-	}
-
-	public void print() {
-		IntStream.range(0, numRows()).forEach(row -> {
-			IntStream.range(0, numCols()).forEach(col -> {
-				System.out.print(get(cell(col, row)));
-			});
-			System.out.println();
-		});
 	}
 }

@@ -73,7 +73,7 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void initLevel() {
-		game.maze.reset();
+		game.maze.resetContent();
 		initEntities();
 	}
 
