@@ -9,6 +9,8 @@ import static de.amr.games.pacman.model.Tile.BONUS_KEY;
 import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
 import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class Spritesheet {
 
 	private static BufferedImage sheet = Assets.readImage("sprites.png");
 	private static BufferedImage mazeImage;
+	private static BufferedImage[] energizerImages = new BufferedImage[2];
 	private static Map<Character, BufferedImage> bonusImages = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
@@ -40,6 +43,10 @@ public class Spritesheet {
 	static {
 		// Maze:
 		mazeImage = sheet.getSubimage(228, 0, 224, 248);
+
+		// Energizer:
+		energizerImages[0] = createEnergizerImage(true);
+		energizerImages[1] = createEnergizerImage(false);
 
 		// Boni:
 		int offset = 0;
@@ -83,6 +90,23 @@ public class Spritesheet {
 		for (int i = 0; i < 4; ++i) {
 			deadGhostImages[i] = sheet.getSubimage(584 + i * 16, 80, 16, 16);
 		}
+	}
+
+	private static BufferedImage createEnergizerImage(boolean visible) {
+		BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = img.createGraphics();
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, img.getWidth(), img.getHeight());
+		if (visible) {
+			int size = 16;
+			g.setColor(Color.PINK);
+			g.fillOval((16 - size) / 2, (16 - size) / 2, size, size);
+		}
+		return img;
+	}
+
+	public static BufferedImage[] getEnergizerImages() {
+		return energizerImages;
 	}
 
 	public static BufferedImage getMaze() {

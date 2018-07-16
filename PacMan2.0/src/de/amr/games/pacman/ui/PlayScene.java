@@ -20,10 +20,10 @@ public class PlayScene extends Scene<PacManApp> {
 		super(controller.app);
 		this.controller = controller;
 		hud = new HUD(controller.getGame());
-		hud.tf.moveTo(0, 0);
 		maze = new MazeUI(controller, getWidth(), getHeight() - 5 * TS);
-		maze.tf.moveTo(0, 3 * TS);
 		status = new StatusDisplay(controller.getGame());
+		hud.tf.moveTo(0, 0);
+		maze.tf.moveTo(0, 3 * TS);
 		status.tf.moveTo(0, getHeight() - 2 * TS);
 	}
 
