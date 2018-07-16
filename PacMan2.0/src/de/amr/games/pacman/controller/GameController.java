@@ -18,6 +18,7 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
+import de.amr.games.pacman.ui.MazeMover;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
 import de.amr.games.pacman.ui.PlayScene;
@@ -47,7 +48,7 @@ public class GameController implements Controller, GameEventListener {
 		return game;
 	}
 
-	public PacMan getPacMan() {
+	public MazeMover<State> getPacMan() {
 		return pacMan;
 	}
 
@@ -103,11 +104,11 @@ public class GameController implements Controller, GameEventListener {
 		pacMan.addObserver(this);
 
 		// Wirf Hirn...
-		ghosts[RED_GHOST].setBrain(new BlinkyBrain(pacMan, game.maze));
-		ghosts[PINK_GHOST].setBrain(new PinkyBrain());
-		ghosts[BLUE_GHOST].setBrain(new InkyBrain());
-		ghosts[ORANGE_GHOST].setBrain(new ClydeBrain());
-		pacMan.setBrain(new PacManBrain());
+		ghosts[RED_GHOST].setBrain(new BlinkyBrain(ghosts[RED_GHOST], pacMan, game.maze));
+		ghosts[PINK_GHOST].setBrain(new PinkyBrain(ghosts[PINK_GHOST]));
+		ghosts[BLUE_GHOST].setBrain(new InkyBrain(ghosts[BLUE_GHOST]));
+		ghosts[ORANGE_GHOST].setBrain(new ClydeBrain(ghosts[ORANGE_GHOST]));
+		pacMan.setBrain(new PacManBrain(pacMan));
 
 	}
 

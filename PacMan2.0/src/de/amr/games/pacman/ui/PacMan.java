@@ -15,15 +15,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.BonusFoundEvent;
-import de.amr.games.pacman.controller.Brain;
 import de.amr.games.pacman.controller.FoodFoundEvent;
+import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GhostContactEvent;
 import de.amr.games.pacman.controller.PacManDiedEvent;
@@ -32,13 +31,10 @@ import de.amr.games.pacman.model.Maze;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
-	private static boolean DEBUG = false;
-
 	public enum State {
 		ALIVE, DYING
 	};
 
-	private Brain<PacMan> brain;
 	public final Sprite[] spriteWalking = new Sprite[4];
 	public final Sprite spriteStanding;
 	public final Sprite spriteDying;
@@ -55,11 +51,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
 	}
 
-	public void setBrain(Brain<PacMan> brain) {
-		Objects.nonNull(brain);
-		this.brain = brain;
-	}
-
 	@Override
 	public void update() {
 		if (getState() == State.ALIVE) {
@@ -68,7 +59,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				fireGameEvent(discovery.get());
 				return;
 			}
-			nextMoveDirection = brain.recommendNextMoveDirection(this);
+			nextMoveDirection = brain.recommendNextMoveDirection();
 			if (canMove(nextMoveDirection)) {
 				moveDirection = nextMoveDirection;
 			}
@@ -92,14 +83,13 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		if (DEBUG) {
+		super.draw(g);
+		GameController.whenDebugging(() -> {
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
 			g.translate(tf.getX(), tf.getY());
 			g.fillRect(0, 0, getWidth(), getHeight());
 			g.translate(-tf.getX(), -tf.getY());
-		} else {
-			super.draw(g);
-		}
+		});
 	}
 
 	@Override

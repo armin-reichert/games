@@ -11,22 +11,25 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
-import de.amr.games.pacman.ui.PacMan;
+import de.amr.games.pacman.ui.MazeMover;
+import de.amr.games.pacman.ui.PacMan.State;
 
-public class BlinkyBrain implements Brain<Ghost> {
+public class BlinkyBrain implements Brain {
 
 	public final static Tile HOME = new Tile(13, 11);
 
-	private final PacMan pacMan;
+	private final Ghost blinky;
+	private final MazeMover<State> pacMan;
 	private final Maze maze;
 
-	public BlinkyBrain(PacMan pacMan, Maze maze) {
+	public BlinkyBrain(Ghost blinky, MazeMover<State> pacMan, Maze maze) {
+		this.blinky = blinky;
 		this.pacMan = pacMan;
 		this.maze = maze;
 	}
 
 	@Override
-	public int recommendNextMoveDirection(Ghost blinky) {
+	public int recommendNextMoveDirection() {
 		if (blinky.getState() == Ghost.State.ATTACKING) {
 			List<Integer> path = findPathToPacMan(blinky);
 			OptionalInt recommendedDir = getDirection(path);

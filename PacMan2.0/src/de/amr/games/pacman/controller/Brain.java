@@ -1,6 +1,6 @@
 package de.amr.games.pacman.controller;
 
-public interface Brain<E> {
+public interface Brain {
 
-	int recommendNextMoveDirection(E entity);
+	int recommendNextMoveDirection();
 }

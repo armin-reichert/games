@@ -1,12 +1,10 @@
 package de.amr.games.pacman.ui;
 
 import java.awt.Graphics2D;
-import java.util.Objects;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.Brain;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -17,7 +15,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		ATTACKING, SCATTERING, FRIGHTENED, DEAD
 	}
 
-	private Brain<Ghost> brain;
 	private final int color;
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
@@ -36,11 +33,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(getSpriteSize(), getSpriteSize());
 		});
-	}
-
-	public void setBrain(Brain<Ghost> brain) {
-		Objects.nonNull(brain);
-		this.brain = brain;
 	}
 
 	public int getColor() {
@@ -65,11 +57,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public void update() {
 		move();
-		setNextMoveDirection(brain.recommendNextMoveDirection(this));
+		setNextMoveDirection(brain.recommendNextMoveDirection());
 		if (canMove(nextMoveDirection)) {
 			setMoveDirection(nextMoveDirection);
 		}
-		//TODO
+		// TODO
 		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
 			setState(State.ATTACKING);
 		}
