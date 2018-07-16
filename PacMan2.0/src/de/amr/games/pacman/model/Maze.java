@@ -3,7 +3,6 @@ package de.amr.games.pacman.model;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.WALL;
 
-import java.awt.Point;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -30,12 +29,12 @@ public class Maze extends GridGraph<Character, Integer> {
 		vertices().forEach(tile -> set(tile, mazeData[row(tile)].charAt(col(tile))));
 	}
 
-	public Stream<Point> tiles() {
-		return vertices().mapToObj(v -> new Point(col(v), row(v)));
+	public Stream<Tile> tiles() {
+		return vertices().mapToObj(v -> new Tile(col(v), row(v)));
 	}
 
-	public Stream<Point> tilesContaining(char content) {
-		return vertices().filter(v -> get(v) == content).mapToObj(v -> new Point(col(v), row(v)));
+	public Stream<Tile> tilesContaining(char content) {
+		return vertices().filter(v -> get(v) == content).mapToObj(v -> new Tile(col(v), row(v)));
 	}
 
 	public boolean containsFood() {
@@ -46,16 +45,16 @@ public class Maze extends GridGraph<Character, Integer> {
 		return get(cell(col, row));
 	}
 
-	public char getContent(Point position) {
-		return get(cell(position.x, position.y));
+	public char getContent(Tile tile) {
+		return get(cell(tile.col, tile.row));
 	}
 
 	public void setContent(int col, int row, char c) {
 		set(cell(col, row), c);
 	}
 
-	public void setContent(Point position, char c) {
-		set(cell(position.x, position.y), c);
+	public void setContent(Tile tile, char c) {
+		set(cell(tile.col, tile.row), c);
 	}
 
 	public void print() {

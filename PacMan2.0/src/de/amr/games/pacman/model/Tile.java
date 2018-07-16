@@ -1,6 +1,6 @@
 package de.amr.games.pacman.model;
 
-public interface Tile {
+public class Tile {
 
 	public static final char EMPTY = ' ';
 	public static final char OUTSIDE = 'x';
@@ -11,7 +11,7 @@ public interface Tile {
 	public static final char ENERGIZER = 'O';
 	public static final char TUNNEL = 'T';
 	public static final char WORMHOLE = 'W';
-	// Bonus tiles:
+
 	public static final char BONUS_CHERRIES = '1';
 	public static final char BONUS_STRAWBERRY = '2';
 	public static final char BONUS_PEACH = '3';
@@ -20,4 +20,27 @@ public interface Tile {
 	public static final char BONUS_GALAXIAN = '6';
 	public static final char BONUS_BELL = '7';
 	public static final char BONUS_KEY = '8';
+
+	public final int col;
+	public final int row;
+
+	public Tile(int col, int row) {
+		this.col = col;
+		this.row = row;
+	}
+
+	@Override
+	public int hashCode() {
+		int sum = col + row;
+		return sum * (sum + 1) / 2 + col;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Tile) {
+			Tile other = (Tile) obj;
+			return col == other.col && row == other.row;
+		}
+		return super.equals(obj);
+	}
 }

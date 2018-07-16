@@ -1,5 +1,6 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
 import static de.amr.games.pacman.model.Tile.BONUS_BELL;
 import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
@@ -21,8 +22,8 @@ import java.util.Arrays;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameController;
+import de.amr.games.pacman.model.Tile;
 
 public class MazeUI extends GameEntity {
 
@@ -51,7 +52,7 @@ public class MazeUI extends GameEntity {
 	public void draw(Graphics2D g) {
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
-		controller.getGame().maze.tiles().forEach(pos -> drawTile(g, pos.x, pos.y));
+		controller.getGame().maze.tiles().forEach(tile -> drawTile(g, tile));
 		controller.getPacMan().draw(g);
 		Arrays.stream(controller.getGhosts()).forEach(ghost -> ghost.draw(g));
 		if (debug) {
@@ -60,15 +61,15 @@ public class MazeUI extends GameEntity {
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	private void drawTile(Graphics2D g, int col, int row) {
-		g.translate(col * PacManApp.TS, row * PacManApp.TS);
-		char tile = controller.getGame().maze.getContent(col, row);
-		switch (tile) {
+	private void drawTile(Graphics2D g, Tile tile) {
+		g.translate(tile.col * TS, tile.row * TS);
+		char content = controller.getGame().maze.getContent(tile);
+		switch (content) {
 		case PELLET:
-			drawPellet(g, row, col);
+			drawPellet(g);
 			break;
 		case ENERGIZER:
-			drawEnergizer(g, row, col);
+			drawEnergizer(g);
 			break;
 		case BONUS_APPLE:
 		case BONUS_BELL:
@@ -78,46 +79,45 @@ public class MazeUI extends GameEntity {
 		case BONUS_KEY:
 		case BONUS_PEACH:
 		case BONUS_STRAWBERRY:
-			drawBonus(g, row, col, tile);
+			drawBonus(g, content);
 		default:
 			break;
 		}
-		g.translate(-col * PacManApp.TS, -row * PacManApp.TS);
+		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 
-	private void drawBonus(Graphics2D g, int row, int col, char bonus) {
-		g.drawImage(Spritesheet.getBonus(bonus), 0, -PacManApp.TS / 2, PacManApp.TS * 2, PacManApp.TS * 2, null);
+	private void drawBonus(Graphics2D g, char bonus) {
+		g.drawImage(Spritesheet.getBonus(bonus), 0, -TS / 2, TS * 2, TS * 2, null);
 	}
 
-	private void drawPellet(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.PINK, row, col, PacManApp.TS / 8);
+	private void drawPellet(Graphics2D g) {
+		int size = TS / 4;
+		g.setColor(Color.PINK);
+		g.fillRect((TS - size) / 2, (TS - size) / 2, size, size);
 	}
 
-	private void drawEnergizer(Graphics2D g, int row, int col) {
-		drawCircle(g, Color.PINK, row, col, PacManApp.TS / 2);
-	}
-
-	private void drawCircle(Graphics2D g, Color color, int row, int col, int r) {
+	private void drawEnergizer(Graphics2D g) {
+		int size = TS * 3 / 4;
+		g.setColor(Color.PINK);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(color);
-		g.fillOval(PacManApp.TS / 2 - r, PacManApp.TS / 2 - r, 2 * r, 2 * r);
+		g.fillOval((TS - size) / 2, (TS - size) / 2, size, size);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 
 	private void drawDebugInfo(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
 		for (int row = 0; row < controller.getGame().maze.numRows() + 1; ++row) {
-			g.drawLine(0, row * PacManApp.TS, getWidth(), row * PacManApp.TS);
+			g.drawLine(0, row * TS, getWidth(), row * TS);
 		}
 		for (int col = 1; col < controller.getGame().maze.numCols(); ++col) {
-			g.drawLine(col * PacManApp.TS, 0, col * PacManApp.TS, getHeight());
+			g.drawLine(col * TS, 0, col * TS, getHeight());
 		}
-		g.setFont(new Font("Arial Narrow", Font.PLAIN, PacManApp.TS * 40 / 100));
+		g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
 		for (int row = 0; row < controller.getGame().maze.numRows(); ++row) {
 			for (int col = 0; col < controller.getGame().maze.numCols(); ++col) {
-				g.translate(col * PacManApp.TS, row * PacManApp.TS);
-				g.drawString(String.format("%d,%d", col, row), PacManApp.TS / 8, PacManApp.TS / 2);
-				g.translate(-col * PacManApp.TS, -row * PacManApp.TS);
+				g.translate(col * TS, row * TS);
+				g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
+				g.translate(-col * TS, -row * TS);
 			}
 		}
 	}
