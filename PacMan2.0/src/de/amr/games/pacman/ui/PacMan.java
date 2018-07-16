@@ -84,7 +84,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		GameController.whenDebugging(() -> {
+		GameController.debug(() -> {
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
 			g.translate(tf.getX(), tf.getY());
 			g.fillRect(0, 0, getWidth(), getHeight());

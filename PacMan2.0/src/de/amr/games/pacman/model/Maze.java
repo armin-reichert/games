@@ -40,14 +40,6 @@ public class Maze extends GridGraph<Character, Integer> {
 		return vertices().mapToObj(v -> new Tile(col(v), row(v)));
 	}
 
-	public Stream<Tile> tilesContaining(char content) {
-		return vertices().filter(v -> get(v) == content).mapToObj(v -> new Tile(col(v), row(v)));
-	}
-
-	public boolean containsFood() {
-		return vertices().anyMatch(v -> get(v) == Tile.PELLET || get(v) == Tile.ENERGIZER);
-	}
-
 	public int cell(Tile tile) {
 		return cell(tile.col, tile.row);
 	}

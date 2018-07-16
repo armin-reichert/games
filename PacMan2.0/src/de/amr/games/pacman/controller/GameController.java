@@ -1,5 +1,8 @@
 package de.amr.games.pacman.controller;
 
+import static de.amr.games.pacman.model.Tile.EMPTY;
+import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.model.Tile.PELLET;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
@@ -16,9 +19,7 @@ import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
-import de.amr.games.pacman.ui.MazeMover;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
 import de.amr.games.pacman.ui.PlayScene;
@@ -27,28 +28,31 @@ public class GameController implements Controller, GameEventListener {
 
 	private static boolean DEBUG;
 
-	public static void whenDebugging(Runnable code) {
+	public static void debug(Runnable code) {
 		if (DEBUG) {
 			code.run();
 		}
 	}
 
-	public final PacManApp app;
-
+	private final PacManApp app;
 	private Game game;
 	private View currentView;
 	private PacMan pacMan;
 	private Ghost[] ghosts;
 
-	public GameController(final PacManApp app) {
+	public GameController(PacManApp app) {
 		this.app = app;
+	}
+
+	public PacManApp getApp() {
+		return app;
 	}
 
 	public Game getGame() {
 		return game;
 	}
 
-	public MazeMover<State> getPacMan() {
+	public PacMan getPacMan() {
 		return pacMan;
 	}
 
@@ -64,14 +68,13 @@ public class GameController implements Controller, GameEventListener {
 	@Override
 	public void init() {
 		game = new Game(Assets.text("maze.txt"));
+		initLevel();
 		currentView = new PlayScene(this);
-		startLevel();
 	}
 
-	private void startLevel() {
+	private void initLevel() {
 		game.maze.reset();
 		initEntities();
-		System.out.println("Started level " + game.level);
 	}
 
 	private void initEntities() {
@@ -134,7 +137,6 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
-		pacMan.spriteDying.resetAnimation(); // TODO
 		initEntities();
 	}
 
@@ -142,7 +144,7 @@ public class GameController implements Controller, GameEventListener {
 		if (pacMan.getState() != PacMan.State.DYING) {
 			if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 				e.ghost.setState(Ghost.State.DEAD);
-				System.out.println(String.format("Killed %s at col=%d, row=%d", e.ghost, e.col, e.row));
+				debug(() -> System.out.println(String.format("Killed %s at col=%d, row=%d", e.ghost, e.col, e.row)));
 			} else if (e.ghost.getState() == Ghost.State.DEAD) {
 				// do nothing
 			} else {
@@ -154,20 +156,20 @@ public class GameController implements Controller, GameEventListener {
 					enemy.setState(Ghost.State.STARRED);
 				});
 				game.lives -= 1;
-				System.out.println(String.format("Got killed by %s at col=%d, row=%d", e.ghost, e.col, e.row));
+				debug(() -> System.out.println(String.format("Got killed by %s at col=%d, row=%d", e.ghost, e.col, e.row)));
 			}
 		}
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		game.maze.setContent(e.col, e.row, Tile.EMPTY);
-		if (!game.maze.containsFood()) {
+		game.maze.setContent(e.col, e.row, EMPTY);
+		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
 			++game.level;
-			startLevel();
+			initLevel();
 			return;
 		}
-		if (e.food == Tile.ENERGIZER) {
-			System.out.println(String.format("Eat energizer at col=%d, row=%d", e.col, e.row));
+		if (e.food == ENERGIZER) {
+			debug(() -> System.out.println(String.format("Eat energizer at col=%d, row=%d", e.col, e.row)));
 			game.score += 50;
 			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		} else {
@@ -176,7 +178,7 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void onBonusFound(BonusFoundEvent e) {
-		System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row));
-		game.maze.setContent(e.col, e.row, Tile.EMPTY);
+		game.maze.setContent(e.col, e.row, EMPTY);
+		debug(() -> System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row)));
 	}
 }
