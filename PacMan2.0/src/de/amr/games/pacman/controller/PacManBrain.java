@@ -6,20 +6,20 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.ui.PacMan;
 
-public class PacManBrain implements MazeMoverBrain<PacMan> {
+public class PacManBrain implements Brain<PacMan> {
 
 	@Override
-	public void think(PacMan pacMan) {
+	public int recommendNextMoveDirection(PacMan pacMan) {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			pacMan.setNextMoveDirection(Top4.W);
+			return Top4.W;
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			pacMan.setNextMoveDirection(Top4.E);
+			return Top4.E;
 		} else if (Keyboard.keyDown(KeyEvent.VK_DOWN)) {
-			pacMan.setNextMoveDirection(Top4.S);
+			return Top4.S;
 		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
-			pacMan.setNextMoveDirection(Top4.N);
+			return Top4.N;
+		} else {
+			return pacMan.getNextMoveDirection();
 		}
-		
 	}
-
 }

@@ -21,16 +21,16 @@ import de.amr.games.pacman.model.Maze;
 
 /**
  *
- * @param <State>
+ * @param <S>
  *          type of state
  */
-public abstract class MazeMover<State> extends GameEntity {
+public abstract class MazeMover<S> extends GameEntity {
 
 	protected final Game game;
 
-	private State state;
+	private S state;
 	protected long stateEntryTime;
-	
+
 	protected float speed;
 	protected int moveDirection;
 	protected int nextMoveDirection;
@@ -61,8 +61,8 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	protected abstract int getSpriteSize();
 
-	public void setState(State state) {
-		State oldState = this.state;
+	public void setState(S state) {
+		S oldState = this.state;
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
@@ -70,7 +70,7 @@ public abstract class MazeMover<State> extends GameEntity {
 		}
 	}
 
-	public State getState() {
+	public S getState() {
 		return state;
 	}
 
@@ -90,6 +90,14 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	protected void fireGameEvent(GameEvent event) {
 		observers.forEach(observer -> observer.processGameEvent(event));
+	}
+
+	public int getMoveDirection() {
+		return moveDirection;
+	}
+
+	public int getNextMoveDirection() {
+		return nextMoveDirection;
 	}
 
 	public void setMoveDirection(int moveDirection) {
@@ -168,9 +176,15 @@ public abstract class MazeMover<State> extends GameEntity {
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}
 		if (col() == touchedCol && row() == touchedRow) {
-			return true;
+			return true; // move will not leave current tile
 		}
-		return game.maze.getContent(touchedCol, touchedRow) != WALL;
+		if (game.maze.getContent(touchedCol, touchedRow) == WALL) {
+			return false;
+		}
+		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
+			return isExactlyOverTile();
+		}
+		return true;
 	}
 
 	public void move() {
