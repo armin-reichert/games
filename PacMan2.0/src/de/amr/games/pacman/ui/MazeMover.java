@@ -29,12 +29,12 @@ import de.amr.games.pacman.model.Tile;
 public abstract class MazeMover<State> extends GameEntity {
 
 	protected final Maze maze;
-	protected MoveBehavior moveBehavior;
+	private MoveBehavior moveBehavior;
 	private State state;
-	protected long stateEntryTime;
-	protected float speed;
-	protected int moveDirection;
-	protected int nextMoveDirection;
+	private long stateEntryTime;
+	private float speed;
+	private int moveDirection;
+	private int nextMoveDirection;
 
 	protected MazeMover(Maze maze) {
 		Objects.requireNonNull(maze);
@@ -60,7 +60,7 @@ public abstract class MazeMover<State> extends GameEntity {
 		return TS;
 	}
 
-	protected abstract int getSpriteSize();
+	public abstract int getSpriteSize();
 
 	public void setState(State state) {
 		State oldState = this.state;
@@ -78,6 +78,14 @@ public abstract class MazeMover<State> extends GameEntity {
 	public void setMoveBehavior(MoveBehavior behavior) {
 		Objects.nonNull(behavior);
 		this.moveBehavior = behavior;
+	}
+
+	protected void walk() {
+		nextMoveDirection = moveBehavior.getNextMoveDirection();
+		if (canMove(nextMoveDirection)) {
+			moveDirection = nextMoveDirection;
+		}
+		move();
 	}
 
 	public int stateDurationSeconds() {

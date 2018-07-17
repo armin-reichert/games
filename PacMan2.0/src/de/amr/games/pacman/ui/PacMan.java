@@ -1,5 +1,6 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
 import static de.amr.games.pacman.model.Tile.BONUS_BELL;
 import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
@@ -19,7 +20,6 @@ import java.util.Optional;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.BonusFoundEvent;
 import de.amr.games.pacman.controller.FoodFoundEvent;
 import de.amr.games.pacman.controller.GameController;
@@ -66,14 +66,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 			}
 		}
 	}
-	
-	private void walk() {
-		nextMoveDirection = moveBehavior.getNextMoveDirection();
-		if (canMove(nextMoveDirection)) {
-			moveDirection = nextMoveDirection;
-		}
-		super.move();
-	}
 
 	@Override
 	public String toString() {
@@ -81,8 +73,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	@Override
-	protected int getSpriteSize() {
-		return PacManApp.TS * 2;
+	public int getSpriteSize() {
+		return TS * 2;
 	}
 
 	@Override
@@ -99,7 +91,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public Sprite currentSprite() {
 		if (getState() == State.ALIVE) {
-			return canMove(moveDirection) ? spriteWalking[moveDirection] : spriteStanding;
+			return canMove(getMoveDirection()) ? spriteWalking[getMoveDirection()] : spriteStanding;
 		}
 		if (getState() == State.DYING) {
 			return spriteDying;

@@ -23,13 +23,13 @@ public class ChaserMoveBehavior implements MoveBehavior {
 	private final Maze maze;
 	private final Ghost chaser;
 	private final PacMan pacMan;
-	private List<Tile> pathToTarget;
+	private List<Tile> chasePath;
 
 	public ChaserMoveBehavior(Maze maze, Ghost chaser, PacMan pacMan) {
 		this.maze = maze;
 		this.chaser = chaser;
 		this.pacMan = pacMan;
-		pathToTarget = Collections.emptyList();
+		chasePath = Collections.emptyList();
 	}
 
 	@Override
@@ -50,32 +50,24 @@ public class ChaserMoveBehavior implements MoveBehavior {
 
 	@Override
 	public List<Tile> getPathToTarget() {
-		return pathToTarget;
+		return chasePath;
 	}
 
 	private OptionalInt findPathDirection(Tile target) {
-		pathToTarget = maze.findPath(chaser.getMazePosition(), target);
+		chasePath = maze.findPath(chaser.getMazePosition(), target);
 		debug(() -> {
-			String pathString = pathToTarget.stream().map(Tile::toString).collect(Collectors.joining("-"));
-			System.out.println("Chaser path: " + pathString);
+			String pathString = chasePath.stream().map(Tile::toString).collect(Collectors.joining("-"));
+			System.out.println("Chase path: " + pathString);
 		});
-		if (pathToTarget.size() < 2) {
+		if (chasePath.size() < 2) {
 			return OptionalInt.empty();
 		}
-		OptionalInt pathDirection = maze.direction(pathToTarget.get(0), pathToTarget.get(1));
+		OptionalInt pathDirection = maze.direction(chasePath.get(0), chasePath.get(1));
 		debug(() -> pathDirection.ifPresent(dir -> System.out.println("Chase direction: " + name(dir))));
 		return pathDirection;
 	}
 
 	private String name(int dir) {
-		if (dir == Top4.N)
-			return "N";
-		if (dir == Top4.E)
-			return "E";
-		if (dir == Top4.S)
-			return "S";
-		if (dir == Top4.W)
-			return "W";
-		return "";
+		return dir == Top4.N ? "N" : dir == Top4.E ? "E" : dir == Top4.S ? "S" : dir == Top4.W ? "W" : "";
 	}
 }

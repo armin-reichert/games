@@ -1,10 +1,11 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.PacManApp.TS;
+
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -32,7 +33,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(getSpriteSize(), getSpriteSize());
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
 
-		// TODO make setAnimated(boolean) work
+		// TODO HACK
 		allSprites = new Sprite[spriteNormal.length + spriteDead.length + 1];
 		System.arraycopy(spriteNormal, 0, allSprites, 0, spriteNormal.length);
 		System.arraycopy(spriteDead, 0, allSprites, spriteNormal.length, spriteDead.length);
@@ -61,11 +62,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public void update() {
 		if (getState() != State.STARRED) {
-			setNextMoveDirection(moveBehavior.getNextMoveDirection());
-			if (canMove(nextMoveDirection)) {
-				setMoveDirection(nextMoveDirection);
-			}
-			move();
+			walk();
 		}
 		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
 			setState(State.ATTACKING);
@@ -79,27 +76,27 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public void draw(Graphics2D g) {
 		// TODO hack
 		if (maze.getContent(getMazePosition()) == Tile.GHOSTHOUSE) {
-			g.translate(PacManApp.TS / 2, 0);
+			g.translate(TS / 2, 0);
 			super.draw(g);
-			g.translate(-PacManApp.TS / 2, 0);
+			g.translate(-TS / 2, 0);
 		} else {
 			super.draw(g);
 		}
 	}
 
 	@Override
-	protected int getSpriteSize() {
-		return PacManApp.TS * 2;
+	public int getSpriteSize() {
+		return TS * 2;
 	}
 
 	@Override
 	public Sprite currentSprite() {
 		if (getState() == State.ATTACKING || getState() == State.STARRED) {
-			return spriteNormal[moveDirection];
+			return spriteNormal[getMoveDirection()];
 		} else if (getState() == State.FRIGHTENED) {
 			return spriteFrightened;
 		} else if (getState() == State.DEAD) {
-			return spriteDead[moveDirection];
+			return spriteDead[getMoveDirection()];
 		}
 		throw new IllegalStateException("Illegal ghost state: " + getState());
 	}
