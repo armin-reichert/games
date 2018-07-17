@@ -58,7 +58,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				fireGameEvent(discovery.get());
 				return;
 			}
-			nextMoveDirection = brain.recommendNextMoveDirection();
+			nextMoveDirection = moveBehaviour.getNextMoveDirection();
 			if (canMove(nextMoveDirection)) {
 				moveDirection = nextMoveDirection;
 			}

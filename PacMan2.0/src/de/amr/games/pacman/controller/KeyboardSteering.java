@@ -7,16 +7,16 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.ui.MazeMover;
 import de.amr.games.pacman.ui.PacMan.State;
 
-public class PacManBrain implements Brain {
+public class KeyboardSteering implements MoveBehaviour {
 
-	private final MazeMover<State> pacMan;
+	private final MazeMover<State> mover;
 
-	public PacManBrain(MazeMover<State> pacMan) {
-		this.pacMan = pacMan;
+	public KeyboardSteering(MazeMover<State> mover) {
+		this.mover = mover;
 	}
 
 	@Override
-	public int recommendNextMoveDirection() {
+	public int getNextMoveDirection() {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
 			return Top4.W;
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
@@ -26,7 +26,7 @@ public class PacManBrain implements Brain {
 		} else if (Keyboard.keyDown(KeyEvent.VK_UP)) {
 			return Top4.N;
 		} else {
-			return pacMan.getNextMoveDirection();
+			return mover.getNextMoveDirection();
 		}
 	}
 }

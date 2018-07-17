@@ -14,9 +14,9 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.Brain;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
+import de.amr.games.pacman.controller.MoveBehaviour;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -27,7 +27,7 @@ import de.amr.games.pacman.model.Tile;
 public abstract class MazeMover<State> extends GameEntity {
 
 	protected final Maze maze;
-	protected Brain brain;
+	protected MoveBehaviour moveBehaviour;
 	private State state;
 	protected long stateEntryTime;
 	protected float speed;
@@ -73,9 +73,9 @@ public abstract class MazeMover<State> extends GameEntity {
 		return state;
 	}
 
-	public void setBrain(Brain brain) {
-		Objects.nonNull(brain);
-		this.brain = brain;
+	public void setMoveBehaviour(MoveBehaviour behaviour) {
+		Objects.nonNull(behaviour);
+		this.moveBehaviour = behaviour;
 	}
 
 	public int stateDurationSeconds() {

@@ -80,7 +80,7 @@ public class GameController implements Controller, GameEventListener {
 	private void initEntities() {
 		ghosts = new Ghost[4];
 		ghosts[RED_GHOST] = new Ghost(game.maze, RED_GHOST);
-		ghosts[RED_GHOST].setMazePosition(BlinkyBrain.HOME);
+		ghosts[RED_GHOST].setMazePosition(ChaserMoveBehaviour.HOME);
 		ghosts[RED_GHOST].setMoveDirection(Top4.E);
 		ghosts[PINK_GHOST] = new Ghost(game.maze, PINK_GHOST);
 		ghosts[PINK_GHOST].setMazePosition(13, 14);
@@ -107,11 +107,11 @@ public class GameController implements Controller, GameEventListener {
 		pacMan.addObserver(this);
 
 		// Wirf Hirn...
-		ghosts[RED_GHOST].setBrain(new BlinkyBrain(ghosts[RED_GHOST], pacMan, game.maze));
-		ghosts[PINK_GHOST].setBrain(new PinkyBrain(ghosts[PINK_GHOST]));
-		ghosts[BLUE_GHOST].setBrain(new InkyBrain(ghosts[BLUE_GHOST]));
-		ghosts[ORANGE_GHOST].setBrain(new ClydeBrain(ghosts[ORANGE_GHOST]));
-		pacMan.setBrain(new PacManBrain(pacMan));
+		ghosts[RED_GHOST].setMoveBehaviour(new ChaserMoveBehaviour(game.maze, ghosts[RED_GHOST], pacMan));
+		ghosts[PINK_GHOST].setMoveBehaviour(new AmbusherMoveBehaviour(ghosts[PINK_GHOST]));
+		ghosts[BLUE_GHOST].setMoveBehaviour(new MoodyMoveBehaviour(ghosts[BLUE_GHOST]));
+		ghosts[ORANGE_GHOST].setMoveBehaviour(new LackingBehindMoveBehaviour(ghosts[ORANGE_GHOST]));
+		pacMan.setMoveBehaviour(new KeyboardSteering(pacMan));
 	}
 
 	@Override

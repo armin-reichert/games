@@ -16,7 +16,7 @@ public class HUD extends GameEntity {
 
 	public HUD(Game game) {
 		this.game = game;
-		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, PacManApp.TS * 3/2);
+		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, PacManApp.TS * 3 / 2);
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class HUD extends GameEntity {
 		g.setFont(font);
 		g.drawString("SCORE", PacManApp.TS, PacManApp.TS);
 		g.drawString(String.format("%06d", game.score), PacManApp.TS, PacManApp.TS * 2);
-		g.drawString("LEVEL " + game.level, 20*PacManApp.TS, PacManApp.TS);
+		g.drawString("LEVEL " + game.level, 20 * PacManApp.TS, PacManApp.TS);
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
