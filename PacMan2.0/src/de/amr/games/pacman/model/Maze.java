@@ -29,8 +29,11 @@ public class Maze extends GridGraph<Character, Integer> {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		this.contentRows = contentRows;
 		reset();
-		fill();
-		edges().filter(edge -> get(edge.either()) == WALL || get(edge.other()) == WALL).forEach(this::removeEdge);
+		vertices().filter(cell -> get(cell) != WALL).forEach(cell -> {
+			adj(cell).filter(neighbor -> get(neighbor) != WALL).forEach(neighbor -> {
+				addEdge(cell, neighbor);
+			});
+		});
 	}
 
 	public void reset() {
@@ -38,7 +41,7 @@ public class Maze extends GridGraph<Character, Integer> {
 	}
 
 	public Stream<Tile> tiles() {
-		return vertices().mapToObj(v -> new Tile(col(v), row(v)));
+		return vertices().mapToObj(this::tile);
 	}
 
 	public boolean isValidTile(Tile tile) {
@@ -49,16 +52,20 @@ public class Maze extends GridGraph<Character, Integer> {
 		return cell(tile.col, tile.row);
 	}
 
+	public Tile tile(int cell) {
+		return new Tile(col(cell), row(cell));
+	}
+
 	public char getContent(Tile tile) {
-		return get(cell(tile.col, tile.row));
+		return get(cell(tile));
 	}
 
 	public void setContent(Tile tile, char c) {
-		set(cell(tile.col, tile.row), c);
+		set(cell(tile), c);
 	}
 
 	public OptionalInt direction(Tile t1, Tile t2) {
-		return direction(cell(t1.col, t1.row), cell(t2.col, t2.row));
+		return direction(cell(t1), cell(t2));
 	}
 
 	public List<Tile> findPath(Tile source, Tile target) {
