@@ -17,27 +17,26 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.Brain;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
 /**
- * @param <S>
+ * @param <State>
  *          type of state, for example {@link PacMan.State}
  */
-public abstract class MazeMover<S> extends GameEntity {
+public abstract class MazeMover<State> extends GameEntity {
 
-	protected final Game game;
+	protected final Maze maze;
 	protected Brain brain;
-	private S state;
+	private State state;
 	protected long stateEntryTime;
 	protected float speed;
 	protected int moveDirection;
 	protected int nextMoveDirection;
 
-	protected MazeMover(Game game) {
-		Objects.requireNonNull(game);
-		this.game = game;
+	protected MazeMover(Maze maze) {
+		Objects.requireNonNull(maze);
+		this.maze = maze;
 	}
 
 	@Override
@@ -61,8 +60,8 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	protected abstract int getSpriteSize();
 
-	public void setState(S state) {
-		S oldState = this.state;
+	public void setState(State state) {
+		State oldState = this.state;
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
@@ -70,7 +69,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		}
 	}
 
-	public S getState() {
+	public State getState() {
 		return state;
 	}
 
@@ -183,7 +182,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		if (col() == touchedCol && row() == touchedRow) {
 			return true; // move will not leave current tile
 		}
-		if (game.maze.getContent(touchedCol, touchedRow) == WALL) {
+		if (maze.getContent(touchedCol, touchedRow) == WALL) {
 			return false;
 		}
 		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
@@ -194,7 +193,7 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	public void move() {
 		int col = col(), row = row();
-		if (game.maze.getContent(col, row) == WORMHOLE) {
+		if (maze.getContent(col, row) == WORMHOLE) {
 			warp(col, row);
 		} else if (canMove(moveDirection)) {
 			tf.moveTo(computePosition(moveDirection));
@@ -204,10 +203,10 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void warp(int col, int row) {
-		if (moveDirection == Top4.E && col == game.maze.numCols() - 1) {
+		if (moveDirection == Top4.E && col == maze.numCols() - 1) {
 			setMazePosition(1, row);
 		} else if (moveDirection == Top4.W && col == 0) {
-			setMazePosition(game.maze.numCols() - 2, row);
+			setMazePosition(maze.numCols() - 2, row);
 		}
 	}
 

@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -21,8 +20,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final Sprite spriteFrightened;
 	private final Sprite[] allSprites;
 
-	public Ghost(Game game, int color) {
-		super(game);
+	public Ghost(Maze maze, int color) {
+		super(maze);
 		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
@@ -79,7 +78,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public void draw(Graphics2D g) {
 		// TODO hack
-		if (game.maze.getContent(col(), row()) == Tile.GHOSTHOUSE) {
+		if (maze.getContent(col(), row()) == Tile.GHOSTHOUSE) {
 			g.translate(PacManApp.TS / 2, 0);
 			super.draw(g);
 			g.translate(-PacManApp.TS / 2, 0);

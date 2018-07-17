@@ -26,7 +26,6 @@ import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GhostContactEvent;
 import de.amr.games.pacman.controller.PacManDiedEvent;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 
 public class PacMan extends MazeMover<PacMan.State> {
@@ -40,8 +39,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public final Sprite spriteDying;
 	public final List<Ghost> enemies = new ArrayList<>();
 
-	public PacMan(Game game) {
-		super(game);
+	public PacMan(Maze maze) {
+		super(maze);
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());
@@ -121,7 +120,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private Optional<GameEvent> checkBonus() {
 		int col = col(), row = row();
-		char content = game.maze.getContent(col, row);
+		char content = maze.getContent(col, row);
 		switch (content) {
 		case BONUS_APPLE:
 		case BONUS_BELL:
@@ -139,7 +138,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private Optional<GameEvent> checkFood() {
 		int col = col(), row = row();
-		char content = game.maze.getContent(col, row);
+		char content = maze.getContent(col, row);
 		switch (content) {
 		case PELLET:
 		case ENERGIZER:
