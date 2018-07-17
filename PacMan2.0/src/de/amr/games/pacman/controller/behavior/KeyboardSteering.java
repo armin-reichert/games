@@ -3,14 +3,13 @@ package de.amr.games.pacman.controller.behavior;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.ui.MazeMover;
-import de.amr.games.pacman.ui.PacMan.State;
 
 public class KeyboardSteering implements MoveBehavior {
 
-	private final MazeMover<State> mover;
+	private final MazeMover<?> mover;
 	private final int[] nesw;
 
-	public KeyboardSteering(MazeMover<State> mover, int... nesw) {
+	public KeyboardSteering(MazeMover<?> mover, int... nesw) {
 		if (nesw.length != 4) {
 			throw new IllegalArgumentException("Must specify 4 keyboard codes for steering");
 		}

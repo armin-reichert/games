@@ -122,8 +122,8 @@ public class GameController implements Controller, GameEventListener {
 		ghosts[PINK_GHOST].setMoveBehavior(new AmbusherMoveBehavior(ghosts[PINK_GHOST]));
 		ghosts[BLUE_GHOST].setMoveBehavior(new MoodyMoveBehavior(ghosts[BLUE_GHOST]));
 		// ghosts[ORANGE_GHOST].setMoveBehavior(new LackingBehindMoveBehavior(ghosts[ORANGE_GHOST]));
-		ghosts[ORANGE_GHOST].setMoveBehavior(new KeyboardSteering(pacMan, KeyEvent.VK_NUMPAD8, KeyEvent.VK_NUMPAD6,
-				KeyEvent.VK_NUMPAD2, KeyEvent.VK_NUMPAD4));
+		ghosts[ORANGE_GHOST].setMoveBehavior(new KeyboardSteering(ghosts[ORANGE_GHOST], KeyEvent.VK_NUMPAD8,
+				KeyEvent.VK_NUMPAD6, KeyEvent.VK_NUMPAD2, KeyEvent.VK_NUMPAD4));
 		pacMan.setMoveBehavior(
 				new KeyboardSteering(pacMan, KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT));
 	}
