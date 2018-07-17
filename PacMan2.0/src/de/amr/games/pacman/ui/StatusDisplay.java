@@ -1,11 +1,12 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.PacManApp.TS;
+
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
 
 public class StatusDisplay extends GameEntity {
@@ -15,7 +16,7 @@ public class StatusDisplay extends GameEntity {
 
 	public StatusDisplay(Game gameState) {
 		this.gameState = gameState;
-		spritePacMan = new Sprite(Spritesheet.getPacManWalking(Top4.W)[1]).scale(PacManApp.TS * 2, PacManApp.TS * 2);
+		spritePacMan = new Sprite(Spritesheet.getPacManWalking(Top4.W)[1]).scale(TS * 2, TS * 2);
 	}
 
 	@Override

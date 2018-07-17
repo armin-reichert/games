@@ -1,6 +1,7 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
+import static de.amr.games.pacman.controller.GameController.debug;
 import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
 import static de.amr.games.pacman.model.Tile.BONUS_BELL;
 import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
@@ -51,7 +52,7 @@ public class MazeUI extends GameEntity {
 		maze.tiles().forEach(tile -> drawTile(g, tile));
 		Arrays.stream(controller.getGhosts()).forEach(ghost -> ghost.draw(g));
 		controller.getPacMan().draw(g);
-		GameController.debug(() -> drawDebugInfo(g));
+		debug(() -> drawDebugInfo(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 

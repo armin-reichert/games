@@ -80,14 +80,6 @@ public abstract class MazeMover<State> extends GameEntity {
 		this.moveBehavior = behavior;
 	}
 
-	protected void walk() {
-		nextMoveDirection = moveBehavior.getNextMoveDirection();
-		if (canMove(nextMoveDirection)) {
-			moveDirection = nextMoveDirection;
-		}
-		move();
-	}
-
 	public int stateDurationSeconds() {
 		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
 	}
@@ -122,10 +114,6 @@ public abstract class MazeMover<State> extends GameEntity {
 		this.nextMoveDirection = nextMoveDirection;
 	}
 
-	protected Tile getMazePosition(float x, float y) {
-		return new Tile(round(x) / TS, round(y) / TS);
-	}
-
 	public void setMazePosition(int col, int row) {
 		tf.moveTo(col * TS, row * TS);
 	}
@@ -135,7 +123,7 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	public Tile getMazePosition() {
-		return getMazePosition(tf.getX() + getWidth() / 2, tf.getY() + getHeight() / 2);
+		return new Tile(round(tf.getX() + getWidth() / 2) / TS, round(tf.getY() + getHeight() / 2) / TS);
 	}
 
 	public int row() {
@@ -156,15 +144,26 @@ public abstract class MazeMover<State> extends GameEntity {
 		this.speed = speed;
 	}
 
+	protected void walk() {
+		nextMoveDirection = moveBehavior.getNextMoveDirection();
+		if (canMove(nextMoveDirection)) {
+			moveDirection = nextMoveDirection;
+		}
+		move();
+	}
+
 	public void move() {
 		Tile currentTile = getMazePosition();
 		if (maze.getContent(currentTile) == WORMHOLE) {
-			teleport(currentTile);
+			if (moveDirection == Top4.E && currentTile.col == maze.numCols() - 1
+					|| moveDirection == Top4.W && currentTile.col == 0) {
+				setMazePosition(maze.numCols() - 1 - currentTile.col, currentTile.row);
+			}
 		}
 		if (canMove(moveDirection)) {
 			tf.moveTo(computeExactMovePosition(moveDirection));
-		} else { // position exactly over tile
-			setMazePosition(getMazePosition());
+		} else { // adjust exactly over tile
+			setMazePosition(currentTile);
 		}
 	}
 
@@ -174,10 +173,7 @@ public abstract class MazeMover<State> extends GameEntity {
 		if (currentTile.equals(touchedTile)) {
 			return true;
 		}
-		if (!maze.isValidTile(touchedTile)) {
-			return false;
-		}
-		if (maze.getContent(touchedTile) == WALL) {
+		if (!maze.isValidTile(touchedTile) || maze.getContent(touchedTile) == WALL) {
 			return false;
 		}
 		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
@@ -200,14 +196,6 @@ public abstract class MazeMover<State> extends GameEntity {
 			return new Tile(currentTile.col, round(y + getHeight()) / TS);
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
-		}
-	}
-
-	private void teleport(Tile wormhole) {
-		if (moveDirection == Top4.E && wormhole.col > 0) {
-			setMazePosition(0, wormhole.row);
-		} else if (moveDirection == Top4.W && wormhole.col == 0) {
-			setMazePosition(maze.numCols() - 1, wormhole.row);
 		}
 	}
 
