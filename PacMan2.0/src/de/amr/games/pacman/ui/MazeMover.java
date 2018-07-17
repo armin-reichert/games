@@ -6,6 +6,7 @@ import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.controller.GameController.debug;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
+import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
 import java.util.LinkedHashSet;
@@ -113,16 +114,8 @@ public abstract class MazeMover<State> extends GameEntity {
 		this.nextMoveDirection = nextMoveDirection;
 	}
 
-	protected int row(float y) {
-		return Math.round(y) / TS;
-	}
-
-	protected int col(float x) {
-		return Math.round(x) / TS;
-	}
-
 	protected Tile getMazePosition(float x, float y) {
-		return new Tile(col(x), row(y));
+		return new Tile(round(x) / TS, round(y) / TS);
 	}
 
 	public void setMazePosition(int col, int row) {
@@ -134,7 +127,7 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	public Tile getMazePosition() {
-		return getMazePosition(tf.getX(), tf.getY());
+		return getMazePosition(tf.getX() + getWidth() / 2, tf.getY() + getHeight() / 2);
 	}
 
 	public boolean collidesWith(MazeMover<?> other) {
@@ -142,41 +135,38 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	public int row() {
-		return row(tf.getY() + TS / 2);
+		float centerY = tf.getY() + getHeight() / 2;
+		return round(centerY) / TS;
 	}
 
 	public int col() {
-		return col(tf.getX() + TS / 2);
+		float centerX = tf.getX() + getWidth() / 2;
+		return round(centerX) / TS;
 	}
 
 	public boolean isExactlyOverTile() {
-		return Math.round(tf.getX()) % TS == 0 && Math.round(tf.getY()) % TS == 0;
+		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
 	}
 
 	public void setSpeed(float speed) {
 		this.speed = speed;
 	}
 
+	public void move() {
+		Tile currentTile = getMazePosition();
+		if (maze.getContent(currentTile) == WORMHOLE) {
+			teleport(currentTile);
+		}
+		if (canMove(moveDirection)) {
+			tf.moveTo(computeExactMovePosition(moveDirection));
+		} else { // position exactly over tile
+			setMazePosition(getMazePosition());
+		}
+	}
+
 	public boolean canMove(int dir) {
 		Tile currentTile = getMazePosition();
-		Tile touchedTile = null;
-		Vector2f newPosition = computeExactPosition(dir);
-		switch (dir) {
-		case Top4.W:
-			touchedTile = new Tile(col(newPosition.x), currentTile.row);
-			break;
-		case Top4.E:
-			touchedTile = new Tile(col(newPosition.x + getWidth()), currentTile.row);
-			break;
-		case Top4.N:
-			touchedTile = new Tile(currentTile.col, row(newPosition.y));
-			break;
-		case Top4.S:
-			touchedTile = new Tile(currentTile.col, row(newPosition.y + getHeight()));
-			break;
-		default:
-			throw new IllegalArgumentException("Illegal direction: " + dir);
-		}
+		Tile touchedTile = computeTouchedTile(currentTile, dir);
 		if (currentTile.equals(touchedTile)) {
 			return true;
 		}
@@ -192,27 +182,32 @@ public abstract class MazeMover<State> extends GameEntity {
 		return true;
 	}
 
-	public void move() {
-		Tile currentTile = getMazePosition();
-		if (maze.getContent(currentTile) == WORMHOLE) {
-			teleport(currentTile);
-		}
-		if (canMove(moveDirection)) {
-			tf.moveTo(computeExactPosition(moveDirection));
-		} else { // position exactly over tile
-			setMazePosition(getMazePosition());
+	private Tile computeTouchedTile(Tile currentTile, int dir) {
+		Vector2f newPosition = computeExactMovePosition(dir);
+		float x = newPosition.x, y = newPosition.y;
+		switch (dir) {
+		case Top4.W:
+			return new Tile(round(x) / TS, currentTile.row);
+		case Top4.E:
+			return new Tile(round(x + getWidth()) / TS, currentTile.row);
+		case Top4.N:
+			return new Tile(currentTile.col, round(y) / TS);
+		case Top4.S:
+			return new Tile(currentTile.col, round(y + getHeight()) / TS);
+		default:
+			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}
 	}
 
 	private void teleport(Tile wormhole) {
-		if (moveDirection == Top4.E && wormhole.col == maze.numCols() - 1) {
-			setMazePosition(1, wormhole.row);
+		if (moveDirection == Top4.E && wormhole.col > 0) {
+			setMazePosition(0, wormhole.row);
 		} else if (moveDirection == Top4.W && wormhole.col == 0) {
-			setMazePosition(maze.numCols() - 2, wormhole.row);
+			setMazePosition(maze.numCols() - 1, wormhole.row);
 		}
 	}
 
-	private Vector2f computeExactPosition(int dir) {
+	private Vector2f computeExactMovePosition(int dir) {
 		return sum(tf.getPosition(), smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir))));
 	}
 }

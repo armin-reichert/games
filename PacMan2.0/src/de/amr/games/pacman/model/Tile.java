@@ -43,4 +43,9 @@ public class Tile {
 		}
 		return super.equals(obj);
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("(%d,%d)", col, row);
+	}
 }
