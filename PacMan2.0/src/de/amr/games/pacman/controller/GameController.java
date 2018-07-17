@@ -29,6 +29,7 @@ import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
@@ -77,7 +78,7 @@ public class GameController implements Controller, GameEventListener {
 
 	@Override
 	public void init() {
-		game = new Game(Assets.text("maze.txt"));
+		game = new Game(Maze.of(Assets.text("maze.txt")));
 		initLevel();
 		currentView = new PlayScene(this);
 	}
@@ -176,17 +177,17 @@ public class GameController implements Controller, GameEventListener {
 
 	private void onFoodFound(FoodFoundEvent e) {
 		game.maze.setContent(e.tile, EMPTY);
-		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
-			++game.level;
-			initLevel();
-			return;
-		}
 		if (e.food == ENERGIZER) {
 			debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
 			game.score += 50;
 			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
-		} else {
+		} else if (e.food == PELLET) {
 			game.score += 10;
+		}
+		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
+			++game.level;
+			initLevel();
+			return;
 		}
 	}
 
