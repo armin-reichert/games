@@ -130,10 +130,6 @@ public abstract class MazeMover<State> extends GameEntity {
 		return getMazePosition(tf.getX() + getWidth() / 2, tf.getY() + getHeight() / 2);
 	}
 
-	public boolean collidesWith(MazeMover<?> other) {
-		return getCollisionBox().intersects(other.getCollisionBox());
-	}
-
 	public int row() {
 		float centerY = tf.getY() + getHeight() / 2;
 		return round(centerY) / TS;
