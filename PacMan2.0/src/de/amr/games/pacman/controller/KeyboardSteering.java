@@ -7,7 +7,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.ui.MazeMover;
 import de.amr.games.pacman.ui.PacMan.State;
 
-public class KeyboardSteering implements MoveBehaviour {
+public class KeyboardSteering implements MoveBehavior {
 
 	private final MazeMover<State> mover;
 

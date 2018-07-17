@@ -6,13 +6,13 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.Ghost;
 
 /**
- * Clyde's behaviour.
+ * Inky's behaviour.
  */
-public class LackingBehindMoveBehaviour implements MoveBehaviour {
+public class MoodyMoveBehavior implements MoveBehavior {
 
 	private final Ghost ghost;
 
-	public LackingBehindMoveBehaviour(Ghost ghost) {
+	public MoodyMoveBehavior(Ghost ghost) {
 		this.ghost = ghost;
 	}
 
@@ -21,4 +21,5 @@ public class LackingBehindMoveBehaviour implements MoveBehaviour {
 		return randomElement(Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(ghost.getMoveDirection())))
 				.getAsInt();
 	}
+
 }
