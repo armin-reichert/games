@@ -28,41 +28,37 @@ public class Maze extends GridGraph<Character, Integer> {
 	private Maze(int numCols, int numRows, String[] contentRows) {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		this.contentRows = contentRows;
-		resetContent();
+		reset();
 		fill();
 		edges().filter(edge -> get(edge.either()) == WALL || get(edge.other()) == WALL).forEach(this::removeEdge);
 	}
 
-	public void resetContent() {
+	public void reset() {
 		vertices().forEach(v -> set(v, contentRows[row(v)].charAt(col(v))));
 	}
 
 	public Stream<Tile> tiles() {
 		return vertices().mapToObj(v -> new Tile(col(v), row(v)));
 	}
+	
+	public boolean isValidTile(Tile tile) {
+		return isValidCol(tile.col) && isValidRow(tile.row);
+	}
 
 	public int cell(Tile tile) {
 		return cell(tile.col, tile.row);
-	}
-
-	public char getContent(int col, int row) {
-		return get(cell(col, row));
 	}
 
 	public char getContent(Tile tile) {
 		return get(cell(tile.col, tile.row));
 	}
 
-	public void setContent(int col, int row, char c) {
-		set(cell(col, row), c);
-	}
-
 	public void setContent(Tile tile, char c) {
 		set(cell(tile.col, tile.row), c);
 	}
-	
+
 	public OptionalInt direction(Tile t1, Tile t2) {
-		return direction(cell(t1.col,t1.row), cell(t2.col,t2.row));
+		return direction(cell(t1.col, t1.row), cell(t2.col, t2.row));
 	}
 
 	private List<Integer> computePath(int source, int target) {

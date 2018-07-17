@@ -33,9 +33,9 @@ public class ChaserMoveBehavior implements MoveBehavior {
 		int previousDir = chaser.getNextMoveDirection();
 		switch (chaser.getState()) {
 		case ATTACKING:
-			return followPath(pacMan.getMazePosition()).orElse(previousDir);
+			return findPathDirection(pacMan.getMazePosition()).orElse(previousDir);
 		case DEAD:
-			return followPath(HOME).orElse(previousDir);
+			return findPathDirection(HOME).orElse(previousDir);
 		case FRIGHTENED:
 		case SCATTERING:
 		case STARRED:
@@ -49,7 +49,7 @@ public class ChaserMoveBehavior implements MoveBehavior {
 		return pathToTarget;
 	}
 
-	private OptionalInt followPath(Tile target) {
+	private OptionalInt findPathDirection(Tile target) {
 		List<Tile> path = maze.findPath(chaser.getMazePosition(), target);
 		return path.size() > 1 ? maze.direction(path.get(0), path.get(1)) : OptionalInt.empty();
 	}

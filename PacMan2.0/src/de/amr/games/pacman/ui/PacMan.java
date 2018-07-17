@@ -27,6 +27,7 @@ import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GhostContactEvent;
 import de.amr.games.pacman.controller.PacManDiedEvent;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
@@ -53,21 +54,25 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public void update() {
 		if (getState() == State.ALIVE) {
-			Optional<GameEvent> discovery = checkCurrentTile();
+			Optional<GameEvent> discovery = inspectCurrentTile();
 			if (discovery.isPresent()) {
 				fireGameEvent(discovery.get());
 				return;
 			}
-			nextMoveDirection = moveBehavior.getNextMoveDirection();
-			if (canMove(nextMoveDirection)) {
-				moveDirection = nextMoveDirection;
-			}
-			move();
+			walk();
 		} else if (getState() == State.DYING) {
 			if (stateDurationSeconds() > 3) {
 				fireGameEvent(new PacManDiedEvent());
 			}
 		}
+	}
+	
+	private void walk() {
+		nextMoveDirection = moveBehavior.getNextMoveDirection();
+		if (canMove(nextMoveDirection)) {
+			moveDirection = nextMoveDirection;
+		}
+		super.move();
 	}
 
 	@Override
@@ -102,25 +107,25 @@ public class PacMan extends MazeMover<PacMan.State> {
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
 	}
 
-	private Optional<GameEvent> checkCurrentTile() {
-		Optional<GameEvent> enemy = checkEnemy();
+	private Optional<GameEvent> inspectCurrentTile() {
+		Tile currentTile = getMazePosition();
+		Optional<GameEvent> enemy = checkEnemy(currentTile);
 		if (enemy.isPresent()) {
 			return enemy;
 		}
-		Optional<GameEvent> food = checkFood();
+		Optional<GameEvent> food = checkFood(currentTile);
 		if (food.isPresent()) {
 			return food;
 		}
-		Optional<GameEvent> bonus = checkBonus();
+		Optional<GameEvent> bonus = checkBonus(currentTile);
 		if (bonus.isPresent()) {
 			return bonus;
 		}
 		return Optional.empty();
 	}
 
-	private Optional<GameEvent> checkBonus() {
-		int col = col(), row = row();
-		char content = maze.getContent(col, row);
+	private Optional<GameEvent> checkBonus(Tile tile) {
+		char content = maze.getContent(tile);
 		switch (content) {
 		case BONUS_APPLE:
 		case BONUS_BELL:
@@ -130,26 +135,25 @@ public class PacMan extends MazeMover<PacMan.State> {
 		case BONUS_KEY:
 		case BONUS_PEACH:
 		case BONUS_STRAWBERRY:
-			return Optional.of(new BonusFoundEvent(this, col, row, content));
+			return Optional.of(new BonusFoundEvent(this, tile.col, tile.row, content));
 		default:
 			return Optional.empty();
 		}
 	}
 
-	private Optional<GameEvent> checkFood() {
-		int col = col(), row = row();
-		char content = maze.getContent(col, row);
+	private Optional<GameEvent> checkFood(Tile tile) {
+		char content = maze.getContent(tile);
 		switch (content) {
 		case PELLET:
 		case ENERGIZER:
-			return Optional.of(new FoodFoundEvent(this, col, row, content));
+			return Optional.of(new FoodFoundEvent(this, tile.col, tile.row, content));
 		default:
 			return Optional.empty();
 		}
 	}
 
-	private Optional<GameEvent> checkEnemy() {
+	private Optional<GameEvent> checkEnemy(Tile tile) {
 		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
-				.map(ghost -> new GhostContactEvent(this, ghost, col(), row()));
+				.map(ghost -> new GhostContactEvent(this, ghost, tile.col, tile.row));
 	}
 }

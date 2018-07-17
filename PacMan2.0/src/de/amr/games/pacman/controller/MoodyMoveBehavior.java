@@ -21,5 +21,4 @@ public class MoodyMoveBehavior implements MoveBehavior {
 		return randomElement(Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(ghost.getMoveDirection())))
 				.getAsInt();
 	}
-
 }

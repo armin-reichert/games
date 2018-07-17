@@ -1,5 +1,7 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.easy.game.math.Vector2f.smul;
+import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.controller.GameController.debug;
 import static de.amr.games.pacman.model.Tile.WALL;
@@ -13,7 +15,6 @@ import java.util.Set;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameEvent;
 import de.amr.games.pacman.controller.GameEventListener;
 import de.amr.games.pacman.controller.MoveBehavior;
@@ -50,12 +51,12 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return PacManApp.TS;
+		return TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return PacManApp.TS;
+		return TS;
 	}
 
 	protected abstract int getSpriteSize();
@@ -113,11 +114,11 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	protected int row(float y) {
-		return Math.round(y) / PacManApp.TS;
+		return Math.round(y) / TS;
 	}
 
 	protected int col(float x) {
-		return Math.round(x) / PacManApp.TS;
+		return Math.round(x) / TS;
 	}
 
 	protected Tile getMazePosition(float x, float y) {
@@ -157,32 +158,32 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	public boolean canMove(int dir) {
-		Vector2f newPosition = computePosition(dir);
-		int touchedCol, touchedRow;
+		Tile currentTile = getMazePosition();
+		Tile touchedTile = null;
+		Vector2f newPosition = computeExactPosition(dir);
 		switch (dir) {
 		case Top4.W:
-			touchedCol = col(newPosition.x);
-			touchedRow = row();
+			touchedTile = new Tile(col(newPosition.x), currentTile.row);
 			break;
 		case Top4.E:
-			touchedCol = col(newPosition.x + getWidth());
-			touchedRow = row();
+			touchedTile = new Tile(col(newPosition.x + getWidth()), currentTile.row);
 			break;
 		case Top4.N:
-			touchedCol = col();
-			touchedRow = row(newPosition.y);
+			touchedTile = new Tile(currentTile.col, row(newPosition.y));
 			break;
 		case Top4.S:
-			touchedCol = col();
-			touchedRow = row(newPosition.y + getHeight());
+			touchedTile = new Tile(currentTile.col, row(newPosition.y + getHeight()));
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}
-		if (col() == touchedCol && row() == touchedRow) {
-			return true; // move will not leave current tile
+		if (currentTile.equals(touchedTile)) {
+			return true;
 		}
-		if (maze.getContent(touchedCol, touchedRow) == WALL) {
+		if (!maze.isValidTile(touchedTile)) {
+			return false;
+		}
+		if (maze.getContent(touchedTile) == WALL) {
 			return false;
 		}
 		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
@@ -192,26 +193,26 @@ public abstract class MazeMover<State> extends GameEntity {
 	}
 
 	public void move() {
-		int col = col(), row = row();
-		if (maze.getContent(col, row) == WORMHOLE) {
-			warp(col, row);
-		} else if (canMove(moveDirection)) {
-			tf.moveTo(computePosition(moveDirection));
+		Tile currentTile = getMazePosition();
+		if (maze.getContent(currentTile) == WORMHOLE) {
+			teleport(currentTile);
+		}
+		if (canMove(moveDirection)) {
+			tf.moveTo(computeExactPosition(moveDirection));
 		} else { // position exactly over tile
-			setMazePosition(col, row);
+			setMazePosition(getMazePosition());
 		}
 	}
 
-	public void warp(int col, int row) {
-		if (moveDirection == Top4.E && col == maze.numCols() - 1) {
-			setMazePosition(1, row);
-		} else if (moveDirection == Top4.W && col == 0) {
-			setMazePosition(maze.numCols() - 2, row);
+	private void teleport(Tile wormhole) {
+		if (moveDirection == Top4.E && wormhole.col == maze.numCols() - 1) {
+			setMazePosition(1, wormhole.row);
+		} else if (moveDirection == Top4.W && wormhole.col == 0) {
+			setMazePosition(maze.numCols() - 2, wormhole.row);
 		}
 	}
 
-	public Vector2f computePosition(int dir) {
-		Vector2f velocity = Vector2f.smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir)));
-		return Vector2f.sum(tf.getPosition(), velocity);
+	private Vector2f computeExactPosition(int dir) {
+		return sum(tf.getPosition(), smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir))));
 	}
 }

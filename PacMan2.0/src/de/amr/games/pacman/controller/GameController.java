@@ -19,6 +19,7 @@ import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
@@ -73,7 +74,7 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void initLevel() {
-		game.maze.resetContent();
+		game.maze.reset();
 		initEntities();
 	}
 
@@ -162,7 +163,7 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		game.maze.setContent(e.col, e.row, EMPTY);
+		game.maze.setContent(new Tile(e.col, e.row), EMPTY);
 		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
 			++game.level;
 			initLevel();
@@ -178,7 +179,7 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void onBonusFound(BonusFoundEvent e) {
-		game.maze.setContent(e.col, e.row, EMPTY);
+		game.maze.setContent(new Tile(e.col, e.row), EMPTY);
 		debug(() -> System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row)));
 	}
 }
