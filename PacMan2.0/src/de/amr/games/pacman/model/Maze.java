@@ -29,11 +29,8 @@ public class Maze extends GridGraph<Character, Integer> {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		this.contentRows = contentRows;
 		reset();
-		vertices().filter(cell -> get(cell) != WALL).forEach(cell -> {
-			adj(cell).filter(neighbor -> get(neighbor) != WALL).forEach(neighbor -> {
-				addEdge(cell, neighbor);
-			});
-		});
+		fill();
+		edges().filter(e -> get(e.either()) == WALL || get(e.other()) ==WALL).forEach(this::removeEdge);
 	}
 
 	public void reset() {
@@ -72,7 +69,6 @@ public class Maze extends GridGraph<Character, Integer> {
 		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
 		int sourceCell = cell(source), targetCell = cell(target);
 		pathfinder.traverseGraph(sourceCell, targetCell);
-		return pathfinder.path(targetCell).stream().map(cell -> new Tile(col(cell), row(cell)))
-				.collect(Collectors.toList());
+		return pathfinder.path(targetCell).stream().map(this::tile).collect(Collectors.toList());
 	}
 }

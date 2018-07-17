@@ -61,11 +61,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public void update() {
 		if (getState() != State.STARRED) {
-			move();
 			setNextMoveDirection(moveBehavior.getNextMoveDirection());
 			if (canMove(nextMoveDirection)) {
 				setMoveDirection(nextMoveDirection);
 			}
+			move();
 		}
 		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
 			setState(State.ATTACKING);

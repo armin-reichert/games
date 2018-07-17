@@ -107,7 +107,7 @@ public class GameController implements Controller, GameEventListener {
 		pacMan.enemies.addAll(Arrays.asList(ghosts));
 		pacMan.addObserver(this);
 
-		// Wirf Hirn...
+		// behavior
 		ghosts[RED_GHOST].setMoveBehavior(new ChaserMoveBehavior(game.maze, ghosts[RED_GHOST], pacMan));
 		ghosts[PINK_GHOST].setMoveBehavior(new AmbusherMoveBehavior(ghosts[PINK_GHOST]));
 		ghosts[BLUE_GHOST].setMoveBehavior(new MoodyMoveBehavior(ghosts[BLUE_GHOST]));
