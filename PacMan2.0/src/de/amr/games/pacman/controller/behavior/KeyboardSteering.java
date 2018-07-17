@@ -1,4 +1,4 @@
-package de.amr.games.pacman.controller;
+package de.amr.games.pacman.controller.behavior;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;

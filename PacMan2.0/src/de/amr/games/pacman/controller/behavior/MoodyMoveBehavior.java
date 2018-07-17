@@ -1,4 +1,4 @@
-package de.amr.games.pacman.controller;
+package de.amr.games.pacman.controller.behavior;
 
 import static de.amr.easy.util.StreamUtils.randomElement;
 
@@ -6,13 +6,13 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.Ghost;
 
 /**
- * Clyde's behaviour.
+ * Inky's behaviour.
  */
-public class LackingBehindMoveBehavior implements MoveBehavior {
+public class MoodyMoveBehavior implements MoveBehavior {
 
 	private final Ghost ghost;
 
-	public LackingBehindMoveBehavior(Ghost ghost) {
+	public MoodyMoveBehavior(Ghost ghost) {
 		this.ghost = ghost;
 	}
 

@@ -16,9 +16,9 @@ import java.util.Set;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.GameEvent;
-import de.amr.games.pacman.controller.GameEventListener;
-import de.amr.games.pacman.controller.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.event.GameEvent;
+import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 

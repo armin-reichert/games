@@ -20,12 +20,12 @@ import java.util.Optional;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.BonusFoundEvent;
-import de.amr.games.pacman.controller.FoodFoundEvent;
 import de.amr.games.pacman.controller.GameController;
-import de.amr.games.pacman.controller.GameEvent;
-import de.amr.games.pacman.controller.GhostContactEvent;
-import de.amr.games.pacman.controller.PacManDiedEvent;
+import de.amr.games.pacman.controller.event.BonusFoundEvent;
+import de.amr.games.pacman.controller.event.FoodFoundEvent;
+import de.amr.games.pacman.controller.event.GameEvent;
+import de.amr.games.pacman.controller.event.GhostContactEvent;
+import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
