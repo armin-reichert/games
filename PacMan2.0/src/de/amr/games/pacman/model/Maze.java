@@ -30,7 +30,7 @@ public class Maze extends GridGraph<Character, Integer> {
 		this.contentRows = contentRows;
 		reset();
 		fill();
-		edges().filter(e -> get(e.either()) == WALL || get(e.other()) ==WALL).forEach(this::removeEdge);
+		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL).forEach(this::removeEdge);
 	}
 
 	public void reset() {

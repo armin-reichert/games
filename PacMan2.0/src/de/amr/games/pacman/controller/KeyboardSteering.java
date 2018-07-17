@@ -11,6 +11,9 @@ public class KeyboardSteering implements MoveBehavior {
 	private final int[] nesw;
 
 	public KeyboardSteering(MazeMover<State> mover, int... nesw) {
+		if (nesw.length != 4) {
+			throw new IllegalArgumentException("Must specify 4 keyboard codes for steering");
+		}
 		this.mover = mover;
 		this.nesw = nesw;
 	}
