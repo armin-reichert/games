@@ -40,7 +40,7 @@ public class Maze extends GridGraph<Character, Integer> {
 	public Stream<Tile> tiles() {
 		return vertices().mapToObj(v -> new Tile(col(v), row(v)));
 	}
-	
+
 	public boolean isValidTile(Tile tile) {
 		return isValidCol(tile.col) && isValidRow(tile.row);
 	}
@@ -61,14 +61,11 @@ public class Maze extends GridGraph<Character, Integer> {
 		return direction(cell(t1.col, t1.row), cell(t2.col, t2.row));
 	}
 
-	private List<Integer> computePath(int source, int target) {
-		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
-		pathfinder.traverseGraph(source, target);
-		return pathfinder.path(target);
-	}
-
 	public List<Tile> findPath(Tile source, Tile target) {
-		return computePath(cell(source.col, source.row), cell(target.col, target.col)).stream()
-				.map(v -> new Tile(col(v), row(v))).collect(Collectors.toList());
+		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
+		int sourceCell = cell(source), targetCell = cell(target);
+		pathfinder.traverseGraph(sourceCell, targetCell);
+		return pathfinder.path(targetCell).stream().map(cell -> new Tile(col(cell), row(cell)))
+				.collect(Collectors.toList());
 	}
 }
