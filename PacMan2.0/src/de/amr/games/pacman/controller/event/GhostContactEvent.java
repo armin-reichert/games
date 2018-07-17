@@ -1,20 +1,15 @@
 package de.amr.games.pacman.controller.event;
 
+import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
-import de.amr.games.pacman.ui.MazeMover;
-import de.amr.games.pacman.ui.PacMan.State;
 
 public class GhostContactEvent implements GameEvent {
 
-	public final MazeMover<State> pacMan;
 	public final Ghost ghost;
-	public final int col;
-	public final int row;
+	public final Tile tile;
 
-	public GhostContactEvent(MazeMover<State> pacMan, Ghost ghost, int col, int row) {
-		this.pacMan = pacMan;
+	public GhostContactEvent(Ghost ghost, Tile tile) {
 		this.ghost = ghost;
-		this.col = col;
-		this.row = row;
+		this.tile = tile;
 	}
 }

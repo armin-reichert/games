@@ -29,7 +29,6 @@ import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
@@ -158,7 +157,7 @@ public class GameController implements Controller, GameEventListener {
 		if (pacMan.getState() != PacMan.State.DYING) {
 			if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 				e.ghost.setState(Ghost.State.DEAD);
-				debug(() -> System.out.println(String.format("Killed %s at col=%d, row=%d", e.ghost, e.col, e.row)));
+				debug(() -> System.out.println(String.format("Killed %s at tile %s", e.ghost, e.tile)));
 			} else if (e.ghost.getState() == Ghost.State.DEAD) {
 				// do nothing
 			} else {
@@ -170,20 +169,20 @@ public class GameController implements Controller, GameEventListener {
 					enemy.setState(Ghost.State.STARRED);
 				});
 				game.lives -= 1;
-				debug(() -> System.out.println(String.format("Got killed by %s at col=%d, row=%d", e.ghost, e.col, e.row)));
+				debug(() -> System.out.println(String.format("Got killed by %s at tile %s", e.ghost, e.tile)));
 			}
 		}
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		game.maze.setContent(new Tile(e.col, e.row), EMPTY);
+		game.maze.setContent(e.tile, EMPTY);
 		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
 			++game.level;
 			initLevel();
 			return;
 		}
 		if (e.food == ENERGIZER) {
-			debug(() -> System.out.println(String.format("Eat energizer at col=%d, row=%d", e.col, e.row)));
+			debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
 			game.score += 50;
 			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		} else {
@@ -192,7 +191,7 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void onBonusFound(BonusFoundEvent e) {
-		game.maze.setContent(new Tile(e.col, e.row), EMPTY);
-		debug(() -> System.out.println(String.format("Found bonus %s at col=%d, row=%d", e.bonus, e.col, e.row)));
+		game.maze.setContent(e.tile, EMPTY);
+		debug(() -> System.out.println(String.format("Found bonus %s at tile=%s", e.bonus, e.tile)));
 	}
 }

@@ -127,7 +127,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		case BONUS_KEY:
 		case BONUS_PEACH:
 		case BONUS_STRAWBERRY:
-			return Optional.of(new BonusFoundEvent(this, tile.col, tile.row, content));
+			return Optional.of(new BonusFoundEvent(this, tile, content));
 		default:
 			return Optional.empty();
 		}
@@ -138,7 +138,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		switch (content) {
 		case PELLET:
 		case ENERGIZER:
-			return Optional.of(new FoodFoundEvent(this, tile.col, tile.row, content));
+			return Optional.of(new FoodFoundEvent(this, tile, content));
 		default:
 			return Optional.empty();
 		}
@@ -146,6 +146,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private Optional<GameEvent> checkEnemy(Tile tile) {
 		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
-				.map(ghost -> new GhostContactEvent(this, ghost, tile.col, tile.row));
+				.map(ghost -> new GhostContactEvent(ghost, tile));
 	}
 }
