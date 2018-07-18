@@ -22,7 +22,7 @@ public class BoardTests {
 
 		assertEquals(28, maze.numCols());
 		assertEquals(31, maze.numRows());
-		
+
 		assertEquals(4, maze.tiles().filter(tile -> maze.getContent(tile) == Tile.ENERGIZER).count());
 		assertEquals(240, maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).count());
 

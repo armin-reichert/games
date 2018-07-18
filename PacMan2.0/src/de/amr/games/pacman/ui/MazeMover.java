@@ -130,7 +130,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public Tile getTile() {
-		return new Tile(round(tf.getX() + getWidth() / 2) / TS, round(tf.getY() + getHeight() / 2) / TS);
+		return new Tile(col(), row());
 	}
 
 	public int row() {

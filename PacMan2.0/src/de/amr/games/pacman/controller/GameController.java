@@ -22,7 +22,6 @@ import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.behavior.AmbushTarget;
 import de.amr.games.pacman.controller.behavior.ChaseTarget;
 import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
@@ -137,7 +136,7 @@ public class GameController implements Controller, GameEventListener {
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, blinky, pacMan));
 		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, Maze.BLINKY_HOME));
-//		pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
+		// pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, Maze.PINKY_HOME));
 		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
@@ -207,9 +206,7 @@ public class GameController implements Controller, GameEventListener {
 		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
 			++game.level;
 			initLevel();
-			return;
-		}
-		if (e.food == ENERGIZER) {
+		} else if (e.food == ENERGIZER) {
 			debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
 			pacMan.enemies().forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}

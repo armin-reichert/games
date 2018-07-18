@@ -152,7 +152,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		case BONUS_KEY:
 		case BONUS_PEACH:
 		case BONUS_STRAWBERRY:
-			return Optional.of(new BonusFoundEvent(this, tile, content));
+			return Optional.of(new BonusFoundEvent(tile, content));
 		default:
 			return Optional.empty();
 		}
@@ -163,7 +163,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		switch (content) {
 		case PELLET:
 		case ENERGIZER:
-			return Optional.of(new FoodFoundEvent(this, tile, content));
+			return Optional.of(new FoodFoundEvent(tile, content));
 		default:
 			return Optional.empty();
 		}
