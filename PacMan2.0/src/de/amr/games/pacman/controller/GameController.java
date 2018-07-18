@@ -38,6 +38,7 @@ import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.PacMan.State;
@@ -87,7 +88,7 @@ public class GameController implements Controller, GameEventListener {
 	@Override
 	public void init() {
 		game = new Game(Maze.of(Assets.text("maze.txt")));
-		initLevel();
+		initEntities();
 		currentView = new PlayScene(this);
 	}
 
@@ -136,7 +137,8 @@ public class GameController implements Controller, GameEventListener {
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, blinky, pacMan));
 		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, Maze.BLINKY_HOME));
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
+//		pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, Maze.PINKY_HOME));
 		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
 		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, inky, Maze.INKY_HOME));
@@ -197,9 +199,9 @@ public class GameController implements Controller, GameEventListener {
 		game.maze.setContent(e.tile, EMPTY);
 		game.dotsEatenInLevel += 1;
 		if (game.dotsEatenInLevel == 70) {
-			System.out.println("First bonus");
+			game.maze.setContent(Maze.BONUS_TILE, Tile.BONUS_CHERRIES);
 		} else if (game.dotsEatenInLevel == 170) {
-			System.out.println("Second bonus");
+			game.maze.setContent(Maze.BONUS_TILE, Tile.BONUS_STRAWBERRY);
 		}
 		game.score += e.food == ENERGIZER ? 50 : 10;
 		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
