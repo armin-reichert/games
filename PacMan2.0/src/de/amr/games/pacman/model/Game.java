@@ -1,7 +1,7 @@
 package de.amr.games.pacman.model;
 
 public class Game {
-
+	
 	public final Maze maze;
 	public int level;
 	public int lives;

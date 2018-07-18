@@ -14,13 +14,16 @@ import static de.amr.games.pacman.model.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.GameController;
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -35,10 +38,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 		ALIVE, DYING
 	};
 
-	public final Sprite[] spriteWalking = new Sprite[4];
-	public final Sprite spriteStanding;
-	public final Sprite spriteDying;
-	public final List<Ghost> enemies = new ArrayList<>();
+	private final Sprite[] spriteWalking = new Sprite[4];
+	private final Sprite spriteStanding;
+	private final Sprite spriteDying;
+	private final Set<Ghost> enemies = new HashSet<>();
+	private final EnumMap<State, MoveBehavior> moveBehavior = new EnumMap<>(State.class);
 
 	public PacMan(Maze maze) {
 		super(maze);
@@ -68,11 +72,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	@Override
-	public String toString() {
-		return "PacMan";
-	}
-
-	@Override
 	public int getSpriteSize() {
 		return TS * 2;
 	}
@@ -99,6 +98,31 @@ public class PacMan extends MazeMover<PacMan.State> {
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
 	}
 
+	public void setMoveBehavior(State state, MoveBehavior behavior) {
+		moveBehavior.put(state, behavior);
+	}
+
+	@Override
+	public MoveBehavior currentMoveBehavior() {
+		return moveBehavior.get(getState());
+	}
+
+	// PacMan enemies
+
+	public void addEnemy(Ghost ghost) {
+		enemies.add(ghost);
+	}
+
+	public void removeEnemy(Ghost ghost) {
+		enemies.remove(ghost);
+	}
+
+	public Stream<Ghost> enemies() {
+		return enemies.stream();
+	}
+
+	// PacMan activity
+	
 	private Optional<GameEvent> inspectCurrentTile() {
 		Tile currentTile = getMazePosition();
 		Optional<GameEvent> enemy = checkEnemy(currentTile);

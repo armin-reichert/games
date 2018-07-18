@@ -1,5 +1,6 @@
 package de.amr.games.pacman.controller;
 
+import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.model.Tile.PELLET;
@@ -7,9 +8,12 @@ import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_LEFT;
+import static java.awt.event.KeyEvent.VK_RIGHT;
+import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -18,9 +22,11 @@ import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.behavior.AmbusherMoveBehavior;
-import de.amr.games.pacman.controller.behavior.ChaserMoveBehavior;
+import de.amr.games.pacman.controller.behavior.AmbushTarget;
+import de.amr.games.pacman.controller.behavior.ChaseTarget;
+import de.amr.games.pacman.controller.behavior.GoHome;
 import de.amr.games.pacman.controller.behavior.KeyboardSteering;
+import de.amr.games.pacman.controller.behavior.LackingBehindMoveBehavior;
 import de.amr.games.pacman.controller.behavior.MoodyMoveBehavior;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
@@ -49,7 +55,7 @@ public class GameController implements Controller, GameEventListener {
 	private Game game;
 	private View currentView;
 	private PacMan pacMan;
-	private Ghost[] ghosts;
+	private Ghost blinky, pinky, inky, clyde;
 
 	public GameController(PacManApp app) {
 		this.app = app;
@@ -67,8 +73,8 @@ public class GameController implements Controller, GameEventListener {
 		return pacMan;
 	}
 
-	public Ghost[] getGhosts() {
-		return ghosts;
+	public Stream<Ghost> getGhosts() {
+		return Stream.of(blinky, pinky, inky, clyde);
 	}
 
 	@Override
@@ -89,43 +95,51 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void initEntities() {
-		ghosts = new Ghost[4];
-		ghosts[RED_GHOST] = new Ghost(game.maze, RED_GHOST);
-		ghosts[RED_GHOST].setMazePosition(ChaserMoveBehavior.HOME);
-		ghosts[RED_GHOST].setMoveDirection(Top4.E);
-		ghosts[PINK_GHOST] = new Ghost(game.maze, PINK_GHOST);
-		ghosts[PINK_GHOST].setMazePosition(13, 14);
-		ghosts[PINK_GHOST].setMoveDirection(Top4.S);
-		ghosts[BLUE_GHOST] = new Ghost(game.maze, BLUE_GHOST);
-		ghosts[BLUE_GHOST].setMazePosition(11, 14);
-		ghosts[BLUE_GHOST].setMoveDirection(Top4.N);
-		ghosts[ORANGE_GHOST] = new Ghost(game.maze, ORANGE_GHOST);
-		ghosts[ORANGE_GHOST].setMazePosition(15, 14);
-		ghosts[ORANGE_GHOST].setMoveDirection(Top4.N);
-		Stream.of(ghosts).forEach(ghost -> {
+		blinky = new Ghost(game.maze, RED_GHOST);
+		blinky.setMazePosition(Maze.BLINKY_HOME);
+		blinky.setMoveDirection(Top4.E);
+
+		pinky = new Ghost(game.maze, PINK_GHOST);
+		pinky.setMazePosition(Maze.PINKY_HOME);
+		pinky.setMoveDirection(Top4.S);
+
+		inky = new Ghost(game.maze, BLUE_GHOST);
+		inky.setMazePosition(Maze.INKY_HOME);
+		inky.setMoveDirection(Top4.N);
+
+		clyde = new Ghost(game.maze, ORANGE_GHOST);
+		clyde.setMazePosition(Maze.CLYDE_HOME);
+		clyde.setMoveDirection(Top4.N);
+
+		getGhosts().forEach(ghost -> {
 			ghost.setSpeed(PacManApp.TS / 16f);
 			ghost.setState(Ghost.State.ATTACKING);
 			ghost.addObserver(this);
 		});
 
 		pacMan = new PacMan(game.maze);
-		pacMan.setMazePosition(14, 23);
-		pacMan.setSpeed(PacManApp.TS / 8f);
+		pacMan.setMazePosition(Maze.PACMAN_HOME);
+		pacMan.setSpeed(TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
 		pacMan.setState(State.ALIVE);
-		pacMan.enemies.addAll(Arrays.asList(ghosts));
 		pacMan.addObserver(this);
+		getGhosts().forEach(pacMan::addEnemy);
 
-		// behavior
-		ghosts[RED_GHOST].setMoveBehavior(new ChaserMoveBehavior(game.maze, ghosts[RED_GHOST], pacMan));
-		ghosts[PINK_GHOST].setMoveBehavior(new AmbusherMoveBehavior(ghosts[PINK_GHOST]));
-		ghosts[BLUE_GHOST].setMoveBehavior(new MoodyMoveBehavior(ghosts[BLUE_GHOST]));
-		// ghosts[ORANGE_GHOST].setMoveBehavior(new LackingBehindMoveBehavior(ghosts[ORANGE_GHOST]));
-		ghosts[ORANGE_GHOST].setMoveBehavior(new KeyboardSteering(ghosts[ORANGE_GHOST], KeyEvent.VK_NUMPAD8,
-				KeyEvent.VK_NUMPAD6, KeyEvent.VK_NUMPAD2, KeyEvent.VK_NUMPAD4));
-		pacMan.setMoveBehavior(
-				new KeyboardSteering(pacMan, KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT));
+		// define move behavior
+		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, Maze.BLINKY_HOME));
+		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, blinky, pacMan));
+
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, Maze.PINKY_HOME));
+
+		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
+		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, inky, Maze.INKY_HOME));
+
+		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
+		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, clyde, Maze.CLYDE_HOME));
+
+		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 	}
 
 	@Override
@@ -147,7 +161,7 @@ public class GameController implements Controller, GameEventListener {
 			DEBUG = !DEBUG;
 		}
 		pacMan.update();
-		Arrays.stream(ghosts).forEach(Ghost::update);
+		getGhosts().forEach(Ghost::update);
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
@@ -164,7 +178,7 @@ public class GameController implements Controller, GameEventListener {
 			} else {
 				pacMan.setState(State.DYING);
 				pacMan.setSpeed(0);
-				pacMan.enemies.forEach(enemy -> {
+				pacMan.enemies().forEach(enemy -> {
 					enemy.setSpeed(0);
 					enemy.setAnimated(false);
 					enemy.setState(Ghost.State.STARRED);
@@ -180,7 +194,7 @@ public class GameController implements Controller, GameEventListener {
 		if (e.food == ENERGIZER) {
 			debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
 			game.score += 50;
-			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
+			pacMan.enemies().forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		} else if (e.food == PELLET) {
 			game.score += 10;
 		}

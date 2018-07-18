@@ -18,6 +18,12 @@ public class Maze extends GridGraph<Character, Integer> {
 
 	public static final Topology TOPOLOGY = new Top4();
 
+	public static final Tile PACMAN_HOME = new Tile(14, 23);
+	public static final Tile BLINKY_HOME = new Tile(13, 11);
+	public static final Tile PINKY_HOME = new Tile(13, 14);
+	public static final Tile INKY_HOME = new Tile(11, 14);
+	public static final Tile CLYDE_HOME = new Tile(15, 14);
+
 	public static Maze of(String mazeData) {
 		String[] rows = mazeData.split("\n");
 		return new Maze(rows[0].length(), rows.length, rows);
@@ -70,5 +76,9 @@ public class Maze extends GridGraph<Character, Integer> {
 		int sourceCell = cell(source), targetCell = cell(target);
 		pathfinder.traverseGraph(sourceCell, targetCell);
 		return pathfinder.path(targetCell).stream().map(this::tile).collect(Collectors.toList());
+	}
+
+	public OptionalInt alongPath(List<Tile> path) {
+		return path.size() < 2 ? OptionalInt.empty() : direction(path.get(0), path.get(1));
 	}
 }

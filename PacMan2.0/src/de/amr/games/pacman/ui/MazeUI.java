@@ -16,7 +16,6 @@ import static de.amr.games.pacman.model.Tile.PELLET;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
@@ -50,7 +49,7 @@ public class MazeUI extends GameEntity {
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
 		maze.tiles().forEach(tile -> drawTile(g, tile));
-		Arrays.stream(controller.getGhosts()).forEach(ghost -> ghost.draw(g));
+		controller.getGhosts().forEach(ghost -> ghost.draw(g));
 		controller.getPacMan().draw(g);
 		debug(() -> drawDebugInfo(g));
 		g.translate(-tf.getX(), -tf.getY());

@@ -3,9 +3,12 @@ package de.amr.games.pacman.ui;
 import static de.amr.games.pacman.PacManApp.TS;
 
 import java.awt.Graphics2D;
+import java.util.EnumMap;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.controller.behavior.DoNothing;
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -20,6 +23,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
 	private final Sprite[] allSprites;
+
+	private EnumMap<State, MoveBehavior> moveBehavior = new EnumMap<>(State.class);
+	private MoveBehavior defaultMoveBehavior = new DoNothing(this);
 
 	public Ghost(Maze maze, int color) {
 		super(maze);
@@ -44,19 +50,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return color;
 	}
 
+	public void setMoveBehavior(State state, MoveBehavior behavior) {
+		moveBehavior.put(state, behavior);
+	}
+
 	@Override
-	public String toString() {
-		switch (color) {
-		case Spritesheet.BLUE_GHOST:
-			return "Inky";
-		case Spritesheet.ORANGE_GHOST:
-			return "Clyde";
-		case Spritesheet.PINK_GHOST:
-			return "Pinky";
-		case Spritesheet.RED_GHOST:
-			return "Blinky";
-		}
-		throw new IllegalArgumentException("Illegal ghost color: " + color);
+	public MoveBehavior currentMoveBehavior() {
+		return moveBehavior.getOrDefault(getState(), defaultMoveBehavior);
 	}
 
 	@Override

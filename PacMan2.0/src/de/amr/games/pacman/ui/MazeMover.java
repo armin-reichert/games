@@ -22,16 +22,9 @@ import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-/**
- * @param <State>
- *          type of state, for example {@link PacMan.State}
- */
-public abstract class MazeMover<State> extends GameEntity {
+public abstract class MazeMover<S> extends GameEntity {
 
 	protected final Maze maze;
-	private MoveBehavior moveBehavior;
-	private State state;
-	private long stateEntryTime;
 	private float speed;
 	private int moveDirection;
 	private int nextMoveDirection;
@@ -62,8 +55,13 @@ public abstract class MazeMover<State> extends GameEntity {
 
 	public abstract int getSpriteSize();
 
-	public void setState(State state) {
-		State oldState = this.state;
+	// State support
+
+	private S state;
+	private long stateEntryTime;
+
+	public void setState(S state) {
+		S oldState = this.state;
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
@@ -71,18 +69,15 @@ public abstract class MazeMover<State> extends GameEntity {
 		}
 	}
 
-	public State getState() {
+	public S getState() {
 		return state;
-	}
-
-	public void setMoveBehavior(MoveBehavior behavior) {
-		Objects.nonNull(behavior);
-		this.moveBehavior = behavior;
 	}
 
 	public int stateDurationSeconds() {
 		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
 	}
+
+	// GameEvent observer support
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
@@ -98,16 +93,28 @@ public abstract class MazeMover<State> extends GameEntity {
 		observers.forEach(observer -> observer.processGameEvent(event));
 	}
 
+	// Movement
+
+	public abstract MoveBehavior currentMoveBehavior();
+
+	public float getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(float speed) {
+		this.speed = speed;
+	}
+
 	public int getMoveDirection() {
 		return moveDirection;
 	}
 
-	public int getNextMoveDirection() {
-		return nextMoveDirection;
-	}
-
 	public void setMoveDirection(int moveDirection) {
 		this.moveDirection = moveDirection;
+	}
+
+	public int getNextMoveDirection() {
+		return nextMoveDirection;
 	}
 
 	public void setNextMoveDirection(int nextMoveDirection) {
@@ -140,12 +147,8 @@ public abstract class MazeMover<State> extends GameEntity {
 		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
 	}
 
-	public void setSpeed(float speed) {
-		this.speed = speed;
-	}
-
 	protected void walk() {
-		nextMoveDirection = moveBehavior.getNextMoveDirection();
+		nextMoveDirection = currentMoveBehavior().getNextMoveDirection();
 		if (canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
 		}
