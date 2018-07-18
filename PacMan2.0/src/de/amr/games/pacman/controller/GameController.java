@@ -93,6 +93,7 @@ public class GameController implements Controller, GameEventListener {
 
 	private void initLevel() {
 		game.maze.reset();
+		game.dotsEatenInLevel = 0;
 		initEntities();
 	}
 
@@ -194,17 +195,21 @@ public class GameController implements Controller, GameEventListener {
 
 	private void onFoodFound(FoodFoundEvent e) {
 		game.maze.setContent(e.tile, EMPTY);
-		if (e.food == ENERGIZER) {
-			debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
-			game.score += 50;
-			pacMan.enemies().forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
-		} else if (e.food == PELLET) {
-			game.score += 10;
+		game.dotsEatenInLevel += 1;
+		if (game.dotsEatenInLevel == 70) {
+			System.out.println("First bonus");
+		} else if (game.dotsEatenInLevel == 170) {
+			System.out.println("Second bonus");
 		}
+		game.score += e.food == ENERGIZER ? 50 : 10;
 		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
 			++game.level;
 			initLevel();
 			return;
+		}
+		if (e.food == ENERGIZER) {
+			debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
+			pacMan.enemies().forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}
 	}
 
