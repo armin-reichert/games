@@ -27,8 +27,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private EnumMap<State, MoveBehavior> moveBehavior = new EnumMap<>(State.class);
 	private MoveBehavior defaultMoveBehavior = new DoNothing(this);
 
-	public Ghost(Maze maze, int color) {
+	public Ghost(Maze maze, String name, int color) {
 		super(maze);
+		setName(name);
 		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),

@@ -95,19 +95,19 @@ public class GameController implements Controller, GameEventListener {
 	}
 
 	private void initEntities() {
-		blinky = new Ghost(game.maze, RED_GHOST);
+		blinky = new Ghost(game.maze, "Blinky", RED_GHOST);
 		blinky.setTile(Maze.BLINKY_HOME);
 		blinky.setMoveDirection(Top4.E);
 
-		pinky = new Ghost(game.maze, PINK_GHOST);
+		pinky = new Ghost(game.maze, "Pinky", PINK_GHOST);
 		pinky.setTile(Maze.PINKY_HOME);
 		pinky.setMoveDirection(Top4.S);
 
-		inky = new Ghost(game.maze, BLUE_GHOST);
+		inky = new Ghost(game.maze, "Inky", BLUE_GHOST);
 		inky.setTile(Maze.INKY_HOME);
 		inky.setMoveDirection(Top4.N);
 
-		clyde = new Ghost(game.maze, ORANGE_GHOST);
+		clyde = new Ghost(game.maze, "Clyde", ORANGE_GHOST);
 		clyde.setTile(Maze.CLYDE_HOME);
 		clyde.setMoveDirection(Top4.N);
 
@@ -117,7 +117,7 @@ public class GameController implements Controller, GameEventListener {
 			ghost.addObserver(this);
 		});
 
-		pacMan = new PacMan(game.maze);
+		pacMan = new PacMan(game.maze, "Pac-Man");
 		pacMan.setTile(Maze.PACMAN_HOME);
 		pacMan.setSpeed(TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
@@ -172,7 +172,7 @@ public class GameController implements Controller, GameEventListener {
 		if (pacMan.getState() != PacMan.State.DYING) {
 			if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 				e.ghost.setState(Ghost.State.DEAD);
-				debug(() -> System.out.println(String.format("Killed %s at tile %s", e.ghost, e.tile)));
+				debug(() -> System.out.println(String.format("Killed %s at tile %s", e.ghost.getName(), e.tile)));
 			} else if (e.ghost.getState() == Ghost.State.DEAD) {
 				// do nothing
 			} else {
@@ -184,7 +184,7 @@ public class GameController implements Controller, GameEventListener {
 					enemy.setState(Ghost.State.STARRED);
 				});
 				game.lives -= 1;
-				debug(() -> System.out.println(String.format("Got killed by %s at tile %s", e.ghost, e.tile)));
+				debug(() -> System.out.println(String.format("Got killed by %s at tile %s", e.ghost.getName(), e.tile)));
 			}
 		}
 	}

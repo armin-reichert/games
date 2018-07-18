@@ -44,8 +44,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final Set<Ghost> enemies = new HashSet<>();
 	private final EnumMap<State, MoveBehavior> moveBehavior = new EnumMap<>(State.class);
 
-	public PacMan(Maze maze) {
+	public PacMan(Maze maze, String name) {
 		super(maze);
+		setName(name);
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());

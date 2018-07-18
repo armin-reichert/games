@@ -98,12 +98,15 @@ public class MazeUI extends GameEntity {
 		for (int col = 1; col < controller.getGame().maze.numCols(); ++col) {
 			g.drawLine(col * TS, 0, col * TS, getHeight());
 		}
-		g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
-		for (int row = 0; row < controller.getGame().maze.numRows(); ++row) {
-			for (int col = 0; col < controller.getGame().maze.numCols(); ++col) {
-				g.translate(col * TS, row * TS);
-				g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
-				g.translate(-col * TS, -row * TS);
+		int fontSize = TS * 4 / 10;
+		if (fontSize > 6) {
+			g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
+			for (int row = 0; row < controller.getGame().maze.numRows(); ++row) {
+				for (int col = 0; col < controller.getGame().maze.numCols(); ++col) {
+					g.translate(col * TS, row * TS);
+					g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
+					g.translate(-col * TS, -row * TS);
+				}
 			}
 		}
 	}

@@ -41,14 +41,14 @@ public class Spritesheet {
 	private static BufferedImage[] deadGhostImages = new BufferedImage[4];
 
 	static {
-		// Maze:
-		mazeImage = sheet.getSubimage(228, 0, 224, 248);
+		// Maze
+		mazeImage = region(228, 0, 224, 248);
 
-		// Energizer:
+		// Energizer
 		energizerImages[0] = createEnergizerImage(true);
 		energizerImages[1] = createEnergizerImage(false);
 
-		// Boni:
+		// Boni
 		int offset = 0;
 		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE, BONUS_GRAPES,
 				BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
@@ -56,40 +56,39 @@ public class Spritesheet {
 			offset += 16;
 		}
 
-		// PacMan:
-		pacManWalking[Top4.E] = new BufferedImage[] { sheet.getSubimage(456, 0, 15, 15),
-				sheet.getSubimage(472, 0, 15, 15) };
-		pacManWalking[Top4.W] = new BufferedImage[] { sheet.getSubimage(456, 16, 15, 15),
-				sheet.getSubimage(472, 16, 15, 15) };
-		pacManWalking[Top4.N] = new BufferedImage[] { sheet.getSubimage(456, 32, 15, 15),
-				sheet.getSubimage(472, 32, 15, 15) };
-		pacManWalking[Top4.S] = new BufferedImage[] { sheet.getSubimage(456, 48, 15, 15),
-				sheet.getSubimage(472, 48, 15, 15) };
-		pacManStanding = sheet.getSubimage(488, 0, 16, 16);
+		// Pac-Man
+		pacManWalking[Top4.E] = new BufferedImage[] { region(456, 0, 16, 16), region(472, 0, 16, 16) };
+		pacManWalking[Top4.W] = new BufferedImage[] { region(456, 16, 16, 16), region(472, 16, 16, 16) };
+		pacManWalking[Top4.N] = new BufferedImage[] { region(456, 32, 16, 16), region(472, 32, 16, 16) };
+		pacManWalking[Top4.S] = new BufferedImage[] { region(456, 48, 16, 16), region(472, 48, 16, 16) };
+		pacManStanding = region(488, 0, 16, 16);
 		for (int i = 0; i < 11; ++i) {
-			pacManDying[i] = sheet.getSubimage(504 + i * 16, 0, 16, 16);
+			pacManDying[i] = region(504 + i * 16, 0, 16, 16);
 		}
 
-		// Ghosts:
-		BufferedImage ghostImages = sheet.getSubimage(456, 64, 128, 64);
+		// Ghosts
 		for (int i = 0; i < 8; ++i) {
-			redGhostImages[i] = ghostImages.getSubimage(i * 16, 0, 16, 16);
+			redGhostImages[i] = region(456 + i * 16, 64, 16, 16);
 		}
 		for (int i = 0; i < 8; ++i) {
-			pinkGhostImages[i] = ghostImages.getSubimage(i * 16, 16, 16, 16);
+			pinkGhostImages[i] = region(456 + i * 16, 80, 16, 16);
 		}
 		for (int i = 0; i < 8; ++i) {
-			blueGhostImages[i] = ghostImages.getSubimage(i * 16, 32, 16, 16);
+			blueGhostImages[i] = region(456 + i * 16, 96, 16, 16);
 		}
 		for (int i = 0; i < 8; ++i) {
-			orangeGhostImages[i] = ghostImages.getSubimage(i * 16, 48, 16, 16);
+			orangeGhostImages[i] = region(456 + i * 16, 112, 16, 16);
 		}
 		for (int i = 0; i < 4; ++i) {
-			frightenedGhostImages[i] = sheet.getSubimage(584 + i * 16, 64, 16, 16);
+			frightenedGhostImages[i] = region(584 + i * 16, 64, 16, 16);
 		}
 		for (int i = 0; i < 4; ++i) {
-			deadGhostImages[i] = sheet.getSubimage(584 + i * 16, 80, 16, 16);
+			deadGhostImages[i] = region(584 + i * 16, 80, 16, 16);
 		}
+	}
+
+	private static BufferedImage region(int x, int y, int w, int h) {
+		return sheet.getSubimage(x, y, w, h);
 	}
 
 	private static BufferedImage createEnergizerImage(boolean visible) {

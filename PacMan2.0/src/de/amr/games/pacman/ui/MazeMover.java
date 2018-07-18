@@ -65,7 +65,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			debug(() -> System.out.println(String.format("%s changed from %s to %s", this, oldState, state)));
+			debug(() -> System.out.println(String.format("%s changed from %s to %s", getName(), oldState, state)));
 		}
 	}
 
