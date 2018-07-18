@@ -13,6 +13,7 @@ import de.amr.easy.graph.impl.traversal.AStarTraversal;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.GridGraph;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.ui.Ghost;
 
 public class Maze extends GridGraph<Character, Integer> {
 
@@ -23,7 +24,7 @@ public class Maze extends GridGraph<Character, Integer> {
 	public static final Tile PINKY_HOME = new Tile(13, 14);
 	public static final Tile INKY_HOME = new Tile(11, 14);
 	public static final Tile CLYDE_HOME = new Tile(15, 14);
-
+	
 	public static Maze of(String mazeData) {
 		String[] rows = mazeData.split("\n");
 		return new Maze(rows[0].length(), rows.length, rows);

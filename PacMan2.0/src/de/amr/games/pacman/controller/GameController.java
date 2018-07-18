@@ -24,6 +24,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.behavior.AmbushTarget;
 import de.amr.games.pacman.controller.behavior.ChaseTarget;
+import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
 import de.amr.games.pacman.controller.behavior.GoHome;
 import de.amr.games.pacman.controller.behavior.KeyboardSteering;
@@ -129,13 +130,17 @@ public class GameController implements Controller, GameEventListener {
 
 		// define move behavior
 		getGhosts().forEach(ghost -> {
-			ghost.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, ghost, Maze.BLINKY_HOME));
+			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing(ghost));
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(game.maze, ghost, pacMan));
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, blinky, pacMan));
+		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, Maze.BLINKY_HOME));
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, Maze.PINKY_HOME));
 		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
+		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, inky, Maze.INKY_HOME));
 		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
+		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, clyde, Maze.CLYDE_HOME));
 
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 	}
