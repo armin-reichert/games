@@ -70,6 +70,10 @@ public class Maze extends GridGraph<Character, Integer> {
 	public OptionalInt direction(Tile t1, Tile t2) {
 		return direction(cell(t1), cell(t2));
 	}
+	
+	public Stream<Tile> getAdjacentTiles(Tile tile) {
+		return adj(cell(tile)).mapToObj(this::tile);
+	}
 
 	public List<Tile> findPath(Tile source, Tile target) {
 		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
