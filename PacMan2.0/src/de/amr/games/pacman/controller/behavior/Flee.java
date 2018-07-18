@@ -24,7 +24,8 @@ public class Flee implements MoveBehavior {
 		if (towardsChaser.isPresent()) {
 			int dir = towardsChaser.getAsInt();
 			for (int d : Arrays.asList(Maze.TOPOLOGY.inv(dir), Maze.TOPOLOGY.right(dir), Maze.TOPOLOGY.left(dir))) {
-				if (refugee.canMove(d)) {
+				OptionalInt neighbor = maze.neighbor(maze.cell(refugee.getTile()), d);
+				if (neighbor.isPresent() && maze.adjacent(maze.cell(refugee.getTile()), neighbor.getAsInt())) {
 					return d;
 				}
 			}

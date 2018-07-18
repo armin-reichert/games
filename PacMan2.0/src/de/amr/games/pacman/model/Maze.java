@@ -4,6 +4,7 @@ import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.WALL;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,7 +14,6 @@ import de.amr.easy.graph.impl.traversal.AStarTraversal;
 import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.GridGraph;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.ui.Ghost;
 
 public class Maze extends GridGraph<Character, Integer> {
 
@@ -75,7 +75,7 @@ public class Maze extends GridGraph<Character, Integer> {
 	public Stream<Tile> getAdjacentTiles(Tile tile) {
 		return adj(cell(tile)).mapToObj(this::tile);
 	}
-
+	
 	public List<Tile> findPath(Tile source, Tile target) {
 		AStarTraversal<?> pathfinder = new AStarTraversal<>(this, this::manhattan);
 		int sourceCell = cell(source), targetCell = cell(target);
