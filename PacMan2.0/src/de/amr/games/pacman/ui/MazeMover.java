@@ -121,15 +121,15 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.nextMoveDirection = nextMoveDirection;
 	}
 
-	public void setMazePosition(int col, int row) {
+	public void setTile(int col, int row) {
 		tf.moveTo(col * TS, row * TS);
 	}
 
-	public void setMazePosition(Tile tile) {
-		setMazePosition(tile.col, tile.row);
+	public void setTile(Tile tile) {
+		setTile(tile.col, tile.row);
 	}
 
-	public Tile getMazePosition() {
+	public Tile getTile() {
 		return new Tile(round(tf.getX() + getWidth() / 2) / TS, round(tf.getY() + getHeight() / 2) / TS);
 	}
 
@@ -156,22 +156,22 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void move() {
-		Tile currentTile = getMazePosition();
+		Tile currentTile = getTile();
 		if (maze.getContent(currentTile) == WORMHOLE) {
 			if (moveDirection == Top4.E && currentTile.col == maze.numCols() - 1
 					|| moveDirection == Top4.W && currentTile.col == 0) {
-				setMazePosition(maze.numCols() - 1 - currentTile.col, currentTile.row);
+				setTile(maze.numCols() - 1 - currentTile.col, currentTile.row);
 			}
 		}
 		if (canMove(moveDirection)) {
 			tf.moveTo(computeExactMovePosition(moveDirection));
 		} else { // adjust exactly over tile
-			setMazePosition(currentTile);
+			setTile(currentTile);
 		}
 	}
 
 	public boolean canMove(int dir) {
-		Tile currentTile = getMazePosition();
+		Tile currentTile = getTile();
 		Tile touchedTile = computeTouchedTile(currentTile, dir);
 		if (currentTile.equals(touchedTile)) {
 			return true;

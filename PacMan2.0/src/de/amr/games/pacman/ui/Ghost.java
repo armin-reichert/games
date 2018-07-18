@@ -75,7 +75,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public void draw(Graphics2D g) {
 		// TODO hack
-		if (maze.getContent(getMazePosition()) == Tile.GHOSTHOUSE) {
+		if (maze.getContent(getTile()) == Tile.GHOSTHOUSE) {
 			g.translate(TS / 2, 0);
 			super.draw(g);
 			g.translate(-TS / 2, 0);

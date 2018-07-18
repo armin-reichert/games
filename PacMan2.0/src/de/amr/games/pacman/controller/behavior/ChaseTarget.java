@@ -27,7 +27,7 @@ public class ChaseTarget implements MoveBehavior {
 
 	@Override
 	public int getNextMoveDirection() {
-		List<Tile> path = maze.findPath(chaser.getMazePosition(), target.getMazePosition());
+		List<Tile> path = maze.findPath(chaser.getTile(), target.getTile());
 		int dir = maze.alongPath(path).orElse(chaser.getNextMoveDirection());
 		debug(() -> {
 			String pathString = path.stream().map(Tile::toString).collect(Collectors.joining("-"));

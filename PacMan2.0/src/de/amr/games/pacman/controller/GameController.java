@@ -96,19 +96,19 @@ public class GameController implements Controller, GameEventListener {
 
 	private void initEntities() {
 		blinky = new Ghost(game.maze, RED_GHOST);
-		blinky.setMazePosition(Maze.BLINKY_HOME);
+		blinky.setTile(Maze.BLINKY_HOME);
 		blinky.setMoveDirection(Top4.E);
 
 		pinky = new Ghost(game.maze, PINK_GHOST);
-		pinky.setMazePosition(Maze.PINKY_HOME);
+		pinky.setTile(Maze.PINKY_HOME);
 		pinky.setMoveDirection(Top4.S);
 
 		inky = new Ghost(game.maze, BLUE_GHOST);
-		inky.setMazePosition(Maze.INKY_HOME);
+		inky.setTile(Maze.INKY_HOME);
 		inky.setMoveDirection(Top4.N);
 
 		clyde = new Ghost(game.maze, ORANGE_GHOST);
-		clyde.setMazePosition(Maze.CLYDE_HOME);
+		clyde.setTile(Maze.CLYDE_HOME);
 		clyde.setMoveDirection(Top4.N);
 
 		getGhosts().forEach(ghost -> {
@@ -118,7 +118,7 @@ public class GameController implements Controller, GameEventListener {
 		});
 
 		pacMan = new PacMan(game.maze);
-		pacMan.setMazePosition(Maze.PACMAN_HOME);
+		pacMan.setTile(Maze.PACMAN_HOME);
 		pacMan.setSpeed(TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);

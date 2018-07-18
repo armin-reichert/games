@@ -122,9 +122,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	// PacMan activity
-	
+
 	private Optional<GameEvent> inspectCurrentTile() {
-		Tile currentTile = getMazePosition();
+		Tile currentTile = getTile();
 		Optional<GameEvent> enemy = checkEnemy(currentTile);
 		if (enemy.isPresent()) {
 			return enemy;
