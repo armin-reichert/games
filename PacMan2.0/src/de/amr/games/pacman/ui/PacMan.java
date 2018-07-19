@@ -72,10 +72,10 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		if (getState() == State.ALIVE) {
+		switch (getState()) {
+		case ALIVE:
 			return canMove(getMoveDirection()) ? spriteWalking[getMoveDirection()] : spriteStanding;
-		}
-		if (getState() == State.DYING) {
+		case DYING:
 			return spriteDying;
 		}
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
