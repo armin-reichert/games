@@ -1,14 +1,6 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
-import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
-import static de.amr.games.pacman.model.Tile.BONUS_BELL;
-import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
-import static de.amr.games.pacman.model.Tile.BONUS_GALAXIAN;
-import static de.amr.games.pacman.model.Tile.BONUS_GRAPES;
-import static de.amr.games.pacman.model.Tile.BONUS_KEY;
-import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
-import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.model.Tile.PELLET;
 
@@ -59,24 +51,14 @@ public class MazeUI extends GameEntity {
 	private void drawTile(Graphics2D g, Tile tile) {
 		g.translate(tile.col * TS, tile.row * TS);
 		char content = maze.getContent(tile);
-		switch (content) {
-		case PELLET:
-			drawPellet(g);
-			break;
-		case ENERGIZER:
-			spriteEnergizer.draw(g);
-			break;
-		case BONUS_APPLE:
-		case BONUS_BELL:
-		case BONUS_CHERRIES:
-		case BONUS_GALAXIAN:
-		case BONUS_GRAPES:
-		case BONUS_KEY:
-		case BONUS_PEACH:
-		case BONUS_STRAWBERRY:
+		if (Tile.isFood(content)) {
+			if (content == PELLET) {
+				drawPellet(g);
+			} else if (content == ENERGIZER) {
+				spriteEnergizer.draw(g);
+			}
+		} else if (Tile.isBonus(content)) {
 			drawBonus(g, content);
-		default:
-			break;
 		}
 		g.translate(-tile.col * TS, -tile.row * TS);
 	}

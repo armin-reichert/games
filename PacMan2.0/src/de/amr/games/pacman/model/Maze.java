@@ -45,12 +45,12 @@ public class Maze extends GridGraph<Character, Integer> {
 				} else if (c == Tile.BONUS) {
 					bonusTile = new Tile(col, row);
 				} else if (c == Tile.PACMAN) {
-					pacManHome = new Tile(col, row); 
+					pacManHome = new Tile(col, row);
 				}
 			}
 		}
 		fill();
-//		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL).forEach(this::removeEdge);
+		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL).forEach(this::removeEdge);
 	}
 
 	private char content(int row, int col) {

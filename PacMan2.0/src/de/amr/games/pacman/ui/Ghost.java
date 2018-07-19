@@ -40,13 +40,12 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public void update() {
-		move();
 		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
 			setState(State.ATTACKING);
-		}
-		if (getState() == State.FRIGHTENED && stateDurationSeconds() > 3) {
+		} else if (getState() == State.FRIGHTENED && stateDurationSeconds() > 3) {
 			setState(State.ATTACKING);
 		}
+		move();
 	}
 
 	@Override
