@@ -7,8 +7,6 @@ import java.util.EnumMap;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.behavior.DoNothing;
-import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -18,18 +16,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 		ATTACKING, SCATTERING, FRIGHTENED, DEAD, STARRED
 	}
 
-	private final int color;
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
 	private final Sprite[] allSprites;
 
-	private MoveBehavior defaultMoveBehavior = new DoNothing(this);
-
 	public Ghost(Maze maze, String name, int color) {
 		super(maze, new EnumMap<>(State.class));
 		setName(name);
-		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
 					getSpriteSize());
@@ -46,23 +40,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 		allSprites[allSprites.length - 1] = spriteFrightened;
 	}
 
-	public int getColor() {
-		return color;
-	}
-
-	@Override
-	public void setMoveBehavior(State state, MoveBehavior behavior) {
-		moveBehavior.put(state, behavior);
-	}
-
-	@Override
-	public MoveBehavior currentMoveBehavior() {
-		return moveBehavior.getOrDefault(getState(), defaultMoveBehavior);
-	}
-
 	@Override
 	public void update() {
-		walk();
+		move();
 		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
 			setState(State.ATTACKING);
 		}
@@ -90,14 +70,17 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		if (getState() == State.ATTACKING || getState() == State.STARRED) {
+		switch (getState()) {
+		case ATTACKING:
+		case STARRED:
 			return spriteNormal[getMoveDirection()];
-		} else if (getState() == State.FRIGHTENED) {
+		case FRIGHTENED:
 			return spriteFrightened;
-		} else if (getState() == State.DEAD) {
+		case DEAD:
 			return spriteDead[getMoveDirection()];
+		default:
+			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}
-		throw new IllegalStateException("Illegal ghost state: " + getState());
 	}
 
 	@Override

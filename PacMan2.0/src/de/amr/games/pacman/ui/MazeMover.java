@@ -17,6 +17,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
+import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GameEventListener;
@@ -27,6 +28,7 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	protected final Maze maze;
 	protected final Map<S, MoveBehavior> moveBehavior;
+	private final MoveBehavior defaultMoveBehavior;
 	private float speed;
 	private int moveDirection;
 	private int nextMoveDirection;
@@ -37,6 +39,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		Objects.requireNonNull(maze);
 		this.maze = maze;
 		this.moveBehavior = moveBehavior;
+		defaultMoveBehavior = new DoNothing(this);
 	}
 
 	@Override
@@ -102,7 +105,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public MoveBehavior currentMoveBehavior() {
-		return moveBehavior.get(getState());
+		return moveBehavior.getOrDefault(getState(), defaultMoveBehavior);
 	}
 
 	public float getSpeed() {
@@ -155,15 +158,11 @@ public abstract class MazeMover<S> extends GameEntity {
 		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
 	}
 
-	protected void walk() {
+	public void move() {
 		nextMoveDirection = currentMoveBehavior().getNextMoveDirection();
 		if (canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
 		}
-		move();
-	}
-
-	public void move() {
 		Tile currentTile = getTile();
 		if (maze.getContent(currentTile) == WORMHOLE) {
 			if (moveDirection == Top4.E && currentTile.col == maze.numCols() - 1

@@ -119,7 +119,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.addObserver(this);
 		});
 
-		pacMan = new PacMan(game.maze, "Pac-Man");
+		pacMan = new PacMan(game.maze);
 		pacMan.setTile(Maze.PACMAN_HOME);
 		pacMan.setSpeed(TS / 8f);
 		pacMan.setMoveDirection(Top4.E);

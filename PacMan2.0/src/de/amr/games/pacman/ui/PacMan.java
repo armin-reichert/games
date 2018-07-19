@@ -42,9 +42,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final Sprite spriteDying;
 	private final Set<Ghost> enemies = new HashSet<>();
 
-	public PacMan(Maze maze, String name) {
+	public PacMan(Maze maze) {
 		super(maze, new EnumMap<>(State.class));
-		setName(name);
+		setName("Pac-Man");
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());
@@ -52,22 +52,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
-	}
-
-	@Override
-	public void update() {
-		if (getState() == State.ALIVE) {
-			Optional<GameEvent> discovery = inspectCurrentTile();
-			if (discovery.isPresent()) {
-				fireGameEvent(discovery.get());
-				return;
-			}
-			walk();
-		} else if (getState() == State.DYING) {
-			if (stateDurationSeconds() > 3) {
-				fireGameEvent(new PacManDiedEvent());
-			}
-		}
 	}
 
 	@Override
@@ -112,6 +96,28 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	// PacMan activity
+
+	@Override
+	public void update() {
+		switch (getState()) {
+		case ALIVE:
+			Optional<GameEvent> discovery = inspectCurrentTile();
+			if (discovery.isPresent()) {
+				fireGameEvent(discovery.get());
+			} else {
+				move();
+			}
+			break;
+		case DYING:
+			if (stateDurationSeconds() > 3) {
+				fireGameEvent(new PacManDiedEvent());
+			}
+			break;
+		default:
+			throw new IllegalStateException("Illegal PacMan state: " + getState());
+
+		}
+	}
 
 	private Optional<GameEvent> inspectCurrentTile() {
 		Tile currentTile = getTile();
