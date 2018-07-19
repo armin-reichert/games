@@ -5,11 +5,14 @@ public class Tile {
 	public static final char EMPTY = ' ';
 	public static final char WALL = '#';
 	public static final char DOOR = 'D';
-	public static final char PELLET = '.';
-	public static final char ENERGIZER = 'O';
 	public static final char TUNNEL = 'T';
 	public static final char WORMHOLE = 'W';
 
+	// Food
+	public static final char PELLET = '.';
+	public static final char ENERGIZER = 'O';
+
+	// Bonus
 	public static final char BONUS_CHERRIES = '1';
 	public static final char BONUS_STRAWBERRY = '2';
 	public static final char BONUS_PEACH = '3';
@@ -21,10 +24,20 @@ public class Tile {
 
 	// Position markers
 	public static final char BONUS = '$';
+	public static final char PACMAN = '@';
 	public static final char BLINKY = 'B';
 	public static final char INKY = 'I';
 	public static final char PINKY = 'P';
 	public static final char CLYDE = 'C';
+
+	public static boolean isFood(char c) {
+		return c == PELLET || c == ENERGIZER;
+	}
+
+	public static boolean isBonus(char c) {
+		return c == BONUS_APPLE || c == BONUS_BELL || c == BONUS_CHERRIES || c == BONUS_GALAXIAN || c == BONUS_GRAPES
+				|| c == BONUS_KEY || c == BONUS_PEACH || c == BONUS_STRAWBERRY;
+	}
 
 	public final int col;
 	public final int row;

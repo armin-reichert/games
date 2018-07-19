@@ -1,16 +1,6 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
-import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
-import static de.amr.games.pacman.model.Tile.BONUS_BELL;
-import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
-import static de.amr.games.pacman.model.Tile.BONUS_GALAXIAN;
-import static de.amr.games.pacman.model.Tile.BONUS_GRAPES;
-import static de.amr.games.pacman.model.Tile.BONUS_KEY;
-import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
-import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
-import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.model.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -122,7 +112,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private Optional<GameEvent> inspectCurrentTile() {
 		Tile currentTile = getTile();
-		Optional<GameEvent> enemy = checkEnemy(currentTile);
+		Optional<GameEvent> enemy = checkLivingEnemy(currentTile);
 		if (enemy.isPresent()) {
 			return enemy;
 		}
@@ -139,33 +129,15 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private Optional<GameEvent> checkBonus(Tile tile) {
 		char content = maze.getContent(tile);
-		switch (content) {
-		case BONUS_APPLE:
-		case BONUS_BELL:
-		case BONUS_CHERRIES:
-		case BONUS_GALAXIAN:
-		case BONUS_GRAPES:
-		case BONUS_KEY:
-		case BONUS_PEACH:
-		case BONUS_STRAWBERRY:
-			return Optional.of(new BonusFoundEvent(tile, content));
-		default:
-			return Optional.empty();
-		}
+		return Tile.isBonus(content) ? Optional.of(new BonusFoundEvent(tile, content)) : Optional.empty();
 	}
 
 	private Optional<GameEvent> checkFood(Tile tile) {
 		char content = maze.getContent(tile);
-		switch (content) {
-		case PELLET:
-		case ENERGIZER:
-			return Optional.of(new FoodFoundEvent(tile, content));
-		default:
-			return Optional.empty();
-		}
+		return Tile.isFood(content) ? Optional.of(new FoodFoundEvent(tile, content)) : Optional.empty();
 	}
 
-	private Optional<GameEvent> checkEnemy(Tile tile) {
+	private Optional<GameEvent> checkLivingEnemy(Tile tile) {
 		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
 				.map(ghost -> new GhostContactEvent(ghost, tile));
 	}

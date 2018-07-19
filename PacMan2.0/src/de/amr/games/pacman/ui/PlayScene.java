@@ -43,24 +43,16 @@ import de.amr.games.pacman.ui.PacMan.State;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	private Game game;
+	private Maze maze;
 	private PacMan pacMan;
 	private Ghost blinky, pinky, inky, clyde;
-	private MazeUI maze;
+	private MazeUI mazeUI;
 	private HUD hud;
-	private StatusDisplay status;
+	private StatusUI status;
 
 	public PlayScene(PacManApp app) {
 		super(app);
 	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		hud.draw(g);
-		maze.draw(g);
-		status.draw(g);
-	}
-
-	// Controller part
 
 	public PacManApp getApp() {
 		return app;
@@ -78,29 +70,37 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		return Stream.of(blinky, pinky, inky, clyde);
 	}
 
+	private void createUI() {
+		hud = new HUD(game);
+		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze, pacMan, new Ghost[] { blinky, pinky, inky, clyde });
+		status = new StatusUI(game);
+		hud.tf.moveTo(0, 0);
+		mazeUI.tf.moveTo(0, 3 * TS);
+		status.tf.moveTo(0, getHeight() - 2 * TS);
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		hud.draw(g);
+		mazeUI.draw(g);
+		status.draw(g);
+	}
+
 	@Override
 	public void init() {
-		game = new Game(Maze.of(Assets.text("maze.txt")));
+		game = new Game();
+		maze = Maze.of(Assets.text("maze.txt"));
 		createEntities();
 		createUI();
 		initEntities();
 	}
 
-	private void createUI() {
-		hud = new HUD(game);
-		maze = new MazeUI(getWidth(), getHeight() - 5 * TS, game.maze, pacMan, new Ghost[] { blinky, pinky, inky, clyde });
-		status = new StatusDisplay(game);
-		hud.tf.moveTo(0, 0);
-		maze.tf.moveTo(0, 3 * TS);
-		status.tf.moveTo(0, getHeight() - 2 * TS);
-	}
-
 	private void createEntities() {
-		blinky = new Ghost(game.maze, "Blinky", RED_GHOST);
-		pinky = new Ghost(game.maze, "Pinky", PINK_GHOST);
-		inky = new Ghost(game.maze, "Inky", BLUE_GHOST);
-		clyde = new Ghost(game.maze, "Clyde", ORANGE_GHOST);
-		pacMan = new PacMan(game.maze);
+		blinky = new Ghost(maze, "Blinky", RED_GHOST);
+		pinky = new Ghost(maze, "Pinky", PINK_GHOST);
+		inky = new Ghost(maze, "Inky", BLUE_GHOST);
+		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST);
+		pacMan = new PacMan(maze);
 		getGhosts().forEach(pacMan::addEnemy);
 
 		getGhosts().forEach(ghost -> ghost.addObserver(this));
@@ -109,32 +109,32 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// define move behavior
 		getGhosts().forEach(ghost -> {
 			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing(ghost));
-			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(game.maze, ghost, pacMan));
+			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(maze, ghost, pacMan));
 		});
-		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, blinky, pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, game.maze.blinkyHome));
-		// pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, pinky, pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, game.maze.pinkyHome));
+		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(maze, blinky, pacMan));
+		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, blinky, maze.blinkyHome));
+		// pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(maze, pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(maze, pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, pinky, maze.pinkyHome));
 		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
-		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, inky, game.maze.inkyHome));
+		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, inky, maze.inkyHome));
 		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
-		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, clyde, game.maze.clydeHome));
+		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, clyde, maze.clydeHome));
 
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 	}
 
 	private void initEntities() {
-		blinky.setTile(game.maze.blinkyHome);
+		blinky.setTile(maze.blinkyHome);
 		blinky.setMoveDirection(Top4.E);
 
-		pinky.setTile(game.maze.pinkyHome);
+		pinky.setTile(maze.pinkyHome);
 		pinky.setMoveDirection(Top4.S);
 
-		inky.setTile(game.maze.inkyHome);
+		inky.setTile(maze.inkyHome);
 		inky.setMoveDirection(Top4.N);
 
-		clyde.setTile(game.maze.clydeHome);
+		clyde.setTile(maze.clydeHome);
 		clyde.setMoveDirection(Top4.N);
 
 		getGhosts().forEach(ghost -> {
@@ -142,16 +142,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setState(Ghost.State.ATTACKING);
 		});
 
-		pacMan.setTile(Maze.PACMAN_HOME);
+		pacMan.setTile(maze.pacManHome);
 		pacMan.setSpeed(TS / 8f);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
 		pacMan.setState(State.ALIVE);
-
 	}
 
 	private void initLevel() {
-		game.maze.loadContent();
+		maze.loadContent();
 		game.dotsEatenInLevel = 0;
 		initEntities();
 	}
@@ -206,15 +205,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
-		game.maze.setContent(e.tile, EMPTY);
+		maze.setContent(e.tile, EMPTY);
 		game.dotsEatenInLevel += 1;
 		if (game.dotsEatenInLevel == 70) {
-			game.maze.setContent(game.maze.bonusTile, Tile.BONUS_CHERRIES);
+			maze.setContent(maze.bonusTile, Tile.BONUS_CHERRIES);
 		} else if (game.dotsEatenInLevel == 170) {
-			game.maze.setContent(game.maze.bonusTile, Tile.BONUS_STRAWBERRY);
+			maze.setContent(maze.bonusTile, Tile.BONUS_STRAWBERRY);
 		}
 		game.score += e.food == ENERGIZER ? 50 : 10;
-		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
+		if (maze.tiles().map(maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
 			++game.level;
 			initLevel();
 		} else if (e.food == ENERGIZER) {
@@ -224,7 +223,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onBonusFound(BonusFoundEvent e) {
-		game.maze.setContent(e.tile, EMPTY);
+		maze.setContent(e.tile, EMPTY);
 		PacManApp.debug(() -> System.out.println(String.format("Found bonus %s at tile=%s", e.bonus, e.tile)));
 	}
 }

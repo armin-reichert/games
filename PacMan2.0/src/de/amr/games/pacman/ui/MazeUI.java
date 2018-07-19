@@ -20,7 +20,6 @@ import java.util.Arrays;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -48,12 +47,12 @@ public class MazeUI extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
+		spriteMaze.draw(g);
 		maze.tiles().forEach(tile -> drawTile(g, tile));
 		Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 		pacMan.draw(g);
-//		PacManApp.debug(() -> drawDebugInfo(g));
+		// PacManApp.debug(() -> drawDebugInfo(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
