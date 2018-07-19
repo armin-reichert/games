@@ -20,7 +20,6 @@ public class Maze extends GridGraph<Character, Integer> {
 	public static final Topology TOPOLOGY = new Top4();
 
 	public static final Tile PACMAN_HOME = new Tile(14, 23);
-	public static final Tile BONUS_TILE = new Tile(13, 17);
 
 	public static Maze of(String mazeData) {
 		String[] rows = mazeData.split("\n");
@@ -28,7 +27,7 @@ public class Maze extends GridGraph<Character, Integer> {
 	}
 
 	private final String[] content;
-	public Tile blinkyHome, pinkyHome, inkyHome, clydeHome;
+	public Tile blinkyHome, pinkyHome, inkyHome, clydeHome, bonusTile;
 
 	private Maze(int numCols, int numRows, String[] content) {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
@@ -45,6 +44,8 @@ public class Maze extends GridGraph<Character, Integer> {
 					inkyHome = new Tile(col, row);
 				} else if (c == Tile.CLYDE) {
 					clydeHome = new Tile(col, row);
+				} else if (c == Tile.BONUS) {
+					bonusTile = new Tile(col, row);
 				}
 			}
 		}

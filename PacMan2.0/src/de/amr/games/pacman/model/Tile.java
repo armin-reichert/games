@@ -3,10 +3,8 @@ package de.amr.games.pacman.model;
 public class Tile {
 
 	public static final char EMPTY = ' ';
-	public static final char OUTSIDE = 'x';
 	public static final char WALL = '#';
 	public static final char DOOR = 'D';
-	public static final char GHOSTHOUSE = 'G';
 	public static final char PELLET = '.';
 	public static final char ENERGIZER = 'O';
 	public static final char TUNNEL = 'T';
@@ -20,7 +18,9 @@ public class Tile {
 	public static final char BONUS_GALAXIAN = '6';
 	public static final char BONUS_BELL = '7';
 	public static final char BONUS_KEY = '8';
-	
+
+	// Position markers
+	public static final char BONUS = '$';
 	public static final char BLINKY = 'B';
 	public static final char INKY = 'I';
 	public static final char PINKY = 'P';

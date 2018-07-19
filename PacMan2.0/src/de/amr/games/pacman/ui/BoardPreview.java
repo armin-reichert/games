@@ -2,7 +2,6 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.model.Tile.DOOR;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.model.Tile.GHOSTHOUSE;
 import static de.amr.games.pacman.model.Tile.PELLET;
 import static de.amr.games.pacman.model.Tile.TUNNEL;
 import static de.amr.games.pacman.model.Tile.WALL;
@@ -51,7 +50,6 @@ public class BoardPreview extends JFrame {
 		colors.put(WALL, Color.BLUE);
 		colors.put(PELLET, Color.YELLOW);
 		colors.put(ENERGIZER, Color.GREEN);
-		colors.put(GHOSTHOUSE, Color.ORANGE);
 		colors.put(DOOR, Color.ORANGE.darker());
 		colors.put(WORMHOLE, Color.PINK);
 		colors.put(TUNNEL, Color.PINK.darker());

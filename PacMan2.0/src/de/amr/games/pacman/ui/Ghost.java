@@ -2,13 +2,11 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
 
-import java.awt.Graphics2D;
 import java.util.EnumMap;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.model.Tile;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
@@ -48,18 +46,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		}
 		if (getState() == State.FRIGHTENED && stateDurationSeconds() > 3) {
 			setState(State.ATTACKING);
-		}
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		// TODO hack
-		if (maze.getContent(getTile()) == Tile.GHOSTHOUSE) {
-			g.translate(TS / 2, 0);
-			super.draw(g);
-			g.translate(-TS / 2, 0);
-		} else {
-			super.draw(g);
 		}
 	}
 

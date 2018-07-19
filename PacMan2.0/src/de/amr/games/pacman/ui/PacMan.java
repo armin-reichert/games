@@ -51,7 +51,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 150);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
-		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 200);
+		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 100);
 	}
 
 	@Override
@@ -110,6 +110,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			break;
 		case DYING:
 			if (stateDurationSeconds() > 3) {
+				spriteDying.resetAnimation();
 				fireGameEvent(new PacManDiedEvent());
 			}
 			break;

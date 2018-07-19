@@ -209,9 +209,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.maze.setContent(e.tile, EMPTY);
 		game.dotsEatenInLevel += 1;
 		if (game.dotsEatenInLevel == 70) {
-			game.maze.setContent(Maze.BONUS_TILE, Tile.BONUS_CHERRIES);
+			game.maze.setContent(game.maze.bonusTile, Tile.BONUS_CHERRIES);
 		} else if (game.dotsEatenInLevel == 170) {
-			game.maze.setContent(Maze.BONUS_TILE, Tile.BONUS_STRAWBERRY);
+			game.maze.setContent(game.maze.bonusTile, Tile.BONUS_STRAWBERRY);
 		}
 		game.score += e.food == ENERGIZER ? 50 : 10;
 		if (game.maze.tiles().map(game.maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
