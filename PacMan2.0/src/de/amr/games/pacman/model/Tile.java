@@ -20,6 +20,11 @@ public class Tile {
 	public static final char BONUS_GALAXIAN = '6';
 	public static final char BONUS_BELL = '7';
 	public static final char BONUS_KEY = '8';
+	
+	public static final char BLINKY = 'B';
+	public static final char INKY = 'I';
+	public static final char PINKY = 'P';
+	public static final char CLYDE = 'C';
 
 	public final int col;
 	public final int row;

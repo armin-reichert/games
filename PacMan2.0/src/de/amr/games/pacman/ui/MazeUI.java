@@ -53,7 +53,7 @@ public class MazeUI extends GameEntity {
 		maze.tiles().forEach(tile -> drawTile(g, tile));
 		Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 		pacMan.draw(g);
-		PacManApp.debug(() -> drawDebugInfo(g));
+//		PacManApp.debug(() -> drawDebugInfo(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 

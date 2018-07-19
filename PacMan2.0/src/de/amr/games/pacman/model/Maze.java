@@ -20,10 +20,6 @@ public class Maze extends GridGraph<Character, Integer> {
 	public static final Topology TOPOLOGY = new Top4();
 
 	public static final Tile PACMAN_HOME = new Tile(14, 23);
-	public static final Tile BLINKY_HOME = new Tile(13, 11);
-	public static final Tile PINKY_HOME = new Tile(13, 14);
-	public static final Tile INKY_HOME = new Tile(11, 14);
-	public static final Tile CLYDE_HOME = new Tile(15, 14);
 	public static final Tile BONUS_TILE = new Tile(13, 17);
 
 	public static Maze of(String mazeData) {
@@ -31,18 +27,37 @@ public class Maze extends GridGraph<Character, Integer> {
 		return new Maze(rows[0].length(), rows.length, rows);
 	}
 
-	private final String[] contentRows;
+	private final String[] content;
+	public Tile blinkyHome, pinkyHome, inkyHome, clydeHome;
 
-	private Maze(int numCols, int numRows, String[] contentRows) {
+	private Maze(int numCols, int numRows, String[] content) {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
-		this.contentRows = contentRows;
-		reset();
+		this.content = content;
+		loadContent();
+		for (int row = 0; row < numRows; ++row) {
+			for (int col = 0; col < numCols; ++col) {
+				char c = content(row, col);
+				if (c == Tile.BLINKY) {
+					blinkyHome = new Tile(col, row);
+				} else if (c == Tile.PINKY) {
+					pinkyHome = new Tile(col, row);
+				} else if (c == Tile.INKY) {
+					inkyHome = new Tile(col, row);
+				} else if (c == Tile.CLYDE) {
+					clydeHome = new Tile(col, row);
+				}
+			}
+		}
 		fill();
 		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL).forEach(this::removeEdge);
 	}
 
-	public void reset() {
-		vertices().forEach(v -> set(v, contentRows[row(v)].charAt(col(v))));
+	private char content(int row, int col) {
+		return content[row].charAt(col);
+	}
+
+	public void loadContent() {
+		vertices().forEach(v -> set(v, content[row(v)].charAt(col(v))));
 	}
 
 	public Stream<Tile> tiles() {

@@ -81,7 +81,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	@Override
 	public void init() {
 		game = new Game(Maze.of(Assets.text("maze.txt")));
+		createEntities();
+		createUI();
 		initEntities();
+	}
+
+	private void createUI() {
 		hud = new HUD(game);
 		maze = new MazeUI(getWidth(), getHeight() - 5 * TS, game.maze, pacMan, new Ghost[] { blinky, pinky, inky, clyde });
 		status = new StatusDisplay(game);
@@ -90,43 +95,16 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		status.tf.moveTo(0, getHeight() - 2 * TS);
 	}
 
-	private void initLevel() {
-		game.maze.reset();
-		game.dotsEatenInLevel = 0;
-		initEntities();
-	}
-
-	private void initEntities() {
+	private void createEntities() {
 		blinky = new Ghost(game.maze, "Blinky", RED_GHOST);
-		blinky.setTile(Maze.BLINKY_HOME);
-		blinky.setMoveDirection(Top4.E);
-
 		pinky = new Ghost(game.maze, "Pinky", PINK_GHOST);
-		pinky.setTile(Maze.PINKY_HOME);
-		pinky.setMoveDirection(Top4.S);
-
 		inky = new Ghost(game.maze, "Inky", BLUE_GHOST);
-		inky.setTile(Maze.INKY_HOME);
-		inky.setMoveDirection(Top4.N);
-
 		clyde = new Ghost(game.maze, "Clyde", ORANGE_GHOST);
-		clyde.setTile(Maze.CLYDE_HOME);
-		clyde.setMoveDirection(Top4.N);
-
-		getGhosts().forEach(ghost -> {
-			ghost.setSpeed(PacManApp.TS / 16f);
-			ghost.setState(Ghost.State.ATTACKING);
-			ghost.addObserver(this);
-		});
-
 		pacMan = new PacMan(game.maze);
-		pacMan.setTile(Maze.PACMAN_HOME);
-		pacMan.setSpeed(TS / 8f);
-		pacMan.setMoveDirection(Top4.E);
-		pacMan.setNextMoveDirection(Top4.E);
-		pacMan.setState(State.ALIVE);
-		pacMan.addObserver(this);
 		getGhosts().forEach(pacMan::addEnemy);
+
+		getGhosts().forEach(ghost -> ghost.addObserver(this));
+		pacMan.addObserver(this);
 
 		// define move behavior
 		getGhosts().forEach(ghost -> {
@@ -134,16 +112,48 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(game.maze, ghost, pacMan));
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, blinky, pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, Maze.BLINKY_HOME));
+		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, blinky, game.maze.blinkyHome));
 		// pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(game.maze, pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(game.maze, pinky, pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, Maze.PINKY_HOME));
+		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, pinky, game.maze.pinkyHome));
 		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
-		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, inky, Maze.INKY_HOME));
+		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, inky, game.maze.inkyHome));
 		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
-		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, clyde, Maze.CLYDE_HOME));
+		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(game.maze, clyde, game.maze.clydeHome));
 
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+	}
+
+	private void initEntities() {
+		blinky.setTile(game.maze.blinkyHome);
+		blinky.setMoveDirection(Top4.E);
+
+		pinky.setTile(game.maze.pinkyHome);
+		pinky.setMoveDirection(Top4.S);
+
+		inky.setTile(game.maze.inkyHome);
+		inky.setMoveDirection(Top4.N);
+
+		clyde.setTile(game.maze.clydeHome);
+		clyde.setMoveDirection(Top4.N);
+
+		getGhosts().forEach(ghost -> {
+			ghost.setSpeed(PacManApp.TS / 16f);
+			ghost.setState(Ghost.State.ATTACKING);
+		});
+
+		pacMan.setTile(Maze.PACMAN_HOME);
+		pacMan.setSpeed(TS / 8f);
+		pacMan.setMoveDirection(Top4.E);
+		pacMan.setNextMoveDirection(Top4.E);
+		pacMan.setState(State.ALIVE);
+
+	}
+
+	private void initLevel() {
+		game.maze.loadContent();
+		game.dotsEatenInLevel = 0;
+		initEntities();
 	}
 
 	@Override
