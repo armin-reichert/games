@@ -9,6 +9,7 @@ import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -25,22 +26,26 @@ import de.amr.games.pacman.model.Tile;
 public abstract class MazeMover<S> extends GameEntity {
 
 	protected final Maze maze;
+	protected final Map<S, MoveBehavior> moveBehavior;
 	private float speed;
 	private int moveDirection;
 	private int nextMoveDirection;
+	private S state;
+	private long stateEntryTime;
 
-	protected MazeMover(Maze maze) {
+	protected MazeMover(Maze maze, Map<S, MoveBehavior> moveBehavior) {
 		Objects.requireNonNull(maze);
 		this.maze = maze;
+		this.moveBehavior = moveBehavior;
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		// draw sprite centered over tile
-		int offsetX = (getSpriteSize() - getWidth()) / 2, offsetY = (getSpriteSize() - getHeight()) / 2;
-		g.translate(-offsetX, -offsetY);
-		super.draw(g);
+		// draw sprite centered over collision box
+		int offsetX = (getWidth() - getSpriteSize()) / 2, offsetY = (getHeight() - getSpriteSize()) / 2;
 		g.translate(offsetX, offsetY);
+		super.draw(g);
+		g.translate(-offsetX, -offsetY);
 	}
 
 	@Override
@@ -56,9 +61,6 @@ public abstract class MazeMover<S> extends GameEntity {
 	public abstract int getSpriteSize();
 
 	// State support
-
-	private S state;
-	private long stateEntryTime;
 
 	public void setState(S state) {
 		S oldState = this.state;
@@ -95,7 +97,13 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// Movement
 
-	public abstract MoveBehavior currentMoveBehavior();
+	public void setMoveBehavior(S state, MoveBehavior behavior) {
+		moveBehavior.put(state, behavior);
+	}
+
+	public MoveBehavior currentMoveBehavior() {
+		return moveBehavior.get(getState());
+	}
 
 	public float getSpeed() {
 		return speed;

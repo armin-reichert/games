@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -42,10 +41,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final Sprite spriteStanding;
 	private final Sprite spriteDying;
 	private final Set<Ghost> enemies = new HashSet<>();
-	private final EnumMap<State, MoveBehavior> moveBehavior = new EnumMap<>(State.class);
 
 	public PacMan(Maze maze, String name) {
-		super(maze);
+		super(maze, new EnumMap<>(State.class));
 		setName(name);
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
@@ -97,15 +95,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return spriteDying;
 		}
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
-	}
-
-	public void setMoveBehavior(State state, MoveBehavior behavior) {
-		moveBehavior.put(state, behavior);
-	}
-
-	@Override
-	public MoveBehavior currentMoveBehavior() {
-		return moveBehavior.get(getState());
 	}
 
 	// PacMan enemies

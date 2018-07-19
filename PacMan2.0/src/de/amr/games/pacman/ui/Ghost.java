@@ -24,11 +24,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final Sprite spriteFrightened;
 	private final Sprite[] allSprites;
 
-	private EnumMap<State, MoveBehavior> moveBehavior = new EnumMap<>(State.class);
 	private MoveBehavior defaultMoveBehavior = new DoNothing(this);
 
 	public Ghost(Maze maze, String name, int color) {
-		super(maze);
+		super(maze, new EnumMap<>(State.class));
 		setName(name);
 		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
@@ -51,6 +50,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return color;
 	}
 
+	@Override
 	public void setMoveBehavior(State state, MoveBehavior behavior) {
 		moveBehavior.put(state, behavior);
 	}
