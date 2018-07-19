@@ -1,7 +1,6 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
-import static de.amr.games.pacman.controller.GameController.debug;
 import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
 import static de.amr.games.pacman.model.Tile.BONUS_BELL;
 import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
@@ -16,24 +15,27 @@ import static de.amr.games.pacman.model.Tile.PELLET;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.GameController;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
 public class MazeUI extends GameEntity {
 
-	private final GameController controller;
 	private final Maze maze;
+	private final PacMan pacMan;
+	private final Ghost[] ghosts;
 	private final Sprite spriteMaze;
 	private final Sprite spriteEnergizer;
 
-	public MazeUI(GameController controller, int width, int height) {
-		this.controller = controller;
-		this.maze = controller.getGame().maze;
+	public MazeUI(int width, int height, Maze maze, PacMan pacMan, Ghost[] ghosts) {
+		this.maze = maze;
+		this.pacMan = pacMan;
+		this.ghosts = ghosts;
 		spriteMaze = new Sprite(Spritesheet.getMaze()).scale(width, height);
 		spriteEnergizer = new Sprite(Spritesheet.getEnergizerImages()).scale(TS, TS);
 		spriteEnergizer.makeAnimated(AnimationMode.BACK_AND_FORTH, 500);
@@ -49,9 +51,9 @@ public class MazeUI extends GameEntity {
 		super.draw(g);
 		g.translate(tf.getX(), tf.getY());
 		maze.tiles().forEach(tile -> drawTile(g, tile));
-		controller.getGhosts().forEach(ghost -> ghost.draw(g));
-		controller.getPacMan().draw(g);
-		debug(() -> drawDebugInfo(g));
+		Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
+		pacMan.draw(g);
+		PacManApp.debug(() -> drawDebugInfo(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
@@ -92,17 +94,17 @@ public class MazeUI extends GameEntity {
 
 	private void drawDebugInfo(Graphics2D g) {
 		g.setColor(Color.LIGHT_GRAY);
-		for (int row = 0; row < controller.getGame().maze.numRows() + 1; ++row) {
+		for (int row = 0; row < maze.numRows() + 1; ++row) {
 			g.drawLine(0, row * TS, getWidth(), row * TS);
 		}
-		for (int col = 1; col < controller.getGame().maze.numCols(); ++col) {
+		for (int col = 1; col < maze.numCols(); ++col) {
 			g.drawLine(col * TS, 0, col * TS, getHeight());
 		}
 		int fontSize = TS * 4 / 10;
 		if (fontSize > 4) {
 			g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
-			for (int row = 0; row < controller.getGame().maze.numRows(); ++row) {
-				for (int col = 0; col < controller.getGame().maze.numCols(); ++col) {
+			for (int row = 0; row < maze.numRows(); ++row) {
+				for (int col = 0; col < maze.numCols(); ++col) {
 					g.translate(col * TS, row * TS);
 					g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
 					g.translate(-col * TS, -row * TS);

@@ -3,7 +3,6 @@ package de.amr.games.pacman.ui;
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.PacManApp.TS;
-import static de.amr.games.pacman.controller.GameController.debug;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
 import static java.lang.Math.round;
@@ -16,6 +15,7 @@ import java.util.Set;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GameEventListener;
@@ -65,7 +65,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			debug(() -> System.out.println(String.format("%s changed from %s to %s", getName(), oldState, state)));
+			PacManApp.debug(() -> System.out.println(String.format("%s changed from %s to %s", getName(), oldState, state)));
 		}
 	}
 

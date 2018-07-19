@@ -2,13 +2,21 @@ package de.amr.games.pacman;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.ui.PlayScene;
 
 public class PacManApp extends Application {
 
 	/** Tile size of the board. */
 	public static int TS = 16;
+
+	public static boolean DEBUG;
+
+	public static void debug(Runnable code) {
+		if (DEBUG) {
+			code.run();
+		}
+	}
 
 	public static void main(String[] args) {
 		if (args.length > 0) {
@@ -27,6 +35,6 @@ public class PacManApp extends Application {
 
 	@Override
 	public void init() {
-		select(new GameController(this));
+		select(new PlayScene(this));
 	}
 }

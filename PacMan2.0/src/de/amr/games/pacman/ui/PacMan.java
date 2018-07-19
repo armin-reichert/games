@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.GameController;
+import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
@@ -80,7 +80,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public void draw(Graphics2D g) {
 		super.draw(g);
-		GameController.debug(() -> {
+		PacManApp.debug(() -> {
 			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
 			g.translate(tf.getX(), tf.getY());
 			g.fillRect(0, 0, getWidth(), getHeight());
