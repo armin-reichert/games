@@ -7,29 +7,22 @@ import de.amr.games.pacman.ui.PlayScene;
 
 public class PacManApp extends Application {
 
-	/** Tile size of the board. */
-	public static int TS = 16;
-
-	public static boolean DEBUG;
-
-	public static void debug(Runnable code) {
-		if (DEBUG) {
-			code.run();
-		}
-	}
+	/** Tile size. */
+	public static final int TS = 16;
 
 	public static void main(String[] args) {
+		float scaling = 1f;
 		if (args.length > 0) {
-			TS = Integer.parseInt(args[0]);
+			scaling = Float.parseFloat(args[0]);
 		}
-		launch(new PacManApp());
+		launch(new PacManApp(scaling));
 	}
 
-	public PacManApp() {
+	public PacManApp(float scaling) {
 		Maze maze = Maze.of(Assets.text("maze.txt"));
 		settings.width = maze.numCols() * TS;
 		settings.height = (maze.numRows() + 5) * TS;
-		settings.scale = 1.5f;
+		settings.scale = scaling;
 		settings.title = String.format("PacMan 2.0 (%d x %d * %.2f)", settings.width, settings.height, settings.scale);
 	}
 

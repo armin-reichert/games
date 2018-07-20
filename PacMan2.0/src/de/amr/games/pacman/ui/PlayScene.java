@@ -34,6 +34,8 @@ import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
+import de.amr.games.pacman.controller.event.GhostDeadEndsEvent;
+import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
@@ -54,6 +56,23 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		super(app);
 	}
 
+	@Override
+	public void processGameEvent(GameEvent e) {
+		if (e instanceof GhostContactEvent) {
+			onGhostContact((GhostContactEvent) e);
+		} else if (e instanceof FoodFoundEvent) {
+			onFoodFound((FoodFoundEvent) e);
+		} else if (e instanceof BonusFoundEvent) {
+			onBonusFound((BonusFoundEvent) e);
+		} else if (e instanceof PacManDiedEvent) {
+			onPacManDied((PacManDiedEvent) e);
+		} else if (e instanceof GhostFrightenedEndsEvent) {
+			onGhostFrightenedEnds((GhostFrightenedEndsEvent) e);
+		} else if (e instanceof GhostDeadEndsEvent) {
+			onGhostDeadEnds((GhostDeadEndsEvent) e);
+		}
+	}
+
 	public PacManApp getApp() {
 		return app;
 	}
@@ -72,7 +91,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void createUI() {
 		hud = new HUD(game);
-		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze, pacMan, new Ghost[] { blinky, pinky, inky, clyde });
+		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze, pacMan, blinky, pinky, inky, clyde);
 		status = new StatusUI(game);
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
@@ -138,12 +157,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		clyde.setMoveDirection(Top4.N);
 
 		getGhosts().forEach(ghost -> {
-			ghost.setSpeed(PacManApp.TS / 16f);
+			ghost.setSpeed(7 * TS / 60);
 			ghost.setState(Ghost.State.ATTACKING);
 		});
 
 		pacMan.setTile(maze.pacManHome);
-		pacMan.setSpeed(TS / 8f);
+		pacMan.setSpeed(9 * TS / 60);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
 		pacMan.setState(State.ALIVE);
@@ -156,22 +175,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	@Override
-	public void processGameEvent(GameEvent e) {
-		if (e instanceof GhostContactEvent) {
-			onGhostContact((GhostContactEvent) e);
-		} else if (e instanceof FoodFoundEvent) {
-			onFoodFound((FoodFoundEvent) e);
-		} else if (e instanceof BonusFoundEvent) {
-			onBonusFound((BonusFoundEvent) e);
-		} else if (e instanceof PacManDiedEvent) {
-			onPacManDied((PacManDiedEvent) e);
-		}
-	}
-
-	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
-			PacManApp.DEBUG = !PacManApp.DEBUG;
+			Debug.DEBUG = !Debug.DEBUG;
 		}
 		pacMan.update();
 		getGhosts().forEach(Ghost::update);
@@ -187,7 +193,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 		if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 			e.ghost.setState(Ghost.State.DEAD);
-			PacManApp.debug(() -> System.out.println(String.format("Killed %s at tile %s", e.ghost.getName(), e.tile)));
+			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.tile));
 		} else if (e.ghost.getState() == Ghost.State.DEAD) {
 			// do nothing
 		} else {
@@ -199,8 +205,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 				enemy.setState(Ghost.State.STARRED);
 			});
 			game.lives -= 1;
-			PacManApp
-					.debug(() -> System.out.println(String.format("Got killed by %s at tile %s", e.ghost.getName(), e.tile)));
+			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.tile));
 		}
 	}
 
@@ -217,13 +222,24 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			++game.level;
 			initLevel();
 		} else if (e.food == ENERGIZER) {
-			PacManApp.debug(() -> System.out.println(String.format("Eat energizer at tile %s", e.tile)));
+			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
 			pacMan.enemies().forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}
 	}
 
 	private void onBonusFound(BonusFoundEvent e) {
 		maze.setContent(e.tile, EMPTY);
-		PacManApp.debug(() -> System.out.println(String.format("Found bonus %s at tile=%s", e.bonus, e.tile)));
+		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 	}
+
+	private void onGhostFrightenedEnds(GhostFrightenedEndsEvent e) {
+		// TODO depends on currently running wave (scattering or attacking wave)
+		e.ghost.setState(Ghost.State.ATTACKING);
+	}
+
+	private void onGhostDeadEnds(GhostDeadEndsEvent e) {
+		// TODO depends on currently running wave (scattering or attacking wave)
+		e.ghost.setState(Ghost.State.ATTACKING);
+	}
+
 }

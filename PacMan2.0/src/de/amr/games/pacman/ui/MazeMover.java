@@ -16,7 +16,6 @@ import java.util.Set;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -70,7 +69,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			PacManApp.debug(() -> System.out.println(String.format("%s changed from %s to %s", getName(), oldState, state)));
+			Debug.log(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
 		}
 	}
 
@@ -171,7 +170,7 @@ public abstract class MazeMover<S> extends GameEntity {
 			}
 		}
 		if (canMove(moveDirection)) {
-			tf.moveTo(computeExactMovePosition(moveDirection));
+			tf.moveTo(computeMovePosition(moveDirection, speed));
 		} else { // adjust exactly over tile
 			setTile(currentTile);
 		}
@@ -193,7 +192,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	private Tile computeTouchedTile(Tile currentTile, int dir) {
-		Vector2f newPosition = computeExactMovePosition(dir);
+		Vector2f newPosition = computeMovePosition(dir, speed);
 		float x = newPosition.x, y = newPosition.y;
 		switch (dir) {
 		case Top4.W:
@@ -209,7 +208,10 @@ public abstract class MazeMover<S> extends GameEntity {
 		}
 	}
 
-	private Vector2f computeExactMovePosition(int dir) {
-		return sum(tf.getPosition(), smul(speed, Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir))));
+	private Vector2f computeMovePosition(int dir, float speed) {
+		Vector2f dirVector = Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir));
+		Vector2f velocity = smul(speed, dirVector);
+		// TODO insert micro-move such that taking turn is always possible
+		return sum(tf.getPosition(), velocity);
 	}
 }

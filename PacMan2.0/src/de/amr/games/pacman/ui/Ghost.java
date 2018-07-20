@@ -2,10 +2,14 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.controller.event.GhostDeadEndsEvent;
+import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
 import de.amr.games.pacman.model.Maze;
 
 public class Ghost extends MazeMover<Ghost.State> {
@@ -17,7 +21,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
-	private final Sprite[] allSprites;
+	// TODO remove this:
+	private final List<Sprite> allSprites = new ArrayList<>();
 
 	public Ghost(Maze maze, String name, int color) {
 		super(maze, new EnumMap<>(State.class));
@@ -27,25 +32,40 @@ public class Ghost extends MazeMover<Ghost.State> {
 					getSpriteSize());
 			spriteNormal[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
 			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(getSpriteSize(), getSpriteSize());
+			allSprites.add(spriteNormal[dir]);
+			allSprites.add(spriteDead[dir]);
 		});
 		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(getSpriteSize(), getSpriteSize());
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
-
-		// TODO HACK
-		allSprites = new Sprite[spriteNormal.length + spriteDead.length + 1];
-		System.arraycopy(spriteNormal, 0, allSprites, 0, spriteNormal.length);
-		System.arraycopy(spriteDead, 0, allSprites, spriteNormal.length, spriteDead.length);
-		allSprites[allSprites.length - 1] = spriteFrightened;
+		allSprites.add(spriteFrightened);
 	}
 
 	@Override
 	public void update() {
-		if (getState() == State.DEAD && stateDurationSeconds() > 6) {
-			setState(State.ATTACKING);
-		} else if (getState() == State.FRIGHTENED && stateDurationSeconds() > 3) {
-			setState(State.ATTACKING);
+		switch (getState()) {
+		case ATTACKING:
+			move();
+			break;
+		case DEAD:
+			move();
+			if (stateDurationSeconds() > 6) {
+				fireGameEvent(new GhostDeadEndsEvent(this));
+			}
+			break;
+		case FRIGHTENED:
+			move();
+			if (stateDurationSeconds() > 3) {
+				fireGameEvent(new GhostFrightenedEndsEvent(this));
+			}
+			break;
+		case SCATTERING:
+			move();
+			break;
+		case STARRED:
+			break;
+		default:
+			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}
-		move();
 	}
 
 	@Override
@@ -57,12 +77,15 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public Sprite currentSprite() {
 		switch (getState()) {
 		case ATTACKING:
-		case STARRED:
 			return spriteNormal[getMoveDirection()];
-		case FRIGHTENED:
-			return spriteFrightened;
 		case DEAD:
 			return spriteDead[getMoveDirection()];
+		case FRIGHTENED:
+			return spriteFrightened;
+		case SCATTERING:
+			return spriteNormal[getMoveDirection()];
+		case STARRED:
+			return spriteNormal[getMoveDirection()];
 		default:
 			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}
@@ -70,6 +93,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	protected Sprite[] getSprites() {
-		return allSprites;
+		return allSprites.toArray(new Sprite[allSprites.size()]);
 	}
 }
