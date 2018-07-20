@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.Debug;
 import de.amr.games.pacman.ui.MazeMover;
 
 /**
@@ -30,13 +29,11 @@ public class Ambush implements MoveBehavior {
 	public int getNextMoveDirection() {
 		Optional<Tile> fourAhead = ahead(4, refugee.getTile(), refugee.getMoveDirection());
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {
-			Tile targetTile = fourAhead.get();
-			Debug.log(() -> "One tile ahead: " + targetTile);
-			targetPath = maze.findPath(ambusher.getTile(), targetTile);
-			return maze.dirAlongPath(targetPath).orElse(ambusher.getNextMoveDirection());
+			targetPath = maze.findPath(ambusher.getTile(), fourAhead.get());
 		} else {
-			return ambusher.getNextMoveDirection();
+			targetPath = maze.findPath(ambusher.getTile(), refugee.getTile());
 		}
+		return maze.dirAlongPath(targetPath).orElse(ambusher.getNextMoveDirection());
 	}
 
 	@Override

@@ -131,9 +131,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, blinky, maze.blinkyHome));
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(maze, pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, pinky, maze.pinkyHome));
-//		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
+		// inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
 		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, inky, maze.inkyHome));
-		//		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
+		// clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
 		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, clyde, maze.clydeHome));
 
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
@@ -170,15 +170,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		initEntities();
 	}
 
+	// Game event handling
+
 	@Override
 	public void update() {
 		Debug.readDebugLevel();
 		pacMan.update();
 		getGhosts().forEach(Ghost::update);
-	}
-
-	private void onPacManDied(PacManDiedEvent e) {
-		initEntities();
 	}
 
 	private void onGhostContact(GhostContactEvent e) {
@@ -201,6 +199,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game.lives -= 1;
 			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.tile));
 		}
+	}
+
+	private void onPacManDied(PacManDiedEvent e) {
+		initEntities();
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
