@@ -26,7 +26,7 @@ import de.amr.games.pacman.controller.behavior.Chase;
 import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
 import de.amr.games.pacman.controller.behavior.GoHome;
-import de.amr.games.pacman.controller.behavior.KeyboardSteering;
+import de.amr.games.pacman.controller.behavior.FollowKeyboard;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -127,7 +127,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pacMan.addObserver(this);
 
 		// define move behavior
-		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		pacMan.setMoveBehavior(PacMan.State.ALIVE, new FollowKeyboard(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 
 		getGhosts().forEach(ghost -> {
 			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing(ghost));
