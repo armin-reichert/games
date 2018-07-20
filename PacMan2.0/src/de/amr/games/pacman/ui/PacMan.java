@@ -37,7 +37,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());
-			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 150);
+			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 100);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 100);
@@ -76,7 +76,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		enemies.add(ghost);
 	}
 
-	public void removeEnemy(MazeMover<de.amr.games.pacman.ui.Ghost.State> ghost) {
+	public void removeEnemy(Ghost ghost) {
 		enemies.remove(ghost);
 	}
 
@@ -90,7 +90,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public void update() {
 		switch (getState()) {
 		case ALIVE:
-			Optional<GameEvent> discovery = inspectCurrentTile();
+			Optional<GameEvent> discovery = inspectTile(getTile());
 			if (discovery.isPresent()) {
 				fireGameEvent(discovery.get());
 			} else {
@@ -105,38 +105,17 @@ public class PacMan extends MazeMover<PacMan.State> {
 			break;
 		default:
 			throw new IllegalStateException("Illegal PacMan state: " + getState());
-
 		}
 	}
 
-	private Optional<GameEvent> inspectCurrentTile() {
-		Tile currentTile = getTile();
-		Optional<GameEvent> enemy = checkLivingEnemy(currentTile);
-		if (enemy.isPresent()) {
-			return enemy;
-		}
-		Optional<GameEvent> food = checkFood(currentTile);
-		if (food.isPresent()) {
-			return food;
-		}
-		Optional<GameEvent> bonus = checkBonus(currentTile);
-		if (bonus.isPresent()) {
-			return bonus;
-		}
-		return Optional.empty();
-	}
-
-	private Optional<GameEvent> checkBonus(Tile tile) {
+	private Optional<GameEvent> inspectTile(Tile tile) {
 		char content = getMaze().getContent(tile);
-		return Tile.isBonus(content) ? Optional.of(new BonusFoundEvent(tile, content)) : Optional.empty();
-	}
-
-	private Optional<GameEvent> checkFood(Tile tile) {
-		char content = getMaze().getContent(tile);
-		return Tile.isFood(content) ? Optional.of(new FoodFoundEvent(tile, content)) : Optional.empty();
-	}
-
-	private Optional<GameEvent> checkLivingEnemy(Tile tile) {
+		if (Tile.isBonus(content)) {
+			return Optional.of(new BonusFoundEvent(tile, content));
+		}
+		if (Tile.isFood(content)) {
+			return Optional.of(new FoodFoundEvent(tile, content));
+		}
 		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
 				.map(ghost -> new GhostContactEvent(ghost, tile));
 	}
