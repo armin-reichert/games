@@ -135,6 +135,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(blinky, pacMan));
 		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(blinky));
+		blinky.setMoveBehavior(Ghost.State.RECOVERING, new GoHome(blinky));
 
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(pinky));
@@ -239,7 +240,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostDeadIsOver(GhostDeadIsOverEvent e) {
 		e.ghost.setState(Ghost.State.RECOVERING);
 		e.ghost.setMoveDirection(Top4.N);
-		e.ghost.setSpeed(6f * TS / 60);
+		e.ghost.setSpeed(3f * TS / 60);
 	}
 
 	private void onGhostRecoveringComplete(GhostRecoveringCompleteEvent e) {

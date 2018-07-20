@@ -13,13 +13,11 @@ import de.amr.games.pacman.ui.MazeMover;
  */
 public class Ambush implements MoveBehavior {
 
-	private final Maze maze;
 	private final MazeMover<?> ambusher;
 	private final MazeMover<?> refugee;
 	private List<Tile> targetPath;
 
 	public Ambush(MazeMover<?> ambusher, MazeMover<?> refugee) {
-		this.maze = ambusher.getMaze();
 		this.ambusher = ambusher;
 		this.refugee = refugee;
 		this.targetPath = Collections.emptyList();
@@ -27,7 +25,8 @@ public class Ambush implements MoveBehavior {
 
 	@Override
 	public int getNextMoveDirection() {
-		Optional<Tile> fourAhead = ahead(4, refugee.getTile(), refugee.getMoveDirection());
+		Maze maze = refugee.getMaze();
+		Optional<Tile> fourAhead = ahead(4, refugee);
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {
 			targetPath = maze.findPath(ambusher.getTile(), fourAhead.get());
 		} else {
@@ -41,10 +40,10 @@ public class Ambush implements MoveBehavior {
 		return targetPath;
 	}
 
-	private Optional<Tile> ahead(int n, Tile tile, int dir) {
-		Tile current = tile;
+	private Optional<Tile> ahead(int n, MazeMover<?> refugee) {
+		Tile current = refugee.getTile();
 		for (int i = 0; i < n; ++i) {
-			Optional<Tile> next = maze.neighbor(current, dir);
+			Optional<Tile> next = refugee.getMaze().neighbor(current, refugee.getMoveDirection());
 			if (next.isPresent()) {
 				current = next.get();
 			}
