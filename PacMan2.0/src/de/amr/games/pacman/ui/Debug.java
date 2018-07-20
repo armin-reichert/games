@@ -74,7 +74,8 @@ public class Debug {
 		if (DEBUG_LEVEL < 1) {
 			return;
 		}
-		ghost.currentMoveBehavior().getTargetTile().ifPresent(tile -> {
+		List<Tile> path = ghost.currentMoveBehavior().getTargetPath();
+		if (path.size() > 1) {
 			switch (ghost.getColor()) {
 			case Spritesheet.RED_GHOST:
 				g.setColor(Color.RED);
@@ -90,23 +91,20 @@ public class Debug {
 				break;
 			}
 			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
-			// Path to target
-			List<Tile> path = ghost.currentMoveBehavior().getTargetPath();
-			if (path.size() > 0) {
-				for (int i = 0; i < path.size() - 1; ++i) {
-					Tile u = path.get(i), v = path.get(i+1);
-					int u1 = u.col * TS + TS/2;
-					int u2 = u.row * TS + TS/2;
-					int v1 = v.col * TS + TS/2;
-					int v2 = v.row * TS + TS/2;
-					g.drawLine(u1, u2, v1, v2);
-				}
+			for (int i = 0; i < path.size() - 1; ++i) {
+				Tile u = path.get(i), v = path.get(i + 1);
+				int u1 = u.col * TS + TS / 2;
+				int u2 = u.row * TS + TS / 2;
+				int v1 = v.col * TS + TS / 2;
+				int v2 = v.row * TS + TS / 2;
+				g.drawLine(u1, u2, v1, v2);
 			}
 			// Target tile
+			Tile tile = path.get(path.size() - 1);
 			g.translate(tile.col * TS, tile.row * TS);
 			g.fillRect(0, 0, TS, TS);
 			g.translate(-tile.col * TS, -tile.row * TS);
 			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
-		});
+		}
 	}
 }

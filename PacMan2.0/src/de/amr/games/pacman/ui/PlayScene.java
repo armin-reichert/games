@@ -26,8 +26,6 @@ import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
 import de.amr.games.pacman.controller.behavior.GoHome;
 import de.amr.games.pacman.controller.behavior.KeyboardSteering;
-import de.amr.games.pacman.controller.behavior.LackingBehindMoveBehavior;
-import de.amr.games.pacman.controller.behavior.MoodyMoveBehavior;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -135,7 +133,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, pinky, maze.pinkyHome));
 //		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
 		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, inky, maze.inkyHome));
-//		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
+		//		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
 		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, clyde, maze.clydeHome));
 
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
