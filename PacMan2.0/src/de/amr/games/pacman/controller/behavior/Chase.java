@@ -16,8 +16,8 @@ public class Chase implements MoveBehavior {
 	private final MazeMover<?> refugee;
 	private List<Tile> targetPath;
 
-	public Chase(Maze maze, MazeMover<?> chaser, MazeMover<?> refugee) {
-		this.maze = maze;
+	public Chase(MazeMover<?> chaser, MazeMover<?> refugee) {
+		this.maze = chaser.getMaze();
 		this.chaser = chaser;
 		this.refugee = refugee;
 	}

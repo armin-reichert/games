@@ -21,6 +21,7 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.behavior.Ambush;
+import de.amr.games.pacman.controller.behavior.Bounce;
 import de.amr.games.pacman.controller.behavior.Chase;
 import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
@@ -69,7 +70,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		} else if (e instanceof GhostDeadIsOverEvent) {
 			onGhostDeadIsOver((GhostDeadIsOverEvent) e);
 		} else if (e instanceof GhostRecoveringCompleteEvent) {
-			onGhostRecoveringComplete((GhostRecoveringCompleteEvent)e);
+			onGhostRecoveringComplete((GhostRecoveringCompleteEvent) e);
 		}
 	}
 
@@ -119,27 +120,33 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
-		pacMan = new PacMan(maze);
+		pacMan = new PacMan(maze, maze.pacManHome);
 		getGhosts().forEach(pacMan::addEnemy);
 
 		getGhosts().forEach(ghost -> ghost.addObserver(this));
 		pacMan.addObserver(this);
 
 		// define move behavior
+		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+
 		getGhosts().forEach(ghost -> {
 			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing(ghost));
-			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(maze, ghost, pacMan));
+			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(ghost, pacMan));
 		});
-		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(maze, blinky, pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, blinky, maze.blinkyHome));
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(maze, pinky, pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, pinky, maze.pinkyHome));
-		// inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
-		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, inky, maze.inkyHome));
-		// clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
-		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, clyde, maze.clydeHome));
+		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(blinky, pacMan));
+		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(blinky));
 
-		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(pinky));
+		pinky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce(pinky));
+
+		// inky.setMoveBehavior(Ghost.State.ATTACKING, new Moody(inky));
+		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(inky));
+		inky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce(inky));
+
+		// clyde.setMoveBehavior(Ghost.State.ATTACKING, new StayBehind(clyde));
+		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(clyde));
+		clyde.setMoveBehavior(Ghost.State.RECOVERING, new Bounce(clyde));
 	}
 
 	private void initEntities() {
@@ -154,7 +161,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		});
 
 		pacMan.setTile(maze.pacManHome);
-		pacMan.setSpeed(7f * TS / 60);
+		pacMan.setSpeed(9f * TS / 60);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
 		pacMan.setState(State.ALIVE);
@@ -171,14 +178,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	@Override
 	public void update() {
 		Debug.readDebugLevel();
+		Debug.handleCheats(this);
+		
 		pacMan.update();
 		getGhosts().forEach(Ghost::update);
 	}
 
 	private void onGhostContact(GhostContactEvent e) {
-		if (pacMan.getState() == PacMan.State.DYING) {
-			return;
-		}
 		if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 			e.ghost.setState(Ghost.State.DEAD);
 			e.ghost.setSpeed(12f * TS / 60);
@@ -232,8 +238,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onGhostDeadIsOver(GhostDeadIsOverEvent e) {
 		e.ghost.setState(Ghost.State.RECOVERING);
+		e.ghost.setMoveDirection(Top4.N);
+		e.ghost.setSpeed(6f * TS / 60);
 	}
-	
+
 	private void onGhostRecoveringComplete(GhostRecoveringCompleteEvent e) {
 		e.ghost.setSpeed(6f * TS / 60);
 		e.ghost.setState(Ghost.State.ATTACKING);

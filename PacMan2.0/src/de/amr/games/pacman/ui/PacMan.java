@@ -31,8 +31,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final Sprite spriteDying;
 	private final Set<Ghost> enemies = new HashSet<>();
 
-	public PacMan(Maze maze) {
-		super(maze, new EnumMap<>(State.class));
+	public PacMan(Maze maze, Tile home) {
+		super(maze, home, new EnumMap<>(State.class));
 		setName("Pac-Man");
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
@@ -76,7 +76,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		enemies.add(ghost);
 	}
 
-	public void removeEnemy(Ghost ghost) {
+	public void removeEnemy(MazeMover<de.amr.games.pacman.ui.Ghost.State> ghost) {
 		enemies.remove(ghost);
 	}
 
@@ -127,12 +127,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private Optional<GameEvent> checkBonus(Tile tile) {
-		char content = maze.getContent(tile);
+		char content = getMaze().getContent(tile);
 		return Tile.isBonus(content) ? Optional.of(new BonusFoundEvent(tile, content)) : Optional.empty();
 	}
 
 	private Optional<GameEvent> checkFood(Tile tile) {
-		char content = maze.getContent(tile);
+		char content = getMaze().getContent(tile);
 		return Tile.isFood(content) ? Optional.of(new FoodFoundEvent(tile, content)) : Optional.empty();
 	}
 

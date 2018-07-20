@@ -43,6 +43,13 @@ public class Debug {
 		System.out.println(msg.get());
 	}
 
+	public static void handleCheats(PlayScene scene) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
+			scene.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
+					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
+		}
+	}
+
 	public static void drawMazeDebugInfo(Graphics2D g, MazeUI mazeUI) {
 		if (DEBUG_LEVEL < 2) {
 			return;

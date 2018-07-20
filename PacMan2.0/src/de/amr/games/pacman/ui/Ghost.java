@@ -21,8 +21,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	private final int color;
-	private final Tile home;
-
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
@@ -30,10 +28,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final List<Sprite> allSprites = new ArrayList<>();
 
 	public Ghost(Maze maze, String name, int color, Tile home) {
-		super(maze, new EnumMap<>(State.class));
+		super(maze, home, new EnumMap<>(State.class));
 		setName(name);
 		this.color = color;
-		this.home = home;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
 					getSpriteSize());
@@ -51,10 +48,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return color;
 	}
 
-	public Tile getHome() {
-		return home;
-	}
-
 	@Override
 	public void update() {
 		switch (getState()) {
@@ -63,7 +56,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case DEAD:
 			move();
-			if (getTile().equals(home)) {
+			if (getTile().equals(getHome())) {
 				fireGameEvent(new GhostDeadIsOverEvent(this));
 			}
 			break;
@@ -103,7 +96,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case FRIGHTENED:
 			return spriteFrightened;
 		case RECOVERING:
-				return spriteNormal[getMoveDirection()];
+			return spriteNormal[getMoveDirection()];
 		case SCATTERING:
 			return spriteNormal[getMoveDirection()];
 		case STARRED:

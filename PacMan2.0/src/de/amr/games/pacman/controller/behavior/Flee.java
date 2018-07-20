@@ -12,8 +12,8 @@ public class Flee implements MoveBehavior {
 	private final MazeMover<?> refugee;
 	private final MazeMover<?> chaser;
 
-	public Flee(Maze maze, MazeMover<?> refugee, MazeMover<?> chaser) {
-		this.maze = maze;
+	public Flee(MazeMover<?> refugee, MazeMover<?> chaser) {
+		this.maze = refugee.getMaze();
 		this.refugee = refugee;
 		this.chaser = chaser;
 	}

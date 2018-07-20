@@ -18,8 +18,8 @@ public class Ambush implements MoveBehavior {
 	private final MazeMover<?> refugee;
 	private List<Tile> targetPath;
 
-	public Ambush(Maze maze, MazeMover<?> ambusher, MazeMover<?> refugee) {
-		this.maze = maze;
+	public Ambush(MazeMover<?> ambusher, MazeMover<?> refugee) {
+		this.maze = ambusher.getMaze();
 		this.ambusher = ambusher;
 		this.refugee = refugee;
 		this.targetPath = Collections.emptyList();

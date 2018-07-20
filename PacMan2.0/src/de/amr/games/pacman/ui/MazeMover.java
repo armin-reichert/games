@@ -25,20 +25,27 @@ import de.amr.games.pacman.model.Tile;
 
 public abstract class MazeMover<S> extends GameEntity {
 
-	protected final Maze maze;
-	protected final Map<S, MoveBehavior> moveBehavior;
+	private final Maze maze;
+	private final Tile home;
+	private final Map<S, MoveBehavior> moveBehavior;
 	private final MoveBehavior defaultMoveBehavior;
 	private float speed;
 	private int moveDirection;
 	private int nextMoveDirection;
 	private S state;
 	private long stateEntryTime;
+	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
-	protected MazeMover(Maze maze, Map<S, MoveBehavior> moveBehavior) {
+	protected MazeMover(Maze maze, Tile home, Map<S, MoveBehavior> moveBehavior) {
 		Objects.requireNonNull(maze);
 		this.maze = maze;
+		this.home = home;
 		this.moveBehavior = moveBehavior;
 		defaultMoveBehavior = new DoNothing(this);
+	}
+
+	public Maze getMaze() {
+		return maze;
 	}
 
 	@Override
@@ -82,8 +89,6 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	// GameEvent observer support
-
-	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
 	public void addObserver(GameEventListener observer) {
 		observers.add(observer);
@@ -185,13 +190,13 @@ public abstract class MazeMover<S> extends GameEntity {
 			return false;
 		}
 		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
-			setTile(getTile()); //TODO improve
+			setTile(getTile()); // TODO improve
 			return isExactlyOverTile();
 		}
 		return true;
 	}
 
-	private Tile computeTouchedTile(Tile currentTile, int dir) {
+	public Tile computeTouchedTile(Tile currentTile, int dir) {
 		Vector2f newPosition = computeMovePosition(dir, speed);
 		float x = newPosition.x, y = newPosition.y;
 		switch (dir) {
@@ -213,5 +218,9 @@ public abstract class MazeMover<S> extends GameEntity {
 		Vector2f velocity = smul(speed, dirVector);
 		// TODO insert micro-move such that taking turn is always possible
 		return sum(tf.getPosition(), velocity);
+	}
+
+	public Tile getHome() {
+		return home;
 	}
 }

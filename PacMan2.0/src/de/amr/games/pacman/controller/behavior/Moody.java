@@ -3,16 +3,17 @@ package de.amr.games.pacman.controller.behavior;
 import static de.amr.easy.util.StreamUtils.randomElement;
 
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.Ghost;
+import de.amr.games.pacman.ui.Ghost.State;
+import de.amr.games.pacman.ui.MazeMover;
 
 /**
  * Inky's behaviour.
  */
 public class Moody implements MoveBehavior {
 
-	private final Ghost ghost;
+	private final MazeMover<State> ghost;
 
-	public Moody(Ghost ghost) {
+	public Moody(MazeMover<State> ghost) {
 		this.ghost = ghost;
 	}
 

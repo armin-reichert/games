@@ -56,22 +56,14 @@ public class MazeUI extends GameEntity {
 		g.translate(tile.col * TS, tile.row * TS);
 		char content = maze.getContent(tile);
 		if (content == PELLET) {
-			drawPellet(g);
+			int size = TS / 4;
+			g.setColor(Color.PINK);
+			g.fillRect((TS - size) / 2, (TS - size) / 2, size, size);
 		} else if (content == ENERGIZER) {
 			spriteEnergizer.draw(g);
 		} else if (Tile.isBonus(content)) {
-			drawBonus(g, content);
+			g.drawImage(Spritesheet.getBonus(content), 0, -TS / 2, TS * 2, TS * 2, null);
 		}
 		g.translate(-tile.col * TS, -tile.row * TS);
-	}
-
-	private void drawBonus(Graphics2D g, char bonus) {
-		g.drawImage(Spritesheet.getBonus(bonus), 0, -TS / 2, TS * 2, TS * 2, null);
-	}
-
-	private void drawPellet(Graphics2D g) {
-		int size = TS / 4;
-		g.setColor(Color.PINK);
-		g.fillRect((TS - size) / 2, (TS - size) / 2, size, size);
 	}
 }
