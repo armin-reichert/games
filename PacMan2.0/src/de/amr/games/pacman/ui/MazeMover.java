@@ -185,8 +185,8 @@ public abstract class MazeMover<S> extends GameEntity {
 			return false;
 		}
 		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
-			setTile(getTile());
-			return isExactlyOverTile(); //TODO this is too restrictive
+			setTile(getTile()); //TODO improve
+			return isExactlyOverTile();
 		}
 		return true;
 	}

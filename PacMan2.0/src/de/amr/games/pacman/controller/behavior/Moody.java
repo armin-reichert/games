@@ -8,11 +8,11 @@ import de.amr.games.pacman.ui.Ghost;
 /**
  * Inky's behaviour.
  */
-public class MoodyMoveBehavior implements MoveBehavior {
+public class Moody implements MoveBehavior {
 
 	private final Ghost ghost;
 
-	public MoodyMoveBehavior(Ghost ghost) {
+	public Moody(Ghost ghost) {
 		this.ghost = ghost;
 	}
 

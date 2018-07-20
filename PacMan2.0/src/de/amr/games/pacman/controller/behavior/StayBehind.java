@@ -8,11 +8,11 @@ import de.amr.games.pacman.ui.Ghost;
 /**
  * Clyde's behaviour.
  */
-public class LackingBehindMoveBehavior implements MoveBehavior {
+public class StayBehind implements MoveBehavior {
 
 	private final Ghost ghost;
 
-	public LackingBehindMoveBehavior(Ghost ghost) {
+	public StayBehind(Ghost ghost) {
 		this.ghost = ghost;
 	}
 
