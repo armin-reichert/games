@@ -25,8 +25,8 @@ import de.amr.games.pacman.controller.behavior.Bounce;
 import de.amr.games.pacman.controller.behavior.Chase;
 import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
-import de.amr.games.pacman.controller.behavior.GoHome;
 import de.amr.games.pacman.controller.behavior.FollowKeyboard;
+import de.amr.games.pacman.controller.behavior.GoHome;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -180,7 +180,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	public void update() {
 		Debug.readDebugLevel();
 		Debug.handleCheats(this);
-		
+
 		pacMan.update();
 		getGhosts().forEach(Ghost::update);
 	}
@@ -189,7 +189,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 			e.ghost.setState(Ghost.State.DEAD);
 			e.ghost.setSpeed(12f * TS / 60);
-			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.tile));
+			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
 		} else if (e.ghost.getState() == Ghost.State.DEAD) {
 			// do nothing
 		} else {
@@ -201,7 +201,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 				enemy.setState(Ghost.State.STARRED);
 			});
 			game.lives -= 1;
-			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.tile));
+			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
 		}
 	}
 

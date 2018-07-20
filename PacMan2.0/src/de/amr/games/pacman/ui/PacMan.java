@@ -117,6 +117,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return Optional.of(new FoodFoundEvent(tile, content));
 		}
 		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
-				.map(ghost -> new GhostContactEvent(ghost, tile));
+				.map(ghost -> new GhostContactEvent(ghost));
 	}
 }
