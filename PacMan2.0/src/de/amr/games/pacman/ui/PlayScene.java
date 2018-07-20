@@ -31,8 +31,9 @@ import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
-import de.amr.games.pacman.controller.event.GhostDeadEndsEvent;
+import de.amr.games.pacman.controller.event.GhostDeadIsOverEvent;
 import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
+import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
@@ -65,8 +66,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			onPacManDied((PacManDiedEvent) e);
 		} else if (e instanceof GhostFrightenedEndsEvent) {
 			onGhostFrightenedEnds((GhostFrightenedEndsEvent) e);
-		} else if (e instanceof GhostDeadEndsEvent) {
-			onGhostDeadEnds((GhostDeadEndsEvent) e);
+		} else if (e instanceof GhostDeadIsOverEvent) {
+			onGhostDeadIsOver((GhostDeadIsOverEvent) e);
+		} else if (e instanceof GhostRecoveringCompleteEvent) {
+			onGhostRecoveringComplete((GhostRecoveringCompleteEvent)e);
 		}
 	}
 
@@ -112,10 +115,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void createEntities() {
-		blinky = new Ghost(maze, "Blinky", RED_GHOST);
-		pinky = new Ghost(maze, "Pinky", PINK_GHOST);
-		inky = new Ghost(maze, "Inky", BLUE_GHOST);
-		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST);
+		blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
+		pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
+		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
+		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		pacMan = new PacMan(maze);
 		getGhosts().forEach(pacMan::addEnemy);
 
@@ -140,25 +143,18 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void initEntities() {
-		blinky.setTile(maze.blinkyHome);
 		blinky.setMoveDirection(Top4.E);
-
-		pinky.setTile(maze.pinkyHome);
 		pinky.setMoveDirection(Top4.S);
-
-		inky.setTile(maze.inkyHome);
 		inky.setMoveDirection(Top4.N);
-
-		clyde.setTile(maze.clydeHome);
 		clyde.setMoveDirection(Top4.N);
-
 		getGhosts().forEach(ghost -> {
-			ghost.setSpeed(7 * TS / 60);
+			ghost.setTile(ghost.getHome());
+			ghost.setSpeed(6f * TS / 60);
 			ghost.setState(Ghost.State.ATTACKING);
 		});
 
 		pacMan.setTile(maze.pacManHome);
-		pacMan.setSpeed(9 * TS / 60);
+		pacMan.setSpeed(7f * TS / 60);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
 		pacMan.setState(State.ALIVE);
@@ -185,6 +181,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 		if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
 			e.ghost.setState(Ghost.State.DEAD);
+			e.ghost.setSpeed(12f * TS / 60);
 			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.tile));
 		} else if (e.ghost.getState() == Ghost.State.DEAD) {
 			// do nothing
@@ -233,8 +230,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 
-	private void onGhostDeadEnds(GhostDeadEndsEvent e) {
-		// TODO depends on currently running wave (scattering or attacking wave)
+	private void onGhostDeadIsOver(GhostDeadIsOverEvent e) {
+		e.ghost.setState(Ghost.State.RECOVERING);
+	}
+	
+	private void onGhostRecoveringComplete(GhostRecoveringCompleteEvent e) {
+		e.ghost.setSpeed(6f * TS / 60);
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 

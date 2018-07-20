@@ -177,8 +177,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public boolean canMove(int dir) {
-		Tile currentTile = getTile();
-		Tile touchedTile = computeTouchedTile(currentTile, dir);
+		Tile currentTile = getTile(), touchedTile = computeTouchedTile(currentTile, dir);
 		if (currentTile.equals(touchedTile)) {
 			return true;
 		}
@@ -186,7 +185,8 @@ public abstract class MazeMover<S> extends GameEntity {
 			return false;
 		}
 		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
-			return isExactlyOverTile();
+			setTile(getTile());
+			return isExactlyOverTile(); //TODO this is too restrictive
 		}
 		return true;
 	}

@@ -8,27 +8,32 @@ import java.util.List;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.event.GhostDeadEndsEvent;
+import de.amr.games.pacman.controller.event.GhostDeadIsOverEvent;
 import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
+import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		ATTACKING, SCATTERING, FRIGHTENED, DEAD, STARRED
+		ATTACKING, SCATTERING, FRIGHTENED, DEAD, RECOVERING, STARRED
 	}
 
 	private final int color;
+	private final Tile home;
+
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
 	// TODO remove this:
 	private final List<Sprite> allSprites = new ArrayList<>();
 
-	public Ghost(Maze maze, String name, int color) {
+	public Ghost(Maze maze, String name, int color, Tile home) {
 		super(maze, new EnumMap<>(State.class));
 		setName(name);
 		this.color = color;
+		this.home = home;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
 					getSpriteSize());
@@ -41,9 +46,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
 		allSprites.add(spriteFrightened);
 	}
-	
+
 	public int getColor() {
 		return color;
+	}
+
+	public Tile getHome() {
+		return home;
 	}
 
 	@Override
@@ -54,8 +63,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case DEAD:
 			move();
-			if (stateDurationSeconds() > 6) {
-				fireGameEvent(new GhostDeadEndsEvent(this));
+			if (getTile().equals(home)) {
+				fireGameEvent(new GhostDeadIsOverEvent(this));
 			}
 			break;
 		case FRIGHTENED:
@@ -64,6 +73,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 				fireGameEvent(new GhostFrightenedEndsEvent(this));
 			}
 			break;
+		case RECOVERING:
+			move();
+			if (stateDurationSeconds() > 1) {
+				fireGameEvent(new GhostRecoveringCompleteEvent(this));
+			}
 		case SCATTERING:
 			move();
 			break;
@@ -88,6 +102,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 			return spriteDead[getMoveDirection()];
 		case FRIGHTENED:
 			return spriteFrightened;
+		case RECOVERING:
+				return spriteNormal[getMoveDirection()];
 		case SCATTERING:
 			return spriteNormal[getMoveDirection()];
 		case STARRED:
