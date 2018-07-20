@@ -5,30 +5,46 @@ import static de.amr.games.pacman.PacManApp.TS;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.function.Supplier;
 
+import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 
 public class Debug {
 
-	public static boolean DEBUG = false;
+	public static int DEBUG_LEVEL = 0;
+
+	public static void readDebugLevel() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_0)) {
+			DEBUG_LEVEL = 0;
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
+			DEBUG_LEVEL = 1;
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
+			DEBUG_LEVEL = 2;
+		}
+	}
 
 	public static void run(Runnable code) {
-		if (!DEBUG) {
+		if (DEBUG_LEVEL == 0) {
 			return;
 		}
 		code.run();
 	}
 
 	public static void log(Supplier<String> msg) {
-		if (!DEBUG) {
+		if (DEBUG_LEVEL < 1) {
 			return;
 		}
 		System.out.println(msg.get());
 	}
 
 	public static void drawMazeDebugInfo(Graphics2D g, MazeUI mazeUI) {
-		if (!DEBUG) {
+		if (DEBUG_LEVEL < 2) {
 			return;
 		}
 		Maze maze = mazeUI.getMaze();
@@ -53,12 +69,44 @@ public class Debug {
 		}
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
-	
-	public static void drawGhostPath(Graphics2D g, Ghost ghost) {
-		if (!DEBUG) {
+
+	public static void drawGhostPath(Graphics2D g, MazeUI mazeUI, Ghost ghost) {
+		if (DEBUG_LEVEL < 1) {
 			return;
 		}
-		
+		ghost.currentMoveBehavior().getTargetTile().ifPresent(tile -> {
+			switch (ghost.getColor()) {
+			case Spritesheet.RED_GHOST:
+				g.setColor(Color.RED);
+				break;
+			case Spritesheet.PINK_GHOST:
+				g.setColor(Color.PINK);
+				break;
+			case Spritesheet.BLUE_GHOST:
+				g.setColor(Color.BLUE);
+				break;
+			case Spritesheet.ORANGE_GHOST:
+				g.setColor(Color.ORANGE);
+				break;
+			}
+			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+			// Path to target
+			List<Tile> path = ghost.currentMoveBehavior().getTargetPath();
+			if (path.size() > 0) {
+				for (int i = 0; i < path.size() - 1; ++i) {
+					Tile u = path.get(i), v = path.get(i+1);
+					int u1 = u.col * TS + TS/2;
+					int u2 = u.row * TS + TS/2;
+					int v1 = v.col * TS + TS/2;
+					int v2 = v.row * TS + TS/2;
+					g.drawLine(u1, u2, v1, v2);
+				}
+			}
+			// Target tile
+			g.translate(tile.col * TS, tile.row * TS);
+			g.fillRect(0, 0, TS, TS);
+			g.translate(-tile.col * TS, -tile.row * TS);
+			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+		});
 	}
-
 }

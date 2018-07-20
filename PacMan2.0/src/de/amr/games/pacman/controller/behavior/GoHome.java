@@ -18,6 +18,6 @@ public class GoHome implements MoveBehavior {
 
 	@Override
 	public int getNextMoveDirection() {
-		return maze.alongPath(maze.findPath(mover.getTile(), homeTile)).orElse(mover.getNextMoveDirection());
+		return maze.dirAlongPath(maze.findPath(mover.getTile(), homeTile)).orElse(mover.getNextMoveDirection());
 	}
 }

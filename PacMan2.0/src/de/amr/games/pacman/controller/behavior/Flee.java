@@ -20,7 +20,7 @@ public class Flee implements MoveBehavior {
 
 	@Override
 	public int getNextMoveDirection() {
-		OptionalInt towardsChaser = maze.alongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
+		OptionalInt towardsChaser = maze.dirAlongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
 		if (towardsChaser.isPresent()) {
 			int dir = towardsChaser.getAsInt();
 			for (int d : Arrays.asList(Maze.TOPOLOGY.inv(dir), Maze.TOPOLOGY.right(dir), Maze.TOPOLOGY.left(dir))) {

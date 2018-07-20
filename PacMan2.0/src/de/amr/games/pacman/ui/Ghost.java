@@ -18,6 +18,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		ATTACKING, SCATTERING, FRIGHTENED, DEAD, STARRED
 	}
 
+	private final int color;
 	private final Sprite[] spriteNormal = new Sprite[4];
 	private final Sprite[] spriteDead = new Sprite[4];
 	private final Sprite spriteFrightened;
@@ -27,6 +28,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public Ghost(Maze maze, String name, int color) {
 		super(maze, new EnumMap<>(State.class));
 		setName(name);
+		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
 					getSpriteSize());
@@ -38,6 +40,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(getSpriteSize(), getSpriteSize());
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
 		allSprites.add(spriteFrightened);
+	}
+	
+	public int getColor() {
+		return color;
 	}
 
 	@Override

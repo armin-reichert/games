@@ -4,6 +4,7 @@ import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.WALL;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,6 +90,11 @@ public class Maze extends GridGraph<Character, Integer> {
 		return direction(cell(t1), cell(t2));
 	}
 
+	public Optional<Tile> neighbor(Tile tile, int dir) {
+		OptionalInt neighbor = neighbor(cell(tile), dir);
+		return neighbor.isPresent() ? Optional.of(tile(neighbor.getAsInt())) : Optional.empty();
+	}
+
 	public Stream<Tile> getAdjacentTiles(Tile tile) {
 		return adj(cell(tile)).mapToObj(this::tile);
 	}
@@ -99,7 +105,7 @@ public class Maze extends GridGraph<Character, Integer> {
 		return pathfinder.path(cell(target)).stream().map(this::tile).collect(Collectors.toList());
 	}
 
-	public OptionalInt alongPath(List<Tile> path) {
+	public OptionalInt dirAlongPath(List<Tile> path) {
 		return path.size() < 2 ? OptionalInt.empty() : direction(path.get(0), path.get(1));
 	}
 }

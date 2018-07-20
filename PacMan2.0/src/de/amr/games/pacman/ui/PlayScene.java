@@ -14,15 +14,14 @@ import static java.awt.event.KeyEvent.VK_RIGHT;
 import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.behavior.ChaseTarget;
+import de.amr.games.pacman.controller.behavior.Ambush;
+import de.amr.games.pacman.controller.behavior.Chase;
 import de.amr.games.pacman.controller.behavior.DoNothing;
 import de.amr.games.pacman.controller.behavior.Flee;
 import de.amr.games.pacman.controller.behavior.GoHome;
@@ -130,14 +129,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing(ghost));
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(maze, ghost, pacMan));
 		});
-		blinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(maze, blinky, pacMan));
+		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(maze, blinky, pacMan));
 		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, blinky, maze.blinkyHome));
-		// pinky.setMoveBehavior(Ghost.State.ATTACKING, new AmbushTarget(maze, pinky, pacMan));
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, new ChaseTarget(maze, pinky, pacMan));
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(maze, pinky, pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, pinky, maze.pinkyHome));
-		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
+//		inky.setMoveBehavior(Ghost.State.ATTACKING, new MoodyMoveBehavior(inky));
 		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, inky, maze.inkyHome));
-		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
+//		clyde.setMoveBehavior(Ghost.State.ATTACKING, new LackingBehindMoveBehavior(clyde));
 		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(maze, clyde, maze.clydeHome));
 
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new KeyboardSteering(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
@@ -176,9 +174,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	@Override
 	public void update() {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
-			Debug.DEBUG = !Debug.DEBUG;
-		}
+		Debug.readDebugLevel();
 		pacMan.update();
 		getGhosts().forEach(Ghost::update);
 	}
