@@ -3,6 +3,7 @@ package de.amr.games.pacman.ui;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
@@ -63,14 +64,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case FRIGHTENED:
 			move();
-			//TODO does not belong here
+			// TODO does not belong here
 			if (stateDurationSeconds() > 4) {
 				fireGameEvent(new GhostFrightenedEndsEvent(this));
 			}
 			break;
 		case RECOVERING:
 			move();
-			//TODO does not belong here
+			// TODO does not belong here
 			if (stateDurationSeconds() > 2) {
 				fireGameEvent(new GhostRecoveringCompleteEvent(this));
 			}
@@ -85,8 +86,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	@Override
-	protected Sprite[] getSprites() {
-		return allSprites.toArray(new Sprite[allSprites.size()]);
+	protected Stream<Sprite> getSprites() {
+		return allSprites.stream();
 	}
 
 	@Override

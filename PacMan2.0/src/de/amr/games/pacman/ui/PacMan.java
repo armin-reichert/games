@@ -1,9 +1,12 @@
 package de.amr.games.pacman.ui;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
@@ -26,6 +29,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Sprite[] spriteWalking = new Sprite[4];
 	private Sprite spriteStanding;
 	private Sprite spriteDying;
+	private List<Sprite> allSprites = new ArrayList<>();
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
@@ -35,12 +39,15 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private void createSprites() {
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SPRITE_SIZE, SPRITE_SIZE);
+		allSprites.add(spriteStanding);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
 			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 100);
+			allSprites.add(spriteWalking[dir]);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		spriteDying.makeAnimated(AnimationMode.LINEAR, 100);
+		allSprites.add(spriteDying);
 	}
 
 	@Override
@@ -52,6 +59,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return spriteDying;
 		}
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
+	}
+
+	@Override
+	protected Stream<Sprite> getSprites() {
+		return allSprites.stream();
 	}
 
 	// PacMan activity

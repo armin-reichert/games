@@ -186,8 +186,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pacMan.setSpeed(game::getPacManSpeed);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
-		pacMan.currentSprite().setAnimationEnabled(false);
-		mazeUI.getSpriteEnergizer().setAnimationEnabled(false);
+		pacMan.setAnimated(false);
+		mazeUI.setAnimated(false);
 	}
 
 	private void initLevel() {
@@ -207,8 +207,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		switch (state) {
 		case READY:
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-				mazeUI.getSpriteEnergizer().setAnimationEnabled(true);
-				pacMan.currentSprite().setAnimationEnabled(true);
+				mazeUI.setAnimated(true);
+				pacMan.setAnimated(true);
 				state = State.RUNNING;
 			}
 			break;
@@ -218,8 +218,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			break;
 		case COMPLETE:
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-				mazeUI.getSpriteEnergizer().setAnimationEnabled(false);
-				pacMan.currentSprite().setAnimationEnabled(false);
+				mazeUI.setAnimated(false);
+				pacMan.setAnimated(false);
 				state = State.READY;
 			}
 			break;
