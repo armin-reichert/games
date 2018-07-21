@@ -133,6 +133,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		createEntities();
 		createUI();
 		initEntities();
+		pacMan.enableAnimation(false);
+		mazeUI.enableAnimation(false);
+		getGhosts().forEach(ghost -> ghost.enableAnimation(false));
 	}
 
 	private void createEntities() {
@@ -179,15 +182,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setState(Ghost.State.RECOVERING);
 			ghost.setTile(ghost.getHome());
 			ghost.setSpeed(game::getGhostSpeed);
-			ghost.setAnimated(true);
+			ghost.enableAnimation(true);
 		});
 		pacMan.setState(PacMan.State.ALIVE);
 		pacMan.setTile(maze.pacManHome);
 		pacMan.setSpeed(game::getPacManSpeed);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
-		pacMan.setAnimated(false);
-		mazeUI.setAnimated(false);
+		pacMan.enableAnimation(true);
 	}
 
 	private void initLevel() {
@@ -206,20 +208,21 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Debug.update(this);
 		switch (state) {
 		case READY:
-			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-				mazeUI.setAnimated(true);
-				pacMan.setAnimated(true);
-				state = State.RUNNING;
-			}
+			mazeUI.enableAnimation(true);
+			pacMan.enableAnimation(true);
+			getGhosts().forEach(ghost -> ghost.enableAnimation(true));
+			state = State.RUNNING;
 			break;
 		case RUNNING:
 			pacMan.update();
 			getGhosts().forEach(Ghost::update);
 			break;
 		case COMPLETE:
+			mazeUI.enableAnimation(false);
+			pacMan.enableAnimation(false);
+			getGhosts().forEach(ghost -> ghost.enableAnimation(false));
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
-				mazeUI.setAnimated(false);
-				pacMan.setAnimated(false);
+				game = new Game();
 				state = State.READY;
 			}
 			break;
@@ -236,7 +239,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case STARRED:
 			pacMan.setState(PacMan.State.DYING);
 			pacMan.enemies.forEach(enemy -> {
-				enemy.setAnimated(false);
+				enemy.enableAnimation(false);
 				enemy.setState(Ghost.State.STARRED);
 			});
 			game.lives -= 1;

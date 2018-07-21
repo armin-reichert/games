@@ -7,6 +7,7 @@ import static de.amr.games.pacman.model.Tile.PELLET;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
@@ -28,15 +29,20 @@ public class MazeUI extends GameEntity {
 		this.ghosts = ghosts;
 		spriteMaze = new Sprite(Spritesheet.getMaze()).scale(width, height);
 		spriteEnergizer = new Sprite(Spritesheet.getEnergizerImages()).scale(TS, TS);
-		spriteEnergizer.makeAnimated(AnimationMode.BACK_AND_FORTH, 250);
+		spriteEnergizer.createAnimation(AnimationMode.BACK_AND_FORTH, 250);
 	}
 
 	public Maze getMaze() {
 		return maze;
 	}
-	
+
 	public Sprite getSpriteEnergizer() {
 		return spriteEnergizer;
+	}
+
+	@Override
+	protected Stream<Sprite> getSprites() {
+		return Stream.of(spriteMaze, spriteEnergizer);
 	}
 
 	@Override

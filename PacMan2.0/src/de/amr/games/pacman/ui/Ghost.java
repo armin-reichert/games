@@ -36,13 +36,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void loadSprites() {
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
-			spriteNormal[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
+			spriteNormal[dir].createAnimation(AnimationMode.BACK_AND_FORTH, 300);
 			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
 			allSprites.add(spriteNormal[dir]);
 			allSprites.add(spriteDead[dir]);
 		});
 		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(SPRITE_SIZE, SPRITE_SIZE);
-		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
+		spriteFrightened.createAnimation(AnimationMode.CYCLIC, 200);
 		allSprites.add(spriteFrightened);
 	}
 

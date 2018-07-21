@@ -42,11 +42,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 		allSprites.add(spriteStanding);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
-			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 100);
+			spriteWalking[dir].createAnimation(AnimationMode.CYCLIC, 100);
 			allSprites.add(spriteWalking[dir]);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SPRITE_SIZE, SPRITE_SIZE);
-		spriteDying.makeAnimated(AnimationMode.LINEAR, 100);
+		spriteDying.createAnimation(AnimationMode.LINEAR, 100);
 		allSprites.add(spriteDying);
 	}
 
@@ -89,7 +89,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 			break;
 		case DYING:
 			if (stateDurationSeconds() > 3) {
-				spriteDying.resetAnimation();
 				fireGameEvent(new PacManDiedEvent());
 			}
 			break;

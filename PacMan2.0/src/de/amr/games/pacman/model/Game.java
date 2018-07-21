@@ -14,34 +14,33 @@ public class Game {
 	}
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {
-		return tps(8f);
-	}
-
-	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
-		float speed = 0;
-		switch (ghost.getState()) {
-		case ATTACKING:
-			speed = tps(6f);
-			break;
-		case DEAD:
-			speed = tps(10f);
-			break;
-		case FRIGHTENED:
-			speed = tps(4f);
-			break;
-		case RECOVERING:
-			speed = tps(3f);
-			break;
-		case SCATTERING:
-			speed = tps(6f);
-			break;
-		case STARRED:
-			speed = 0f;
-			break;
+		switch (pacMan.getState()) {
+		case ALIVE:
+			return tps(8f);
+		case DYING:
+			return 0;
 		default:
 			throw new IllegalStateException();
 		}
-		return speed;
+	}
+
+	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
+		switch (ghost.getState()) {
+		case ATTACKING:
+			return tps(6f);
+		case DEAD:
+			return tps(10f);
+		case FRIGHTENED:
+			return tps(4f);
+		case RECOVERING:
+			return tps(3f);
+		case SCATTERING:
+			return tps(6f);
+		case STARRED:
+			return 0f;
+		default:
+			throw new IllegalStateException();
+		}
 	}
 
 	public int level;
