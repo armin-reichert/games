@@ -1,14 +1,11 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.PacManApp.TS;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
@@ -29,23 +26,18 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final Sprite[] spriteWalking = new Sprite[4];
 	private final Sprite spriteStanding;
 	private final Sprite spriteDying;
-	private final Set<Ghost> enemies = new HashSet<>();
+	public final Set<Ghost> enemies = new HashSet<>();
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName("Pac-Man");
-		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(getSpriteSize(), getSpriteSize());
+		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(getSpriteSize(), getSpriteSize());
+			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
 			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 100);
 		});
-		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(getSpriteSize(), getSpriteSize());
+		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 100);
-	}
-
-	@Override
-	public int getSpriteSize() {
-		return TS * 2;
 	}
 
 	@Override
@@ -68,20 +60,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return spriteDying;
 		}
 		throw new IllegalStateException("Illegal PacMan state: " + getState());
-	}
-
-	// PacMan enemies
-
-	public void addEnemy(Ghost ghost) {
-		enemies.add(ghost);
-	}
-
-	public void removeEnemy(Ghost ghost) {
-		enemies.remove(ghost);
-	}
-
-	public Stream<Ghost> enemies() {
-		return enemies.stream();
 	}
 
 	// PacMan activity

@@ -25,6 +25,8 @@ import de.amr.games.pacman.model.Tile;
 
 public abstract class MazeMover<S> extends GameEntity {
 
+	public static int SPRITE_SIZE = 2 * TS;
+
 	private final Maze maze;
 	private final Tile home;
 	private final Map<S, MoveBehavior> moveBehavior;
@@ -51,7 +53,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		// draw sprite centered over collision box
-		int offsetX = (getWidth() - getSpriteSize()) / 2, offsetY = (getHeight() - getSpriteSize()) / 2;
+		int offsetX = (getWidth() - SPRITE_SIZE) / 2, offsetY = (getHeight() - SPRITE_SIZE) / 2;
 		g.translate(offsetX, offsetY);
 		super.draw(g);
 		g.translate(-offsetX, -offsetY);
@@ -66,8 +68,6 @@ public abstract class MazeMover<S> extends GameEntity {
 	public int getHeight() {
 		return TS;
 	}
-
-	public abstract int getSpriteSize();
 
 	// State support
 

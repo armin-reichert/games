@@ -14,6 +14,7 @@ import static java.awt.event.KeyEvent.VK_RIGHT;
 import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.Graphics2D;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -44,8 +45,8 @@ import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
-import de.amr.games.pacman.ui.StatusUI;
 import de.amr.games.pacman.ui.PacMan.State;
+import de.amr.games.pacman.ui.StatusUI;
 
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
@@ -127,7 +128,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		pacMan = new PacMan(maze, maze.pacManHome);
-		getGhosts().forEach(pacMan::addEnemy);
+		pacMan.enemies.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 
 		getGhosts().forEach(ghost -> ghost.addObserver(this));
 		pacMan.addObserver(this);
@@ -201,7 +202,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		} else {
 			pacMan.setState(State.DYING);
 			pacMan.setSpeed(0);
-			pacMan.enemies().forEach(enemy -> {
+			pacMan.enemies.forEach(enemy -> {
 				enemy.setSpeed(0);
 				enemy.setAnimated(false);
 				enemy.setState(Ghost.State.STARRED);
@@ -229,7 +230,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			initLevel();
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
-			pacMan.enemies().forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
+			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}
 	}
 

@@ -1,7 +1,5 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.PacManApp.TS;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -32,14 +30,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 		setName(name);
 		this.color = color;
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(getSpriteSize(),
-					getSpriteSize());
+			spriteNormal[dir] = new Sprite(Spritesheet.getNormalGhostImages(color, dir)).scale(SPRITE_SIZE,
+					SPRITE_SIZE);
 			spriteNormal[dir].makeAnimated(AnimationMode.BACK_AND_FORTH, 300);
-			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(getSpriteSize(), getSpriteSize());
+			spriteDead[dir] = new Sprite(Spritesheet.getDeadGhostImage(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
 			allSprites.add(spriteNormal[dir]);
 			allSprites.add(spriteDead[dir]);
 		});
-		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(getSpriteSize(), getSpriteSize());
+		spriteFrightened = new Sprite(Spritesheet.getFrightenedGhostImages()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		spriteFrightened.makeAnimated(AnimationMode.CYCLIC, 200);
 		allSprites.add(spriteFrightened);
 	}
@@ -79,11 +77,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		default:
 			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}
-	}
-
-	@Override
-	public int getSpriteSize() {
-		return TS * 2;
 	}
 
 	@Override
