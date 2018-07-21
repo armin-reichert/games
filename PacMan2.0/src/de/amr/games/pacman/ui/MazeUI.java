@@ -34,6 +34,10 @@ public class MazeUI extends GameEntity {
 	public Maze getMaze() {
 		return maze;
 	}
+	
+	public Sprite getSpriteEnergizer() {
+		return spriteEnergizer;
+	}
 
 	@Override
 	public Sprite currentSprite() {

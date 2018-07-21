@@ -181,12 +181,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setSpeed(game::getGhostSpeed);
 			ghost.setAnimated(true);
 		});
-
 		pacMan.setState(PacMan.State.ALIVE);
 		pacMan.setTile(maze.pacManHome);
 		pacMan.setSpeed(game::getPacManSpeed);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
+		pacMan.currentSprite().setAnimationEnabled(false);
+		mazeUI.getSpriteEnergizer().setAnimationEnabled(false);
 	}
 
 	private void initLevel() {
@@ -197,12 +198,17 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	// Game event handling
 
+	/**
+	 * Called on every clock tick.
+	 */
 	@Override
 	public void update() {
 		Debug.update(this);
 		switch (state) {
 		case READY:
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
+				mazeUI.getSpriteEnergizer().setAnimationEnabled(true);
+				pacMan.currentSprite().setAnimationEnabled(true);
 				state = State.RUNNING;
 			}
 			break;
@@ -212,13 +218,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			break;
 		case COMPLETE:
 			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
+				mazeUI.getSpriteEnergizer().setAnimationEnabled(false);
+				pacMan.currentSprite().setAnimationEnabled(false);
 				state = State.READY;
-				break;
 			}
+			break;
 		default:
 			throw new IllegalStateException();
 		}
-
 	}
 
 	private void onGhostContact(GhostContactEvent e) {
@@ -234,6 +241,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			});
 			game.lives -= 1;
 			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
+			if (game.lives == 0) {
+				state = State.COMPLETE;
+			}
+			break;
 		case DEAD:
 			break;
 		case FRIGHTENED:
