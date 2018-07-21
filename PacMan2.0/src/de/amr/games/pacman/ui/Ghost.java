@@ -63,13 +63,15 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case FRIGHTENED:
 			move();
-			if (stateDurationSeconds() > 3) {
+			//TODO does not belong here
+			if (stateDurationSeconds() > 4) {
 				fireGameEvent(new GhostFrightenedEndsEvent(this));
 			}
 			break;
 		case RECOVERING:
 			move();
-			if (stateDurationSeconds() > 3) {
+			//TODO does not belong here
+			if (stateDurationSeconds() > 2) {
 				fireGameEvent(new GhostRecoveringCompleteEvent(this));
 			}
 		case SCATTERING:

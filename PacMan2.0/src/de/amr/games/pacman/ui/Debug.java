@@ -18,7 +18,19 @@ public class Debug {
 
 	public static int DEBUG_LEVEL = 0;
 
-	public static void readDebugLevel() {
+	public static void log(Supplier<String> msg) {
+		if (DEBUG_LEVEL < 1) {
+			return;
+		}
+		System.out.println(msg.get());
+	}
+
+	public static void update(PlayScene scene) {
+		readDebugLevel();
+		handleCheats(scene);
+	}
+
+	private static void readDebugLevel() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_0)) {
 			DEBUG_LEVEL = 0;
 		}
@@ -30,21 +42,7 @@ public class Debug {
 		}
 	}
 
-	public static void run(Runnable code) {
-		if (DEBUG_LEVEL == 0) {
-			return;
-		}
-		code.run();
-	}
-
-	public static void log(Supplier<String> msg) {
-		if (DEBUG_LEVEL < 1) {
-			return;
-		}
-		System.out.println(msg.get());
-	}
-
-	public static void handleCheats(PlayScene scene) {
+	private static void handleCheats(PlayScene scene) {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
 			scene.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));

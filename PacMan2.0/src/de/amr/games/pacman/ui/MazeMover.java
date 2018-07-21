@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
@@ -35,7 +36,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	private final Tile home;
 	private final Map<S, MoveBehavior> moveBehavior;
 	private final MoveBehavior defaultMoveBehavior;
-	private float speed;
+	private Function<MazeMover<S>, Float> fnSpeed;
 	private int moveDirection;
 	private int nextMoveDirection;
 	private S state;
@@ -122,11 +123,11 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public float getSpeed() {
-		return speed;
+		return fnSpeed.apply(this);
 	}
 
-	public void setSpeed(float speed) {
-		this.speed = speed;
+	public void setSpeed(Function<MazeMover<S>, Float> speed) {
+		this.fnSpeed = speed;
 	}
 
 	public int getMoveDirection() {
@@ -184,7 +185,7 @@ public abstract class MazeMover<S> extends GameEntity {
 			}
 		}
 		if (canMove(moveDirection)) {
-			tf.moveTo(computeMovePosition(moveDirection, speed));
+			tf.moveTo(computeMovePosition(moveDirection, fnSpeed.apply(this)));
 		} else { // adjust exactly over tile
 			setTile(currentTile);
 		}
@@ -206,7 +207,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public Tile computeTouchedTile(Tile currentTile, int dir) {
-		Vector2f newPosition = computeMovePosition(dir, speed);
+		Vector2f newPosition = computeMovePosition(dir, fnSpeed.apply(this));
 		float x = newPosition.x, y = newPosition.y;
 		switch (dir) {
 		case Top4.W:

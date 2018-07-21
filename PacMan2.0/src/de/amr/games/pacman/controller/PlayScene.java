@@ -13,10 +13,12 @@ import static java.awt.event.KeyEvent.VK_RIGHT;
 import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
@@ -44,13 +46,19 @@ import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
-import de.amr.games.pacman.ui.PacMan.State;
 import de.amr.games.pacman.ui.StatusUI;
 
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
+	public enum State {
+		READY, RUNNING, COMPLETE
+	};
+
+	private State state;
+
 	private Game game;
 	private Maze maze;
+
 	private PacMan pacMan;
 	private Ghost blinky, pinky, inky, clyde;
 	private MazeUI mazeUI;
@@ -119,6 +127,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	@Override
 	public void init() {
+		state = State.READY;
 		game = new Game();
 		maze = Maze.of(Assets.text("maze.txt"));
 		createEntities();
@@ -167,17 +176,17 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		inky.setMoveDirection(Top4.N);
 		clyde.setMoveDirection(Top4.N);
 		getGhosts().forEach(ghost -> {
-			ghost.setTile(ghost.getHome());
-			ghost.setSpeed(6f * TS / 60);
 			ghost.setState(Ghost.State.RECOVERING);
+			ghost.setTile(ghost.getHome());
+			ghost.setSpeed(game::getGhostSpeed);
 			ghost.setAnimated(true);
 		});
 
+		pacMan.setState(PacMan.State.ALIVE);
 		pacMan.setTile(maze.pacManHome);
-		pacMan.setSpeed(9f * TS / 60);
+		pacMan.setSpeed(game::getPacManSpeed);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
-		pacMan.setState(State.ALIVE);
 	}
 
 	private void initLevel() {
@@ -190,11 +199,26 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	@Override
 	public void update() {
-		Debug.readDebugLevel();
-		Debug.handleCheats(this);
+		Debug.update(this);
+		switch (state) {
+		case READY:
+			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
+				state = State.RUNNING;
+			}
+			break;
+		case RUNNING:
+			pacMan.update();
+			getGhosts().forEach(Ghost::update);
+			break;
+		case COMPLETE:
+			if (Keyboard.keyPressedOnce(KeyEvent.VK_ENTER)) {
+				state = State.READY;
+				break;
+			}
+		default:
+			throw new IllegalStateException();
+		}
 
-		pacMan.update();
-		getGhosts().forEach(Ghost::update);
 	}
 
 	private void onGhostContact(GhostContactEvent e) {
@@ -203,7 +227,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case RECOVERING:
 		case SCATTERING:
 		case STARRED:
-			pacMan.setState(State.DYING);
+			pacMan.setState(PacMan.State.DYING);
 			pacMan.enemies.forEach(enemy -> {
 				enemy.setAnimated(false);
 				enemy.setState(Ghost.State.STARRED);
@@ -214,7 +238,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			break;
 		case FRIGHTENED:
 			e.ghost.setState(Ghost.State.DEAD);
-			e.ghost.setSpeed(12f * TS / 60);
+			e.ghost.setSpeed(game::getGhostSpeed);
 			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
 			break;
 		default:
@@ -258,11 +282,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostDeadIsOver(GhostDeadIsOverEvent e) {
 		e.ghost.setState(Ghost.State.RECOVERING);
 		e.ghost.setMoveDirection(Top4.N);
-		e.ghost.setSpeed(3f * TS / 60);
 	}
 
 	private void onGhostRecoveringComplete(GhostRecoveringCompleteEvent e) {
-		e.ghost.setSpeed(6f * TS / 60);
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 }
