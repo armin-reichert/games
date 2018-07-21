@@ -48,8 +48,6 @@ public class MazeUI extends GameEntity {
 		Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 		pacMan.draw(g);
 		g.translate(-tf.getX(), -tf.getY());
-		Debug.drawMazeDebugInfo(g, this);
-		Arrays.stream(ghosts).forEach(ghost -> Debug.drawGhostPath(g, this, ghost));
 	}
 
 	private void drawTile(Graphics2D g, Tile tile) {

@@ -23,6 +23,10 @@ import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
+/**
+ * @param <S>
+ *          maze mover state type
+ */
 public abstract class MazeMover<S> extends GameEntity {
 
 	public static int SPRITE_SIZE = 2 * TS;
@@ -40,14 +44,19 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	protected MazeMover(Maze maze, Tile home, Map<S, MoveBehavior> moveBehavior) {
 		Objects.requireNonNull(maze);
+		Objects.requireNonNull(home);
 		this.maze = maze;
 		this.home = home;
 		this.moveBehavior = moveBehavior;
-		defaultMoveBehavior = new DoNothing(this);
+		this.defaultMoveBehavior = new DoNothing(this);
 	}
 
 	public Maze getMaze() {
 		return maze;
+	}
+
+	public Tile getHome() {
+		return home;
 	}
 
 	@Override
@@ -218,9 +227,5 @@ public abstract class MazeMover<S> extends GameEntity {
 		Vector2f velocity = smul(speed, dirVector);
 		// TODO insert micro-move such that taking turn is always possible
 		return sum(tf.getPosition(), velocity);
-	}
-
-	public Tile getHome() {
-		return home;
 	}
 }

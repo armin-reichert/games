@@ -1,7 +1,5 @@
 package de.amr.games.pacman.ui;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Optional;
@@ -23,32 +21,26 @@ public class PacMan extends MazeMover<PacMan.State> {
 		ALIVE, DYING
 	};
 
-	private final Sprite[] spriteWalking = new Sprite[4];
-	private final Sprite spriteStanding;
-	private final Sprite spriteDying;
 	public final Set<Ghost> enemies = new HashSet<>();
+
+	private Sprite[] spriteWalking = new Sprite[4];
+	private Sprite spriteStanding;
+	private Sprite spriteDying;
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName("Pac-Man");
+		createSprites();
+	}
+
+	private void createSprites() {
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
 			spriteWalking[dir].makeAnimated(AnimationMode.CYCLIC, 100);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SPRITE_SIZE, SPRITE_SIZE);
-		spriteDying.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 100);
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		super.draw(g);
-		Debug.run(() -> {
-			g.setColor(isExactlyOverTile() ? Color.GREEN : Color.YELLOW);
-			g.translate(tf.getX(), tf.getY());
-			g.fillRect(0, 0, getWidth(), getHeight());
-			g.translate(-tf.getX(), -tf.getY());
-		});
+		spriteDying.makeAnimated(AnimationMode.LINEAR, 100);
 	}
 
 	@Override
@@ -68,11 +60,19 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public void update() {
 		switch (getState()) {
 		case ALIVE:
-			Optional<GameEvent> discovery = inspectTile(getTile());
-			if (discovery.isPresent()) {
-				fireGameEvent(discovery.get());
+			Tile tile = getTile();
+			char content = getMaze().getContent(tile);
+			if (Tile.isBonus(content)) {
+				fireGameEvent(new BonusFoundEvent(tile, content));
+			} else if (Tile.isFood(content)) {
+				fireGameEvent(new FoodFoundEvent(tile, content));
 			} else {
-				move();
+				Optional<GameEvent> enemyContact = checkEnemyContact();
+				if (enemyContact.isPresent()) {
+					fireGameEvent(enemyContact.get());
+				} else {
+					move();
+				}
 			}
 			break;
 		case DYING:
@@ -86,14 +86,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 	}
 
-	private Optional<GameEvent> inspectTile(Tile tile) {
-		char content = getMaze().getContent(tile);
-		if (Tile.isBonus(content)) {
-			return Optional.of(new BonusFoundEvent(tile, content));
-		}
-		if (Tile.isFood(content)) {
-			return Optional.of(new FoodFoundEvent(tile, content));
-		}
+	private Optional<GameEvent> checkEnemyContact() {
 		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
 				.map(ghost -> new GhostContactEvent(ghost));
 	}

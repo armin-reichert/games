@@ -104,7 +104,7 @@ public class ClassicTheme extends PacManTheme {
 		}
 		pacManDyingSprite = new Sprite(dyingAnimationFrames);
 		pacManDyingSprite.scale(SPRITE_SIZE, SPRITE_SIZE);
-		pacManDyingSprite.makeAnimated(AnimationMode.LEFT_TO_RIGHT, 160);
+		pacManDyingSprite.makeAnimated(AnimationMode.LINEAR, 160);
 
 		// Ghosts
 		int ghostFrameMillis = 333;

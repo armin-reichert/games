@@ -88,6 +88,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		return game;
 	}
 
+	public MazeUI getMazeUI() {
+		return mazeUI;
+	}
+
 	public PacMan getPacMan() {
 		return pacMan;
 	}
@@ -110,6 +114,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		hud.draw(g);
 		mazeUI.draw(g);
 		status.draw(g);
+		Debug.draw(g, this);
 	}
 
 	@Override
@@ -164,7 +169,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		getGhosts().forEach(ghost -> {
 			ghost.setTile(ghost.getHome());
 			ghost.setSpeed(6f * TS / 60);
-			ghost.setState(Ghost.State.ATTACKING);
+			ghost.setState(Ghost.State.RECOVERING);
 			ghost.setAnimated(true);
 		});
 

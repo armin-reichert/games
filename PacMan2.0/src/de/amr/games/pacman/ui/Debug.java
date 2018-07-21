@@ -51,10 +51,17 @@ public class Debug {
 		}
 	}
 
-	public static void drawMazeDebugInfo(Graphics2D g, MazeUI mazeUI) {
-		if (DEBUG_LEVEL < 2) {
-			return;
+	public static void draw(Graphics2D g, PlayScene scene) {
+		if (DEBUG_LEVEL == 2) {
+			drawMaze(g, scene.getMazeUI());
 		}
+		if (DEBUG_LEVEL == 1) {
+			drawGhostPaths(g, scene);
+			drawPacManTilePosition(g, scene);
+		}
+	}
+
+	private static void drawMaze(Graphics2D g, MazeUI mazeUI) {
 		Maze maze = mazeUI.getMaze();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		g.setColor(Color.LIGHT_GRAY);
@@ -78,41 +85,52 @@ public class Debug {
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
-	public static void drawGhostPath(Graphics2D g, MazeUI mazeUI, Ghost ghost) {
-		if (DEBUG_LEVEL < 1) {
-			return;
+	private static void drawPacManTilePosition(Graphics2D g, PlayScene scene) {
+		PacMan pacMan = scene.getPacMan();
+		if (pacMan.isExactlyOverTile()) {
+			g.translate(scene.getMazeUI().tf.getX(), scene.getMazeUI().tf.getY());
+			g.setColor(Color.GREEN);
+			g.translate(pacMan.tf.getX(), pacMan.tf.getY());
+			g.drawRect(0, 0, pacMan.getWidth(), pacMan.getHeight());
+			g.translate(-pacMan.tf.getX(), -pacMan.tf.getY());
+			g.translate(-scene.getMazeUI().tf.getX(), -scene.getMazeUI().tf.getY());
 		}
-		List<Tile> path = ghost.currentMoveBehavior().getTargetPath();
-		if (path.size() > 1) {
-			switch (ghost.getColor()) {
-			case Spritesheet.RED_GHOST:
-				g.setColor(Color.RED);
-				break;
-			case Spritesheet.PINK_GHOST:
-				g.setColor(Color.PINK);
-				break;
-			case Spritesheet.BLUE_GHOST:
-				g.setColor(Color.BLUE);
-				break;
-			case Spritesheet.ORANGE_GHOST:
-				g.setColor(Color.ORANGE);
-				break;
+	}
+
+	private static void drawGhostPaths(Graphics2D g, PlayScene scene) {
+		scene.getGhosts().forEach(ghost -> {
+			List<Tile> path = ghost.currentMoveBehavior().getTargetPath();
+			if (path.size() > 1) {
+				switch (ghost.getColor()) {
+				case Spritesheet.RED_GHOST:
+					g.setColor(Color.RED);
+					break;
+				case Spritesheet.PINK_GHOST:
+					g.setColor(Color.PINK);
+					break;
+				case Spritesheet.BLUE_GHOST:
+					g.setColor(Color.BLUE);
+					break;
+				case Spritesheet.ORANGE_GHOST:
+					g.setColor(Color.ORANGE);
+					break;
+				}
+				g.translate(scene.getMazeUI().tf.getX(), scene.getMazeUI().tf.getY());
+				for (int i = 0; i < path.size() - 1; ++i) {
+					Tile u = path.get(i), v = path.get(i + 1);
+					int u1 = u.col * TS + TS / 2;
+					int u2 = u.row * TS + TS / 2;
+					int v1 = v.col * TS + TS / 2;
+					int v2 = v.row * TS + TS / 2;
+					g.drawLine(u1, u2, v1, v2);
+				}
+				// Target tile
+				Tile tile = path.get(path.size() - 1);
+				g.translate(tile.col * TS, tile.row * TS);
+				g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
+				g.translate(-tile.col * TS, -tile.row * TS);
+				g.translate(-scene.getMazeUI().tf.getX(), -scene.getMazeUI().tf.getY());
 			}
-			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
-			for (int i = 0; i < path.size() - 1; ++i) {
-				Tile u = path.get(i), v = path.get(i + 1);
-				int u1 = u.col * TS + TS / 2;
-				int u2 = u.row * TS + TS / 2;
-				int v1 = v.col * TS + TS / 2;
-				int v2 = v.row * TS + TS / 2;
-				g.drawLine(u1, u2, v1, v2);
-			}
-			// Target tile
-			Tile tile = path.get(path.size() - 1);
-			g.translate(tile.col * TS, tile.row * TS);
-			g.fillRect(0, 0, TS, TS);
-			g.translate(-tile.col * TS, -tile.row * TS);
-			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
-		}
+		});
 	}
 }
