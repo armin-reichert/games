@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.controller;
 
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.EMPTY;
@@ -39,6 +39,12 @@ import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.Debug;
+import de.amr.games.pacman.ui.Ghost;
+import de.amr.games.pacman.ui.HUD;
+import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.PacMan;
+import de.amr.games.pacman.ui.StatusUI;
 import de.amr.games.pacman.ui.PacMan.State;
 
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {

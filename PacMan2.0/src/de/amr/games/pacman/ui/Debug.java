@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import de.amr.easy.game.input.Keyboard;
+import de.amr.games.pacman.controller.PlayScene;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
