@@ -3,7 +3,6 @@ package de.amr.games.pacman.controller;
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.model.Tile.PELLET;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
@@ -166,6 +165,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setTile(ghost.getHome());
 			ghost.setSpeed(6f * TS / 60);
 			ghost.setState(Ghost.State.ATTACKING);
+			ghost.setAnimated(true);
 		});
 
 		pacMan.setTile(maze.pacManHome);
@@ -193,22 +193,27 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onGhostContact(GhostContactEvent e) {
-		if (e.ghost.getState() == Ghost.State.FRIGHTENED) {
-			e.ghost.setState(Ghost.State.DEAD);
-			e.ghost.setSpeed(12f * TS / 60);
-			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
-		} else if (e.ghost.getState() == Ghost.State.DEAD) {
-			// do nothing
-		} else {
+		switch (e.ghost.getState()) {
+		case ATTACKING:
+		case RECOVERING:
+		case SCATTERING:
+		case STARRED:
 			pacMan.setState(State.DYING);
-			pacMan.setSpeed(0);
 			pacMan.enemies.forEach(enemy -> {
-				enemy.setSpeed(0);
 				enemy.setAnimated(false);
 				enemy.setState(Ghost.State.STARRED);
 			});
 			game.lives -= 1;
 			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
+		case DEAD:
+			break;
+		case FRIGHTENED:
+			e.ghost.setState(Ghost.State.DEAD);
+			e.ghost.setSpeed(12f * TS / 60);
+			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
+			break;
+		default:
+			throw new IllegalStateException();
 		}
 	}
 
@@ -225,12 +230,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			maze.setContent(maze.bonusTile, Tile.BONUS_STRAWBERRY);
 		}
 		game.score += e.food == ENERGIZER ? 50 : 10;
-		if (maze.tiles().map(maze::getContent).noneMatch(c -> c == PELLET || c == ENERGIZER)) {
+		if (maze.tiles().map(maze::getContent).noneMatch(Tile::isFood)) {
 			++game.level;
 			initLevel();
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
-			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
+			pacMan.enemies.stream().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
+					.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
 		}
 	}
 
@@ -254,5 +260,4 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		e.ghost.setSpeed(6f * TS / 60);
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
-
 }
