@@ -1,5 +1,7 @@
-package de.amr.games.pacman.controller.behavior;
+package de.amr.games.pacman.controller.behavior.impl;
 
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
@@ -7,8 +9,8 @@ import de.amr.games.pacman.ui.MazeMover;
 public class Bounce implements MoveBehavior {
 
 	@Override
-	public MoveData apply(MazeMover<?> bouncer) {
-		MoveData result = new MoveData();
+	public Route apply(MazeMover<?> bouncer) {
+		RouteData result = new RouteData();
 		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getMoveDirection()) : bouncer.getMoveDirection();
 		return result;
 	}

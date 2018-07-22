@@ -1,8 +1,10 @@
-package de.amr.games.pacman.controller.behavior;
+package de.amr.games.pacman.controller.behavior.impl;
 
 import java.util.Arrays;
 import java.util.OptionalInt;
 
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeMover;
 
@@ -15,8 +17,8 @@ public class Flee implements MoveBehavior {
 	}
 
 	@Override
-	public MoveData apply(MazeMover<?> refugee) {
-		MoveData result = new MoveData();
+	public Route apply(MazeMover<?> refugee) {
+		RouteData result = new RouteData();
 		result.dir = refugee.getNextMoveDirection();
 		Maze maze = chaser.getMaze();
 		OptionalInt towardsChaser = maze.dirAlongPath(maze.findPath(refugee.getTile(), chaser.getTile()));

@@ -1,6 +1,7 @@
 package de.amr.games.pacman.controller;
 
 import static de.amr.games.pacman.PacManApp.TS;
+import static de.amr.games.pacman.controller.behavior.Behaviors.ambush;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
@@ -22,13 +23,12 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.behavior.Ambush;
-import de.amr.games.pacman.controller.behavior.Bounce;
-import de.amr.games.pacman.controller.behavior.Chase;
-import de.amr.games.pacman.controller.behavior.Forward;
-import de.amr.games.pacman.controller.behavior.Flee;
-import de.amr.games.pacman.controller.behavior.FollowKeyboard;
-import de.amr.games.pacman.controller.behavior.GoHome;
+import de.amr.games.pacman.controller.behavior.impl.Bounce;
+import de.amr.games.pacman.controller.behavior.impl.Chase;
+import de.amr.games.pacman.controller.behavior.impl.Flee;
+import de.amr.games.pacman.controller.behavior.impl.FollowKeyboard;
+import de.amr.games.pacman.controller.behavior.impl.Forward;
+import de.amr.games.pacman.controller.behavior.impl.GoHome;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -160,7 +160,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
 		blinky.setMoveBehavior(Ghost.State.RECOVERING, new GoHome());
 
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(pacMan));
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, ambush(pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
 		pinky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
 

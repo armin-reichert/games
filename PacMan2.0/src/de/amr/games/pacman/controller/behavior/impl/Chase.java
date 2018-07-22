@@ -1,5 +1,7 @@
-package de.amr.games.pacman.controller.behavior;
+package de.amr.games.pacman.controller.behavior.impl;
 
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.ui.MazeMover;
 
 /**
@@ -14,8 +16,8 @@ public class Chase implements MoveBehavior {
 	}
 
 	@Override
-	public MoveData apply(MazeMover<?> chaser) {
-		MoveData result = new MoveData();
+	public Route apply(MazeMover<?> chaser) {
+		RouteData result = new RouteData();
 		result.path = chaser.getMaze().findPath(chaser.getTile(), refugee.getTile());
 		result.dir = chaser.getMaze().dirAlongPath(result.path).orElse(chaser.getNextMoveDirection());
 		return result;

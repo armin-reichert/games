@@ -1,7 +1,9 @@
-package de.amr.games.pacman.controller.behavior;
+package de.amr.games.pacman.controller.behavior.impl;
 
 import java.util.Optional;
 
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
@@ -18,8 +20,8 @@ public class Ambush implements MoveBehavior {
 	}
 
 	@Override
-	public MoveData apply(MazeMover<?> ambusher) {
-		MoveData result = new MoveData();
+	public Route apply(MazeMover<?> ambusher) {
+		RouteData result = new RouteData();
 		Maze maze = victim.getMaze();
 		Optional<Tile> fourAhead = ahead(4, victim);
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {

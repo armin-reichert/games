@@ -1,7 +1,9 @@
-package de.amr.games.pacman.controller.behavior;
+package de.amr.games.pacman.controller.behavior.impl;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.ui.MazeMover;
 
 public class FollowKeyboard implements MoveBehavior {
@@ -16,8 +18,8 @@ public class FollowKeyboard implements MoveBehavior {
 	}
 
 	@Override
-	public MoveData apply(MazeMover<?> mover) {
-		MoveData result = new MoveData();
+	public Route apply(MazeMover<?> mover) {
+		RouteData result = new RouteData();
 		result.dir = mover.getNextMoveDirection();
 		if (Keyboard.keyDown(nesw[0])) {
 			result.dir = Top4.N;
