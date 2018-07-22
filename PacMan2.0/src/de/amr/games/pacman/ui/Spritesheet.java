@@ -39,6 +39,7 @@ public class Spritesheet {
 	private static BufferedImage[] orangeGhostImages = new BufferedImage[8];
 	private static BufferedImage[] frightenedGhostImages = new BufferedImage[4];
 	private static BufferedImage[] deadGhostImages = new BufferedImage[4];
+	private static BufferedImage[] greenNumbers = new BufferedImage[4];
 
 	static {
 		// Maze
@@ -84,6 +85,11 @@ public class Spritesheet {
 		}
 		for (int i = 0; i < 4; ++i) {
 			deadGhostImages[i] = region(584 + i * 16, 80, 16, 16);
+		}
+		
+		// Green numbers (200, 400, 800, 1600)
+		for (int i = 0; i < 4; ++i) {
+			greenNumbers[i] = region(456 + i*16, 128, 16, 16);
 		}
 	}
 
@@ -172,5 +178,9 @@ public class Spritesheet {
 			return deadGhostImages[3];
 		}
 		throw new IllegalArgumentException("Illegal direction: " + direction);
+	}
+	
+	public static BufferedImage getGreenNumber(int i) {
+		return greenNumbers[i];
 	}
 }

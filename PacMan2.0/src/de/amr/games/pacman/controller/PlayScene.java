@@ -54,11 +54,11 @@ import de.amr.games.pacman.ui.StatusUI;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	public enum State {
-		READY, RUNNING, GAMEOVER
+		READY, RUNNING, EARNING_POINTS, GAMEOVER
 	};
-	
+
 	public enum Event {
-		NEXT_LEVEL;
+		NEXT_LEVEL, GHOST_KILLED;
 	}
 
 	private StateMachine<State, Event> fsm;
@@ -66,6 +66,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private Maze maze;
 	private PacMan pacMan;
 	private Ghost blinky, pinky, inky, clyde;
+	private Ghost killedGhost;
 	private MazeUI mazeUI;
 	private HUD hud;
 	private StatusUI status;
@@ -82,19 +83,32 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			initEntities();
 			enableEntities(false);
 		};
-		fsm.change(State.READY, State.RUNNING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER));
-
-		fsm.state(State.RUNNING).entry = state -> {
+		fsm.state(State.READY).exit = state -> {
 			enableEntities(true);
 		};
+		fsm.change(State.READY, State.RUNNING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER));
+
 		fsm.state(State.RUNNING).update = state -> {
 			updateEntities();
 		};
 		fsm.changeOnInput(Event.NEXT_LEVEL, State.RUNNING, State.RUNNING, t -> {
-			++game.level;
-			initLevel();
+			nextLevel();
 		});
 		fsm.change(State.RUNNING, State.GAMEOVER, () -> game.lives == 0);
+		fsm.changeOnInput(Event.GHOST_KILLED, State.RUNNING, State.EARNING_POINTS);
+
+		fsm.state(State.EARNING_POINTS).entry = state -> {
+			killedGhost.setState(Ghost.State.DEAD);
+			game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
+			game.score += game.deadGhostScore;
+			mazeUI.showGhostPoints(killedGhost, game.deadGhostScore);
+			state.setDuration(120);
+		};
+		fsm.changeOnTimeout(State.EARNING_POINTS, State.RUNNING);
+		fsm.state(State.EARNING_POINTS).exit = state -> {
+			killedGhost = null;
+			mazeUI.hideGhostPoints();
+		};
 
 		fsm.state(State.GAMEOVER).entry = state -> {
 			enableEntities(false);
@@ -104,6 +118,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game = new Game();
 		};
 	}
+
+	// Game event handling
 
 	@Override
 	public void processGameEvent(GameEvent e) {
@@ -124,6 +140,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 	}
 
+	@Override
+	public void draw(Graphics2D g) {
+		hud.draw(g);
+		mazeUI.draw(g);
+		status.draw(g);
+		Debug.draw(g, this);
+	}
+
 	public PacManApp getApp() {
 		return app;
 	}
@@ -142,44 +166,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	public Stream<Ghost> getGhosts() {
 		return Stream.of(blinky, pinky, inky, clyde);
-	}
-
-	private void createUI() {
-		hud = new HUD(game);
-		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze, pacMan, blinky, pinky, inky, clyde);
-		status = new StatusUI(game);
-		hud.tf.moveTo(0, 0);
-		mazeUI.tf.moveTo(0, 3 * TS);
-		status.tf.moveTo(0, getHeight() - 2 * TS);
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		hud.draw(g);
-		mazeUI.draw(g);
-		status.draw(g);
-		Debug.draw(g, this);
-	}
-
-	@Override
-	public void init() {
-		game = new Game();
-		maze = Maze.of(Assets.text("maze.txt"));
-		createEntities();
-		createUI();
-		fsm.init();
-	}
-
-	private void enableEntities(boolean enabled) {
-		mazeUI.enableAnimation(enabled);
-		pacMan.enableAnimation(enabled);
-		getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
-	}
-
-	private void updateEntities() {
-		mazeUI.update();
-		pacMan.update();
-		getGhosts().forEach(Ghost::update);
 	}
 
 	private void createEntities() {
@@ -218,6 +204,24 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		clyde.setMoveBehavior(Ghost.State.RECOVERING, bounce());
 	}
 
+	private void createUI() {
+		hud = new HUD(game);
+		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze, pacMan, blinky, pinky, inky, clyde);
+		status = new StatusUI(game);
+		hud.tf.moveTo(0, 0);
+		mazeUI.tf.moveTo(0, 3 * TS);
+		status.tf.moveTo(0, getHeight() - 2 * TS);
+	}
+
+	@Override
+	public void init() {
+		game = new Game();
+		maze = Maze.of(Assets.text("maze.txt"));
+		createEntities();
+		createUI();
+		fsm.init();
+	}
+
 	private void initEntities() {
 		pacMan.setState(PacMan.State.ALIVE);
 		pacMan.setTile(maze.pacManHome);
@@ -237,12 +241,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		});
 	}
 
-	private void initLevel() {
-		maze.loadContent();
-		game.dotsEatenInLevel = 0;
-		initEntities();
-	}
-
 	// Game event handling
 
 	/**
@@ -253,6 +251,28 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Debug.update(this);
 		fsm.update();
 	}
+
+	private void updateEntities() {
+		mazeUI.update();
+		pacMan.update();
+		getGhosts().forEach(Ghost::update);
+	}
+
+	private void enableEntities(boolean enabled) {
+		mazeUI.enableAnimation(enabled);
+		pacMan.enableAnimation(enabled);
+		getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
+	}
+
+	private void nextLevel() {
+		++game.level;
+		game.dotsEatenInLevel = 0;
+		game.deadGhostScore = 0;
+		maze.loadContent();
+		initEntities();
+	}
+
+	// Game event handling
 
 	private void onGhostContact(GhostContactEvent e) {
 		switch (e.ghost.getState()) {
@@ -268,7 +288,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case DEAD:
 			break;
 		case FRIGHTENED:
-			e.ghost.setState(Ghost.State.DEAD);
+			killedGhost = e.ghost;
+			fsm.addInput(Event.GHOST_KILLED);
 			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
 			break;
 		default:
@@ -288,7 +309,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		} else if (game.dotsEatenInLevel == 170) {
 			maze.setContent(maze.bonusTile, Tile.BONUS_STRAWBERRY);
 		}
-		game.score += e.food == ENERGIZER ? 50 : 10;
+		if (e.food == ENERGIZER) {
+			game.score += 50;
+			game.deadGhostScore = 0;
+		} else {
+			game.score += 10;
+		}
 		if (maze.tiles().map(maze::getContent).noneMatch(Tile::isFood)) {
 			fsm.addInput(Event.NEXT_LEVEL);
 		} else if (e.food == ENERGIZER) {
