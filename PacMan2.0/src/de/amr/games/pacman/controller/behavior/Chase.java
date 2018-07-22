@@ -1,13 +1,11 @@
 package de.amr.games.pacman.controller.behavior;
 
-import java.util.function.Function;
-
 import de.amr.games.pacman.ui.MazeMover;
 
 /**
  * Chasing a refugee through the maze.
  */
-public class Chase implements Function<MazeMover<?>, MoveData> {
+public class Chase implements MoveBehavior {
 
 	private final MazeMover<?> refugee;
 

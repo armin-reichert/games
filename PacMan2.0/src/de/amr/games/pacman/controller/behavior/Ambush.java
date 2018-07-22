@@ -1,7 +1,6 @@
 package de.amr.games.pacman.controller.behavior;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -10,7 +9,7 @@ import de.amr.games.pacman.ui.MazeMover;
 /**
  * Ambush the victim in the maze.
  */
-public class Ambush implements Function<MazeMover<?>, MoveData> {
+public class Ambush implements MoveBehavior {
 
 	private final MazeMover<?> victim;
 

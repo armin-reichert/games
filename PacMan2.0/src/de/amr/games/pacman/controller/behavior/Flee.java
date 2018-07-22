@@ -2,12 +2,11 @@ package de.amr.games.pacman.controller.behavior;
 
 import java.util.Arrays;
 import java.util.OptionalInt;
-import java.util.function.Function;
 
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class Flee implements Function<MazeMover<?>, MoveData> {
+public class Flee implements MoveBehavior {
 
 	private final MazeMover<?> chaser;
 

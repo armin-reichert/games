@@ -1,12 +1,10 @@
 package de.amr.games.pacman.controller.behavior;
 
-import java.util.function.Function;
-
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class FollowKeyboard implements Function<MazeMover<?>, MoveData> {
+public class FollowKeyboard implements MoveBehavior {
 
 	private final int[] nesw;
 

@@ -2,15 +2,13 @@ package de.amr.games.pacman.controller.behavior;
 
 import static de.amr.easy.util.StreamUtils.randomElement;
 
-import java.util.function.Function;
-
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeMover;
 
 /**
  * Inky's behaviour.
  */
-public class Moody implements Function<MazeMover<?>, MoveData> {
+public class Moody implements MoveBehavior {
 
 	@Override
 	public MoveData apply(MazeMover<?> mover) {
