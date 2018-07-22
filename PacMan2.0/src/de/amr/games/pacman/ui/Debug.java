@@ -36,10 +36,10 @@ public class Debug {
 			DEBUG_LEVEL = 0;
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			DEBUG_LEVEL = 1;
+			DEBUG_LEVEL = DEBUG_LEVEL == 1 ? 0 : 1;
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			DEBUG_LEVEL = 2;
+			DEBUG_LEVEL = DEBUG_LEVEL == 2 ? 0 : 2;
 		}
 	}
 

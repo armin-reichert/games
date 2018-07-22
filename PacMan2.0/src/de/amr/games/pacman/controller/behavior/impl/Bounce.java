@@ -6,7 +6,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class Bounce implements MoveBehavior {
+class Bounce implements MoveBehavior {
 
 	@Override
 	public Route apply(MazeMover<?> bouncer) {

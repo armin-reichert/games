@@ -8,7 +8,7 @@ import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class Flee implements MoveBehavior {
+class Flee implements MoveBehavior {
 
 	private final MazeMover<?> chaser;
 

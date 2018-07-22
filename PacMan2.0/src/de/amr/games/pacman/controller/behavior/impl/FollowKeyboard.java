@@ -6,11 +6,11 @@ import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.behavior.Route;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class FollowKeyboard implements MoveBehavior {
+class FollowKeyboard implements MoveBehavior {
 
 	private final int[] nesw;
 
-	public FollowKeyboard(MazeMover<?> mover, int... nesw) {
+	public FollowKeyboard(int... nesw) {
 		if (nesw.length != 4) {
 			throw new IllegalArgumentException("Must specify 4 keyboard codes for steering");
 		}

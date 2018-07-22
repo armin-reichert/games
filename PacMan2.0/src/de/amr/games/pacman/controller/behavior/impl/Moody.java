@@ -10,7 +10,7 @@ import de.amr.games.pacman.ui.MazeMover;
 /**
  * Inky's behaviour.
  */
-public class Moody implements MoveBehavior {
+class Moody implements MoveBehavior {
 
 	@Override
 	public Route apply(MazeMover<?> mover) {

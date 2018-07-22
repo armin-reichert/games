@@ -10,7 +10,7 @@ import de.amr.games.pacman.ui.MazeMover;
 /**
  * Clyde's behaviour.
  */
-public class StayBehind implements MoveBehavior {
+class StayBehind implements MoveBehavior {
 
 	@Override
 	public Route apply(MazeMover<?> mover) {

@@ -1,7 +1,15 @@
 package de.amr.games.pacman.controller;
 
 import static de.amr.games.pacman.PacManApp.TS;
-import static de.amr.games.pacman.controller.behavior.Behaviors.ambush;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.ambush;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.bounce;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.chase;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.flee;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.followKeyboard;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.forward;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.goHome;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.moody;
+import static de.amr.games.pacman.controller.behavior.impl.Behaviors.stayBehind;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
@@ -23,12 +31,6 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
-import de.amr.games.pacman.controller.behavior.impl.Bounce;
-import de.amr.games.pacman.controller.behavior.impl.Chase;
-import de.amr.games.pacman.controller.behavior.impl.Flee;
-import de.amr.games.pacman.controller.behavior.impl.FollowKeyboard;
-import de.amr.games.pacman.controller.behavior.impl.Forward;
-import de.amr.games.pacman.controller.behavior.impl.GoHome;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
@@ -150,27 +152,27 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pacMan.addObserver(this);
 
 		// define move behavior
-		pacMan.setMoveBehavior(PacMan.State.ALIVE, new FollowKeyboard(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 
 		getGhosts().forEach(ghost -> {
-			ghost.setMoveBehavior(Ghost.State.STARRED, new Forward());
-			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(pacMan));
+			ghost.setMoveBehavior(Ghost.State.STARRED, forward());
+			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 		});
-		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
-		blinky.setMoveBehavior(Ghost.State.RECOVERING, new GoHome());
+		blinky.setMoveBehavior(Ghost.State.ATTACKING, chase(pacMan));
+		blinky.setMoveBehavior(Ghost.State.DEAD, goHome());
+		blinky.setMoveBehavior(Ghost.State.RECOVERING, goHome());
 
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, ambush(pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
-		pinky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
+		pinky.setMoveBehavior(Ghost.State.DEAD, goHome());
+		pinky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
 
-		// inky.setMoveBehavior(Ghost.State.ATTACKING, new Moody());
-		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
-		inky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
+		inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
+		inky.setMoveBehavior(Ghost.State.DEAD, goHome());
+		inky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
 
-		// clyde.setMoveBehavior(Ghost.State.ATTACKING, new StayBehind());
-		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome());
-		clyde.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
+		clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
+		clyde.setMoveBehavior(Ghost.State.DEAD, goHome());
+		clyde.setMoveBehavior(Ghost.State.RECOVERING, bounce());
 	}
 
 	private void initEntities() {

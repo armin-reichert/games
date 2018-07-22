@@ -11,7 +11,7 @@ import de.amr.games.pacman.ui.MazeMover;
 /**
  * Ambush the victim in the maze.
  */
-public class Ambush implements MoveBehavior {
+class Ambush implements MoveBehavior {
 
 	private final MazeMover<?> victim;
 

@@ -19,7 +19,7 @@ import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.behavior.MoveBehavior;
 import de.amr.games.pacman.controller.behavior.Route;
-import de.amr.games.pacman.controller.behavior.impl.Forward;
+import de.amr.games.pacman.controller.behavior.impl.Behaviors;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.model.Maze;
@@ -50,7 +50,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.maze = maze;
 		this.home = home;
 		this.moveBehavior = moveBehavior;
-		this.defaultMoveBehavior = new Forward();
+		this.defaultMoveBehavior = Behaviors.forward();
 	}
 
 	public Maze getMaze() {

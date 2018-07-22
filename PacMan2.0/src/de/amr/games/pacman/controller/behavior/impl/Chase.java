@@ -7,18 +7,18 @@ import de.amr.games.pacman.ui.MazeMover;
 /**
  * Chasing a refugee through the maze.
  */
-public class Chase implements MoveBehavior {
+class Chase implements MoveBehavior {
 
-	private final MazeMover<?> refugee;
+	private final MazeMover<?> victim;
 
-	public Chase(MazeMover<?> refugee) {
-		this.refugee = refugee;
+	public Chase(MazeMover<?> victim) {
+		this.victim = victim;
 	}
 
 	@Override
 	public Route apply(MazeMover<?> chaser) {
 		RouteData result = new RouteData();
-		result.path = chaser.getMaze().findPath(chaser.getTile(), refugee.getTile());
+		result.path = chaser.getMaze().findPath(chaser.getTile(), victim.getTile());
 		result.dir = chaser.getMaze().dirAlongPath(result.path).orElse(chaser.getNextMoveDirection());
 		return result;
 	}
