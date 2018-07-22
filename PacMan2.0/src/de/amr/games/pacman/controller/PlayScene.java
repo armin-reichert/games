@@ -1,15 +1,15 @@
 package de.amr.games.pacman.controller;
 
 import static de.amr.games.pacman.PacManApp.TS;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.ambush;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.bounce;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.chase;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.flee;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.followKeyboard;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.forward;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.goHome;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.moody;
-import static de.amr.games.pacman.controller.behavior.impl.Behaviors.stayBehind;
+import static de.amr.games.pacman.behavior.impl.Behaviors.ambush;
+import static de.amr.games.pacman.behavior.impl.Behaviors.bounce;
+import static de.amr.games.pacman.behavior.impl.Behaviors.chase;
+import static de.amr.games.pacman.behavior.impl.Behaviors.flee;
+import static de.amr.games.pacman.behavior.impl.Behaviors.followKeyboard;
+import static de.amr.games.pacman.behavior.impl.Behaviors.forward;
+import static de.amr.games.pacman.behavior.impl.Behaviors.goHome;
+import static de.amr.games.pacman.behavior.impl.Behaviors.moody;
+import static de.amr.games.pacman.behavior.impl.Behaviors.stayBehind;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
@@ -158,6 +158,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setMoveBehavior(Ghost.State.STARRED, forward());
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 		});
+		
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, chase(pacMan));
 		blinky.setMoveBehavior(Ghost.State.DEAD, goHome());
 		blinky.setMoveBehavior(Ghost.State.RECOVERING, goHome());

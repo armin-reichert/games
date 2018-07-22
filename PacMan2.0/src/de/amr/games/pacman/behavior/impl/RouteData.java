@@ -1,9 +1,9 @@
-package de.amr.games.pacman.controller.behavior.impl;
+package de.amr.games.pacman.behavior.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.amr.games.pacman.controller.behavior.Route;
+import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.model.Tile;
 
 class RouteData implements Route {

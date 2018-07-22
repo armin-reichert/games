@@ -1,10 +1,10 @@
-package de.amr.games.pacman.controller.behavior.impl;
+package de.amr.games.pacman.behavior.impl;
 
 import java.util.Arrays;
 import java.util.OptionalInt;
 
-import de.amr.games.pacman.controller.behavior.MoveBehavior;
-import de.amr.games.pacman.controller.behavior.Route;
+import de.amr.games.pacman.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeMover;
 

@@ -1,9 +1,9 @@
-package de.amr.games.pacman.controller.behavior.impl;
+package de.amr.games.pacman.behavior.impl;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.behavior.MoveBehavior;
-import de.amr.games.pacman.controller.behavior.Route;
+import de.amr.games.pacman.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.ui.MazeMover;
 
 class FollowKeyboard implements MoveBehavior {

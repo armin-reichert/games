@@ -1,6 +1,6 @@
-package de.amr.games.pacman.controller.behavior.impl;
+package de.amr.games.pacman.behavior.impl;
 
-import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.MoveBehavior;
 import de.amr.games.pacman.ui.MazeMover;
 
 public interface Behaviors {
