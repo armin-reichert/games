@@ -153,24 +153,24 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new FollowKeyboard(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 
 		getGhosts().forEach(ghost -> {
-			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing(ghost));
-			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(ghost, pacMan));
+			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing());
+			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(pacMan));
 		});
-		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(blinky, pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(blinky));
-		blinky.setMoveBehavior(Ghost.State.RECOVERING, new GoHome(blinky));
+		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(pacMan));
+		blinky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
+		blinky.setMoveBehavior(Ghost.State.RECOVERING, new GoHome());
 
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(pinky, pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome(pinky));
-		pinky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce(pinky));
+		pinky.setMoveBehavior(Ghost.State.ATTACKING, new Ambush(pacMan));
+		pinky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
+		pinky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
 
-		// inky.setMoveBehavior(Ghost.State.ATTACKING, new Moody(inky));
-		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome(inky));
-		inky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce(inky));
+		// inky.setMoveBehavior(Ghost.State.ATTACKING, new Moody());
+		inky.setMoveBehavior(Ghost.State.DEAD, new GoHome());
+		inky.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
 
-		// clyde.setMoveBehavior(Ghost.State.ATTACKING, new StayBehind(clyde));
-		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome(clyde));
-		clyde.setMoveBehavior(Ghost.State.RECOVERING, new Bounce(clyde));
+		// clyde.setMoveBehavior(Ghost.State.ATTACKING, new StayBehind());
+		clyde.setMoveBehavior(Ghost.State.DEAD, new GoHome());
+		clyde.setMoveBehavior(Ghost.State.RECOVERING, new Bounce());
 	}
 
 	private void initEntities() {

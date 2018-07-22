@@ -10,17 +10,15 @@ import de.amr.games.pacman.ui.MazeMover;
  */
 public class Chase implements MoveBehavior {
 
-	private final MazeMover<?> chaser;
 	private final MazeMover<?> refugee;
 	private List<Tile> targetPath;
 
-	public Chase(MazeMover<?> chaser, MazeMover<?> refugee) {
-		this.chaser = chaser;
+	public Chase(MazeMover<?> refugee) {
 		this.refugee = refugee;
 	}
 
 	@Override
-	public int getNextMoveDirection() {
+	public int getNextMoveDirection(MazeMover<?> chaser) {
 		targetPath = chaser.getMaze().findPath(chaser.getTile(), refugee.getTile());
 		return chaser.getMaze().dirAlongPath(targetPath).orElse(chaser.getNextMoveDirection());
 	}

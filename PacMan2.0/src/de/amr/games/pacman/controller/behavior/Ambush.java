@@ -13,18 +13,16 @@ import de.amr.games.pacman.ui.MazeMover;
  */
 public class Ambush implements MoveBehavior {
 
-	private final MazeMover<?> ambusher;
 	private final MazeMover<?> refugee;
 	private List<Tile> targetPath;
 
-	public Ambush(MazeMover<?> ambusher, MazeMover<?> refugee) {
-		this.ambusher = ambusher;
+	public Ambush(MazeMover<?> refugee) {
 		this.refugee = refugee;
 		this.targetPath = Collections.emptyList();
 	}
 
 	@Override
-	public int getNextMoveDirection() {
+	public int getNextMoveDirection(MazeMover<?> ambusher) {
 		Maze maze = refugee.getMaze();
 		Optional<Tile> fourAhead = ahead(4, refugee);
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {

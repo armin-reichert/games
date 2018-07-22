@@ -49,7 +49,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.maze = maze;
 		this.home = home;
 		this.moveBehavior = moveBehavior;
-		this.defaultMoveBehavior = new DoNothing(this);
+		this.defaultMoveBehavior = new DoNothing();
 	}
 
 	public Maze getMaze() {
@@ -173,7 +173,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void move() {
-		nextMoveDirection = currentMoveBehavior().getNextMoveDirection();
+		nextMoveDirection = currentMoveBehavior().getNextMoveDirection(this);
 		if (canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
 		}

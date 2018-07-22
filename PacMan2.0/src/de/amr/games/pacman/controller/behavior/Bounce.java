@@ -6,22 +6,16 @@ import de.amr.games.pacman.ui.MazeMover;
 
 public class Bounce implements MoveBehavior {
 
-	public final MazeMover<?> bouncer;
-
-	public Bounce(MazeMover<?> bouncer) {
-		this.bouncer = bouncer;
-	}
-
 	@Override
-	public int getNextMoveDirection() {
-		if (isReflected()) {
+	public int getNextMoveDirection(MazeMover<?> bouncer) {
+		if (isReflected(bouncer)) {
 			return Maze.TOPOLOGY.inv(bouncer.getMoveDirection());
 		} else {
 			return bouncer.getMoveDirection();
 		}
 	}
 
-	private boolean isReflected() {
+	private boolean isReflected(MazeMover<?> bouncer) {
 		Tile touchedTile = bouncer.computeTouchedTile(bouncer.getTile(), bouncer.getMoveDirection());
 		if (touchedTile.equals(bouncer.getTile())) {
 			return false;

@@ -8,16 +8,14 @@ import de.amr.games.pacman.ui.MazeMover;
 
 public class Flee implements MoveBehavior {
 
-	private final MazeMover<?> refugee;
 	private final MazeMover<?> chaser;
 
-	public Flee(MazeMover<?> refugee, MazeMover<?> chaser) {
-		this.refugee = refugee;
+	public Flee(MazeMover<?> chaser) {
 		this.chaser = chaser;
 	}
 
 	@Override
-	public int getNextMoveDirection() {
+	public int getNextMoveDirection(MazeMover<?> refugee) {
 		Maze maze = chaser.getMaze();
 		OptionalInt towardsChaser = maze.dirAlongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
 		if (towardsChaser.isPresent()) {
