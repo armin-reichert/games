@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.controller.PlayScene;
+import de.amr.games.pacman.controller.behavior.MoveData;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -97,7 +98,8 @@ public class Debug {
 
 	private static void drawGhostPaths(Graphics2D g, PlayScene scene) {
 		scene.getGhosts().forEach(ghost -> {
-			List<Tile> path = ghost.currentMoveBehavior().getTargetPath();
+			MoveData behavior = ghost.currentMoveBehavior().apply(ghost);
+			List<Tile> path = behavior.getPath();
 			if (path.size() > 1) {
 				switch (ghost.getColor()) {
 				case Spritesheet.RED_GHOST:

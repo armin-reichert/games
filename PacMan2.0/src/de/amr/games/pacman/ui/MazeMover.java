@@ -17,8 +17,8 @@ import java.util.function.Function;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.behavior.DoNothing;
-import de.amr.games.pacman.controller.behavior.MoveBehavior;
+import de.amr.games.pacman.controller.behavior.Forward;
+import de.amr.games.pacman.controller.behavior.MoveData;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.model.Maze;
@@ -34,8 +34,8 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	private final Maze maze;
 	private final Tile home;
-	private final Map<S, MoveBehavior> moveBehavior;
-	private final MoveBehavior defaultMoveBehavior;
+	private final Map<S, Function<MazeMover<?>, MoveData>> moveBehavior;
+	private final Function<MazeMover<?>, MoveData> defaultMoveBehavior;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int moveDirection;
 	private int nextMoveDirection;
@@ -43,13 +43,13 @@ public abstract class MazeMover<S> extends GameEntity {
 	private long stateEntryTime;
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
-	protected MazeMover(Maze maze, Tile home, Map<S, MoveBehavior> moveBehavior) {
+	protected MazeMover(Maze maze, Tile home, Map<S, Function<MazeMover<?>, MoveData>> moveBehavior) {
 		Objects.requireNonNull(maze);
 		Objects.requireNonNull(home);
 		this.maze = maze;
 		this.home = home;
 		this.moveBehavior = moveBehavior;
-		this.defaultMoveBehavior = new DoNothing();
+		this.defaultMoveBehavior = new Forward();
 	}
 
 	public Maze getMaze() {
@@ -114,11 +114,11 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// Movement
 
-	public void setMoveBehavior(S state, MoveBehavior behavior) {
+	public void setMoveBehavior(S state, Function<MazeMover<?>, MoveData> behavior) {
 		moveBehavior.put(state, behavior);
 	}
 
-	public MoveBehavior currentMoveBehavior() {
+	public Function<MazeMover<?>, MoveData> currentMoveBehavior() {
 		return moveBehavior.getOrDefault(getState(), defaultMoveBehavior);
 	}
 
@@ -173,7 +173,8 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void move() {
-		nextMoveDirection = currentMoveBehavior().getNextMoveDirection(this);
+		MoveData behavior = currentMoveBehavior().apply(this);
+		nextMoveDirection = behavior.getNextMoveDirection();
 		if (canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
 		}

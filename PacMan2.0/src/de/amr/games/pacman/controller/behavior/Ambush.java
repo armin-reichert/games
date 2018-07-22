@@ -1,41 +1,35 @@
 package de.amr.games.pacman.controller.behavior;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
 
 /**
- * Ambushing a refugee in the maze.
+ * Ambush the victim in the maze.
  */
-public class Ambush implements MoveBehavior {
+public class Ambush implements Function<MazeMover<?>, MoveData> {
 
-	private final MazeMover<?> refugee;
-	private List<Tile> targetPath;
+	private final MazeMover<?> victim;
 
-	public Ambush(MazeMover<?> refugee) {
-		this.refugee = refugee;
-		this.targetPath = Collections.emptyList();
+	public Ambush(MazeMover<?> victim) {
+		this.victim = victim;
 	}
 
 	@Override
-	public int getNextMoveDirection(MazeMover<?> ambusher) {
-		Maze maze = refugee.getMaze();
-		Optional<Tile> fourAhead = ahead(4, refugee);
+	public MoveData apply(MazeMover<?> ambusher) {
+		MoveData result = new MoveData();
+		Maze maze = victim.getMaze();
+		Optional<Tile> fourAhead = ahead(4, victim);
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {
-			targetPath = maze.findPath(ambusher.getTile(), fourAhead.get());
+			result.path = maze.findPath(ambusher.getTile(), fourAhead.get());
 		} else {
-			targetPath = maze.findPath(ambusher.getTile(), refugee.getTile());
+			result.path = maze.findPath(ambusher.getTile(), victim.getTile());
 		}
-		return maze.dirAlongPath(targetPath).orElse(ambusher.getNextMoveDirection());
-	}
-
-	@Override
-	public List<Tile> getTargetPath() {
-		return targetPath;
+		result.dir = maze.dirAlongPath(result.path).orElse(ambusher.getNextMoveDirection());
+		return result;
 	}
 
 	private Optional<Tile> ahead(int n, MazeMover<?> refugee) {

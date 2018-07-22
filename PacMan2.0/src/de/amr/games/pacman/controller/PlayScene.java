@@ -25,7 +25,7 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.behavior.Ambush;
 import de.amr.games.pacman.controller.behavior.Bounce;
 import de.amr.games.pacman.controller.behavior.Chase;
-import de.amr.games.pacman.controller.behavior.DoNothing;
+import de.amr.games.pacman.controller.behavior.Forward;
 import de.amr.games.pacman.controller.behavior.Flee;
 import de.amr.games.pacman.controller.behavior.FollowKeyboard;
 import de.amr.games.pacman.controller.behavior.GoHome;
@@ -153,7 +153,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, new FollowKeyboard(pacMan, VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 
 		getGhosts().forEach(ghost -> {
-			ghost.setMoveBehavior(Ghost.State.STARRED, new DoNothing());
+			ghost.setMoveBehavior(Ghost.State.STARRED, new Forward());
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, new Flee(pacMan));
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, new Chase(pacMan));

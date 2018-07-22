@@ -1,10 +1,12 @@
 package de.amr.games.pacman.controller.behavior;
 
+import java.util.function.Function;
+
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class FollowKeyboard implements MoveBehavior {
+public class FollowKeyboard implements Function<MazeMover<?>, MoveData> {
 
 	private final int[] nesw;
 
@@ -16,19 +18,21 @@ public class FollowKeyboard implements MoveBehavior {
 	}
 
 	@Override
-	public int getNextMoveDirection(MazeMover<?> mover) {
+	public MoveData apply(MazeMover<?> mover) {
+		MoveData result = new MoveData();
+		result.dir = mover.getNextMoveDirection();
 		if (Keyboard.keyDown(nesw[0])) {
-			return Top4.N;
+			result.dir = Top4.N;
 		}
 		if (Keyboard.keyDown(nesw[1])) {
-			return Top4.E;
+			result.dir = Top4.E;
 		}
 		if (Keyboard.keyDown(nesw[2])) {
-			return Top4.S;
+			result.dir = Top4.S;
 		}
 		if (Keyboard.keyDown(nesw[3])) {
-			return Top4.W;
+			result.dir = Top4.W;
 		}
-		return mover.getNextMoveDirection();
+		return result;
 	}
 }

@@ -1,18 +1,18 @@
 package de.amr.games.pacman.controller.behavior;
 
+import java.util.function.Function;
+
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class Bounce implements MoveBehavior {
+public class Bounce implements Function<MazeMover<?>, MoveData> {
 
 	@Override
-	public int getNextMoveDirection(MazeMover<?> bouncer) {
-		if (isReflected(bouncer)) {
-			return Maze.TOPOLOGY.inv(bouncer.getMoveDirection());
-		} else {
-			return bouncer.getMoveDirection();
-		}
+	public MoveData apply(MazeMover<?> bouncer) {
+		MoveData result = new MoveData();
+		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getMoveDirection()) : bouncer.getMoveDirection();
+		return result;
 	}
 
 	private boolean isReflected(MazeMover<?> bouncer) {
