@@ -58,11 +58,7 @@ public class StateMachine<S, I> {
 	private S currentState;
 	private int pauseTime;
 	private Logger logger;
-	public Supplier<Integer> fnFrequency;
-
-	private Optional<Logger> getLogger() {
-		return Optional.ofNullable(logger);
-	}
+	public Supplier<Integer> fnFrequency = () -> 60;
 
 	/**
 	 * Creates a new state machine.
@@ -90,6 +86,10 @@ public class StateMachine<S, I> {
 	 */
 	public void setLogger(Logger logger) {
 		this.logger = logger;
+	}
+	
+	public Optional<Logger> getLogger() {
+		return Optional.ofNullable(logger);
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.behavior.Route;
@@ -27,11 +28,11 @@ public class Debug {
 	}
 
 	public static void update(PlayScene scene) {
-		readDebugLevel();
+		readDebugLevel(scene);
 		handleCheats(scene);
 	}
 
-	private static void readDebugLevel() {
+	private static void readDebugLevel(PlayScene scene) {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_0)) {
 			DEBUG_LEVEL = 0;
 		}
@@ -40,6 +41,9 @@ public class Debug {
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
 			DEBUG_LEVEL = DEBUG_LEVEL == 2 ? 0 : 2;
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
+			scene.getFsm().setLogger(scene.getFsm().getLogger().isPresent() ? null : Logger.getGlobal());
 		}
 	}
 

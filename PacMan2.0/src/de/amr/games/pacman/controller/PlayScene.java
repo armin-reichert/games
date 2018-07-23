@@ -24,7 +24,6 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -54,6 +53,7 @@ import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.StatusUI;
 import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateTransition;
 
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
@@ -73,7 +73,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	public PlayScene(PacManApp app) {
 		super(app);
 		defineStateMachine();
-		fsm.setLogger(Logger.getGlobal());
 	}
 
 	@Override
@@ -106,43 +105,24 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			nextLevel();
 		});
 
-		fsm.change(State.RUNNING, State.GAMEOVER, () -> game.lives == 0);
+		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, this::onGhostContact);
 
-		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, t -> {
-			onGhostContact(t.getInput());
-		});
+		fsm.changeOnInput(FoodFoundEvent.class, State.RUNNING, State.RUNNING, this::onFoodFound);
 
-		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.KILLING_GHOST, t -> {
-			onGhostKilled(t.getInput());
-		});
+		fsm.changeOnInput(BonusFoundEvent.class, State.RUNNING, State.RUNNING, this::onBonusFound);
 
-		fsm.changeOnInput(FoodFoundEvent.class, State.RUNNING, State.RUNNING, t -> {
-			onFoodFound((FoodFoundEvent) t.getInput().get());
-		});
+		fsm.changeOnInput(GhostFrightenedEndsEvent.class, State.RUNNING, State.RUNNING, this::onGhostFrightenedEnds);
 
-		fsm.changeOnInput(BonusFoundEvent.class, State.RUNNING, State.RUNNING, t -> {
-			onBonusFound(t.getInput());
-		});
+		fsm.changeOnInput(GhostDeadIsOverEvent.class, State.RUNNING, State.RUNNING, this::onGhostDeadIsOver);
 
-		fsm.changeOnInput(GhostFrightenedEndsEvent.class, State.RUNNING, State.RUNNING, t -> {
-			onGhostFrightenedEnds(t.getInput());
-		});
+		fsm.changeOnInput(GhostRecoveringCompleteEvent.class, State.RUNNING, State.RUNNING,
+				this::onGhostRecoveringComplete);
 
-		fsm.changeOnInput(GhostDeadIsOverEvent.class, State.RUNNING, State.RUNNING, t -> {
-			onGhostDeadIsOver(t.getInput());
-		});
+		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.RUNNING, () -> game.lives > 0, this::onPacManDied);
 
-		fsm.changeOnInput(GhostRecoveringCompleteEvent.class, State.RUNNING, State.RUNNING, t -> {
-			onGhostRecoveringComplete(t.getInput());
-		});
+		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.KILLING_GHOST, this::onGhostKilled);
 
-		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.RUNNING, () -> game.lives > 0, t -> {
-			onPacManDied(t.getInput());
-		});
-
-		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.GAMEOVER, () -> game.lives == 0, t -> {
-			onPacManDied(t.getInput());
-		});
+		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.GAMEOVER, () -> game.lives == 0, this::onPacManDied);
 
 		// -- KILLING_GHOST
 
@@ -177,6 +157,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	public PacManApp getApp() {
 		return app;
+	}
+	
+	public StateMachine<State, GameEvent> getFsm() {
+		return fsm;
 	}
 
 	public Game getGame() {
@@ -302,8 +286,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	// Game event handling
 
-	private void onGhostContact(Optional<GameEvent> optEvent) {
-		GhostContactEvent e = (GhostContactEvent) optEvent.get();
+	private void onGhostContact(StateTransition<State, GameEvent> t) {
+		GhostContactEvent e = (GhostContactEvent) t.getInput().get();
 		switch (e.ghost.getState()) {
 		case ATTACKING:
 		case RECOVERING:
@@ -325,20 +309,21 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 	}
 
-	private void onGhostKilled(Optional<GameEvent> optEvent) {
-		GhostKilledEvent e = (GhostKilledEvent) optEvent.get();
+	private void onGhostKilled(StateTransition<State, GameEvent> t) {
+		GhostKilledEvent e = (GhostKilledEvent) t.getInput().get();
 		e.ghost.setState(Ghost.State.DEAD);
 		game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
 		game.score += game.deadGhostScore;
 		mazeUI.showGhostPoints(e.ghost, game.deadGhostScore);
 	}
 
-	private void onPacManDied(Optional<GameEvent> optEvent) {
+	private void onPacManDied(StateTransition<State, GameEvent> t) {
 		initEntities();
 		maze.setContent(maze.bonusTile, Tile.EMPTY);
 	}
 
-	private void onFoodFound(FoodFoundEvent e) {
+	private void onFoodFound(StateTransition<State, GameEvent> t) {
+		FoodFoundEvent e = (FoodFoundEvent) t.getInput().get();
 		maze.setContent(e.tile, EMPTY);
 		game.dotsEatenInLevel += 1;
 		if (game.dotsEatenInLevel == 70) {
@@ -361,26 +346,26 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 	}
 
-	private void onBonusFound(Optional<GameEvent> optEvent) {
-		BonusFoundEvent e = (BonusFoundEvent) optEvent.get();
+	private void onBonusFound(StateTransition<State, GameEvent> t) {
+		BonusFoundEvent e = (BonusFoundEvent) t.getInput().get();
 		maze.setContent(e.tile, EMPTY);
 		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 	}
 
-	private void onGhostFrightenedEnds(Optional<GameEvent> optEvent) {
-		GhostFrightenedEndsEvent e = (GhostFrightenedEndsEvent) optEvent.get();
+	private void onGhostFrightenedEnds(StateTransition<State, GameEvent> t) {
+		GhostFrightenedEndsEvent e = (GhostFrightenedEndsEvent) t.getInput().get();
 		// TODO depends on currently running wave (scattering or attacking wave)
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 
-	private void onGhostDeadIsOver(Optional<GameEvent> optEvent) {
-		GhostDeadIsOverEvent e = (GhostDeadIsOverEvent) optEvent.get();
+	private void onGhostDeadIsOver(StateTransition<State, GameEvent> t) {
+		GhostDeadIsOverEvent e = (GhostDeadIsOverEvent) t.getInput().get();
 		e.ghost.setState(Ghost.State.RECOVERING);
 		e.ghost.setMoveDirection(Top4.N);
 	}
 
-	private void onGhostRecoveringComplete(Optional<GameEvent> optEvent) {
-		GhostRecoveringCompleteEvent e = (GhostRecoveringCompleteEvent) optEvent.get();
+	private void onGhostRecoveringComplete(StateTransition<State, GameEvent> t) {
+		GhostRecoveringCompleteEvent e = (GhostRecoveringCompleteEvent) t.getInput().get();
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 }
