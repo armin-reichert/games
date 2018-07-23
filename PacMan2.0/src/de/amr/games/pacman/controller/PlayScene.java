@@ -104,9 +104,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			updateEntities();
 		};
 		
-		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.RUNNING, t -> {
-			nextLevel();
-		});
+		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.RUNNING, this::onNextLevel);
 
 		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, this::onGhostContact);
 
@@ -284,15 +282,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
 	}
 
-	private void nextLevel() {
-		++game.level;
-		game.dotsEatenInLevel = 0;
-		game.deadGhostScore = 0;
-		maze.loadContent();
-		maze.setContent(maze.bonusTile, Tile.EMPTY);
-		initEntities();
-	}
-
 	// Game event handling
 
 	private void onGhostContact(StateTransition<State, GameEvent> t) {
@@ -376,5 +365,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostRecoveringComplete(StateTransition<State, GameEvent> t) {
 		GhostRecoveringCompleteEvent e = (GhostRecoveringCompleteEvent) t.getInput().get();
 		e.ghost.setState(Ghost.State.ATTACKING);
+	}
+	
+	private void onNextLevel(StateTransition<State, GameEvent> t) {
+		++game.level;
+		game.dotsEatenInLevel = 0;
+		game.deadGhostScore = 0;
+		maze.loadContent();
+		maze.setContent(maze.bonusTile, Tile.EMPTY);
+		initEntities();
 	}
 }
