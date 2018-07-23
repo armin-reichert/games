@@ -54,7 +54,7 @@ import de.amr.games.pacman.ui.StatusUI;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	public enum State {
-		READY, RUNNING, EARNING_POINTS, GAMEOVER
+		READY, RUNNING, KILLING_GHOST, GAMEOVER
 	};
 
 	public enum Event {
@@ -95,17 +95,17 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			nextLevel();
 		});
 		fsm.change(State.RUNNING, State.GAMEOVER, () -> game.lives == 0);
-		fsm.changeOnInput(Event.GHOST_KILLED, State.RUNNING, State.EARNING_POINTS);
+		fsm.changeOnInput(Event.GHOST_KILLED, State.RUNNING, State.KILLING_GHOST);
 
-		fsm.state(State.EARNING_POINTS).entry = state -> {
+		fsm.state(State.KILLING_GHOST).entry = state -> {
 			killedGhost.setState(Ghost.State.DEAD);
 			game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
 			game.score += game.deadGhostScore;
 			mazeUI.showGhostPoints(killedGhost, game.deadGhostScore);
-			state.setDuration(120);
+			state.setDuration(60);
 		};
-		fsm.changeOnTimeout(State.EARNING_POINTS, State.RUNNING);
-		fsm.state(State.EARNING_POINTS).exit = state -> {
+		fsm.changeOnTimeout(State.KILLING_GHOST, State.RUNNING);
+		fsm.state(State.KILLING_GHOST).exit = state -> {
 			killedGhost = null;
 			mazeUI.hideGhostPoints();
 		};

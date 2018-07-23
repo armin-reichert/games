@@ -42,7 +42,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		allSprites.add(spriteStanding);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
 			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
-			spriteWalking[dir].createAnimation(AnimationMode.CYCLIC, 100);
+			spriteWalking[dir].createAnimation(AnimationMode.BACK_AND_FORTH, 100);
 			allSprites.add(spriteWalking[dir]);
 		});
 		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SPRITE_SIZE, SPRITE_SIZE);

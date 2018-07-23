@@ -43,7 +43,7 @@ public class Spritesheet {
 
 	static {
 		// Maze
-		mazeImage = region(228, 0, 224, 248);
+		mazeImage = $(228, 0, 224, 248);
 
 		// Energizer
 		energizerImages[0] = createEnergizerImage(true);
@@ -58,42 +58,46 @@ public class Spritesheet {
 		}
 
 		// Pac-Man
-		pacManWalking[Top4.E] = new BufferedImage[] { region(456, 0, 16, 16), region(472, 0, 16, 16) };
-		pacManWalking[Top4.W] = new BufferedImage[] { region(456, 16, 16, 16), region(472, 16, 16, 16) };
-		pacManWalking[Top4.N] = new BufferedImage[] { region(456, 32, 16, 16), region(472, 32, 16, 16) };
-		pacManWalking[Top4.S] = new BufferedImage[] { region(456, 48, 16, 16), region(472, 48, 16, 16) };
-		pacManStanding = region(488, 0, 16, 16);
+		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0, 16, 16), $(472, 0, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16, 16, 16), $(472, 16, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32, 16, 16), $(472, 32, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48, 16, 16), $(472, 48, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManStanding = $(488, 0, 16, 16);
 		for (int i = 0; i < 11; ++i) {
-			pacManDying[i] = region(504 + i * 16, 0, 16, 16);
+			pacManDying[i] = $(504 + i * 16, 0, 16, 16);
 		}
 
 		// Ghosts
 		for (int i = 0; i < 8; ++i) {
-			redGhostImages[i] = region(456 + i * 16, 64, 16, 16);
+			redGhostImages[i] = $(456 + i * 16, 64, 16, 16);
 		}
 		for (int i = 0; i < 8; ++i) {
-			pinkGhostImages[i] = region(456 + i * 16, 80, 16, 16);
+			pinkGhostImages[i] = $(456 + i * 16, 80, 16, 16);
 		}
 		for (int i = 0; i < 8; ++i) {
-			blueGhostImages[i] = region(456 + i * 16, 96, 16, 16);
+			blueGhostImages[i] = $(456 + i * 16, 96, 16, 16);
 		}
 		for (int i = 0; i < 8; ++i) {
-			orangeGhostImages[i] = region(456 + i * 16, 112, 16, 16);
+			orangeGhostImages[i] = $(456 + i * 16, 112, 16, 16);
 		}
 		for (int i = 0; i < 4; ++i) {
-			frightenedGhostImages[i] = region(584 + i * 16, 64, 16, 16);
+			frightenedGhostImages[i] = $(584 + i * 16, 64, 16, 16);
 		}
 		for (int i = 0; i < 4; ++i) {
-			deadGhostImages[i] = region(584 + i * 16, 80, 16, 16);
+			deadGhostImages[i] = $(584 + i * 16, 80, 16, 16);
 		}
-		
+
 		// Green numbers (200, 400, 800, 1600)
 		for (int i = 0; i < 4; ++i) {
-			greenNumbers[i] = region(456 + i*16, 128, 16, 16);
+			greenNumbers[i] = $(456 + i * 16, 128, 16, 16);
 		}
 	}
 
-	private static BufferedImage region(int x, int y, int w, int h) {
+	private static BufferedImage $(int x, int y, int w, int h) {
 		return sheet.getSubimage(x, y, w, h);
 	}
 
@@ -179,7 +183,7 @@ public class Spritesheet {
 		}
 		throw new IllegalArgumentException("Illegal direction: " + direction);
 	}
-	
+
 	public static BufferedImage getGreenNumber(int i) {
 		return greenNumbers[i];
 	}
