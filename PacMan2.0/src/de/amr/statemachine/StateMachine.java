@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -50,16 +50,15 @@ public class StateMachine<S, I> {
 		}
 	}
 
-	public Function<Integer, Float> ticksToSec = ticks -> (float) 60 * ticks;
-
 	private final String description;
-	private final Map<S, State> statesByID;
-	private final Map<S, List<Transition>> transitionsByStateID;
-	private final S initialStateID;
 	private final Deque<I> inputQ = new ArrayDeque<>();
-	private S currentStateID;
+	private final Map<S, State> stateMap;
+	private final Map<S, List<Transition>> transitionMap;
+	private final S initialState;
+	private S currentState;
 	private int pauseTime;
 	private Logger logger;
+	public Supplier<Integer> fnFrequency;
 
 	private Optional<Logger> getLogger() {
 		return Optional.ofNullable(logger);
@@ -78,9 +77,9 @@ public class StateMachine<S, I> {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public StateMachine(String description, Class<S> stateIDClass, S initialStateID) {
 		this.description = description;
-		this.statesByID = stateIDClass.isEnum() ? new EnumMap(stateIDClass) : new HashMap<>();
-		this.initialStateID = initialStateID;
-		this.transitionsByStateID = new HashMap<>();
+		this.stateMap = stateIDClass.isEnum() ? new EnumMap(stateIDClass) : new HashMap<>();
+		this.initialState = initialStateID;
+		this.transitionMap = new HashMap<>();
 	}
 
 	/**
@@ -107,7 +106,7 @@ public class StateMachine<S, I> {
 	 * entry action.
 	 */
 	public void init() {
-		currentStateID = initialStateID;
+		currentState = initialState;
 		traceStateEntry();
 		state().doEntry();
 	}
@@ -143,7 +142,7 @@ public class StateMachine<S, I> {
 		if (stateIDs.length == 0) {
 			throw new IllegalArgumentException("At least one state ID is needed");
 		}
-		return Stream.of(stateIDs).anyMatch(stateID -> stateID == currentStateID);
+		return Stream.of(stateIDs).anyMatch(stateID -> stateID == currentState);
 	}
 
 	/**
@@ -153,7 +152,7 @@ public class StateMachine<S, I> {
 	 *          a valid state ID
 	 */
 	public void setState(S stateID) {
-		currentStateID = stateID;
+		currentState = stateID;
 	}
 
 	/**
@@ -162,7 +161,7 @@ public class StateMachine<S, I> {
 	 * @return the ID of this state object in this state machine
 	 */
 	public Optional<S> id(State state) {
-		return statesByID.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey).findFirst();
+		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey).findFirst();
 	}
 
 	/**
@@ -171,7 +170,7 @@ public class StateMachine<S, I> {
 	 * @return the current state's ID
 	 */
 	public S stateID() {
-		return currentStateID;
+		return currentState;
 	}
 
 	/**
@@ -181,10 +180,10 @@ public class StateMachine<S, I> {
 	 * @return the current state object
 	 */
 	public State state() {
-		if (currentStateID == null) {
+		if (currentState == null) {
 			throw new IllegalStateException("State machine '" + description + "' not initialized");
 		}
-		return state(currentStateID);
+		return state(currentState);
 	}
 
 	/**
@@ -196,11 +195,11 @@ public class StateMachine<S, I> {
 	 * @return the state object for the given ID
 	 */
 	public State state(S stateID) {
-		if (!statesByID.containsKey(stateID)) {
-			statesByID.put(stateID, new State());
+		if (!stateMap.containsKey(stateID)) {
+			stateMap.put(stateID, new State());
 			getLogger().ifPresent(log -> log.info(String.format("Created state %s:%s ", description, stateID)));
 		}
-		return statesByID.get(stateID);
+		return stateMap.get(stateID);
 	}
 
 	/**
@@ -214,10 +213,10 @@ public class StateMachine<S, I> {
 	 * @return the state object
 	 */
 	public State defineState(S stateID, State state) {
-		if (statesByID.containsKey(stateID)) {
+		if (stateMap.containsKey(stateID)) {
 			throw new IllegalStateException("State with ID '" + stateID + "' already exists");
 		}
-		statesByID.put(stateID, state);
+		stateMap.put(stateID, state);
 		return state;
 	}
 
@@ -249,8 +248,7 @@ public class StateMachine<S, I> {
 	}
 
 	private void processInput(I input) {
-		Optional<Transition> match = transitions(currentStateID).stream().filter(t -> t.condition.getAsBoolean())
-				.findFirst();
+		Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean()).findFirst();
 		if (match.isPresent()) {
 			Transition t = match.get();
 			processTransition(t, input);
@@ -265,22 +263,22 @@ public class StateMachine<S, I> {
 
 	private void processTransition(Transition transition, I input) {
 		transition.input = input;
-		if (currentStateID == transition.to) {
+		if (currentState == transition.to) {
 			// state loop, no exit/entry actions are executed
 			if (transition.action != null) {
 				transition.action.accept(transition);
 			}
 		} else {
 			// state transition into other state, exit/entry actions are executed
-			traceStateChange(currentStateID, transition.to);
-			if (currentStateID != null) {
+			traceStateChange(currentState, transition.to);
+			if (currentState != null) {
 				state().doExit();
 				traceStateExit();
 			}
 			if (transition.action != null) {
 				transition.action.accept(transition);
 			}
-			currentStateID = transition.to;
+			currentState = transition.to;
 			traceStateEntry();
 			state().doEntry();
 		}
@@ -294,10 +292,10 @@ public class StateMachine<S, I> {
 	}
 
 	private List<Transition> transitions(S stateID) {
-		if (!transitionsByStateID.containsKey(stateID)) {
-			transitionsByStateID.put(stateID, new ArrayList<>(3));
+		if (!transitionMap.containsKey(stateID)) {
+			transitionMap.put(stateID, new ArrayList<>(3));
 		}
-		return transitionsByStateID.get(stateID);
+		return transitionMap.get(stateID);
 	}
 
 	// Tracing
@@ -305,9 +303,9 @@ public class StateMachine<S, I> {
 	private void traceStateEntry() {
 		getLogger().ifPresent(log -> {
 			if (state().getDuration() != State.FOREVER) {
-				float seconds = ticksToSec.apply(state().getDuration());
-				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(), seconds,
-						state().getDuration()));
+				float seconds = fnFrequency.get() * state().getDuration();
+				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(),
+						seconds, state().getDuration()));
 			} else {
 				log.info(String.format("FSM(%s) enters state '%s'", description, stateID()));
 			}
@@ -327,7 +325,8 @@ public class StateMachine<S, I> {
 	private void traceInputStateChange(I input, S oldState, S newState) {
 		getLogger().ifPresent(log -> {
 			if (oldState != newState) {
-				log.info(String.format("FSM(%s) processes %s and changes from '%s' to '%s'", description, input, oldState, newState));
+				log.info(String.format("FSM(%s) processes %s and changes from '%s' to '%s'", description, input, oldState,
+						newState));
 			} else {
 				log.info(String.format("FSM(%s) processes %s and stays in state '%s'", description, input, oldState));
 			}
