@@ -6,11 +6,13 @@ import static de.amr.games.pacman.model.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
@@ -29,6 +31,9 @@ public class MazeUI extends GameEntity {
 
 	private Ghost killedGhost;
 	private int killedGhostPoints;
+
+	private String readyText = "";
+	private String gameOverText = "";
 
 	public MazeUI(int width, int height, Maze maze, PacMan pacMan, Ghost... ghosts) {
 		this.maze = maze;
@@ -68,6 +73,14 @@ public class MazeUI extends GameEntity {
 		killedGhost = null;
 	}
 
+	public void showReadyText(boolean on) {
+		readyText = on ? "Ready!" : "";
+	}
+
+	public void showGameOverText(boolean on) {
+		gameOverText = on ? "Game Over!" : "";
+	}
+
 	@Override
 	protected Stream<Sprite> getSprites() {
 		List<Sprite> sprites = new ArrayList<>();
@@ -87,6 +100,14 @@ public class MazeUI extends GameEntity {
 		g.translate(tf.getX(), tf.getY());
 		spriteMaze.draw(g);
 		maze.tiles().forEach(tile -> drawTile(g, tile));
+		String text = readyText.length() > 0 ? readyText : gameOverText.length() > 0 ? gameOverText : "";
+		if (text.length() > 0) {
+			g.setFont(Assets.font("scoreFont"));
+			g.setColor(Color.YELLOW);
+			Rectangle2D box = g.getFontMetrics().getStringBounds(text, g);
+			g.drawString(text, (maze.bonusTile.col + 1) * TS + TS / 2 - (int) box.getWidth() / 2,
+					(maze.bonusTile.row + 1) * TS);
+		}
 		Arrays.stream(ghosts).filter(ghost -> ghost != killedGhost).forEach(ghost -> ghost.draw(g));
 		if (killedGhost != null) {
 			g.translate(killedGhost.tf.getX(), killedGhost.tf.getY());

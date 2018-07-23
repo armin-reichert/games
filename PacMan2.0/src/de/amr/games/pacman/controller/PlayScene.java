@@ -89,9 +89,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.READY).entry = state -> {
 			initEntities();
 			enableEntities(false);
+			mazeUI.showReadyText(true);
 		};
 		fsm.state(State.READY).exit = state -> {
 			enableEntities(true);
+			mazeUI.showReadyText(false);
 		};
 		fsm.change(State.READY, State.RUNNING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER));
 
@@ -156,9 +158,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.GAMEOVER).entry = state -> {
 			enableEntities(false);
+			mazeUI.showGameOverText(true);
 		};
 		fsm.change(State.GAMEOVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		fsm.state(State.GAMEOVER).exit = state -> {
+			mazeUI.showGameOverText(false);
 			game = new Game();
 		};
 	}
