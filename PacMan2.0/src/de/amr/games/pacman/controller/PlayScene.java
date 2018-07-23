@@ -24,7 +24,6 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -58,7 +57,7 @@ import de.amr.statemachine.StateTransition;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	public enum State {
-		READY, RUNNING, KILLING_GHOST, GAMEOVER
+		READY, RUNNING, SCORING, GAMEOVER
 	};
 
 	private StateMachine<State, GameEvent> fsm;
@@ -75,32 +74,36 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		defineStateMachine();
 	}
 
-	@Override
-	public void onGameEvent(GameEvent e) {
-		fsm.addInput(e);
-	}
-
 	private void defineStateMachine() {
 		fsm = new StateMachine<>("Play scene control", State.class, State.READY);
+		fsm.fnFrequency = () -> app.pulse.getFrequency();
 
 		// -- READY
 
 		fsm.state(State.READY).entry = state -> {
+			game = new Game();
+			maze = Maze.of(Assets.text("maze.txt"));
+			createEntities();
+			createUI();
 			initEntities();
 			enableEntities(false);
 			mazeUI.showReadyText(true);
+			state.setDuration(sec(3));
 		};
+		
 		fsm.state(State.READY).exit = state -> {
 			enableEntities(true);
 			mazeUI.showReadyText(false);
 		};
-		fsm.change(State.READY, State.RUNNING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER));
+		
+		fsm.changeOnTimeout(State.READY, State.RUNNING);
 
 		// -- RUNNING
 
 		fsm.state(State.RUNNING).update = state -> {
 			updateEntities();
 		};
+		
 		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.RUNNING, t -> {
 			nextLevel();
 		});
@@ -120,17 +123,19 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.RUNNING, () -> game.lives > 0, this::onPacManDied);
 
-		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.KILLING_GHOST, this::onGhostKilled);
+		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.SCORING, this::onGhostKilled);
 
 		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.GAMEOVER, () -> game.lives == 0, this::onPacManDied);
 
-		// -- KILLING_GHOST
+		// -- SCORING
 
-		fsm.state(State.KILLING_GHOST).entry = state -> {
-			state.setDuration(60);
+		fsm.state(State.SCORING).entry = state -> {
+			state.setDuration(sec(1));
 		};
-		fsm.changeOnTimeout(State.KILLING_GHOST, State.RUNNING);
-		fsm.state(State.KILLING_GHOST).exit = state -> {
+		
+		fsm.changeOnTimeout(State.SCORING, State.RUNNING);
+		
+		fsm.state(State.SCORING).exit = state -> {
 			mazeUI.hideGhostPoints();
 		};
 
@@ -140,11 +145,31 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			enableEntities(false);
 			mazeUI.showGameOverText(true);
 		};
+		
 		fsm.change(State.GAMEOVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		
 		fsm.state(State.GAMEOVER).exit = state -> {
 			mazeUI.showGameOverText(false);
-			game = new Game();
 		};
+	}
+
+	@Override
+	public void onGameEvent(GameEvent e) {
+		fsm.enqueue(e);
+	}
+
+	@Override
+	public void init() {
+		fsm.init();
+	}
+
+	/**
+	 * Called on every clock tick.
+	 */
+	@Override
+	public void update() {
+		Debug.update(this);
+		fsm.update();
 	}
 
 	@Override
@@ -177,6 +202,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	public Stream<Ghost> getGhosts() {
 		return Stream.of(blinky, pinky, inky, clyde);
+	}
+	
+	private int sec(float seconds) {
+		return app.pulse.secToTicks(seconds);
 	}
 
 	private void createEntities() {
@@ -224,15 +253,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		status.tf.moveTo(0, getHeight() - 2 * TS);
 	}
 
-	@Override
-	public void init() {
-		game = new Game();
-		maze = Maze.of(Assets.text("maze.txt"));
-		createEntities();
-		createUI();
-		fsm.init();
-	}
-
 	private void initEntities() {
 		pacMan.setState(PacMan.State.ALIVE);
 		pacMan.setTile(maze.pacManHome);
@@ -250,17 +270,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setTile(ghost.getHome());
 			ghost.setSpeed(game::getGhostSpeed);
 		});
-	}
-
-	// Game event handling
-
-	/**
-	 * Called on every clock tick.
-	 */
-	@Override
-	public void update() {
-		Debug.update(this);
-		fsm.update();
 	}
 
 	private void updateEntities() {
@@ -301,7 +310,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case DEAD:
 			break;
 		case FRIGHTENED:
-			fsm.addInput(new GhostKilledEvent(e.ghost));
+			fsm.enqueue(new GhostKilledEvent(e.ghost));
 			Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(), e.ghost.getTile()));
 			break;
 		default:
@@ -338,7 +347,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game.score += 10;
 		}
 		if (maze.tiles().map(maze::getContent).noneMatch(Tile::isFood)) {
-			fsm.addInput(new NextLevelEvent());
+			fsm.enqueue(new NextLevelEvent());
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
 			pacMan.enemies.stream().filter(ghost -> ghost.getState() != Ghost.State.DEAD)

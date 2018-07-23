@@ -21,34 +21,21 @@ public class Debug {
 	public static int DEBUG_LEVEL = 0;
 
 	public static void log(Supplier<String> msg) {
-		if (DEBUG_LEVEL < 1) {
-			return;
+		if (DEBUG_LEVEL >= 1) {
+			System.out.println(msg.get());
 		}
-		System.out.println(msg.get());
 	}
 
 	public static void update(PlayScene scene) {
-		readDebugLevel(scene);
-		handleCheats(scene);
-	}
-
-	private static void readDebugLevel(PlayScene scene) {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_0)) {
 			DEBUG_LEVEL = 0;
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
 			DEBUG_LEVEL = DEBUG_LEVEL == 1 ? 0 : 1;
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
 			DEBUG_LEVEL = DEBUG_LEVEL == 2 ? 0 : 2;
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
 			scene.getFsm().setLogger(scene.getFsm().getLogger().isPresent() ? null : Logger.getGlobal());
-		}
-	}
-
-	private static void handleCheats(PlayScene scene) {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
 			scene.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 		}

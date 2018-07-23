@@ -117,7 +117,7 @@ public class StateMachine<S, I> {
 	 * @param input
 	 *          some input / event
 	 */
-	public void addInput(I input) {
+	public void enqueue(I input) {
 		inputQ.add(input);
 	}
 
