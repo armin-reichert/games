@@ -110,7 +110,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	protected void fireGameEvent(GameEvent event) {
-		observers.forEach(observer -> observer.processGameEvent(event));
+		observers.forEach(observer -> observer.onGameEvent(event));
 	}
 
 	// Movement

@@ -5,7 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EasyGame"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EasyGraph"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/EasyStateMachine"/>
 	<classpathentry kind="lib" path="assets"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>

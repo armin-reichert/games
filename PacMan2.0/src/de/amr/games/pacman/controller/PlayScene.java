@@ -24,13 +24,14 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
@@ -39,7 +40,9 @@ import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostDeadIsOverEvent;
 import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
+import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
+import de.amr.games.pacman.controller.event.NextLevelEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
@@ -50,6 +53,7 @@ import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
 import de.amr.games.pacman.ui.StatusUI;
+import de.amr.statemachine.StateMachine;
 
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
@@ -57,16 +61,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		READY, RUNNING, KILLING_GHOST, GAMEOVER
 	};
 
-	public enum Event {
-		NEXT_LEVEL, GHOST_KILLED;
-	}
-
-	private StateMachine<State, Event> fsm;
+	private StateMachine<State, GameEvent> fsm;
 	private Game game;
 	private Maze maze;
 	private PacMan pacMan;
 	private Ghost blinky, pinky, inky, clyde;
-	private Ghost killedGhost;
 	private MazeUI mazeUI;
 	private HUD hud;
 	private StatusUI status;
@@ -74,10 +73,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	public PlayScene(PacManApp app) {
 		super(app);
 		defineStateMachine();
+		fsm.setLogger(Logger.getGlobal());
 	}
 
 	private void defineStateMachine() {
 		fsm = new StateMachine<>("Play scene control", State.class, State.READY);
+
+		// -- READY
 
 		fsm.state(State.READY).entry = state -> {
 			initEntities();
@@ -88,27 +90,44 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		};
 		fsm.change(State.READY, State.RUNNING, () -> Keyboard.keyPressedOnce(KeyEvent.VK_ENTER));
 
+		// -- RUNNING
+
 		fsm.state(State.RUNNING).update = state -> {
 			updateEntities();
 		};
-		fsm.changeOnInput(Event.NEXT_LEVEL, State.RUNNING, State.RUNNING, t -> {
+		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.RUNNING, t -> {
 			nextLevel();
 		});
+
 		fsm.change(State.RUNNING, State.GAMEOVER, () -> game.lives == 0);
-		fsm.changeOnInput(Event.GHOST_KILLED, State.RUNNING, State.KILLING_GHOST);
+
+		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, t -> {
+			onGhostContact(t.getInput());
+		});
+
+		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.KILLING_GHOST, t -> {
+			onGhostKilled(t.getInput());
+		});
+
+		fsm.changeOnInput(FoodFoundEvent.class, State.RUNNING, State.RUNNING, t -> {
+			onFoodFound((FoodFoundEvent) t.getInput().get());
+		});
+
+		fsm.changeOnInput(BonusFoundEvent.class, State.RUNNING, State.RUNNING, t -> {
+			onBonusFound(t.getInput());
+		});
+
+		// -- KILLING_GHOST
 
 		fsm.state(State.KILLING_GHOST).entry = state -> {
-			killedGhost.setState(Ghost.State.DEAD);
-			game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
-			game.score += game.deadGhostScore;
-			mazeUI.showGhostPoints(killedGhost, game.deadGhostScore);
 			state.setDuration(60);
 		};
 		fsm.changeOnTimeout(State.KILLING_GHOST, State.RUNNING);
 		fsm.state(State.KILLING_GHOST).exit = state -> {
-			killedGhost = null;
 			mazeUI.hideGhostPoints();
 		};
+
+		// -- GAME_OVER
 
 		fsm.state(State.GAMEOVER).entry = state -> {
 			enableEntities(false);
@@ -122,13 +141,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	// Game event handling
 
 	@Override
-	public void processGameEvent(GameEvent e) {
+	public void onGameEvent(GameEvent e) {
 		if (e instanceof GhostContactEvent) {
-			onGhostContact((GhostContactEvent) e);
+			fsm.addInput(e);
 		} else if (e instanceof FoodFoundEvent) {
-			onFoodFound((FoodFoundEvent) e);
+			fsm.addInput(e);
 		} else if (e instanceof BonusFoundEvent) {
-			onBonusFound((BonusFoundEvent) e);
+			fsm.addInput(e);
 		} else if (e instanceof PacManDiedEvent) {
 			onPacManDied((PacManDiedEvent) e);
 		} else if (e instanceof GhostFrightenedEndsEvent) {
@@ -274,7 +293,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	// Game event handling
 
-	private void onGhostContact(GhostContactEvent e) {
+	private void onGhostContact(Optional<GameEvent> optEvent) {
+		GhostContactEvent e = (GhostContactEvent) optEvent.get();
 		switch (e.ghost.getState()) {
 		case ATTACKING:
 		case RECOVERING:
@@ -288,13 +308,20 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case DEAD:
 			break;
 		case FRIGHTENED:
-			killedGhost = e.ghost;
-			fsm.addInput(Event.GHOST_KILLED);
-			Debug.log(() -> String.format("PacMan killed %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
+			fsm.addInput(new GhostKilledEvent(e.ghost));
+			Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(), e.ghost.getTile()));
 			break;
 		default:
 			throw new IllegalStateException();
 		}
+	}
+
+	private void onGhostKilled(Optional<GameEvent> optEvent) {
+		GhostKilledEvent e = (GhostKilledEvent) optEvent.get();
+		e.ghost.setState(Ghost.State.DEAD);
+		game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
+		game.score += game.deadGhostScore;
+		mazeUI.showGhostPoints(e.ghost, game.deadGhostScore);
 	}
 
 	private void onPacManDied(PacManDiedEvent e) {
@@ -316,7 +343,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game.score += 10;
 		}
 		if (maze.tiles().map(maze::getContent).noneMatch(Tile::isFood)) {
-			fsm.addInput(Event.NEXT_LEVEL);
+			fsm.addInput(new NextLevelEvent());
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
 			pacMan.enemies.stream().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
@@ -324,7 +351,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 	}
 
-	private void onBonusFound(BonusFoundEvent e) {
+	private void onBonusFound(Optional<GameEvent> optEvent) {
+		BonusFoundEvent e = (BonusFoundEvent) optEvent.get();
 		maze.setContent(e.tile, EMPTY);
 		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 	}
