@@ -11,7 +11,7 @@ public class FoodFoundEvent extends GameEvent {
 		this.tile = tile;
 		this.food = food;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("FoodFound(%s)", food == Tile.PELLET ? "Pellet" : "Energizer");

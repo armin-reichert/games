@@ -10,4 +10,9 @@ public class GhostDeadIsOverEvent extends GameEvent {
 	public GhostDeadIsOverEvent(MazeMover<State> ghost) {
 		this.ghost = ghost;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("GhostDeadIsOver(%s)", ghost.getName());
+	}
 }

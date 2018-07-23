@@ -58,14 +58,10 @@ public class Spritesheet {
 		}
 
 		// Pac-Man
-		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0, 16, 16), $(472, 0, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16, 16, 16), $(472, 16, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32, 16, 16), $(472, 32, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48, 16, 16), $(472, 48, 16, 16),
-				$(488, 0, 16, 16) };
+		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0, 16, 16), $(472, 0, 16, 16), $(488, 0, 16, 16) };
+		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16, 16, 16), $(472, 16, 16, 16), $(488, 0, 16, 16) };
+		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32, 16, 16), $(472, 32, 16, 16), $(488, 0, 16, 16) };
+		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48, 16, 16), $(472, 48, 16, 16), $(488, 0, 16, 16) };
 		pacManStanding = $(488, 0, 16, 16);
 		for (int i = 0; i < 11; ++i) {
 			pacManDying[i] = $(504 + i * 16, 0, 16, 16);

@@ -11,7 +11,7 @@ public class BonusFoundEvent extends GameEvent {
 		this.tile = tile;
 		this.bonus = bonus;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("Bonus(%c)", bonus);

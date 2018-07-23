@@ -303,10 +303,9 @@ public class StateMachine<StateID, Input> {
 	private void traceInputStateChange(Input input, StateID oldState, StateID newState) {
 		optLogger.ifPresent(log -> {
 			if (oldState != newState) {
-				log.info(
-						format("FSM(%s) processes input %s and changes from '%s' to '%s'", description, input, oldState, newState));
+				log.info(format("FSM(%s) processes %s and changes from '%s' to '%s'", description, input, oldState, newState));
 			} else {
-				log.info(format("FSM(%s) processes input %s and stays in state '%s'", description, input, oldState));
+				log.info(format("FSM(%s) processes %s and stays in state '%s'", description, input, oldState));
 			}
 		});
 	}

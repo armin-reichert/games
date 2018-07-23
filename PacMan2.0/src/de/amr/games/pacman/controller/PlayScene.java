@@ -141,7 +141,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.changeOnInput(PacManDiedEvent.class, State.RUNNING, State.GAMEOVER, () -> game.lives == 0, t -> {
 			onPacManDied(t.getInput());
 		});
-		
+
 		// -- KILLING_GHOST
 
 		fsm.state(State.KILLING_GHOST).entry = state -> {

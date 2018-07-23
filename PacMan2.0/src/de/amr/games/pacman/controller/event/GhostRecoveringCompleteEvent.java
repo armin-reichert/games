@@ -10,4 +10,9 @@ public class GhostRecoveringCompleteEvent extends GameEvent {
 	public GhostRecoveringCompleteEvent(MazeMover<State> ghost) {
 		this.ghost = ghost;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("GhostRecoveringComplete(%s)", ghost.getName());
+	}
 }

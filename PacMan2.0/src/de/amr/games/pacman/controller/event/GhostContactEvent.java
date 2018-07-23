@@ -9,7 +9,7 @@ public class GhostContactEvent extends GameEvent {
 	public GhostContactEvent(Ghost ghost) {
 		this.ghost = ghost;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("GhostContact(%s)", ghost.getName());

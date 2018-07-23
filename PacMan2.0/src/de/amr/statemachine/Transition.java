@@ -27,6 +27,6 @@ public interface Transition<StateID, Input> {
 	 * @return state object
 	 */
 	public State to();
-	
+
 	public Optional<Input> getInput();
 }

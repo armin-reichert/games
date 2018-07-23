@@ -36,7 +36,7 @@ class TransitionImpl<StateID, Input> implements Transition<StateID, Input> {
 	public State to() {
 		return fsm.state(to);
 	}
-	
+
 	@Override
 	public Optional<Input> getInput() {
 		return Optional.ofNullable(input);

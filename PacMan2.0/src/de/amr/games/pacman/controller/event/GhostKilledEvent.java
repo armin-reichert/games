@@ -9,4 +9,9 @@ public class GhostKilledEvent extends GameEvent {
 	public GhostKilledEvent(Ghost ghost) {
 		this.ghost = ghost;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("GhostKilled(%s)", ghost.getName());
+	}
 }

@@ -10,4 +10,9 @@ public class GhostFrightenedEndsEvent extends GameEvent {
 	public GhostFrightenedEndsEvent(MazeMover<State> ghost) {
 		this.ghost = ghost;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("GhostFrightenedEnds(%s)", ghost.getName());
+	}
 }
