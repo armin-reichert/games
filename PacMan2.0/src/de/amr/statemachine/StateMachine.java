@@ -87,7 +87,7 @@ public class StateMachine<S, I> {
 	public void setLogger(Logger logger) {
 		this.logger = logger;
 	}
-	
+
 	public Optional<Logger> getLogger() {
 		return Optional.ofNullable(logger);
 	}
@@ -303,7 +303,7 @@ public class StateMachine<S, I> {
 	private void traceStateEntry() {
 		getLogger().ifPresent(log -> {
 			if (state().getDuration() != State.FOREVER) {
-				float seconds = fnFrequency.get() * state().getDuration();
+				float seconds = state().getDuration() / fnFrequency.get();
 				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(),
 						seconds, state().getDuration()));
 			} else {
@@ -403,7 +403,13 @@ public class StateMachine<S, I> {
 	 *          the target state
 	 */
 	public void changeOnTimeout(S from, S to) {
-		changeOnTimeout(from, to, null);
+		changeOnTimeout(from, to, t -> {
+		});
+	}
+
+	public void changeOnTimeout(S from, S to, BooleanSupplier condition) {
+		changeOnTimeout(from, to, condition, t -> {
+		});
 	}
 
 	/**
@@ -419,6 +425,10 @@ public class StateMachine<S, I> {
 	 */
 	public void changeOnTimeout(S from, S to, Consumer<StateTransition<S, I>> action) {
 		addTransition(from, to, () -> state(from).isTerminated(), action);
+	}
+
+	public void changeOnTimeout(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, I>> action) {
+		addTransition(from, to, () -> state(from).isTerminated() && condition.getAsBoolean(), action);
 	}
 
 	/**

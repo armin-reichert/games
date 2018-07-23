@@ -22,7 +22,7 @@ public class Debug {
 
 	public static void log(Supplier<String> msg) {
 		if (DEBUG_LEVEL >= 1) {
-			System.out.println(msg.get());
+			Logger.getGlobal().info(msg.get());
 		}
 	}
 

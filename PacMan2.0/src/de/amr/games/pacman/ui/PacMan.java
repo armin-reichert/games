@@ -14,7 +14,6 @@ import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
-import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -88,9 +87,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 			}
 			break;
 		case DYING:
-			if (stateDurationSeconds() > 3) {
-				fireGameEvent(new PacManDiedEvent());
-			}
 			break;
 		default:
 			throw new IllegalStateException("Illegal PacMan state: " + getState());
