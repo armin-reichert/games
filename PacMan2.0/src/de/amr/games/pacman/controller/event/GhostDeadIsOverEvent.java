@@ -3,7 +3,7 @@ package de.amr.games.pacman.controller.event;
 import de.amr.games.pacman.ui.Ghost.State;
 import de.amr.games.pacman.ui.MazeMover;
 
-public class GhostDeadIsOverEvent implements GameEvent {
+public class GhostDeadIsOverEvent extends GameEvent {
 
 	public final MazeMover<State> ghost;
 

@@ -2,7 +2,7 @@ package de.amr.games.pacman.controller.event;
 
 import de.amr.games.pacman.model.Tile;
 
-public class FoodFoundEvent implements GameEvent {
+public class FoodFoundEvent extends GameEvent {
 
 	public final Tile tile;
 	public final char food;
@@ -10,5 +10,10 @@ public class FoodFoundEvent implements GameEvent {
 	public FoodFoundEvent(Tile tile, char food) {
 		this.tile = tile;
 		this.food = food;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("FoodFound(%s)", food == Tile.PELLET ? "Pellet" : "Energizer");
 	}
 }

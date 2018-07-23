@@ -260,7 +260,13 @@ public class StateMachine<StateID, Input> {
 			traceStateEntry();
 			state().doEntry();
 		}
-		optLogger.ifPresent(log -> traceInputStateChange(input, transition.from, transition.to));
+		optLogger.ifPresent(log -> {
+			if (input != null) {
+				traceInputStateChange(input, transition.from, transition.to);
+			} else {
+				traceStateChange(transition.from, transition.to);
+			}
+		});
 	}
 
 	private List<TransitionImpl<StateID, Input>> transitions(StateID stateID) {

@@ -1,6 +1,6 @@
 package de.amr.games.pacman.controller.event;
 
 
-public class NextLevelEvent implements GameEvent {
+public class NextLevelEvent extends GameEvent {
 
 }
