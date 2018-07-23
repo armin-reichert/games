@@ -7,12 +7,12 @@ import java.util.Optional;
  * 
  * @author Armin Reichert
  *
- * @param <StateID>
- *          type for state identification
- * @param <Input>
- *          type for inputs/events
+ * @param <S>
+ *          type of state identifiers
+ * @param <I>
+ *          type of inputs (events)
  */
-public interface Transition<StateID, Input> {
+public interface StateTransition<S, I> {
 
 	/**
 	 * The state which is changed by this transition.
@@ -28,5 +28,10 @@ public interface Transition<StateID, Input> {
 	 */
 	public State to();
 
-	public Optional<Input> getInput();
+	/**
+	 * The input/event which triggered the execution of this transition.
+	 * 
+	 * @return optional input which triggered transition
+	 */
+	public Optional<I> getInput();
 }

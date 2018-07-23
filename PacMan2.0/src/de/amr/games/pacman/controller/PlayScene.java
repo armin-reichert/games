@@ -292,6 +292,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.dotsEatenInLevel = 0;
 		game.deadGhostScore = 0;
 		maze.loadContent();
+		maze.setContent(maze.bonusTile, Tile.EMPTY);
 		initEntities();
 	}
 
@@ -330,6 +331,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onPacManDied(Optional<GameEvent> optEvent) {
 		initEntities();
+		maze.setContent(maze.bonusTile, Tile.EMPTY);
 	}
 
 	private void onFoodFound(FoodFoundEvent e) {
