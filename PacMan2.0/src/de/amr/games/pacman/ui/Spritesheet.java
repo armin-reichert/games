@@ -27,33 +27,30 @@ public class Spritesheet {
 	public static final int ORANGE_GHOST = 3;
 
 	private static BufferedImage sheet = Assets.readImage("sprites.png");
-	private static BufferedImage mazeImage;
-	private static BufferedImage[] energizerImages = new BufferedImage[2];
-	private static Map<Character, BufferedImage> bonusImages = new HashMap<>();
+	private static BufferedImage maze;
+	private static BufferedImage[] energizer = new BufferedImage[2];
+	private static Map<Character, BufferedImage> bonusMap = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
 	private static BufferedImage[] pacManDying = new BufferedImage[11];
-	private static BufferedImage[] redGhostImages = new BufferedImage[8];
-	private static BufferedImage[] pinkGhostImages = new BufferedImage[8];
-	private static BufferedImage[] blueGhostImages = new BufferedImage[8];
-	private static BufferedImage[] orangeGhostImages = new BufferedImage[8];
-	private static BufferedImage[] frightenedGhostImages = new BufferedImage[4];
-	private static BufferedImage[] deadGhostImages = new BufferedImage[4];
-	private static BufferedImage[] greenNumbers = new BufferedImage[4];
+	private static BufferedImage[][] ghostNormal = new BufferedImage[4][8];
+	private static BufferedImage[] ghostFrightened = new BufferedImage[4];
+	private static BufferedImage[] ghostDead = new BufferedImage[4];
+	private static BufferedImage[] greenNumber = new BufferedImage[4];
 
 	static {
 		// Maze
-		mazeImage = $(228, 0, 224, 248);
+		maze = $(228, 0, 224, 248);
 
 		// Energizer
-		energizerImages[0] = createEnergizerImage(true);
-		energizerImages[1] = createEnergizerImage(false);
+		energizer[0] = createEnergizerImage(true);
+		energizer[1] = createEnergizerImage(false);
 
 		// Boni
 		int offset = 0;
 		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE, BONUS_GRAPES,
 				BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
-			bonusImages.put(bonus, sheet.getSubimage(488 + offset, 48, 16, 16));
+			bonusMap.put(bonus, sheet.getSubimage(488 + offset, 48, 16, 16));
 			offset += 16;
 		}
 
@@ -68,28 +65,21 @@ public class Spritesheet {
 		}
 
 		// Ghosts
-		for (int i = 0; i < 8; ++i) {
-			redGhostImages[i] = $(456 + i * 16, 64, 16, 16);
-		}
-		for (int i = 0; i < 8; ++i) {
-			pinkGhostImages[i] = $(456 + i * 16, 80, 16, 16);
-		}
-		for (int i = 0; i < 8; ++i) {
-			blueGhostImages[i] = $(456 + i * 16, 96, 16, 16);
-		}
-		for (int i = 0; i < 8; ++i) {
-			orangeGhostImages[i] = $(456 + i * 16, 112, 16, 16);
+		for (int color = 0; color < 4; ++color) {
+			for (int i = 0; i < 8; ++i) {
+				ghostNormal[color][i] = $(456 + i * 16, 64 + color * 16, 16, 16);
+			}
 		}
 		for (int i = 0; i < 4; ++i) {
-			frightenedGhostImages[i] = $(584 + i * 16, 64, 16, 16);
+			ghostFrightened[i] = $(584 + i * 16, 64, 16, 16);
 		}
 		for (int i = 0; i < 4; ++i) {
-			deadGhostImages[i] = $(584 + i * 16, 80, 16, 16);
+			ghostDead[i] = $(584 + i * 16, 80, 16, 16);
 		}
 
 		// Green numbers (200, 400, 800, 1600)
 		for (int i = 0; i < 4; ++i) {
-			greenNumbers[i] = $(456 + i * 16, 128, 16, 16);
+			greenNumber[i] = $(456 + i * 16, 128, 16, 16);
 		}
 	}
 
@@ -110,16 +100,16 @@ public class Spritesheet {
 		return img;
 	}
 
-	public static BufferedImage[] getEnergizerImages() {
-		return energizerImages;
+	public static BufferedImage[] getEnergizer() {
+		return energizer;
 	}
 
 	public static BufferedImage getMaze() {
-		return mazeImage;
+		return maze;
 	}
 
 	public static BufferedImage getBonus(char bonus) {
-		return bonusImages.get(bonus);
+		return bonusMap.get(bonus);
 	}
 
 	public static BufferedImage getPacManStanding() {
@@ -134,53 +124,39 @@ public class Spritesheet {
 		return pacManDying;
 	}
 
-	public static BufferedImage[] getNormalGhostImages(int ghostColor, int direction) {
+	public static BufferedImage[] getGhostNormal(int color, int direction) {
 		switch (direction) {
 		case Top4.E:
-			return Arrays.copyOfRange(getGhostImages(ghostColor), 0, 2);
+			return Arrays.copyOfRange(ghostNormal[color], 0, 2);
 		case Top4.W:
-			return Arrays.copyOfRange(getGhostImages(ghostColor), 2, 4);
+			return Arrays.copyOfRange(ghostNormal[color], 2, 4);
 		case Top4.N:
-			return Arrays.copyOfRange(getGhostImages(ghostColor), 4, 6);
+			return Arrays.copyOfRange(ghostNormal[color], 4, 6);
 		case Top4.S:
-			return Arrays.copyOfRange(getGhostImages(ghostColor), 6, 8);
+			return Arrays.copyOfRange(ghostNormal[color], 6, 8);
 		}
 		throw new IllegalArgumentException("Illegal direction: " + direction);
 	}
 
-	public static BufferedImage[] getGhostImages(int ghostColor) {
-		switch (ghostColor) {
-		case RED_GHOST:
-			return redGhostImages;
-		case PINK_GHOST:
-			return pinkGhostImages;
-		case BLUE_GHOST:
-			return blueGhostImages;
-		case ORANGE_GHOST:
-			return orangeGhostImages;
-		}
-		throw new IllegalArgumentException("Illegal ghost color: " + ghostColor);
+	public static BufferedImage[] getGhostFrightened() {
+		return ghostFrightened;
 	}
 
-	public static BufferedImage[] getFrightenedGhostImages() {
-		return frightenedGhostImages;
-	}
-
-	public static BufferedImage getDeadGhostImage(int direction) {
+	public static BufferedImage getGhostDead(int direction) {
 		switch (direction) {
 		case Top4.E:
-			return deadGhostImages[0];
+			return ghostDead[0];
 		case Top4.W:
-			return deadGhostImages[1];
+			return ghostDead[1];
 		case Top4.N:
-			return deadGhostImages[2];
+			return ghostDead[2];
 		case Top4.S:
-			return deadGhostImages[3];
+			return ghostDead[3];
 		}
 		throw new IllegalArgumentException("Illegal direction: " + direction);
 	}
 
 	public static BufferedImage getGreenNumber(int i) {
-		return greenNumbers[i];
+		return greenNumber[i];
 	}
 }

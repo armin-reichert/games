@@ -44,7 +44,7 @@ public class MazeUI extends GameEntity {
 
 	private void createSprites(int width, int height) {
 		spriteMaze = new Sprite(Spritesheet.getMaze()).scale(width, height);
-		spriteEnergizer = new Sprite(Spritesheet.getEnergizerImages()).scale(TS, TS);
+		spriteEnergizer = new Sprite(Spritesheet.getEnergizer()).scale(TS, TS);
 		spriteEnergizer.createAnimation(AnimationMode.BACK_AND_FORTH, 250);
 		spriteGreenNumber = new Sprite[4];
 		for (int i = 0; i < 4; ++i) {
