@@ -37,6 +37,7 @@ public class Spritesheet {
 	private static BufferedImage[] ghostFrightened = new BufferedImage[4];
 	private static BufferedImage[] ghostDead = new BufferedImage[4];
 	private static BufferedImage[] greenNumber = new BufferedImage[4];
+	private static BufferedImage[] pinkNumber = new BufferedImage[8];
 
 	static {
 		// Maze
@@ -80,6 +81,14 @@ public class Spritesheet {
 		// Green numbers (200, 400, 800, 1600)
 		for (int i = 0; i < 4; ++i) {
 			greenNumber[i] = $(456 + i * 16, 128, 16, 16);
+		}
+
+		// Pink numbers (horizontal: 100, 300, 500, 700, vertikal: 1000, 2000, 3000, 5000)
+		for (int i = 0; i < 4; ++i) {
+			pinkNumber[i] = $(456 + i * 16, 144, 16, 16);
+		}
+		for (int j = 0; j < 4; ++j) {
+			pinkNumber[4 + j] = $(520, 144 + j * 16, 16, 16);
 		}
 	}
 
@@ -159,4 +168,9 @@ public class Spritesheet {
 	public static BufferedImage getGreenNumber(int i) {
 		return greenNumber[i];
 	}
+
+	public static BufferedImage getPinkNumber(int i) {
+		return pinkNumber[i];
+	}
+
 }

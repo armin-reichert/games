@@ -133,7 +133,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.lives == 0);
 
-		fsm.changeOnTimeout(State.DYING, State.RUNNING);
+		fsm.changeOnTimeout(State.DYING, State.RUNNING, t -> {
+			initEntities();
+		});
 
 		// -- SCORING
 
@@ -315,7 +317,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		maze.setContent(maze.bonusTile, Tile.EMPTY);
 		game.lives -= 1;
 		pacMan.currentSprite().resetAnimation();
-		initEntities();
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
