@@ -237,23 +237,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		getGhosts().forEach(ghost -> {
 			ghost.setMoveBehavior(Ghost.State.STARRED, forward());
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
+			ghost.setMoveBehavior(Ghost.State.DEAD, goHome());
+			ghost.setMoveBehavior(Ghost.State.RECOVERING, bounce());
 		});
-
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, chase(pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, goHome());
-		blinky.setMoveBehavior(Ghost.State.RECOVERING, goHome());
-
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, ambush(pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, goHome());
-		pinky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
-
-		inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
-		inky.setMoveBehavior(Ghost.State.DEAD, goHome());
-		inky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
-
-		clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
-		clyde.setMoveBehavior(Ghost.State.DEAD, goHome());
-		clyde.setMoveBehavior(Ghost.State.RECOVERING, bounce());
+//		inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
+//		clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
 	}
 
 	private void createUI() {
