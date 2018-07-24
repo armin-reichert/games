@@ -28,6 +28,7 @@ public class Spritesheet {
 
 	private static BufferedImage sheet = Assets.readImage("sprites.png");
 	private static BufferedImage maze;
+	private static BufferedImage mazeFull;
 	private static BufferedImage[] energizer = new BufferedImage[2];
 	private static Map<Character, BufferedImage> bonusMap = new HashMap<>();
 	private static BufferedImage pacManStanding;
@@ -41,6 +42,7 @@ public class Spritesheet {
 
 	static {
 		// Maze
+		mazeFull = $(0, 0, 224, 248);
 		maze = $(228, 0, 224, 248);
 
 		// Energizer
@@ -115,6 +117,10 @@ public class Spritesheet {
 
 	public static BufferedImage getMaze() {
 		return maze;
+	}
+
+	public static BufferedImage getMazeFull() {
+		return mazeFull;
 	}
 
 	public static BufferedImage getBonus(char bonus) {

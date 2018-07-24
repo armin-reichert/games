@@ -20,7 +20,6 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.grid.ui.swing.rendering.ConfigurableGridRenderer;
 import de.amr.easy.grid.ui.swing.rendering.GridCanvas;
 import de.amr.easy.grid.ui.swing.rendering.GridRenderer;
-import de.amr.easy.grid.ui.swing.rendering.PearlsGridRenderer;
 import de.amr.easy.grid.ui.swing.rendering.WallPassageGridRenderer;
 import de.amr.games.pacman.model.Maze;
 
@@ -57,11 +56,11 @@ public class BoardPreview extends JFrame {
 		colors.put(TUNNEL, Color.GRAY);
 		ConfigurableGridRenderer r = new WallPassageGridRenderer();
 		r.fnCellSize = () -> TS;
-		r.fnPassageWidth = () -> TS-1;
+		r.fnPassageWidth = () -> TS - 1;
 		r.fnPassageColor = (cell, dir) -> Color.WHITE;
 		r.fnCellBgColor = cell -> colors.getOrDefault(maze.get(cell), Color.WHITE);
 		r.fnText = cell -> String.valueOf(maze.getContent(maze.tile(cell)));
-		r.fnTextFont = () -> new Font("Arial Bold", Font.BOLD, TS/2);
+		r.fnTextFont = () -> new Font("Arial Bold", Font.BOLD, TS / 2);
 		return r;
 	}
 }

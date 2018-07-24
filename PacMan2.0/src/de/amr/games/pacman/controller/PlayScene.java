@@ -84,13 +84,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			createUI();
 			initEntities();
 			enableEntities(false);
-			mazeUI.showReadyText(true);
+			mazeUI.showText("Ready!");
 			state.setDuration(sec(3));
 		};
 
 		fsm.state(State.READY).exit = state -> {
 			enableEntities(true);
-			mazeUI.showReadyText(false);
+			mazeUI.showText("");
 		};
 
 		fsm.changeOnTimeout(State.READY, State.RUNNING);
@@ -153,13 +153,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.GAMEOVER).entry = state -> {
 			enableEntities(false);
-			mazeUI.showGameOverText(true);
+			mazeUI.showText("Game Over");
 		};
 
 		fsm.change(State.GAMEOVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 		fsm.state(State.GAMEOVER).exit = state -> {
-			mazeUI.showGameOverText(false);
+			mazeUI.showText("");
 		};
 	}
 
@@ -239,8 +239,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		});
 		blinky.setMoveBehavior(Ghost.State.ATTACKING, chase(pacMan));
 		pinky.setMoveBehavior(Ghost.State.ATTACKING, ambush(pacMan));
-//		inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
-//		clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
+		// inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
+		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
 	}
 
 	private void createUI() {

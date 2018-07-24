@@ -2,7 +2,6 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.model.Tile.PELLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -32,8 +31,7 @@ public class MazeUI extends GameEntity {
 	private Ghost killedGhost;
 	private int killedGhostPoints;
 
-	private String readyText = "";
-	private String gameOverText = "";
+	private String text = "";
 
 	public MazeUI(int width, int height, Maze maze, PacMan pacMan, Ghost... ghosts) {
 		this.maze = maze;
@@ -73,12 +71,8 @@ public class MazeUI extends GameEntity {
 		killedGhost = null;
 	}
 
-	public void showReadyText(boolean on) {
-		readyText = on ? "Ready!" : "";
-	}
-
-	public void showGameOverText(boolean on) {
-		gameOverText = on ? "Game Over!" : "";
+	public void showText(String text) {
+		this.text = text;
 	}
 
 	@Override
@@ -100,7 +94,6 @@ public class MazeUI extends GameEntity {
 		g.translate(tf.getX(), tf.getY());
 		spriteMaze.draw(g);
 		maze.tiles().forEach(tile -> drawTile(g, tile));
-		String text = readyText.length() > 0 ? readyText : gameOverText.length() > 0 ? gameOverText : "";
 		if (text.length() > 0) {
 			g.setFont(Assets.font("scoreFont"));
 			g.setColor(Color.YELLOW);
@@ -123,10 +116,9 @@ public class MazeUI extends GameEntity {
 	private void drawTile(Graphics2D g, Tile tile) {
 		g.translate(tile.col * TS, tile.row * TS);
 		char content = maze.getContent(tile);
-		if (content == PELLET) {
-			int size = TS / 4;
+		if (content == Tile.PELLET) {
 			g.setColor(Color.PINK);
-			g.fillRect((TS - size) / 2, (TS - size) / 2, size, size);
+			g.fillRect(TS * 3 / 8, TS * 3 / 8, TS / 4, TS / 4);
 		} else if (content == ENERGIZER) {
 			spriteEnergizer.draw(g);
 		} else if (Tile.isBonus(content)) {
