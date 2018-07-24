@@ -54,7 +54,7 @@ import de.amr.statemachine.StateTransition;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	public enum State {
-		READY, RUNNING, SCORING, DYING, GAMEOVER
+		READY, RUNNING, SCORING, DYING, CHANGING_LEVEL, GAMEOVER
 	};
 
 	private StateMachine<State, GameEvent> fsm;
@@ -118,7 +118,26 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING);
 
-		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.RUNNING, this::onNextLevel);
+		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.CHANGING_LEVEL, this::onNextLevel);
+
+		// -- CHANGING_LEVEL
+
+		fsm.state(State.CHANGING_LEVEL).entry = state -> {
+			state.setDuration(sec(4));
+			mazeUI.setFlashing(true);
+		};
+
+		fsm.state(State.CHANGING_LEVEL).exit = state -> {
+			mazeUI.setFlashing(false);
+		};
+
+		fsm.state(State.CHANGING_LEVEL).update = state -> {
+			if (state.getRemaining() < sec(2)) {
+				mazeUI.setFlashing(false);
+			}
+		};
+
+		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.RUNNING);
 
 		// -- DYING
 
@@ -130,7 +149,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.DYING).exit = state -> {
 			onPacManDied(null);
 		};
-
+		
 		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.lives == 0);
 
 		fsm.changeOnTimeout(State.DYING, State.RUNNING, t -> {

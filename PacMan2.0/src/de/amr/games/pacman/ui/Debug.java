@@ -35,9 +35,15 @@ public class Debug {
 			DEBUG_LEVEL = DEBUG_LEVEL == 2 ? 0 : 2;
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
 			scene.getFsm().setLogger(scene.getFsm().getLogger().isPresent() ? null : Logger.getGlobal());
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
+		}
+		// Cheats
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
 			scene.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
+		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
+			Maze maze = scene.getMazeUI().getMaze();
+			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET)
+					.forEach(tile -> maze.setContent(tile, Tile.EMPTY));
 		}
 	}
 
