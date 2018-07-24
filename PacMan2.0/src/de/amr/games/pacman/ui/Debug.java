@@ -48,6 +48,7 @@ public class Debug {
 		if (DEBUG_LEVEL == 1) {
 			drawGhostPaths(g, scene);
 			drawPacManTilePosition(g, scene);
+			drawEntityState(g, scene);
 		}
 	}
 
@@ -73,6 +74,39 @@ public class Debug {
 			}
 		}
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+	}
+
+	private static void drawEntityState(Graphics2D g, PlayScene scene) {
+		MazeUI mazeUI = scene.getMazeUI();
+		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+		PacMan pacMan = scene.getPacMan();
+		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
+		scene.getGhosts()
+				.forEach(ghost -> drawText(g, color(ghost), ghost.tf.getX(), ghost.tf.getY(), ghost.getState().toString()));
+		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+	}
+
+	private static Color color(Ghost ghost) {
+		switch (ghost.getColor()) {
+		case Spritesheet.BLUE_GHOST:
+			return Color.BLUE;
+		case Spritesheet.ORANGE_GHOST:
+			return Color.ORANGE;
+		case Spritesheet.PINK_GHOST:
+			return Color.PINK;
+		case Spritesheet.RED_GHOST:
+			return Color.RED;
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+
+	private static void drawText(Graphics2D g, Color color, float x, float y, String text) {
+		g.translate(x, y);
+		g.setColor(color);
+		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, TS / 2));
+		g.drawString(text, 0, -TS / 2);
+		g.translate(-x, -y);
 	}
 
 	private static void drawPacManTilePosition(Graphics2D g, PlayScene scene) {
