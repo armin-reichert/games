@@ -6,10 +6,7 @@ import static de.amr.games.pacman.behavior.impl.Behaviors.bounce;
 import static de.amr.games.pacman.behavior.impl.Behaviors.chase;
 import static de.amr.games.pacman.behavior.impl.Behaviors.flee;
 import static de.amr.games.pacman.behavior.impl.Behaviors.followKeyboard;
-import static de.amr.games.pacman.behavior.impl.Behaviors.forward;
 import static de.amr.games.pacman.behavior.impl.Behaviors.goHome;
-import static de.amr.games.pacman.behavior.impl.Behaviors.moody;
-import static de.amr.games.pacman.behavior.impl.Behaviors.stayBehind;
 import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
@@ -132,7 +129,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.DYING).exit = state -> {
 			onPacManDied(null);
-			pacMan.setState(PacMan.State.ALIVE);
 		};
 
 		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.lives == 0);
@@ -235,7 +231,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 
 		getGhosts().forEach(ghost -> {
-			ghost.setMoveBehavior(Ghost.State.STARRED, forward());
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 			ghost.setMoveBehavior(Ghost.State.DEAD, goHome());
 			ghost.setMoveBehavior(Ghost.State.RECOVERING, bounce());
@@ -294,9 +289,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case ATTACKING:
 		case RECOVERING:
 		case SCATTERING:
-		case STARRED:
-			pacMan.enemies.forEach(enemy -> enemy.setState(Ghost.State.STARRED));
-			game.lives -= 1;
 			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
 			fsm.enqueue(new PacManKilledEvent());
 			break;
@@ -320,8 +312,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onPacManDied(StateTransition<State, GameEvent> t) {
-		initEntities();
 		maze.setContent(maze.bonusTile, Tile.EMPTY);
+		game.lives -= 1;
+		pacMan.currentSprite().resetAnimation();
+		initEntities();
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {

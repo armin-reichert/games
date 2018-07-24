@@ -8,15 +8,14 @@ import de.amr.games.pacman.ui.PacMan;
 
 public class Game {
 
-	/** Tiles per second. */
-	private static float tps(float value) {
+	private static float tilesPerSec(float value) {
 		return value * TS / 60;
 	}
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {
 		switch (pacMan.getState()) {
 		case ALIVE:
-			return tps(8f);
+			return tilesPerSec(8f);
 		case DYING:
 			return 0;
 		default:
@@ -27,17 +26,15 @@ public class Game {
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
 		switch (ghost.getState()) {
 		case ATTACKING:
-			return tps(6f);
+			return tilesPerSec(6f);
 		case DEAD:
-			return tps(10f);
+			return tilesPerSec(10f);
 		case FRIGHTENED:
-			return tps(4f);
+			return tilesPerSec(4f);
 		case RECOVERING:
-			return tps(3f);
+			return tilesPerSec(3f);
 		case SCATTERING:
-			return tps(6f);
-		case STARRED:
-			return 0f;
+			return tilesPerSec(6f);
 		default:
 			throw new IllegalStateException();
 		}

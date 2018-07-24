@@ -16,7 +16,7 @@ import de.amr.games.pacman.model.Tile;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		ATTACKING, SCATTERING, FRIGHTENED, DEAD, RECOVERING, STARRED
+		ATTACKING, SCATTERING, FRIGHTENED, DEAD, RECOVERING
 	}
 
 	private final int color;
@@ -78,8 +78,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case SCATTERING:
 			move();
 			break;
-		case STARRED:
-			break;
 		default:
 			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}
@@ -102,8 +100,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case RECOVERING:
 			return spriteNormal[getMoveDirection()];
 		case SCATTERING:
-			return spriteNormal[getMoveDirection()];
-		case STARRED:
 			return spriteNormal[getMoveDirection()];
 		default:
 			throw new IllegalStateException("Illegal ghost state: " + getState());
