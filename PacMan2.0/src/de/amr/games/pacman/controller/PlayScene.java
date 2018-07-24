@@ -367,7 +367,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onNextLevel(StateTransition<State, GameEvent> t) {
-		++game.level;
+		game.level += 1;
 		game.dotsEatenInLevel = 0;
 		game.deadGhostScore = 0;
 		maze.loadContent();

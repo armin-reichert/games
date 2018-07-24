@@ -9,6 +9,7 @@ import static de.amr.games.pacman.model.Tile.WORMHOLE;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import de.amr.easy.grid.ui.swing.rendering.ConfigurableGridRenderer;
 import de.amr.easy.grid.ui.swing.rendering.GridCanvas;
 import de.amr.easy.grid.ui.swing.rendering.GridRenderer;
 import de.amr.easy.grid.ui.swing.rendering.PearlsGridRenderer;
+import de.amr.easy.grid.ui.swing.rendering.WallPassageGridRenderer;
 import de.amr.games.pacman.model.Maze;
 
 public class BoardPreview extends JFrame {
@@ -48,16 +50,18 @@ public class BoardPreview extends JFrame {
 	private GridRenderer createRenderer() {
 		Map<Character, Color> colors = new HashMap<>();
 		colors.put(WALL, Color.BLUE);
-		colors.put(PELLET, Color.YELLOW);
+		colors.put(PELLET, Color.WHITE);
 		colors.put(ENERGIZER, Color.GREEN);
-		colors.put(DOOR, Color.ORANGE.darker());
-		colors.put(WORMHOLE, Color.PINK);
-		colors.put(TUNNEL, Color.PINK.darker());
-		ConfigurableGridRenderer r = new PearlsGridRenderer();
+		colors.put(DOOR, Color.ORANGE);
+		colors.put(WORMHOLE, Color.ORANGE);
+		colors.put(TUNNEL, Color.GRAY);
+		ConfigurableGridRenderer r = new WallPassageGridRenderer();
 		r.fnCellSize = () -> TS;
-		r.fnPassageWidth = () -> 4;
-		r.fnPassageColor = (cell, dir) -> Color.LIGHT_GRAY;
+		r.fnPassageWidth = () -> TS-1;
+		r.fnPassageColor = (cell, dir) -> Color.WHITE;
 		r.fnCellBgColor = cell -> colors.getOrDefault(maze.get(cell), Color.WHITE);
+		r.fnText = cell -> String.valueOf(maze.getContent(maze.tile(cell)));
+		r.fnTextFont = () -> new Font("Arial Bold", Font.BOLD, TS/2);
 		return r;
 	}
 }
