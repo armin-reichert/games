@@ -374,14 +374,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
 		BonusFoundEvent e = (BonusFoundEvent) t.getInput().get();
 		game.score += e.bonus.getValue();
-		mazeUI.hideBonus();
-		mazeUI.showPoints(e.bonus.getValue(), e.bonus.getTile(), sec(2));
+		mazeUI.honorBonus(sec(2));
 		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 	}
 
 	private void onGhostFrightenedEnds(StateTransition<State, GameEvent> t) {
 		GhostFrightenedEndsEvent e = (GhostFrightenedEndsEvent) t.getInput().get();
-		// TODO depends on currently running wave (scattering or attacking wave)
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 

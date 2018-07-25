@@ -2,37 +2,49 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
 
+import java.util.Arrays;
+
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.model.Tile;
 
 public class Bonus extends GameEntity {
 
-	private char symbol;
-	private int value;
-	private Sprite sprite;
+	private static final int[] POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
-	public Bonus(char symbol, int value) {
+	private boolean honored;
+	private char symbol;
+	private int points;
+	private Sprite spriteSymbol;
+	private Sprite spritePoints;
+
+	public Bonus(char symbol, int points) {
 		this.symbol = symbol;
-		this.value = value;
-		sprite = new Sprite(Spritesheet.getBonus(symbol)).scale(2 * TS, 2 * TS);
+		this.points = points;
+		this.honored = false;
+		spriteSymbol = new Sprite(Spritesheet.getBonus(symbol)).scale(2 * TS, 2 * TS);
+		int index = Arrays.binarySearch(POINTS, points);
+		if (index >= 0) {
+			spritePoints = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * TS, 2 * TS);
+		} else {
+			throw new IllegalArgumentException("Bonus value not supported: " + points);
+		}
 	}
 
 	public int getValue() {
-		return value;
+		return points;
 	}
 
 	public char getSymbol() {
 		return symbol;
 	}
 
-	public Tile getTile() {
-		return new Tile((int) tf.getX() / TS, (int) tf.getY() / TS);
+	public void setHonored() {
+		honored = true;
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return sprite;
+		return honored ? spritePoints : spriteSymbol;
 	}
 
 	@Override

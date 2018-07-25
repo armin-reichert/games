@@ -74,6 +74,14 @@ public class MazeUI extends GameEntity {
 		return spriteEnergizer;
 	}
 
+	public void showText(String text) {
+		this.text = text;
+	}
+
+	public void hideText() {
+		this.text = "";
+	}
+
 	public void showPoints(int value, Tile tile, int ticks) {
 		points = new Points(value);
 		points.tf.moveTo(tile.col * TS, tile.row * TS);
@@ -91,8 +99,8 @@ public class MazeUI extends GameEntity {
 
 	public void showBonus(Bonus bonus, int ticks) {
 		this.bonus = bonus;
-		bonus.tf.moveTo(maze.bonusTile.col * TS, maze.bonusTile.row * TS - TS / 2);
 		bonusTimeLeft = ticks;
+		bonus.tf.moveTo(maze.bonusTile.col * TS, maze.bonusTile.row * TS - TS / 2);
 		getPacMan().ifPresent(pacMan -> pacMan.interests.add(bonus));
 	}
 
@@ -100,32 +108,32 @@ public class MazeUI extends GameEntity {
 		return Optional.ofNullable(bonus);
 	}
 
-	public void hideBonus() {
-		getPacMan().ifPresent(pacMan -> pacMan.interests.remove(bonus));
-		bonus = null;
-		bonusTimeLeft = 0;
-	}
-
-	public void showText(String text) {
-		this.text = text;
+	public void honorBonus(int ticks) {
+		getBonus().ifPresent(bonus -> {
+			getPacMan().ifPresent(pacMan -> pacMan.interests.remove(bonus));
+			bonusTimeLeft = ticks;
+			bonus.setHonored();
+		});
 	}
 	
-	public void hideText() {
-		this.text = "";
+	private void removeBonus() {
+		getPacMan().ifPresent(pacMan -> pacMan.interests.remove(bonus));
+		bonus = null;
 	}
-
+	
 	@Override
 	public void update() {
 		getBonus().ifPresent(bonus -> {
 			--bonusTimeLeft;
-			if (bonusTimeLeft == 0) {
-				hideBonus();
+			Debug.log(() -> "Bonus time left: " + bonusTimeLeft);
+			if (bonusTimeLeft <= 0) {
+				removeBonus();
 			}
 		});
 		getPoints().ifPresent(points -> {
 			--pointsTimeLeft;
-			if (pointsTimeLeft == 0) {
-				hidePoints();
+			if (pointsTimeLeft <= 0) {
+				points = null;
 			}
 		});
 	}
