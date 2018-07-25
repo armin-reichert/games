@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
-import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -23,7 +22,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		ALIVE, DYING
 	};
 
-	public final Set<Ghost> enemies = new HashSet<>();
+	public final Set<GameEntity> interests = new HashSet<>();
 
 	private Sprite[] spriteWalking = new Sprite[4];
 	private Sprite spriteStanding;
@@ -72,19 +71,19 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public void update() {
 		switch (getState()) {
 		case ALIVE:
+			move();
 			Tile tile = getTile();
 			char content = getMaze().getContent(tile);
-			if (Tile.isBonus(content)) {
-				observers.fireGameEvent(new BonusFoundEvent(tile, content));
-			} else if (Tile.isFood(content)) {
+			if (Tile.isFood(content)) {
 				observers.fireGameEvent(new FoodFoundEvent(tile, content));
 			} else {
-				Optional<GameEvent> enemyContact = checkEnemyContact();
-				if (enemyContact.isPresent()) {
-					observers.fireGameEvent(enemyContact.get());
-				} else {
-					move();
-				}
+				interests.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
+					if (thing instanceof Ghost) {
+						observers.fireGameEvent(new GhostContactEvent((Ghost) thing));
+					} else if (thing instanceof Bonus) {
+						observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) thing));
+					}
+				});
 			}
 			break;
 		case DYING:
@@ -92,10 +91,5 @@ public class PacMan extends MazeMover<PacMan.State> {
 		default:
 			throw new IllegalStateException("Illegal PacMan state: " + getState());
 		}
-	}
-
-	private Optional<GameEvent> checkEnemyContact() {
-		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD)
-				.filter(this::collidesWith).findAny().map(ghost -> new GhostContactEvent(ghost));
 	}
 }

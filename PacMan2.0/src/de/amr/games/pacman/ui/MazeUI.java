@@ -9,6 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -34,6 +35,9 @@ public class MazeUI extends GameEntity {
 	private boolean flashing;
 	private String text = "";
 	private Points points;
+	private int pointsTimeLeft;
+	private Bonus bonus;
+	private int bonusTimeLeft;
 
 	public MazeUI(int width, int height, Maze maze) {
 		this.maze = maze;
@@ -58,6 +62,10 @@ public class MazeUI extends GameEntity {
 		return maze;
 	}
 
+	public Optional<PacMan> getPacMan() {
+		return Optional.ofNullable(pacMan);
+	}
+
 	public void setFlashing(boolean on) {
 		flashing = on;
 	}
@@ -66,17 +74,56 @@ public class MazeUI extends GameEntity {
 		return spriteEnergizer;
 	}
 
-	public void showPoints(int value, Tile tile) {
+	public void showPoints(int value, Tile tile, int ticks) {
 		points = new Points(value);
-		points.tf.moveTo(tile.col * TS, tile.row * TS);
+		points.tf.moveTo(tile.col * TS, tile.row * TS - TS / 2);
+		pointsTimeLeft = ticks;
+	}
+
+	public Optional<Points> getPoints() {
+		return Optional.ofNullable(points);
 	}
 
 	public void hidePoints() {
 		points = null;
+		pointsTimeLeft = 0;
+	}
+
+	public void showBonus(char symbol, int ticks) {
+		bonus = new Bonus(symbol, 100);
+		bonus.tf.moveTo(maze.bonusTile.col * TS, maze.bonusTile.row * TS - TS / 2);
+		bonusTimeLeft = ticks;
+		getPacMan().ifPresent(pacMan -> pacMan.interests.add(bonus));
+	}
+
+	public Optional<Bonus> getBonus() {
+		return Optional.ofNullable(bonus);
+	}
+
+	public void hideBonus() {
+		getPacMan().ifPresent(pacMan -> pacMan.interests.remove(bonus));
+		bonus = null;
+		bonusTimeLeft = 0;
 	}
 
 	public void showText(String text) {
 		this.text = text;
+	}
+
+	@Override
+	public void update() {
+		getBonus().ifPresent(bonus -> {
+			--bonusTimeLeft;
+			if (bonusTimeLeft == 0) {
+				hideBonus();
+			}
+		});
+		getPoints().ifPresent(points -> {
+			--pointsTimeLeft;
+			if (pointsTimeLeft == 0) {
+				hidePoints();
+			}
+		});
 	}
 
 	@Override
@@ -95,23 +142,27 @@ public class MazeUI extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
-		currentSprite().draw(g);
-		if (!flashing) {
-			maze.tiles().forEach(tile -> drawTile(g, tile));
+		if (flashing) {
+			spriteMazeFlashing.draw(g);
+		} else {
+			spriteMaze.draw(g);
+			maze.tiles().forEach(tile -> drawTileContent(g, tile));
+			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
+			pacMan.draw(g);
 			drawCenteredText(g, maze.bonusTile);
-			Arrays.stream(ghosts).filter(ghost -> ghost.visibility.getAsBoolean() == true)
-					.forEach(ghost -> ghost.draw(g));
 			if (points != null) {
 				points.draw(g);
 			}
-			pacMan.draw(g);
+			if (bonus != null) {
+				bonus.draw(g);
+			}
 		}
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
 	private void drawCenteredText(Graphics2D g, Tile tile) {
 		if (text.length() > 0) {
-			g.translate((tile.col + 1) * TS, tile.row * TS + TS/4);
+			g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
 			g.setFont(Assets.font("scoreFont"));
 			g.setColor(Color.YELLOW);
 			Rectangle2D box = g.getFontMetrics().getStringBounds(text, g);
@@ -120,16 +171,14 @@ public class MazeUI extends GameEntity {
 		}
 	}
 
-	private void drawTile(Graphics2D g, Tile tile) {
+	private void drawTileContent(Graphics2D g, Tile tile) {
 		g.translate(tile.col * TS, tile.row * TS);
-		char content = maze.getContent(tile);
-		if (content == Tile.PELLET) {
+		char c = maze.getContent(tile);
+		if (c == Tile.PELLET) {
 			g.setColor(Color.PINK);
 			g.fillRect(TS * 3 / 8, TS * 3 / 8, TS / 4, TS / 4);
-		} else if (content == ENERGIZER) {
+		} else if (c == ENERGIZER) {
 			spriteEnergizer.draw(g);
-		} else if (Tile.isBonus(content)) {
-			g.drawImage(Spritesheet.getBonus(content), 0, -TS / 2, TS * 2, TS * 2, null);
 		}
 		g.translate(-tile.col * TS, -tile.row * TS);
 	}

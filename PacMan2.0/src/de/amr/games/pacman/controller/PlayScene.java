@@ -167,7 +167,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.SCORING).update = state -> {
 			getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD).forEach(Ghost::update);
 		};
-		
+
 		fsm.changeOnTimeout(State.SCORING, State.RUNNING);
 
 		fsm.state(State.SCORING).exit = state -> {
@@ -239,7 +239,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		return Stream.of(blinky, pinky, inky, clyde);
 	}
 
-	private int sec(float seconds) {
+	public int sec(float seconds) {
 		return app.pulse.secToTicks(seconds);
 	}
 
@@ -249,11 +249,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		pacMan = new PacMan(maze, maze.pacManHome);
-		pacMan.enemies.addAll(Arrays.asList(blinky, pinky, inky, clyde));
+		pacMan.interests.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 
 		getGhosts().forEach(ghost -> ghost.observers.addObserver(this));
 		pacMan.observers.addObserver(this);
-		
+
 		// define move behavior
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		getGhosts().forEach(ghost -> {
@@ -308,6 +308,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
 	}
 
+	private void startHuntingGhosts() {
+		getGhosts().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
+				.forEach(ghost -> ghost.setState(Ghost.State.FRIGHTENED));
+	}
+
 	// Game event handling
 
 	private void onGhostContact(StateTransition<State, GameEvent> t) {
@@ -337,7 +342,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		e.ghost.setState(Ghost.State.DEAD);
 		game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
 		game.score += game.deadGhostScore;
-		mazeUI.showPoints(game.deadGhostScore, e.ghost.getTile());
+		mazeUI.showPoints(game.deadGhostScore, e.ghost.getTile(), sec(2));
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -345,9 +350,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		maze.setContent(e.tile, EMPTY);
 		game.dotsEatenInLevel += 1;
 		if (game.dotsEatenInLevel == 70) {
-			maze.setContent(maze.bonusTile, Tile.BONUS_CHERRIES);
+			mazeUI.showBonus(Tile.BONUS_CHERRIES, sec(5));
 		} else if (game.dotsEatenInLevel == 170) {
-			maze.setContent(maze.bonusTile, Tile.BONUS_STRAWBERRY);
+			mazeUI.showBonus(Tile.BONUS_STRAWBERRY, sec(5));
 		}
 		if (e.food == ENERGIZER) {
 			game.score += 50;
@@ -359,14 +364,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			fsm.enqueue(new NextLevelEvent());
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
-			pacMan.enemies.stream().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
-					.forEach(enemy -> enemy.setState(Ghost.State.FRIGHTENED));
+			startHuntingGhosts();
 		}
 	}
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
 		BonusFoundEvent e = (BonusFoundEvent) t.getInput().get();
-		maze.setContent(e.tile, EMPTY);
+		game.score += e.bonus.getValue();
+		mazeUI.hideBonus();
+		mazeUI.showPoints(e.bonus.getValue(), e.bonus.getTile(), sec(2));
 		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 	}
 
