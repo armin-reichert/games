@@ -55,7 +55,7 @@ import de.amr.statemachine.StateTransition;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	public enum State {
-		READY, RUNNING, SCORING, DYING, CHANGING_LEVEL, GAMEOVER
+		READY, RUNNING, DYING, CHANGING_LEVEL, GAMEOVER
 	};
 
 	private StateMachine<State, GameEvent> fsm;
@@ -118,7 +118,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, this::onGhostContact);
 
-		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.SCORING, this::onGhostKilled);
+		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.RUNNING, this::onGhostKilled);
 
 		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING);
 
@@ -158,22 +158,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			pacMan.currentSprite().resetAnimation();
 			initEntities();
 		});
-
-		// -- SCORING
-
-		fsm.state(State.SCORING).entry = state -> {
-			state.setDuration(sec(1));
-		};
-
-		fsm.state(State.SCORING).update = state -> {
-			getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD).forEach(Ghost::update);
-		};
-
-		fsm.changeOnTimeout(State.SCORING, State.RUNNING);
-
-		fsm.state(State.SCORING).exit = state -> {
-			mazeUI.hidePoints();
-		};
 
 		// -- GAME_OVER
 
@@ -326,6 +310,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 					e.ghost.getTile()));
 			fsm.enqueue(new PacManKilledEvent());
 			break;
+		case DYING:
+			break;
 		case DEAD:
 			break;
 		case FRIGHTENED:
@@ -340,10 +326,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
 		GhostKilledEvent e = (GhostKilledEvent) t.getInput().get();
-		mazeUI.showPoints(game.ghostScore, e.ghost.getTile(), sec(2));
-		e.ghost.setState(Ghost.State.DEAD);
-		game.score += game.ghostScore;
-		game.ghostScore *= 2;
+		e.ghost.kill(game.ghostPoints, sec(1));
+		game.score += game.ghostPoints;
+		game.ghostPoints *= 2;
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -359,7 +344,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 		if (e.food == ENERGIZER) {
 			game.score += 50;
-			game.ghostScore = 200;
+			game.ghostPoints = 200;
 		} else {
 			game.score += 10;
 		}
@@ -397,7 +382,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onNextLevel(StateTransition<State, GameEvent> t) {
 		game.level += 1;
 		game.dotsEatenInLevel = 0;
-		game.ghostScore = 0;
+		game.ghostPoints = 0;
 		maze.loadContent();
 		maze.setContent(maze.bonusTile, Tile.EMPTY);
 		initEntities();

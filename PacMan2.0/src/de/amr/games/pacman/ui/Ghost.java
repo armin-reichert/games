@@ -1,6 +1,7 @@
 package de.amr.games.pacman.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Stream;
@@ -16,15 +17,19 @@ import de.amr.games.pacman.model.Tile;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		ATTACKING, SCATTERING, FRIGHTENED, DEAD, RECOVERING
+		ATTACKING, SCATTERING, FRIGHTENED, DYING, DEAD, RECOVERING
 	}
 
+	private static final int[] POINTS = new int[] { 200, 400, 800, 1600 };
+	
 	private final int color;
-
+	private int points = 200;
+	private int dyingTime;
 	private Sprite[] spriteNormal = new Sprite[4];
+	private Sprite[] spriteDying = new Sprite[4];
 	private Sprite[] spriteDead = new Sprite[4];
 	private Sprite spriteFrightened;
-	private final List<Sprite> allSprites = new ArrayList<>();
+	private final List<Sprite> animatedSprites = new ArrayList<>();
 
 	public Ghost(Maze maze, String name, int color, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
@@ -38,17 +43,26 @@ public class Ghost extends MazeMover<Ghost.State> {
 			spriteNormal[dir] = new Sprite(Spritesheet.getGhostNormal(color, dir)).scale(SPRITE_SIZE,
 					SPRITE_SIZE);
 			spriteNormal[dir].createAnimation(AnimationMode.BACK_AND_FORTH, 300);
+			animatedSprites.add(spriteNormal[dir]);
 			spriteDead[dir] = new Sprite(Spritesheet.getGhostDead(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
-			allSprites.add(spriteNormal[dir]);
-			allSprites.add(spriteDead[dir]);
+			animatedSprites.add(spriteDead[dir]);
 		});
+		for (int i = 0; i < 4; ++i) {
+			spriteDying[i] = new Sprite(Spritesheet.getPinkNumber(i)).scale(SPRITE_SIZE, SPRITE_SIZE);
+		}
 		spriteFrightened = new Sprite(Spritesheet.getGhostFrightened()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		spriteFrightened.createAnimation(AnimationMode.CYCLIC, 200);
-		allSprites.add(spriteFrightened);
+		animatedSprites.add(spriteFrightened);
 	}
 
 	public int getColor() {
 		return color;
+	}
+	
+	public void kill(int points, int ticks) {
+		this.points = points;
+		this.dyingTime = ticks;
+		setState(State.DYING);
 	}
 
 	@Override
@@ -61,6 +75,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 			move();
 			if (getTile().equals(getHome())) {
 				observers.fireGameEvent(new GhostDeadIsOverEvent(this));
+			}
+			break;
+		case DYING:
+			if (dyingTime-- <= 0) {
+				setState(State.DEAD);
 			}
 			break;
 		case FRIGHTENED:
@@ -86,7 +105,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return allSprites.stream();
+		return animatedSprites.stream(); //TODO improve this 
 	}
 
 	@Override
@@ -94,6 +113,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 		switch (getState()) {
 		case ATTACKING:
 			return spriteNormal[getMoveDirection()];
+		case DYING:
+			int index = Arrays.binarySearch(POINTS, points);
+			return spriteDying[index];
 		case DEAD:
 			return spriteDead[getMoveDirection()];
 		case FRIGHTENED:

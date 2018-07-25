@@ -34,8 +34,6 @@ public class MazeUI extends GameEntity {
 
 	private boolean flashing;
 	private String text = "";
-	private Points points;
-	private int pointsTimeLeft;
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
@@ -82,21 +80,6 @@ public class MazeUI extends GameEntity {
 		this.text = "";
 	}
 
-	public void showPoints(int value, Tile tile, int ticks) {
-		points = new Points(value);
-		points.tf.moveTo(tile.col * TS, tile.row * TS);
-		pointsTimeLeft = ticks;
-	}
-
-	public Optional<Points> getPoints() {
-		return Optional.ofNullable(points);
-	}
-
-	public void hidePoints() {
-		points = null;
-		pointsTimeLeft = 0;
-	}
-
 	public void showBonus(Bonus bonus, int ticks) {
 		this.bonus = bonus;
 		bonusTimeLeft = ticks;
@@ -115,12 +98,12 @@ public class MazeUI extends GameEntity {
 			bonus.setHonored();
 		});
 	}
-	
+
 	private void removeBonus() {
 		getPacMan().ifPresent(pacMan -> pacMan.interests.remove(bonus));
 		bonus = null;
 	}
-	
+
 	@Override
 	public void update() {
 		getBonus().ifPresent(bonus -> {
@@ -128,12 +111,6 @@ public class MazeUI extends GameEntity {
 			Debug.log(() -> "Bonus time left: " + bonusTimeLeft);
 			if (bonusTimeLeft <= 0) {
 				removeBonus();
-			}
-		});
-		getPoints().ifPresent(points -> {
-			--pointsTimeLeft;
-			if (pointsTimeLeft <= 0) {
-				points = null;
 			}
 		});
 	}
@@ -162,9 +139,6 @@ public class MazeUI extends GameEntity {
 			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
 			drawCenteredText(g, maze.bonusTile);
-			if (points != null) {
-				points.draw(g);
-			}
 			if (bonus != null) {
 				bonus.draw(g);
 			}

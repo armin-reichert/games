@@ -27,8 +27,10 @@ public class Game {
 		switch (ghost.getState()) {
 		case ATTACKING:
 			return tilesPerSec(6f);
+		case DYING:
+			return 0;
 		case DEAD:
-			return tilesPerSec(10f);
+			return tilesPerSec(12f);
 		case FRIGHTENED:
 			return tilesPerSec(4f);
 		case RECOVERING:
@@ -44,13 +46,13 @@ public class Game {
 	public int lives;
 	public int score;
 	public int dotsEatenInLevel;
-	public int ghostScore;
+	public int ghostPoints;
 
 	public Game() {
 		level = 1;
 		lives = 3;
 		score = 0;
 		dotsEatenInLevel = 0;
-		ghostScore = 200;
+		ghostPoints = 200;
 	}
 }

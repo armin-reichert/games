@@ -79,7 +79,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 			} else {
 				interests.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
 					if (thing instanceof Ghost) {
-						observers.fireGameEvent(new GhostContactEvent((Ghost) thing));
+						Ghost ghost = (Ghost) thing;
+						// keine Leichenfledderei
+						if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
+							observers.fireGameEvent(new GhostContactEvent(ghost));
+						}
 					} else if (thing instanceof Bonus) {
 						observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) thing));
 					}
