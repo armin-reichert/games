@@ -167,7 +167,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.changeOnTimeout(State.SCORING, State.RUNNING);
 
 		fsm.state(State.SCORING).exit = state -> {
-			mazeUI.hideGhostPoints();
+			mazeUI.hidePoints();
 		};
 
 		// -- GAME_OVER
@@ -267,6 +267,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void createUI() {
 		hud = new HUD(game);
 		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze);
+		mazeUI.observers.addObserver(this);
 		status = new StatusUI(game);
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
@@ -333,7 +334,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		e.ghost.setState(Ghost.State.DEAD);
 		game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
 		game.score += game.deadGhostScore;
-		mazeUI.showGhostPoints(e.ghost, game.deadGhostScore);
+		mazeUI.showPoints(game.deadGhostScore, e.ghost.getTile());
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
