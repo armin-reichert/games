@@ -15,8 +15,9 @@ class StayBehind implements MoveBehavior {
 	@Override
 	public Route apply(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.dir = randomElement(Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(mover.getMoveDirection())))
-				.getAsInt();
+		result.dir = randomElement(
+				Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(mover.getMoveDirection())))
+						.getAsInt();
 		return result;
 	}
 }

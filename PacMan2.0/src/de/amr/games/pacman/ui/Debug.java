@@ -87,8 +87,8 @@ public class Debug {
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		PacMan pacMan = scene.getPacMan();
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
-		scene.getGhosts()
-				.forEach(ghost -> drawText(g, color(ghost), ghost.tf.getX(), ghost.tf.getY(), ghost.getState().toString()));
+		scene.getGhosts().forEach(ghost -> drawText(g, color(ghost), ghost.tf.getX(), ghost.tf.getY(),
+				ghost.getState().toString()));
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 

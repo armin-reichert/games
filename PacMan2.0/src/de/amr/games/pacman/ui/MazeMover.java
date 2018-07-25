@@ -8,10 +8,8 @@ import static de.amr.games.pacman.model.Tile.WORMHOLE;
 import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -20,8 +18,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.behavior.MoveBehavior;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.behavior.impl.Behaviors;
-import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.GameEventListener;
+import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -33,6 +30,8 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	public static int SPRITE_SIZE = 2 * TS;
 
+	public final GameEventSupport observers = new GameEventSupport();
+
 	private final Maze maze;
 	private final Tile home;
 	private final Map<S, MoveBehavior> moveBehavior;
@@ -42,7 +41,6 @@ public abstract class MazeMover<S> extends GameEntity {
 	private int nextMoveDirection;
 	private S state;
 	private long stateEntryTime;
-	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
 	protected MazeMover(Maze maze, Tile home, Map<S, MoveBehavior> moveBehavior) {
 		Objects.requireNonNull(maze);
@@ -97,20 +95,6 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	public int stateDurationSeconds() {
 		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
-	}
-
-	// GameEvent observer support
-
-	public void addObserver(GameEventListener observer) {
-		observers.add(observer);
-	}
-
-	public void removeObserver(GameEventListener observer) {
-		observers.remove(observer);
-	}
-
-	protected void fireGameEvent(GameEvent event) {
-		observers.forEach(observer -> observer.onGameEvent(event));
 	}
 
 	// Movement

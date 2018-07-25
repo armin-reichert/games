@@ -51,7 +51,8 @@ public class Maze extends GridGraph<Character, Integer> {
 			}
 		}
 		fill();
-		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL).forEach(this::removeEdge);
+		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL)
+				.forEach(this::removeEdge);
 	}
 
 	private char content(int row, int col) {

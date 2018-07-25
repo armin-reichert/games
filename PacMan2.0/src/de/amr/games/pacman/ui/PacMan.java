@@ -40,7 +40,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SPRITE_SIZE, SPRITE_SIZE);
 		allSprites.add(spriteStanding);
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
+			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE,
+					SPRITE_SIZE);
 			spriteWalking[dir].createAnimation(AnimationMode.BACK_AND_FORTH, 100);
 			allSprites.add(spriteWalking[dir]);
 		});
@@ -74,13 +75,13 @@ public class PacMan extends MazeMover<PacMan.State> {
 			Tile tile = getTile();
 			char content = getMaze().getContent(tile);
 			if (Tile.isBonus(content)) {
-				fireGameEvent(new BonusFoundEvent(tile, content));
+				observers.fireGameEvent(new BonusFoundEvent(tile, content));
 			} else if (Tile.isFood(content)) {
-				fireGameEvent(new FoodFoundEvent(tile, content));
+				observers.fireGameEvent(new FoodFoundEvent(tile, content));
 			} else {
 				Optional<GameEvent> enemyContact = checkEnemyContact();
 				if (enemyContact.isPresent()) {
-					fireGameEvent(enemyContact.get());
+					observers.fireGameEvent(enemyContact.get());
 				} else {
 					move();
 				}
@@ -94,7 +95,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private Optional<GameEvent> checkEnemyContact() {
-		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD).filter(this::collidesWith).findAny()
-				.map(ghost -> new GhostContactEvent(ghost));
+		return enemies.stream().filter(enemy -> enemy.getState() != Ghost.State.DEAD)
+				.filter(this::collidesWith).findAny().map(ghost -> new GhostContactEvent(ghost));
 	}
 }

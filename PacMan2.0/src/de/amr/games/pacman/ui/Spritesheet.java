@@ -52,17 +52,21 @@ public class Spritesheet {
 
 		// Boni
 		int offset = 0;
-		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE, BONUS_GRAPES,
-				BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
+		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE,
+				BONUS_GRAPES, BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
 			bonusMap.put(bonus, sheet.getSubimage(488 + offset, 48, 16, 16));
 			offset += 16;
 		}
 
 		// Pac-Man
-		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0, 16, 16), $(472, 0, 16, 16), $(488, 0, 16, 16) };
-		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16, 16, 16), $(472, 16, 16, 16), $(488, 0, 16, 16) };
-		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32, 16, 16), $(472, 32, 16, 16), $(488, 0, 16, 16) };
-		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48, 16, 16), $(472, 48, 16, 16), $(488, 0, 16, 16) };
+		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0, 16, 16), $(472, 0, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16, 16, 16), $(472, 16, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32, 16, 16), $(472, 32, 16, 16),
+				$(488, 0, 16, 16) };
+		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48, 16, 16), $(472, 48, 16, 16),
+				$(488, 0, 16, 16) };
 		pacManStanding = $(488, 0, 16, 16);
 		for (int i = 0; i < 11; ++i) {
 			pacManDying[i] = $(504 + i * 16, 0, 16, 16);
@@ -123,7 +127,7 @@ public class Spritesheet {
 	public static BufferedImage getMazeWhite() {
 		return mazeWhite;
 	}
-	
+
 	public static BufferedImage getBonus(char bonus) {
 		return bonusMap.get(bonus);
 	}

@@ -35,8 +35,8 @@ public class Tile {
 	}
 
 	public static boolean isBonus(char c) {
-		return c == BONUS_APPLE || c == BONUS_BELL || c == BONUS_CHERRIES || c == BONUS_GALAXIAN || c == BONUS_GRAPES
-				|| c == BONUS_KEY || c == BONUS_PEACH || c == BONUS_STRAWBERRY;
+		return c == BONUS_APPLE || c == BONUS_BELL || c == BONUS_CHERRIES || c == BONUS_GALAXIAN
+				|| c == BONUS_GRAPES || c == BONUS_KEY || c == BONUS_PEACH || c == BONUS_STRAWBERRY;
 	}
 
 	public final int col;

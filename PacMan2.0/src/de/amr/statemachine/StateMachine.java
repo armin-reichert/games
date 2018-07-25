@@ -161,7 +161,8 @@ public class StateMachine<S, I> {
 	 * @return the ID of this state object in this state machine
 	 */
 	public Optional<S> id(State state) {
-		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey).findFirst();
+		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey)
+				.findFirst();
 	}
 
 	/**
@@ -197,7 +198,8 @@ public class StateMachine<S, I> {
 	public State state(S stateID) {
 		if (!stateMap.containsKey(stateID)) {
 			stateMap.put(stateID, new State());
-			getLogger().ifPresent(log -> log.info(String.format("Created state %s:%s ", description, stateID)));
+			getLogger()
+					.ifPresent(log -> log.info(String.format("Created state %s:%s ", description, stateID)));
 		}
 		return stateMap.get(stateID);
 	}
@@ -248,14 +250,15 @@ public class StateMachine<S, I> {
 	}
 
 	private void processInput(I input) {
-		Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean()).findFirst();
+		Optional<Transition> match = transitions(currentState).stream()
+				.filter(t -> t.condition.getAsBoolean()).findFirst();
 		if (match.isPresent()) {
 			Transition t = match.get();
 			processTransition(t, input);
 		} else {
 			if (input != null) {
-				getLogger()
-						.ifPresent(log -> log.info(String.format("Input %s ignored. No matching transition was found", input)));
+				getLogger().ifPresent(log -> log
+						.info(String.format("Input %s ignored. No matching transition was found", input)));
 			}
 			state().doUpdate();
 		}
@@ -304,8 +307,8 @@ public class StateMachine<S, I> {
 		getLogger().ifPresent(log -> {
 			if (state().getDuration() != State.FOREVER) {
 				float seconds = state().getDuration() / fnFrequency.get();
-				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description, stateID(),
-						seconds, state().getDuration()));
+				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)",
+						description, stateID(), seconds, state().getDuration()));
 			} else {
 				log.info(String.format("FSM(%s) enters state '%s'", description, stateID()));
 			}
@@ -315,7 +318,8 @@ public class StateMachine<S, I> {
 	private void traceStateChange(S oldState, S newState) {
 		getLogger().ifPresent(log -> {
 			if (oldState != newState) {
-				log.info(String.format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
+				log.info(
+						String.format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
 			} else {
 				log.info(String.format("FSM(%s) stays in state '%s'", description, oldState));
 			}
@@ -325,21 +329,24 @@ public class StateMachine<S, I> {
 	private void traceInputStateChange(I input, S oldState, S newState) {
 		getLogger().ifPresent(log -> {
 			if (oldState != newState) {
-				log.info(String.format("FSM(%s) processes %s and changes from '%s' to '%s'", description, input, oldState,
-						newState));
+				log.info(String.format("FSM(%s) processes %s and changes from '%s' to '%s'", description,
+						input, oldState, newState));
 			} else {
-				log.info(String.format("FSM(%s) processes %s and stays in state '%s'", description, input, oldState));
+				log.info(String.format("FSM(%s) processes %s and stays in state '%s'", description, input,
+						oldState));
 			}
 		});
 	}
 
 	private void traceStateExit() {
-		getLogger().ifPresent(log -> log.info(String.format("FSM(%s) exits state '%s'", description, stateID())));
+		getLogger().ifPresent(
+				log -> log.info(String.format("FSM(%s) exits state '%s'", description, stateID())));
 	}
 
 	// methods for specifying the transitions
 
-	private void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, I>> action) {
+	private void addTransition(S from, S to, BooleanSupplier condition,
+			Consumer<StateTransition<S, I>> action) {
 		Transition transition = new Transition();
 		transition.from = from;
 		transition.to = to;
@@ -362,7 +369,8 @@ public class StateMachine<S, I> {
 	 * @param action
 	 *          code which will be executed when this transition occurs
 	 */
-	public void change(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, I>> action) {
+	public void change(S from, S to, BooleanSupplier condition,
+			Consumer<StateTransition<S, I>> action) {
 		addTransition(from, to, condition, action);
 	}
 
@@ -427,7 +435,8 @@ public class StateMachine<S, I> {
 		addTransition(from, to, () -> state(from).isTerminated(), action);
 	}
 
-	public void changeOnTimeout(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, I>> action) {
+	public void changeOnTimeout(S from, S to, BooleanSupplier condition,
+			Consumer<StateTransition<S, I>> action) {
 		addTransition(from, to, () -> state(from).isTerminated() && condition.getAsBoolean(), action);
 	}
 
@@ -459,7 +468,8 @@ public class StateMachine<S, I> {
 	 * @param condition
 	 *          some condition
 	 */
-	public void changeOnInput(Class<? extends I> inputClass, S from, S to, BooleanSupplier condition) {
+	public void changeOnInput(Class<? extends I> inputClass, S from, S to,
+			BooleanSupplier condition) {
 		change(from, to, () -> hasMatchingInput(inputClass) && condition.getAsBoolean());
 	}
 
@@ -477,7 +487,8 @@ public class StateMachine<S, I> {
 	 * @param action
 	 *          code which will be executed when this transition occurs
 	 */
-	public void changeOnInput(Class<? extends I> inputClass, S from, S to, Consumer<StateTransition<S, I>> action) {
+	public void changeOnInput(Class<? extends I> inputClass, S from, S to,
+			Consumer<StateTransition<S, I>> action) {
 		addTransition(from, to, () -> hasMatchingInput(inputClass), action);
 	}
 

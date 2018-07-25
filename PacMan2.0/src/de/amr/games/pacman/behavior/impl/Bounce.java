@@ -11,7 +11,8 @@ class Bounce implements MoveBehavior {
 	@Override
 	public Route apply(MazeMover<?> bouncer) {
 		RouteData result = new RouteData();
-		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getMoveDirection()) : bouncer.getMoveDirection();
+		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getMoveDirection())
+				: bouncer.getMoveDirection();
 		return result;
 	}
 

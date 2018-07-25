@@ -35,7 +35,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	private void loadSprites() {
 		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteNormal[dir] = new Sprite(Spritesheet.getGhostNormal(color, dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
+			spriteNormal[dir] = new Sprite(Spritesheet.getGhostNormal(color, dir)).scale(SPRITE_SIZE,
+					SPRITE_SIZE);
 			spriteNormal[dir].createAnimation(AnimationMode.BACK_AND_FORTH, 300);
 			spriteDead[dir] = new Sprite(Spritesheet.getGhostDead(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
 			allSprites.add(spriteNormal[dir]);
@@ -59,21 +60,21 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case DEAD:
 			move();
 			if (getTile().equals(getHome())) {
-				fireGameEvent(new GhostDeadIsOverEvent(this));
+				observers.fireGameEvent(new GhostDeadIsOverEvent(this));
 			}
 			break;
 		case FRIGHTENED:
 			move();
 			// TODO does not belong here
 			if (stateDurationSeconds() > 4) {
-				fireGameEvent(new GhostFrightenedEndsEvent(this));
+				observers.fireGameEvent(new GhostFrightenedEndsEvent(this));
 			}
 			break;
 		case RECOVERING:
 			move();
 			// TODO does not belong here
 			if (stateDurationSeconds() > 2) {
-				fireGameEvent(new GhostRecoveringCompleteEvent(this));
+				observers.fireGameEvent(new GhostRecoveringCompleteEvent(this));
 			}
 		case SCATTERING:
 			move();
