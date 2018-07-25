@@ -42,6 +42,7 @@ import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.Bonus;
 import de.amr.games.pacman.ui.Debug;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.HUD;
@@ -339,10 +340,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
 		GhostKilledEvent e = (GhostKilledEvent) t.getInput().get();
+		mazeUI.showPoints(game.ghostScore, e.ghost.getTile(), sec(2));
 		e.ghost.setState(Ghost.State.DEAD);
-		game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
-		game.score += game.deadGhostScore;
-		mazeUI.showPoints(game.deadGhostScore, e.ghost.getTile(), sec(2));
+		game.score += game.ghostScore;
+		game.ghostScore *= 2;
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -350,13 +351,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		maze.setContent(e.tile, EMPTY);
 		game.dotsEatenInLevel += 1;
 		if (game.dotsEatenInLevel == 70) {
-			mazeUI.showBonus(Tile.BONUS_CHERRIES, sec(5));
+			// TODO use correct bonus value and time
+			mazeUI.showBonus(new Bonus(Tile.BONUS_CHERRIES, 100), sec(5));
 		} else if (game.dotsEatenInLevel == 170) {
-			mazeUI.showBonus(Tile.BONUS_STRAWBERRY, sec(5));
+			// TODO use correct bonus value and time
+			mazeUI.showBonus(new Bonus(Tile.BONUS_STRAWBERRY, 100), sec(5));
 		}
 		if (e.food == ENERGIZER) {
 			game.score += 50;
-			game.deadGhostScore = 0;
+			game.ghostScore = 200;
 		} else {
 			game.score += 10;
 		}
@@ -396,7 +399,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onNextLevel(StateTransition<State, GameEvent> t) {
 		game.level += 1;
 		game.dotsEatenInLevel = 0;
-		game.deadGhostScore = 0;
+		game.ghostScore = 0;
 		maze.loadContent();
 		maze.setContent(maze.bonusTile, Tile.EMPTY);
 		initEntities();

@@ -2,6 +2,7 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
 
+import java.awt.Graphics2D;
 import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -32,5 +33,13 @@ public class Points extends GameEntity {
 	@Override
 	public Sprite currentSprite() {
 		return sprite;
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		int offsetX = (getWidth() - 2 * TS) / 2, offsetY = (getHeight() - 2 * TS) / 2;
+		g.translate(offsetX, offsetY);
+		super.draw(g);
+		g.translate(-offsetX, -offsetY);
 	}
 }

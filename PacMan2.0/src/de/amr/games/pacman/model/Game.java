@@ -44,13 +44,13 @@ public class Game {
 	public int lives;
 	public int score;
 	public int dotsEatenInLevel;
-	public int deadGhostScore;
+	public int ghostScore;
 
 	public Game() {
 		level = 1;
 		lives = 3;
 		score = 0;
 		dotsEatenInLevel = 0;
-		deadGhostScore = 0;
+		ghostScore = 200;
 	}
 }

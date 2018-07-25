@@ -76,7 +76,7 @@ public class MazeUI extends GameEntity {
 
 	public void showPoints(int value, Tile tile, int ticks) {
 		points = new Points(value);
-		points.tf.moveTo(tile.col * TS, tile.row * TS - TS / 2);
+		points.tf.moveTo(tile.col * TS, tile.row * TS);
 		pointsTimeLeft = ticks;
 	}
 
@@ -89,8 +89,8 @@ public class MazeUI extends GameEntity {
 		pointsTimeLeft = 0;
 	}
 
-	public void showBonus(char symbol, int ticks) {
-		bonus = new Bonus(symbol, 100);
+	public void showBonus(Bonus bonus, int ticks) {
+		this.bonus = bonus;
 		bonus.tf.moveTo(maze.bonusTile.col * TS, maze.bonusTile.row * TS - TS / 2);
 		bonusTimeLeft = ticks;
 		getPacMan().ifPresent(pacMan -> pacMan.interests.add(bonus));
