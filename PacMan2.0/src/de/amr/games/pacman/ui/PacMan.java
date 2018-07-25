@@ -22,7 +22,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		ALIVE, DYING
 	};
 
-	public final Set<GameEntity> interests = new HashSet<>();
+	public final Set<GameEntity> interestingThings = new HashSet<>();
 
 	private Sprite[] spriteWalking = new Sprite[4];
 	private Sprite spriteStanding;
@@ -77,7 +77,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			if (Tile.isFood(content)) {
 				observers.fireGameEvent(new FoodFoundEvent(tile, content));
 			} else {
-				interests.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
+				interestingThings.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
 					if (thing instanceof Ghost) {
 						Ghost ghost = (Ghost) thing;
 						// keine Leichenfledderei

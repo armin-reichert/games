@@ -82,6 +82,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			state.setDuration(sec(2));
 			game = new Game();
 			maze = Maze.of(Assets.text("maze.txt"));
+			loadMazeContent();
 			createUI();
 			createPacManAndFriends();
 			mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
@@ -234,7 +235,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		pacMan = new PacMan(maze, maze.pacManHome);
-		pacMan.interests.addAll(Arrays.asList(blinky, pinky, inky, clyde));
+		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 
 		getGhosts().forEach(ghost -> ghost.observers.addObserver(this));
 		pacMan.observers.addObserver(this);
@@ -334,12 +335,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
 		FoodFoundEvent e = (FoodFoundEvent) t.getInput().get();
 		maze.setContent(e.tile, EMPTY);
-		game.dotsEatenInLevel += 1;
-		if (game.dotsEatenInLevel == 70) {
-			// TODO use correct bonus value and time
+		game.dotsEaten += 1;
+		if (game.dotsEaten == 70) {
 			mazeUI.showBonus(new Bonus(Tile.BONUS_CHERRIES, 100), sec(5));
-		} else if (game.dotsEatenInLevel == 170) {
-			// TODO use correct bonus value and time
+		} else if (game.dotsEaten == 170) {
 			mazeUI.showBonus(new Bonus(Tile.BONUS_STRAWBERRY, 100), sec(5));
 		}
 		if (e.food == ENERGIZER) {
@@ -348,7 +347,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		} else {
 			game.score += 10;
 		}
-		if (maze.tiles().map(maze::getContent).noneMatch(Tile::isFood)) {
+		if (game.dotsEaten == game.totalDotsInLevel) {
 			fsm.enqueue(new NextLevelEvent());
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
@@ -380,11 +379,16 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onNextLevel(StateTransition<State, GameEvent> t) {
+		loadMazeContent();
 		game.level += 1;
-		game.dotsEatenInLevel = 0;
+		game.dotsEaten = 0;
 		game.ghostPoints = 0;
+		initEntities();
+	}
+	
+	private void loadMazeContent() {
 		maze.loadContent();
 		maze.setContent(maze.bonusTile, Tile.EMPTY);
-		initEntities();
+		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }
