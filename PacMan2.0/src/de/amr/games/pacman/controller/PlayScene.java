@@ -78,6 +78,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// -- READY
 
 		fsm.state(State.READY).entry = state -> {
+			state.setDuration(sec(2));
 			game = new Game();
 			maze = Maze.of(Assets.text("maze.txt"));
 			createUI();
@@ -86,7 +87,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			initEntities();
 			animateEntities(false);
 			mazeUI.showText("Ready!");
-			state.setDuration(sec(3));
 		};
 
 		fsm.state(State.READY).exit = state -> {
@@ -164,6 +164,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			state.setDuration(sec(1));
 		};
 
+		fsm.state(State.SCORING).update = state -> {
+			getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD).forEach(Ghost::update);
+		};
+		
 		fsm.changeOnTimeout(State.SCORING, State.RUNNING);
 
 		fsm.state(State.SCORING).exit = state -> {
@@ -249,10 +253,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		getGhosts().forEach(ghost -> ghost.observers.addObserver(this));
 		pacMan.observers.addObserver(this);
-
+		
 		// define move behavior
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
-
 		getGhosts().forEach(ghost -> {
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 			ghost.setMoveBehavior(Ghost.State.DEAD, goHome());

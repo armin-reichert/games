@@ -111,7 +111,7 @@ public class MazeUI extends GameEntity {
 
 	private void drawCenteredText(Graphics2D g, Tile tile) {
 		if (text.length() > 0) {
-			g.translate((tile.col + 1) * TS, tile.row * TS);
+			g.translate((tile.col + 1) * TS, tile.row * TS + TS/4);
 			g.setFont(Assets.font("scoreFont"));
 			g.setColor(Color.YELLOW);
 			Rectangle2D box = g.getFontMetrics().getStringBounds(text, g);
