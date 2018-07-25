@@ -83,13 +83,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			createEntities();
 			createUI();
 			initEntities();
-			enableEntities(false);
+			animateEntities(false);
 			mazeUI.showText("Ready!");
 			state.setDuration(sec(3));
 		};
 
 		fsm.state(State.READY).exit = state -> {
-			enableEntities(true);
+			animateEntities(true);
 			mazeUI.showText("");
 		};
 
@@ -105,9 +105,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(BonusFoundEvent.class, State.RUNNING, State.RUNNING, this::onBonusFound);
 
-		fsm.changeOnInput(GhostFrightenedEndsEvent.class, State.RUNNING, State.RUNNING, this::onGhostFrightenedEnds);
+		fsm.changeOnInput(GhostFrightenedEndsEvent.class, State.RUNNING, State.RUNNING,
+				this::onGhostFrightenedEnds);
 
-		fsm.changeOnInput(GhostDeadIsOverEvent.class, State.RUNNING, State.RUNNING, this::onGhostDeadIsOver);
+		fsm.changeOnInput(GhostDeadIsOverEvent.class, State.RUNNING, State.RUNNING,
+				this::onGhostDeadIsOver);
 
 		fsm.changeOnInput(GhostRecoveringCompleteEvent.class, State.RUNNING, State.RUNNING,
 				this::onGhostRecoveringComplete);
@@ -144,15 +146,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.DYING).entry = state -> {
 			state.setDuration(sec(3));
 			pacMan.setState(PacMan.State.DYING);
+			game.lives -= 1;
 		};
 
-		fsm.state(State.DYING).exit = state -> {
-			onPacManDied(null);
-		};
-		
 		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.lives == 0);
 
-		fsm.changeOnTimeout(State.DYING, State.RUNNING, t -> {
+		fsm.changeOnTimeout(State.DYING, State.RUNNING,  () -> game.lives > 0, t -> {
+			maze.setContent(maze.bonusTile, Tile.EMPTY);
+			pacMan.currentSprite().resetAnimation();
 			initEntities();
 		});
 
@@ -171,7 +172,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// -- GAME_OVER
 
 		fsm.state(State.GAMEOVER).entry = state -> {
-			enableEntities(false);
+			animateEntities(false);
 			mazeUI.showText("Game Over");
 		};
 
@@ -296,7 +297,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		getGhosts().forEach(Ghost::update);
 	}
 
-	private void enableEntities(boolean enabled) {
+	private void animateEntities(boolean enabled) {
 		mazeUI.enableAnimation(enabled);
 		pacMan.enableAnimation(enabled);
 		getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
@@ -310,14 +311,16 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		case ATTACKING:
 		case RECOVERING:
 		case SCATTERING:
-			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(), e.ghost.getTile()));
+			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(),
+					e.ghost.getTile()));
 			fsm.enqueue(new PacManKilledEvent());
 			break;
 		case DEAD:
 			break;
 		case FRIGHTENED:
+			Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(),
+					e.ghost.getTile()));
 			fsm.enqueue(new GhostKilledEvent(e.ghost));
-			Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(), e.ghost.getTile()));
 			break;
 		default:
 			throw new IllegalStateException();
@@ -330,12 +333,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.deadGhostScore = game.deadGhostScore == 0 ? 200 : 2 * game.deadGhostScore;
 		game.score += game.deadGhostScore;
 		mazeUI.showGhostPoints(e.ghost, game.deadGhostScore);
-	}
-
-	private void onPacManDied(StateTransition<State, GameEvent> t) {
-		maze.setContent(maze.bonusTile, Tile.EMPTY);
-		game.lives -= 1;
-		pacMan.currentSprite().resetAnimation();
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
