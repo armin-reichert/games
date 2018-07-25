@@ -109,6 +109,10 @@ public class MazeUI extends GameEntity {
 	public void showText(String text) {
 		this.text = text;
 	}
+	
+	public void hideText() {
+		this.text = "";
+	}
 
 	@Override
 	public void update() {

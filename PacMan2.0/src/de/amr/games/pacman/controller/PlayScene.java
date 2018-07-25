@@ -91,7 +91,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.READY).exit = state -> {
 			animateEntities(true);
-			mazeUI.showText("");
+			mazeUI.hideText();
 		};
 
 		fsm.changeOnTimeout(State.READY, State.RUNNING);
@@ -184,7 +184,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.change(State.GAMEOVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 		fsm.state(State.GAMEOVER).exit = state -> {
-			mazeUI.showText("");
+			mazeUI.hideText();
 		};
 	}
 
