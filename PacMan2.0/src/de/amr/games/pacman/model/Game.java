@@ -8,6 +8,9 @@ import de.amr.games.pacman.ui.PacMan;
 
 public class Game {
 
+	public static final int PELLET_VALUE = 10;
+	public static final int ENERGIZER_VALUE = 50;
+	
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
 	private static float tilesPerSec(float value) {
@@ -49,7 +52,7 @@ public class Game {
 	public int score;
 	public long totalDots;
 	public int dotsEaten;
-	public int ghostValue;
+	public int ghostIndex;
 
 	public void init(Maze maze) {
 		maze.init();
@@ -57,7 +60,7 @@ public class Game {
 		livesLeft = 3;
 		score = 0;
 		dotsEaten = 0;
-		ghostValue = 200;
+		ghostIndex = 0;
 		totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }

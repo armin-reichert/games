@@ -297,11 +297,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		maze.init();
 		game.totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 		game.dotsEaten = 0;
-		game.ghostValue = 0;
+		game.ghostIndex = 0;
 		initEntities();
 	}
 
-	private void startHuntingGhosts() {
+	private void startGhostHunting() {
 		getGhosts().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
 				.forEach(ghost -> ghost.setState(Ghost.State.FRIGHTENED));
 	}
@@ -341,31 +341,31 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostKilled(Ghost ghost) {
 		Debug.log(
 				() -> String.format("Ghost %s got killed at tile %s", ghost.getName(), ghost.getTile()));
-		ghost.killAndShowPoints(game.ghostValue, sec(1));
-		game.score += game.ghostValue;
-		game.ghostValue *= 2;
+		ghost.killAndShowPoints(game.ghostIndex, sec(1));
+		game.score += Game.GHOST_POINTS[game.ghostIndex];
+		game.ghostIndex += 1;
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
 		FoodFoundEvent e = event(t);
 		maze.setContent(e.tile, EMPTY);
 		game.dotsEaten += 1;
+		if (game.dotsEaten == game.totalDots) {
+			fsm.enqueue(new NextLevelEvent());
+			return;
+		}
 		if (game.dotsEaten == 70) {
 			mazeUI.showBonus(new Bonus(BonusSymbol.CHERRIES, 100), sec(5));
 		} else if (game.dotsEaten == 170) {
 			mazeUI.showBonus(new Bonus(BonusSymbol.STRAWBERRY, 100), sec(5));
 		}
 		if (e.food == ENERGIZER) {
-			game.score += 50;
-			game.ghostValue = 200;
-		} else {
-			game.score += 10;
-		}
-		if (game.dotsEaten == game.totalDots) {
-			fsm.enqueue(new NextLevelEvent());
-		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
-			startHuntingGhosts();
+			game.score += Game.ENERGIZER_VALUE;
+			game.ghostIndex = 0;
+			startGhostHunting();
+		} else {
+			game.score += Game.PELLET_VALUE;
 		}
 	}
 

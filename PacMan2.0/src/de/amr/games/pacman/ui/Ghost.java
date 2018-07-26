@@ -4,8 +4,7 @@ import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostDead;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostFrightened;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostNormal;
-import static de.amr.games.pacman.ui.Spritesheet.getPinkNumber;
-import static java.util.Arrays.binarySearch;
+import static de.amr.games.pacman.ui.Spritesheet.getGreenNumber;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -17,7 +16,6 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.GhostDeadIsOverEvent;
 import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
 import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -48,7 +46,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			s_dead[dir] = new Sprite(getGhostDead(dir)).scale(SPRITE_SIZE);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_dying[i] = new Sprite(getPinkNumber(i)).scale(SPRITE_SIZE);
+			s_dying[i] = new Sprite(getGreenNumber(i)).scale(SPRITE_SIZE);
 		}
 		s_points = s_dying[0];
 		s_frightened = new Sprite(getGhostFrightened()).scale(SPRITE_SIZE)
@@ -84,9 +82,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return color;
 	}
 
-	public void killAndShowPoints(int points, int ticks) {
+	public void killAndShowPoints(int ghostIndex, int ticks) {
 		this.dyingTime = ticks;
-		s_points = s_dying[binarySearch(Game.GHOST_POINTS, points)];
+		s_points = s_dying[ghostIndex];
 		setState(State.DYING);
 	}
 
