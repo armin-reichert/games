@@ -10,7 +10,7 @@ public class Game {
 
 	public static final int PELLET_VALUE = 10;
 	public static final int ENERGIZER_VALUE = 50;
-	
+
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
 	private static float tilesPerSec(float value) {

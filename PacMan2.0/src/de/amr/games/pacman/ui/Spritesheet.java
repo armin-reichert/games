@@ -111,11 +111,11 @@ public class Spritesheet {
 		return energizer;
 	}
 
-	public static BufferedImage getMaze() {
+	public static BufferedImage getMazeImage() {
 		return maze;
 	}
 
-	public static BufferedImage getMazeWhite() {
+	public static BufferedImage getMazeImageWhite() {
 		return mazeWhite;
 	}
 

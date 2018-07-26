@@ -38,7 +38,7 @@ public class Debug {
 		}
 		// Cheats
 		else if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-			scene.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
+			scene.getMazeUI().getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
 			Maze maze = scene.getMazeUI().getMaze();
@@ -89,7 +89,7 @@ public class Debug {
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		PacMan pacMan = scene.getPacMan();
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
-		scene.getGhosts().forEach(ghost -> drawText(g, color(ghost), ghost.tf.getX(), ghost.tf.getY(),
+		mazeUI.getGhosts().forEach(ghost -> drawText(g, color(ghost), ghost.tf.getX(), ghost.tf.getY(),
 				ghost.getState().toString()));
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
@@ -130,7 +130,7 @@ public class Debug {
 	}
 
 	private static void drawGhostPaths(Graphics2D g, PlayScene scene) {
-		scene.getGhosts().forEach(ghost -> {
+		scene.getMazeUI().getGhosts().forEach(ghost -> {
 			Route route = ghost.currentMoveBehavior().apply(ghost);
 			List<Tile> path = route.getPath();
 			if (path.size() > 1) {

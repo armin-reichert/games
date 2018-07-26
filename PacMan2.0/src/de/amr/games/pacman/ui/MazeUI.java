@@ -2,14 +2,18 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.ui.Spritesheet.getEnergizer;
+import static de.amr.games.pacman.ui.Spritesheet.getMazeImage;
+import static de.amr.games.pacman.ui.Spritesheet.getMazeImageWhite;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -25,21 +29,25 @@ public class MazeUI extends GameEntity {
 	public final GameEventSupport observers = new GameEventSupport();
 
 	private final Maze maze;
-	private PacMan pacMan;
-	private Ghost[] ghosts = new Ghost[0];
+	private final PacMan pacMan;
+	private final Set<Ghost> ghosts = new HashSet<>();
 
-	private Sprite spriteMazeNormal;
-	private Sprite spriteMazeFlashing;
-	private Sprite spriteEnergizer;
+	private final Sprite s_normal;
+	private final Sprite s_flashing;
+	private final Sprite s_energizer;
 
 	private boolean flashing;
 	private String infoText;
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
-	public MazeUI(Maze maze) {
+	public MazeUI(Maze maze, PacMan pacMan) {
 		this.maze = maze;
-		createSprites();
+		this.pacMan = pacMan;
+		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
+		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
+				.animation(AnimationMode.CYCLIC, 100);
+		s_energizer = new Sprite(getEnergizer()).scale(TS).animation(AnimationMode.BACK_AND_FORTH, 250);
 	}
 
 	@Override
@@ -52,26 +60,26 @@ public class MazeUI extends GameEntity {
 		return maze.numRows() * TS;
 	}
 
-	public void populate(PacMan pacMan, Ghost... ghosts) {
-		this.pacMan = pacMan;
-		this.ghosts = ghosts;
+	public void addGhost(Ghost ghost) {
+		ghosts.add(ghost);
+		pacMan.lookFor.add(ghost);
 	}
 
-	private void createSprites() {
-		spriteMazeNormal = new Sprite(Spritesheet.getMaze()).scale(getWidth(), getHeight());
-		spriteMazeFlashing = new Sprite(Spritesheet.getMaze(), Spritesheet.getMazeWhite())
-				.scale(getWidth(), getHeight());
-		spriteMazeFlashing.animation(AnimationMode.CYCLIC, 100);
-		spriteEnergizer = new Sprite(Spritesheet.getEnergizer()).scale(TS, TS);
-		spriteEnergizer.animation(AnimationMode.BACK_AND_FORTH, 250);
+	public void removeGhost(Ghost ghost) {
+		ghosts.remove(ghost);
+		pacMan.lookFor.remove(ghost);
+	}
+
+	public Stream<Ghost> getGhosts() {
+		return ghosts.stream();
 	}
 
 	public Maze getMaze() {
 		return maze;
 	}
 
-	public Optional<PacMan> getPacMan() {
-		return Optional.ofNullable(pacMan);
+	public PacMan getPacMan() {
+		return pacMan;
 	}
 
 	public void showInfo(String text) {
@@ -94,7 +102,7 @@ public class MazeUI extends GameEntity {
 		this.bonus = bonus;
 		bonusTimeLeft = ticks;
 		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
-		getPacMan().ifPresent(pacMan -> pacMan.lookFor.add(bonus));
+		pacMan.lookFor.add(bonus);
 	}
 
 	public Optional<Bonus> getBonus() {
@@ -103,14 +111,14 @@ public class MazeUI extends GameEntity {
 
 	public void honorBonus(int ticks) {
 		getBonus().ifPresent(bonus -> {
-			getPacMan().ifPresent(pacMan -> pacMan.lookFor.remove(bonus));
+			pacMan.lookFor.remove(bonus);
 			bonusTimeLeft = ticks;
 			bonus.setHonored();
 		});
 	}
 
 	private void removeBonus() {
-		getPacMan().ifPresent(pacMan -> pacMan.lookFor.remove(bonus));
+		pacMan.lookFor.remove(bonus);
 		bonus = null;
 	}
 
@@ -128,25 +136,25 @@ public class MazeUI extends GameEntity {
 	@Override
 	protected Stream<Sprite> getSprites() {
 		List<Sprite> sprites = new ArrayList<>();
-		sprites.add(spriteMazeNormal);
-		sprites.add(spriteEnergizer);
+		sprites.add(s_normal);
+		sprites.add(s_energizer);
 		return sprites.stream();
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return flashing ? spriteMazeFlashing : spriteMazeNormal;
+		return flashing ? s_flashing : s_normal;
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
 		if (flashing) {
-			spriteMazeFlashing.draw(g);
+			s_flashing.draw(g);
 		} else {
-			spriteMazeNormal.draw(g);
+			s_normal.draw(g);
 			maze.tiles().forEach(tile -> drawContent(g, tile));
-			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
+			ghosts.forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
 			getBonus().ifPresent(bonus -> bonus.draw(g));
 			getInfo().ifPresent(info -> drawInfo(g, info));
@@ -171,7 +179,7 @@ public class MazeUI extends GameEntity {
 			g.setColor(Color.PINK);
 			g.fillRect(TS * 3 / 8, TS * 3 / 8, TS / 4, TS / 4);
 		} else if (c == ENERGIZER) {
-			spriteEnergizer.draw(g);
+			s_energizer.draw(g);
 		}
 		g.translate(-tile.col * TS, -tile.row * TS);
 	}
