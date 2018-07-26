@@ -28,7 +28,7 @@ public class MazeUI extends GameEntity {
 	private PacMan pacMan;
 	private Ghost[] ghosts = new Ghost[0];
 
-	private Sprite spriteMaze;
+	private Sprite spriteMazeNormal;
 	private Sprite spriteMazeFlashing;
 	private Sprite spriteEnergizer;
 
@@ -37,9 +37,19 @@ public class MazeUI extends GameEntity {
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
-	public MazeUI(int width, int height, Maze maze) {
+	public MazeUI(Maze maze) {
 		this.maze = maze;
-		createSprites(width, height);
+		createSprites();
+	}
+
+	@Override
+	public int getWidth() {
+		return maze.numCols() * TS;
+	}
+
+	@Override
+	public int getHeight() {
+		return maze.numRows() * TS;
 	}
 
 	public void populate(PacMan pacMan, Ghost... ghosts) {
@@ -47,10 +57,10 @@ public class MazeUI extends GameEntity {
 		this.ghosts = ghosts;
 	}
 
-	private void createSprites(int width, int height) {
-		spriteMaze = new Sprite(Spritesheet.getMaze()).scale(width, height);
-		spriteMazeFlashing = new Sprite(Spritesheet.getMaze(), Spritesheet.getMazeWhite()).scale(width,
-				height);
+	private void createSprites() {
+		spriteMazeNormal = new Sprite(Spritesheet.getMaze()).scale(getWidth(), getHeight());
+		spriteMazeFlashing = new Sprite(Spritesheet.getMaze(), Spritesheet.getMazeWhite())
+				.scale(getWidth(), getHeight());
 		spriteMazeFlashing.createAnimation(AnimationMode.CYCLIC, 100);
 		spriteEnergizer = new Sprite(Spritesheet.getEnergizer()).scale(TS, TS);
 		spriteEnergizer.createAnimation(AnimationMode.BACK_AND_FORTH, 250);
@@ -64,20 +74,16 @@ public class MazeUI extends GameEntity {
 		return Optional.ofNullable(pacMan);
 	}
 
-	public void setFlashing(boolean on) {
-		flashing = on;
-	}
-
-	public Sprite getSpriteEnergizer() {
-		return spriteEnergizer;
-	}
-
 	public void showText(String text) {
 		this.text = text;
 	}
 
 	public void hideText() {
 		this.text = "";
+	}
+
+	public void setFlashing(boolean on) {
+		flashing = on;
 	}
 
 	public void showBonus(Bonus bonus, int ticks) {
@@ -118,14 +124,14 @@ public class MazeUI extends GameEntity {
 	@Override
 	protected Stream<Sprite> getSprites() {
 		List<Sprite> sprites = new ArrayList<>();
-		sprites.add(spriteMaze);
+		sprites.add(spriteMazeNormal);
 		sprites.add(spriteEnergizer);
 		return sprites.stream();
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return flashing ? spriteMazeFlashing : spriteMaze;
+		return flashing ? spriteMazeFlashing : spriteMazeNormal;
 	}
 
 	@Override
@@ -134,7 +140,7 @@ public class MazeUI extends GameEntity {
 		if (flashing) {
 			spriteMazeFlashing.draw(g);
 		} else {
-			spriteMaze.draw(g);
+			spriteMazeNormal.draw(g);
 			maze.tiles().forEach(tile -> drawTileContent(g, tile));
 			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);

@@ -83,7 +83,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game = new Game();
 			maze = Maze.of(Assets.text("maze.txt"));
 			loadMazeContent();
-			createUI();
+			createUI(game, maze);
 			createPacManAndFriends();
 			mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
 			initEntities();
@@ -252,14 +252,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
 	}
 
-	private void createUI() {
-		hud = new HUD(game);
-		mazeUI = new MazeUI(getWidth(), getHeight() - 5 * TS, maze);
+	private void createUI(Game game, Maze maze) {
+		mazeUI = new MazeUI(maze);
 		mazeUI.observers.addObserver(this);
+		hud = new HUD(game);
 		status = new StatusUI(game);
+		// layout
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
-		status.tf.moveTo(0, getHeight() - 2 * TS);
+		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
 	}
 
 	private void initEntities() {
