@@ -29,8 +29,12 @@ public class PacManApp extends Application {
 				settings.scale);
 	}
 
+	public Maze getMaze() {
+		return maze;
+	}
+
 	@Override
 	public void init() {
-		select(new PlayScene(this, maze));
+		select(new PlayScene(this));
 	}
 }
