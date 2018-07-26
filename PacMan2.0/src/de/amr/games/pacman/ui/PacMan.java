@@ -1,6 +1,7 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.model.Tile.isFood;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManStanding;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManWalking;
@@ -29,75 +30,62 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	public final Set<GameEntity> interestingThings = new HashSet<>();
 
-	private Sprite[] spriteWalking = new Sprite[4];
-	private Sprite spriteStanding;
-	private Sprite spriteDying;
-	private List<Sprite> allSprites = new ArrayList<>();
+	private Sprite[] walking = new Sprite[4];
+	private Sprite standing;
+	private Sprite dying;
+	private List<Sprite> animated = new ArrayList<>();
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName("Pac-Man");
-		createSprites();
-	}
 
-	private void createSprites() {
-		spriteStanding = new Sprite(getPacManStanding()).scale(SPRITE_SIZE);
-		spriteDying = new Sprite(getPacManDying()).scale(SPRITE_SIZE).animation(AnimationMode.LINEAR,
-				100);
-		TOPOLOGY.dirs().forEach(dir -> spriteWalking[dir] = new Sprite(getPacManWalking(dir))
+		standing = new Sprite(getPacManStanding()).scale(SPRITE_SIZE);
+		dying = new Sprite(getPacManDying()).scale(SPRITE_SIZE).animation(AnimationMode.LINEAR, 100);
+		TOPOLOGY.dirs().forEach(dir -> walking[dir] = new Sprite(getPacManWalking(dir))
 				.scale(SPRITE_SIZE).animation(AnimationMode.BACK_AND_FORTH, 60));
 
-		// TODO remove this:
-		allSprites.add(spriteStanding);
-		allSprites.add(spriteDying);
-		TOPOLOGY.dirs().forEach(dir -> allSprites.add(spriteWalking[dir]));
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		switch (getState()) {
-		case ALIVE:
-			return canMove(getMoveDirection()) ? spriteWalking[getMoveDirection()] : spriteStanding;
-		case DYING:
-			return spriteDying;
-		}
-		throw new IllegalStateException("Illegal PacMan state: " + getState());
+		// TODO: remove
+		animated.add(standing);
+		animated.add(dying);
+		TOPOLOGY.dirs().forEach(dir -> animated.add(walking[dir]));
 	}
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return allSprites.stream();
+		return animated.stream();
 	}
 
-	// PacMan activity
+	@Override
+	public Sprite currentSprite() {
+		if (getState() == State.ALIVE) {
+			int dir = getMoveDirection();
+			return canMove(dir) ? walking[dir] : standing;
+		} else {
+			return dying;
+		}
+	}
 
 	@Override
 	public void update() {
-		switch (getState()) {
-		case ALIVE:
-			move();
-			Tile tile = getTile();
-			char content = getMaze().getContent(tile);
-			if (Tile.isFood(content)) {
-				observers.fireGameEvent(new FoodFoundEvent(tile, content));
-			} else {
-				interestingThings.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
-					if (thing instanceof Ghost) {
-						Ghost ghost = (Ghost) thing;
-						// keine Leichenfledderei
-						if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-							observers.fireGameEvent(new GhostContactEvent(ghost));
-						}
-					} else if (thing instanceof Bonus) {
-						observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) thing));
-					}
-				});
-			}
-			break;
-		case DYING:
-			break;
-		default:
-			throw new IllegalStateException("Illegal PacMan state: " + getState());
+		if (getState() == State.DYING) {
+			return;
 		}
+		move();
+		Tile tile = getTile();
+		char content = getMaze().getContent(tile);
+		if (isFood(content)) {
+			observers.fireGameEvent(new FoodFoundEvent(tile, content));
+			return;
+		}
+		interestingThings.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
+			if (thing instanceof Ghost) {
+				Ghost ghost = (Ghost) thing;
+				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
+					observers.fireGameEvent(new GhostContactEvent(ghost));
+				}
+			} else if (thing instanceof Bonus) {
+				observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) thing));
+			}
+		});
 	}
 }
