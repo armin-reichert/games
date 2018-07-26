@@ -122,7 +122,7 @@ public class City extends GameEntity {
 	@Override
 	public void draw(Graphics2D pen) {
 		pen.translate(tf.getX(), tf.getY());
-		Image image = currentSprite().getImage();
+		Image image = currentSprite().currentFrame();
 		for (int x = 0; x < width; x += image.getWidth(null)) {
 			pen.drawImage(image, x, 0, null);
 		}
