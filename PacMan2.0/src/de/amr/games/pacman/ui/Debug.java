@@ -29,24 +29,57 @@ public class Debug {
 	public static void update(PlayScene scene) {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_0)) {
 			DEBUG_LEVEL = 0;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
 			DEBUG_LEVEL = DEBUG_LEVEL == 1 ? 0 : 1;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
 			DEBUG_LEVEL = DEBUG_LEVEL == 2 ? 0 : 2;
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
 			scene.getFsm().setLogger(scene.getFsm().getLogger().isPresent() ? null : Logger.getGlobal());
 		}
-		// Cheats
+
 		else if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
 			scene.getMazeUI().getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
-		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
+			toggleGhost(scene, scene.getBlinky());
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
+			toggleGhost(scene, scene.getPinky());
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
+			toggleGhost(scene, scene.getInky());
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
+			toggleGhost(scene, scene.getClyde());
+		}
+
+		else if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
 			Maze maze = scene.getMazeUI().getMaze();
 			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
 				maze.setContent(tile, Tile.EMPTY);
 				scene.getGame().dotsEaten += 1;
 			});
 		}
+	}
+
+	private static void toggleGhost(PlayScene scene, Ghost ghost) {
+		if (scene.getMazeUI().containsGhost(ghost)) {
+			scene.getMazeUI().removeGhost(ghost);
+		} else {
+			scene.getMazeUI().addGhost(ghost);
+		}
+
 	}
 
 	public static void draw(Graphics2D g, PlayScene scene) {

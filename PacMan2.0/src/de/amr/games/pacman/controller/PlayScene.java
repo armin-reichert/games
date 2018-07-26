@@ -84,9 +84,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		mazeUI = new MazeUI(maze, pacMan);
 		mazeUI.observers.addObserver(this);
 		mazeUI.addGhost(blinky);
-		// mazeUI.addGhost(pinky);
-		// mazeUI.addGhost(inky);
-		// mazeUI.addGhost(clyde);
+		mazeUI.addGhost(pinky);
+		mazeUI.addGhost(inky);
+		mazeUI.addGhost(clyde);
 
 		hud = new HUD(game);
 		status = new StatusUI(game);
@@ -226,6 +226,22 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	public PacMan getPacMan() {
 		return pacMan;
+	}
+
+	public Ghost getBlinky() {
+		return blinky;
+	}
+
+	public Ghost getPinky() {
+		return pinky;
+	}
+
+	public Ghost getInky() {
+		return inky;
+	}
+
+	public Ghost getClyde() {
+		return clyde;
 	}
 
 	private int sec(float seconds) {
