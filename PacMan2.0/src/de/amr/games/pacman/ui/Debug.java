@@ -42,8 +42,10 @@ public class Debug {
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
 			Maze maze = scene.getMazeUI().getMaze();
-			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET)
-					.forEach(tile -> maze.setContent(tile, Tile.EMPTY));
+			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
+				maze.setContent(tile, Tile.EMPTY);
+				scene.getGame().dotsEaten += 1;
+			});
 		}
 	}
 

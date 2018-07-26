@@ -145,7 +145,7 @@ public class MazeUI extends GameEntity {
 			spriteMazeFlashing.draw(g);
 		} else {
 			spriteMazeNormal.draw(g);
-			maze.tiles().forEach(tile -> drawTileContent(g, tile));
+			maze.tiles().forEach(tile -> drawContent(g, tile));
 			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
 			getBonus().ifPresent(bonus -> bonus.draw(g));
@@ -164,7 +164,7 @@ public class MazeUI extends GameEntity {
 		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 
-	private void drawTileContent(Graphics2D g, Tile tile) {
+	private void drawContent(Graphics2D g, Tile tile) {
 		g.translate(tile.col * TS, tile.row * TS);
 		char c = maze.getContent(tile);
 		if (c == Tile.PELLET) {
