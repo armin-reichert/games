@@ -57,16 +57,20 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		READY, RUNNING, DYING, CHANGING_LEVEL, GAMEOVER
 	};
 
-	private final StateMachine<State, GameEvent> fsm;
+	// Model
 	private final Game game = new Game();
 	private final Maze maze;
+	
+	// View
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI status;
-
 	private final PacMan pacMan;
 	private final Ghost blinky, pinky, inky, clyde;
 
+	// Controller
+	private final StateMachine<State, GameEvent> fsm;
+	
 	public PlayScene(PacManApp app, Maze maze) {
 		super(app);
 		this.maze = maze;
@@ -80,7 +84,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		configurePacMan();
 		configureGhosts();
 
-		// Scene
+		// Board
 		mazeUI = new MazeUI(maze);
 		mazeUI.observers.addObserver(this);
 		mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
@@ -88,7 +92,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		status = new StatusUI(game);
 		buildLayout();
 
-		fsm = new StateMachine<>("Play scene control", State.class, State.READY);
+		// Controller
+		
+		fsm = new StateMachine<>("Game control", State.class, State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
 
 		// -- READY
@@ -98,12 +104,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game.init(maze);
 			initEntities();
 			animateEntities(false);
-			mazeUI.showText("Ready!");
+			mazeUI.showInfo("Ready!");
 		};
 
 		fsm.state(State.READY).exit = state -> {
 			animateEntities(true);
-			mazeUI.hideText();
+			mazeUI.hideInfo();
 		};
 
 		fsm.changeOnTimeout(State.READY, State.RUNNING);
@@ -168,13 +174,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.GAMEOVER).entry = state -> {
 			animateEntities(false);
-			mazeUI.showText("Game Over!");
+			mazeUI.showInfo("Game Over!");
 		};
 
 		fsm.change(State.GAMEOVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 		fsm.state(State.GAMEOVER).exit = state -> {
-			mazeUI.hideText();
+			mazeUI.hideInfo();
 			game.init(maze);
 		};
 	}

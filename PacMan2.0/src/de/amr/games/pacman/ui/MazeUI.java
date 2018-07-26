@@ -33,7 +33,7 @@ public class MazeUI extends GameEntity {
 	private Sprite spriteEnergizer;
 
 	private boolean flashing;
-	private String text = "";
+	private String infoText;
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
@@ -74,12 +74,16 @@ public class MazeUI extends GameEntity {
 		return Optional.ofNullable(pacMan);
 	}
 
-	public void showText(String text) {
-		this.text = text;
+	public void showInfo(String text) {
+		this.infoText = text;
 	}
 
-	public void hideText() {
-		this.text = "";
+	public void hideInfo() {
+		this.infoText = null;
+	}
+
+	Optional<String> getInfo() {
+		return Optional.ofNullable(infoText);
 	}
 
 	public void setFlashing(boolean on) {
@@ -144,23 +148,20 @@ public class MazeUI extends GameEntity {
 			maze.tiles().forEach(tile -> drawTileContent(g, tile));
 			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
-			drawCenteredText(g, maze.infoTile);
-			if (bonus != null) {
-				bonus.draw(g);
-			}
+			getBonus().ifPresent(bonus -> bonus.draw(g));
+			getInfo().ifPresent(info -> drawInfo(g, info));
 		}
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	private void drawCenteredText(Graphics2D g, Tile tile) {
-		if (text.length() > 0) {
-			g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
-			g.setFont(Assets.font("scoreFont"));
-			g.setColor(Color.YELLOW);
-			Rectangle2D box = g.getFontMetrics().getStringBounds(text, g);
-			g.drawString(text, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-			g.translate(-tile.col * TS, -tile.row * TS);
-		}
+	private void drawInfo(Graphics2D g, String text) {
+		Tile tile = maze.infoTile;
+		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
+		g.setFont(Assets.font("scoreFont"));
+		g.setColor(Color.YELLOW);
+		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
+		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
+		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 
 	private void drawTileContent(Graphics2D g, Tile tile) {

@@ -15,6 +15,6 @@ public class BonusFoundEvent extends GameEvent {
 
 	@Override
 	public String toString() {
-		return String.format("Bonus(%c)", bonus.getSymbol());
+		return String.format("Bonus(%s)", bonus.getSymbol().name());
 	}
 }
