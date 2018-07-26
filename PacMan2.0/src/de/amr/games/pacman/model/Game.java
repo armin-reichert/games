@@ -10,6 +10,8 @@ public class Game {
 
 	public static final int PELLET_VALUE = 10;
 	public static final int ENERGIZER_VALUE = 50;
+	public static final int DOTS_BONUS_1 = 70;
+	public static final int DOTS_BONUS_2 = 170;
 
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
@@ -50,7 +52,7 @@ public class Game {
 	public int level;
 	public int livesLeft;
 	public int score;
-	public long totalDots;
+	public long dotsTotal;
 	public int dotsEaten;
 	public int ghostIndex;
 
@@ -61,6 +63,6 @@ public class Game {
 		score = 0;
 		dotsEaten = 0;
 		ghostIndex = 0;
-		totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
+		dotsTotal = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }

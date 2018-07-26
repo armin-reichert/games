@@ -21,6 +21,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.GameEventSupport;
+import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -102,8 +103,8 @@ public class MazeUI extends GameEntity {
 		flashing = on;
 	}
 
-	public void showBonus(Bonus bonus, int ticks) {
-		this.bonus = bonus;
+	public void showBonus(BonusSymbol bonusSymbol, int value, int ticks) {
+		this.bonus = new Bonus(bonusSymbol, value);
 		bonusTimeLeft = ticks;
 		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 		pacMan.lookFor.add(bonus);
@@ -114,27 +115,28 @@ public class MazeUI extends GameEntity {
 	}
 
 	public void honorBonus(int ticks) {
-		getBonus().ifPresent(bonus -> {
+		if (bonus != null) {
 			pacMan.lookFor.remove(bonus);
-			bonusTimeLeft = ticks;
 			bonus.setHonored();
-		});
+			bonusTimeLeft = ticks;
+		}
 	}
 
 	public void removeBonus() {
-		getBonus().ifPresent(bonus -> {
+		if (bonus != null) {
 			pacMan.lookFor.remove(bonus);
 			bonus = null;
-		});
+			bonusTimeLeft = 0;
+		}
 	}
 
 	@Override
 	public void update() {
-		getBonus().ifPresent(bonus -> {
-			if (--bonusTimeLeft <= 0) {
+		if (bonus != null) {
+			if (bonusTimeLeft-- == 0) {
 				removeBonus();
 			}
-		});
+		}
 		getPacMan().update();
 		getGhosts().forEach(Ghost::update);
 	}

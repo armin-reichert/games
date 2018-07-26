@@ -38,7 +38,6 @@ import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.Bonus;
 import de.amr.games.pacman.ui.Debug;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.HUD;
@@ -364,13 +363,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
 		PacManKilledEvent e = event(t);
-		Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(),
-				e.ghost.getTile()));
+		Debug.log(
+				() -> String.format("PacMan got killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onGhostKilled(Ghost ghost) {
-		Debug.log(
-				() -> String.format("Ghost %s got killed at tile %s", ghost.getName(), ghost.getTile()));
+		Debug.log(() -> String.format("Ghost %s got killed at %s", ghost.getName(), ghost.getTile()));
 		ghost.killAndShowPoints(game.ghostIndex, sec(1));
 		game.score += Game.GHOST_POINTS[game.ghostIndex];
 		game.ghostIndex += 1;
@@ -380,17 +378,17 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		FoodFoundEvent e = event(t);
 		getMaze().setContent(e.tile, EMPTY);
 		game.dotsEaten += 1;
-		if (game.dotsEaten == game.totalDots) {
+		if (game.dotsEaten == game.dotsTotal) {
 			fsm.enqueue(new NextLevelEvent());
 			return;
 		}
-		if (game.dotsEaten == 70) {
-			mazeUI.showBonus(new Bonus(BonusSymbol.CHERRIES, 100), sec(5));
-		} else if (game.dotsEaten == 170) {
-			mazeUI.showBonus(new Bonus(BonusSymbol.STRAWBERRY, 100), sec(5));
+		if (game.dotsEaten == Game.DOTS_BONUS_1) {
+			mazeUI.showBonus(BonusSymbol.CHERRIES, 100, sec(5));
+		} else if (game.dotsEaten == Game.DOTS_BONUS_2) {
+			mazeUI.showBonus(BonusSymbol.STRAWBERRY, 100, sec(5));
 		}
 		if (e.food == ENERGIZER) {
-			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));
+			Debug.log(() -> String.format("PacMan found energizer at %s", e.tile));
 			game.score += Game.ENERGIZER_VALUE;
 			game.ghostIndex = 0;
 			startGhostHunting();
@@ -401,7 +399,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
 		BonusFoundEvent e = event(t);
-		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
+		Debug.log(() -> String.format("PacMan found bonus %s at %s", e.bonus, e.tile));
 		game.score += e.bonus.getValue();
 		mazeUI.honorBonus(sec(2));
 	}
@@ -414,7 +412,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostDeadIsOver(StateTransition<State, GameEvent> t) {
 		GhostDeadIsOverEvent e = event(t);
 		e.ghost.setState(Ghost.State.RECOVERING);
-		e.ghost.setMoveDirection(Top4.N);
 	}
 
 	private void onGhostRecoveringComplete(StateTransition<State, GameEvent> t) {
