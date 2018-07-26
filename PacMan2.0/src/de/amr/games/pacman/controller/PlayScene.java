@@ -101,12 +101,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			state.setDuration(sec(2));
 			game.init(getMaze());
 			initEntities();
-			animateEntities(false);
+			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!");
 		};
 
 		fsm.state(State.READY).exit = state -> {
-			animateEntities(true);
+			mazeUI.enableAnimation(true);
 			mazeUI.hideInfo();
 		};
 
@@ -170,7 +170,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// -- GAME_OVER
 
 		fsm.state(State.GAMEOVER).entry = state -> {
-			animateEntities(false);
+			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Game Over!");
 		};
 
@@ -178,6 +178,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.GAMEOVER).exit = state -> {
 			mazeUI.hideInfo();
+			mazeUI.removeBonus();
 			game.init(getMaze());
 		};
 	}
@@ -319,12 +320,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setTile(ghost.getHome());
 			ghost.setSpeed(game::getGhostSpeed);
 		});
-	}
-
-	private void animateEntities(boolean enabled) {
-		mazeUI.enableAnimation(enabled);
-		pacMan.enableAnimation(enabled);
-		mazeUI.getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
 	}
 
 	private void initNextLevel() {

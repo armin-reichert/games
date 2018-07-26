@@ -121,9 +121,11 @@ public class MazeUI extends GameEntity {
 		});
 	}
 
-	private void removeBonus() {
-		pacMan.lookFor.remove(bonus);
-		bonus = null;
+	public void removeBonus() {
+		getBonus().ifPresent(bonus -> {
+			pacMan.lookFor.remove(bonus);
+			bonus = null;
+		});
 	}
 
 	@Override
@@ -148,6 +150,13 @@ public class MazeUI extends GameEntity {
 	@Override
 	public Sprite currentSprite() {
 		return flashing ? s_flashing : s_normal;
+	}
+
+	@Override
+	public void enableAnimation(boolean animated) {
+		super.enableAnimation(animated);
+		getPacMan().enableAnimation(animated);
+		getGhosts().forEach(ghost -> ghost.enableAnimation(animated));
 	}
 
 	@Override
