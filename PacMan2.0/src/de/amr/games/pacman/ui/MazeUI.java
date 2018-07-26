@@ -69,7 +69,7 @@ public class MazeUI extends GameEntity {
 		ghosts.remove(ghost);
 		pacMan.lookFor.remove(ghost);
 	}
-	
+
 	public boolean containsGhost(Ghost ghost) {
 		return ghosts.contains(ghost);
 	}
@@ -129,12 +129,12 @@ public class MazeUI extends GameEntity {
 	@Override
 	public void update() {
 		getBonus().ifPresent(bonus -> {
-			--bonusTimeLeft;
-			Debug.log(() -> "Bonus time left: " + bonusTimeLeft);
-			if (bonusTimeLeft <= 0) {
+			if (--bonusTimeLeft <= 0) {
 				removeBonus();
 			}
 		});
+		getPacMan().update();
+		getGhosts().forEach(Ghost::update);
 	}
 
 	@Override

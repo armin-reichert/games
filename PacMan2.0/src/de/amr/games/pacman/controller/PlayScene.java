@@ -114,9 +114,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		// -- RUNNING
 
-		fsm.state(State.RUNNING).update = state -> {
-			updateEntities();
-		};
+		fsm.state(State.RUNNING).update = state -> mazeUI.update();
 
 		fsm.changeOnInput(FoodFoundEvent.class, State.RUNNING, State.RUNNING, this::onFoodFound);
 
@@ -321,12 +319,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			ghost.setTile(ghost.getHome());
 			ghost.setSpeed(game::getGhostSpeed);
 		});
-	}
-
-	private void updateEntities() {
-		mazeUI.update();
-		pacMan.update();
-		mazeUI.getGhosts().forEach(Ghost::update);
 	}
 
 	private void animateEntities(boolean enabled) {
