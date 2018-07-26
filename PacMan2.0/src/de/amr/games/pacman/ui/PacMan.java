@@ -28,40 +28,37 @@ public class PacMan extends MazeMover<PacMan.State> {
 		ALIVE, DYING
 	};
 
-	public final Set<GameEntity> interestingThings = new HashSet<>();
+	public final Set<GameEntity> lookFor = new HashSet<>();
 
-	private Sprite[] walking = new Sprite[4];
-	private Sprite standing;
-	private Sprite dying;
-	private List<Sprite> animated = new ArrayList<>();
+	private Sprite[] s_walking = new Sprite[4];
+	private Sprite s_standing;
+	private Sprite s_dying;
+	private List<Sprite> s_animated = new ArrayList<>();
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName("Pac-Man");
-
-		standing = new Sprite(getPacManStanding()).scale(SPRITE_SIZE);
-		dying = new Sprite(getPacManDying()).scale(SPRITE_SIZE).animation(AnimationMode.LINEAR, 100);
-		TOPOLOGY.dirs().forEach(dir -> walking[dir] = new Sprite(getPacManWalking(dir))
+		s_standing = new Sprite(getPacManStanding()).scale(SPRITE_SIZE);
+		s_dying = new Sprite(getPacManDying()).scale(SPRITE_SIZE).animation(AnimationMode.LINEAR, 100);
+		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = new Sprite(getPacManWalking(dir))
 				.scale(SPRITE_SIZE).animation(AnimationMode.BACK_AND_FORTH, 60));
-
-		// TODO: remove
-		animated.add(standing);
-		animated.add(dying);
-		TOPOLOGY.dirs().forEach(dir -> animated.add(walking[dir]));
+		s_animated.add(s_standing);
+		s_animated.add(s_dying);
+		TOPOLOGY.dirs().forEach(dir -> s_animated.add(s_walking[dir]));
 	}
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return animated.stream();
+		return s_animated.stream();
 	}
 
 	@Override
 	public Sprite currentSprite() {
 		if (getState() == State.ALIVE) {
 			int dir = getMoveDirection();
-			return canMove(dir) ? walking[dir] : standing;
+			return canMove(dir) ? s_walking[dir] : s_standing;
 		} else {
-			return dying;
+			return s_dying;
 		}
 	}
 
@@ -77,14 +74,14 @@ public class PacMan extends MazeMover<PacMan.State> {
 			observers.fireGameEvent(new FoodFoundEvent(tile, content));
 			return;
 		}
-		interestingThings.stream().filter(this::collidesWith).findAny().ifPresent(thing -> {
-			if (thing instanceof Ghost) {
-				Ghost ghost = (Ghost) thing;
+		lookFor.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
+			if (finding instanceof Ghost) {
+				Ghost ghost = (Ghost) finding;
 				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
 					observers.fireGameEvent(new GhostContactEvent(ghost));
 				}
-			} else if (thing instanceof Bonus) {
-				observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) thing));
+			} else if (finding instanceof Bonus) {
+				observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) finding));
 			}
 		});
 	}

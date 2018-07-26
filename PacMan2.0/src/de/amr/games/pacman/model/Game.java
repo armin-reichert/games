@@ -8,6 +8,8 @@ import de.amr.games.pacman.ui.PacMan;
 
 public class Game {
 
+	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
+
 	private static float tilesPerSec(float value) {
 		return value * TS / 60;
 	}
@@ -43,22 +45,19 @@ public class Game {
 	}
 
 	public int level;
-	public int lives;
+	public int livesLeft;
 	public int score;
 	public long totalDots;
-	public int dotsEaten; // number of dots eaten in current level
-	public int ghostPoints;
-
-	public Game() {
-	}
+	public int dotsEaten;
+	public int ghostValue;
 
 	public void init(Maze maze) {
 		maze.init();
 		level = 1;
-		lives = 3;
+		livesLeft = 3;
 		score = 0;
 		dotsEaten = 0;
-		ghostPoints = 200;
+		ghostValue = 200;
 		totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }

@@ -1,5 +1,10 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostDead;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostFrightened;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostNormal;
+import static de.amr.games.pacman.ui.Spritesheet.getPinkNumber;
 import static java.util.Arrays.binarySearch;
 
 import java.util.ArrayList;
@@ -12,6 +17,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.GhostDeadIsOverEvent;
 import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
 import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -21,48 +27,66 @@ public class Ghost extends MazeMover<Ghost.State> {
 		ATTACKING, SCATTERING, FRIGHTENED, DYING, DEAD, RECOVERING
 	}
 
-	private static final int[] POINTS = new int[] { 200, 400, 800, 1600 };
-
 	private final int color;
-	private int points = 200;
 	private int dyingTime;
-	private Sprite[] spriteNormal = new Sprite[4];
-	private Sprite[] spriteDying = new Sprite[4];
-	private Sprite[] spriteDead = new Sprite[4];
-	private Sprite spriteFrightened;
-	private final List<Sprite> animatedSprites = new ArrayList<>();
+
+	private Sprite[] s_normal = new Sprite[4];
+	private Sprite[] s_dying = new Sprite[4];
+	private Sprite s_points;
+	private Sprite[] s_dead = new Sprite[4];
+	private Sprite s_frightened;
+	private final List<Sprite> s_animated = new ArrayList<>();
 
 	public Ghost(Maze maze, String name, int color, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName(name);
 		this.color = color;
-		loadSprites();
-	}
-
-	private void loadSprites() {
-		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteNormal[dir] = new Sprite(Spritesheet.getGhostNormal(color, dir)).scale(SPRITE_SIZE,
-					SPRITE_SIZE);
-			spriteNormal[dir].animation(AnimationMode.BACK_AND_FORTH, 300);
-			animatedSprites.add(spriteNormal[dir]);
-			spriteDead[dir] = new Sprite(Spritesheet.getGhostDead(dir)).scale(SPRITE_SIZE, SPRITE_SIZE);
-			animatedSprites.add(spriteDead[dir]);
+		TOPOLOGY.dirs().forEach(dir -> {
+			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(SPRITE_SIZE)
+					.animation(AnimationMode.BACK_AND_FORTH, 300);
+			s_animated.add(s_normal[dir]);
+			s_dead[dir] = new Sprite(getGhostDead(dir)).scale(SPRITE_SIZE);
 		});
 		for (int i = 0; i < 4; ++i) {
-			spriteDying[i] = new Sprite(Spritesheet.getPinkNumber(i)).scale(SPRITE_SIZE, SPRITE_SIZE);
+			s_dying[i] = new Sprite(getPinkNumber(i)).scale(SPRITE_SIZE);
 		}
-		spriteFrightened = new Sprite(Spritesheet.getGhostFrightened()).scale(SPRITE_SIZE, SPRITE_SIZE);
-		spriteFrightened.animation(AnimationMode.CYCLIC, 200);
-		animatedSprites.add(spriteFrightened);
+		s_points = s_dying[0];
+		s_frightened = new Sprite(getGhostFrightened()).scale(SPRITE_SIZE)
+				.animation(AnimationMode.CYCLIC, 200);
+		s_animated.add(s_frightened);
+	}
+
+	@Override
+	protected Stream<Sprite> getSprites() {
+		return s_animated.stream();
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		int dir = getMoveDirection();
+		switch (getState()) {
+		case ATTACKING:
+		case RECOVERING:
+		case SCATTERING:
+			return s_normal[dir];
+		case DYING:
+			return s_points;
+		case DEAD:
+			return s_dead[dir];
+		case FRIGHTENED:
+			return s_frightened;
+		default:
+			throw new IllegalStateException("Illegal ghost state: " + getState());
+		}
 	}
 
 	public int getColor() {
 		return color;
 	}
 
-	public void kill(int points, int ticks) {
-		this.points = points;
+	public void killAndShowPoints(int points, int ticks) {
 		this.dyingTime = ticks;
+		s_points = s_dying[binarySearch(Game.GHOST_POINTS, points)];
 		setState(State.DYING);
 	}
 
@@ -99,31 +123,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case SCATTERING:
 			move();
 			break;
-		default:
-			throw new IllegalStateException("Illegal ghost state: " + getState());
-		}
-	}
-
-	@Override
-	protected Stream<Sprite> getSprites() {
-		return animatedSprites.stream(); // TODO improve this
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		switch (getState()) {
-		case ATTACKING:
-			return spriteNormal[getMoveDirection()];
-		case DYING:
-			return spriteDying[binarySearch(POINTS, points)];
-		case DEAD:
-			return spriteDead[getMoveDirection()];
-		case FRIGHTENED:
-			return spriteFrightened;
-		case RECOVERING:
-			return spriteNormal[getMoveDirection()];
-		case SCATTERING:
-			return spriteNormal[getMoveDirection()];
 		default:
 			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}

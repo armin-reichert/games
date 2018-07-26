@@ -94,7 +94,7 @@ public class MazeUI extends GameEntity {
 		this.bonus = bonus;
 		bonusTimeLeft = ticks;
 		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
-		getPacMan().ifPresent(pacMan -> pacMan.interestingThings.add(bonus));
+		getPacMan().ifPresent(pacMan -> pacMan.lookFor.add(bonus));
 	}
 
 	public Optional<Bonus> getBonus() {
@@ -103,14 +103,14 @@ public class MazeUI extends GameEntity {
 
 	public void honorBonus(int ticks) {
 		getBonus().ifPresent(bonus -> {
-			getPacMan().ifPresent(pacMan -> pacMan.interestingThings.remove(bonus));
+			getPacMan().ifPresent(pacMan -> pacMan.lookFor.remove(bonus));
 			bonusTimeLeft = ticks;
 			bonus.setHonored();
 		});
 	}
 
 	private void removeBonus() {
-		getPacMan().ifPresent(pacMan -> pacMan.interestingThings.remove(bonus));
+		getPacMan().ifPresent(pacMan -> pacMan.lookFor.remove(bonus));
 		bonus = null;
 	}
 

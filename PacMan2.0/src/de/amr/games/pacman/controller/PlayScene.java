@@ -160,12 +160,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.DYING).entry = state -> {
 			state.setDuration(sec(3));
 			pacMan.setState(PacMan.State.DYING);
-			game.lives -= 1;
+			game.livesLeft -= 1;
 		};
 
-		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.lives == 0);
+		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.livesLeft == 0);
 
-		fsm.changeOnTimeout(State.DYING, State.RUNNING, () -> game.lives > 0, t -> {
+		fsm.changeOnTimeout(State.DYING, State.RUNNING, () -> game.livesLeft > 0, t -> {
 			pacMan.currentSprite().resetAnimation();
 			initEntities();
 		});
@@ -239,7 +239,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void configurePacMan() {
 		pacMan.observers.addObserver(this);
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
-		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
+		pacMan.lookFor.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 	}
 
 	private void configureGhosts() {
@@ -297,7 +297,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		maze.init();
 		game.totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 		game.dotsEaten = 0;
-		game.ghostPoints = 0;
+		game.ghostValue = 0;
 		initEntities();
 	}
 
@@ -341,9 +341,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostKilled(Ghost ghost) {
 		Debug.log(
 				() -> String.format("Ghost %s got killed at tile %s", ghost.getName(), ghost.getTile()));
-		ghost.kill(game.ghostPoints, sec(1));
-		game.score += game.ghostPoints;
-		game.ghostPoints *= 2;
+		ghost.killAndShowPoints(game.ghostValue, sec(1));
+		game.score += game.ghostValue;
+		game.ghostValue *= 2;
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -357,7 +357,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		}
 		if (e.food == ENERGIZER) {
 			game.score += 50;
-			game.ghostPoints = 200;
+			game.ghostValue = 200;
 		} else {
 			game.score += 10;
 		}
