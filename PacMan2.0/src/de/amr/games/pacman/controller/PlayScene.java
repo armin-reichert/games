@@ -72,13 +72,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		this.maze = maze;
 
 		// Actors
-		pacMan = createPacMan();
+		pacMan = new PacMan(maze, maze.pacManHome);
 		blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
+		configurePacMan();
 		configureGhosts();
-		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 
 		// Scene
 		mazeUI = new MazeUI(maze);
@@ -230,11 +230,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		return app.pulse.secToTicks(seconds);
 	}
 
-	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(maze, maze.pacManHome);
+	private void configurePacMan() {
 		pacMan.observers.addObserver(this);
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
-		return pacMan;
+		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 	}
 
 	private void configureGhosts() {
