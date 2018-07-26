@@ -1,7 +1,8 @@
 package de.amr.games.pacman.ui;
 
+import static java.util.Arrays.binarySearch;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	private static final int[] POINTS = new int[] { 200, 400, 800, 1600 };
-	
+
 	private final int color;
 	private int points = 200;
 	private int dyingTime;
@@ -58,7 +59,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public int getColor() {
 		return color;
 	}
-	
+
 	public void kill(int points, int ticks) {
 		this.points = points;
 		this.dyingTime = ticks;
@@ -105,7 +106,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return animatedSprites.stream(); //TODO improve this 
+		return animatedSprites.stream(); // TODO improve this
 	}
 
 	@Override
@@ -114,8 +115,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case ATTACKING:
 			return spriteNormal[getMoveDirection()];
 		case DYING:
-			int index = Arrays.binarySearch(POINTS, points);
-			return spriteDying[index];
+			return spriteDying[binarySearch(POINTS, points)];
 		case DEAD:
 			return spriteDead[getMoveDirection()];
 		case FRIGHTENED:

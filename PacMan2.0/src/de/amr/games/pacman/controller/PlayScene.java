@@ -121,7 +121,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.RUNNING, this::onGhostKilled);
 
-		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING);
+		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING, this::onPacManKilled);
 
 		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.CHANGING_LEVEL, this::onNextLevel);
 
@@ -301,39 +301,47 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	// Game event handling
 
+	@SuppressWarnings("unchecked")
+	private <E extends GameEvent> E event(StateTransition<State, GameEvent> t) {
+		return (E) t.getInput().get();
+	}
+
 	private void onGhostContact(StateTransition<State, GameEvent> t) {
-		GhostContactEvent e = (GhostContactEvent) t.getInput().get();
+		GhostContactEvent e = event(t);
 		switch (e.ghost.getState()) {
 		case ATTACKING:
 		case RECOVERING:
 		case SCATTERING:
-			Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(),
-					e.ghost.getTile()));
-			fsm.enqueue(new PacManKilledEvent());
-			break;
-		case DYING:
-			break;
-		case DEAD:
+			fsm.enqueue(new PacManKilledEvent(e.ghost));
 			break;
 		case FRIGHTENED:
-			Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(),
-					e.ghost.getTile()));
 			fsm.enqueue(new GhostKilledEvent(e.ghost));
+			break;
+		case DYING:
+		case DEAD:
 			break;
 		default:
 			throw new IllegalStateException();
 		}
 	}
 
+	private void onPacManKilled(StateTransition<State, GameEvent> t) {
+		PacManKilledEvent e = event(t);
+		Debug.log(() -> String.format("PacMan got killed by %s at tile %s", e.ghost.getName(),
+				e.ghost.getTile()));
+	}
+
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
-		GhostKilledEvent e = (GhostKilledEvent) t.getInput().get();
+		GhostKilledEvent e = event(t);
+		Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(),
+				e.ghost.getTile()));
 		e.ghost.kill(game.ghostPoints, sec(1));
 		game.score += game.ghostPoints;
 		game.ghostPoints *= 2;
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
-		FoodFoundEvent e = (FoodFoundEvent) t.getInput().get();
+		FoodFoundEvent e = event(t);
 		maze.setContent(e.tile, EMPTY);
 		game.dotsEaten += 1;
 		if (game.dotsEaten == 70) {
@@ -356,25 +364,25 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
-		BonusFoundEvent e = (BonusFoundEvent) t.getInput().get();
+		BonusFoundEvent e = event(t);
+		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 		game.score += e.bonus.getValue();
 		mazeUI.honorBonus(sec(2));
-		Debug.log(() -> String.format("PacMan found bonus %s at tile=%s", e.bonus, e.tile));
 	}
 
 	private void onGhostFrightenedEnds(StateTransition<State, GameEvent> t) {
-		GhostFrightenedEndsEvent e = (GhostFrightenedEndsEvent) t.getInput().get();
+		GhostFrightenedEndsEvent e = event(t);
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 
 	private void onGhostDeadIsOver(StateTransition<State, GameEvent> t) {
-		GhostDeadIsOverEvent e = (GhostDeadIsOverEvent) t.getInput().get();
+		GhostDeadIsOverEvent e = event(t);
 		e.ghost.setState(Ghost.State.RECOVERING);
 		e.ghost.setMoveDirection(Top4.N);
 	}
 
 	private void onGhostRecoveringComplete(StateTransition<State, GameEvent> t) {
-		GhostRecoveringCompleteEvent e = (GhostRecoveringCompleteEvent) t.getInput().get();
+		GhostRecoveringCompleteEvent e = event(t);
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 
@@ -385,10 +393,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.ghostPoints = 0;
 		initEntities();
 	}
-	
+
 	private void loadMazeContent() {
 		maze.loadContent();
-		maze.setContent(maze.bonusTile, Tile.EMPTY);
 		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }
