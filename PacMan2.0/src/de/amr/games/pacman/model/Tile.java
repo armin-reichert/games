@@ -23,7 +23,7 @@ public class Tile {
 	public static final char BONUS_KEY = '8';
 
 	// Position markers
-	public static final char BONUS = '$';
+	public static final char INFO = '$';
 	public static final char PACMAN = '@';
 	public static final char BLINKY = 'B';
 	public static final char INKY = 'I';

@@ -83,7 +83,7 @@ public class MazeUI extends GameEntity {
 	public void showBonus(Bonus bonus, int ticks) {
 		this.bonus = bonus;
 		bonusTimeLeft = ticks;
-		bonus.tf.moveTo(maze.bonusTile.col * TS, maze.bonusTile.row * TS - TS / 2);
+		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 		getPacMan().ifPresent(pacMan -> pacMan.interestingThings.add(bonus));
 	}
 
@@ -138,7 +138,7 @@ public class MazeUI extends GameEntity {
 			maze.tiles().forEach(tile -> drawTileContent(g, tile));
 			Arrays.stream(ghosts).forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
-			drawCenteredText(g, maze.bonusTile);
+			drawCenteredText(g, maze.infoTile);
 			if (bonus != null) {
 				bonus.draw(g);
 			}

@@ -155,7 +155,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.lives == 0);
 
 		fsm.changeOnTimeout(State.DYING, State.RUNNING, () -> game.lives > 0, t -> {
-			maze.setContent(maze.bonusTile, Tile.EMPTY);
 			pacMan.currentSprite().resetAnimation();
 			initEntities();
 		});

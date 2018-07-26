@@ -26,7 +26,7 @@ public class Maze extends GridGraph<Character, Integer> {
 	}
 
 	private final String[] content;
-	public Tile pacManHome, blinkyHome, pinkyHome, inkyHome, clydeHome, bonusTile;
+	public Tile pacManHome, blinkyHome, pinkyHome, inkyHome, clydeHome, infoTile;
 
 	private Maze(int numCols, int numRows, String[] content) {
 		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
@@ -43,8 +43,8 @@ public class Maze extends GridGraph<Character, Integer> {
 					inkyHome = new Tile(col, row);
 				} else if (c == Tile.CLYDE) {
 					clydeHome = new Tile(col, row);
-				} else if (c == Tile.BONUS) {
-					bonusTile = new Tile(col, row);
+				} else if (c == Tile.INFO) {
+					infoTile = new Tile(col, row);
 				} else if (c == Tile.PACMAN) {
 					pacManHome = new Tile(col, row);
 				}
