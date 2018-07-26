@@ -21,16 +21,6 @@ public class Tile {
 	public static final char PELLET = '.';
 	public static final char ENERGIZER = '*';
 
-	// Bonus
-	public static final char BONUS_CHERRIES = '1';
-	public static final char BONUS_STRAWBERRY = '2';
-	public static final char BONUS_PEACH = '3';
-	public static final char BONUS_APPLE = '4';
-	public static final char BONUS_GRAPES = '5';
-	public static final char BONUS_GALAXIAN = '6';
-	public static final char BONUS_BELL = '7';
-	public static final char BONUS_KEY = '8';
-
 	public static boolean isFood(char c) {
 		return c == PELLET || c == ENERGIZER;
 	}

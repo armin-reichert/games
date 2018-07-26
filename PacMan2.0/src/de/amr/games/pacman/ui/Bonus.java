@@ -6,18 +6,19 @@ import java.util.Arrays;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.model.BonusSymbol;
 
 public class Bonus extends GameEntity {
 
 	private static final int[] POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
 	private boolean honored;
-	private char symbol;
+	private BonusSymbol symbol;
 	private int points;
 	private Sprite spriteSymbol;
 	private Sprite spritePoints;
 
-	public Bonus(char symbol, int points) {
+	public Bonus(BonusSymbol symbol, int points) {
 		this.symbol = symbol;
 		this.points = points;
 		this.honored = false;
@@ -34,7 +35,7 @@ public class Bonus extends GameEntity {
 		return points;
 	}
 
-	public char getSymbol() {
+	public BonusSymbol getSymbol() {
 		return symbol;
 	}
 
@@ -49,6 +50,6 @@ public class Bonus extends GameEntity {
 
 	@Override
 	public String toString() {
-		return String.format("Bonus(%c)", symbol);
+		return String.format("Bonus(%s)", symbol);
 	}
 }

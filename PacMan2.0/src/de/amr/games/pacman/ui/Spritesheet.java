@@ -1,14 +1,5 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.model.Tile.BONUS_APPLE;
-import static de.amr.games.pacman.model.Tile.BONUS_BELL;
-import static de.amr.games.pacman.model.Tile.BONUS_CHERRIES;
-import static de.amr.games.pacman.model.Tile.BONUS_GALAXIAN;
-import static de.amr.games.pacman.model.Tile.BONUS_GRAPES;
-import static de.amr.games.pacman.model.Tile.BONUS_KEY;
-import static de.amr.games.pacman.model.Tile.BONUS_PEACH;
-import static de.amr.games.pacman.model.Tile.BONUS_STRAWBERRY;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -18,6 +9,7 @@ import java.util.Map;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.model.BonusSymbol;
 
 public class Spritesheet {
 
@@ -30,7 +22,7 @@ public class Spritesheet {
 	private static BufferedImage maze;
 	private static BufferedImage mazeWhite;
 	private static BufferedImage[] energizer = new BufferedImage[2];
-	private static Map<Character, BufferedImage> bonusMap = new HashMap<>();
+	private static Map<BonusSymbol, BufferedImage> bonusMap = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
 	private static BufferedImage[] pacManDying = new BufferedImage[11];
@@ -52,9 +44,8 @@ public class Spritesheet {
 
 		// Boni
 		int offset = 0;
-		for (char bonus : Arrays.asList(BONUS_CHERRIES, BONUS_STRAWBERRY, BONUS_PEACH, BONUS_APPLE,
-				BONUS_GRAPES, BONUS_GALAXIAN, BONUS_BELL, BONUS_KEY)) {
-			bonusMap.put(bonus, sheet.getSubimage(488 + offset, 48, 16, 16));
+		for (BonusSymbol symbol : BonusSymbol.values()) {
+			bonusMap.put(symbol, sheet.getSubimage(488 + offset, 48, 16, 16));
 			offset += 16;
 		}
 
@@ -128,7 +119,7 @@ public class Spritesheet {
 		return mazeWhite;
 	}
 
-	public static BufferedImage getBonus(char bonus) {
+	public static BufferedImage getBonus(BonusSymbol bonus) {
 		return bonusMap.get(bonus);
 	}
 

@@ -39,6 +39,7 @@ import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
 import de.amr.games.pacman.controller.event.NextLevelEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
+import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -352,9 +353,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		maze.setContent(e.tile, EMPTY);
 		game.dotsEaten += 1;
 		if (game.dotsEaten == 70) {
-			mazeUI.showBonus(new Bonus(Tile.BONUS_CHERRIES, 100), sec(5));
+			mazeUI.showBonus(new Bonus(BonusSymbol.CHERRIES, 100), sec(5));
 		} else if (game.dotsEaten == 170) {
-			mazeUI.showBonus(new Bonus(Tile.BONUS_STRAWBERRY, 100), sec(5));
+			mazeUI.showBonus(new Bonus(BonusSymbol.STRAWBERRY, 100), sec(5));
 		}
 		if (e.food == ENERGIZER) {
 			game.score += 50;
