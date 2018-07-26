@@ -23,7 +23,6 @@ import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.grid.impl.Top4;
@@ -58,21 +57,28 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		READY, RUNNING, DYING, CHANGING_LEVEL, GAMEOVER
 	};
 
-	private StateMachine<State, GameEvent> fsm;
-	private Game game;
-	private Maze maze;
+	private final StateMachine<State, GameEvent> fsm;
+	private final Maze maze;
+	private final Game game;
+	private final MazeUI mazeUI;
+	private final HUD hud;
+	private final StatusUI status;
+
 	private PacMan pacMan;
 	private Ghost blinky, pinky, inky, clyde;
-	private MazeUI mazeUI;
-	private HUD hud;
-	private StatusUI status;
 
-	public PlayScene(PacManApp app) {
+	public PlayScene(PacManApp app, Maze maze) {
 		super(app);
-		defineStateMachine();
-	}
+		this.maze = maze;
+		game = new Game();
+		mazeUI = new MazeUI(maze);
+		mazeUI.observers.addObserver(this);
+		hud = new HUD(game);
+		status = new StatusUI(game);
+		createLayout();
+		createPacManAndFriends();
+		mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
 
-	private void defineStateMachine() {
 		fsm = new StateMachine<>("Play scene control", State.class, State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
 
@@ -80,12 +86,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(sec(2));
-			maze = new Maze(Assets.text("maze.txt"));
-			game = new Game();
-			game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
-			createUI(game, maze);
-			createPacManAndFriends();
-			mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
+			game.init(maze);
 			initEntities();
 			animateEntities(false);
 			mazeUI.showText("Ready!");
@@ -165,6 +166,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.GAMEOVER).exit = state -> {
 			mazeUI.hideText();
+			game.init(maze);
 		};
 	}
 
@@ -195,10 +197,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Debug.draw(g, this);
 	}
 
-	public PacManApp getApp() {
-		return app;
-	}
-
 	public StateMachine<State, GameEvent> getFsm() {
 		return fsm;
 	}
@@ -219,16 +217,16 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		return Stream.of(blinky, pinky, inky, clyde);
 	}
 
-	public int sec(float seconds) {
+	private int sec(float seconds) {
 		return app.pulse.secToTicks(seconds);
 	}
 
 	private void createPacManAndFriends() {
+		pacMan = new PacMan(maze, maze.pacManHome);
 		blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
-		pacMan = new PacMan(maze, maze.pacManHome);
 		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
 
 		getGhosts().forEach(ghost -> ghost.observers.addObserver(this));
@@ -247,16 +245,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
 	}
 
-	private void createUI(Game game, Maze maze) {
-		mazeUI = new MazeUI(maze);
-		hud = new HUD(game);
-		status = new StatusUI(game);
-		// layout
+	private void createLayout() {
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
 		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
-		// events
-		mazeUI.observers.addObserver(this);
 	}
 
 	private void initEntities() {
@@ -292,8 +284,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void initNextLevel() {
 		game.level += 1;
-		maze.reset();
-		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
+		maze.init();
+		game.totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 		game.dotsEaten = 0;
 		game.ghostPoints = 0;
 		initEntities();
@@ -359,7 +351,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		} else {
 			game.score += 10;
 		}
-		if (game.dotsEaten == game.totalDotsInLevel) {
+		if (game.dotsEaten == game.totalDots) {
 			fsm.enqueue(new NextLevelEvent());
 		} else if (e.food == ENERGIZER) {
 			Debug.log(() -> String.format("PacMan found energizer at tile %s", e.tile));

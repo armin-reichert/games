@@ -31,7 +31,7 @@ public class Maze {
 		parseContent();
 	}
 
-	public void reset() {
+	public void init() {
 		parseContent();
 	}
 

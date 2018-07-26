@@ -45,15 +45,20 @@ public class Game {
 	public int level;
 	public int lives;
 	public int score;
-	public long totalDotsInLevel;
+	public long totalDots;
 	public int dotsEaten; // number of dots eaten in current level
 	public int ghostPoints;
 
 	public Game() {
+	}
+
+	public void init(Maze maze) {
+		maze.init();
 		level = 1;
 		lives = 3;
 		score = 0;
 		dotsEaten = 0;
 		ghostPoints = 200;
+		totalDots = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }
