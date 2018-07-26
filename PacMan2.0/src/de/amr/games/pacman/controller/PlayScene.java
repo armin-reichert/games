@@ -35,7 +35,6 @@ import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostDeadIsOverEvent;
 import de.amr.games.pacman.controller.event.GhostFrightenedEndsEvent;
-import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.GhostRecoveringCompleteEvent;
 import de.amr.games.pacman.controller.event.NextLevelEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
@@ -120,8 +119,6 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, this::onGhostContact);
 
-		fsm.changeOnInput(GhostKilledEvent.class, State.RUNNING, State.RUNNING, this::onGhostKilled);
-
 		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING, this::onPacManKilled);
 
 		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.CHANGING_LEVEL);
@@ -129,13 +126,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// -- CHANGING_LEVEL
 
 		fsm.state(State.CHANGING_LEVEL).entry = state -> {
-			state.setDuration(sec(3));
-			initNextLevel();
+			state.setDuration(sec(4));
 			mazeUI.setFlashing(true);
+			initNextLevel();
 		};
 
 		fsm.state(State.CHANGING_LEVEL).update = state -> {
-			if (state.getRemaining() < sec(2)) {
+			if (state.getRemaining() == state.getDuration() / 2) {
 				mazeUI.setFlashing(false);
 			}
 		};
@@ -323,11 +320,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			fsm.enqueue(new PacManKilledEvent(e.ghost));
 			break;
 		case FRIGHTENED:
-			fsm.enqueue(new GhostKilledEvent(e.ghost));
+			onGhostKilled(e.ghost); // internal event
 			break;
 		case DYING:
 		case DEAD:
-			break;
+			// no event should be triggered by collision with ghost corpse
 		default:
 			throw new IllegalStateException();
 		}
@@ -339,11 +336,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 				e.ghost.getTile()));
 	}
 
-	private void onGhostKilled(StateTransition<State, GameEvent> t) {
-		GhostKilledEvent e = event(t);
-		Debug.log(() -> String.format("Ghost %s got killed at tile %s", e.ghost.getName(),
-				e.ghost.getTile()));
-		e.ghost.kill(game.ghostPoints, sec(1));
+	private void onGhostKilled(Ghost ghost) {
+		Debug.log(
+				() -> String.format("Ghost %s got killed at tile %s", ghost.getName(), ghost.getTile()));
+		ghost.kill(game.ghostPoints, sec(1));
 		game.score += game.ghostPoints;
 		game.ghostPoints *= 2;
 	}
