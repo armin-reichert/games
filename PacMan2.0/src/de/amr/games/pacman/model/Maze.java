@@ -46,17 +46,17 @@ public class Maze {
 		for (int row = 0; row < size.height; ++row) {
 			for (int col = 0; col < size.width; ++col) {
 				char c = rows[row].charAt(col);
-				if (c == Tile.BLINKY) {
+				if (c == Tile.POS_BLINKY) {
 					blinkyHome = new Tile(col, row);
-				} else if (c == Tile.PINKY) {
+				} else if (c == Tile.POS_PINKY) {
 					pinkyHome = new Tile(col, row);
-				} else if (c == Tile.INKY) {
+				} else if (c == Tile.POS_INKY) {
 					inkyHome = new Tile(col, row);
-				} else if (c == Tile.CLYDE) {
+				} else if (c == Tile.POS_CLYDE) {
 					clydeHome = new Tile(col, row);
-				} else if (c == Tile.INFO) {
+				} else if (c == Tile.POS_INFO) {
 					infoTile = new Tile(col, row);
-				} else if (c == Tile.PACMAN) {
+				} else if (c == Tile.POS_PACMAN) {
 					pacManHome = new Tile(col, row);
 				} else {
 					graph.set(graph.cell(col, row), c);

@@ -2,15 +2,24 @@ package de.amr.games.pacman.model;
 
 public class Tile {
 
+	// Structure
 	public static final char EMPTY = ' ';
 	public static final char WALL = '#';
 	public static final char DOOR = 'D';
 	public static final char TUNNEL = 'T';
 	public static final char WORMHOLE = 'W';
 
+	// Position markers
+	public static final char POS_INFO = '$';
+	public static final char POS_PACMAN = 'O';
+	public static final char POS_BLINKY = 'B';
+	public static final char POS_INKY = 'I';
+	public static final char POS_PINKY = 'P';
+	public static final char POS_CLYDE = 'C';
+
 	// Food
 	public static final char PELLET = '.';
-	public static final char ENERGIZER = 'O';
+	public static final char ENERGIZER = '*';
 
 	// Bonus
 	public static final char BONUS_CHERRIES = '1';
@@ -22,21 +31,8 @@ public class Tile {
 	public static final char BONUS_BELL = '7';
 	public static final char BONUS_KEY = '8';
 
-	// Position markers
-	public static final char INFO = '$';
-	public static final char PACMAN = '@';
-	public static final char BLINKY = 'B';
-	public static final char INKY = 'I';
-	public static final char PINKY = 'P';
-	public static final char CLYDE = 'C';
-
 	public static boolean isFood(char c) {
 		return c == PELLET || c == ENERGIZER;
-	}
-
-	public static boolean isBonus(char c) {
-		return c == BONUS_APPLE || c == BONUS_BELL || c == BONUS_CHERRIES || c == BONUS_GALAXIAN
-				|| c == BONUS_GRAPES || c == BONUS_KEY || c == BONUS_PEACH || c == BONUS_STRAWBERRY;
 	}
 
 	public final int col;
