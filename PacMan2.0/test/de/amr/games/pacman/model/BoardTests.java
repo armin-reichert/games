@@ -17,7 +17,7 @@ public class BoardTests {
 
 	@Test
 	public void testBoardLoading() {
-		Maze maze = Maze.of(Assets.text("maze.txt"));
+		Maze maze = new Maze(Assets.text("maze.txt"));
 		printMaze(maze);
 
 		assertEquals(28, maze.numCols());

@@ -80,7 +80,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(sec(2));
-			maze = Maze.of(Assets.text("maze.txt"));
+			maze = new Maze(Assets.text("maze.txt"));
 			game = new Game();
 			game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 			createUI(game, maze);
@@ -138,7 +138,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 				mazeUI.setFlashing(false);
 			}
 		};
-		
+
 		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.RUNNING);
 
 		// -- DYING
@@ -293,9 +293,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void initNextLevel() {
-		maze.loadContent();
-		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 		game.level += 1;
+		maze.reset();
+		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 		game.dotsEaten = 0;
 		game.ghostPoints = 0;
 		initEntities();

@@ -36,7 +36,7 @@ class Ambush implements MoveBehavior {
 	private Optional<Tile> ahead(int n, MazeMover<?> refugee) {
 		Tile current = refugee.getTile();
 		for (int i = 0; i < n; ++i) {
-			Optional<Tile> next = refugee.getMaze().neighbor(current, refugee.getMoveDirection());
+			Optional<Tile> next = refugee.getMaze().neighborTile(current, refugee.getMoveDirection());
 			if (next.isPresent()) {
 				current = next.get();
 			}

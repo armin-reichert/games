@@ -1,8 +1,6 @@
 package de.amr.games.pacman.model;
 
-import static de.amr.games.pacman.model.Tile.EMPTY;
-import static de.amr.games.pacman.model.Tile.WALL;
-
+import java.awt.Dimension;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -20,22 +18,34 @@ public class Maze {
 
 	public static final Topology TOPOLOGY = new Top4();
 
-	public static Maze of(String mazeData) {
-		String[] rows = mazeData.split("\n");
-		return new Maze(rows[0].length(), rows.length, rows);
-	}
-
-	private GridGraph<Character, Integer> graph;
-	private final String[] content;
 	public Tile pacManHome, blinkyHome, pinkyHome, inkyHome, clydeHome, infoTile;
 
-	private Maze(int numCols, int numRows, String[] content) {
-		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
-		this.content = content;
-		loadContent();
-		for (int row = 0; row < numRows; ++row) {
-			for (int col = 0; col < numCols; ++col) {
-				char c = getOriginalContent(row, col);
+	private final String data;
+	private final GridGraph<Character, Integer> graph;
+
+	public Maze(String data) {
+		this.data = data;
+		Dimension size = parseDimension();
+		graph = new GridGraph<>(size.width, size.height, TOPOLOGY, Tile.EMPTY, (u, v) -> 1,
+				UndirectedEdge::new);
+		parseContent();
+	}
+
+	public void reset() {
+		parseContent();
+	}
+
+	private Dimension parseDimension() {
+		String[] rows = data.split("\n");
+		return new Dimension(rows[0].length(), rows.length);
+	}
+
+	private void parseContent() {
+		Dimension size = parseDimension();
+		String[] rows = data.split("\n");
+		for (int row = 0; row < size.height; ++row) {
+			for (int col = 0; col < size.width; ++col) {
+				char c = rows[row].charAt(col);
 				if (c == Tile.BLINKY) {
 					blinkyHome = new Tile(col, row);
 				} else if (c == Tile.PINKY) {
@@ -48,28 +58,27 @@ public class Maze {
 					infoTile = new Tile(col, row);
 				} else if (c == Tile.PACMAN) {
 					pacManHome = new Tile(col, row);
+				} else {
+					graph.set(graph.cell(col, row), c);
 				}
 			}
 		}
 		graph.fill();
-		graph.edges().filter(e -> graph.get(e.either()) == WALL || graph.get(e.other()) == WALL)
+		graph.edges()
+				.filter(e -> graph.get(e.either()) == Tile.WALL || graph.get(e.other()) == Tile.WALL)
 				.forEach(graph::removeEdge);
 	}
 
 	public GridGraph<Character, Integer> getGraph() {
 		return graph;
 	}
-	
+
 	public int numCols() {
 		return graph.numCols();
 	}
-	
+
 	public int numRows() {
 		return graph.numRows();
-	}
-
-	public void loadContent() {
-		graph.vertices().forEach(v -> graph.set(v, content[graph.row(v)].charAt(graph.col(v))));
 	}
 
 	public Stream<Tile> tiles() {
@@ -80,21 +89,10 @@ public class Maze {
 		return graph.isValidCol(tile.col) && graph.isValidRow(tile.row);
 	}
 
-	public int cell(Tile tile) {
-		return graph.cell(tile.col, tile.row);
-	}
-
-	public Tile tile(int cell) {
-		return new Tile(graph.col(cell), graph.row(cell));
-	}
-
-	private char getOriginalContent(int row, int col) {
-		return content[row].charAt(col);
-	}
-
 	public char getContent(int col, int row) {
 		return graph.get(graph.cell(col, row));
 	}
+
 	public char getContent(Tile tile) {
 		return graph.get(cell(tile));
 	}
@@ -107,11 +105,11 @@ public class Maze {
 		return graph.direction(cell(t1), cell(t2));
 	}
 
-	public boolean adjacent(Tile t1, Tile t2) {
+	public boolean hasAdjacentTile(Tile t1, Tile t2) {
 		return graph.adjacent(cell(t1), cell(t2));
 	}
 
-	public Optional<Tile> neighbor(Tile tile, int dir) {
+	public Optional<Tile> neighborTile(Tile tile, int dir) {
 		OptionalInt neighbor = graph.neighbor(cell(tile), dir);
 		return neighbor.isPresent() ? Optional.of(tile(neighbor.getAsInt())) : Optional.empty();
 	}
@@ -129,4 +127,15 @@ public class Maze {
 	public OptionalInt dirAlongPath(List<Tile> path) {
 		return path.size() < 2 ? OptionalInt.empty() : direction(path.get(0), path.get(1));
 	}
+
+	// convert between vertex numbers ("cells") and tiles
+
+	private int cell(Tile tile) {
+		return graph.cell(tile.col, tile.row);
+	}
+
+	private Tile tile(int cell) {
+		return new Tile(graph.col(cell), graph.row(cell));
+	}
+
 }
