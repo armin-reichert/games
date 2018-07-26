@@ -80,9 +80,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(sec(2));
-			game = new Game();
 			maze = Maze.of(Assets.text("maze.txt"));
-			loadMazeContent();
+			game = new Game();
+			game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 			createUI(game, maze);
 			createPacManAndFriends();
 			mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
@@ -123,17 +123,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING, this::onPacManKilled);
 
-		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.CHANGING_LEVEL, this::onNextLevel);
+		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.CHANGING_LEVEL);
 
 		// -- CHANGING_LEVEL
 
 		fsm.state(State.CHANGING_LEVEL).entry = state -> {
-			state.setDuration(sec(4));
+			state.setDuration(sec(3));
+			initNextLevel();
 			mazeUI.setFlashing(true);
-		};
-
-		fsm.state(State.CHANGING_LEVEL).exit = state -> {
-			mazeUI.setFlashing(false);
 		};
 
 		fsm.state(State.CHANGING_LEVEL).update = state -> {
@@ -141,7 +138,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 				mazeUI.setFlashing(false);
 			}
 		};
-
+		
 		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.RUNNING);
 
 		// -- DYING
@@ -254,13 +251,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void createUI(Game game, Maze maze) {
 		mazeUI = new MazeUI(maze);
-		mazeUI.observers.addObserver(this);
 		hud = new HUD(game);
 		status = new StatusUI(game);
 		// layout
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
 		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
+		// events
+		mazeUI.observers.addObserver(this);
 	}
 
 	private void initEntities() {
@@ -386,16 +384,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		e.ghost.setState(Ghost.State.ATTACKING);
 	}
 
-	private void onNextLevel(StateTransition<State, GameEvent> t) {
-		loadMazeContent();
+	private void initNextLevel() {
+		maze.loadContent();
+		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 		game.level += 1;
 		game.dotsEaten = 0;
 		game.ghostPoints = 0;
 		initEntities();
-	}
-
-	private void loadMazeContent() {
-		maze.loadContent();
-		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }
