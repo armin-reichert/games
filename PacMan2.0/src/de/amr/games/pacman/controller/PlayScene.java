@@ -38,7 +38,6 @@ import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Bonus;
 import de.amr.games.pacman.ui.Debug;
 import de.amr.games.pacman.ui.Ghost;
@@ -144,9 +143,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.CHANGING_LEVEL).update = state -> {
 			if (state.getRemaining() == state.getDuration() / 2) {
+				nextLevel();
 				mazeUI.setFlashing(false);
+				mazeUI.enableAnimation(false);
 			} else if (state.isTerminated()) {
-				initNextLevel();
+				mazeUI.enableAnimation(true);
 			}
 		};
 
@@ -322,12 +323,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		});
 	}
 
-	private void initNextLevel() {
+	private void nextLevel() {
 		game.level += 1;
-		getMaze().init();
-		game.totalDots = getMaze().tiles().map(getMaze()::getContent).filter(Tile::isFood).count();
 		game.dotsEaten = 0;
 		game.ghostIndex = 0;
+		getMaze().init();
 		initEntities();
 	}
 
