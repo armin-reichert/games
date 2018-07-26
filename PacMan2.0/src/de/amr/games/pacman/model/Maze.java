@@ -16,7 +16,7 @@ import de.amr.easy.grid.api.Topology;
 import de.amr.easy.grid.impl.GridGraph;
 import de.amr.easy.grid.impl.Top4;
 
-public class Maze extends GridGraph<Character, Integer> {
+public class Maze {
 
 	public static final Topology TOPOLOGY = new Top4();
 
@@ -25,16 +25,17 @@ public class Maze extends GridGraph<Character, Integer> {
 		return new Maze(rows[0].length(), rows.length, rows);
 	}
 
+	private GridGraph<Character, Integer> graph;
 	private final String[] content;
 	public Tile pacManHome, blinkyHome, pinkyHome, inkyHome, clydeHome, infoTile;
 
 	private Maze(int numCols, int numRows, String[] content) {
-		super(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
+		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		this.content = content;
 		loadContent();
 		for (int row = 0; row < numRows; ++row) {
 			for (int col = 0; col < numCols; ++col) {
-				char c = content(row, col);
+				char c = getOriginalContent(row, col);
 				if (c == Tile.BLINKY) {
 					blinkyHome = new Tile(col, row);
 				} else if (c == Tile.PINKY) {
@@ -50,58 +51,77 @@ public class Maze extends GridGraph<Character, Integer> {
 				}
 			}
 		}
-		fill();
-		edges().filter(e -> get(e.either()) == WALL || get(e.other()) == WALL)
-				.forEach(this::removeEdge);
+		graph.fill();
+		graph.edges().filter(e -> graph.get(e.either()) == WALL || graph.get(e.other()) == WALL)
+				.forEach(graph::removeEdge);
 	}
 
-	private char content(int row, int col) {
-		return content[row].charAt(col);
+	public GridGraph<Character, Integer> getGraph() {
+		return graph;
+	}
+	
+	public int numCols() {
+		return graph.numCols();
+	}
+	
+	public int numRows() {
+		return graph.numRows();
 	}
 
 	public void loadContent() {
-		vertices().forEach(v -> set(v, content[row(v)].charAt(col(v))));
+		graph.vertices().forEach(v -> graph.set(v, content[graph.row(v)].charAt(graph.col(v))));
 	}
 
 	public Stream<Tile> tiles() {
-		return vertices().mapToObj(this::tile);
+		return graph.vertices().mapToObj(this::tile);
 	}
 
 	public boolean isValidTile(Tile tile) {
-		return isValidCol(tile.col) && isValidRow(tile.row);
+		return graph.isValidCol(tile.col) && graph.isValidRow(tile.row);
 	}
 
 	public int cell(Tile tile) {
-		return cell(tile.col, tile.row);
+		return graph.cell(tile.col, tile.row);
 	}
 
 	public Tile tile(int cell) {
-		return new Tile(col(cell), row(cell));
+		return new Tile(graph.col(cell), graph.row(cell));
 	}
 
+	private char getOriginalContent(int row, int col) {
+		return content[row].charAt(col);
+	}
+
+	public char getContent(int col, int row) {
+		return graph.get(graph.cell(col, row));
+	}
 	public char getContent(Tile tile) {
-		return get(cell(tile));
+		return graph.get(cell(tile));
 	}
 
 	public void setContent(Tile tile, char c) {
-		set(cell(tile), c);
+		graph.set(cell(tile), c);
 	}
 
 	public OptionalInt direction(Tile t1, Tile t2) {
-		return direction(cell(t1), cell(t2));
+		return graph.direction(cell(t1), cell(t2));
+	}
+
+	public boolean adjacent(Tile t1, Tile t2) {
+		return graph.adjacent(cell(t1), cell(t2));
 	}
 
 	public Optional<Tile> neighbor(Tile tile, int dir) {
-		OptionalInt neighbor = neighbor(cell(tile), dir);
+		OptionalInt neighbor = graph.neighbor(cell(tile), dir);
 		return neighbor.isPresent() ? Optional.of(tile(neighbor.getAsInt())) : Optional.empty();
 	}
 
 	public Stream<Tile> getAdjacentTiles(Tile tile) {
-		return adj(cell(tile)).mapToObj(this::tile);
+		return graph.adj(cell(tile)).mapToObj(this::tile);
 	}
 
 	public List<Tile> findPath(Tile source, Tile target) {
-		GraphTraversal pathfinder = new AStarTraversal<>(this, this::manhattan);
+		GraphTraversal pathfinder = new AStarTraversal<>(graph, graph::manhattan);
 		pathfinder.traverseGraph(cell(source), cell(target));
 		return pathfinder.path(cell(target)).stream().map(this::tile).collect(Collectors.toList());
 	}

@@ -292,6 +292,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		getGhosts().forEach(ghost -> ghost.enableAnimation(enabled));
 	}
 
+	private void initNextLevel() {
+		maze.loadContent();
+		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
+		game.level += 1;
+		game.dotsEaten = 0;
+		game.ghostPoints = 0;
+		initEntities();
+	}
+
 	private void startHuntingGhosts() {
 		getGhosts().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
 				.forEach(ghost -> ghost.setState(Ghost.State.FRIGHTENED));
@@ -382,14 +391,5 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostRecoveringComplete(StateTransition<State, GameEvent> t) {
 		GhostRecoveringCompleteEvent e = event(t);
 		e.ghost.setState(Ghost.State.ATTACKING);
-	}
-
-	private void initNextLevel() {
-		maze.loadContent();
-		game.totalDotsInLevel = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
-		game.level += 1;
-		game.dotsEaten = 0;
-		game.ghostPoints = 0;
-		initEntities();
 	}
 }

@@ -1,11 +1,13 @@
 package de.amr.games.pacman.behavior.impl;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import de.amr.games.pacman.behavior.MoveBehavior;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
 
 class Flee implements MoveBehavior {
@@ -27,9 +29,8 @@ class Flee implements MoveBehavior {
 			int dir = towardsChaser.getAsInt();
 			for (int d : Arrays.asList(Maze.TOPOLOGY.inv(dir), Maze.TOPOLOGY.right(dir),
 					Maze.TOPOLOGY.left(dir))) {
-				OptionalInt neighbor = maze.neighbor(maze.cell(refugee.getTile()), d);
-				if (neighbor.isPresent()
-						&& maze.adjacent(maze.cell(refugee.getTile()), neighbor.getAsInt())) {
+				Optional<Tile> neighbor = maze.neighbor(refugee.getTile(), d);
+				if (neighbor.isPresent() && maze.adjacent(refugee.getTile(), neighbor.get())) {
 					result.dir = d;
 					break;
 				}

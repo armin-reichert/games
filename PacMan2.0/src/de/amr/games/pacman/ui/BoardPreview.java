@@ -37,7 +37,7 @@ public class BoardPreview extends JFrame {
 		maze = Maze.of(Assets.text("maze.txt"));
 		setTitle("Pac-Man Maze Preview");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		GridCanvas canvas = new GridCanvas(maze, TS);
+		GridCanvas canvas = new GridCanvas(maze.getGraph(), TS);
 		canvas.pushRenderer(createRenderer());
 		add(canvas, BorderLayout.CENTER);
 		canvas.drawGrid();
@@ -58,7 +58,7 @@ public class BoardPreview extends JFrame {
 		r.fnCellSize = () -> TS;
 		r.fnPassageWidth = () -> TS - 1;
 		r.fnPassageColor = (cell, dir) -> Color.WHITE;
-		r.fnCellBgColor = cell -> colors.getOrDefault(maze.get(cell), Color.WHITE);
+		r.fnCellBgColor = cell -> colors.getOrDefault(maze.getGraph().get(cell), Color.WHITE);
 		r.fnText = cell -> String.valueOf(maze.getContent(maze.tile(cell)));
 		r.fnTextFont = () -> new Font("Arial Bold", Font.BOLD, TS / 2);
 		return r;
