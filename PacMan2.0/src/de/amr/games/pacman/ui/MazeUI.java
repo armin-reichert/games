@@ -61,9 +61,9 @@ public class MazeUI extends GameEntity {
 		spriteMazeNormal = new Sprite(Spritesheet.getMaze()).scale(getWidth(), getHeight());
 		spriteMazeFlashing = new Sprite(Spritesheet.getMaze(), Spritesheet.getMazeWhite())
 				.scale(getWidth(), getHeight());
-		spriteMazeFlashing.createAnimation(AnimationMode.CYCLIC, 100);
+		spriteMazeFlashing.animation(AnimationMode.CYCLIC, 100);
 		spriteEnergizer = new Sprite(Spritesheet.getEnergizer()).scale(TS, TS);
-		spriteEnergizer.createAnimation(AnimationMode.BACK_AND_FORTH, 250);
+		spriteEnergizer.animation(AnimationMode.BACK_AND_FORTH, 250);
 	}
 
 	public Maze getMaze() {

@@ -1,5 +1,10 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
+import static de.amr.games.pacman.ui.Spritesheet.getPacManStanding;
+import static de.amr.games.pacman.ui.Spritesheet.getPacManWalking;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -36,17 +41,16 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private void createSprites() {
-		spriteStanding = new Sprite(Spritesheet.getPacManStanding()).scale(SPRITE_SIZE, SPRITE_SIZE);
+		spriteStanding = new Sprite(getPacManStanding()).scale(SPRITE_SIZE);
+		spriteDying = new Sprite(getPacManDying()).scale(SPRITE_SIZE).animation(AnimationMode.LINEAR,
+				100);
+		TOPOLOGY.dirs().forEach(dir -> spriteWalking[dir] = new Sprite(getPacManWalking(dir))
+				.scale(SPRITE_SIZE).animation(AnimationMode.BACK_AND_FORTH, 60));
+
+		// TODO remove this:
 		allSprites.add(spriteStanding);
-		Maze.TOPOLOGY.dirs().forEach(dir -> {
-			spriteWalking[dir] = new Sprite(Spritesheet.getPacManWalking(dir)).scale(SPRITE_SIZE,
-					SPRITE_SIZE);
-			spriteWalking[dir].createAnimation(AnimationMode.BACK_AND_FORTH, 60);
-			allSprites.add(spriteWalking[dir]);
-		});
-		spriteDying = new Sprite(Spritesheet.getPacManDying()).scale(SPRITE_SIZE, SPRITE_SIZE);
-		spriteDying.createAnimation(AnimationMode.LINEAR, 100);
 		allSprites.add(spriteDying);
+		TOPOLOGY.dirs().forEach(dir -> allSprites.add(spriteWalking[dir]));
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class Star extends GameEntity {
 
 	public Star() {
 		Sprite sprite = new Sprite("blink_00", "blink_01", "blink_02");
-		sprite.createAnimation(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
+		sprite.animation(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
 		setSprites(sprite);
 	}
 }
