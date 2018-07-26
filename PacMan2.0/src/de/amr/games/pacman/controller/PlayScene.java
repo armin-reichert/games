@@ -58,26 +58,35 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	};
 
 	private final StateMachine<State, GameEvent> fsm;
+	private final Game game = new Game();
 	private final Maze maze;
-	private final Game game;
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI status;
 
-	private PacMan pacMan;
-	private Ghost blinky, pinky, inky, clyde;
+	private final PacMan pacMan;
+	private final Ghost blinky, pinky, inky, clyde;
 
 	public PlayScene(PacManApp app, Maze maze) {
 		super(app);
 		this.maze = maze;
-		game = new Game();
+
+		// Actors
+		pacMan = createPacMan();
+		blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
+		pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
+		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
+		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
+		configureGhosts();
+		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
+
+		// Scene
 		mazeUI = new MazeUI(maze);
 		mazeUI.observers.addObserver(this);
+		mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
 		hud = new HUD(game);
 		status = new StatusUI(game);
-		createLayout();
-		createPacManAndFriends();
-		mazeUI.populate(pacMan, blinky, pinky, inky, clyde);
+		buildLayout();
 
 		fsm = new StateMachine<>("Play scene control", State.class, State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
@@ -129,12 +138,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.CHANGING_LEVEL).entry = state -> {
 			state.setDuration(sec(4));
 			mazeUI.setFlashing(true);
-			initNextLevel();
 		};
 
 		fsm.state(State.CHANGING_LEVEL).update = state -> {
 			if (state.getRemaining() == state.getDuration() / 2) {
 				mazeUI.setFlashing(false);
+				initNextLevel();
 			}
 		};
 
@@ -221,19 +230,15 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		return app.pulse.secToTicks(seconds);
 	}
 
-	private void createPacManAndFriends() {
-		pacMan = new PacMan(maze, maze.pacManHome);
-		blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
-		pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
-		inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
-		clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
-		pacMan.interestingThings.addAll(Arrays.asList(blinky, pinky, inky, clyde));
-
-		getGhosts().forEach(ghost -> ghost.observers.addObserver(this));
+	private PacMan createPacMan() {
+		PacMan pacMan = new PacMan(maze, maze.pacManHome);
 		pacMan.observers.addObserver(this);
-
-		// define move behavior
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		return pacMan;
+	}
+
+	private void configureGhosts() {
+		getGhosts().forEach(ghost -> ghost.observers.addObserver(this));
 		getGhosts().forEach(ghost -> {
 			ghost.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 			ghost.setMoveBehavior(Ghost.State.DEAD, goHome());
@@ -245,7 +250,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
 	}
 
-	private void createLayout() {
+	private void buildLayout() {
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
 		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
