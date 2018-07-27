@@ -62,7 +62,7 @@ public class Game {
 	public int ghostIndex;
 
 	public void init(Maze maze) {
-		maze.init();
+		maze.resetFood();
 		level = 1;
 		livesLeft = 3;
 		score = 0;

@@ -22,15 +22,18 @@ public class Maze {
 	private final String[] data;
 	private final GridGraph<Character, Integer> graph;
 
-	public void init() {
-		readContent();
+	public void resetFood() {
+		tiles().filter(tile -> Tile.isFood(data(tile.row, tile.col))).forEach(tile -> {
+			setContent(tile, data(tile.row, tile.col));
+		});
 	}
 
 	public Maze(String map) {
 		data = map.split("\n");
 		int numCols = data[0].length(), numRows = data.length;
-		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, Tile.EMPTY, (u, v) -> 1,
+		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, v -> Tile.EMPTY, (u, v) -> 1,
 				UndirectedEdge::new);
+		graph.setDefaultVertexLabel(v -> data(graph.row(v), graph.col(v)));
 		for (int row = 0; row < numRows; ++row) {
 			for (int col = 0; col < numCols; ++col) {
 				char c = data(row, col);
@@ -49,7 +52,6 @@ public class Maze {
 				}
 			}
 		}
-		readContent();
 		graph.fill();
 		graph.edges().filter(edge -> {
 			int u = edge.either(), v = edge.other();
@@ -60,13 +62,6 @@ public class Maze {
 
 	private char data(int row, int col) {
 		return data[row].charAt(col);
-	}
-
-	private void readContent() {
-		graph.vertices().forEach(v -> {
-			char c = data(graph.row(v), graph.col(v));
-			graph.set(v, c);
-		});
 	}
 
 	public GridGraph<Character, Integer> getGraph() {

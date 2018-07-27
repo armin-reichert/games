@@ -292,7 +292,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.level += 1;
 		game.dotsEaten = 0;
 		game.ghostIndex = 0;
-		maze.init();
+		maze.resetFood();
 		initEntities();
 	}
 
