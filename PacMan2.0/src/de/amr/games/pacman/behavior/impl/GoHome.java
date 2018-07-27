@@ -9,8 +9,8 @@ class GoHome implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.path = mover.getMaze().findPath(mover.getTile(), mover.getHome());
-		result.dir = mover.getMaze().dirAlongPath(result.path).orElse(mover.getNextMoveDirection());
+		result.path = mover.maze.findPath(mover.getTile(), mover.homeTile);
+		result.dir = mover.maze.dirAlongPath(result.path).orElse(mover.getIntendedDirection());
 		return result;
 	}
 }

@@ -55,7 +55,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public Sprite currentSprite() {
 		if (getState() == State.ALIVE) {
-			int dir = getMoveDirection();
+			int dir = getDirection();
 			return canMove(dir) ? s_walking[dir] : s_standing;
 		} else {
 			return s_dying;
@@ -69,7 +69,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 		move();
 		Tile tile = getTile();
-		char content = getMaze().getContent(tile);
+		char content = maze.getContent(tile);
 		if (isFood(content)) {
 			observers.fireGameEvent(new FoodFoundEvent(tile, content));
 			return;

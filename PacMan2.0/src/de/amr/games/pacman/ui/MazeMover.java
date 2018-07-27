@@ -3,6 +3,7 @@ package de.amr.games.pacman.ui;
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.PacManApp.TS;
+import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
 import static java.lang.Math.round;
@@ -16,7 +17,6 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.behavior.MoveBehavior;
-import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.behavior.impl.Behaviors;
 import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
@@ -31,41 +31,31 @@ public abstract class MazeMover<S> extends GameEntity {
 	public static int SPRITE_SIZE = 2 * TS;
 
 	public final GameEventSupport observers = new GameEventSupport();
-
-	private final Maze maze;
-	private final Tile home;
-	private final Map<S, MoveBehavior> moveBehavior;
-	private final MoveBehavior defaultMoveBehavior;
+	public final Maze maze;
+	public final Tile homeTile;
+	private final Map<S, MoveBehavior> behaviorMap;
 	private Function<MazeMover<S>, Float> fnSpeed;
-	private int moveDirection;
-	private int nextMoveDirection;
+	private int direction;
+	private int intendedDirection;
 	private S state;
 	private long stateEntryTime;
 
-	protected MazeMover(Maze maze, Tile home, Map<S, MoveBehavior> moveBehavior) {
+	protected MazeMover(Maze maze, Tile homeTile, Map<S, MoveBehavior> behavior) {
 		Objects.requireNonNull(maze);
-		Objects.requireNonNull(home);
+		Objects.requireNonNull(homeTile);
+		Objects.requireNonNull(behavior);
 		this.maze = maze;
-		this.home = home;
-		this.moveBehavior = moveBehavior;
-		this.defaultMoveBehavior = Behaviors.forward();
-	}
-
-	public Maze getMaze() {
-		return maze;
-	}
-
-	public Tile getHome() {
-		return home;
+		this.homeTile = homeTile;
+		this.behaviorMap = behavior;
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		// draw sprite centered over collision box
-		int offsetX = (getWidth() - SPRITE_SIZE) / 2, offsetY = (getHeight() - SPRITE_SIZE) / 2;
-		g.translate(offsetX, offsetY);
+		// center sprite over collision box
+		int dx = (getWidth() - SPRITE_SIZE) / 2, dy = (getHeight() - SPRITE_SIZE) / 2;
+		g.translate(dx, dy);
 		super.draw(g);
-		g.translate(-offsetX, -offsetY);
+		g.translate(-dx, -dy);
 	}
 
 	@Override
@@ -99,12 +89,12 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// Movement
 
-	public void setMoveBehavior(S state, MoveBehavior behavior) {
-		moveBehavior.put(state, behavior);
+	public void setBehavior(S state, MoveBehavior behavior) {
+		this.behaviorMap.put(state, behavior);
 	}
 
-	public MoveBehavior currentMoveBehavior() {
-		return moveBehavior.getOrDefault(getState(), defaultMoveBehavior);
+	public MoveBehavior getBehavior() {
+		return behaviorMap.getOrDefault(getState(), Behaviors.forward());
 	}
 
 	public float getSpeed() {
@@ -115,28 +105,28 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.fnSpeed = speed;
 	}
 
-	public int getMoveDirection() {
-		return moveDirection;
+	public int getDirection() {
+		return direction;
 	}
 
-	public void setMoveDirection(int moveDirection) {
-		this.moveDirection = moveDirection;
+	public void setDirection(int dir) {
+		this.direction = dir;
 	}
 
-	public int getNextMoveDirection() {
-		return nextMoveDirection;
+	public int getIntendedDirection() {
+		return intendedDirection;
 	}
 
-	public void setNextMoveDirection(int nextMoveDirection) {
-		this.nextMoveDirection = nextMoveDirection;
+	public void setIntendedDirection(int dir) {
+		this.intendedDirection = dir;
 	}
 
-	public void setTile(int col, int row) {
+	public void placeAt(int col, int row) {
 		tf.moveTo(col * TS, row * TS);
 	}
 
-	public void setTile(Tile tile) {
-		setTile(tile.col, tile.row);
+	public void placeAt(Tile tile) {
+		placeAt(tile.col, tile.row);
 	}
 
 	public Tile getTile() {
@@ -144,13 +134,11 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public int row() {
-		float centerY = tf.getY() + getHeight() / 2;
-		return round(centerY) / TS;
+		return round(tf.getY() + getHeight() / 2) / TS;
 	}
 
 	public int col() {
-		float centerX = tf.getX() + getWidth() / 2;
-		return round(centerX) / TS;
+		return round(tf.getX() + getWidth() / 2) / TS;
 	}
 
 	public boolean isExactlyOverTile() {
@@ -158,43 +146,43 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void move() {
-		Route route = currentMoveBehavior().getRoute(this);
-		nextMoveDirection = route.getNextMoveDirection();
-		if (canMove(nextMoveDirection)) {
-			moveDirection = nextMoveDirection;
-		}
-		Tile currentTile = getTile();
-		if (maze.getContent(currentTile) == WORMHOLE) {
-			if (moveDirection == Top4.E && currentTile.col == maze.numCols() - 1
-					|| moveDirection == Top4.W && currentTile.col == 0) {
-				setTile(maze.numCols() - 1 - currentTile.col, currentTile.row);
+		Tile tile = getTile();
+		if (maze.getContent(tile) == WORMHOLE) {
+			if (direction == Top4.E && tile.col == maze.numCols() - 1
+					|| direction == Top4.W && tile.col == 0) {
+				placeAt(maze.numCols() - 1 - tile.col, tile.row);
 			}
 		}
-		if (canMove(moveDirection)) {
-			tf.moveTo(computeMovePosition(moveDirection, fnSpeed.apply(this)));
-		} else { // adjust exactly over tile
-			setTile(currentTile);
+		intendedDirection = getBehavior().getRoute(this).getDirection();
+		if (canMove(intendedDirection)) {
+			direction = intendedDirection;
+		}
+		if (canMove(direction)) {
+			tf.moveTo(computePosition(direction, fnSpeed.apply(this)));
+		} else {
+			// adjust exactly over tile
+			placeAt(tile);
 		}
 	}
 
 	public boolean canMove(int dir) {
-		Tile currentTile = getTile(), touchedTile = computeTouchedTile(currentTile, dir);
-		if (currentTile.equals(touchedTile)) {
+		Tile tile = getTile(), touched = computeTouchedTile(tile, dir);
+		if (tile.equals(touched)) {
 			return true;
 		}
-		if (!maze.isValidTile(touchedTile) || maze.getContent(touchedTile) == WALL) {
+		if (!maze.isValidTile(touched) || maze.getContent(touched) == WALL) {
 			return false;
 		}
-		if (dir == Maze.TOPOLOGY.right(moveDirection) || dir == Maze.TOPOLOGY.left(moveDirection)) {
-			setTile(getTile()); // TODO improve
+		if (dir == TOPOLOGY.right(direction) || dir == TOPOLOGY.left(direction)) {
+			placeAt(getTile()); // TODO
 			return isExactlyOverTile();
 		}
 		return true;
 	}
 
 	public Tile computeTouchedTile(Tile currentTile, int dir) {
-		Vector2f newPosition = computeMovePosition(dir, fnSpeed.apply(this));
-		float x = newPosition.x, y = newPosition.y;
+		Vector2f newPos = computePosition(dir, fnSpeed.apply(this));
+		float x = newPos.x, y = newPos.y;
 		switch (dir) {
 		case Top4.W:
 			return new Tile(round(x) / TS, currentTile.row);
@@ -209,10 +197,8 @@ public abstract class MazeMover<S> extends GameEntity {
 		}
 	}
 
-	private Vector2f computeMovePosition(int dir, float speed) {
-		Vector2f dirVector = Vector2f.of(Maze.TOPOLOGY.dx(dir), Maze.TOPOLOGY.dy(dir));
-		Vector2f velocity = smul(speed, dirVector);
-		// TODO insert micro-move such that taking turn is always possible
-		return sum(tf.getPosition(), velocity);
+	private Vector2f computePosition(int dir, float speed) {
+		Vector2f v = Vector2f.of(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
+		return sum(tf.getPosition(), smul(speed, v));
 	}
 }

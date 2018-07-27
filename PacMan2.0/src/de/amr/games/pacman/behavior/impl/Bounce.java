@@ -11,17 +11,17 @@ class Bounce implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> bouncer) {
 		RouteData result = new RouteData();
-		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getMoveDirection())
-				: bouncer.getMoveDirection();
+		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getDirection())
+				: bouncer.getDirection();
 		return result;
 	}
 
 	private boolean isReflected(MazeMover<?> bouncer) {
-		Tile touchedTile = bouncer.computeTouchedTile(bouncer.getTile(), bouncer.getMoveDirection());
+		Tile touchedTile = bouncer.computeTouchedTile(bouncer.getTile(), bouncer.getDirection());
 		if (touchedTile.equals(bouncer.getTile())) {
 			return false;
 		}
-		char c = bouncer.getMaze().getContent(touchedTile);
+		char c = bouncer.maze.getContent(touchedTile);
 		return c == Tile.WALL || c == Tile.DOOR;
 	}
 }

@@ -18,8 +18,8 @@ class Chase implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> chaser) {
 		RouteData result = new RouteData();
-		result.path = chaser.getMaze().findPath(chaser.getTile(), victim.getTile());
-		result.dir = chaser.getMaze().dirAlongPath(result.path).orElse(chaser.getNextMoveDirection());
+		result.path = chaser.maze.findPath(chaser.getTile(), victim.getTile());
+		result.dir = chaser.maze.dirAlongPath(result.path).orElse(chaser.getIntendedDirection());
 		return result;
 	}
 }

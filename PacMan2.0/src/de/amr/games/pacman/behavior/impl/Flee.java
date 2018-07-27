@@ -21,8 +21,8 @@ class Flee implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> refugee) {
 		RouteData result = new RouteData();
-		result.dir = refugee.getNextMoveDirection();
-		Maze maze = chaser.getMaze();
+		result.dir = refugee.getIntendedDirection();
+		Maze maze = chaser.maze;
 		OptionalInt towardsChaser = maze
 				.dirAlongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
 		if (towardsChaser.isPresent()) {

@@ -61,7 +61,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		int dir = getMoveDirection();
+		int dir = getDirection();
 		switch (getState()) {
 		case ATTACKING:
 		case RECOVERING:
@@ -96,7 +96,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case DEAD:
 			move();
-			if (getTile().equals(getHome())) {
+			if (getTile().equals(homeTile)) {
 				observers.fireGameEvent(new GhostDeadIsOverEvent(this));
 			}
 			break;

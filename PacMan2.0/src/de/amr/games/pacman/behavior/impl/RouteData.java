@@ -12,7 +12,7 @@ class RouteData implements Route {
 	List<Tile> path = new ArrayList<>();
 
 	@Override
-	public int getNextMoveDirection() {
+	public int getDirection() {
 		return dir;
 	}
 

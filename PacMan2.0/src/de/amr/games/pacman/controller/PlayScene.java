@@ -218,36 +218,36 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private PacMan createPacMan() {
 		PacMan pacMan = new PacMan(maze, maze.pacManHome);
 		pacMan.observers.addObserver(this);
-		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		pacMan.setBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		return pacMan;
 	}
 
 	private Ghost createBlinky() {
 		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.observers.addObserver(this);
-		blinky.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
-		blinky.setMoveBehavior(Ghost.State.DEAD, goHome());
-		blinky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
-		blinky.setMoveBehavior(Ghost.State.ATTACKING, chase(pacMan));
+		blinky.setBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
+		blinky.setBehavior(Ghost.State.DEAD, goHome());
+		blinky.setBehavior(Ghost.State.RECOVERING, bounce());
+		blinky.setBehavior(Ghost.State.ATTACKING, chase(pacMan));
 		return blinky;
 	}
 
 	private Ghost createPinky() {
 		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.observers.addObserver(this);
-		pinky.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
-		pinky.setMoveBehavior(Ghost.State.DEAD, goHome());
-		pinky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
-		pinky.setMoveBehavior(Ghost.State.ATTACKING, ambush(pacMan));
+		pinky.setBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
+		pinky.setBehavior(Ghost.State.DEAD, goHome());
+		pinky.setBehavior(Ghost.State.RECOVERING, bounce());
+		pinky.setBehavior(Ghost.State.ATTACKING, ambush(pacMan));
 		return pinky;
 	}
 
 	private Ghost createInky() {
 		Ghost inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		inky.observers.addObserver(this);
-		inky.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
-		inky.setMoveBehavior(Ghost.State.DEAD, goHome());
-		inky.setMoveBehavior(Ghost.State.RECOVERING, bounce());
+		inky.setBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
+		inky.setBehavior(Ghost.State.DEAD, goHome());
+		inky.setBehavior(Ghost.State.RECOVERING, bounce());
 		// inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
 		return inky;
 	}
@@ -255,9 +255,9 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private Ghost createClyde() {
 		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.observers.addObserver(this);
-		clyde.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
-		clyde.setMoveBehavior(Ghost.State.DEAD, goHome());
-		clyde.setMoveBehavior(Ghost.State.RECOVERING, bounce());
+		clyde.setBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
+		clyde.setBehavior(Ghost.State.DEAD, goHome());
+		clyde.setBehavior(Ghost.State.RECOVERING, bounce());
 		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
 		return clyde;
 	}
@@ -270,19 +270,19 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void initEntities() {
 		pacMan.setState(PacMan.State.ALIVE);
-		pacMan.setTile(maze.pacManHome);
+		pacMan.placeAt(maze.pacManHome);
 		pacMan.setSpeed(game::getPacManSpeed);
-		pacMan.setMoveDirection(Top4.E);
-		pacMan.setNextMoveDirection(Top4.E);
+		pacMan.setDirection(Top4.E);
+		pacMan.setIntendedDirection(Top4.E);
 
-		blinky.setMoveDirection(Top4.E);
-		pinky.setMoveDirection(Top4.S);
-		inky.setMoveDirection(Top4.N);
-		clyde.setMoveDirection(Top4.N);
+		blinky.setDirection(Top4.E);
+		pinky.setDirection(Top4.S);
+		inky.setDirection(Top4.N);
+		clyde.setDirection(Top4.N);
 
 		mazeUI.getGhosts().forEach(ghost -> {
 			ghost.setState(Ghost.State.RECOVERING);
-			ghost.setTile(ghost.getHome());
+			ghost.placeAt(ghost.homeTile);
 			ghost.setSpeed(game::getGhostSpeed);
 		});
 	}

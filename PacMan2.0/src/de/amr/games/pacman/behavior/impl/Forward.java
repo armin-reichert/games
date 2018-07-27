@@ -9,7 +9,7 @@ class Forward implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.dir = mover.getNextMoveDirection();
+		result.dir = mover.getIntendedDirection();
 		return result;
 	}
 }

@@ -20,7 +20,7 @@ class FollowKeyboard implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.dir = mover.getNextMoveDirection();
+		result.dir = mover.getIntendedDirection();
 		if (Keyboard.keyDown(nesw[0])) {
 			result.dir = Top4.N;
 		}

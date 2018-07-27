@@ -6,7 +6,7 @@ import de.amr.games.pacman.model.Tile;
 
 public interface Route {
 
-	int getNextMoveDirection();
+	int getDirection();
 
 	List<Tile> getPath();
 }

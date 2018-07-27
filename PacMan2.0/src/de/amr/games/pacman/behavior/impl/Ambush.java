@@ -22,21 +22,21 @@ class Ambush implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> ambusher) {
 		RouteData result = new RouteData();
-		Maze maze = victim.getMaze();
+		Maze maze = victim.maze;
 		Optional<Tile> fourAhead = ahead(4, victim);
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {
 			result.path = maze.findPath(ambusher.getTile(), fourAhead.get());
 		} else {
 			result.path = maze.findPath(ambusher.getTile(), victim.getTile());
 		}
-		result.dir = maze.dirAlongPath(result.path).orElse(ambusher.getNextMoveDirection());
+		result.dir = maze.dirAlongPath(result.path).orElse(ambusher.getIntendedDirection());
 		return result;
 	}
 
 	private Optional<Tile> ahead(int n, MazeMover<?> refugee) {
 		Tile current = refugee.getTile();
 		for (int i = 0; i < n; ++i) {
-			Optional<Tile> next = refugee.getMaze().neighborTile(current, refugee.getMoveDirection());
+			Optional<Tile> next = refugee.maze.neighborTile(current, refugee.getDirection());
 			if (next.isPresent()) {
 				current = next.get();
 			}
