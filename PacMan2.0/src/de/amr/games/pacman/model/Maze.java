@@ -95,7 +95,7 @@ public class Maze {
 	public void clearTile(Tile tile) {
 		graph.set(cell(tile), Tile.EMPTY);
 	}
-	
+
 	public OptionalInt direction(Tile t1, Tile t2) {
 		return graph.direction(cell(t1), cell(t2));
 	}

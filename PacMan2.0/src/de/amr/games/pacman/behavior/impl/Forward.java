@@ -7,7 +7,7 @@ import de.amr.games.pacman.ui.MazeMover;
 class Forward implements MoveBehavior {
 
 	@Override
-	public Route apply(MazeMover<?> mover) {
+	public Route getRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
 		result.dir = mover.getNextMoveDirection();
 		return result;

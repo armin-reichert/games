@@ -20,7 +20,7 @@ class Ambush implements MoveBehavior {
 	}
 
 	@Override
-	public Route apply(MazeMover<?> ambusher) {
+	public Route getRoute(MazeMover<?> ambusher) {
 		RouteData result = new RouteData();
 		Maze maze = victim.getMaze();
 		Optional<Tile> fourAhead = ahead(4, victim);

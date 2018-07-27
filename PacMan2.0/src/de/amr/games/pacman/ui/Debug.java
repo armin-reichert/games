@@ -164,7 +164,7 @@ public class Debug {
 
 	private static void drawGhostPaths(Graphics2D g, PlayScene scene) {
 		scene.mazeUI.getGhosts().forEach(ghost -> {
-			Route route = ghost.currentMoveBehavior().apply(ghost);
+			Route route = ghost.currentMoveBehavior().getRoute(ghost);
 			List<Tile> path = route.getPath();
 			if (path.size() > 1) {
 				switch (ghost.getColor()) {

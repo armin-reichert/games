@@ -9,7 +9,7 @@ import de.amr.games.pacman.ui.MazeMover;
 class Bounce implements MoveBehavior {
 
 	@Override
-	public Route apply(MazeMover<?> bouncer) {
+	public Route getRoute(MazeMover<?> bouncer) {
 		RouteData result = new RouteData();
 		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getMoveDirection())
 				: bouncer.getMoveDirection();

@@ -16,7 +16,7 @@ public class Game {
 	public static final int DOTS_BONUS_2 = 170;
 
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
-	
+
 	public static IntSupplier fnPulse = () -> 60;
 
 	/** Tiles per second. */

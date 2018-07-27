@@ -158,7 +158,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void move() {
-		Route route = currentMoveBehavior().apply(this);
+		Route route = currentMoveBehavior().getRoute(this);
 		nextMoveDirection = route.getNextMoveDirection();
 		if (canMove(nextMoveDirection)) {
 			moveDirection = nextMoveDirection;
