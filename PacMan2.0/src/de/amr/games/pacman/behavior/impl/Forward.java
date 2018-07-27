@@ -7,7 +7,7 @@ import de.amr.games.pacman.ui.MazeMover;
 class Forward implements RoutePlanner {
 
 	@Override
-	public Route getRoute(MazeMover<?> mover) {
+	public Route computeRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
 		result.dir = mover.getNextDir();
 		return result;

@@ -13,7 +13,7 @@ import de.amr.games.pacman.ui.MazeMover;
 class Moody implements RoutePlanner {
 
 	@Override
-	public Route getRoute(MazeMover<?> mover) {
+	public Route computeRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
 		result.dir = randomElement(
 				Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(mover.getDir())))

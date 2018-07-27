@@ -74,7 +74,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			Debug.LOG.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
+			PlaySceneInfo.LOG.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
 		}
 	}
 
@@ -152,7 +152,7 @@ public abstract class MazeMover<S> extends GameEntity {
 				placeAt(maze.numCols() - 1 - tile.col, tile.row);
 			}
 		}
-		nextDir = getNavigation().getRoute(this).getDirection();
+		nextDir = getNavigation().computeRoute(this).getDirection();
 		if (canMove(nextDir)) {
 			dir = nextDir;
 		}

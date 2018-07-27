@@ -15,7 +15,7 @@ public class Spritesheet {
 
 	public static final int RED_GHOST = 0;
 	public static final int PINK_GHOST = 1;
-	public static final int BLUE_GHOST = 2;
+	public static final int TURQUOISE_GHOST = 2;
 	public static final int ORANGE_GHOST = 3;
 
 	private static BufferedImage sheet = Assets.readImage("sprites.png");

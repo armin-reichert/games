@@ -9,7 +9,7 @@ import de.amr.games.pacman.ui.MazeMover;
 class Bounce implements RoutePlanner {
 
 	@Override
-	public Route getRoute(MazeMover<?> bouncer) {
+	public Route computeRoute(MazeMover<?> bouncer) {
 		RouteData result = new RouteData();
 		result.dir = isReflected(bouncer) ? Maze.TOPOLOGY.inv(bouncer.getDir())
 				: bouncer.getDir();

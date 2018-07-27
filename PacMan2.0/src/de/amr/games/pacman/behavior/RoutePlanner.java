@@ -4,6 +4,6 @@ import de.amr.games.pacman.ui.MazeMover;
 
 public interface RoutePlanner {
 
-	Route getRoute(MazeMover<?> mover);
+	Route computeRoute(MazeMover<?> mover);
 
 }

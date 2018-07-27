@@ -19,7 +19,7 @@ class Flee implements RoutePlanner {
 	}
 
 	@Override
-	public Route getRoute(MazeMover<?> refugee) {
+	public Route computeRoute(MazeMover<?> refugee) {
 		RouteData result = new RouteData();
 		result.dir = refugee.getNextDir();
 		Maze maze = chaser.maze;

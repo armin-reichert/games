@@ -7,7 +7,7 @@ import de.amr.games.pacman.ui.MazeMover;
 class GoHome implements RoutePlanner {
 
 	@Override
-	public Route getRoute(MazeMover<?> mover) {
+	public Route computeRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
 		result.path = mover.maze.findPath(mover.getTile(), mover.homeTile);
 		result.dir = mover.maze.dirAlongPath(result.path).orElse(mover.getNextDir());

@@ -8,7 +8,7 @@ import static de.amr.games.pacman.behavior.impl.NavigationSystem.flee;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.followKeyboard;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.goHome;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.TURQUOISE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
@@ -37,7 +37,7 @@ import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.Debug;
+import de.amr.games.pacman.ui.PlaySceneInfo;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
@@ -93,7 +93,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm = new StateMachine<>("Game control", State.class, State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
-		fsm.setLogger(Debug.LOG);
+		fsm.setLogger(PlaySceneInfo.LOG);
 
 		// -- READY
 
@@ -200,7 +200,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	 */
 	@Override
 	public void update() {
-		Debug.update(this);
+		PlaySceneInfo.update(this);
 		fsm.update();
 	}
 
@@ -209,7 +209,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		hud.draw(g);
 		mazeUI.draw(g);
 		status.draw(g);
-		Debug.draw(g, this);
+		PlaySceneInfo.draw(g, this);
 	}
 
 	private int sec(float seconds) {
@@ -244,7 +244,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private Ghost createInky() {
-		Ghost inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
+		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
 		inky.observers.addObserver(this);
 		inky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
@@ -329,12 +329,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
 		PacManKilledEvent e = event(t);
-		Debug.LOG.info(
+		PlaySceneInfo.LOG.info(
 				() -> String.format("PacMan got killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onGhostKilled(Ghost ghost) {
-		Debug.LOG
+		PlaySceneInfo.LOG
 				.info(() -> String.format("Ghost %s got killed at %s", ghost.getName(), ghost.getTile()));
 		ghost.killAndShowPoints(game.ghostIndex, sec(1));
 		game.score += Game.GHOST_POINTS[game.ghostIndex];
@@ -355,7 +355,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			mazeUI.showBonus(BonusSymbol.STRAWBERRY, 100, sec(5));
 		}
 		if (e.food == ENERGIZER) {
-			Debug.LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
+			PlaySceneInfo.LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
 			game.score += Game.ENERGIZER_VALUE;
 			game.ghostIndex = 0;
 			startGhostHunting();
@@ -366,7 +366,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
 		BonusFoundEvent e = event(t);
-		Debug.LOG.info(() -> String.format("PacMan found bonus %s at %s", e.bonus, e.tile));
+		PlaySceneInfo.LOG.info(() -> String.format("PacMan found bonus %s at %s", e.bonus, e.tile));
 		game.score += e.bonus.getValue();
 		mazeUI.honorBonus(sec(2));
 	}

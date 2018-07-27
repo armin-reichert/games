@@ -20,7 +20,7 @@ class Ambush implements RoutePlanner {
 	}
 
 	@Override
-	public Route getRoute(MazeMover<?> ambusher) {
+	public Route computeRoute(MazeMover<?> ambusher) {
 		RouteData result = new RouteData();
 		Maze maze = victim.maze;
 		Optional<Tile> fourAhead = ahead(4, victim);

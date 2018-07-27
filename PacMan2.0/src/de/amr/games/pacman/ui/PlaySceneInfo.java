@@ -11,23 +11,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
-import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.controller.PlayScene;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-public class Debug {
-	
-	public static final Logger LOG = Logger.getLogger(Debug.class.getSimpleName());
-	
+public class PlaySceneInfo {
+
+	public static final Logger LOG = Logger.getLogger(PlaySceneInfo.class.getSimpleName());
+
 	static {
 		LOG.setLevel(Level.OFF);
 	}
-	
+
 	private static boolean show_grid;
 	private static boolean show_ghost_route;
 	private static boolean show_entity_state;
-	
+
 	public static void update(PlayScene scene) {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
 			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
@@ -72,7 +71,6 @@ public class Debug {
 		} else {
 			scene.mazeUI.addGhost(ghost);
 		}
-
 	}
 
 	public static void draw(Graphics2D g, PlayScene scene) {
@@ -80,7 +78,7 @@ public class Debug {
 			drawGrid(g, scene.mazeUI);
 		}
 		if (show_ghost_route) {
-			drawGhostPaths(g, scene);
+			scene.mazeUI.getGhosts().forEach(ghost -> drawGhostPath(g, ghost, scene.mazeUI));
 		}
 		if (show_entity_state) {
 			drawPacManTilePosition(g, scene);
@@ -124,8 +122,8 @@ public class Debug {
 
 	private static Color color(Ghost ghost) {
 		switch (ghost.getColor()) {
-		case Spritesheet.BLUE_GHOST:
-			return Color.BLUE;
+		case Spritesheet.TURQUOISE_GHOST:
+			return new Color(64, 224, 208);
 		case Spritesheet.ORANGE_GHOST:
 			return Color.ORANGE;
 		case Spritesheet.PINK_GHOST:
@@ -157,41 +155,25 @@ public class Debug {
 		}
 	}
 
-	private static void drawGhostPaths(Graphics2D g, PlayScene scene) {
-		scene.mazeUI.getGhosts().forEach(ghost -> {
-			Route route = ghost.getNavigation().getRoute(ghost);
-			List<Tile> path = route.getPath();
-			if (path.size() > 1) {
-				switch (ghost.getColor()) {
-				case Spritesheet.RED_GHOST:
-					g.setColor(Color.RED);
-					break;
-				case Spritesheet.PINK_GHOST:
-					g.setColor(Color.PINK);
-					break;
-				case Spritesheet.BLUE_GHOST:
-					g.setColor(Color.BLUE);
-					break;
-				case Spritesheet.ORANGE_GHOST:
-					g.setColor(Color.ORANGE);
-					break;
-				}
-				g.translate(scene.mazeUI.tf.getX(), scene.mazeUI.tf.getY());
-				for (int i = 0; i < path.size() - 1; ++i) {
-					Tile u = path.get(i), v = path.get(i + 1);
-					int u1 = u.col * TS + TS / 2;
-					int u2 = u.row * TS + TS / 2;
-					int v1 = v.col * TS + TS / 2;
-					int v2 = v.row * TS + TS / 2;
-					g.drawLine(u1, u2, v1, v2);
-				}
-				// Target tile
-				Tile tile = path.get(path.size() - 1);
-				g.translate(tile.col * TS, tile.row * TS);
-				g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
-				g.translate(-tile.col * TS, -tile.row * TS);
-				g.translate(-scene.mazeUI.tf.getX(), -scene.mazeUI.tf.getY());
+	private static void drawGhostPath(Graphics2D g, Ghost ghost, MazeUI mazeUI) {
+		List<Tile> path = ghost.getNavigation().computeRoute(ghost).getPath();
+		if (path.size() > 1) {
+			g.setColor(color(ghost));
+			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+			for (int i = 0; i < path.size() - 1; ++i) {
+				Tile u = path.get(i), v = path.get(i + 1);
+				int u1 = u.col * TS + TS / 2;
+				int u2 = u.row * TS + TS / 2;
+				int v1 = v.col * TS + TS / 2;
+				int v2 = v.row * TS + TS / 2;
+				g.drawLine(u1, u2, v1, v2);
 			}
-		});
+			// Target tile
+			Tile tile = path.get(path.size() - 1);
+			g.translate(tile.col * TS, tile.row * TS);
+			g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
+			g.translate(-tile.col * TS, -tile.row * TS);
+			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+		}
 	}
 }
