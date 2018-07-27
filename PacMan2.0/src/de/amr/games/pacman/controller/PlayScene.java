@@ -161,12 +161,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.DYING).entry = state -> {
 			state.setDuration(sec(3));
 			pacMan.setState(PacMan.State.DYING);
-			game.livesLeft -= 1;
+			game.lives -= 1;
 		};
 
-		fsm.changeOnTimeout(State.DYING, State.GAME_OVER, () -> game.livesLeft == 0);
+		fsm.changeOnTimeout(State.DYING, State.GAME_OVER, () -> game.lives == 0);
 
-		fsm.changeOnTimeout(State.DYING, State.PLAYING, () -> game.livesLeft > 0, t -> {
+		fsm.changeOnTimeout(State.DYING, State.PLAYING, () -> game.lives > 0, t -> {
 			pacMan.currentSprite().resetAnimation();
 			initActors();
 		});
@@ -229,6 +229,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.observers.addObserver(this);
 		blinky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		blinky.setNavigation(Ghost.State.FRIGHTENED_ENDING, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
 		blinky.setNavigation(Ghost.State.RECOVERING, bounce());
 		blinky.setNavigation(Ghost.State.ATTACKING, chase(pacMan));
@@ -239,6 +240,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.observers.addObserver(this);
 		pinky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		pinky.setNavigation(Ghost.State.FRIGHTENED_ENDING, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
 		pinky.setNavigation(Ghost.State.RECOVERING, bounce());
 		pinky.setNavigation(Ghost.State.ATTACKING, ambush(pacMan));
@@ -249,6 +251,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
 		inky.observers.addObserver(this);
 		inky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		inky.setNavigation(Ghost.State.FRIGHTENED_ENDING, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.RECOVERING, bounce());
 		// inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
@@ -259,6 +262,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.observers.addObserver(this);
 		clyde.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		clyde.setNavigation(Ghost.State.FRIGHTENED_ENDING, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
 		clyde.setNavigation(Ghost.State.RECOVERING, bounce());
 		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
@@ -292,7 +296,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void nextLevel() {
 		game.level += 1;
-		game.dotsEaten = 0;
+		game.foodEaten = 0;
 		game.ghostIndex = 0;
 		maze.resetFood();
 		initActors();
@@ -346,14 +350,14 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
 		FoodFoundEvent e = event(t);
 		maze.clearTile(e.tile);
-		game.dotsEaten += 1;
-		if (game.dotsEaten == game.dotsTotal) {
+		game.foodEaten += 1;
+		if (game.foodEaten == game.foodTotal) {
 			fsm.enqueue(new NextLevelEvent());
 			return;
 		}
-		if (game.dotsEaten == Game.DOTS_BONUS_1) {
+		if (game.foodEaten == Game.DOTS_BONUS_1) {
 			mazeUI.showBonus(BonusSymbol.CHERRIES, 100, sec(5));
-		} else if (game.dotsEaten == Game.DOTS_BONUS_2) {
+		} else if (game.foodEaten == Game.DOTS_BONUS_2) {
 			mazeUI.showBonus(BonusSymbol.STRAWBERRY, 100, sec(5));
 		}
 		if (e.food == ENERGIZER) {

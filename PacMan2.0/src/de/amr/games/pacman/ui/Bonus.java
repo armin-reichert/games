@@ -7,10 +7,9 @@ import java.util.Arrays;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
+import de.amr.games.pacman.model.Game;
 
 public class Bonus extends GameEntity {
-
-	private static final int[] POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
 	private boolean honored;
 	private BonusSymbol symbol;
@@ -23,7 +22,7 @@ public class Bonus extends GameEntity {
 		this.points = points;
 		this.honored = false;
 		spriteSymbol = new Sprite(Spritesheet.getBonus(symbol)).scale(2 * TS, 2 * TS);
-		int index = Arrays.binarySearch(POINTS, points);
+		int index = Arrays.binarySearch(Game.BONUS_POINTS, points);
 		if (index >= 0) {
 			spritePoints = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * TS, 2 * TS);
 		} else {

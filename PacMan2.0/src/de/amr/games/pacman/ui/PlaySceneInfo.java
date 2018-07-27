@@ -41,15 +41,10 @@ public class PlaySceneInfo {
 			show_ghost_route = !show_ghost_route;
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-			scene.mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
-					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
+			killAllLivingGhosts(scene);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
-			Maze maze = scene.mazeUI.getMaze();
-			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
-				maze.clearTile(tile);
-				scene.game.dotsEaten += 1;
-			});
+			eatAllPellets(scene);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
 			toggleGhost(scene, scene.blinky);
@@ -65,12 +60,17 @@ public class PlaySceneInfo {
 		}
 	}
 
-	private static void toggleGhost(PlayScene scene, Ghost ghost) {
-		if (scene.mazeUI.containsGhost(ghost)) {
-			scene.mazeUI.removeGhost(ghost);
-		} else {
-			scene.mazeUI.addGhost(ghost);
-		}
+	private static void killAllLivingGhosts(PlayScene scene) {
+		scene.mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
+				.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
+	}
+
+	private static void eatAllPellets(PlayScene scene) {
+		Maze maze = scene.mazeUI.getMaze();
+		maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
+			maze.clearTile(tile);
+			scene.game.foodEaten += 1;
+		});
 	}
 
 	public static void draw(Graphics2D g, PlayScene scene) {
@@ -120,6 +120,14 @@ public class PlaySceneInfo {
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
+	private static void toggleGhost(PlayScene scene, Ghost ghost) {
+		if (scene.mazeUI.containsGhost(ghost)) {
+			scene.mazeUI.removeGhost(ghost);
+		} else {
+			scene.mazeUI.addGhost(ghost);
+		}
+	}
+
 	private static Color color(Ghost ghost) {
 		switch (ghost.getColor()) {
 		case Spritesheet.TURQUOISE_GHOST:
@@ -147,8 +155,8 @@ public class PlaySceneInfo {
 		PacMan pacMan = scene.pacMan;
 		if (pacMan.isExactlyOverTile()) {
 			g.translate(scene.mazeUI.tf.getX(), scene.mazeUI.tf.getY());
-			g.setColor(Color.GREEN);
 			g.translate(pacMan.tf.getX(), pacMan.tf.getY());
+			g.setColor(Color.GREEN);
 			g.drawRect(0, 0, pacMan.getWidth(), pacMan.getHeight());
 			g.translate(-pacMan.tf.getX(), -pacMan.tf.getY());
 			g.translate(-scene.mazeUI.tf.getX(), -scene.mazeUI.tf.getY());

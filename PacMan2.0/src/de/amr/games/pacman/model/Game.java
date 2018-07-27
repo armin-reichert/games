@@ -16,6 +16,7 @@ public class Game {
 	public static final int DOTS_BONUS_2 = 170;
 
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
+	public static final int[] BONUS_POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
 	public static IntSupplier fnPulse = () -> 60;
 
@@ -44,6 +45,7 @@ public class Game {
 		case DEAD:
 			return tps(12f);
 		case FRIGHTENED:
+		case FRIGHTENED_ENDING:
 			return tps(4f);
 		case RECOVERING:
 			return tps(3f);
@@ -55,19 +57,19 @@ public class Game {
 	}
 
 	public int level;
-	public int livesLeft;
+	public int lives;
 	public int score;
-	public long dotsTotal;
-	public int dotsEaten;
+	public long foodTotal;
+	public int foodEaten;
 	public int ghostIndex;
 
 	public void init(Maze maze) {
 		maze.resetFood();
 		level = 1;
-		livesLeft = 3;
+		lives = 3;
 		score = 0;
-		dotsEaten = 0;
+		foodEaten = 0;
 		ghostIndex = 0;
-		dotsTotal = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
+		foodTotal = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }

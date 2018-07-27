@@ -28,7 +28,8 @@ public class Spritesheet {
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
 	private static BufferedImage[] pacManDying = new BufferedImage[11];
 	private static BufferedImage[][] ghostNormal = new BufferedImage[4][8];
-	private static BufferedImage[] ghostFrightened = new BufferedImage[4];
+	private static BufferedImage[] ghostFrightened = new BufferedImage[2];
+	private static BufferedImage[] ghostFrightenedEnding = new BufferedImage[4];
 	private static BufferedImage[] ghostDead = new BufferedImage[4];
 	private static BufferedImage[] greenNumber = new BufferedImage[4];
 	private static BufferedImage[] pinkNumber = new BufferedImage[8];
@@ -70,8 +71,11 @@ public class Spritesheet {
 				ghostNormal[color][i] = $(456 + i * 16, 64 + color * 16, 16, 16);
 			}
 		}
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 2; ++i) {
 			ghostFrightened[i] = $(584 + i * 16, 64, 16, 16);
+		}
+		for (int i = 0; i < 4; ++i) {
+			ghostFrightenedEnding[i] = $(584 + i * 16, 64, 16, 16);
 		}
 		for (int i = 0; i < 4; ++i) {
 			ghostDead[i] = $(584 + i * 16, 80, 16, 16);
@@ -155,6 +159,10 @@ public class Spritesheet {
 		return ghostFrightened;
 	}
 
+	public static BufferedImage[] getGhostFrightenedEnding() {
+		return ghostFrightenedEnding;
+	}
+	
 	public static BufferedImage getGhostDead(int direction) {
 		switch (direction) {
 		case Top4.E:

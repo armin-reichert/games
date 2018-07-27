@@ -4,6 +4,7 @@ import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostDead;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostFrightened;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostFrightenedEnding;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostNormal;
 import static de.amr.games.pacman.ui.Spritesheet.getGreenNumber;
 
@@ -23,7 +24,7 @@ import de.amr.games.pacman.model.Tile;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		ATTACKING, SCATTERING, FRIGHTENED, DYING, DEAD, RECOVERING
+		ATTACKING, SCATTERING, FRIGHTENED, FRIGHTENED_ENDING, DYING, DEAD, RECOVERING
 	}
 
 	private final int color;
@@ -34,6 +35,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_points;
 	private Sprite[] s_dead = new Sprite[4];
 	private Sprite s_frightened;
+	private Sprite s_frightened_ending;
 	private final List<Sprite> s_animated = new ArrayList<>();
 
 	public Ghost(Maze maze, String name, int color, Tile home) {
@@ -53,6 +55,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 		s_points = s_dying[0];
 		s_frightened = new Sprite(getGhostFrightened()).scale(size).animation(AnimationMode.CYCLIC,
 				200);
+		s_frightened_ending = new Sprite(getGhostFrightenedEnding()).scale(size)
+				.animation(AnimationMode.CYCLIC, 100);
 		s_animated.add(s_frightened);
 	}
 
@@ -74,6 +78,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 			return s_dead[getDir()];
 		case FRIGHTENED:
 			return s_frightened;
+		case FRIGHTENED_ENDING:
+			return s_frightened_ending;
 		default:
 			throw new IllegalStateException("Illegal ghost state: " + getState());
 		}
@@ -108,8 +114,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case FRIGHTENED:
 			move();
-			// TODO does not belong here
-			if (stateDurationSeconds() > 4) {
+			if (stateDurationSeconds() > 3) {
+				setState(State.FRIGHTENED_ENDING);
+			}
+			break;
+		case FRIGHTENED_ENDING:
+			move();
+			if (stateDurationSeconds() > 1) {
 				observers.fireGameEvent(new GhostFrightenedEndsEvent(this));
 			}
 			break;
