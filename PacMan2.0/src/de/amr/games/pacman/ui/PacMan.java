@@ -83,7 +83,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 						observers.fireGameEvent(new GhostContactEvent(ghost));
 					}
 				} else if (finding instanceof Bonus) {
-					observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) finding));
+					Bonus bonus = (Bonus) finding;
+					observers.fireGameEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 				}
 			});
 		}

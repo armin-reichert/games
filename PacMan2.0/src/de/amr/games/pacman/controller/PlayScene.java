@@ -8,10 +8,11 @@ import static de.amr.games.pacman.behavior.impl.NavigationSystem.flee;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.followKeyboard;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.goHome;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.ui.Spritesheet.TURQUOISE_GHOST;
+import static de.amr.games.pacman.ui.PlaySceneInfo.LOG;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.TURQUOISE_GHOST;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -37,11 +38,11 @@ import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.PlaySceneInfo;
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PacMan;
+import de.amr.games.pacman.ui.PlaySceneInfo;
 import de.amr.games.pacman.ui.StatusUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
@@ -361,7 +362,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			mazeUI.showBonus(BonusSymbol.STRAWBERRY, 100, sec(5));
 		}
 		if (e.food == ENERGIZER) {
-			PlaySceneInfo.LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
+			LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
 			game.score += Game.ENERGIZER_VALUE;
 			game.ghostIndex = 0;
 			startGhostHunting();
@@ -372,8 +373,8 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
 		BonusFoundEvent e = event(t);
-		PlaySceneInfo.LOG.info(() -> String.format("PacMan found bonus %s at %s", e.bonus, e.tile));
-		game.score += e.bonus.getValue();
+		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
+		game.score += e.value;
 		mazeUI.honorBonus(sec(2));
 	}
 

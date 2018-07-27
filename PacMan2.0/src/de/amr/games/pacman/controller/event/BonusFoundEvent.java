@@ -1,20 +1,19 @@
 package de.amr.games.pacman.controller.event;
 
-import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.Bonus;
+import de.amr.games.pacman.model.BonusSymbol;
 
 public class BonusFoundEvent extends GameEvent {
 
-	public final Tile tile;
-	public final Bonus bonus;
+	public final BonusSymbol symbol;
+	public final int value;
 
-	public BonusFoundEvent(Tile tile, Bonus bonus) {
-		this.tile = tile;
-		this.bonus = bonus;
+	public BonusFoundEvent(BonusSymbol symbol, int value) {
+		this.symbol = symbol;
+		this.value = value;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Bonus(%s)", bonus.getSymbol().name());
+		return String.format("Bonus(%s,%d)", symbol, value);
 	}
 }
