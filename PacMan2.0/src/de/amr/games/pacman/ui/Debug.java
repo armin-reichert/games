@@ -7,7 +7,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
@@ -17,59 +17,52 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
 public class Debug {
-
-	public static int DEBUG_LEVEL = 0;
-
-	public static void log(Supplier<String> msg) {
-		if (DEBUG_LEVEL >= 1) {
-			Logger.getGlobal().info(msg.get());
-		}
+	
+	public static final Logger LOG = Logger.getLogger(Debug.class.getSimpleName());
+	
+	static {
+		LOG.setLevel(Level.OFF);
 	}
-
+	
+	private static boolean show_grid;
+	private static boolean show_ghost_route;
+	private static boolean show_entity_state;
+	
 	public static void update(PlayScene scene) {
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_0)) {
-			DEBUG_LEVEL = 0;
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
+			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
 		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_1)) {
-			DEBUG_LEVEL = DEBUG_LEVEL == 1 ? 0 : 1;
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_G)) {
+			show_grid = !show_grid;
 		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_2)) {
-			DEBUG_LEVEL = DEBUG_LEVEL == 2 ? 0 : 2;
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_S)) {
+			show_entity_state = !show_entity_state;
 		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
-			scene.fsm.setLogger(scene.fsm.getLogger().isPresent() ? null : Logger.getGlobal());
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_R)) {
+			show_ghost_route = !show_ghost_route;
 		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
 			scene.mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.ATTACKING)
 					.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(scene, scene.blinky);
-		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(scene, scene.pinky);
-		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(scene, scene.inky);
-		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(scene, scene.clyde);
-		}
-
-		else if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
 			Maze maze = scene.mazeUI.getMaze();
 			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
 				maze.clearTile(tile);
 				scene.game.dotsEaten += 1;
 			});
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
+			toggleGhost(scene, scene.blinky);
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
+			toggleGhost(scene, scene.pinky);
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
+			toggleGhost(scene, scene.inky);
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
+			toggleGhost(scene, scene.clyde);
 		}
 	}
 
@@ -83,17 +76,19 @@ public class Debug {
 	}
 
 	public static void draw(Graphics2D g, PlayScene scene) {
-		if (DEBUG_LEVEL == 2) {
-			drawMaze(g, scene.mazeUI);
+		if (show_grid) {
+			drawGrid(g, scene.mazeUI);
 		}
-		if (DEBUG_LEVEL == 1) {
+		if (show_ghost_route) {
 			drawGhostPaths(g, scene);
+		}
+		if (show_entity_state) {
 			drawPacManTilePosition(g, scene);
 			drawEntityState(g, scene);
 		}
 	}
 
-	private static void drawMaze(Graphics2D g, MazeUI mazeUI) {
+	private static void drawGrid(Graphics2D g, MazeUI mazeUI) {
 		Maze maze = mazeUI.getMaze();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		g.setColor(Color.LIGHT_GRAY);
