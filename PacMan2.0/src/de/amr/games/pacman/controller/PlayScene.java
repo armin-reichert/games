@@ -50,24 +50,26 @@ import de.amr.statemachine.StateTransition;
 public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
 
 	public enum State {
-		READY, RUNNING, DYING, CHANGING_LEVEL, GAMEOVER
+		READY, PLAYING, DYING, CHANGING_LEVEL, GAME_OVER
 	};
 
 	// Model
-	private final Game game = new Game();
+	public final Game game = new Game();
+	public final Maze maze;
 
 	// View
-	private final MazeUI mazeUI;
-	private final HUD hud;
-	private final StatusUI status;
-	private final PacMan pacMan;
-	private final Ghost blinky, pinky, inky, clyde;
+	public final MazeUI mazeUI;
+	public final HUD hud;
+	public final StatusUI status;
+	public final PacMan pacMan;
+	public final Ghost blinky, pinky, inky, clyde;
 
 	// Controller
-	private final StateMachine<State, GameEvent> fsm;
+	public final StateMachine<State, GameEvent> fsm;
 
 	public PlayScene(PacManApp app) {
 		super(app);
+		this.maze = app.maze;
 
 		// Actors
 		pacMan = createPacMan();
@@ -77,7 +79,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		clyde = createClyde();
 
 		// Board
-		mazeUI = new MazeUI(getMaze(), pacMan);
+		mazeUI = new MazeUI(maze, pacMan);
 		mazeUI.observers.addObserver(this);
 		mazeUI.addGhost(blinky);
 		mazeUI.addGhost(pinky);
@@ -97,7 +99,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(sec(2));
-			game.init(getMaze());
+			game.init(maze);
 			initEntities();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!");
@@ -108,30 +110,30 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			mazeUI.hideInfo();
 		};
 
-		fsm.changeOnTimeout(State.READY, State.RUNNING);
+		fsm.changeOnTimeout(State.READY, State.PLAYING);
 
 		// -- RUNNING
 
-		fsm.state(State.RUNNING).update = state -> mazeUI.update();
+		fsm.state(State.PLAYING).update = state -> mazeUI.update();
 
-		fsm.changeOnInput(FoodFoundEvent.class, State.RUNNING, State.RUNNING, this::onFoodFound);
+		fsm.changeOnInput(FoodFoundEvent.class, State.PLAYING, State.PLAYING, this::onFoodFound);
 
-		fsm.changeOnInput(BonusFoundEvent.class, State.RUNNING, State.RUNNING, this::onBonusFound);
+		fsm.changeOnInput(BonusFoundEvent.class, State.PLAYING, State.PLAYING, this::onBonusFound);
 
-		fsm.changeOnInput(GhostFrightenedEndsEvent.class, State.RUNNING, State.RUNNING,
+		fsm.changeOnInput(GhostFrightenedEndsEvent.class, State.PLAYING, State.PLAYING,
 				this::onGhostFrightenedEnds);
 
-		fsm.changeOnInput(GhostDeadIsOverEvent.class, State.RUNNING, State.RUNNING,
+		fsm.changeOnInput(GhostDeadIsOverEvent.class, State.PLAYING, State.PLAYING,
 				this::onGhostDeadIsOver);
 
-		fsm.changeOnInput(GhostRecoveringCompleteEvent.class, State.RUNNING, State.RUNNING,
+		fsm.changeOnInput(GhostRecoveringCompleteEvent.class, State.PLAYING, State.PLAYING,
 				this::onGhostRecoveringComplete);
 
-		fsm.changeOnInput(GhostContactEvent.class, State.RUNNING, State.RUNNING, this::onGhostContact);
+		fsm.changeOnInput(GhostContactEvent.class, State.PLAYING, State.PLAYING, this::onGhostContact);
 
-		fsm.changeOnInput(PacManKilledEvent.class, State.RUNNING, State.DYING, this::onPacManKilled);
+		fsm.changeOnInput(PacManKilledEvent.class, State.PLAYING, State.DYING, this::onPacManKilled);
 
-		fsm.changeOnInput(NextLevelEvent.class, State.RUNNING, State.CHANGING_LEVEL);
+		fsm.changeOnInput(NextLevelEvent.class, State.PLAYING, State.CHANGING_LEVEL);
 
 		// -- CHANGING_LEVEL
 
@@ -150,7 +152,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			}
 		};
 
-		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.RUNNING);
+		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.PLAYING);
 
 		// -- DYING
 
@@ -160,26 +162,26 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			game.livesLeft -= 1;
 		};
 
-		fsm.changeOnTimeout(State.DYING, State.GAMEOVER, () -> game.livesLeft == 0);
+		fsm.changeOnTimeout(State.DYING, State.GAME_OVER, () -> game.livesLeft == 0);
 
-		fsm.changeOnTimeout(State.DYING, State.RUNNING, () -> game.livesLeft > 0, t -> {
+		fsm.changeOnTimeout(State.DYING, State.PLAYING, () -> game.livesLeft > 0, t -> {
 			pacMan.currentSprite().resetAnimation();
 			initEntities();
 		});
 
 		// -- GAME_OVER
 
-		fsm.state(State.GAMEOVER).entry = state -> {
+		fsm.state(State.GAME_OVER).entry = state -> {
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Game Over!");
 		};
 
-		fsm.change(State.GAMEOVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		fsm.change(State.GAME_OVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
-		fsm.state(State.GAMEOVER).exit = state -> {
+		fsm.state(State.GAME_OVER).exit = state -> {
 			mazeUI.hideInfo();
 			mazeUI.removeBonus();
-			game.init(getMaze());
+			game.init(maze);
 		};
 	}
 
@@ -210,55 +212,19 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		Debug.draw(g, this);
 	}
 
-	public StateMachine<State, GameEvent> getFsm() {
-		return fsm;
-	}
-
-	public Game getGame() {
-		return game;
-	}
-
-	public Maze getMaze() {
-		return app.getMaze();
-	}
-
-	public MazeUI getMazeUI() {
-		return mazeUI;
-	}
-
-	public PacMan getPacMan() {
-		return pacMan;
-	}
-
-	public Ghost getBlinky() {
-		return blinky;
-	}
-
-	public Ghost getPinky() {
-		return pinky;
-	}
-
-	public Ghost getInky() {
-		return inky;
-	}
-
-	public Ghost getClyde() {
-		return clyde;
-	}
-
 	private int sec(float seconds) {
 		return app.pulse.secToTicks(seconds);
 	}
 
 	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(getMaze(), getMaze().pacManHome);
+		PacMan pacMan = new PacMan(maze, maze.pacManHome);
 		pacMan.observers.addObserver(this);
 		pacMan.setMoveBehavior(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		return pacMan;
 	}
 
 	private Ghost createBlinky() {
-		Ghost blinky = new Ghost(getMaze(), "Blinky", RED_GHOST, getMaze().blinkyHome);
+		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.observers.addObserver(this);
 		blinky.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 		blinky.setMoveBehavior(Ghost.State.DEAD, goHome());
@@ -268,7 +234,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private Ghost createPinky() {
-		Ghost pinky = new Ghost(getMaze(), "Pinky", PINK_GHOST, getMaze().pinkyHome);
+		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.observers.addObserver(this);
 		pinky.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 		pinky.setMoveBehavior(Ghost.State.DEAD, goHome());
@@ -278,7 +244,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private Ghost createInky() {
-		Ghost inky = new Ghost(getMaze(), "Inky", BLUE_GHOST, getMaze().inkyHome);
+		Ghost inky = new Ghost(maze, "Inky", BLUE_GHOST, maze.inkyHome);
 		inky.observers.addObserver(this);
 		inky.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 		inky.setMoveBehavior(Ghost.State.DEAD, goHome());
@@ -288,7 +254,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private Ghost createClyde() {
-		Ghost clyde = new Ghost(getMaze(), "Clyde", ORANGE_GHOST, getMaze().clydeHome);
+		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.observers.addObserver(this);
 		clyde.setMoveBehavior(Ghost.State.FRIGHTENED, flee(pacMan));
 		clyde.setMoveBehavior(Ghost.State.DEAD, goHome());
@@ -300,12 +266,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void buildLayout() {
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * TS);
-		status.tf.moveTo(0, (3 + getMaze().numRows()) * TS);
+		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
 	}
 
 	private void initEntities() {
 		pacMan.setState(PacMan.State.ALIVE);
-		pacMan.setTile(getMaze().pacManHome);
+		pacMan.setTile(maze.pacManHome);
 		pacMan.setSpeed(game::getPacManSpeed);
 		pacMan.setMoveDirection(Top4.E);
 		pacMan.setNextMoveDirection(Top4.E);
@@ -326,7 +292,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.level += 1;
 		game.dotsEaten = 0;
 		game.ghostIndex = 0;
-		getMaze().init();
+		maze.init();
 		initEntities();
 	}
 
@@ -376,7 +342,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
 		FoodFoundEvent e = event(t);
-		getMaze().setContent(e.tile, EMPTY);
+		maze.setContent(e.tile, EMPTY);
 		game.dotsEaten += 1;
 		if (game.dotsEaten == game.dotsTotal) {
 			fsm.enqueue(new NextLevelEvent());

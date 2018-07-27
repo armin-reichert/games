@@ -2,6 +2,8 @@ package de.amr.games.pacman.model;
 
 import static de.amr.games.pacman.PacManApp.TS;
 
+import java.util.function.IntSupplier;
+
 import de.amr.games.pacman.ui.Ghost;
 import de.amr.games.pacman.ui.MazeMover;
 import de.amr.games.pacman.ui.PacMan;
@@ -14,15 +16,18 @@ public class Game {
 	public static final int DOTS_BONUS_2 = 170;
 
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
+	
+	public static IntSupplier fnPulse = () -> 60;
 
-	private static float tilesPerSec(float value) {
-		return value * TS / 60;
+	/** Tiles per second. */
+	private static float tps(float value) {
+		return (value * TS) / fnPulse.getAsInt();
 	}
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {
 		switch (pacMan.getState()) {
 		case ALIVE:
-			return tilesPerSec(8f);
+			return tps(8f);
 		case DYING:
 			return 0;
 		default:
@@ -33,17 +38,17 @@ public class Game {
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
 		switch (ghost.getState()) {
 		case ATTACKING:
-			return tilesPerSec(6f);
+			return tps(6f);
 		case DYING:
 			return 0;
 		case DEAD:
-			return tilesPerSec(12f);
+			return tps(12f);
 		case FRIGHTENED:
-			return tilesPerSec(4f);
+			return tps(4f);
 		case RECOVERING:
-			return tilesPerSec(3f);
+			return tps(3f);
 		case SCATTERING:
-			return tilesPerSec(6f);
+			return tps(6f);
 		default:
 			throw new IllegalStateException();
 		}

@@ -3,6 +3,7 @@ package de.amr.games.pacman;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.controller.PlayScene;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 
 public class PacManApp extends Application {
@@ -11,26 +12,19 @@ public class PacManApp extends Application {
 	public static final int TS = 16;
 
 	public static void main(String[] args) {
-		float scaling = 1f;
-		if (args.length > 0) {
-			scaling = Float.parseFloat(args[0]);
-		}
-		launch(new PacManApp(scaling));
+		launch(new PacManApp(args));
 	}
 
-	private final Maze maze;
+	public final Maze maze;
 
-	public PacManApp(float scaling) {
+	public PacManApp(String[] args) {
 		maze = new Maze(Assets.text("maze.txt"));
 		settings.width = maze.numCols() * TS;
 		settings.height = (maze.numRows() + 5) * TS;
-		settings.scale = scaling;
+		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
 		settings.title = String.format("PacMan 2.0 (%d x %d * %.2f)", settings.width, settings.height,
 				settings.scale);
-	}
-
-	public Maze getMaze() {
-		return maze;
+		Game.fnPulse = pulse::getFrequency;
 	}
 
 	@Override
