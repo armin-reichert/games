@@ -33,7 +33,7 @@ public class Maze {
 				UndirectedEdge::new);
 		for (int row = 0; row < numRows; ++row) {
 			for (int col = 0; col < numCols; ++col) {
-				char c = data[row].charAt(col);
+				char c = data(row, col);
 				if (c == Tile.POS_BLINKY) {
 					blinkyHome = new Tile(col, row);
 				} else if (c == Tile.POS_PINKY) {
@@ -51,14 +51,21 @@ public class Maze {
 		}
 		readContent();
 		graph.fill();
-		graph.edges()
-				.filter(e -> graph.get(e.either()) == Tile.WALL || graph.get(e.other()) == Tile.WALL)
-				.forEach(graph::removeEdge);
+		graph.edges().filter(edge -> {
+			int u = edge.either(), v = edge.other();
+			return data(graph.row(u), graph.col(u)) == Tile.WALL
+					|| data(graph.row(v), graph.col(v)) == Tile.WALL;
+		}).forEach(graph::removeEdge);
+	}
+
+	private char data(int row, int col) {
+		return data[row].charAt(col);
 	}
 
 	private void readContent() {
 		graph.vertices().forEach(v -> {
-			graph.set(v, data[graph.row(v)].charAt(graph.col(v)));
+			char c = data(graph.row(v), graph.col(v));
+			graph.set(v, c);
 		});
 	}
 
