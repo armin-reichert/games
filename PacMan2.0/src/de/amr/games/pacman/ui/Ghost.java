@@ -1,5 +1,6 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostDead;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostFrightened;
@@ -39,18 +40,19 @@ public class Ghost extends MazeMover<Ghost.State> {
 		super(maze, home, new EnumMap<>(State.class));
 		setName(name);
 		this.color = color;
+		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(SPRITE_SIZE)
+			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);
 			s_animated.add(s_normal[dir]);
-			s_dead[dir] = new Sprite(getGhostDead(dir)).scale(SPRITE_SIZE);
+			s_dead[dir] = new Sprite(getGhostDead(dir)).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_dying[i] = new Sprite(getGreenNumber(i)).scale(SPRITE_SIZE);
+			s_dying[i] = new Sprite(getGreenNumber(i)).scale(size);
 		}
 		s_points = s_dying[0];
-		s_frightened = new Sprite(getGhostFrightened()).scale(SPRITE_SIZE)
-				.animation(AnimationMode.CYCLIC, 200);
+		s_frightened = new Sprite(getGhostFrightened()).scale(size).animation(AnimationMode.CYCLIC,
+				200);
 		s_animated.add(s_frightened);
 	}
 

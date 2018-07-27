@@ -1,5 +1,6 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.Tile.isFood;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
@@ -38,10 +39,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName("Pac-Man");
-		s_standing = new Sprite(getPacManStanding()).scale(SPRITE_SIZE);
-		s_dying = new Sprite(getPacManDying()).scale(SPRITE_SIZE).animation(AnimationMode.LINEAR, 100);
-		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = new Sprite(getPacManWalking(dir))
-				.scale(SPRITE_SIZE).animation(AnimationMode.BACK_AND_FORTH, 40));
+		int size = 2 * TS;
+		s_standing = new Sprite(getPacManStanding()).scale(size);
+		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
+		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size)
+				.animation(AnimationMode.BACK_AND_FORTH, 40));
 		s_animated.add(s_standing);
 		s_animated.add(s_dying);
 		TOPOLOGY.dirs().forEach(dir -> s_animated.add(s_walking[dir]));

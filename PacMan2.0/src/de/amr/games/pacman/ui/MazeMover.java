@@ -28,8 +28,6 @@ import de.amr.games.pacman.model.Tile;
  */
 public abstract class MazeMover<S> extends GameEntity {
 
-	public static int SPRITE_SIZE = 2 * TS;
-
 	public final GameEventSupport observers = new GameEventSupport();
 	public final Maze maze;
 	public final Tile homeTile;
@@ -52,7 +50,8 @@ public abstract class MazeMover<S> extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		// center sprite over collision box
-		int dx = (getWidth() - SPRITE_SIZE) / 2, dy = (getHeight() - SPRITE_SIZE) / 2;
+		int dx = (getWidth() - currentSprite().getWidth()) / 2,
+				dy = (getHeight() - currentSprite().getHeight()) / 2;
 		g.translate(dx, dy);
 		super.draw(g);
 		g.translate(-dx, -dy);
@@ -180,25 +179,25 @@ public abstract class MazeMover<S> extends GameEntity {
 		return true;
 	}
 
-	public Tile computeTouchedTile(Tile currentTile, int dir) {
-		Vector2f newPos = computePosition(dir, fnSpeed.apply(this));
-		float x = newPos.x, y = newPos.y;
+	public Tile computeTouchedTile(Tile from, int dir) {
+		Vector2f to = computePosition(dir, fnSpeed.apply(this));
+		float x = to.x, y = to.y;
 		switch (dir) {
 		case Top4.W:
-			return new Tile(round(x) / TS, currentTile.row);
+			return new Tile(round(x) / TS, from.row);
 		case Top4.E:
-			return new Tile(round(x + getWidth()) / TS, currentTile.row);
+			return new Tile(round(x + getWidth()) / TS, from.row);
 		case Top4.N:
-			return new Tile(currentTile.col, round(y) / TS);
+			return new Tile(from.col, round(y) / TS);
 		case Top4.S:
-			return new Tile(currentTile.col, round(y + getHeight()) / TS);
+			return new Tile(from.col, round(y + getHeight()) / TS);
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}
 	}
 
 	private Vector2f computePosition(int dir, float speed) {
-		Vector2f v = Vector2f.of(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
-		return sum(tf.getPosition(), smul(speed, v));
+		Vector2f v_dir = Vector2f.of(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
+		return sum(tf.getPosition(), smul(speed, v_dir));
 	}
 }
