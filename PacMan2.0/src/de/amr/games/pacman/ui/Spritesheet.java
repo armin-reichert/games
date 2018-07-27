@@ -2,6 +2,7 @@ package de.amr.games.pacman.ui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -95,15 +96,16 @@ public class Spritesheet {
 	}
 
 	private static BufferedImage createEnergizerImage(boolean visible) {
-		BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+		BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = img.createGraphics();
 		g.setColor(Color.BLACK);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.fillRect(0, 0, img.getWidth(), img.getHeight());
 		if (visible) {
-			int size = 16;
 			g.setColor(Color.PINK);
-			g.fillOval((16 - size) / 2, (16 - size) / 2, size, size);
+			g.fillOval(0, 0, 16, 16);
 		}
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		return img;
 	}
 

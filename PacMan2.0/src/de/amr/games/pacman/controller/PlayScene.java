@@ -145,9 +145,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.CHANGING_LEVEL).update = state -> {
 			if (state.getRemaining() == state.getDuration() / 2) {
 				nextLevel();
+				mazeUI.showInfo("Ready!");
 				mazeUI.setFlashing(false);
 				mazeUI.enableAnimation(false);
 			} else if (state.isTerminated()) {
+				mazeUI.hideInfo();
 				mazeUI.enableAnimation(true);
 			}
 		};
