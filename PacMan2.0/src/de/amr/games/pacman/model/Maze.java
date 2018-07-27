@@ -24,7 +24,7 @@ public class Maze {
 
 	public void resetFood() {
 		tiles().filter(tile -> Tile.isFood(data(tile.row, tile.col))).forEach(tile -> {
-			setContent(tile, data(tile.row, tile.col));
+			graph.set(cell(tile), data(tile.row, tile.col));
 		});
 	}
 
@@ -92,10 +92,10 @@ public class Maze {
 		return graph.get(cell(tile));
 	}
 
-	public void setContent(Tile tile, char c) {
-		graph.set(cell(tile), c);
+	public void clearTile(Tile tile) {
+		graph.set(cell(tile), Tile.EMPTY);
 	}
-
+	
 	public OptionalInt direction(Tile t1, Tile t2) {
 		return graph.direction(cell(t1), cell(t2));
 	}

@@ -67,7 +67,7 @@ public class Debug {
 		else if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
 			Maze maze = scene.mazeUI.getMaze();
 			maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
-				maze.setContent(tile, Tile.EMPTY);
+				maze.clearTile(tile);
 				scene.game.dotsEaten += 1;
 			});
 		}

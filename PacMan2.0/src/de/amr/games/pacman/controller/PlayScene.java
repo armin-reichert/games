@@ -7,7 +7,6 @@ import static de.amr.games.pacman.behavior.impl.Behaviors.chase;
 import static de.amr.games.pacman.behavior.impl.Behaviors.flee;
 import static de.amr.games.pacman.behavior.impl.Behaviors.followKeyboard;
 import static de.amr.games.pacman.behavior.impl.Behaviors.goHome;
-import static de.amr.games.pacman.model.Tile.EMPTY;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.ui.Spritesheet.BLUE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
@@ -342,7 +341,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
 		FoodFoundEvent e = event(t);
-		maze.setContent(e.tile, EMPTY);
+		maze.clearTile(e.tile);
 		game.dotsEaten += 1;
 		if (game.dotsEaten == game.dotsTotal) {
 			fsm.enqueue(new NextLevelEvent());
