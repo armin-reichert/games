@@ -100,7 +100,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(sec(2));
 			game.init(maze);
-			initEntities();
+			initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!");
 		};
@@ -112,7 +112,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnTimeout(State.READY, State.PLAYING);
 
-		// -- RUNNING
+		// -- PLAYING
 
 		fsm.state(State.PLAYING).update = state -> mazeUI.update();
 
@@ -166,7 +166,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		fsm.changeOnTimeout(State.DYING, State.PLAYING, () -> game.livesLeft > 0, t -> {
 			pacMan.currentSprite().resetAnimation();
-			initEntities();
+			initActors();
 		});
 
 		// -- GAME_OVER
@@ -269,7 +269,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
 	}
 
-	private void initEntities() {
+	private void initActors() {
 		pacMan.setState(PacMan.State.ALIVE);
 		pacMan.placeAt(maze.pacManHome);
 		pacMan.setSpeed(game::getPacManSpeed);
@@ -293,7 +293,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		game.dotsEaten = 0;
 		game.ghostIndex = 0;
 		maze.resetFood();
-		initEntities();
+		initActors();
 	}
 
 	private void startGhostHunting() {
