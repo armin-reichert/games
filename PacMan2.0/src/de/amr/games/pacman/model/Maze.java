@@ -1,6 +1,5 @@
 package de.amr.games.pacman.model;
 
-import java.awt.Dimension;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -20,32 +19,21 @@ public class Maze {
 
 	public Tile pacManHome, blinkyHome, pinkyHome, inkyHome, clydeHome, infoTile;
 
-	private final String data;
+	private final String[] data;
 	private final GridGraph<Character, Integer> graph;
 
-	public Maze(String data) {
-		this.data = data;
-		Dimension size = parseDimension();
-		graph = new GridGraph<>(size.width, size.height, TOPOLOGY, Tile.EMPTY, (u, v) -> 1,
-				UndirectedEdge::new);
-		parseContent();
-	}
-
 	public void init() {
-		parseContent();
+		readContent();
 	}
 
-	private Dimension parseDimension() {
-		String[] rows = data.split("\n");
-		return new Dimension(rows[0].length(), rows.length);
-	}
-
-	private void parseContent() {
-		Dimension size = parseDimension();
-		String[] rows = data.split("\n");
-		for (int row = 0; row < size.height; ++row) {
-			for (int col = 0; col < size.width; ++col) {
-				char c = rows[row].charAt(col);
+	public Maze(String map) {
+		data = map.split("\n");
+		int numCols = data[0].length(), numRows = data.length;
+		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, Tile.EMPTY, (u, v) -> 1,
+				UndirectedEdge::new);
+		for (int row = 0; row < numRows; ++row) {
+			for (int col = 0; col < numCols; ++col) {
+				char c = data[row].charAt(col);
 				if (c == Tile.POS_BLINKY) {
 					blinkyHome = new Tile(col, row);
 				} else if (c == Tile.POS_PINKY) {
@@ -58,15 +46,20 @@ public class Maze {
 					infoTile = new Tile(col, row);
 				} else if (c == Tile.POS_PACMAN) {
 					pacManHome = new Tile(col, row);
-				} else {
-					graph.set(graph.cell(col, row), c);
 				}
 			}
 		}
+		readContent();
 		graph.fill();
 		graph.edges()
 				.filter(e -> graph.get(e.either()) == Tile.WALL || graph.get(e.other()) == Tile.WALL)
 				.forEach(graph::removeEdge);
+	}
+
+	private void readContent() {
+		graph.vertices().forEach(v -> {
+			graph.set(v, data[graph.row(v)].charAt(graph.col(v)));
+		});
 	}
 
 	public GridGraph<Character, Integer> getGraph() {
