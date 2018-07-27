@@ -2,11 +2,11 @@ package de.amr.games.pacman.behavior.impl;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.ui.MazeMover;
 
-class FollowKeyboard implements MoveBehavior {
+class FollowKeyboard implements RoutePlanner {
 
 	private final int[] nesw;
 
@@ -20,7 +20,7 @@ class FollowKeyboard implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.dir = mover.getIntendedDirection();
+		result.dir = mover.getNextDir();
 		if (Keyboard.keyDown(nesw[0])) {
 			result.dir = Top4.N;
 		}

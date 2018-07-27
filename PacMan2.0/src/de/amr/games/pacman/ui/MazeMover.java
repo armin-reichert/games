@@ -16,8 +16,8 @@ import java.util.function.Function;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.behavior.MoveBehavior;
-import de.amr.games.pacman.behavior.impl.Behaviors;
+import de.amr.games.pacman.behavior.RoutePlanner;
+import de.amr.games.pacman.behavior.impl.NavigationSystem;
 import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -31,20 +31,20 @@ public abstract class MazeMover<S> extends GameEntity {
 	public final GameEventSupport observers = new GameEventSupport();
 	public final Maze maze;
 	public final Tile homeTile;
-	private final Map<S, MoveBehavior> behaviorMap;
+	private final Map<S, RoutePlanner> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
-	private int direction;
-	private int intendedDirection;
+	private int dir;
+	private int nextDir;
 	private S state;
 	private long stateEntryTime;
 
-	protected MazeMover(Maze maze, Tile homeTile, Map<S, MoveBehavior> behavior) {
+	protected MazeMover(Maze maze, Tile homeTile, Map<S, RoutePlanner> navigation) {
 		Objects.requireNonNull(maze);
 		Objects.requireNonNull(homeTile);
-		Objects.requireNonNull(behavior);
+		Objects.requireNonNull(navigation);
 		this.maze = maze;
 		this.homeTile = homeTile;
-		this.behaviorMap = behavior;
+		this.navigation = navigation;
 	}
 
 	@Override
@@ -88,12 +88,12 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// Movement
 
-	public void setBehavior(S state, MoveBehavior behavior) {
-		this.behaviorMap.put(state, behavior);
+	public void setNavigation(S state, RoutePlanner navigation) {
+		this.navigation.put(state, navigation);
 	}
 
-	public MoveBehavior getBehavior() {
-		return behaviorMap.getOrDefault(getState(), Behaviors.forward());
+	public RoutePlanner getNavigation() {
+		return navigation.getOrDefault(getState(), NavigationSystem.forward());
 	}
 
 	public float getSpeed() {
@@ -104,20 +104,20 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.fnSpeed = speed;
 	}
 
-	public int getDirection() {
-		return direction;
+	public int getDir() {
+		return dir;
 	}
 
-	public void setDirection(int dir) {
-		this.direction = dir;
+	public void setDir(int dir) {
+		this.dir = dir;
 	}
 
-	public int getIntendedDirection() {
-		return intendedDirection;
+	public int getNextDir() {
+		return nextDir;
 	}
 
-	public void setIntendedDirection(int dir) {
-		this.intendedDirection = dir;
+	public void setNextDir(int dir) {
+		this.nextDir = dir;
 	}
 
 	public void placeAt(int col, int row) {
@@ -147,17 +147,17 @@ public abstract class MazeMover<S> extends GameEntity {
 	public void move() {
 		Tile tile = getTile();
 		if (maze.getContent(tile) == WORMHOLE) {
-			if (direction == Top4.E && tile.col == maze.numCols() - 1
-					|| direction == Top4.W && tile.col == 0) {
+			if (dir == Top4.E && tile.col == maze.numCols() - 1
+					|| dir == Top4.W && tile.col == 0) {
 				placeAt(maze.numCols() - 1 - tile.col, tile.row);
 			}
 		}
-		intendedDirection = getBehavior().getRoute(this).getDirection();
-		if (canMove(intendedDirection)) {
-			direction = intendedDirection;
+		nextDir = getNavigation().getRoute(this).getDirection();
+		if (canMove(nextDir)) {
+			dir = nextDir;
 		}
-		if (canMove(direction)) {
-			tf.moveTo(computePosition(direction, fnSpeed.apply(this)));
+		if (canMove(dir)) {
+			tf.moveTo(computePosition(dir, fnSpeed.apply(this)));
 		} else {
 			// adjust exactly over tile
 			placeAt(tile);
@@ -172,7 +172,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		if (!maze.isValidTile(touched) || maze.getContent(touched) == WALL) {
 			return false;
 		}
-		if (dir == TOPOLOGY.right(direction) || dir == TOPOLOGY.left(direction)) {
+		if (dir == TOPOLOGY.right(this.dir) || dir == TOPOLOGY.left(this.dir)) {
 			placeAt(getTile()); // TODO
 			return isExactlyOverTile();
 		}

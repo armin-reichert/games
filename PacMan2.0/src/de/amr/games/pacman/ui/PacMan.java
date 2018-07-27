@@ -59,8 +59,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	@Override
 	public Sprite currentSprite() {
 		if (getState() == State.ALIVE) {
-			int dir = getDirection();
-			return canMove(dir) ? s_walking[dir] : s_standing;
+			return canMove(getDir()) ? s_walking[getDir()] : s_standing;
 		} else {
 			return s_dying;
 		}
@@ -76,17 +75,17 @@ public class PacMan extends MazeMover<PacMan.State> {
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
 			observers.fireGameEvent(new FoodFoundEvent(tile, content));
-			return;
-		}
-		lookFor.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
-			if (finding instanceof Ghost) {
-				Ghost ghost = (Ghost) finding;
-				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-					observers.fireGameEvent(new GhostContactEvent(ghost));
+		} else {
+			lookFor.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
+				if (finding instanceof Ghost) {
+					Ghost ghost = (Ghost) finding;
+					if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
+						observers.fireGameEvent(new GhostContactEvent(ghost));
+					}
+				} else if (finding instanceof Bonus) {
+					observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) finding));
 				}
-			} else if (finding instanceof Bonus) {
-				observers.fireGameEvent(new BonusFoundEvent(tile, (Bonus) finding));
-			}
-		});
+			});
+		}
 	}
 }

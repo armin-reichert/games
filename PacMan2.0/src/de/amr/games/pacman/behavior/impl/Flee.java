@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import de.amr.games.pacman.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeMover;
 
-class Flee implements MoveBehavior {
+class Flee implements RoutePlanner {
 
 	private final MazeMover<?> chaser;
 
@@ -21,7 +21,7 @@ class Flee implements MoveBehavior {
 	@Override
 	public Route getRoute(MazeMover<?> refugee) {
 		RouteData result = new RouteData();
-		result.dir = refugee.getIntendedDirection();
+		result.dir = refugee.getNextDir();
 		Maze maze = chaser.maze;
 		OptionalInt towardsChaser = maze
 				.dirAlongPath(maze.findPath(refugee.getTile(), chaser.getTile()));

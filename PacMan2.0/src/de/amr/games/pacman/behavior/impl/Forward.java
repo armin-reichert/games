@@ -1,15 +1,15 @@
 package de.amr.games.pacman.behavior.impl;
 
-import de.amr.games.pacman.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.ui.MazeMover;
 
-class Forward implements MoveBehavior {
+class Forward implements RoutePlanner {
 
 	@Override
 	public Route getRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.dir = mover.getIntendedDirection();
+		result.dir = mover.getNextDir();
 		return result;
 	}
 }

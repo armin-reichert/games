@@ -63,16 +63,15 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		int dir = getDirection();
 		switch (getState()) {
 		case ATTACKING:
 		case RECOVERING:
 		case SCATTERING:
-			return s_normal[dir];
+			return s_normal[getDir()];
 		case DYING:
 			return s_points;
 		case DEAD:
-			return s_dead[dir];
+			return s_dead[getDir()];
 		case FRIGHTENED:
 			return s_frightened;
 		default:

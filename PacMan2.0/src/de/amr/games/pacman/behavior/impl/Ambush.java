@@ -2,7 +2,7 @@ package de.amr.games.pacman.behavior.impl;
 
 import java.util.Optional;
 
-import de.amr.games.pacman.behavior.MoveBehavior;
+import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -11,7 +11,7 @@ import de.amr.games.pacman.ui.MazeMover;
 /**
  * Ambush the victim in the maze.
  */
-class Ambush implements MoveBehavior {
+class Ambush implements RoutePlanner {
 
 	private final MazeMover<?> victim;
 
@@ -29,14 +29,14 @@ class Ambush implements MoveBehavior {
 		} else {
 			result.path = maze.findPath(ambusher.getTile(), victim.getTile());
 		}
-		result.dir = maze.dirAlongPath(result.path).orElse(ambusher.getIntendedDirection());
+		result.dir = maze.dirAlongPath(result.path).orElse(ambusher.getNextDir());
 		return result;
 	}
 
 	private Optional<Tile> ahead(int n, MazeMover<?> refugee) {
 		Tile current = refugee.getTile();
 		for (int i = 0; i < n; ++i) {
-			Optional<Tile> next = refugee.maze.neighborTile(current, refugee.getDirection());
+			Optional<Tile> next = refugee.maze.neighborTile(current, refugee.getDir());
 			if (next.isPresent()) {
 				current = next.get();
 			}
