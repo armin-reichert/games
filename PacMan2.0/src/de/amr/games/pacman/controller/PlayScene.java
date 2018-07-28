@@ -304,6 +304,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	}
 
 	private void startGhostHunting() {
+		game.ghostIndex = 0;
 		mazeUI.getGhosts().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
 				.forEach(ghost -> ghost.setState(Ghost.State.FRIGHTENED));
 	}
@@ -336,13 +337,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
 		PacManKilledEvent e = event(t);
-		PlaySceneInfo.LOG.info(
+		LOG.info(
 				() -> String.format("PacMan got killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onGhostKilled(Ghost ghost) {
-		PlaySceneInfo.LOG
-				.info(() -> String.format("Ghost %s got killed at %s", ghost.getName(), ghost.getTile()));
+		LOG.info(() -> String.format("Ghost %s got killed at %s", ghost.getName(), ghost.getTile()));
 		ghost.killAndShowPoints(game.ghostIndex, sec(1));
 		game.score += Game.GHOST_POINTS[game.ghostIndex];
 		game.ghostIndex += 1;
@@ -352,6 +352,13 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		FoodFoundEvent e = event(t);
 		maze.clearTile(e.tile);
 		game.foodEaten += 1;
+		if (e.food == ENERGIZER) {
+			LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
+			game.score += Game.ENERGIZER_VALUE;
+		} else {
+			LOG.info(() -> String.format("PacMan found pellet at %s", e.tile));
+			game.score += Game.PELLET_VALUE;
+		}
 		if (game.foodEaten == game.foodTotal) {
 			fsm.enqueue(new NextLevelEvent());
 			return;
@@ -362,12 +369,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			mazeUI.showBonus(BonusSymbol.STRAWBERRY, 100, sec(5));
 		}
 		if (e.food == ENERGIZER) {
-			LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
-			game.score += Game.ENERGIZER_VALUE;
-			game.ghostIndex = 0;
 			startGhostHunting();
-		} else {
-			game.score += Game.PELLET_VALUE;
 		}
 	}
 
