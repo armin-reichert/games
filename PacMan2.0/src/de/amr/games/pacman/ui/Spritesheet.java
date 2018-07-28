@@ -155,15 +155,15 @@ public class Spritesheet {
 		throw new IllegalArgumentException("Illegal direction: " + direction);
 	}
 
-	public static BufferedImage[] getGhostFrightened() {
+	public static BufferedImage[] getGhostBlue() {
 		return ghostFrightened;
 	}
 
-	public static BufferedImage[] getGhostFrightenedEnding() {
+	public static BufferedImage[] getGhostBlueWhite() {
 		return ghostFrightenedEnding;
 	}
 
-	public static BufferedImage getGhostDead(int direction) {
+	public static BufferedImage getGhostEyes(int direction) {
 		switch (direction) {
 		case Top4.E:
 			return ghostDead[0];
