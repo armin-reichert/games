@@ -32,10 +32,10 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	public final Set<GameEntity> lookFor = new HashSet<>();
 
-	private Sprite[] s_walking = new Sprite[4];
+	private Sprite s_walking[] = new Sprite[4];
 	private Sprite s_standing;
 	private Sprite s_dying;
-	private List<Sprite> s_animated = new ArrayList<>();
+	private List<Sprite> s_list = new ArrayList<>();
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
@@ -45,22 +45,22 @@ public class PacMan extends MazeMover<PacMan.State> {
 		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size)
-					.animation(AnimationMode.BACK_AND_FORTH, 40);
+					.animation(AnimationMode.BACK_AND_FORTH, 80);
 		});
-		s_animated.add(s_standing);
-		s_animated.add(s_dying);
-		TOPOLOGY.dirs().forEach(dir -> s_animated.add(s_walking[dir]));
+		s_list.add(s_standing);
+		s_list.add(s_dying);
+		TOPOLOGY.dirs().forEach(dir -> s_list.add(s_walking[dir]));
 	}
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return s_animated.stream();
+		return s_list.stream();
 	}
 
 	@Override
 	public Sprite currentSprite() {
 		if (getState() == State.ALIVE) {
-			return canMove(getDir()) ? s_walking[getDir()] : s_standing;
+			return s_walking[getDir()];
 		} else {
 			return s_dying;
 		}
@@ -72,6 +72,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return;
 		}
 		move();
+		currentSprite().enableAnimation(canMove(getDir()));
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {

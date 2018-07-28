@@ -90,7 +90,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 		// Controller
 
-		fsm = new StateMachine<>("Game control", State.class, State.READY);
+		fsm = new StateMachine<>("GameController", State.class, State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
 		fsm.setLogger(PlaySceneInfo.LOG);
 

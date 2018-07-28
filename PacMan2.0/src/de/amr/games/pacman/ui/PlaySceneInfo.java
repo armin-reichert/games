@@ -118,8 +118,10 @@ public class PlaySceneInfo {
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		PacMan pacMan = scene.pacMan;
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
-		mazeUI.getGhosts().forEach(ghost -> drawText(g, color(ghost), ghost.tf.getX(), ghost.tf.getY(),
-				ghost.getState().toString()));
+		mazeUI.getGhosts().forEach(ghost -> {
+			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
+			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
+		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
