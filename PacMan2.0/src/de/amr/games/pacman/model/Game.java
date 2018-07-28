@@ -4,9 +4,9 @@ import static de.amr.games.pacman.PacManApp.TS;
 
 import java.util.function.IntSupplier;
 
-import de.amr.games.pacman.ui.Ghost;
-import de.amr.games.pacman.ui.MazeMover;
-import de.amr.games.pacman.ui.PacMan;
+import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.MazeMover;
+import de.amr.games.pacman.ui.actor.PacMan;
 
 public class Game {
 

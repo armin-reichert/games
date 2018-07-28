@@ -1,11 +1,11 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.model.Spritesheet.getPacManDying;
+import static de.amr.games.pacman.model.Spritesheet.getPacManStanding;
+import static de.amr.games.pacman.model.Spritesheet.getPacManWalking;
 import static de.amr.games.pacman.model.Tile.isFood;
-import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
-import static de.amr.games.pacman.ui.Spritesheet.getPacManStanding;
-import static de.amr.games.pacman.ui.Spritesheet.getPacManWalking;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -22,6 +22,8 @@ import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.Bonus;
+import de.amr.games.pacman.ui.actor.Ghost.State;
 
 public class PacMan extends MazeMover<PacMan.State> {
 

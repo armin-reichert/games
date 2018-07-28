@@ -8,7 +8,7 @@ import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.MazeMover;
+import de.amr.games.pacman.ui.actor.MazeMover;
 
 class Flee implements RoutePlanner {
 

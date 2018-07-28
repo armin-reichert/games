@@ -13,7 +13,10 @@ import java.util.logging.Logger;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.controller.PlayScene;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Spritesheet;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.PacMan;
 
 public class PlaySceneInfo {
 

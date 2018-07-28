@@ -1,10 +1,10 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.PacManApp.TS;
+import static de.amr.games.pacman.model.Spritesheet.getEnergizer;
+import static de.amr.games.pacman.model.Spritesheet.getMazeImage;
+import static de.amr.games.pacman.model.Spritesheet.getMazeImageWhite;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.ui.Spritesheet.getEnergizer;
-import static de.amr.games.pacman.ui.Spritesheet.getMazeImage;
-import static de.amr.games.pacman.ui.Spritesheet.getMazeImageWhite;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -24,6 +24,8 @@ import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.PacMan;
 
 public class MazeUI extends GameEntity {
 

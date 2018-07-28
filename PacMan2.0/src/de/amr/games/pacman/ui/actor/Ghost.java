@@ -1,12 +1,12 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostBlue;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostBlueWhite;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostEyes;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostNormal;
-import static de.amr.games.pacman.ui.Spritesheet.getGreenNumber;
+import static de.amr.games.pacman.model.Spritesheet.getGhostBlue;
+import static de.amr.games.pacman.model.Spritesheet.getGhostBlueWhite;
+import static de.amr.games.pacman.model.Spritesheet.getGhostEyes;
+import static de.amr.games.pacman.model.Spritesheet.getGhostNormal;
+import static de.amr.games.pacman.model.Spritesheet.getGreenNumber;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -26,13 +26,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	private final int color;
 
-	private Sprite[] s_normal = new Sprite[4];
-	private Sprite[] s_dying = new Sprite[4];
-	private Sprite s_points;
-	private Sprite[] s_dead = new Sprite[4];
-	private Sprite s_frightened;
+	private Sprite s_normal[] = new Sprite[4];
+	private Sprite s_dying[] = new Sprite[4];
+	private Sprite s_dead[] = new Sprite[4];
+	private Sprite s_afraid;
 	private Sprite s_brave;
-	private final List<Sprite> s_animated = new ArrayList<>();
+	private Sprite s_points;
+
+	private final List<Sprite> s_list = new ArrayList<>();
 
 	public Ghost(Maze maze, String name, int color, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
@@ -42,21 +43,21 @@ public class Ghost extends MazeMover<Ghost.State> {
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);
-			s_animated.add(s_normal[dir]);
+			s_list.add(s_normal[dir]);
 			s_dead[dir] = new Sprite(getGhostEyes(dir)).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
 			s_dying[i] = new Sprite(getGreenNumber(i)).scale(size);
 		}
 		s_points = s_dying[0];
-		s_frightened = new Sprite(getGhostBlue()).scale(size).animation(AnimationMode.CYCLIC, 200);
+		s_afraid = new Sprite(getGhostBlue()).scale(size).animation(AnimationMode.CYCLIC, 200);
 		s_brave = new Sprite(getGhostBlueWhite()).scale(size).animation(AnimationMode.CYCLIC, 100);
-		s_animated.add(s_frightened);
+		s_list.add(s_afraid);
 	}
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return s_animated.stream();
+		return s_list.stream();
 	}
 
 	@Override
@@ -71,7 +72,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		case DEAD:
 			return s_dead[getDir()];
 		case AFRAID:
-			return s_frightened;
+			return s_afraid;
 		case BRAVE:
 			return s_brave;
 		default:

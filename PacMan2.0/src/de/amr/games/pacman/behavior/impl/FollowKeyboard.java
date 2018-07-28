@@ -4,7 +4,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.behavior.RoutePlanner;
-import de.amr.games.pacman.ui.MazeMover;
+import de.amr.games.pacman.ui.actor.MazeMover;
 
 class FollowKeyboard implements RoutePlanner {
 

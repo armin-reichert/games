@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.ui.actor;
 
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
@@ -21,6 +21,7 @@ import de.amr.games.pacman.behavior.impl.NavigationSystem;
 import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.PlaySceneInfo;
 
 /**
  * @param <S>

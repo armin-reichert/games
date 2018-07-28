@@ -1,6 +1,6 @@
 package de.amr.games.pacman.behavior;
 
-import de.amr.games.pacman.ui.MazeMover;
+import de.amr.games.pacman.ui.actor.MazeMover;
 
 public interface RoutePlanner {
 

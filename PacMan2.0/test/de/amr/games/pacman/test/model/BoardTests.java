@@ -1,4 +1,4 @@
-package de.amr.games.pacman.model;
+package de.amr.games.pacman.test.model;
 
 import static de.amr.games.pacman.model.Tile.DOOR;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
@@ -12,6 +12,8 @@ import java.util.stream.IntStream;
 import org.junit.Test;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.Tile;
 
 public class BoardTests {
 

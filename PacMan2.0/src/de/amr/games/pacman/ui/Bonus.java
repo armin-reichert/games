@@ -8,6 +8,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.model.Spritesheet;
 
 public class Bonus extends GameEntity {
 
