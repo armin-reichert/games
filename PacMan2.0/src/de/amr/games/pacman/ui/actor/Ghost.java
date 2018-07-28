@@ -8,9 +8,7 @@ import static de.amr.games.pacman.model.Spritesheet.getGhostEyes;
 import static de.amr.games.pacman.model.Spritesheet.getGhostNormal;
 import static de.amr.games.pacman.model.Spritesheet.getGreenNumber;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
@@ -33,8 +31,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_brave;
 	private Sprite s_points;
 
-	private final List<Sprite> s_list = new ArrayList<>();
-
 	public Ghost(Maze maze, String name, int color, Tile home) {
 		super(maze, home, new EnumMap<>(State.class));
 		setName(name);
@@ -43,7 +39,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);
-			s_list.add(s_normal[dir]);
 			s_dead[dir] = new Sprite(getGhostEyes(dir)).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
@@ -52,12 +47,12 @@ public class Ghost extends MazeMover<Ghost.State> {
 		s_points = s_dying[0];
 		s_afraid = new Sprite(getGhostBlue()).scale(size).animation(AnimationMode.CYCLIC, 200);
 		s_brave = new Sprite(getGhostBlueWhite()).scale(size).animation(AnimationMode.CYCLIC, 100);
-		s_list.add(s_afraid);
 	}
 
 	@Override
 	protected Stream<Sprite> getSprites() {
-		return s_list.stream();
+		return Stream.of(Stream.of(s_normal), Stream.of(s_dying), Stream.of(s_dead),
+				Stream.of(s_afraid, s_brave, s_points)).flatMap(s -> s);
 	}
 
 	@Override

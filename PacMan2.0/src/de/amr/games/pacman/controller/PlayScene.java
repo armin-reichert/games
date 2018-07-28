@@ -131,7 +131,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		// -- KILLING_GHOST
 
 		fsm.state(State.KILLING_GHOST).entry = state -> {
-			state.setDuration(sec(1));
+			state.setDuration(sec(0.5f));
 			pacMan.visibility = () -> false;
 		};
 
