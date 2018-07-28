@@ -108,13 +108,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case AFRAID:
 			move();
-			if (stateSec() > 3) {
+			if (stateSec() > 6) {
 				setState(State.BRAVE);
 			}
 			break;
 		case BRAVE:
 			move();
-			if (stateSec() > 1) {
+			if (stateSec() > 2) {
 				setState(State.AGGRO);
 			}
 			break;
