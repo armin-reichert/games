@@ -87,7 +87,7 @@ public class Maze {
 	public boolean isValidTile(Tile tile) {
 		return graph.isValidCol(tile.col) && graph.isValidRow(tile.row);
 	}
-	
+
 	public int getFoodCount() {
 		return foodCount;
 	}

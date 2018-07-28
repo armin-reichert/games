@@ -23,7 +23,6 @@ import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Bonus;
-import de.amr.games.pacman.ui.actor.Ghost.State;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
