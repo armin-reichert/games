@@ -20,6 +20,7 @@ public class Maze {
 	public Tile pacManHome, blinkyHome, pinkyHome, inkyHome, clydeHome, infoTile;
 
 	private final String[] data;
+	private int foodCount;
 	private final GridGraph<Character, Integer> graph;
 
 	public void resetFood() {
@@ -34,6 +35,7 @@ public class Maze {
 		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, v -> Tile.EMPTY, (u, v) -> 1,
 				UndirectedEdge::new);
 		graph.setDefaultVertexLabel(v -> data(graph.row(v), graph.col(v)));
+		foodCount = 0;
 		for (int row = 0; row < numRows; ++row) {
 			for (int col = 0; col < numCols; ++col) {
 				char c = data(row, col);
@@ -49,6 +51,8 @@ public class Maze {
 					infoTile = new Tile(col, row);
 				} else if (c == Tile.POS_PACMAN) {
 					pacManHome = new Tile(col, row);
+				} else if (Tile.isFood(c)) {
+					foodCount += 1;
 				}
 			}
 		}
@@ -82,6 +86,10 @@ public class Maze {
 
 	public boolean isValidTile(Tile tile) {
 		return graph.isValidCol(tile.col) && graph.isValidRow(tile.row);
+	}
+	
+	public int getFoodCount() {
+		return foodCount;
 	}
 
 	public char getContent(int col, int row) {

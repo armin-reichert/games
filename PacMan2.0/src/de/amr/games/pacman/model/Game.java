@@ -65,11 +65,11 @@ public class Game {
 
 	public void init(Maze maze) {
 		maze.resetFood();
+		foodTotal = maze.getFoodCount();
 		level = 1;
 		lives = 3;
 		score = 0;
 		foodEaten = 0;
 		ghostIndex = 0;
-		foodTotal = maze.tiles().map(maze::getContent).filter(Tile::isFood).count();
 	}
 }
