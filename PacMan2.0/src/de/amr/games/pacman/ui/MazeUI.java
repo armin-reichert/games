@@ -169,7 +169,8 @@ public class MazeUI extends GameEntity {
 		} else {
 			s_normal.draw(g);
 			maze.tiles().forEach(tile -> drawContent(g, tile));
-			ghosts.forEach(ghost -> ghost.draw(g));
+			ghosts.stream().filter(ghost -> ghost.getState() != Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
+			ghosts.stream().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
 			getBonus().ifPresent(bonus -> bonus.draw(g));
 			getInfo().ifPresent(info -> drawInfo(g, info));

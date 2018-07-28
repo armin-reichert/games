@@ -28,7 +28,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	private final int color;
-	private int dyingTime;
 
 	private Sprite[] s_normal = new Sprite[4];
 	private Sprite[] s_dying = new Sprite[4];
@@ -89,10 +88,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return color;
 	}
 
-	public void killAndShowPoints(int ghostIndex, int ticks) {
-		this.dyingTime = ticks;
+	public void onWounded(int ghostIndex) {
 		s_points = s_dying[ghostIndex];
 		setState(State.DYING);
+	}
+	
+	public void onExitus() {
+		setState(State.DEAD);
 	}
 
 	@Override
@@ -108,9 +110,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			}
 			break;
 		case DYING:
-			if (dyingTime-- <= 0) {
-				setState(State.DEAD);
-			}
 			break;
 		case FRIGHTENED:
 			move();
