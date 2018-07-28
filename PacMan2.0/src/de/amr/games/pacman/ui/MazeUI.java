@@ -9,9 +9,7 @@ import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -51,6 +49,27 @@ public class MazeUI extends GameEntity {
 		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
 				.animation(AnimationMode.CYCLIC, 100);
 		s_energizer = new Sprite(getEnergizer()).scale(TS).animation(AnimationMode.BACK_AND_FORTH, 250);
+	}
+
+	@Override
+	protected Stream<Sprite> getSprites() {
+		return Stream.of(s_normal, s_flashing, s_energizer);
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return flashing ? s_flashing : s_normal;
+	}
+
+	@Override
+	public void update() {
+		if (bonus != null) {
+			if (bonusTimeLeft-- == 0) {
+				removeBonus();
+			}
+		}
+		getPacMan().update();
+		getGhosts().forEach(Ghost::update);
 	}
 
 	@Override
@@ -130,30 +149,6 @@ public class MazeUI extends GameEntity {
 			bonus = null;
 			bonusTimeLeft = 0;
 		}
-	}
-
-	@Override
-	public void update() {
-		if (bonus != null) {
-			if (bonusTimeLeft-- == 0) {
-				removeBonus();
-			}
-		}
-		getPacMan().update();
-		getGhosts().forEach(Ghost::update);
-	}
-
-	@Override
-	protected Stream<Sprite> getSprites() {
-		List<Sprite> sprites = new ArrayList<>();
-		sprites.add(s_normal);
-		sprites.add(s_energizer);
-		return sprites.stream();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return flashing ? s_flashing : s_normal;
 	}
 
 	@Override
