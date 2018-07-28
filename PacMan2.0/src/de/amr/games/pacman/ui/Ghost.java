@@ -92,7 +92,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		s_points = s_dying[ghostIndex];
 		setState(State.DYING);
 	}
-	
+
 	public void onExitus() {
 		setState(State.DEAD);
 	}

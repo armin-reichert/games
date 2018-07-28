@@ -1,7 +1,7 @@
 package de.amr.games.pacman.behavior.impl;
 
-import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.behavior.Route;
+import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.ui.MazeMover;
 
 class Forward implements RoutePlanner {

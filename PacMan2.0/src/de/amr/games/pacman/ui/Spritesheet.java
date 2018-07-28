@@ -162,7 +162,7 @@ public class Spritesheet {
 	public static BufferedImage[] getGhostFrightenedEnding() {
 		return ghostFrightenedEnding;
 	}
-	
+
 	public static BufferedImage getGhostDead(int direction) {
 		switch (direction) {
 		case Top4.E:

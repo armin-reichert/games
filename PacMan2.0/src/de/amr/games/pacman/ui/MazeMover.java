@@ -74,7 +74,8 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			PlaySceneInfo.LOG.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
+			PlaySceneInfo.LOG
+					.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
 		}
 	}
 
@@ -147,8 +148,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	public void move() {
 		Tile tile = getTile();
 		if (maze.getContent(tile) == WORMHOLE) {
-			if (dir == Top4.E && tile.col == maze.numCols() - 1
-					|| dir == Top4.W && tile.col == 0) {
+			if (dir == Top4.E && tile.col == maze.numCols() - 1 || dir == Top4.W && tile.col == 0) {
 				placeAt(maze.numCols() - 1 - tile.col, tile.row);
 			}
 		}
