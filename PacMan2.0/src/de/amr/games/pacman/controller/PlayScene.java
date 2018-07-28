@@ -234,44 +234,44 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private Ghost createBlinky() {
 		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.observers.addObserver(this);
-		blinky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
+		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
-		blinky.setNavigation(Ghost.State.HEALING, bounce());
-		blinky.setNavigation(Ghost.State.AGGRESSIVE, chase(pacMan));
+		blinky.setNavigation(Ghost.State.SAFE, bounce());
 		return blinky;
 	}
 
 	private Ghost createPinky() {
 		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.observers.addObserver(this);
-		pinky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
+		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
-		pinky.setNavigation(Ghost.State.HEALING, bounce());
-		pinky.setNavigation(Ghost.State.AGGRESSIVE, ambush(pacMan));
+		pinky.setNavigation(Ghost.State.SAFE, bounce());
 		return pinky;
 	}
 
 	private Ghost createInky() {
 		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
 		inky.observers.addObserver(this);
-		inky.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		inky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
+		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
-		inky.setNavigation(Ghost.State.HEALING, bounce());
-		// inky.setMoveBehavior(Ghost.State.ATTACKING, moody());
+		inky.setNavigation(Ghost.State.SAFE, bounce());
 		return inky;
 	}
 
 	private Ghost createClyde() {
 		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.observers.addObserver(this);
-		clyde.setNavigation(Ghost.State.FRIGHTENED, flee(pacMan));
+		clyde.setNavigation(Ghost.State.AGGRO, chase(pacMan));
+		clyde.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
-		clyde.setNavigation(Ghost.State.HEALING, bounce());
-		// clyde.setMoveBehavior(Ghost.State.ATTACKING, stayBehind());
+		clyde.setNavigation(Ghost.State.SAFE, bounce());
 		return clyde;
 	}
 
@@ -294,7 +294,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 		clyde.setDir(Top4.N);
 
 		mazeUI.getGhosts().forEach(ghost -> {
-			ghost.setState(Ghost.State.HEALING);
+			ghost.setState(Ghost.State.SAFE);
 			ghost.placeAt(ghost.homeTile);
 			ghost.setSpeed(game::getGhostSpeed);
 		});
@@ -310,8 +310,10 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 
 	private void startGhostHunting() {
 		game.ghostIndex = 0;
-		mazeUI.getGhosts().filter(ghost -> ghost.getState() != Ghost.State.DEAD)
-				.forEach(ghost -> ghost.setState(Ghost.State.FRIGHTENED));
+		mazeUI.getGhosts()
+				.filter(
+						ghost -> ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.SAFE)
+				.forEach(ghost -> ghost.setState(Ghost.State.AFRAID));
 	}
 
 	// Game event handling
@@ -324,12 +326,12 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	private void onGhostContact(StateTransition<State, GameEvent> t) {
 		GhostContactEvent e = event(t);
 		switch (e.ghost.getState()) {
-		case AGGRESSIVE:
-		case HEALING:
+		case AGGRO:
+		case SAFE:
 		case SCATTERING:
 			fsm.enqueue(new PacManKilledEvent(e.ghost));
 			break;
-		case FRIGHTENED:
+		case AFRAID:
 		case BRAVE:
 			fsm.enqueue(new GhostKilledEvent(e.ghost));
 			break;

@@ -61,7 +61,7 @@ public class PlaySceneInfo {
 	}
 
 	private static void killAllLivingGhosts(PlayScene scene) {
-		scene.mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRESSIVE)
+		scene.mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRO)
 				.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 	}
 

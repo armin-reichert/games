@@ -21,7 +21,7 @@ import de.amr.games.pacman.model.Tile;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	public enum State {
-		AGGRESSIVE, SCATTERING, FRIGHTENED, BRAVE, DYING, DEAD, HEALING
+		AGGRO, SCATTERING, AFRAID, BRAVE, DYING, DEAD, SAFE
 	}
 
 	private final int color;
@@ -62,15 +62,15 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public Sprite currentSprite() {
 		switch (getState()) {
-		case AGGRESSIVE:
-		case HEALING:
+		case AGGRO:
+		case SAFE:
 		case SCATTERING:
 			return s_normal[getDir()];
 		case DYING:
 			return s_points;
 		case DEAD:
 			return s_dead[getDir()];
-		case FRIGHTENED:
+		case AFRAID:
 			return s_frightened;
 		case BRAVE:
 			return s_brave;
@@ -95,33 +95,33 @@ public class Ghost extends MazeMover<Ghost.State> {
 	@Override
 	public void update() {
 		switch (getState()) {
-		case AGGRESSIVE:
+		case AGGRO:
 			move();
 			break;
 		case DEAD:
 			move();
 			if (getTile().equals(homeTile)) {
-				setState(State.HEALING);
+				setState(State.SAFE);
 			}
 			break;
 		case DYING:
 			break;
-		case FRIGHTENED:
+		case AFRAID:
 			move();
-			if (stateDurationSeconds() > 3) {
+			if (stateSec() > 3) {
 				setState(State.BRAVE);
 			}
 			break;
 		case BRAVE:
 			move();
-			if (stateDurationSeconds() > 1) {
-				setState(State.AGGRESSIVE);
+			if (stateSec() > 1) {
+				setState(State.AGGRO);
 			}
 			break;
-		case HEALING:
+		case SAFE:
 			move();
-			if (stateDurationSeconds() > 2) {
-				setState(State.AGGRESSIVE);
+			if (stateSec() > 3) {
+				setState(State.AGGRO);
 			}
 		case SCATTERING:
 			move();

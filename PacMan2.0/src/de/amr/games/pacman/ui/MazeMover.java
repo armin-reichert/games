@@ -83,7 +83,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		return state;
 	}
 
-	public int stateDurationSeconds() {
+	public int stateSec() {
 		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
 	}
 

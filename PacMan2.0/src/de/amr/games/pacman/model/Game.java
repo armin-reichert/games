@@ -38,16 +38,16 @@ public class Game {
 
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
 		switch (ghost.getState()) {
-		case AGGRESSIVE:
+		case AGGRO:
 			return tps(6f);
 		case DYING:
 			return 0;
 		case DEAD:
 			return tps(12f);
-		case FRIGHTENED:
+		case AFRAID:
 		case BRAVE:
 			return tps(4f);
-		case HEALING:
+		case SAFE:
 			return tps(3f);
 		case SCATTERING:
 			return tps(6f);
