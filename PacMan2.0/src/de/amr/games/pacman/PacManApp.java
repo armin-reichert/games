@@ -29,6 +29,6 @@ public class PacManApp extends Application {
 
 	@Override
 	public void init() {
-		select(new PlayScene(this));
+		setController(new PlayScene(this));
 	}
 }

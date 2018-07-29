@@ -88,6 +88,6 @@ public class BirdyGame extends Application {
 		entities.store(new Ground(this));
 		entities.store(new City(this));
 
-		select(getIntroScene());
+		setController(getIntroScene());
 	}
 }

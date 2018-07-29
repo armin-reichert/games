@@ -68,7 +68,7 @@ public class StartScene implements ActiveScene<Graphics2D> {
 				displayText("readyText");
 			};
 
-			changeOnTimeout(Ready, StartPlaying, t -> app.select(app.getPlayScene()));
+			changeOnTimeout(Ready, StartPlaying, t -> app.setController(app.getPlayScene()));
 
 			changeOnInput(BirdTouchedGround, Ready, GameOver, t -> displayText("title"));
 

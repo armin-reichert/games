@@ -48,6 +48,6 @@ public class MillGameApp extends Application {
 		controller.setWhitePlayer(new InteractivePlayer(model, gameScene::findBoardPosition, WHITE));
 		controller.setBlackPlayer(new Zwick(model, BLACK));
 
-		select(controller);
+		setController(controller);
 	}
 }

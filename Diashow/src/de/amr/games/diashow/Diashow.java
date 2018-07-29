@@ -24,6 +24,6 @@ public class Diashow extends Application {
 		Assets.image("2.jpg");
 		Assets.image("3.jpg");
 		DiashowScreen scene = new DiashowScreen(900,600);
-		select(scene);
+		setController(scene);
 	}
 }

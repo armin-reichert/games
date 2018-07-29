@@ -97,7 +97,7 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 			changeOnInput(BirdTouchedGround, GameOver, GameOver,
 					t -> Assets.sound("music/bgmusic.mp3").stop());
 
-			state(StartingNewGame).entry = s -> app.select(app.getStartScene());
+			state(StartingNewGame).entry = s -> app.setController(app.getStartScene());
 		}
 	}
 

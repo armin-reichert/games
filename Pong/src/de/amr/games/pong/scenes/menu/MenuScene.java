@@ -75,7 +75,7 @@ public class MenuScene implements ActiveScene<Graphics2D> {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_ENTER)) {
-			app.select(app.playScene);
+			app.setController(app.playScene);
 		}
 		control.update();
 	}

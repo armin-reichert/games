@@ -28,6 +28,6 @@ public class MillTestApp extends Application {
 
 	@Override
 	public void init() {
-		select(new TestScene(this));
+		setController(new TestScene(this));
 	}
 }

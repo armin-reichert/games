@@ -16,7 +16,7 @@ public class DrawTestApp extends Application {
 
 	@Override
 	public void init() {
-		select(new DrawTestScene(this));
+		setController(new DrawTestScene(this));
 	}
 
 }

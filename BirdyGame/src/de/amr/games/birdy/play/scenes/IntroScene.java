@@ -62,7 +62,7 @@ public class IntroScene implements ActiveScene<Graphics2D> {
 		// ShowGameTitle
 		control.changeOnTimeout(ShowGameTitle, Finished);
 
-		control.state(ShowGameTitle).exit = s -> app.select(app.getStartScene());
+		control.state(ShowGameTitle).exit = s -> app.setController(app.getStartScene());
 	}
 	
 	@Override

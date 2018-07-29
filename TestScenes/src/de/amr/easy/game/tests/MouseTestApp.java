@@ -16,6 +16,6 @@ public class MouseTestApp extends Application {
 
 	@Override
 	public void init() {
-		select(new MouseTestScene(this));
+		setController(new MouseTestScene(this));
 	}
 }

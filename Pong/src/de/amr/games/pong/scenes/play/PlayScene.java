@@ -131,7 +131,7 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_CONTROL, VK_C)) {
-			app.select(app.menuScene);
+			app.setController(app.menuScene);
 		}
 		control.update();
 	}

@@ -68,7 +68,7 @@ public class PongGame extends Application {
 
 		menuScene = new MenuScene(this);
 		playScene = new PlayScene(this);
-		select(menuScene);
+		setController(menuScene);
 
 		setPlayMode(PlayMode.Player1_Player2);
 	}
