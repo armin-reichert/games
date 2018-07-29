@@ -7,25 +7,37 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
-import de.amr.games.diashow.Diashow;
 
-public class DiashowScreen extends ActiveScene<Diashow> {
+public class DiashowScreen implements ActiveScene {
 
 	private static final int KEY_NEXT = KeyEvent.VK_SPACE;
 
+	private int width;
+	private int height;
 	private int current;
 	private Image images[];
 	private int nImages = 4;
 
-	public DiashowScreen(Diashow app) {
-		super(app);
+	public DiashowScreen(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+
+	@Override
+	public int getWidth() {
+		return width;
+	}
+
+	@Override
+	public int getHeight() {
+		return height;
 	}
 
 	@Override
 	public void init() {
 		images = new Image[nImages];
 		for (int i = 0; i < nImages; i++) {
-			images[i] = Assets.readImage(i + ".jpg").getScaledInstance(app.getWidth(), -1, Image.SCALE_SMOOTH);
+			images[i] = Assets.readImage(i + ".jpg").getScaledInstance(width, -1, Image.SCALE_SMOOTH);
 		}
 		current = 0;
 	}
@@ -40,7 +52,6 @@ public class DiashowScreen extends ActiveScene<Diashow> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(images[current], 0, 0, app.getWidth(), app.getHeight(), null);
+		g.drawImage(images[current], 0, 0, null);
 	}
-
 }

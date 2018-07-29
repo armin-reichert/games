@@ -24,7 +24,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class IntroScene extends ActiveScene<BirdyGame> {
+public class IntroScene implements ActiveScene {
 
 	private static final String CREDITS_TEXT = "Anna proudly presents\nin cooperation with\nProf. Zwickmann\nGeräteschuppen Software 2017";
 
@@ -32,13 +32,14 @@ public class IntroScene extends ActiveScene<BirdyGame> {
 		ShowCredits, Wait, ShowGameTitle, Finished
 	}
 
+	private final BirdyGame app;
 	private final StateMachine<State, Object> control;
 	private City city;
 	private PumpingImage gameTitleImage;
 	private TextArea creditsText;
 
 	public IntroScene(BirdyGame app) {
-		super(app);
+		this.app = app;
 
 		control = new StateMachine<>("Intro Scene Control", State.class, ShowCredits);
 
@@ -51,7 +52,8 @@ public class IntroScene extends ActiveScene<BirdyGame> {
 
 		control.state(ShowCredits).update = s -> creditsText.update();
 
-		control.change(ShowCredits, Wait, () -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
+		control.change(ShowCredits, Wait,
+				() -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
 				t -> t.to().setDuration(app.pulse.secToTicks(2)));
 
 		// Wait
@@ -61,6 +63,16 @@ public class IntroScene extends ActiveScene<BirdyGame> {
 		control.changeOnTimeout(ShowGameTitle, Finished);
 
 		control.state(ShowGameTitle).exit = s -> app.select(app.getStartScene());
+	}
+	
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+	
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override

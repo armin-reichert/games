@@ -6,6 +6,7 @@ import static de.amr.games.muehle.model.board.StoneColor.BLACK;
 import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 import static java.util.stream.Collectors.joining;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.stream.IntStream;
 
@@ -15,15 +16,27 @@ import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.view.BoardUI;
 import de.amr.games.muehle.view.MillGameUI;
 
-public class TestScene extends ActiveScene<MillTestApp> {
+public class TestScene implements ActiveScene {
 
+	private final MillTestApp app;
 	private final Board board;
 	private BoardUI boardUI;
+	private Color bgColor;
 
 	public TestScene(MillTestApp app) {
-		super(app);
-		setBgColor(MillGameUI.BOARD_COLOR);
+		this.app = app;
+		bgColor = MillGameUI.BOARD_COLOR;
 		board = new Board();
+	}
+	
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+	
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override
@@ -46,7 +59,8 @@ public class TestScene extends ActiveScene<MillTestApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		super.draw(g);
+		g.setColor(bgColor);
+		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
 	}
 

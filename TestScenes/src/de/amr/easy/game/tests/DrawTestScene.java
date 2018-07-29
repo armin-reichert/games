@@ -10,15 +10,26 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class DrawTestScene extends ActiveScene<DrawTestApp> {
+public class DrawTestScene implements ActiveScene {
 
+	private DrawTestApp app;
 	private BufferedImage drawArea;
 	private Graphics2D pen;
 	private int penWidth;
 	private boolean randomColor;
 
 	public DrawTestScene(DrawTestApp app) {
-		super(app);
+		this.app = app;
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override

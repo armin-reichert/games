@@ -32,15 +32,15 @@ import de.amr.games.pong.entities.ScoreDisplay;
  * 
  * @author Armin Reichert
  */
-public class PlayScene extends ActiveScene<PongGame> {
+public class PlayScene implements ActiveScene {
 
 	/**
 	 * State machine for controlling the play scene.
 	 */
 	private StateMachine<PlaySceneState, PlaySceneEvent> createStateMachine() {
 
-		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl", PlaySceneState.class,
-				Initialized);
+		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl",
+				PlaySceneState.class, Initialized);
 
 		// Initialized
 
@@ -76,6 +76,7 @@ public class PlayScene extends ActiveScene<PongGame> {
 		return fsm;
 	}
 
+	private final PongGame app;
 	private final StateMachine<PlaySceneState, PlaySceneEvent> control;
 	private Court court;
 	private Paddle paddleLeft;
@@ -83,10 +84,20 @@ public class PlayScene extends ActiveScene<PongGame> {
 	private Ball ball;
 	private ScoreDisplay score;
 
-	public PlayScene(PongGame game) {
-		super(game);
+	public PlayScene(PongGame app) {
+		this.app = app;
 		control = createStateMachine();
 		control.setLogger(Application.LOG);
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override

@@ -6,12 +6,23 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.samples.marbletoy.MarbleToySimulation;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
-public class MainScene extends ActiveScene<MarbleToySimulation> {
+public class MainScene implements ActiveScene {
 
+	private MarbleToySimulation app;
 	private MarbleToy toy;
 
-	public MainScene(MarbleToySimulation game) {
-		super(game);
+	public MainScene(MarbleToySimulation app) {
+		this.app = app;
+	}
+	
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+	
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override

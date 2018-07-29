@@ -7,19 +7,14 @@ import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.scene.ActiveScene;
 
-public class MainScene extends ActiveScene<GamePerformanceApp> {
+public class MainScene implements ActiveScene {
 
+	private Image bgImg;
 	private int sampleIndex;
 	private int[] fpsValues;
 	private int stepX = 20;
 
 	public MainScene(GamePerformanceApp app) {
-		super(app);
-	}
-
-	@Override
-	public void init() {
-		fpsValues = new int[getWidth()];
 		app.pulse.addRenderListener(e -> {
 			if ("fps".equals(e.getPropertyName())) {
 				fpsValues[sampleIndex++] = (Integer) e.getNewValue();
@@ -28,9 +23,24 @@ public class MainScene extends ActiveScene<GamePerformanceApp> {
 				}
 			}
 		});
-		setBgImage(createBgImage());
+	}
+	
+	@Override
+	public int getWidth() {
+		return 1000;
+	}
+	
+	@Override
+	public int getHeight() {
+		return 400;
 	}
 
+	@Override
+	public void init() {
+		fpsValues = new int[getWidth()];
+		bgImg = createBgImage();
+	}
+	
 	@Override
 	public void update() {
 	}
@@ -49,7 +59,7 @@ public class MainScene extends ActiveScene<GamePerformanceApp> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		super.draw(g);
+		g.drawImage(bgImg, 0, 0, null);
 		g.translate(0, getHeight());
 		g.scale(1, -1);
 		int xOffset = 50;

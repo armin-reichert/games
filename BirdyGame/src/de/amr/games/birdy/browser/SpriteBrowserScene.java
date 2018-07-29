@@ -13,14 +13,15 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class SpriteBrowserScene extends ActiveScene<SpriteBrowser> {
+public class SpriteBrowserScene implements ActiveScene {
 
+	private final SpriteBrowser app;
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);
 	private final List<String> spriteNames;
 	private int index;
 
 	public SpriteBrowserScene(SpriteBrowser app) {
-		super(app);
+		this.app = app;
 		spriteNames = new ArrayList<>();
 		for (String name : Assets.imageNames()) {
 			spriteNames.add(name);
@@ -30,6 +31,16 @@ public class SpriteBrowserScene extends ActiveScene<SpriteBrowser> {
 
 	@Override
 	public void init() {
+	}
+	
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+	
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override

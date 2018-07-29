@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.game.scene.Scene;
+import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.game.view.Controller;
 import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
@@ -27,24 +27,41 @@ import de.amr.games.muehle.msg.Messages;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
+public class MillGameScene implements ActiveScene, MillGameUI {
 
+	private final MillGameApp app;
 	private final MillGameController controller;
 	private final MillGameModel model;
 
+	private final Color bgColor;
 	private final BoardUI boardUI;
 	private final TextArea messageArea;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
 	public MillGameScene(MillGameApp app, MillGameController control) {
-		super(app);
+		this.app = app;
 		this.controller = control;
 		this.model = control.model;
-		setBgColor(BOARD_COLOR.darker());
+		this.bgColor = BOARD_COLOR.darker();
 		boardUI = new BoardUI(model.board);
 		messageArea = new TextArea();
 	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
+	}
+	
+	@Override
+		public void update() {
+			
+		}
 
 	@Override
 	public void init() {
@@ -58,7 +75,8 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
 		messageArea.setColor(Color.BLUE);
-		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
+		messageArea.setFont(
+				Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 		messageArea.tf.moveTo(0, getHeight() - 90);
 
 		controller.assistant.hCenter(getWidth());
@@ -127,7 +145,8 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 
 	@Override
 	public void draw(Graphics2D g) {
-		super.draw(g);
+		g.setColor(bgColor);
+		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
 		controller.assistant.draw(g);
 		messageArea.hCenter(getWidth());
@@ -138,8 +157,10 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 					boardUI.markPosition(g, p, Color.ORANGE);
 				}
 			});
-			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
-			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
+			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40,
+					getHeight() - 30);
+			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100,
+					getHeight() - 30);
 		}
 		if (controller.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
 				&& controller.playerInTurn().isInteractive()) {
@@ -160,9 +181,12 @@ public class MillGameScene extends Scene<MillGameApp> implements MillGameUI {
 		if (stonesLeft > 1) {
 			g.setColor(player == controller.playerInTurn() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(stonesCounterFont);
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(), stoneTemplate.getRadius());
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+					RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(),
+					stoneTemplate.getRadius());
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+					RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		}
 		g.translate(-x, -y);
 	}

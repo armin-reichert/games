@@ -33,17 +33,29 @@ import de.amr.games.breakout.entities.Brick;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PlayScene extends ActiveScene<BreakoutGame> {
+public class PlayScene implements ActiveScene {
 
+	private final BreakoutGame app;
 	private final PlaySceneControl control;
 	private Bat bat;
 	private Ball ball;
 	private int points;
+	private Image bgImage;
 
 	public PlayScene(BreakoutGame app) {
-		super(app);
+		this.app = app;
 		control = new PlaySceneControl();
 		control.setLogger(Application.LOG);
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	private class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
@@ -100,11 +112,11 @@ public class PlayScene extends ActiveScene<BreakoutGame> {
 
 	@Override
 	public void init() {
-		Image background = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
+		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
 				BufferedImage.SCALE_SMOOTH);
-		setBgImage(background);
 		ball = app.entities.add(new Ball(app, app.settings.get("ball_size")));
-		bat = app.entities.add(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
+		bat = app.entities
+				.add(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -117,7 +129,10 @@ public class PlayScene extends ActiveScene<BreakoutGame> {
 
 	@Override
 	public void draw(Graphics2D g) {
-		super.draw(g);
+		if (bgImage != null) {
+			g.drawImage(bgImage, 0, 0, null);
+		}
+		app.entities.all().forEach(entity -> entity.draw(g));
 		drawScore(g);
 	}
 
@@ -184,10 +199,12 @@ public class PlayScene extends ActiveScene<BreakoutGame> {
 	private final Font scoreFont = new Font(Font.SANS_SERIF, Font.PLAIN, 48);
 
 	private void drawScore(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setFont(scoreFont);
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
-		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
+		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2,
+				getHeight() * 3 / 4);
 	}
 }

@@ -21,17 +21,28 @@ import de.amr.games.pong.PongGame.PlayMode;
  * 
  * @author Armin Reichert
  */
-public class MenuScene extends ActiveScene<PongGame> {
+public class MenuScene implements ActiveScene {
 
+	private final PongGame app;
 	private final StateMachine<PlayMode, String> control;
 	private Color bgColor;
 	private Color bgColorSelected;
 	private Color hilightColor;
 
 	public MenuScene(PongGame app) {
-		super(app);
+		this.app = app;
 		control = createStateMachine();
 		control.setLogger(Application.LOG);
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override
@@ -42,7 +53,8 @@ public class MenuScene extends ActiveScene<PongGame> {
 	}
 
 	private StateMachine<PlayMode, String> createStateMachine() {
-		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);
+		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class,
+				Player1_Player2);
 		PlayMode[] playModes = PlayMode.values();
 		for (int i = 0, n = playModes.length; i < n; i += 1) {
 			fsm.change(playModes[i], playModes[(i + 1) % n], () -> keyPressedOnce(KeyEvent.VK_DOWN));

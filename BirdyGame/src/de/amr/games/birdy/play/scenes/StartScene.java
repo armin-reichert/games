@@ -36,7 +36,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class StartScene extends ActiveScene<BirdyGame> {
+public class StartScene implements ActiveScene {
 
 	public enum State {
 		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser
@@ -87,6 +87,7 @@ public class StartScene extends ActiveScene<BirdyGame> {
 		}
 	}
 
+	private final BirdyGame app;
 	private final StartSceneControl control;
 	private Bird bird;
 	private City city;
@@ -94,8 +95,18 @@ public class StartScene extends ActiveScene<BirdyGame> {
 	private Optional<GameEntity> displayedText;
 
 	public StartScene(BirdyGame game) {
-		super(game);
+		this.app = game;
 		control = new StartSceneControl();
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override
@@ -191,7 +202,7 @@ public class StartScene extends ActiveScene<BirdyGame> {
 
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(), control.stateID(),
-				bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
+		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(),
+				control.stateID(), bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

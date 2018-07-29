@@ -9,13 +9,23 @@ import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class MouseTestScene extends ActiveScene<MouseTestApp> {
+public class MouseTestScene implements ActiveScene {
 
+	private final MouseTestApp app;
 	private TextArea messageDisplay;
 
 	public MouseTestScene(MouseTestApp app) {
-		super(app);
-		setBgColor(Color.WHITE);
+		this.app = app;
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override
@@ -26,29 +36,36 @@ public class MouseTestScene extends ActiveScene<MouseTestApp> {
 	@Override
 	public void update() {
 
-		if (Mouse.clicked() || Mouse.pressed() || Mouse.released() || Mouse.moved() || Mouse.dragged()) {
+		if (Mouse.clicked() || Mouse.pressed() || Mouse.released() || Mouse.moved()
+				|| Mouse.dragged()) {
 			messageDisplay.setText("");
 		}
 		if (Mouse.clicked()) {
-			info(format("Mouse clicked at (%d, %d), %s button", Mouse.getX(), Mouse.getY(), whichMouseButton()));
+			info(format("Mouse clicked at (%d, %d), %s button", Mouse.getX(), Mouse.getY(),
+					whichMouseButton()));
 		}
 		if (Mouse.pressed()) {
-			info(format("Mouse pressed at (%d, %d), %s button", Mouse.getX(), Mouse.getY(), whichMouseButton()));
+			info(format("Mouse pressed at (%d, %d), %s button", Mouse.getX(), Mouse.getY(),
+					whichMouseButton()));
 		}
 		if (Mouse.released()) {
-			info(format("Mouse released at (%d, %d), %s button", Mouse.getX(), Mouse.getY(), whichMouseButton()));
+			info(format("Mouse released at (%d, %d), %s button", Mouse.getX(), Mouse.getY(),
+					whichMouseButton()));
 		}
 		if (Mouse.moved()) {
-			info(format("Mouse moved to (%d, %d), %s button", Mouse.getX(), Mouse.getY(), whichMouseButton()));
+			info(format("Mouse moved to (%d, %d), %s button", Mouse.getX(), Mouse.getY(),
+					whichMouseButton()));
 		}
 		if (Mouse.dragged()) {
-			info(format("Mouse dragged to (%d, %d), %s button", Mouse.getX(), Mouse.getY(), whichMouseButton()));
+			info(format("Mouse dragged to (%d, %d), %s button", Mouse.getX(), Mouse.getY(),
+					whichMouseButton()));
 		}
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		super.draw(g);
+		g.setColor(Color.white);
+		g.fillRect(0, 0, getWidth(), getHeight());
 		messageDisplay.center(getWidth(), getHeight());
 		messageDisplay.draw(g);
 		g.translate(Mouse.getX(), Mouse.getY());

@@ -37,8 +37,9 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class PlayScene extends ActiveScene<BirdyGame> {
+public class PlayScene implements ActiveScene {
 
+	private final BirdyGame app;
 	private final PlaySceneControl control;
 	private final Score score = new Score();
 	private final ObstacleManager obstacleManager;
@@ -93,14 +94,15 @@ public class PlayScene extends ActiveScene<BirdyGame> {
 			state(GameOver).entry = s -> stop();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver, t -> Assets.sound("music/bgmusic.mp3").stop());
+			changeOnInput(BirdTouchedGround, GameOver, GameOver,
+					t -> Assets.sound("music/bgmusic.mp3").stop());
 
 			state(StartingNewGame).entry = s -> app.select(app.getStartScene());
 		}
 	}
 
 	public PlayScene(BirdyGame game) {
-		super(game);
+		this.app = game;
 		control = new PlaySceneControl();
 		obstacleManager = new ObstacleManager(app);
 		// control.setLogger(Application.LOG);
@@ -109,6 +111,16 @@ public class PlayScene extends ActiveScene<BirdyGame> {
 	public void receive(BirdyGameEvent event) {
 		control.addInput(event);
 		bird.receiveEvent(event);
+	}
+	
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+	
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override
@@ -174,7 +186,7 @@ public class PlayScene extends ActiveScene<BirdyGame> {
 	private void showState(Graphics2D g) {
 		g.setColor(Color.BLACK);
 		g.setFont(stateTextFont);
-		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(), bird.getFlightState(),
-				bird.getHealthState()), 20, getHeight() - 50);
+		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(),
+				bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

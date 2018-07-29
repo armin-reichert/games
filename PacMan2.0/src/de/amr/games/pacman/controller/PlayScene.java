@@ -45,11 +45,13 @@ import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
-public class PlayScene extends ActiveScene<PacManApp> implements GameEventListener {
+public class PlayScene implements ActiveScene, GameEventListener {
 
 	public enum State {
 		READY, PLAYING, KILLING_GHOST, DYING, CHANGING_LEVEL, GAME_OVER
 	};
+
+	private final PacManApp app;
 
 	// Model
 	public final Game game = new Game();
@@ -66,7 +68,7 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 	public final StateMachine<State, GameEvent> fsm;
 
 	public PlayScene(PacManApp app) {
-		super(app);
+		this.app = app;
 		this.maze = app.maze;
 
 		// Actors
@@ -201,6 +203,16 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			mazeUI.removeBonus();
 			game.init(maze);
 		};
+	}
+
+	@Override
+	public int getWidth() {
+		return app.getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return app.getHeight();
 	}
 
 	@Override
