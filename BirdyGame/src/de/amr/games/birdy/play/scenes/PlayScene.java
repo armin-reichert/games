@@ -21,10 +21,10 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
+import de.amr.games.birdy.entities.GameOverText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
@@ -112,12 +112,12 @@ public class PlayScene implements ActiveScene {
 		control.addInput(event);
 		bird.receiveEvent(event);
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return app.getWidth();
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return app.getHeight();
@@ -131,7 +131,7 @@ public class PlayScene implements ActiveScene {
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
 		scoreDisplay.hCenter(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
-		gameOverText = app.entities.add(new GameEntity(new Sprite(Assets.image("text_game_over"))));
+		gameOverText = app.entities.add(new GameOverText());
 		gameOverText.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tf.moveTo(0, -getHeight());

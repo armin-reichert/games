@@ -5,14 +5,15 @@ import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
 
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.OptionalInt;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.timing.Pulse;
-import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
+import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.controller.move.MoveController;
@@ -30,7 +31,7 @@ import de.amr.games.muehle.view.MillGameUI;
  * 
  * @author Armin Reichert
  */
-public class MillGameController extends MillGameStateMachine implements Controller {
+public class MillGameController extends MillGameStateMachine implements ViewController {
 
 	public final Pulse pulse;
 	public final MillGameModel model;
@@ -108,6 +109,10 @@ public class MillGameController extends MillGameStateMachine implements Controll
 		readUserInput();
 		super.update();
 		assistant.update();
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
 	}
 
 	private void readUserInput() {
@@ -219,7 +224,8 @@ public class MillGameController extends MillGameStateMachine implements Controll
 				LOG.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (model.board.getStoneAt(p).get() != colorToRemove) {
 				LOG.info(Messages.text("stone_at_position_wrong_color", p));
-			} else if (model.board.inMill(p, colorToRemove) && !model.board.allStonesInMills(colorToRemove)) {
+			} else if (model.board.inMill(p, colorToRemove)
+					&& !model.board.allStonesInMills(colorToRemove)) {
 				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				view.removeStoneAt(p);
@@ -275,6 +281,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 
 	@Override
 	protected boolean shallStartNewGame() {
-		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive() || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);
+		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive()
+				|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);
 	}
 }

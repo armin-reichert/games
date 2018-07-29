@@ -22,11 +22,12 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
+import de.amr.games.birdy.entities.GameOverText;
 import de.amr.games.birdy.entities.Ground;
+import de.amr.games.birdy.entities.TitleText;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGame;
 import de.amr.games.birdy.play.BirdyGameEvent;
@@ -146,13 +147,13 @@ public class StartScene implements ActiveScene {
 		bird.setNormalFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 
 		if (!app.entities.contains("title")) {
-			GameEntity titleText = new GameEntity(new Sprite(Assets.image("title")));
+			GameEntity titleText = new TitleText();
 			titleText.setName("title");
 			app.entities.add(titleText);
 		}
 
 		if (!app.entities.contains("text_game_over")) {
-			GameEntity gameOverText = new GameEntity(new Sprite(Assets.image("text_game_over")));
+			GameEntity gameOverText = new GameOverText();
 			gameOverText.setName("game_over");
 			app.entities.add(gameOverText);
 		}

@@ -20,7 +20,7 @@ public class Ground extends GameEntity {
 	public Ground(BirdyGame app) {
 		setSprites(new Sprite(Assets.image("land")));
 	}
-
+	
 	@Override
 	public void update() {
 		startX -= tf.getVelocityX();
