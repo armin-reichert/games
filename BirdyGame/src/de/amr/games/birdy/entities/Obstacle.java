@@ -9,7 +9,7 @@ import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.entity.collision.CollisionBoxSupplier;
+import de.amr.easy.game.entity.collision.CollisionSensitive;
 import de.amr.games.birdy.play.BirdyGame;
 
 /**
@@ -78,16 +78,16 @@ public class Obstacle extends GameEntity {
 		this.lighted = lighted;
 	}
 
-	public CollisionBoxSupplier getUpperPart() {
+	public CollisionSensitive getUpperPart() {
 		return () -> new Rectangle2D.Double(tf.getX(), tf.getY(), upperPart.getWidth(), upperPart.getHeight());
 	}
 
-	public CollisionBoxSupplier getLowerPart() {
+	public CollisionSensitive getLowerPart() {
 		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight() + passage.getHeight(),
 				lowerPart.getWidth(), lowerPart.getHeight());
 	}
 
-	public CollisionBoxSupplier getPassage() {
+	public CollisionSensitive getPassage() {
 		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight(), passage.getWidth(),
 				passage.getHeight());
 	}
