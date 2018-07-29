@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.controller.PlayScene;
 import de.amr.games.pacman.model.Maze;
@@ -20,7 +21,7 @@ import de.amr.games.pacman.ui.actor.PacMan;
 
 public class PlaySceneInfo {
 
-	public static final Logger LOG = Logger.getLogger(PlaySceneInfo.class.getSimpleName());
+	public static final Logger LOG = Application.LOG;
 
 	static {
 		LOG.setLevel(Level.OFF);
