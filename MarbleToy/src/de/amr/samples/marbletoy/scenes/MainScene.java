@@ -14,12 +14,12 @@ public class MainScene implements ActiveScene<Graphics2D> {
 	public MainScene(MarbleToySimulation app) {
 		this.app = app;
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return app.getWidth();
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return app.getHeight();
@@ -27,7 +27,7 @@ public class MainScene implements ActiveScene<Graphics2D> {
 
 	@Override
 	public void init() {
-		toy = app.entities.findAny(MarbleToy.class);
+		toy = app.entities.ofClass(MarbleToy.class).findFirst().get();
 		toy.init();
 	}
 

@@ -102,27 +102,27 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 
 	@Override
 	public void init() {
-		court = app.entities.findAny(Court.class);
+		court = app.entities.ofClass(Court.class).findFirst().get();
 		switch (app.getPlayMode()) {
 		case Computer_Computer:
-			paddleLeft = app.entities.findAny(AutoPaddleLeft.class);
-			paddleRight = app.entities.findAny(AutoPaddleRight.class);
+			paddleLeft = app.entities.ofClass(AutoPaddleLeft.class).findFirst().get();
+			paddleRight = app.entities.ofClass(AutoPaddleRight.class).findFirst().get();
 			break;
 		case Computer_Player2:
-			paddleLeft = app.entities.findAny(AutoPaddleLeft.class);
-			paddleRight = app.entities.findByName(Paddle.class, "paddleRight");
+			paddleLeft = app.entities.ofClass(AutoPaddleLeft.class).findFirst().get();
+			paddleRight = app.entities.ofName("paddleRight");
 			break;
 		case Player1_Computer:
-			paddleLeft = app.entities.findByName(Paddle.class, "paddleLeft");
-			paddleRight = app.entities.findAny(AutoPaddleRight.class);
+			paddleLeft = app.entities.ofName("paddleLeft");
+			paddleRight = app.entities.ofClass(AutoPaddleRight.class).findFirst().get();
 			break;
 		case Player1_Player2:
-			paddleLeft = app.entities.findByName(Paddle.class, "paddleLeft");
-			paddleRight = app.entities.findByName(Paddle.class, "paddleRight");
+			paddleLeft = app.entities.ofName("paddleLeft");
+			paddleRight = app.entities.ofName("paddleRight");
 			break;
 		}
-		ball = app.entities.findAny(Ball.class);
-		score = app.entities.findAny(ScoreDisplay.class);
+		ball = app.entities.ofClass(Ball.class).findFirst().get();
+		score = app.entities.ofClass(ScoreDisplay.class).findFirst().get();
 		score.hCenter(getWidth());
 		score.tf.setY(100);
 		control.init();

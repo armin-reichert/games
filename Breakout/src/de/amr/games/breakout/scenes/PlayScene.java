@@ -76,7 +76,7 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 			state(Playing).entry = s -> launchBall();
 
 			state(Playing).update = s -> {
-				if (app.entities.filter(Brick.class).count() == 0) {
+				if (app.entities.ofClass(Brick.class).count() == 0) {
 					resetBatAndBall();
 					newBricks();
 				}
@@ -91,7 +91,7 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 			changeOnInput(BallHitsBrick, Playing, Playing, t -> {
 				Brick brick = t.getInput().get().getUserData();
 				if (brick.isDamaged()) {
-					app.entities.remove(brick);
+					app.entities.removeEntity(brick);
 					app.collisionHandler.unregisterStart(ball, brick);
 					points += brick.getValue();
 					Assets.sound("Sounds/point.mp3").play();
@@ -114,9 +114,9 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 	public void init() {
 		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
 				BufferedImage.SCALE_SMOOTH);
-		ball = app.entities.add(new Ball(app, app.settings.get("ball_size")));
+		ball = app.entities.store(new Ball(app, app.settings.get("ball_size")));
 		bat = app.entities
-				.add(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
+				.store(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -155,7 +155,7 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 			for (int col = 0; col < numCols; ++col) {
 				Brick brick = new Brick(brickWidth, brickHeight, type, value);
 				brick.tf.moveTo(x, y);
-				app.entities.add(brick);
+				app.entities.store(brick);
 				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
 				x += hSpace;
 			}

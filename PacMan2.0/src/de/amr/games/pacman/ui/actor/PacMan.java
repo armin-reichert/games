@@ -33,8 +33,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Sprite s_dying;
 
 	public PacMan(Maze maze, Tile home) {
-		super(maze, home, new EnumMap<>(State.class));
-		setName("Pac-Man");
+		super(maze, "Pac-Man", home, new EnumMap<>(State.class));
 		int size = 2 * TS;
 		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
 		TOPOLOGY.dirs().forEach(dir -> {

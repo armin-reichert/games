@@ -32,6 +32,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	public final GameEventSupport observers = new GameEventSupport();
 	public final Maze maze;
 	public final Tile homeTile;
+	private final String name;
 	private final Map<S, RoutePlanner> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
@@ -39,13 +40,19 @@ public abstract class MazeMover<S> extends GameEntity {
 	private S state;
 	private long stateEntryTime;
 
-	protected MazeMover(Maze maze, Tile homeTile, Map<S, RoutePlanner> navigation) {
+	protected MazeMover(Maze maze, String name, Tile homeTile, Map<S, RoutePlanner> navigation) {
 		Objects.requireNonNull(maze);
+		Objects.requireNonNull(name);
 		Objects.requireNonNull(homeTile);
 		Objects.requireNonNull(navigation);
 		this.maze = maze;
+		this.name = name;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	@Override

@@ -18,8 +18,8 @@ public class DrawingScene implements ActiveScene<Graphics2D> {
 	public DrawingScene(MagicBallApp app) {
 		this.app = app;
 		image = new BufferedImage(app.getWidth(), app.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		pen = app.entities.add(new Pen(image));
-		pen2 = app.entities.add(new Pen(image));
+		pen = app.entities.store(new Pen(image));
+		pen2 = app.entities.store(new Pen(image));
 	}
 
 	@Override

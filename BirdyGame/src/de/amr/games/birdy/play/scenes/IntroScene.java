@@ -77,7 +77,7 @@ public class IntroScene implements ActiveScene<Graphics2D> {
 
 	@Override
 	public void init() {
-		city = app.entities.findAny(City.class);
+		city = app.entities.ofClass(City.class).findAny().get();
 		city.setWidth(getWidth());
 		if (new Random().nextBoolean()) {
 			city.letSunGoDown();

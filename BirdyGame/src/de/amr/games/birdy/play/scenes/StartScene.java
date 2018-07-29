@@ -13,7 +13,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.util.Optional;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
@@ -25,9 +24,8 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.entities.GameOverText;
+import de.amr.games.birdy.entities.GraphicText;
 import de.amr.games.birdy.entities.Ground;
-import de.amr.games.birdy.entities.TitleText;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGame;
 import de.amr.games.birdy.play.BirdyGameEvent;
@@ -74,13 +72,13 @@ public class StartScene implements ActiveScene<Graphics2D> {
 
 			changeOnInput(BirdTouchedGround, Ready, GameOver, t -> displayText("title"));
 
-			state(Ready).exit = s -> displayedText = Optional.empty();
+			state(Ready).exit = s -> displayedText = null;
 
 			// GameOver ---
 
 			state(GameOver).entry = s -> {
 				stop();
-				displayedText = Optional.of(app.entities.findByName(GameEntity.class, "game_over"));
+				displayedText = app.entities.ofName("game_over");
 				Assets.sounds().forEach(Sound::stop);
 			};
 
@@ -93,7 +91,7 @@ public class StartScene implements ActiveScene<Graphics2D> {
 	private Bird bird;
 	private City city;
 	private Ground ground;
-	private Optional<GameEntity> displayedText;
+	private GraphicText displayedText;
 
 	public StartScene(BirdyGame game) {
 		this.app = game;
@@ -127,52 +125,49 @@ public class StartScene implements ActiveScene<Graphics2D> {
 	}
 
 	private void displayText(String name) {
-		displayedText = Optional.of(app.entities.findByName(GameEntity.class, name));
+		displayedText = app.entities.ofName(name);
 	}
 
 	private void reset() {
-		city = app.entities.findAny(City.class);
+		city = app.entities.ofClass(City.class).findAny().get();
 		city.setWidth(getWidth());
 		city.init();
 
-		ground = app.entities.findAny(Ground.class);
+		ground = app.entities.ofClass(Ground.class).findAny().get();
 		ground.setWidth(getWidth());
 		ground.tf.moveTo(0, getHeight() - ground.getHeight());
 		ground.tf.setVelocity(app.settings.getAsFloat("world speed"), 0);
 
-		bird = app.entities.findAny(Bird.class);
+		bird = app.entities.ofClass(Bird.class).findAny().get();
 		bird.init();
 		bird.tf.moveTo(getWidth() / 8, ground.tf.getY() / 2);
 		bird.tf.setVelocity(0, 0);
 		bird.setNormalFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 
 		if (!app.entities.contains("title")) {
-			GameEntity titleText = new TitleText();
-			titleText.setName("title");
-			app.entities.add(titleText);
+			GameEntity titleText = new GraphicText(Assets.image("title"));
+			app.entities.store("title", titleText);
 		}
 
 		if (!app.entities.contains("text_game_over")) {
-			GameEntity gameOverText = new GameOverText();
-			gameOverText.setName("game_over");
-			app.entities.add(gameOverText);
+			GameEntity gameOverText = new GraphicText(Assets.image("text_game_over"));
+			app.entities.store("text_game_over", gameOverText);
 		}
 
 		if (!app.entities.contains("text_ready")) {
 			PumpingImage readyText = new PumpingImage(Assets.image("text_ready"));
-			readyText.setName("readyText");
-			app.entities.add(readyText);
+			app.entities.store("text_ready", readyText);
 		}
 
 		if (!app.entities.contains("world")) {
 			Area world = new Area(getWidth(), 2 * getHeight());
-			world.setName("world");
 			world.tf.moveTo(0, -getHeight());
-			app.entities.add(world);
+			app.entities.store("world", world);
 		}
 
 		app.collisionHandler.clear();
-		app.collisionHandler.registerEnd(bird, app.entities.findAny(Area.class), BirdLeftWorld);
+		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(),
+				BirdLeftWorld);
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 
 		displayText("title");
@@ -196,11 +191,10 @@ public class StartScene implements ActiveScene<Graphics2D> {
 		city.draw(g);
 		ground.draw(g);
 		bird.draw(g);
-		displayedText.ifPresent(text -> {
-			text.center(getWidth(), getHeight() - ground.getHeight());
-			text.draw(g);
-		});
-
+		if (displayedText != null) {
+			displayedText.center(getWidth(), getHeight() - ground.getHeight());
+			displayedText.draw(g);
+		}
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
 		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(),

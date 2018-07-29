@@ -104,9 +104,9 @@ public class ObstacleManager extends GameEntity {
 	}
 
 	private void updateObstacles() {
-		Ground ground = app.entities.findAny(Ground.class);
-		City city = app.entities.findAny(City.class);
-		Bird bird = app.entities.findAny(Bird.class);
+		Ground ground = app.entities.ofClass(Ground.class).findAny().get();
+		City city = app.entities.ofClass(City.class).findAny().get();
+		Bird bird = app.entities.ofClass(Bird.class).findAny().get();
 
 		// Add new obstacle
 		int minHeight = app.settings.get("min pipe height");

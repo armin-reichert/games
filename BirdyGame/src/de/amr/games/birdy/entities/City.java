@@ -56,7 +56,7 @@ public class City extends GameEntity {
 		};
 
 		control.state(Night).update = s -> {
-			app.entities.filter(Star.class).forEach(Star::update);
+			app.entities.ofClass(Star.class).forEach(GameEntity::update);
 		};
 
 		control.state(Night).exit = s -> {
@@ -91,7 +91,7 @@ public class City extends GameEntity {
 		app.entities.removeAll(Star.class);
 		int numStars = randomInt(1, app.settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
-			Star star = app.entities.add(new Star());
+			Star star = app.entities.store(new Star());
 			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		});
 		LOG.info("Created " + numStars + " new stars");
@@ -135,7 +135,7 @@ public class City extends GameEntity {
 		for (int x = 0; x < width; x += image.getWidth(null)) {
 			pen.drawImage(image, x, 0, null);
 		}
-		app.entities.filter(Star.class).forEach(star -> star.draw(pen));
+		app.entities.ofClass(Star.class).forEach(star -> star.draw(pen));
 		pen.translate(-tf.getX(), -tf.getY());
 	}
 }

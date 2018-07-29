@@ -52,21 +52,19 @@ public class PongGame extends Application {
 		Assets.sound("plip.mp3");
 		Assets.sound("out.mp3");
 
-		entities.add(new Court(getWidth(), getHeight()));
-		entities.add(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
+		entities.store(new Court(getWidth(), getHeight()));
+		entities.store(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
 
-		entities.add(new Ball(getHeight()));
+		entities.store(new Ball(getHeight()));
 
-		entities.add(new AutoPaddleLeft(this));
-		entities.add(new AutoPaddleRight(this));
+		entities.store(new AutoPaddleLeft(this));
+		entities.store(new AutoPaddleRight(this));
 
 		Paddle paddleLeft = new Paddle(this, VK_A, VK_Y);
-		paddleLeft.setName("paddleLeft");
-		entities.add(paddleLeft);
+		entities.store("paddleLeft", paddleLeft);
 
 		Paddle paddleRight = new Paddle(this, VK_UP, VK_DOWN);
-		paddleRight.setName("paddleRight");
-		entities.add(paddleRight);
+		entities.store("paddleRight", paddleRight);
 
 		menuScene = new MenuScene(this);
 		playScene = new PlayScene(this);

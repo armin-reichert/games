@@ -28,7 +28,7 @@ public class MarbleToySimulation extends Application {
 		Marble marble = new Marble(new Sprite(Assets.image("marble.png")).scale(50, 50));
 		MarbleToy toy = new MarbleToy(new Sprite(Assets.image("toy.png")), marble);
 		toy.setLeverControl(new LeverControl(toy));
-		entities.add(toy);
+		entities.store(toy);
 		select(new MainScene(this));
 	}
 }

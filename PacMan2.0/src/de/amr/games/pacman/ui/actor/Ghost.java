@@ -32,8 +32,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_points;
 
 	public Ghost(Maze maze, String name, int color, Tile home) {
-		super(maze, home, new EnumMap<>(State.class));
-		setName(name);
+		super(maze, name, home, new EnumMap<>(State.class));
 		this.color = color;
 		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {

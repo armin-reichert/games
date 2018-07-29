@@ -84,9 +84,9 @@ public class BirdyGame extends Application {
 		Assets.storeTrueTypeFont("Pacifico-Regular", "fonts/Pacifico-Regular.ttf", Font.BOLD, 40);
 
 		// create entities shared by different scenes:
-		entities.add(new Bird(this));
-		entities.add(new Ground(this));
-		entities.add(new City(this));
+		entities.store(new Bird(this));
+		entities.store(new Ground(this));
+		entities.store(new City(this));
 
 		select(getIntroScene());
 	}

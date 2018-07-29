@@ -24,7 +24,7 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.entities.GameOverText;
+import de.amr.games.birdy.entities.GraphicText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
@@ -125,13 +125,13 @@ public class PlayScene implements ActiveScene<Graphics2D> {
 
 	@Override
 	public void init() {
-		ground = app.entities.findAny(Ground.class);
-		city = app.entities.findAny(City.class);
-		bird = app.entities.findAny(Bird.class);
+		ground = app.entities.ofClass(Ground.class).findAny().get();
+		city = app.entities.ofClass(City.class).findAny().get();
+		bird = app.entities.ofClass(Bird.class).findAny().get();
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
 		scoreDisplay.hCenter(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
-		gameOverText = app.entities.add(new GameOverText());
+		gameOverText = app.entities.store(new GraphicText(Assets.image("text_game_over")));
 		gameOverText.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tf.moveTo(0, -getHeight());
