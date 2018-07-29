@@ -44,7 +44,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	@Override
-	protected Stream<Sprite> getSprites() {
+	public Stream<Sprite> getSprites() {
 		return Stream.of(Stream.of(s_walking), Stream.of(s_dying)).flatMap(s -> s);
 	}
 

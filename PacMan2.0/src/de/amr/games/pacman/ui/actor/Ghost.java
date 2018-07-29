@@ -50,7 +50,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	@Override
-	protected Stream<Sprite> getSprites() {
+	public Stream<Sprite> getSprites() {
 		return Stream.of(Stream.of(s_normal), Stream.of(s_dying), Stream.of(s_dead),
 				Stream.of(s_afraid, s_brave, s_points)).flatMap(s -> s);
 	}

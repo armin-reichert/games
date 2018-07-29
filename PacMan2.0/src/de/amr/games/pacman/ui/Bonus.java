@@ -3,6 +3,7 @@ package de.amr.games.pacman.ui;
 import static de.amr.games.pacman.PacManApp.TS;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
@@ -12,20 +13,20 @@ import de.amr.games.pacman.model.Spritesheet;
 
 public class Bonus extends GameEntity {
 
-	private boolean honored;
 	private BonusSymbol symbol;
 	private int points;
-	private Sprite spriteSymbol;
-	private Sprite spritePoints;
+	private boolean honored;
+	private Sprite s_symbol;
+	private Sprite s_points;
 
 	public Bonus(BonusSymbol symbol, int points) {
 		this.symbol = symbol;
 		this.points = points;
 		this.honored = false;
-		spriteSymbol = new Sprite(Spritesheet.getBonus(symbol)).scale(2 * TS, 2 * TS);
+		s_symbol = new Sprite(Spritesheet.getBonus(symbol)).scale(2 * TS, 2 * TS);
 		int index = Arrays.binarySearch(Game.BONUS_POINTS, points);
 		if (index >= 0) {
-			spritePoints = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * TS, 2 * TS);
+			s_points = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * TS, 2 * TS);
 		} else {
 			throw new IllegalArgumentException("Bonus value not supported: " + points);
 		}
@@ -45,7 +46,12 @@ public class Bonus extends GameEntity {
 
 	@Override
 	public Sprite currentSprite() {
-		return honored ? spritePoints : spriteSymbol;
+		return honored ? s_points : s_symbol;
+	}
+	
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.of(s_points, s_symbol);
 	}
 
 	@Override

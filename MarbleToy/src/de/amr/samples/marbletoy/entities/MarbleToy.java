@@ -16,6 +16,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.EnumSet;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
@@ -30,12 +31,12 @@ public class MarbleToy extends GameEntity {
 	public final Lever[] levers = new Lever[3];
 	private final EnumSet<RoutingPoint> auxPoints = EnumSet.of(E, F, G, H);
 	private final GameEntity marble;
-
+	private Sprite sprite;
 	private LeverControl leverControl;
 	private MarbleRouter router;
 
 	public MarbleToy(Sprite sprite, Marble marble) {
-		super(sprite);
+		this.sprite = sprite;
 		this.marble = marble;
 		marble.tf.moveTo(-marble.getWidth(), -marble.getHeight());
 		levers[0] = new Lever(178, 82);
@@ -85,6 +86,16 @@ public class MarbleToy extends GameEntity {
 		for (int i = 0; i < levers.length; ++i) {
 			levers[i].setPointsLeft(isLeverRoutingLeft(i));
 		}
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return sprite;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.of(sprite);
 	}
 
 	@Override

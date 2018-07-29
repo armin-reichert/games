@@ -6,10 +6,12 @@ import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.CollisionSensitive;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.play.BirdyGame;
 
 /**
@@ -61,14 +63,24 @@ public class Obstacle extends GameEntity {
 	}
 
 	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
+	}
+
+	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
 		g.drawImage(pipeDown, 0, 0, null);
 		if (lighted) {
 			int inset = (int) passage.getWidth() / 10;
 			g.setColor(new Color(255, 255, 0, rand.nextInt(170)));
-			g.fillRect((int) passage.getX() + inset, (int) passage.getY(), (int) (passage.getWidth() - 2 * inset),
-					(int) passage.getHeight());
+			g.fillRect((int) passage.getX() + inset, (int) passage.getY(),
+					(int) (passage.getWidth() - 2 * inset), (int) passage.getHeight());
 		}
 		g.drawImage(pipeUp, 0, (int) (upperPart.getHeight() + passage.getHeight()), null);
 		g.translate(-tf.getX(), -tf.getY());
@@ -79,16 +91,18 @@ public class Obstacle extends GameEntity {
 	}
 
 	public CollisionSensitive getUpperPart() {
-		return () -> new Rectangle2D.Double(tf.getX(), tf.getY(), upperPart.getWidth(), upperPart.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY(), upperPart.getWidth(),
+				upperPart.getHeight());
 	}
 
 	public CollisionSensitive getLowerPart() {
-		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight() + passage.getHeight(),
-				lowerPart.getWidth(), lowerPart.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(),
+				tf.getY() + upperPart.getHeight() + passage.getHeight(), lowerPart.getWidth(),
+				lowerPart.getHeight());
 	}
 
 	public CollisionSensitive getPassage() {
-		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight(), passage.getWidth(),
-				passage.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight(),
+				passage.getWidth(), passage.getHeight());
 	}
 }

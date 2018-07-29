@@ -1,6 +1,7 @@
 package de.amr.games.breakout.entities;
 
 import java.awt.Dimension;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
@@ -9,11 +10,21 @@ import de.amr.games.breakout.BreakoutGame;
 public class Ball extends GameEntity {
 
 	private final Dimension boardSize;
+	private Sprite s_ball;
 
 	public Ball(BreakoutGame app, int size) {
 		boardSize = new Dimension(app.getWidth(), app.getHeight());
-		Sprite ballSprite = new Sprite("ball_green.png").scaleFrame(0, size, size);
-		setSprites(ballSprite);
+		s_ball = new Sprite("ball_green.png").scaleFrame(0, size, size);
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return s_ball;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.of(s_ball);
 	}
 
 	@Override

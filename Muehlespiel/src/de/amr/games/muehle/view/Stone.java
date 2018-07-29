@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.muehle.model.board.StoneColor;
 
 /**
@@ -62,6 +63,16 @@ public class Stone extends GameEntity {
 	@Override
 	public int getHeight() {
 		return 2 * radius;
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
 	}
 
 	@Override

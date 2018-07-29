@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.stream.Stream;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 
@@ -17,14 +17,9 @@ public class Pen extends GameEntity {
 	private int thickness;
 
 	public Pen(BufferedImage image) {
-		super(new Sprite(Assets.image("ball.png")).scaleFrame(0, 50, 50));
 		this.image = image;
 		thickness = 20;
 		color = randomColor();
-	}
-
-	@Override
-	public void init() {
 	}
 
 	@Override
@@ -38,6 +33,16 @@ public class Pen extends GameEntity {
 		}
 		color = randomColor();
 		draw();
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
 	}
 
 	public void draw() {

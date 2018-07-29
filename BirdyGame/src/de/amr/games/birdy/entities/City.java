@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
@@ -36,11 +37,14 @@ public class City extends GameEntity {
 	private final BirdyGame app;
 	private final StateMachine<CityState, CityEvent> control;
 	private int width;
+	private Sprite s_night;
+	private Sprite s_day;
 
 	public City(BirdyGame app) {
 		this.app = app;
 
-		setSprites(new Sprite("bg_night"), new Sprite("bg_day"));
+		s_night = new Sprite("bg_night");
+		s_day = new Sprite("bg_day");
 
 		control = new StateMachine<>("City control", CityState.class, Day);
 
@@ -116,7 +120,12 @@ public class City extends GameEntity {
 
 	@Override
 	public Sprite currentSprite() {
-		return getSprite(isNight() ? 0 : 1);
+		return isNight() ? s_night : s_day;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.of(s_night, s_day);
 	}
 
 	@Override

@@ -2,8 +2,10 @@ package de.amr.games.pong.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.sprite.Sprite;
 
 public class Court extends GameEntity {
 
@@ -16,6 +18,16 @@ public class Court extends GameEntity {
 	public Court(int width, int height) {
 		this.width = width;
 		this.height = height;
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
 	}
 
 	@Override

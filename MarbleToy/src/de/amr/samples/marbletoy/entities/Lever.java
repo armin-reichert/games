@@ -4,8 +4,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.sprite.Sprite;
 
 public class Lever extends GameEntity {
 
@@ -21,12 +23,12 @@ public class Lever extends GameEntity {
 	public int getWidth() {
 		return size;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return size;
 	}
-	
+
 	@Override
 	public void init() {
 	}
@@ -44,6 +46,16 @@ public class Lever extends GameEntity {
 	}
 
 	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
+	}
+
+	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(new Color(200, 200, 200));
 		g.setStroke(new BasicStroke(4));
@@ -53,9 +65,9 @@ public class Lever extends GameEntity {
 		} else {
 			g.drawLine(x - legLen, y - legLen, x + legLen, y + legLen);
 		}
-//		g.fillOval(x - size / 2, y - size / 2, size, size);
-//		g.setColor(Color.BLACK);
-//		g.fill(getCollisionBox());
+		// g.fillOval(x - size / 2, y - size / 2, size, size);
+		// g.setColor(Color.BLACK);
+		// g.fill(getCollisionBox());
 	}
 
 	@Override

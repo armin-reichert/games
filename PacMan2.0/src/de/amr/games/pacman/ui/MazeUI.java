@@ -52,7 +52,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	@Override
-	protected Stream<Sprite> getSprites() {
+	public Stream<Sprite> getSprites() {
 		return Stream.of(s_normal, s_flashing, s_energizer);
 	}
 

@@ -14,6 +14,7 @@ import static java.lang.Math.PI;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
@@ -105,18 +106,27 @@ public class Bird extends GameEntity {
 		// flightControl.setLogger(Application.Log);
 		healthControl = new HealthControl();
 		// health.setLogger(Application.Log);
-		YELLOW_FEATHERS = createFeathers("bird0");
-		BLUE_FEATHERS = createFeathers("bird1");
-		RED_FEATHERS = createFeathers("bird2");
-		setSprites(YELLOW_FEATHERS, BLUE_FEATHERS, RED_FEATHERS);
+		YELLOW_FEATHERS = createFeatherSprite("bird0");
+		BLUE_FEATHERS = createFeatherSprite("bird1");
+		RED_FEATHERS = createFeatherSprite("bird2");
 		normalFeathers = YELLOW_FEATHERS;
 		gravity = app.settings.getAsFloat("world gravity");
 	}
 
-	private Sprite createFeathers(String birdName) {
+	private Sprite createFeatherSprite(String birdName) {
 		Sprite sprite = new Sprite(birdName + "_0", birdName + "_1", birdName + "_2");
 		sprite.animation(AnimationMode.BACK_AND_FORTH, app.settings.get("bird flap millis"));
 		return sprite;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.of(YELLOW_FEATHERS, BLUE_FEATHERS, RED_FEATHERS);
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return healthControl.is(Injured) ? RED_FEATHERS : normalFeathers;
 	}
 
 	@Override
@@ -161,11 +171,6 @@ public class Bird extends GameEntity {
 		int margin = Math.min(getWidth() / 4, getHeight() / 4);
 		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin, getWidth() - 2 * margin,
 				getHeight() - 2 * margin);
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return healthControl.is(Injured) ? RED_FEATHERS : normalFeathers;
 	}
 
 	public void flap() {

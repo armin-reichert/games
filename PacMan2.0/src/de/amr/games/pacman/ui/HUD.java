@@ -5,9 +5,11 @@ import static de.amr.games.pacman.PacManApp.TS;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.Game;
 
 public class HUD extends GameEntity {
@@ -18,6 +20,16 @@ public class HUD extends GameEntity {
 	public HUD(Game game) {
 		this.game = game;
 		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, TS * 3 / 2);
+	}
+
+	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
+
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
 	}
 
 	@Override
