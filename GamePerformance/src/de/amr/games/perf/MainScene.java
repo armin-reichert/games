@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.scene.ActiveScene;
 
-public class MainScene implements ActiveScene {
+public class MainScene implements ActiveScene<Graphics2D> {
 
 	private Image bgImg;
 	private int sampleIndex;
@@ -24,12 +24,12 @@ public class MainScene implements ActiveScene {
 			}
 		});
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return 1000;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return 400;
@@ -40,7 +40,7 @@ public class MainScene implements ActiveScene {
 		fpsValues = new int[getWidth()];
 		bgImg = createBgImage();
 	}
-	
+
 	@Override
 	public void update() {
 	}

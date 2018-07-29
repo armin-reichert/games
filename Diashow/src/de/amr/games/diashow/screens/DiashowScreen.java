@@ -8,7 +8,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class DiashowScreen implements ActiveScene {
+public class DiashowScreen implements ActiveScene<Graphics2D> {
 
 	private static final int KEY_NEXT = KeyEvent.VK_SPACE;
 

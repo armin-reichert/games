@@ -24,7 +24,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class IntroScene implements ActiveScene {
+public class IntroScene implements ActiveScene<Graphics2D> {
 
 	private static final String CREDITS_TEXT = "Anna proudly presents\nin cooperation with\nProf. Zwickmann\nGeräteschuppen Software 2017";
 

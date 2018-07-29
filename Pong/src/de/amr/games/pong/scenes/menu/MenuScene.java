@@ -21,7 +21,7 @@ import de.amr.games.pong.PongGame.PlayMode;
  * 
  * @author Armin Reichert
  */
-public class MenuScene implements ActiveScene {
+public class MenuScene implements ActiveScene<Graphics2D> {
 
 	private final PongGame app;
 	private final StateMachine<PlayMode, String> control;

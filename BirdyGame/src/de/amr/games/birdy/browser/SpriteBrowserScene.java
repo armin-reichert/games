@@ -13,7 +13,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class SpriteBrowserScene implements ActiveScene {
+public class SpriteBrowserScene implements ActiveScene<Graphics2D> {
 
 	private final SpriteBrowser app;
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);

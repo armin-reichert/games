@@ -9,7 +9,7 @@ import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class MouseTestScene implements ActiveScene {
+public class MouseTestScene implements ActiveScene<Graphics2D> {
 
 	private final MouseTestApp app;
 	private TextArea messageDisplay;

@@ -4,9 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.View;
 
-public class Ball extends GameEntity implements View {
+public class Ball extends GameEntity {
 
 	private final int courtHeight;
 	private int size = 16;

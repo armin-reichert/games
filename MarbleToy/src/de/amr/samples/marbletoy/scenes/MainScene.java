@@ -6,7 +6,7 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.samples.marbletoy.MarbleToySimulation;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
-public class MainScene implements ActiveScene {
+public class MainScene implements ActiveScene<Graphics2D> {
 
 	private MarbleToySimulation app;
 	private MarbleToy toy;

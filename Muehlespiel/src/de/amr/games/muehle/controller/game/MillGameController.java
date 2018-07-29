@@ -31,7 +31,7 @@ import de.amr.games.muehle.view.MillGameUI;
  * 
  * @author Armin Reichert
  */
-public class MillGameController extends MillGameStateMachine implements ViewController {
+public class MillGameController extends MillGameStateMachine implements ViewController<Graphics2D> {
 
 	public final Pulse pulse;
 	public final MillGameModel model;
@@ -77,7 +77,7 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 	}
 
 	@Override
-	public View currentView() {
+	public View<Graphics2D> currentView() {
 		return view;
 	}
 
@@ -109,10 +109,6 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 		readUserInput();
 		super.update();
 		assistant.update();
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
 	}
 
 	private void readUserInput() {

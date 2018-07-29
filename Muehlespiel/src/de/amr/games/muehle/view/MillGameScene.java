@@ -27,7 +27,7 @@ import de.amr.games.muehle.msg.Messages;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene implements ActiveScene, MillGameUI {
+public class MillGameScene implements ActiveScene<Graphics2D>, MillGameUI {
 
 	private final MillGameApp app;
 	private final MillGameController controller;
@@ -57,11 +57,11 @@ public class MillGameScene implements ActiveScene, MillGameUI {
 	public int getHeight() {
 		return app.getHeight();
 	}
-	
+
 	@Override
-		public void update() {
-			
-		}
+	public void update() {
+
+	}
 
 	@Override
 	public void init() {

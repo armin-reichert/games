@@ -37,7 +37,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class StartScene implements ActiveScene {
+public class StartScene implements ActiveScene<Graphics2D> {
 
 	public enum State {
 		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser

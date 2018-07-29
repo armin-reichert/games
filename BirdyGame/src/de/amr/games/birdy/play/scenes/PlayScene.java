@@ -37,7 +37,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements ActiveScene {
+public class PlayScene implements ActiveScene<Graphics2D> {
 
 	private final BirdyGame app;
 	private final PlaySceneControl control;

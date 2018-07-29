@@ -45,7 +45,7 @@ import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
-public class PlayScene implements ActiveScene, GameEventListener {
+public class PlayScene implements ActiveScene<Graphics2D>, GameEventListener {
 
 	public enum State {
 		READY, PLAYING, KILLING_GHOST, DYING, CHANGING_LEVEL, GAME_OVER

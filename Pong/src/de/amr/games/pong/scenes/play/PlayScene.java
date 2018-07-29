@@ -32,7 +32,7 @@ import de.amr.games.pong.entities.ScoreDisplay;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements ActiveScene {
+public class PlayScene implements ActiveScene<Graphics2D> {
 
 	/**
 	 * State machine for controlling the play scene.

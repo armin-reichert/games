@@ -10,7 +10,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.scene.ActiveScene;
 
-public class DrawTestScene implements ActiveScene {
+public class DrawTestScene implements ActiveScene<Graphics2D> {
 
 	private DrawTestApp app;
 	private BufferedImage drawArea;

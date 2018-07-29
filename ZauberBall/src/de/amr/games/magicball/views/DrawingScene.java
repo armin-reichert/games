@@ -8,7 +8,7 @@ import de.amr.easy.game.scene.ActiveScene;
 import de.amr.games.magicball.MagicBallApp;
 import de.amr.games.magicball.entities.Pen;
 
-public class DrawingScene implements ActiveScene {
+public class DrawingScene implements ActiveScene<Graphics2D> {
 
 	private final MagicBallApp app;
 	private final BufferedImage image;

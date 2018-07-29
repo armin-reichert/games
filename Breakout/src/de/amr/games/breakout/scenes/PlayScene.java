@@ -33,7 +33,7 @@ import de.amr.games.breakout.entities.Brick;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PlayScene implements ActiveScene {
+public class PlayScene implements ActiveScene<Graphics2D> {
 
 	private final BreakoutGame app;
 	private final PlaySceneControl control;

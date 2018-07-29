@@ -16,7 +16,7 @@ import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.view.BoardUI;
 import de.amr.games.muehle.view.MillGameUI;
 
-public class TestScene implements ActiveScene {
+public class TestScene implements ActiveScene<Graphics2D> {
 
 	private final MillTestApp app;
 	private final Board board;
@@ -28,12 +28,12 @@ public class TestScene implements ActiveScene {
 		bgColor = MillGameUI.BOARD_COLOR;
 		board = new Board();
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return app.getWidth();
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return app.getHeight();
