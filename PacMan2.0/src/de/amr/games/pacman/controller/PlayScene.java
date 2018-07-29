@@ -135,6 +135,11 @@ public class PlayScene extends ActiveScene<PacManApp> implements GameEventListen
 			pacMan.visibility = () -> false;
 		};
 
+		fsm.state(State.KILLING_GHOST).update = state -> {
+			mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD)
+					.forEach(Ghost::update);
+		};
+
 		fsm.changeOnTimeout(State.KILLING_GHOST, State.PLAYING, this::onGhostDied);
 
 		fsm.state(State.KILLING_GHOST).exit = state -> {

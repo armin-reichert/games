@@ -104,7 +104,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 			break;
 		case AFRAID:
 			move();
-			if (stateSec() > 6) {
+			if (getTile().equals(homeTile)) {
+				setState(State.SAFE);
+			} else if (stateSec() > 6) {
 				setState(State.BRAVE);
 			}
 			break;
