@@ -4,6 +4,8 @@ import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
+import static de.amr.games.muehle.model.board.StoneColor.BLACK;
+import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 
 import java.awt.event.KeyEvent;
 import java.util.OptionalInt;
@@ -15,14 +17,18 @@ import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.Transition;
+import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.move.MoveController;
 import de.amr.games.muehle.controller.move.MoveState;
+import de.amr.games.muehle.controller.player.InteractivePlayer;
 import de.amr.games.muehle.controller.player.Player;
+import de.amr.games.muehle.controller.player.Zwick;
 import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.view.Assistant;
+import de.amr.games.muehle.view.MillGameScene;
 import de.amr.games.muehle.view.MillGameUI;
 
 /**
@@ -32,6 +38,7 @@ import de.amr.games.muehle.view.MillGameUI;
  */
 public class MillGameController extends MillGameStateMachine implements Controller {
 
+	public final MillGameApp app;
 	public final Pulse pulse;
 	public final MillGameModel model;
 	public final Assistant assistant;
@@ -45,7 +52,8 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	private float placingTimeSeconds;
 	private OptionalInt positionNearMouse;
 
-	public MillGameController(Pulse pulse, MillGameModel model) {
+	public MillGameController(MillGameApp app, Pulse pulse, MillGameModel model) {
+		this.app = app;
 		this.pulse = pulse;
 		this.model = model;
 		this.assistant = new Assistant(this);
@@ -98,6 +106,11 @@ public class MillGameController extends MillGameStateMachine implements Controll
 
 	@Override
 	public void init() {
+		MillGameScene gameScene = new MillGameScene(app, this);
+		setWhitePlayer(new InteractivePlayer(model, gameScene::findBoardPosition, WHITE));
+		setBlackPlayer(new Zwick(model, BLACK));
+		setView(gameScene);
+		gameScene.init();
 		super.init();
 		assistant.init();
 		assistedPlayer = whitePlayer;

@@ -34,8 +34,8 @@ public class MillGameScene implements ViewController, MillGameUI {
 	private final MillGameModel model;
 
 	private final Color bgColor;
-	private final BoardUI boardUI;
-	private final TextArea messageArea;
+	private BoardUI boardUI;
+	private TextArea messageArea;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
@@ -44,8 +44,6 @@ public class MillGameScene implements ViewController, MillGameUI {
 		this.controller = control;
 		this.model = control.model;
 		this.bgColor = BOARD_COLOR.darker();
-		boardUI = new BoardUI(model.board);
-		messageArea = new TextArea();
 	}
 
 	@Override
@@ -65,6 +63,8 @@ public class MillGameScene implements ViewController, MillGameUI {
 
 	@Override
 	public void init() {
+		boardUI = new BoardUI(model.board);
+		messageArea = new TextArea();
 		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
@@ -89,7 +89,9 @@ public class MillGameScene implements ViewController, MillGameUI {
 
 	@Override
 	public void clearBoard() {
-		boardUI.clear();
+		if (boardUI != null) {
+			boardUI.clear();
+		}
 	}
 
 	@Override
