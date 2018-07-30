@@ -46,41 +46,35 @@ import de.amr.statemachine.StateTransition;
 
 public class PlayScene implements ViewController {
 
-	public enum State {
-		READY, PLAYING, KILLING_GHOST, DYING, CHANGING_LEVEL, GAME_OVER
-	};
-
 	private final PacManApp app;
 
-	// Model
 	public final Game game = new Game();
 	public final Maze maze;
 
-	// View
 	public final MazeUI mazeUI;
 	public final HUD hud;
 	public final StatusUI status;
 	public final PacMan pacMan;
 	public final Ghost blinky, pinky, inky, clyde;
 
-	// Controller
-	public final StateMachine<State, GameEvent> fsm;
+	public enum State {
+		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
+	};
+
+	public final StateMachine<State, GameEvent> gameControl;
 
 	public PlayScene(PacManApp app) {
 		this.app = app;
 		this.maze = app.maze;
 
-		// Create state machine controlling the game play
-		fsm = createPlayControl();
+		gameControl = createGameControl();
 
-		// Create the actors
 		pacMan = createPacMan();
 		blinky = createBlinky();
 		pinky = createPinky();
 		inky = createInky();
 		clyde = createClyde();
 
-		// Create and populate the board
 		mazeUI = new MazeUI(maze, pacMan);
 		mazeUI.addGhost(blinky);
 		mazeUI.addGhost(pinky);
@@ -90,13 +84,12 @@ public class PlayScene implements ViewController {
 		status = new StatusUI(game);
 		buildLayout();
 
-		// Pass game events to state machine
-		mazeUI.observers.addObserver(fsm::enqueue);
+		mazeUI.observers.addObserver(gameControl::enqueue);
 		Stream.of(pacMan, blinky, pinky, inky, clyde)
-				.forEach(entity -> entity.observers.addObserver(fsm::enqueue));
+				.forEach(entity -> entity.observers.addObserver(gameControl::enqueue));
 	}
 
-	private StateMachine<State, GameEvent> createPlayControl() {
+	private StateMachine<State, GameEvent> createGameControl() {
 		StateMachine<State, GameEvent> fsm = new StateMachine<>("GameController", State.class,
 				State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
@@ -129,28 +122,29 @@ public class PlayScene implements ViewController {
 
 		fsm.changeOnInput(GhostContactEvent.class, State.PLAYING, State.PLAYING, this::onGhostContact);
 
-		fsm.changeOnInput(GhostKilledEvent.class, State.PLAYING, State.KILLING_GHOST,
+		fsm.changeOnInput(GhostKilledEvent.class, State.PLAYING, State.GHOST_DYING,
 				this::onGhostKilled);
 
-		fsm.changeOnInput(PacManKilledEvent.class, State.PLAYING, State.DYING, this::onPacManKilled);
+		fsm.changeOnInput(PacManKilledEvent.class, State.PLAYING, State.PACMAN_DYING,
+				this::onPacManKilled);
 
 		fsm.changeOnInput(NextLevelEvent.class, State.PLAYING, State.CHANGING_LEVEL);
 
-		// -- KILLING_GHOST
+		// -- GHOST_DYING
 
-		fsm.state(State.KILLING_GHOST).entry = state -> {
+		fsm.state(State.GHOST_DYING).entry = state -> {
 			state.setDuration(sec(0.5f));
 			pacMan.visibility = () -> false;
 		};
 
-		fsm.state(State.KILLING_GHOST).update = state -> {
+		fsm.state(State.GHOST_DYING).update = state -> {
 			mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD)
 					.forEach(Ghost::update);
 		};
 
-		fsm.changeOnTimeout(State.KILLING_GHOST, State.PLAYING, this::onGhostDied);
+		fsm.changeOnTimeout(State.GHOST_DYING, State.PLAYING, this::onGhostDied);
 
-		fsm.state(State.KILLING_GHOST).exit = state -> {
+		fsm.state(State.GHOST_DYING).exit = state -> {
 			pacMan.visibility = () -> true;
 		};
 
@@ -175,22 +169,22 @@ public class PlayScene implements ViewController {
 
 		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.PLAYING);
 
-		// -- DYING
+		// -- PACMAN_DYING
 
-		fsm.state(State.DYING).entry = state -> {
+		fsm.state(State.PACMAN_DYING).entry = state -> {
 			state.setDuration(sec(3));
 			pacMan.setState(PacMan.State.DYING);
 			mazeUI.getGhosts().forEach(ghost -> ghost.visibility = () -> false);
 			game.lives -= 1;
 		};
 
-		fsm.state(State.DYING).exit = state -> {
+		fsm.state(State.PACMAN_DYING).exit = state -> {
 			mazeUI.getGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		};
 
-		fsm.changeOnTimeout(State.DYING, State.GAME_OVER, () -> game.lives == 0);
+		fsm.changeOnTimeout(State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
 
-		fsm.changeOnTimeout(State.DYING, State.PLAYING, () -> game.lives > 0, t -> {
+		fsm.changeOnTimeout(State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
 			pacMan.currentSprite().resetAnimation();
 			initActors();
 		});
@@ -225,7 +219,7 @@ public class PlayScene implements ViewController {
 
 	@Override
 	public void init() {
-		fsm.init();
+		gameControl.init();
 	}
 
 	/**
@@ -234,7 +228,7 @@ public class PlayScene implements ViewController {
 	@Override
 	public void update() {
 		PlaySceneInfo.update(this);
-		fsm.update();
+		gameControl.update();
 	}
 
 	@Override
@@ -349,11 +343,11 @@ public class PlayScene implements ViewController {
 		case AGGRO:
 		case SAFE:
 		case SCATTERING:
-			fsm.enqueue(new PacManKilledEvent(e.ghost));
+			gameControl.enqueue(new PacManKilledEvent(e.ghost));
 			break;
 		case AFRAID:
 		case BRAVE:
-			fsm.enqueue(new GhostKilledEvent(e.ghost));
+			gameControl.enqueue(new GhostKilledEvent(e.ghost));
 			break;
 		case DYING:
 		case DEAD:
@@ -395,7 +389,7 @@ public class PlayScene implements ViewController {
 			game.score += Game.PELLET_VALUE;
 		}
 		if (game.foodEaten == game.foodTotal) {
-			fsm.enqueue(new NextLevelEvent());
+			gameControl.enqueue(new NextLevelEvent());
 			return;
 		}
 		if (game.foodEaten == Game.DOTS_BONUS_1) {
