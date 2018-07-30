@@ -119,7 +119,7 @@ public class ObstacleManager extends GameEntity {
 
 		Obstacle obstacle = new Obstacle(app, width, height, passageHeight, passageCenterY);
 		obstacle.tf.setVelocityX(speed);
-		obstacle.tf.setX(app.getWidth());
+		obstacle.tf.setX(app.settings.width);
 		obstacle.setLighted(city.isNight() && randomInt(0, 5) == 0);
 		obstacles.add(obstacle);
 

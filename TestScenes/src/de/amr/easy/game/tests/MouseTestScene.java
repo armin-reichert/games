@@ -20,12 +20,12 @@ public class MouseTestScene implements ViewController {
 
 	@Override
 	public int getWidth() {
-		return app.getWidth();
+		return app.settings.width;
 	}
 
 	@Override
 	public int getHeight() {
-		return app.getHeight();
+		return app.settings.height;
 	}
 
 	@Override

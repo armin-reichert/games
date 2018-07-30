@@ -27,8 +27,8 @@ public abstract class RuleBasedPlayer implements Player {
 	private final MovingRule[] movingRules;
 	private final RemovalRule[] removalRules;
 
-	public RuleBasedPlayer(MillGameModel model, StoneColor color, PlacingRule[] placingRules, MovingRule[] movingRules,
-			RemovalRule[] removalRules) {
+	public RuleBasedPlayer(MillGameModel model, StoneColor color, PlacingRule[] placingRules,
+			MovingRule[] movingRules, RemovalRule[] removalRules) {
 		this.model = model;
 		this.color = color;
 		this.placingRules = placingRules;
@@ -48,14 +48,14 @@ public abstract class RuleBasedPlayer implements Player {
 
 	@Override
 	public OptionalInt supplyPlacingPosition() {
-		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
+		return Stream.of(placingRules).map(this::tryPlacingRule).filter(OptionalInt::isPresent)
+				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	@Override
 	public OptionalInt supplyRemovalPosition() {
-		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent).findFirst()
-				.orElse(OptionalInt.empty());
+		return Stream.of(removalRules).map(this::tryRemovalRule).filter(OptionalInt::isPresent)
+				.findFirst().orElse(OptionalInt.empty());
 	}
 
 	@Override
@@ -82,8 +82,8 @@ public abstract class RuleBasedPlayer implements Player {
 
 	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
-		optMove
-				.ifPresent(move -> LOG.info(name() + ": " + format(rule.getDescription(), move.from().get(), move.to().get())));
+		optMove.ifPresent(move -> LOG
+				.info(name() + ": " + format(rule.getDescription(), move.from().get(), move.to().get())));
 		return optMove;
 	}
 }

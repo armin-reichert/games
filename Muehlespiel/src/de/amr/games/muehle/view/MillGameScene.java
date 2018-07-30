@@ -48,12 +48,12 @@ public class MillGameScene implements ViewController, MillGameUI {
 
 	@Override
 	public int getWidth() {
-		return app.getWidth();
+		return app.settings.width;
 	}
 
 	@Override
 	public int getHeight() {
-		return app.getHeight();
+		return app.settings.height;
 	}
 
 	@Override

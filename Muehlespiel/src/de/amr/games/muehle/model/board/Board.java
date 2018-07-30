@@ -11,8 +11,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * Represents the board as an undirected graph and provides information about the board content and mill-related
- * functionality.
+ * Represents the board as an undirected graph and provides information about the board content and
+ * mill-related functionality.
  *
  * @author Armin Reichert, Peter & Anna Schillo
  */
@@ -24,7 +24,8 @@ public class Board {
 	/*
 	 * An adjacency list-like representation of the board graph.
 	 * 
-	 * NEIGHBOR[p] = { neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST) }, -1 = no neighbor
+	 * NEIGHBOR[p] = { neighbor(p, NORTH), neighbor(p, EAST), neighbor(p, SOUTH), neighbor(p, WEST) },
+	 * -1 = no neighbor
 	 */
 	private static final int[][] NEIGHBOR = {
 		/*@formatter:off*/
@@ -209,8 +210,8 @@ public class Board {
 	 *          a position
 	 * @param q
 	 *          a position
-	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and <code>q</code> are
-	 *         neighbors
+	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and
+	 *         <code>q</code> are neighbors
 	 */
 	public static Optional<Direction> getDirection(int p, int q) {
 		checkPosition(p);
@@ -310,7 +311,8 @@ public class Board {
 	}
 
 	/**
-	 * Puts a stone with the given color at the given position. The position must not contain a stone already.
+	 * Puts a stone with the given color at the given position. The position must not contain a stone
+	 * already.
 	 * 
 	 * @param p
 	 *          a position
@@ -338,8 +340,8 @@ public class Board {
 	}
 
 	/**
-	 * Moves the stone from position <code>from</code> to position <code>to</code>. If the source position is empty or the
-	 * target position is not empty, an exception is thrown.
+	 * Moves the stone from position <code>from</code> to position <code>to</code>. If the source
+	 * position is empty or the target position is not empty, an exception is thrown.
 	 * 
 	 * @param from
 	 *          the source position
@@ -432,7 +434,8 @@ public class Board {
 	/**
 	 * @param color
 	 *          a stone color
-	 * @return a stream of the positions carrying a stone of the given color and having an empty neighbor position
+	 * @return a stream of the positions carrying a stone of the given color and having an empty
+	 *         neighbor position
 	 */
 	public IntStream positionsWithEmptyNeighbor(StoneColor color) {
 		return positions(color).filter(this::hasEmptyNeighbor);
@@ -564,7 +567,8 @@ public class Board {
 
 	private boolean isPartOfOpenXMill(int p, StoneColor color, int[][] mill) {
 		int q = mill[p][0], r = mill[p][1];
-		return has(p, color) && has(q, color) && has(r, null) || has(p, color) && has(q, null) && has(r, color);
+		return has(p, color) && has(q, color) && has(r, null)
+				|| has(p, color) && has(q, null) && has(r, color);
 	}
 
 	/**
@@ -631,7 +635,8 @@ public class Board {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return has(p, null) && has(q, color) && has(r, null) || has(p, null) && has(q, null) && has(r, color);
+		return has(p, null) && has(q, color) && has(r, null)
+				|| has(p, null) && has(q, null) && has(r, color);
 	}
 
 	/**
@@ -652,7 +657,8 @@ public class Board {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if placing a stone of the given color at the given position would open two mills of that color
+	 * @return if placing a stone of the given color at the given position would open two mills of
+	 *         that color
 	 */
 	public boolean areTwoMillsOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
@@ -665,7 +671,8 @@ public class Board {
 	 *          a valid position
 	 * @param color
 	 *          a stone color
-	 * @return if a mill of the given color is closed by placing a stone of that color at the given position
+	 * @return if a mill of the given color is closed by placing a stone of that color at the given
+	 *         position
 	 */
 	public boolean isMillClosingPosition(int p, StoneColor color) {
 		checkPosition(p);
@@ -688,8 +695,8 @@ public class Board {
 	 *          move end position
 	 * @param color
 	 *          stone color
-	 * @return if a mill of the given color is closed when moving a stone of the given color from the start to the end
-	 *         position
+	 * @return if a mill of the given color is closed when moving a stone of the given color from the
+	 *         start to the end position
 	 */
 	public boolean isMillClosedByMove(int from, int to, StoneColor color) {
 		checkPosition(from);
@@ -757,7 +764,8 @@ public class Board {
 	 */
 	public IntStream positionsOpeningTwoMillsLater(StoneColor color) {
 		checkStoneColor(color);
-		return positions().filter(this::isEmptyPosition).filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
+		return positions().filter(this::isEmptyPosition)
+				.filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
 	}
 
 	/**
@@ -765,12 +773,14 @@ public class Board {
 	 *          valid position
 	 * @param color
 	 *          stone color
-	 * @return if by placing a stone of the given color at the position later two mills could be opened
+	 * @return if by placing a stone of the given color at the position later two mills could be
+	 *         opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return nextToNeighbors(p).filter(q -> get(q) == color).anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
+		return nextToNeighbors(p).filter(q -> get(q) == color)
+				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
@@ -788,7 +798,7 @@ public class Board {
 		if (!otherNeighbor2.isPresent()) {
 			otherNeighbor2 = neighbor(commonNeighbor, dir2);
 		}
-		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt()) && otherNeighbor2.isPresent()
-				&& isEmptyPosition(otherNeighbor2.getAsInt());
+		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt())
+				&& otherNeighbor2.isPresent() && isEmptyPosition(otherNeighbor2.getAsInt());
 	}
 }

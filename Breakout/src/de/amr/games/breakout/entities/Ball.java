@@ -13,7 +13,7 @@ public class Ball extends GameEntity {
 	private Sprite s_ball;
 
 	public Ball(BreakoutGame app, int size) {
-		boardSize = new Dimension(app.getWidth(), app.getHeight());
+		boardSize = new Dimension(app.settings.width, app.settings.height);
 		s_ball = new Sprite("ball_green.png").scaleFrame(0, size, size);
 	}
 

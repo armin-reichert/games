@@ -37,12 +37,12 @@ public class MenuScene implements ViewController {
 
 	@Override
 	public int getWidth() {
-		return app.getWidth();
+		return app.settings.width;
 	}
 
 	@Override
 	public int getHeight() {
-		return app.getHeight();
+		return app.settings.height;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class MenuScene implements ViewController {
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(bgColor);
-		g.fillRect(0, 0, app.getWidth(), getHeight());
+		g.fillRect(0, 0, app.settings.width, getHeight());
 		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 
 		PlayMode[] playModes = PlayMode.values();

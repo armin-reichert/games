@@ -52,10 +52,10 @@ public class PongGame extends Application {
 		Assets.sound("plip.mp3");
 		Assets.sound("out.mp3");
 
-		entities.store(new Court(getWidth(), getHeight()));
+		entities.store(new Court(settings.width, settings.height));
 		entities.store(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
 
-		entities.store(new Ball(getHeight()));
+		entities.store(new Ball(settings.height));
 
 		entities.store(new AutoPaddleLeft(this));
 		entities.store(new AutoPaddleRight(this));

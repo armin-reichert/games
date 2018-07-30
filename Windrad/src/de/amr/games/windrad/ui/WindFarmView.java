@@ -143,7 +143,7 @@ public class WindFarmView extends JPanel {
 	private void bindKey(String key, Consumer<ActionEvent> action) {
 		getInputMap().put(KeyStroke.getKeyStroke(key), action.toString());
 		getActionMap().put(action.toString(), new AbstractAction() {
-	
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				action.accept(e);
@@ -279,8 +279,8 @@ public class WindFarmView extends JPanel {
 		float nacelleRadius = towerWidthTop;
 		float rotorLength = towerHeight / 2 - WindTurbine.getMinBottomDistance();
 		float rotorThickness = rotorLength / 10;
-		WindTurbine turbine = new WindTurbine(0, y, towerHeight, towerWidthBottom, towerWidthTop, nacelleRadius,
-				rotorLength, rotorThickness);
+		WindTurbine turbine = new WindTurbine(0, y, towerHeight, towerWidthBottom, towerWidthTop,
+				nacelleRadius, rotorLength, rotorThickness);
 		farm.turbines.add(turbine);
 		turbineViews.add(new WindTurbineView(this, turbine));
 		selectTurbine(turbine);

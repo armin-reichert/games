@@ -46,7 +46,7 @@ public class Bonus extends GameEntity {
 	public Sprite currentSprite() {
 		return honored ? s_points : s_symbol;
 	}
-	
+
 	@Override
 	public Stream<Sprite> getSprites() {
 		return Stream.of(s_points, s_symbol);

@@ -72,7 +72,8 @@ public class BoardTests {
 
 	@Test
 	public void testNodeDegree() {
-		IntStream.of(0, 2, 23, 21, 3, 5, 20, 18, 6, 8, 17, 15).forEach(p -> assertTrue(2 == neighbors(p).count()));
+		IntStream.of(0, 2, 23, 21, 3, 5, 20, 18, 6, 8, 17, 15)
+				.forEach(p -> assertTrue(2 == neighbors(p).count()));
 		IntStream.of(1, 14, 22, 9, 7, 12, 16, 11).forEach(p -> assertTrue(3 == neighbors(p).count()));
 		IntStream.of(4, 13, 19, 10).forEach(p -> assertTrue(4 == neighbors(p).count()));
 	}
@@ -240,15 +241,16 @@ public class BoardTests {
 		board.putStoneAt(10, WHITE);
 		board.putStoneAt(18, WHITE);
 		assertTrue(IntStream.of(3, 10, 18).allMatch(p -> board.inVMill(p, WHITE)));
-		assertTrue(
-				IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18)).noneMatch(p -> board.inVMill(p, WHITE)));
+		assertTrue(IntStream.range(0, 24).filter(p -> !(p == 3 || p == 10 || p == 18))
+				.noneMatch(p -> board.inVMill(p, WHITE)));
 		assertTrue(board.hasVMill(3, 10, 18, WHITE));
 	}
 
 	@Test
 	public void testTwoMillsLater() {
 		board.putStoneAt(13, WHITE);
-		assertTrue(sameElements(board.positionsOpeningTwoMillsLater(WHITE), IntStream.of(2, 4, 8, 17, 19, 23)));
+		assertTrue(sameElements(board.positionsOpeningTwoMillsLater(WHITE),
+				IntStream.of(2, 4, 8, 17, 19, 23)));
 	}
 
 	@Test

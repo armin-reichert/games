@@ -9,61 +9,61 @@ import javax.swing.ImageIcon;
  */
 public class Player {
 
-  private Team team;
-  private String name;
-  private ImageIcon image;
-  private Color penColor = Color.WHITE;
-  private int speed = 1;
-  private int points;
-  
-  public Player() {
-  }
+	private Team team;
+	private String name;
+	private ImageIcon image;
+	private Color penColor = Color.WHITE;
+	private int speed = 1;
+	private int points;
 
-  public String getName() {
-    return name;
-  }
+	public Player() {
+	}
 
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public Team getTeam() {
-    return team;
-  }
-  
-  public void setTeam(Team team) {
-    this.team = team;
-  }
-  
-  public ImageIcon getImage() {
-    return image;
-  }
-  
-  public void setImage(ImageIcon image) {
-    this.image = image;
-  }
-  
-  public Color getPenColor() {
-    return penColor;
-  }
-  
-  public void setPenColor(Color penColor) {
-    this.penColor = penColor;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public int getSpeed() {
-    return speed;
-  }
-  
-  public void setSpeed(int speed) {
-    this.speed = speed;
-  }
-  
-  public int getPoints() {
-    return points;
-  }
-  
-  public void setPoints(int points) {
-    this.points = points;
-  }
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+
+	public ImageIcon getImage() {
+		return image;
+	}
+
+	public void setImage(ImageIcon image) {
+		this.image = image;
+	}
+
+	public Color getPenColor() {
+		return penColor;
+	}
+
+	public void setPenColor(Color penColor) {
+		this.penColor = penColor;
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+
+	public int getPoints() {
+		return points;
+	}
+
+	public void setPoints(int points) {
+		this.points = points;
+	}
 }

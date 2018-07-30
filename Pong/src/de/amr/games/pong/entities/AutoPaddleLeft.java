@@ -15,7 +15,7 @@ public class AutoPaddleLeft extends Paddle {
 	@Override
 	public void update() {
 		Ball ball = game.entities.ofClass(Ball.class).findFirst().get();
-		int targetY = game.getHeight() / 2 + getHeight();
+		int targetY = game.settings.height / 2 + getHeight();
 		if (ball.tf.getVelocityX() < 0) {
 			computeBallPositionLeft();
 			targetY = (int) ballLeftY;
@@ -36,7 +36,7 @@ public class AutoPaddleLeft extends Paddle {
 			ballLeftY += ball.tf.getVelocityY();
 			if (ballLeftY < 0) {
 				ballLeftY += ball.tf.getVelocityY();
-			} else if (ballLeftY >= game.getHeight()) {
+			} else if (ballLeftY >= game.settings.height) {
 				ballLeftY -= ball.tf.getVelocityY();
 			}
 		}

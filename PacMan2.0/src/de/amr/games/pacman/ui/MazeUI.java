@@ -50,7 +50,8 @@ public class MazeUI extends GameEntity {
 		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
 		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
 				.animation(AnimationMode.CYCLIC, 100);
-		s_energizer = new Sprite(getEnergizer()).scale(MazeUI.TS).animation(AnimationMode.BACK_AND_FORTH, 250);
+		s_energizer = new Sprite(getEnergizer()).scale(MazeUI.TS)
+				.animation(AnimationMode.BACK_AND_FORTH, 250);
 	}
 
 	@Override

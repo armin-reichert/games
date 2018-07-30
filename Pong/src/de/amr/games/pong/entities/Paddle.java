@@ -39,8 +39,8 @@ public class Paddle extends GameEntity {
 		tf.move();
 		if (tf.getY() < 0) {
 			tf.setY(0);
-		} else if (tf.getY() >= game.getHeight() - getHeight()) {
-			tf.setY(game.getHeight() - getHeight());
+		} else if (tf.getY() >= game.settings.height - getHeight()) {
+			tf.setY(game.settings.height - getHeight());
 		}
 		tf.setVelocityY(0);
 	}

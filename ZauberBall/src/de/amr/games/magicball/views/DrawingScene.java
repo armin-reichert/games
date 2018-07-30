@@ -17,19 +17,19 @@ public class DrawingScene implements ViewController {
 
 	public DrawingScene(MagicBallApp app) {
 		this.app = app;
-		image = new BufferedImage(app.getWidth(), app.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		image = new BufferedImage(app.settings.width, app.settings.height, BufferedImage.TYPE_INT_ARGB);
 		pen = app.entities.store(new Pen(image));
 		pen2 = app.entities.store(new Pen(image));
 	}
 
 	@Override
 	public int getWidth() {
-		return app.getWidth();
+		return app.settings.width;
 	}
 
 	@Override
 	public int getHeight() {
-		return app.getHeight();
+		return app.settings.height;
 	}
 
 	@Override

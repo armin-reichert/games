@@ -17,7 +17,8 @@ public class HUD extends GameEntity {
 
 	public HUD(Game game) {
 		this.game = game;
-		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, MazeUI.TS * 3 / 2);
+		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN,
+				MazeUI.TS * 3 / 2);
 	}
 
 	@Override
