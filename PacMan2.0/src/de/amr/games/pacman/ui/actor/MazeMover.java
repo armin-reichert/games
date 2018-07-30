@@ -29,7 +29,7 @@ import de.amr.games.pacman.ui.PlaySceneInfo;
  */
 public abstract class MazeMover<S> extends GameEntity {
 
-	public final GameEventSupport observers = new GameEventSupport();
+	public final GameEventSupport eventing = new GameEventSupport();
 	public final Maze maze;
 	public final Tile homeTile;
 	private final String name;

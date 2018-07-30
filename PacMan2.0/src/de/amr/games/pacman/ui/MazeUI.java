@@ -1,9 +1,23 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.behavior.impl.NavigationSystem.ambush;
+import static de.amr.games.pacman.behavior.impl.NavigationSystem.bounce;
+import static de.amr.games.pacman.behavior.impl.NavigationSystem.chase;
+import static de.amr.games.pacman.behavior.impl.NavigationSystem.flee;
+import static de.amr.games.pacman.behavior.impl.NavigationSystem.followKeyboard;
+import static de.amr.games.pacman.behavior.impl.NavigationSystem.goHome;
+import static de.amr.games.pacman.model.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.model.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.model.Spritesheet.RED_GHOST;
+import static de.amr.games.pacman.model.Spritesheet.TURQUOISE_GHOST;
 import static de.amr.games.pacman.model.Spritesheet.getEnergizer;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImage;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImageWhite;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_LEFT;
+import static java.awt.event.KeyEvent.VK_RIGHT;
+import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -26,10 +40,14 @@ import de.amr.games.pacman.ui.actor.PacMan;
 
 public class MazeUI extends GameEntity {
 
-	public final GameEventSupport observers = new GameEventSupport();
+	public final GameEventSupport eventing = new GameEventSupport();
 
 	private final Maze maze;
 	private final PacMan pacMan;
+	private final Ghost blinky;
+	private final Ghost pinky;
+	private final Ghost inky;
+	private final Ghost clyde;
 	private final Set<Ghost> ghosts = new HashSet<>();
 
 	private final Sprite s_normal;
@@ -44,14 +62,71 @@ public class MazeUI extends GameEntity {
 	/** Tile size. */
 	public static final int TS = 16;
 
-	public MazeUI(Maze maze, PacMan pacMan) {
+	public MazeUI(Maze maze) {
 		this.maze = maze;
-		this.pacMan = pacMan;
 		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
 		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
 				.animation(AnimationMode.CYCLIC, 100);
 		s_energizer = new Sprite(getEnergizer()).scale(MazeUI.TS)
 				.animation(AnimationMode.BACK_AND_FORTH, 250);
+
+		pacMan = createPacMan();
+		blinky = createBlinky();
+		pinky = createPinky();
+		inky = createInky();
+		clyde = createClyde();
+
+		addGhost(blinky);
+		addGhost(pinky);
+		addGhost(inky);
+		addGhost(clyde);
+
+	}
+
+	private PacMan createPacMan() {
+		PacMan pacMan = new PacMan(maze, maze.pacManHome);
+		pacMan.setNavigation(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		return pacMan;
+	}
+
+	private Ghost createBlinky() {
+		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
+		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
+		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
+		blinky.setNavigation(Ghost.State.DEAD, goHome());
+		blinky.setNavigation(Ghost.State.SAFE, bounce());
+		return blinky;
+	}
+
+	private Ghost createPinky() {
+		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
+		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
+		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
+		pinky.setNavigation(Ghost.State.DEAD, goHome());
+		pinky.setNavigation(Ghost.State.SAFE, bounce());
+		return pinky;
+	}
+
+	private Ghost createInky() {
+		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
+		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
+		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
+		inky.setNavigation(Ghost.State.DEAD, goHome());
+		inky.setNavigation(Ghost.State.SAFE, bounce());
+		return inky;
+	}
+
+	private Ghost createClyde() {
+		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
+		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
+		clyde.setNavigation(Ghost.State.AFRAID, goHome());
+		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
+		clyde.setNavigation(Ghost.State.DEAD, goHome());
+		clyde.setNavigation(Ghost.State.SAFE, bounce());
+		return clyde;
 	}
 
 	@Override
@@ -99,16 +174,32 @@ public class MazeUI extends GameEntity {
 		return ghosts.contains(ghost);
 	}
 
-	public Stream<Ghost> getGhosts() {
-		return ghosts.stream();
-	}
-
 	public Maze getMaze() {
 		return maze;
 	}
 
 	public PacMan getPacMan() {
 		return pacMan;
+	}
+
+	public Ghost getBlinky() {
+		return blinky;
+	}
+
+	public Ghost getPinky() {
+		return pinky;
+	}
+
+	public Ghost getInky() {
+		return inky;
+	}
+
+	public Ghost getClyde() {
+		return clyde;
+	}
+
+	public Stream<Ghost> getGhosts() {
+		return ghosts.stream();
 	}
 
 	public void showInfo(String text) {

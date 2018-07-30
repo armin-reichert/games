@@ -49,16 +49,16 @@ public class PlaySceneInfo {
 			eatAllPellets(scene);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(scene, scene.blinky);
+			toggleGhost(scene, scene.mazeUI.getBlinky());
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(scene, scene.pinky);
+			toggleGhost(scene, scene.mazeUI.getPinky());
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(scene, scene.inky);
+			toggleGhost(scene, scene.mazeUI.getInky());
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(scene, scene.clyde);
+			toggleGhost(scene, scene.mazeUI.getClyde());
 		}
 	}
 
@@ -114,8 +114,8 @@ public class PlaySceneInfo {
 
 	private static void drawEntityState(Graphics2D g, PlayScene scene) {
 		MazeUI mazeUI = scene.mazeUI;
+		PacMan pacMan = mazeUI.getPacMan();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
-		PacMan pacMan = scene.pacMan;
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
 		mazeUI.getGhosts().forEach(ghost -> {
 			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
@@ -156,7 +156,7 @@ public class PlaySceneInfo {
 	}
 
 	private static void drawPacManTilePosition(Graphics2D g, PlayScene scene) {
-		PacMan pacMan = scene.pacMan;
+		PacMan pacMan = scene.mazeUI.getPacMan();
 		if (pacMan.isExactlyOverTile()) {
 			g.translate(scene.mazeUI.tf.getX(), scene.mazeUI.tf.getY());
 			g.translate(pacMan.tf.getX(), pacMan.tf.getY());

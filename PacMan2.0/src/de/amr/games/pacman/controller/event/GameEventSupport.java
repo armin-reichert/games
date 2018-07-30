@@ -7,15 +7,15 @@ public class GameEventSupport {
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 
-	public void addObserver(GameEventListener observer) {
+	public void subscribe(GameEventListener observer) {
 		observers.add(observer);
 	}
 
-	public void removeObserver(GameEventListener observer) {
+	public void unsubscribe(GameEventListener observer) {
 		observers.remove(observer);
 	}
 
-	public void fireGameEvent(GameEvent event) {
+	public void publish(GameEvent event) {
 		observers.forEach(observer -> observer.onGameEvent(event));
 	}
 }

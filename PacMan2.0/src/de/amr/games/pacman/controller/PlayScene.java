@@ -1,25 +1,10 @@
 package de.amr.games.pacman.controller;
 
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.ambush;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.bounce;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.chase;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.flee;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.followKeyboard;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.goHome;
-import static de.amr.games.pacman.model.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.model.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.model.Spritesheet.RED_GHOST;
-import static de.amr.games.pacman.model.Spritesheet.TURQUOISE_GHOST;
 import static de.amr.games.pacman.model.Tile.ENERGIZER;
 import static de.amr.games.pacman.ui.PlaySceneInfo.LOG;
-import static java.awt.event.KeyEvent.VK_DOWN;
-import static java.awt.event.KeyEvent.VK_LEFT;
-import static java.awt.event.KeyEvent.VK_RIGHT;
-import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
@@ -47,15 +32,11 @@ import de.amr.statemachine.StateTransition;
 public class PlayScene implements ViewController {
 
 	private final PacManApp app;
-
 	public final Game game = new Game();
 	public final Maze maze;
-
 	public final MazeUI mazeUI;
 	public final HUD hud;
 	public final StatusUI status;
-	public final PacMan pacMan;
-	public final Ghost blinky, pinky, inky, clyde;
 
 	public enum State {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
@@ -66,27 +47,15 @@ public class PlayScene implements ViewController {
 	public PlayScene(PacManApp app) {
 		this.app = app;
 		this.maze = app.maze;
-
-		gameControl = createGameControl();
-
-		pacMan = createPacMan();
-		blinky = createBlinky();
-		pinky = createPinky();
-		inky = createInky();
-		clyde = createClyde();
-
-		mazeUI = new MazeUI(maze, pacMan);
-		mazeUI.addGhost(blinky);
-		mazeUI.addGhost(pinky);
-		mazeUI.addGhost(inky);
-		mazeUI.addGhost(clyde);
+		mazeUI = new MazeUI(maze);
 		hud = new HUD(game);
 		status = new StatusUI(game);
 		buildLayout();
 
-		mazeUI.observers.addObserver(gameControl::enqueue);
-		Stream.of(pacMan, blinky, pinky, inky, clyde)
-				.forEach(entity -> entity.observers.addObserver(gameControl::enqueue));
+		gameControl = createGameControl();
+		mazeUI.eventing.subscribe(gameControl::enqueue);
+		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
+		mazeUI.getGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {
@@ -134,7 +103,7 @@ public class PlayScene implements ViewController {
 
 		fsm.state(State.GHOST_DYING).entry = state -> {
 			state.setDuration(sec(0.5f));
-			pacMan.visibility = () -> false;
+			mazeUI.getPacMan().visibility = () -> false;
 		};
 
 		fsm.state(State.GHOST_DYING).update = state -> {
@@ -145,7 +114,7 @@ public class PlayScene implements ViewController {
 		fsm.changeOnTimeout(State.GHOST_DYING, State.PLAYING, this::onGhostDied);
 
 		fsm.state(State.GHOST_DYING).exit = state -> {
-			pacMan.visibility = () -> true;
+			mazeUI.getPacMan().visibility = () -> true;
 		};
 
 		// -- CHANGING_LEVEL
@@ -173,7 +142,7 @@ public class PlayScene implements ViewController {
 
 		fsm.state(State.PACMAN_DYING).entry = state -> {
 			state.setDuration(sec(3));
-			pacMan.setState(PacMan.State.DYING);
+			mazeUI.getPacMan().setState(PacMan.State.DYING);
 			mazeUI.getGhosts().forEach(ghost -> ghost.visibility = () -> false);
 			game.lives -= 1;
 		};
@@ -185,7 +154,7 @@ public class PlayScene implements ViewController {
 		fsm.changeOnTimeout(State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
 
 		fsm.changeOnTimeout(State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
-			pacMan.currentSprite().resetAnimation();
+			mazeUI.getPacMan().currentSprite().resetAnimation();
 			initActors();
 		});
 
@@ -243,52 +212,6 @@ public class PlayScene implements ViewController {
 		return app.pulse.secToTicks(seconds);
 	}
 
-	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(maze, maze.pacManHome);
-		pacMan.setNavigation(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
-		return pacMan;
-	}
-
-	private Ghost createBlinky() {
-		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
-		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
-		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
-		blinky.setNavigation(Ghost.State.DEAD, goHome());
-		blinky.setNavigation(Ghost.State.SAFE, bounce());
-		return blinky;
-	}
-
-	private Ghost createPinky() {
-		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
-		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
-		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
-		pinky.setNavigation(Ghost.State.DEAD, goHome());
-		pinky.setNavigation(Ghost.State.SAFE, bounce());
-		return pinky;
-	}
-
-	private Ghost createInky() {
-		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
-		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
-		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
-		inky.setNavigation(Ghost.State.DEAD, goHome());
-		inky.setNavigation(Ghost.State.SAFE, bounce());
-		return inky;
-	}
-
-	private Ghost createClyde() {
-		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
-		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
-		clyde.setNavigation(Ghost.State.AFRAID, goHome());
-		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
-		clyde.setNavigation(Ghost.State.DEAD, goHome());
-		clyde.setNavigation(Ghost.State.SAFE, bounce());
-		return clyde;
-	}
-
 	private void buildLayout() {
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * MazeUI.TS);
@@ -296,17 +219,16 @@ public class PlayScene implements ViewController {
 	}
 
 	private void initActors() {
-		pacMan.setState(PacMan.State.ALIVE);
-		pacMan.placeAt(maze.pacManHome);
-		pacMan.setSpeed(game::getPacManSpeed);
-		pacMan.setDir(Top4.E);
-		pacMan.setNextDir(Top4.E);
+		mazeUI.getPacMan().setState(PacMan.State.ALIVE);
+		mazeUI.getPacMan().placeAt(maze.pacManHome);
+		mazeUI.getPacMan().setSpeed(game::getPacManSpeed);
+		mazeUI.getPacMan().setDir(Top4.E);
+		mazeUI.getPacMan().setNextDir(Top4.E);
 
-		blinky.setDir(Top4.E);
-		pinky.setDir(Top4.S);
-		inky.setDir(Top4.N);
-		clyde.setDir(Top4.N);
-
+		mazeUI.getBlinky().setDir(Top4.E);
+		mazeUI.getPinky().setDir(Top4.S);
+		mazeUI.getInky().setDir(Top4.N);
+		mazeUI.getClyde().setDir(Top4.N);
 		mazeUI.getGhosts().forEach(ghost -> {
 			ghost.setState(Ghost.State.SAFE);
 			ghost.placeAt(ghost.homeTile);

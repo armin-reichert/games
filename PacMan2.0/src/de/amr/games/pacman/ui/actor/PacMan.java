@@ -66,17 +66,17 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
-			observers.fireGameEvent(new FoodFoundEvent(tile, content));
+			eventing.publish(new FoodFoundEvent(tile, content));
 		} else {
 			lookFor.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
 				if (finding instanceof Ghost) {
 					Ghost ghost = (Ghost) finding;
 					if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-						observers.fireGameEvent(new GhostContactEvent(ghost));
+						eventing.publish(new GhostContactEvent(ghost));
 					}
 				} else if (finding instanceof Bonus) {
 					Bonus bonus = (Bonus) finding;
-					observers.fireGameEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+					eventing.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 				}
 			});
 		}
