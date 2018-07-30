@@ -340,7 +340,7 @@ public class PlayScene implements ViewController {
 
 	@SuppressWarnings("unchecked")
 	private <E extends GameEvent> E event(StateTransition<State, GameEvent> t) {
-		return (E) t.getInput().get();
+		return (E) t.event().get();
 	}
 
 	private void onGhostContact(StateTransition<State, GameEvent> t) {

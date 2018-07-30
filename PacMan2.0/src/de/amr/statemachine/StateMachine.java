@@ -18,21 +18,21 @@ import java.util.stream.Stream;
  * A finite state machine.
  *
  * @param <S>
- *          type of state identifiers, for example an enumeration type.
- * @param <I>
+ *          type of state labels, for example an enumeration type.
+ * @param <E>
  *          type of inputs (events).
  * 
  * @author Armin Reichert
  */
-public class StateMachine<S, I> {
+public class StateMachine<S, E> {
 
-	private class Transition implements StateTransition<S, I> {
+	private class Transition implements StateTransition<S, E> {
 
 		private S from;
 		private S to;
-		private I input;
+		private E event;
 		private BooleanSupplier condition;
-		private Consumer<StateTransition<S, I>> action;
+		private Consumer<StateTransition<S, E>> action;
 
 		@Override
 		public State from() {
@@ -45,41 +45,44 @@ public class StateMachine<S, I> {
 		}
 
 		@Override
-		public Optional<I> getInput() {
-			return Optional.ofNullable(input);
+		public Optional<E> event() {
+			return Optional.ofNullable(event);
 		}
 	}
 
 	private final String description;
-	private final Deque<I> inputQ = new ArrayDeque<>();
+	private final Deque<E> inputQ;
 	private final Map<S, State> stateMap;
 	private final Map<S, List<Transition>> transitionMap;
-	private final S initialState;
-	private S currentState;
+	private final S initialStateLabel;
+
+	private S currentStateLabel;
 	private int pauseTime;
 	private Logger logger;
+
 	public Supplier<Integer> fnFrequency = () -> 60;
 
 	/**
 	 * Creates a new state machine.
 	 * 
 	 * @param description
-	 *          a string describing this state machine, used for tracing
-	 * @param stateIDClass
-	 *          type used for identifying the states, for example an enumeration type
-	 * @param initialStateID
-	 *          the ID of the initial state
+	 *          a string describing this state machine, used for logging
+	 * @param stateLabelType
+	 *          type used for labeling the states, for example an enumeration type
+	 * @param initialStateLabel
+	 *          the label of the initial state
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public StateMachine(String description, Class<S> stateIDClass, S initialStateID) {
+	public StateMachine(String description, Class<S> stateLabelType, S initialStateLabel) {
 		this.description = description;
-		this.stateMap = stateIDClass.isEnum() ? new EnumMap(stateIDClass) : new HashMap<>();
-		this.initialState = initialStateID;
+		this.inputQ = new ArrayDeque<>();
+		this.stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>();
 		this.transitionMap = new HashMap<>();
+		this.initialStateLabel = initialStateLabel;
 	}
 
 	/**
-	 * Sets a logger and activates tracing to this logger.
+	 * Sets a logger.
 	 * 
 	 * @param logger
 	 *          a logger
@@ -88,13 +91,14 @@ public class StateMachine<S, I> {
 		this.logger = logger;
 	}
 
+	/**
+	 * @return (optional) current logger
+	 */
 	public Optional<Logger> getLogger() {
 		return Optional.ofNullable(logger);
 	}
 
 	/**
-	 * The description of this state machine.
-	 * 
 	 * @return the description of this state machine
 	 */
 	public String getDescription() {
@@ -106,18 +110,18 @@ public class StateMachine<S, I> {
 	 * entry action.
 	 */
 	public void init() {
-		currentState = initialState;
+		currentStateLabel = initialStateLabel;
 		traceStateEntry();
 		state().doEntry();
 	}
 
 	/**
-	 * Adds an input ("event") to this state machine which will be picked in the next processing step.
+	 * Adds an input ("event") to the queue of this state machine.
 	 * 
 	 * @param input
-	 *          some input / event
+	 *          some input/event
 	 */
-	public void enqueue(I input) {
+	public void enqueue(E input) {
 		inputQ.add(input);
 	}
 
@@ -133,45 +137,33 @@ public class StateMachine<S, I> {
 	/**
 	 * Tells if the state machine is in any of the given states.
 	 * 
-	 * @param stateIDs
-	 *          non-empty list of state IDs
+	 * @param stateLabels
+	 *          non-empty list of state labels
 	 * @return <code>true</code> if the state machine is in any of the given states
 	 */
 	@SuppressWarnings("unchecked")
-	public boolean is(S... stateIDs) {
-		if (stateIDs.length == 0) {
+	public boolean is(S... stateLabels) {
+		if (stateLabels.length == 0) {
 			throw new IllegalArgumentException("At least one state ID is needed");
 		}
-		return Stream.of(stateIDs).anyMatch(stateID -> stateID == currentState);
-	}
-
-	/**
-	 * Sets the given state as this state machine's current state. No actions are executed.
-	 * 
-	 * @param stateID
-	 *          a valid state ID
-	 */
-	public void setState(S stateID) {
-		currentState = stateID;
+		return Stream.of(stateLabels).anyMatch(stateLabel -> stateLabel == currentStateLabel);
 	}
 
 	/**
 	 * @param state
 	 *          a state object
-	 * @return the ID of this state object in this state machine
+	 * @return the label of the given state object
 	 */
-	public Optional<S> id(State state) {
+	public Optional<S> label(State state) {
 		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey)
 				.findFirst();
 	}
 
 	/**
-	 * Returns the ID of the current state.
-	 * 
-	 * @return the current state's ID
+	 * @return the current state's label
 	 */
-	public S stateID() {
-		return currentState;
+	public S currentStateLabel() {
+		return currentStateLabel;
 	}
 
 	/**
@@ -181,47 +173,34 @@ public class StateMachine<S, I> {
 	 * @return the current state object
 	 */
 	public State state() {
-		if (currentState == null) {
+		if (currentStateLabel == null) {
 			throw new IllegalStateException("State machine '" + description + "' not initialized");
 		}
-		return state(currentState);
+		return state(currentStateLabel);
 	}
 
 	/**
-	 * Returns the state with the given ID. If this state is accessed for the first time, it will be
-	 * created.
+	 * Returns the state object with the given label. The state object is created on demand.
 	 * 
-	 * @param stateID
-	 *          a state ID
-	 * @return the state object for the given ID
+	 * @param stateLabel
+	 *          a state label
+	 * @return the state object for the given label
 	 */
-	public State state(S stateID) {
-		if (!stateMap.containsKey(stateID)) {
-			stateMap.put(stateID, new State());
-			getLogger()
-					.ifPresent(log -> log.info(String.format("Created state %s:%s ", description, stateID)));
+	public State state(S stateLabel) {
+		if (!stateMap.containsKey(stateLabel)) {
+			stateMap.put(stateLabel, new State());
+			getLogger().ifPresent(
+					log -> log.info(String.format("Created state %s:%s ", description, stateLabel)));
 		}
-		return stateMap.get(stateID);
+		return stateMap.get(stateLabel);
 	}
 
 	/**
-	 * Defines the state with the given ID by the given state object which may be an instance of a
-	 * specialized state subclass. This is useful if the state object itself needs "state".
+	 * Set pause timer for given number of ticks.
 	 * 
-	 * @param stateID
-	 *          some state ID
-	 * @param state
-	 *          a state object (maybe of a subclass of State)
-	 * @return the state object
+	 * @param ticks
+	 *          number of ticks the state machine should pause updates
 	 */
-	public State defineState(S stateID, State state) {
-		if (stateMap.containsKey(stateID)) {
-			throw new IllegalStateException("State with ID '" + stateID + "' already exists");
-		}
-		stateMap.put(stateID, state);
-		return state;
-	}
-
 	public void pause(int ticks) {
 		if (pauseTime < 0) {
 			throw new IllegalArgumentException("Negative pause time is not allowed");
@@ -245,12 +224,12 @@ public class StateMachine<S, I> {
 		}
 	}
 
-	private boolean hasMatchingInput(Class<? extends I> inputClass) {
+	private boolean hasMatchingInput(Class<? extends E> inputClass) {
 		return hasInput() && inputQ.peek().getClass().equals(inputClass);
 	}
 
-	private void processInput(I input) {
-		Optional<Transition> match = transitions(currentState).stream()
+	private void processInput(E input) {
+		Optional<Transition> match = transitions(currentStateLabel).stream()
 				.filter(t -> t.condition.getAsBoolean()).findFirst();
 		if (match.isPresent()) {
 			Transition t = match.get();
@@ -264,24 +243,24 @@ public class StateMachine<S, I> {
 		}
 	}
 
-	private void processTransition(Transition transition, I input) {
-		transition.input = input;
-		if (currentState == transition.to) {
+	private void processTransition(Transition transition, E input) {
+		transition.event = input;
+		if (currentStateLabel == transition.to) {
 			// state loop, no exit/entry actions are executed
 			if (transition.action != null) {
 				transition.action.accept(transition);
 			}
 		} else {
 			// state transition into other state, exit/entry actions are executed
-			traceStateChange(currentState, transition.to);
-			if (currentState != null) {
+			traceStateChange(currentStateLabel, transition.to);
+			if (currentStateLabel != null) {
 				state().doExit();
 				traceStateExit();
 			}
 			if (transition.action != null) {
 				transition.action.accept(transition);
 			}
-			currentState = transition.to;
+			currentStateLabel = transition.to;
 			traceStateEntry();
 			state().doEntry();
 		}
@@ -294,11 +273,11 @@ public class StateMachine<S, I> {
 		});
 	}
 
-	private List<Transition> transitions(S stateID) {
-		if (!transitionMap.containsKey(stateID)) {
-			transitionMap.put(stateID, new ArrayList<>(3));
+	private List<Transition> transitions(S stateLabel) {
+		if (!transitionMap.containsKey(stateLabel)) {
+			transitionMap.put(stateLabel, new ArrayList<>(3));
 		}
-		return transitionMap.get(stateID);
+		return transitionMap.get(stateLabel);
 	}
 
 	// Tracing
@@ -308,9 +287,9 @@ public class StateMachine<S, I> {
 			if (state().getDuration() != State.FOREVER) {
 				float seconds = state().getDuration() / fnFrequency.get();
 				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)",
-						description, stateID(), seconds, state().getDuration()));
+						description, currentStateLabel(), seconds, state().getDuration()));
 			} else {
-				log.info(String.format("FSM(%s) enters state '%s'", description, stateID()));
+				log.info(String.format("FSM(%s) enters state '%s'", description, currentStateLabel()));
 			}
 		});
 	}
@@ -326,7 +305,7 @@ public class StateMachine<S, I> {
 		});
 	}
 
-	private void traceInputStateChange(I input, S oldState, S newState) {
+	private void traceInputStateChange(E input, S oldState, S newState) {
 		getLogger().ifPresent(log -> {
 			if (oldState != newState) {
 				log.info(String.format("FSM(%s) processes %s and changes from '%s' to '%s'", description,
@@ -339,14 +318,14 @@ public class StateMachine<S, I> {
 	}
 
 	private void traceStateExit() {
-		getLogger().ifPresent(
-				log -> log.info(String.format("FSM(%s) exits state '%s'", description, stateID())));
+		getLogger().ifPresent(log -> log
+				.info(String.format("FSM(%s) exits state '%s'", description, currentStateLabel())));
 	}
 
 	// methods for specifying the transitions
 
 	private void addTransition(S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, I>> action) {
+			Consumer<StateTransition<S, E>> action) {
 		Transition transition = new Transition();
 		transition.from = from;
 		transition.to = to;
@@ -370,7 +349,7 @@ public class StateMachine<S, I> {
 	 *          code which will be executed when this transition occurs
 	 */
 	public void change(S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, I>> action) {
+			Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, condition, action);
 	}
 
@@ -386,7 +365,7 @@ public class StateMachine<S, I> {
 	 *          the condition which must hold
 	 */
 	public void change(S from, S to, BooleanSupplier condition) {
-		addTransition(from, to, condition, (Consumer<StateTransition<S, I>>) null);
+		addTransition(from, to, condition, (Consumer<StateTransition<S, E>>) null);
 	};
 
 	/**
@@ -415,6 +394,17 @@ public class StateMachine<S, I> {
 		});
 	}
 
+	/**
+	 * Defines a transition between the given states which can be fired if the source state got a
+	 * timeout and the given condition holds.
+	 * 
+	 * @param from
+	 *          the source state
+	 * @param to
+	 *          the target state
+	 * @param condition
+	 *          some condition
+	 */
 	public void changeOnTimeout(S from, S to, BooleanSupplier condition) {
 		changeOnTimeout(from, to, condition, t -> {
 		});
@@ -431,36 +421,49 @@ public class StateMachine<S, I> {
 	 * @param action
 	 *          code which will be executed when this transition occurs
 	 */
-	public void changeOnTimeout(S from, S to, Consumer<StateTransition<S, I>> action) {
+	public void changeOnTimeout(S from, S to, Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, () -> state(from).isTerminated(), action);
 	}
 
+	/**
+	 * Defines a transition between the given states which can be fired if the source state got a
+	 * timeout and the given condition holds.
+	 * 
+	 * @param from
+	 *          the source state
+	 * @param to
+	 *          the target state
+	 * @param condition
+	 *          some condition
+	 * @param action
+	 *          code which will be executed when this transition occurs
+	 */
 	public void changeOnTimeout(S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, I>> action) {
+			Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, () -> state(from).isTerminated() && condition.getAsBoolean(), action);
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the given input (event).
+	 * Defines a transition between the given states which can be fired only if the next event matches
+	 * the transition.
 	 * 
-	 * @param input
-	 *          the current input (event)
+	 * @param eventType
+	 *          type of events matching the transition
 	 * @param from
 	 *          the source state
 	 * @param to
 	 *          the target state
 	 */
-	public void changeOnInput(Class<? extends I> inputClass, S from, S to) {
-		change(from, to, () -> hasMatchingInput(inputClass));
+	public void changeOnInput(Class<? extends E> eventType, S from, S to) {
+		change(from, to, () -> hasMatchingInput(eventType));
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the current input (event) and the given condition holds.
+	 * Defines a transition between the given states which can be fired only if the next event matches
+	 * the transition and the given condition holds.
 	 * 
-	 * @param input
-	 *          the current input (event)
+	 * @param eventType
+	 *          type of events matching the transition
 	 * @param from
 	 *          the source state
 	 * @param to
@@ -468,37 +471,34 @@ public class StateMachine<S, I> {
 	 * @param condition
 	 *          some condition
 	 */
-	public void changeOnInput(Class<? extends I> inputClass, S from, S to,
-			BooleanSupplier condition) {
-		change(from, to, () -> hasMatchingInput(inputClass) && condition.getAsBoolean());
+	public void changeOnInput(Class<? extends E> eventType, S from, S to, BooleanSupplier condition) {
+		change(from, to, () -> hasMatchingInput(eventType) && condition.getAsBoolean());
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the current input (event). If the transition fires, the given action is
-	 * executed.
+	 * Defines a transition between the given states which can be fired only if the next event matches
+	 * the transition.
 	 * 
-	 * @param input
-	 *          the current input (event)
+	 * @param eventType
+	 *          type of events matching the transition
 	 * @param from
 	 *          the source state
 	 * @param to
 	 *          the target state
 	 * @param action
-	 *          code which will be executed when this transition occurs
+	 *          performed action
 	 */
-	public void changeOnInput(Class<? extends I> inputClass, S from, S to,
-			Consumer<StateTransition<S, I>> action) {
-		addTransition(from, to, () -> hasMatchingInput(inputClass), action);
+	public void changeOnInput(Class<? extends E> eventType, S from, S to,
+			Consumer<StateTransition<S, E>> action) {
+		addTransition(from, to, () -> hasMatchingInput(eventType), action);
 	}
 
 	/**
-	 * Defines a transition between the given states which can be fired only if the given input
-	 * (event) equals the current input (event). If the transition fires, the given action is
-	 * executed.
+	 * Defines a transition between the given states which can be fired only if the next event matches
+	 * the transition.
 	 * 
-	 * @param input
-	 *          the current input (event)
+	 * @param eventType
+	 *          type of events matching the transition
 	 * @param from
 	 *          the source state
 	 * @param to
@@ -506,10 +506,10 @@ public class StateMachine<S, I> {
 	 * @param condition
 	 *          some condition
 	 * @param action
-	 *          code which will be executed when this transition occurs
+	 *          performed action
 	 */
-	public void changeOnInput(Class<? extends I> inputClass, S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, I>> action) {
-		addTransition(from, to, () -> hasMatchingInput(inputClass) && condition.getAsBoolean(), action);
+	public void changeOnInput(Class<? extends E> eventType, S from, S to, BooleanSupplier condition,
+			Consumer<StateTransition<S, E>> action) {
+		addTransition(from, to, () -> hasMatchingInput(eventType) && condition.getAsBoolean(), action);
 	}
 }

@@ -9,10 +9,10 @@ import java.util.Optional;
  *
  * @param <S>
  *          type of state identifiers
- * @param <I>
+ * @param <E>
  *          type of inputs (events)
  */
-public interface StateTransition<S, I> {
+public interface StateTransition<S, E> {
 
 	/**
 	 * The state which is changed by this transition.
@@ -33,5 +33,5 @@ public interface StateTransition<S, I> {
 	 * 
 	 * @return optional input which triggered transition
 	 */
-	public Optional<I> getInput();
+	public Optional<E> event();
 }
