@@ -3,7 +3,6 @@ package de.amr.games.pacman.ui.actor;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.Spritesheet.getPacManDying;
 import static de.amr.games.pacman.model.Spritesheet.getPacManWalking;
-import static de.amr.games.pacman.model.Tile.isFood;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -18,6 +17,7 @@ import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.model.TileContent;
 import de.amr.games.pacman.ui.Bonus;
 import de.amr.games.pacman.ui.MazeUI;
 
@@ -65,7 +65,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		currentSprite().enableAnimation(canMove(getDir()));
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
-		if (isFood(content)) {
+		if (TileContent.isFood(content)) {
 			eventing.publish(new FoodFoundEvent(tile, content));
 		} else {
 			lookFor.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {

@@ -1,5 +1,14 @@
 package de.amr.games.pacman.model;
 
+import static de.amr.games.pacman.model.TileContent.EMPTY;
+import static de.amr.games.pacman.model.TileContent.POS_BLINKY;
+import static de.amr.games.pacman.model.TileContent.POS_CLYDE;
+import static de.amr.games.pacman.model.TileContent.POS_INFO;
+import static de.amr.games.pacman.model.TileContent.POS_INKY;
+import static de.amr.games.pacman.model.TileContent.POS_PACMAN;
+import static de.amr.games.pacman.model.TileContent.POS_PINKY;
+import static de.amr.games.pacman.model.TileContent.WALL;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -24,7 +33,7 @@ public class Maze {
 	private final GridGraph<Character, Integer> graph;
 
 	public void resetFood() {
-		tiles().filter(tile -> Tile.isFood(data(tile.row, tile.col))).forEach(tile -> {
+		tiles().filter(tile -> TileContent.isFood(data(tile.row, tile.col))).forEach(tile -> {
 			graph.set(cell(tile), data(tile.row, tile.col));
 		});
 	}
@@ -32,26 +41,26 @@ public class Maze {
 	public Maze(String map) {
 		data = map.split("\n");
 		int numCols = data[0].length(), numRows = data.length;
-		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, v -> Tile.EMPTY, (u, v) -> 1,
+		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, v -> EMPTY, (u, v) -> 1,
 				UndirectedEdge::new);
 		graph.setDefaultVertexLabel(v -> data(graph.row(v), graph.col(v)));
 		foodCount = 0;
 		for (int row = 0; row < numRows; ++row) {
 			for (int col = 0; col < numCols; ++col) {
 				char c = data(row, col);
-				if (c == Tile.POS_BLINKY) {
+				if (c == POS_BLINKY) {
 					blinkyHome = new Tile(col, row);
-				} else if (c == Tile.POS_PINKY) {
+				} else if (c == POS_PINKY) {
 					pinkyHome = new Tile(col, row);
-				} else if (c == Tile.POS_INKY) {
+				} else if (c == POS_INKY) {
 					inkyHome = new Tile(col, row);
-				} else if (c == Tile.POS_CLYDE) {
+				} else if (c == POS_CLYDE) {
 					clydeHome = new Tile(col, row);
-				} else if (c == Tile.POS_INFO) {
+				} else if (c == POS_INFO) {
 					infoTile = new Tile(col, row);
-				} else if (c == Tile.POS_PACMAN) {
+				} else if (c == POS_PACMAN) {
 					pacManHome = new Tile(col, row);
-				} else if (Tile.isFood(c)) {
+				} else if (TileContent.isFood(c)) {
 					foodCount += 1;
 				}
 			}
@@ -59,8 +68,7 @@ public class Maze {
 		graph.fill();
 		graph.edges().filter(edge -> {
 			int u = edge.either(), v = edge.other();
-			return data(graph.row(u), graph.col(u)) == Tile.WALL
-					|| data(graph.row(v), graph.col(v)) == Tile.WALL;
+			return data(graph.row(u), graph.col(u)) == WALL || data(graph.row(v), graph.col(v)) == WALL;
 		}).forEach(graph::removeEdge);
 	}
 
@@ -101,7 +109,7 @@ public class Maze {
 	}
 
 	public void clearTile(Tile tile) {
-		graph.set(cell(tile), Tile.EMPTY);
+		graph.set(cell(tile), EMPTY);
 	}
 
 	public OptionalInt direction(Tile t1, Tile t2) {

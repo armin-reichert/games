@@ -1,5 +1,7 @@
 package de.amr.games.pacman.behavior.impl;
 
+import static de.amr.games.pacman.model.TileContent.WALL;
+
 import java.util.Optional;
 
 import de.amr.games.pacman.behavior.Route;
@@ -24,7 +26,7 @@ class Ambush implements RoutePlanner {
 		RouteData result = new RouteData();
 		Maze maze = victim.maze;
 		Optional<Tile> fourAhead = ahead(4, victim);
-		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != Tile.WALL) {
+		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != WALL) {
 			result.path = maze.findPath(ambusher.getTile(), fourAhead.get());
 		} else {
 			result.path = maze.findPath(ambusher.getTile(), victim.getTile());

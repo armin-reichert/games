@@ -10,10 +10,10 @@ import static de.amr.games.pacman.model.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.model.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.model.Spritesheet.RED_GHOST;
 import static de.amr.games.pacman.model.Spritesheet.TURQUOISE_GHOST;
-import static de.amr.games.pacman.model.Spritesheet.getEnergizer;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImage;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImageWhite;
-import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.model.TileContent.ENERGIZER;
+import static de.amr.games.pacman.model.TileContent.PELLET;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -37,10 +37,14 @@ import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.model.TileContent;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
 
 public class MazeUI extends GameEntity {
+
+	/** Tile size. */
+	public static final int TS = 16;
 
 	public final GameEventSupport eventing = new GameEventSupport();
 
@@ -51,26 +55,25 @@ public class MazeUI extends GameEntity {
 	private final Ghost inky;
 	private final Ghost clyde;
 	private final Set<Ghost> ghosts = new HashSet<>();
+	private final Energizer energizer;
+	private final Pellet pellet;
 
 	private final Sprite s_normal;
 	private final Sprite s_flashing;
-	private final Sprite s_energizer;
 
 	private boolean flashing;
 	private String infoText;
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
-	/** Tile size. */
-	public static final int TS = 16;
-
 	public MazeUI(Maze maze) {
 		this.maze = maze;
 		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
 		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
 				.animation(AnimationMode.CYCLIC, 100);
-		s_energizer = new Sprite(getEnergizer()).scale(MazeUI.TS)
-				.animation(AnimationMode.BACK_AND_FORTH, 250);
+
+		energizer = new Energizer();
+		pellet = new Pellet();
 
 		pacMan = createPacMan();
 		blinky = createBlinky();
@@ -150,7 +153,7 @@ public class MazeUI extends GameEntity {
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(s_normal, s_flashing, s_energizer);
+		return Stream.of(s_normal, s_flashing);
 	}
 
 	@Override
@@ -267,8 +270,9 @@ public class MazeUI extends GameEntity {
 	@Override
 	public void enableAnimation(boolean animated) {
 		super.enableAnimation(animated);
-		getPacMan().enableAnimation(animated);
-		getGhosts().forEach(ghost -> ghost.enableAnimation(animated));
+		energizer.enableAnimation(animated);
+		pacMan.enableAnimation(animated);
+		ghosts.forEach(ghost -> ghost.enableAnimation(animated));
 	}
 
 	@Override
@@ -278,7 +282,8 @@ public class MazeUI extends GameEntity {
 			s_flashing.draw(g);
 		} else {
 			s_normal.draw(g);
-			maze.tiles().forEach(tile -> drawContent(g, tile));
+			maze.tiles().filter(tile -> TileContent.isFood(maze.getContent(tile)))
+					.forEach(tile -> drawFood(g, tile));
 			ghosts.stream().filter(ghost -> ghost.getState() != Ghost.State.DYING)
 					.forEach(ghost -> ghost.draw(g));
 			ghosts.stream().filter(ghost -> ghost.getState() == Ghost.State.DYING)
@@ -300,14 +305,13 @@ public class MazeUI extends GameEntity {
 		g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
 	}
 
-	private void drawContent(Graphics2D g, Tile tile) {
+	private void drawFood(Graphics2D g, Tile tile) {
 		g.translate(tile.col * MazeUI.TS, tile.row * MazeUI.TS);
 		char c = maze.getContent(tile);
-		if (c == Tile.PELLET) {
-			g.setColor(Color.PINK);
-			g.fillRect(MazeUI.TS * 3 / 8, MazeUI.TS * 3 / 8, MazeUI.TS / 4, MazeUI.TS / 4);
+		if (c == PELLET) {
+			pellet.draw(g);
 		} else if (c == ENERGIZER) {
-			s_energizer.draw(g);
+			energizer.draw(g);
 		}
 		g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
 	}

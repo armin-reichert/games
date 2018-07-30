@@ -1,9 +1,9 @@
 package de.amr.games.pacman.test.model;
 
-import static de.amr.games.pacman.model.Tile.DOOR;
-import static de.amr.games.pacman.model.Tile.ENERGIZER;
-import static de.amr.games.pacman.model.Tile.PELLET;
-import static de.amr.games.pacman.model.Tile.WALL;
+import static de.amr.games.pacman.model.TileContent.DOOR;
+import static de.amr.games.pacman.model.TileContent.ENERGIZER;
+import static de.amr.games.pacman.model.TileContent.PELLET;
+import static de.amr.games.pacman.model.TileContent.WALL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.model.Tile;
 
 public class BoardTests {
 
@@ -25,8 +24,8 @@ public class BoardTests {
 		assertEquals(28, maze.numCols());
 		assertEquals(31, maze.numRows());
 
-		assertEquals(4, maze.tiles().filter(tile -> maze.getContent(tile) == Tile.ENERGIZER).count());
-		assertEquals(240, maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).count());
+		assertEquals(4, maze.tiles().filter(tile -> maze.getContent(tile) == ENERGIZER).count());
+		assertEquals(240, maze.tiles().filter(tile -> maze.getContent(tile) == PELLET).count());
 
 		assertTrue(WALL == maze.getContent(0, 3));
 		assertTrue(PELLET == maze.getContent(1, 4));

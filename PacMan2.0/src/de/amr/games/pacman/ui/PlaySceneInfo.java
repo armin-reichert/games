@@ -1,5 +1,7 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.model.TileContent.PELLET;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -69,7 +71,7 @@ public class PlaySceneInfo {
 
 	private static void eatAllPellets(PlayScene scene) {
 		Maze maze = scene.mazeUI.getMaze();
-		maze.tiles().filter(tile -> maze.getContent(tile) == Tile.PELLET).forEach(tile -> {
+		maze.tiles().filter(tile -> maze.getContent(tile) == PELLET).forEach(tile -> {
 			maze.clearTile(tile);
 			scene.game.foodEaten += 1;
 		});

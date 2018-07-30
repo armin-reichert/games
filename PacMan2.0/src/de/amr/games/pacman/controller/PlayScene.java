@@ -1,6 +1,6 @@
 package de.amr.games.pacman.controller;
 
-import static de.amr.games.pacman.model.Tile.ENERGIZER;
+import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 import static de.amr.games.pacman.ui.PlaySceneInfo.LOG;
 
 import java.awt.Graphics2D;
