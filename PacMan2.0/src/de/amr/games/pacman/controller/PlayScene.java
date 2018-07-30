@@ -299,9 +299,9 @@ public class PlayScene implements ViewController {
 			return;
 		}
 		if (game.foodEaten == Game.DOTS_BONUS_1) {
-			mazeUI.showBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
+			mazeUI.addBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
 		} else if (game.foodEaten == Game.DOTS_BONUS_2) {
-			mazeUI.showBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
+			mazeUI.addBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
 		}
 		if (e.food == ENERGIZER) {
 			startGhostHunting();
@@ -312,6 +312,6 @@ public class PlayScene implements ViewController {
 		BonusFoundEvent e = event(t);
 		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 		game.score += e.value;
-		mazeUI.honorBonus(sec(2));
+		mazeUI.honorAndRemoveBonus(sec(2));
 	}
 }

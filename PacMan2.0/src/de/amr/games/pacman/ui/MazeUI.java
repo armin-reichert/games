@@ -14,6 +14,7 @@ import static de.amr.games.pacman.model.Spritesheet.getMazeImage;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImageWhite;
 import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 import static de.amr.games.pacman.model.TileContent.PELLET;
+import static de.amr.games.pacman.model.TileContent.isFood;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -23,7 +24,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -37,7 +37,6 @@ import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.model.TileContent;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
 
@@ -80,29 +79,10 @@ public class MazeUI extends GameEntity {
 		pinky = createPinky();
 		inky = createInky();
 		clyde = createClyde();
-
 		addGhost(blinky);
 		addGhost(pinky);
 		addGhost(inky);
 		addGhost(clyde);
-	}
-
-	public void initActors(Game game) {
-		getPacMan().setState(PacMan.State.ALIVE);
-		getPacMan().placeAt(maze.pacManHome);
-		getPacMan().setSpeed(game::getPacManSpeed);
-		getPacMan().setDir(Top4.E);
-		getPacMan().setNextDir(Top4.E);
-
-		getBlinky().setDir(Top4.E);
-		getPinky().setDir(Top4.S);
-		getInky().setDir(Top4.N);
-		getClyde().setDir(Top4.N);
-		getGhosts().forEach(ghost -> {
-			ghost.setState(Ghost.State.SAFE);
-			ghost.placeAt(ghost.homeTile);
-			ghost.setSpeed(game::getGhostSpeed);
-		});
 	}
 
 	private PacMan createPacMan() {
@@ -151,6 +131,24 @@ public class MazeUI extends GameEntity {
 		return clyde;
 	}
 
+	public void initActors(Game game) {
+		pacMan.setState(PacMan.State.ALIVE);
+		pacMan.placeAt(maze.pacManHome);
+		pacMan.setSpeed(game::getPacManSpeed);
+		pacMan.setDir(Top4.E);
+		pacMan.setNextDir(Top4.E);
+
+		ghosts.forEach(ghost -> {
+			ghost.setState(Ghost.State.SAFE);
+			ghost.placeAt(ghost.homeTile);
+			ghost.setSpeed(game::getGhostSpeed);
+		});
+		blinky.setDir(Top4.E);
+		pinky.setDir(Top4.S);
+		inky.setDir(Top4.N);
+		clyde.setDir(Top4.N);
+	}
+
 	@Override
 	public Stream<Sprite> getSprites() {
 		return Stream.of(s_normal, s_flashing);
@@ -168,32 +166,18 @@ public class MazeUI extends GameEntity {
 				removeBonus();
 			}
 		}
-		getPacMan().update();
-		getGhosts().forEach(Ghost::update);
+		pacMan.update();
+		ghosts.forEach(Ghost::update);
 	}
 
 	@Override
 	public int getWidth() {
-		return maze.numCols() * MazeUI.TS;
+		return maze.numCols() * TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return maze.numRows() * MazeUI.TS;
-	}
-
-	public void addGhost(Ghost ghost) {
-		ghosts.add(ghost);
-		pacMan.lookFor.add(ghost);
-	}
-
-	public void removeGhost(Ghost ghost) {
-		ghosts.remove(ghost);
-		pacMan.lookFor.remove(ghost);
-	}
-
-	public boolean containsGhost(Ghost ghost) {
-		return ghosts.contains(ghost);
+		return maze.numRows() * TS;
 	}
 
 	public Maze getMaze() {
@@ -220,6 +204,20 @@ public class MazeUI extends GameEntity {
 		return clyde;
 	}
 
+	public void addGhost(Ghost ghost) {
+		ghosts.add(ghost);
+		pacMan.lookFor.add(ghost);
+	}
+
+	public void removeGhost(Ghost ghost) {
+		ghosts.remove(ghost);
+		pacMan.lookFor.remove(ghost);
+	}
+
+	public boolean containsGhost(Ghost ghost) {
+		return ghosts.contains(ghost);
+	}
+
 	public Stream<Ghost> getGhosts() {
 		return ghosts.stream();
 	}
@@ -232,31 +230,15 @@ public class MazeUI extends GameEntity {
 		this.infoText = null;
 	}
 
-	Optional<String> getInfo() {
-		return Optional.ofNullable(infoText);
-	}
-
 	public void setFlashing(boolean on) {
 		flashing = on;
 	}
 
-	public void showBonus(BonusSymbol bonusSymbol, int value, int ticks) {
-		this.bonus = new Bonus(bonusSymbol, value);
+	public void addBonus(BonusSymbol symbol, int value, int ticks) {
+		bonus = new Bonus(symbol, value);
+		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 		bonusTimeLeft = ticks;
-		bonus.tf.moveTo(maze.infoTile.col * MazeUI.TS, maze.infoTile.row * MazeUI.TS - MazeUI.TS / 2);
 		pacMan.lookFor.add(bonus);
-	}
-
-	public Optional<Bonus> getBonus() {
-		return Optional.ofNullable(bonus);
-	}
-
-	public void honorBonus(int ticks) {
-		if (bonus != null) {
-			pacMan.lookFor.remove(bonus);
-			bonus.setHonored();
-			bonusTimeLeft = ticks;
-		}
 	}
 
 	public void removeBonus() {
@@ -267,12 +249,20 @@ public class MazeUI extends GameEntity {
 		}
 	}
 
+	public void honorAndRemoveBonus(int ticks) {
+		if (bonus != null) {
+			pacMan.lookFor.remove(bonus);
+			bonus.setHonored();
+			bonusTimeLeft = ticks;
+		}
+	}
+
 	@Override
-	public void enableAnimation(boolean animated) {
-		super.enableAnimation(animated);
-		energizer.enableAnimation(animated);
-		pacMan.enableAnimation(animated);
-		ghosts.forEach(ghost -> ghost.enableAnimation(animated));
+	public void enableAnimation(boolean on) {
+		super.enableAnimation(on);
+		energizer.enableAnimation(on);
+		pacMan.enableAnimation(on);
+		ghosts.forEach(ghost -> ghost.enableAnimation(on));
 	}
 
 	@Override
@@ -282,37 +272,40 @@ public class MazeUI extends GameEntity {
 			s_flashing.draw(g);
 		} else {
 			s_normal.draw(g);
-			maze.tiles().filter(tile -> TileContent.isFood(maze.getContent(tile)))
-					.forEach(tile -> drawFood(g, tile));
+			maze.tiles().filter(tile -> isFood(maze.getContent(tile))).forEach(tile -> drawFood(g, tile));
 			ghosts.stream().filter(ghost -> ghost.getState() != Ghost.State.DYING)
 					.forEach(ghost -> ghost.draw(g));
 			ghosts.stream().filter(ghost -> ghost.getState() == Ghost.State.DYING)
 					.forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
-			getBonus().ifPresent(bonus -> bonus.draw(g));
-			getInfo().ifPresent(info -> drawInfo(g, info));
+			if (bonus != null) {
+				bonus.draw(g);
+			}
+			if (infoText != null) {
+				drawInfoText(g);
+			}
 		}
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	private void drawInfo(Graphics2D g, String text) {
+	private void drawInfoText(Graphics2D g) {
 		Tile tile = maze.infoTile;
-		g.translate((tile.col + 1) * MazeUI.TS, tile.row * MazeUI.TS + MazeUI.TS / 4);
+		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
 		g.setFont(Assets.font("scoreFont"));
 		g.setColor(Color.YELLOW);
 		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
 		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-		g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
+		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 
 	private void drawFood(Graphics2D g, Tile tile) {
-		g.translate(tile.col * MazeUI.TS, tile.row * MazeUI.TS);
+		g.translate(tile.col * TS, tile.row * TS);
 		char c = maze.getContent(tile);
 		if (c == PELLET) {
 			pellet.draw(g);
 		} else if (c == ENERGIZER) {
 			energizer.draw(g);
 		}
-		g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
+		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 }
