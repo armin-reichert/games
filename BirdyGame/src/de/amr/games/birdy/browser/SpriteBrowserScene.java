@@ -11,9 +11,9 @@ import java.util.List;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 
-public class SpriteBrowserScene implements ActiveScene<Graphics2D> {
+public class SpriteBrowserScene implements ViewController {
 
 	private final SpriteBrowser app;
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);
@@ -32,12 +32,12 @@ public class SpriteBrowserScene implements ActiveScene<Graphics2D> {
 	@Override
 	public void init() {
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return app.getWidth();
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return app.getHeight();

@@ -11,7 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.PongGame.PlayMode;
@@ -21,7 +21,7 @@ import de.amr.games.pong.PongGame.PlayMode;
  * 
  * @author Armin Reichert
  */
-public class MenuScene implements ActiveScene<Graphics2D> {
+public class MenuScene implements ViewController {
 
 	private final PongGame app;
 	private final StateMachine<PlayMode, String> control;

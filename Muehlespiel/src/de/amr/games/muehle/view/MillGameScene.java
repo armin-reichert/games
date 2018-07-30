@@ -11,8 +11,8 @@ import java.util.stream.IntStream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.game.scene.ActiveScene;
 import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.ViewController;
 import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
@@ -27,7 +27,7 @@ import de.amr.games.muehle.msg.Messages;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene implements ActiveScene<Graphics2D>, MillGameUI {
+public class MillGameScene implements ViewController, MillGameUI {
 
 	private final MillGameApp app;
 	private final MillGameController controller;
@@ -83,7 +83,6 @@ public class MillGameScene implements ActiveScene<Graphics2D>, MillGameUI {
 		controller.assistant.tf.setY(getHeight() / 2 - 100);
 	}
 
-	@Override
 	public Controller getController() {
 		return controller;
 	}

@@ -128,6 +128,16 @@ public class Bird extends GameEntity {
 	public Sprite currentSprite() {
 		return healthControl.is(Injured) ? RED_FEATHERS : normalFeathers;
 	}
+	
+	@Override
+	public int getWidth() {
+		return currentSprite().getWidth();
+	}
+	
+	@Override
+	public int getHeight() {
+		return currentSprite().getHeight();
+	}
 
 	@Override
 	public void init() {

@@ -5,9 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 
-public class MainScene implements ActiveScene<Graphics2D> {
+public class MainScene implements ViewController {
 
 	private Image bgImg;
 	private int sampleIndex;

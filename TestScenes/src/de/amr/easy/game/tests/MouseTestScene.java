@@ -7,9 +7,9 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 
-public class MouseTestScene implements ActiveScene<Graphics2D> {
+public class MouseTestScene implements ViewController {
 
 	private final MouseTestApp app;
 	private TextArea messageDisplay;

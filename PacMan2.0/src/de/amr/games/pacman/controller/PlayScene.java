@@ -22,7 +22,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
@@ -45,7 +45,7 @@ import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
-public class PlayScene implements ActiveScene<Graphics2D>, GameEventListener {
+public class PlayScene implements ViewController, GameEventListener {
 
 	public enum State {
 		READY, PLAYING, KILLING_GHOST, DYING, CHANGING_LEVEL, GAME_OVER

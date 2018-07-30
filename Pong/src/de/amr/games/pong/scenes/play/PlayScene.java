@@ -17,7 +17,7 @@ import java.util.Random;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.entities.AutoPaddleLeft;
@@ -32,7 +32,7 @@ import de.amr.games.pong.entities.ScoreDisplay;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements ActiveScene<Graphics2D> {
+public class PlayScene implements ViewController {
 
 	/**
 	 * State machine for controlling the play scene.

@@ -11,7 +11,7 @@ import de.amr.easy.game.view.View;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
 
-public interface MillGameUI extends View<Graphics2D> {
+public interface MillGameUI extends View {
 
 	static final Color BOARD_COLOR = new Color(255, 255, 224);
 	static final Color LINE_COLOR = Color.BLACK;

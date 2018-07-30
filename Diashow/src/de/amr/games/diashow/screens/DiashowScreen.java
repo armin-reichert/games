@@ -6,9 +6,9 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 
-public class DiashowScreen implements ActiveScene<Graphics2D> {
+public class DiashowScreen implements ViewController {
 
 	private static final int KEY_NEXT = KeyEvent.VK_SPACE;
 

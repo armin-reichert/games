@@ -11,12 +11,12 @@ import java.awt.Graphics2D;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.view.BoardUI;
 import de.amr.games.muehle.view.MillGameUI;
 
-public class TestScene implements ActiveScene<Graphics2D> {
+public class TestScene implements ViewController {
 
 	private final MillTestApp app;
 	private final Board board;

@@ -20,7 +20,7 @@ import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
@@ -37,7 +37,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements ActiveScene<Graphics2D> {
+public class PlayScene implements ViewController {
 
 	private final BirdyGame app;
 	private final PlaySceneControl control;

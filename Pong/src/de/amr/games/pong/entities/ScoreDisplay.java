@@ -20,6 +20,16 @@ public class ScoreDisplay extends GameEntity {
 	}
 
 	@Override
+	public int getWidth() {
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		return 0;
+	}
+
+	@Override
 	public Sprite currentSprite() {
 		return null;
 	}
