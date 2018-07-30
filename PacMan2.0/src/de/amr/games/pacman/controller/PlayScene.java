@@ -19,6 +19,7 @@ import static java.awt.event.KeyEvent.VK_UP;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.stream.Stream;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
@@ -27,7 +28,6 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.GameEventListener;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.NextLevelEvent;
@@ -44,7 +44,7 @@ import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
-public class PlayScene implements ViewController, GameEventListener {
+public class PlayScene implements ViewController {
 
 	public enum State {
 		READY, PLAYING, KILLING_GHOST, DYING, CHANGING_LEVEL, GAME_OVER
@@ -70,28 +70,35 @@ public class PlayScene implements ViewController, GameEventListener {
 		this.app = app;
 		this.maze = app.maze;
 
-		// Actors
+		// Create state machine controlling the game play
+		fsm = createPlayControl();
+
+		// Create the actors
 		pacMan = createPacMan();
 		blinky = createBlinky();
 		pinky = createPinky();
 		inky = createInky();
 		clyde = createClyde();
 
-		// Board
+		// Create and populate the board
 		mazeUI = new MazeUI(maze, pacMan);
-		mazeUI.observers.addObserver(this);
 		mazeUI.addGhost(blinky);
 		mazeUI.addGhost(pinky);
 		mazeUI.addGhost(inky);
 		mazeUI.addGhost(clyde);
-
 		hud = new HUD(game);
 		status = new StatusUI(game);
 		buildLayout();
 
-		// Controller
+		// Pass game events to state machine
+		mazeUI.observers.addObserver(fsm::enqueue);
+		Stream.of(pacMan, blinky, pinky, inky, clyde)
+				.forEach(entity -> entity.observers.addObserver(fsm::enqueue));
+	}
 
-		fsm = new StateMachine<>("GameController", State.class, State.READY);
+	private StateMachine<State, GameEvent> createPlayControl() {
+		StateMachine<State, GameEvent> fsm = new StateMachine<>("GameController", State.class,
+				State.READY);
 		fsm.fnFrequency = () -> app.pulse.getFrequency();
 		fsm.setLogger(PlaySceneInfo.LOG);
 
@@ -202,6 +209,8 @@ public class PlayScene implements ViewController, GameEventListener {
 			mazeUI.removeBonus();
 			game.init(maze);
 		};
+
+		return fsm;
 	}
 
 	@Override
@@ -212,11 +221,6 @@ public class PlayScene implements ViewController, GameEventListener {
 	@Override
 	public int getHeight() {
 		return app.getHeight();
-	}
-
-	@Override
-	public void onGameEvent(GameEvent e) {
-		fsm.enqueue(e);
 	}
 
 	@Override
@@ -247,14 +251,12 @@ public class PlayScene implements ViewController, GameEventListener {
 
 	private PacMan createPacMan() {
 		PacMan pacMan = new PacMan(maze, maze.pacManHome);
-		pacMan.observers.addObserver(this);
 		pacMan.setNavigation(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		return pacMan;
 	}
 
 	private Ghost createBlinky() {
 		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
-		blinky.observers.addObserver(this);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -265,7 +267,6 @@ public class PlayScene implements ViewController, GameEventListener {
 
 	private Ghost createPinky() {
 		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
-		pinky.observers.addObserver(this);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -276,7 +277,6 @@ public class PlayScene implements ViewController, GameEventListener {
 
 	private Ghost createInky() {
 		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
-		inky.observers.addObserver(this);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -287,7 +287,6 @@ public class PlayScene implements ViewController, GameEventListener {
 
 	private Ghost createClyde() {
 		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
-		clyde.observers.addObserver(this);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
 		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
