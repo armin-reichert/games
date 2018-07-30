@@ -2,7 +2,6 @@ package de.amr.games.pacman.ui.actor;
 
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
-import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.Tile.WALL;
 import static de.amr.games.pacman.model.Tile.WORMHOLE;
@@ -21,6 +20,7 @@ import de.amr.games.pacman.behavior.impl.NavigationSystem;
 import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.PlaySceneInfo;
 
 /**
@@ -67,12 +67,12 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return TS;
+		return MazeUI.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return TS;
+		return MazeUI.TS;
 	}
 
 	// State support
@@ -130,7 +130,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void placeAt(int col, int row) {
-		tf.moveTo(col * TS, row * TS);
+		tf.moveTo(col * MazeUI.TS, row * MazeUI.TS);
 	}
 
 	public void placeAt(Tile tile) {
@@ -142,15 +142,15 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public int row() {
-		return round(tf.getY() + getHeight() / 2) / TS;
+		return round(tf.getY() + getHeight() / 2) / MazeUI.TS;
 	}
 
 	public int col() {
-		return round(tf.getX() + getWidth() / 2) / TS;
+		return round(tf.getX() + getWidth() / 2) / MazeUI.TS;
 	}
 
 	public boolean isExactlyOverTile() {
-		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
+		return round(tf.getX()) % MazeUI.TS == 0 && round(tf.getY()) % MazeUI.TS == 0;
 	}
 
 	public void move() {
@@ -192,13 +192,13 @@ public abstract class MazeMover<S> extends GameEntity {
 		float x = to.x, y = to.y;
 		switch (dir) {
 		case Top4.W:
-			return new Tile(round(x) / TS, from.row);
+			return new Tile(round(x) / MazeUI.TS, from.row);
 		case Top4.E:
-			return new Tile(round(x + getWidth()) / TS, from.row);
+			return new Tile(round(x + getWidth()) / MazeUI.TS, from.row);
 		case Top4.N:
-			return new Tile(from.col, round(y) / TS);
+			return new Tile(from.col, round(y) / MazeUI.TS);
 		case Top4.S:
-			return new Tile(from.col, round(y + getHeight()) / TS);
+			return new Tile(from.col, round(y + getHeight()) / MazeUI.TS);
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}

@@ -1,7 +1,5 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.PacManApp.TS;
-
 import java.awt.Graphics2D;
 import java.util.stream.Stream;
 
@@ -18,7 +16,7 @@ public class StatusUI extends GameEntity {
 
 	public StatusUI(Game gameState) {
 		this.gameState = gameState;
-		s_pacMan = new Sprite(Spritesheet.getPacManWalking(Top4.W)[1]).scale(TS * 2, TS * 2);
+		s_pacMan = new Sprite(Spritesheet.getPacManWalking(Top4.W)[1]).scale(MazeUI.TS * 2, MazeUI.TS * 2);
 	}
 
 	@Override

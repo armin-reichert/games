@@ -1,6 +1,5 @@
 package de.amr.games.pacman.controller;
 
-import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.ambush;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.bounce;
 import static de.amr.games.pacman.behavior.impl.NavigationSystem.chase;
@@ -299,8 +298,8 @@ public class PlayScene implements ViewController, GameEventListener {
 
 	private void buildLayout() {
 		hud.tf.moveTo(0, 0);
-		mazeUI.tf.moveTo(0, 3 * TS);
-		status.tf.moveTo(0, (3 + maze.numRows()) * TS);
+		mazeUI.tf.moveTo(0, 3 * MazeUI.TS);
+		status.tf.moveTo(0, (3 + maze.numRows()) * MazeUI.TS);
 	}
 
 	private void initActors() {

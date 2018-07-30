@@ -1,6 +1,5 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Spritesheet.getEnergizer;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImage;
 import static de.amr.games.pacman.model.Spritesheet.getMazeImageWhite;
@@ -42,13 +41,16 @@ public class MazeUI extends GameEntity {
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
+	/** Tile size. */
+	public static final int TS = 16;
+
 	public MazeUI(Maze maze, PacMan pacMan) {
 		this.maze = maze;
 		this.pacMan = pacMan;
 		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
 		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
 				.animation(AnimationMode.CYCLIC, 100);
-		s_energizer = new Sprite(getEnergizer()).scale(TS).animation(AnimationMode.BACK_AND_FORTH, 250);
+		s_energizer = new Sprite(getEnergizer()).scale(MazeUI.TS).animation(AnimationMode.BACK_AND_FORTH, 250);
 	}
 
 	@Override
@@ -74,12 +76,12 @@ public class MazeUI extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return maze.numCols() * TS;
+		return maze.numCols() * MazeUI.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return maze.numRows() * TS;
+		return maze.numRows() * MazeUI.TS;
 	}
 
 	public void addGhost(Ghost ghost) {
@@ -127,7 +129,7 @@ public class MazeUI extends GameEntity {
 	public void showBonus(BonusSymbol bonusSymbol, int value, int ticks) {
 		this.bonus = new Bonus(bonusSymbol, value);
 		bonusTimeLeft = ticks;
-		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
+		bonus.tf.moveTo(maze.infoTile.col * MazeUI.TS, maze.infoTile.row * MazeUI.TS - MazeUI.TS / 2);
 		pacMan.lookFor.add(bonus);
 	}
 
@@ -179,23 +181,23 @@ public class MazeUI extends GameEntity {
 
 	private void drawInfo(Graphics2D g, String text) {
 		Tile tile = maze.infoTile;
-		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
+		g.translate((tile.col + 1) * MazeUI.TS, tile.row * MazeUI.TS + MazeUI.TS / 4);
 		g.setFont(Assets.font("scoreFont"));
 		g.setColor(Color.YELLOW);
 		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
 		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-		g.translate(-tile.col * TS, -tile.row * TS);
+		g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
 	}
 
 	private void drawContent(Graphics2D g, Tile tile) {
-		g.translate(tile.col * TS, tile.row * TS);
+		g.translate(tile.col * MazeUI.TS, tile.row * MazeUI.TS);
 		char c = maze.getContent(tile);
 		if (c == Tile.PELLET) {
 			g.setColor(Color.PINK);
-			g.fillRect(TS * 3 / 8, TS * 3 / 8, TS / 4, TS / 4);
+			g.fillRect(MazeUI.TS * 3 / 8, MazeUI.TS * 3 / 8, MazeUI.TS / 4, MazeUI.TS / 4);
 		} else if (c == ENERGIZER) {
 			s_energizer.draw(g);
 		}
-		g.translate(-tile.col * TS, -tile.row * TS);
+		g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
 	}
 }

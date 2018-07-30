@@ -1,9 +1,8 @@
 package de.amr.games.pacman.model;
 
-import static de.amr.games.pacman.PacManApp.TS;
-
 import java.util.function.IntSupplier;
 
+import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.MazeMover;
 import de.amr.games.pacman.ui.actor.PacMan;
@@ -22,7 +21,7 @@ public class Game {
 
 	/** Tiles per second. */
 	private static float tps(float value) {
-		return (value * TS) / fnPulse.getAsInt();
+		return (value * MazeUI.TS) / fnPulse.getAsInt();
 	}
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {

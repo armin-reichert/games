@@ -1,6 +1,5 @@
 package de.amr.games.pacman.ui.actor;
 
-import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.Spritesheet.getPacManDying;
 import static de.amr.games.pacman.model.Spritesheet.getPacManWalking;
@@ -20,6 +19,7 @@ import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Bonus;
+import de.amr.games.pacman.ui.MazeUI;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
@@ -34,7 +34,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	public PacMan(Maze maze, Tile home) {
 		super(maze, "Pac-Man", home, new EnumMap<>(State.class));
-		int size = 2 * TS;
+		int size = 2 * MazeUI.TS;
 		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size)

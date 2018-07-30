@@ -1,6 +1,5 @@
 package de.amr.games.pacman.ui.actor;
 
-import static de.amr.games.pacman.PacManApp.TS;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.Spritesheet.getGhostBlue;
 import static de.amr.games.pacman.model.Spritesheet.getGhostBlueWhite;
@@ -15,6 +14,7 @@ import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.MazeUI;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
@@ -34,7 +34,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public Ghost(Maze maze, String name, int color, Tile home) {
 		super(maze, name, home, new EnumMap<>(State.class));
 		this.color = color;
-		int size = 2 * TS;
+		int size = 2 * MazeUI.TS;
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);
