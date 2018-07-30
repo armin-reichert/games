@@ -31,8 +31,10 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.BonusSymbol;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.actor.Ghost;
@@ -80,7 +82,24 @@ public class MazeUI extends GameEntity {
 		addGhost(pinky);
 		addGhost(inky);
 		addGhost(clyde);
+	}
 
+	public void initActors(Game game) {
+		getPacMan().setState(PacMan.State.ALIVE);
+		getPacMan().placeAt(maze.pacManHome);
+		getPacMan().setSpeed(game::getPacManSpeed);
+		getPacMan().setDir(Top4.E);
+		getPacMan().setNextDir(Top4.E);
+
+		getBlinky().setDir(Top4.E);
+		getPinky().setDir(Top4.S);
+		getInky().setDir(Top4.N);
+		getClyde().setDir(Top4.N);
+		getGhosts().forEach(ghost -> {
+			ghost.setState(Ghost.State.SAFE);
+			ghost.placeAt(ghost.homeTile);
+			ghost.setSpeed(game::getGhostSpeed);
+		});
 	}
 
 	private PacMan createPacMan() {

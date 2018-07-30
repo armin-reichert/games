@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.view.ViewController;
-import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
@@ -31,45 +31,56 @@ import de.amr.statemachine.StateTransition;
 
 public class PlayScene implements ViewController {
 
-	private final PacManApp app;
-	public final Game game = new Game();
-	public final Maze maze;
-	public final MazeUI mazeUI;
-	public final HUD hud;
-	public final StatusUI status;
-
 	public enum State {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
 
 	public final StateMachine<State, GameEvent> gameControl;
+	public final Game game;
+	public final Maze maze;
+	public final MazeUI mazeUI;
+	public final HUD hud;
+	public final StatusUI status;
+
+	private final Pulse pulse;
+	private final int width, height;
 
 	public PlayScene(PacManApp app) {
-		this.app = app;
+		this.width = app.settings.width;
+		this.height = app.settings.height;
+		this.pulse = app.pulse;
+
+		this.game = new Game();
 		this.maze = app.maze;
+
+		// UI
 		mazeUI = new MazeUI(maze);
 		hud = new HUD(game);
 		status = new StatusUI(game);
-		buildLayout();
+		hud.tf.moveTo(0, 0);
+		mazeUI.tf.moveTo(0, 3 * MazeUI.TS);
+		status.tf.moveTo(0, (3 + maze.numRows()) * MazeUI.TS);
 
+		// Game controller
 		gameControl = createGameControl();
+		gameControl.setLogger(PlaySceneInfo.LOG);
+		gameControl.fnFrequency = () -> pulse.getFrequency();
 		mazeUI.eventing.subscribe(gameControl::enqueue);
 		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
 		mazeUI.getGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {
+
 		StateMachine<State, GameEvent> fsm = new StateMachine<>("GameController", State.class,
 				State.READY);
-		fsm.fnFrequency = () -> app.pulse.getFrequency();
-		fsm.setLogger(PlaySceneInfo.LOG);
 
 		// -- READY
 
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(sec(2));
 			game.init(maze);
-			initActors();
+			mazeUI.initActors(game);
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!");
 		};
@@ -155,7 +166,7 @@ public class PlayScene implements ViewController {
 
 		fsm.changeOnTimeout(State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
 			mazeUI.getPacMan().currentSprite().resetAnimation();
-			initActors();
+			mazeUI.initActors(game);
 		});
 
 		// -- GAME_OVER
@@ -178,12 +189,12 @@ public class PlayScene implements ViewController {
 
 	@Override
 	public int getWidth() {
-		return app.settings.width;
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return app.settings.height;
+		return height;
 	}
 
 	@Override
@@ -191,9 +202,6 @@ public class PlayScene implements ViewController {
 		gameControl.init();
 	}
 
-	/**
-	 * Called on every clock tick.
-	 */
 	@Override
 	public void update() {
 		PlaySceneInfo.update(this);
@@ -209,31 +217,7 @@ public class PlayScene implements ViewController {
 	}
 
 	private int sec(float seconds) {
-		return app.pulse.secToTicks(seconds);
-	}
-
-	private void buildLayout() {
-		hud.tf.moveTo(0, 0);
-		mazeUI.tf.moveTo(0, 3 * MazeUI.TS);
-		status.tf.moveTo(0, (3 + maze.numRows()) * MazeUI.TS);
-	}
-
-	private void initActors() {
-		mazeUI.getPacMan().setState(PacMan.State.ALIVE);
-		mazeUI.getPacMan().placeAt(maze.pacManHome);
-		mazeUI.getPacMan().setSpeed(game::getPacManSpeed);
-		mazeUI.getPacMan().setDir(Top4.E);
-		mazeUI.getPacMan().setNextDir(Top4.E);
-
-		mazeUI.getBlinky().setDir(Top4.E);
-		mazeUI.getPinky().setDir(Top4.S);
-		mazeUI.getInky().setDir(Top4.N);
-		mazeUI.getClyde().setDir(Top4.N);
-		mazeUI.getGhosts().forEach(ghost -> {
-			ghost.setState(Ghost.State.SAFE);
-			ghost.placeAt(ghost.homeTile);
-			ghost.setSpeed(game::getGhostSpeed);
-		});
+		return pulse.secToTicks(seconds);
 	}
 
 	private void nextLevel() {
@@ -241,7 +225,7 @@ public class PlayScene implements ViewController {
 		game.foodEaten = 0;
 		game.ghostIndex = 0;
 		maze.resetFood();
-		initActors();
+		mazeUI.initActors(game);
 	}
 
 	private void startGhostHunting() {
