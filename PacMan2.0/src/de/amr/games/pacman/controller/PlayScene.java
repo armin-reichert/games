@@ -32,8 +32,8 @@ import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.NextLevelEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
-import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.model.Levels;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
@@ -393,9 +393,9 @@ public class PlayScene implements ViewController {
 			return;
 		}
 		if (game.foodEaten == Game.DOTS_BONUS_1) {
-			mazeUI.showBonus(BonusSymbol.CHERRIES, 100, sec(5));
+			mazeUI.showBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
 		} else if (game.foodEaten == Game.DOTS_BONUS_2) {
-			mazeUI.showBonus(BonusSymbol.STRAWBERRY, 100, sec(5));
+			mazeUI.showBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
 		}
 		if (e.food == ENERGIZER) {
 			startGhostHunting();
