@@ -1,7 +1,7 @@
 package de.amr.games.pacman.ui.actor;
 
 import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
-import static de.amr.games.pacman.model.Spritesheet.getEnergizer;
+import static de.amr.games.pacman.ui.Spritesheet.getEnergizer;
 
 import java.util.stream.Stream;
 

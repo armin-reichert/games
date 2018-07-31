@@ -1,4 +1,4 @@
-package de.amr.games.pacman.model;
+package de.amr.games.pacman.ui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.model.BonusSymbol;
 
 public class Spritesheet {
 

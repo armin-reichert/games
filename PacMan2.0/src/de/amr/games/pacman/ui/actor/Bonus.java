@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
-import de.amr.games.pacman.model.Spritesheet;
+import de.amr.games.pacman.ui.Spritesheet;
 
 public class Bonus extends GameEntity {
 

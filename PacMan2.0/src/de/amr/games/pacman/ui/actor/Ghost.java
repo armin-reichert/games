@@ -1,11 +1,11 @@
 package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.model.Spritesheet.getGhostBlue;
-import static de.amr.games.pacman.model.Spritesheet.getGhostBlueWhite;
-import static de.amr.games.pacman.model.Spritesheet.getGhostEyes;
-import static de.amr.games.pacman.model.Spritesheet.getGhostNormal;
-import static de.amr.games.pacman.model.Spritesheet.getGreenNumber;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostBlue;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostBlueWhite;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostEyes;
+import static de.amr.games.pacman.ui.Spritesheet.getGhostNormal;
+import static de.amr.games.pacman.ui.Spritesheet.getGreenNumber;
 
 import java.util.EnumMap;
 import java.util.stream.Stream;
