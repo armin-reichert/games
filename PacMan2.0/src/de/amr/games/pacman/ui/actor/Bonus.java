@@ -1,16 +1,18 @@
 package de.amr.games.pacman.ui.actor;
 
+import static de.amr.games.pacman.ui.MazeUI.TS;
+
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Spritesheet;
-import de.amr.games.pacman.ui.MazeUI;
 
 public class Bonus extends GameEntity {
+
+	private static final int[] BONUS_POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
 	private BonusSymbol symbol;
 	private int points;
@@ -22,10 +24,10 @@ public class Bonus extends GameEntity {
 		this.symbol = symbol;
 		this.points = points;
 		this.honored = false;
-		s_symbol = new Sprite(Spritesheet.getBonus(symbol)).scale(2 * MazeUI.TS, 2 * MazeUI.TS);
-		int index = Arrays.binarySearch(Game.BONUS_POINTS, points);
+		s_symbol = new Sprite(Spritesheet.getSymbol(symbol)).scale(2 * TS, 2 * TS);
+		int index = Arrays.binarySearch(BONUS_POINTS, points);
 		if (index >= 0) {
-			s_points = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * MazeUI.TS, 2 * MazeUI.TS);
+			s_points = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * TS, 2 * TS);
 		} else {
 			throw new IllegalArgumentException("Bonus value not supported: " + points);
 		}

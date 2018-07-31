@@ -3,7 +3,6 @@ package de.amr.games.pacman;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.controller.PlayScene;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeUI;
 
@@ -21,7 +20,6 @@ public class PacManApp extends Application {
 		settings.height = (maze.numRows() + 5) * MazeUI.TS;
 		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
 		settings.title = "PacMan 2.0";
-		Game.fnPulse = pulse::getFrequency;
 	}
 
 	@Override

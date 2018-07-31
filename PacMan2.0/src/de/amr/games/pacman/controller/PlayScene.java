@@ -18,7 +18,6 @@ import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.NextLevelEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Levels;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
@@ -53,6 +52,7 @@ public class PlayScene implements ViewController {
 		this.pulse = app.pulse;
 
 		this.game = new Game();
+		game.fnPulse = pulse::getFrequency;
 		this.maze = app.maze;
 
 		// UI
@@ -278,7 +278,7 @@ public class PlayScene implements ViewController {
 		GhostKilledEvent e = event(t);
 		LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
 		e.ghost.onWounded(game.ghostIndex);
-		game.score += Game.GHOST_POINTS[game.ghostIndex];
+		game.score += game.getGhostValue();
 		game.ghostIndex += 1;
 	}
 
@@ -294,19 +294,19 @@ public class PlayScene implements ViewController {
 		game.foodEaten += 1;
 		if (e.food == ENERGIZER) {
 			LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
-			game.score += Game.ENERGIZER_VALUE;
+			game.score += game.ENERGIZER_VALUE;
 		} else {
 			LOG.info(() -> String.format("PacMan found pellet at %s", e.tile));
-			game.score += Game.PELLET_VALUE;
+			game.score += game.PELLET_VALUE;
 		}
 		if (game.foodEaten == game.foodTotal) {
 			gameControl.enqueue(new NextLevelEvent());
 			return;
 		}
-		if (game.foodEaten == Game.DOTS_BONUS_1) {
-			mazeUI.addBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
-		} else if (game.foodEaten == Game.DOTS_BONUS_2) {
-			mazeUI.addBonus(Levels.getBonusSymbol(game.level), Levels.getBonusValue(game.level), sec(9));
+		if (game.foodEaten == game.DOTS_BONUS_1) {
+			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), sec(9));
+		} else if (game.foodEaten == game.DOTS_BONUS_2) {
+			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), sec(9));
 		}
 		if (e.food == ENERGIZER) {
 			startGhostHunting();

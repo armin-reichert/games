@@ -22,7 +22,7 @@ public class Spritesheet {
 	private static BufferedImage maze;
 	private static BufferedImage mazeWhite;
 	private static BufferedImage[] energizer = new BufferedImage[2];
-	private static Map<BonusSymbol, BufferedImage> bonusMap = new HashMap<>();
+	private static Map<BonusSymbol, BufferedImage> symbolMap = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
 	private static BufferedImage[] pacManDying = new BufferedImage[11];
@@ -43,10 +43,10 @@ public class Spritesheet {
 		energizer[0] = createEnergizerImage(true);
 		energizer[1] = createEnergizerImage(false);
 
-		// Boni
+		// Symbols for boni
 		int offset = 0;
 		for (BonusSymbol symbol : BonusSymbol.values()) {
-			bonusMap.put(symbol, sheet.getSubimage(488 + offset, 48, 16, 16));
+			symbolMap.put(symbol, sheet.getSubimage(488 + offset, 48, 16, 16));
 			offset += 16;
 		}
 
@@ -124,8 +124,8 @@ public class Spritesheet {
 		return mazeWhite;
 	}
 
-	public static BufferedImage getBonus(BonusSymbol bonus) {
-		return bonusMap.get(bonus);
+	public static BufferedImage getSymbol(BonusSymbol symbol) {
+		return symbolMap.get(symbol);
 	}
 
 	public static BufferedImage getPacManStanding() {
