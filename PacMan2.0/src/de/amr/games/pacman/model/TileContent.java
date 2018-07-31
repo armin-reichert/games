@@ -7,7 +7,6 @@ public class TileContent {
 	public static final char WALL = '#';
 	public static final char DOOR = 'D';
 	public static final char TUNNEL = 'T';
-	public static final char WORMHOLE = 'W';
 
 	// Position markers
 	public static final char POS_INFO = '$';

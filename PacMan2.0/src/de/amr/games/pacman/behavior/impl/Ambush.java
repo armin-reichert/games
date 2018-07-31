@@ -23,16 +23,20 @@ class Ambush implements RoutePlanner {
 
 	@Override
 	public Route computeRoute(MazeMover<?> ambusher) {
-		RouteData result = new RouteData();
+		RouteData route = new RouteData();
+		if (victim.isOutsideMaze()) {
+			route.dir = ambusher.getNextDir();
+			return route;
+		}
 		Maze maze = victim.maze;
 		Optional<Tile> fourAhead = ahead(4, victim);
 		if (fourAhead.isPresent() && maze.getContent(fourAhead.get()) != WALL) {
-			result.path = maze.findPath(ambusher.getTile(), fourAhead.get());
+			route.path = maze.findPath(ambusher.getTile(), fourAhead.get());
 		} else {
-			result.path = maze.findPath(ambusher.getTile(), victim.getTile());
+			route.path = maze.findPath(ambusher.getTile(), victim.getTile());
 		}
-		result.dir = maze.dirAlongPath(result.path).orElse(ambusher.getNextDir());
-		return result;
+		route.dir = maze.alongPath(route.path).orElse(ambusher.getNextDir());
+		return route;
 	}
 
 	private Optional<Tile> ahead(int n, MazeMover<?> refugee) {

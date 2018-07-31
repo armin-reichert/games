@@ -8,9 +8,9 @@ class GoHome implements RoutePlanner {
 
 	@Override
 	public Route computeRoute(MazeMover<?> mover) {
-		RouteData result = new RouteData();
-		result.path = mover.maze.findPath(mover.getTile(), mover.homeTile);
-		result.dir = mover.maze.dirAlongPath(result.path).orElse(mover.getNextDir());
-		return result;
+		RouteData route = new RouteData();
+		route.path = mover.maze.findPath(mover.getTile(), mover.homeTile);
+		route.dir = mover.maze.alongPath(route.path).orElse(mover.getNextDir());
+		return route;
 	}
 }

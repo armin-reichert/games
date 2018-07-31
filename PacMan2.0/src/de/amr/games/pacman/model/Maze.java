@@ -9,6 +9,7 @@ import static de.amr.games.pacman.model.TileContent.POS_PACMAN;
 import static de.amr.games.pacman.model.TileContent.POS_PINKY;
 import static de.amr.games.pacman.model.TileContent.WALL;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -130,12 +131,15 @@ public class Maze {
 	}
 
 	public List<Tile> findPath(Tile source, Tile target) {
-		GraphTraversal pathfinder = new AStarTraversal<>(graph, graph::manhattan);
-		pathfinder.traverseGraph(cell(source), cell(target));
-		return pathfinder.path(cell(target)).stream().map(this::tile).collect(Collectors.toList());
+		if (isValidTile(source) && isValidTile(target)) {
+			GraphTraversal pathfinder = new AStarTraversal<>(graph, graph::manhattan);
+			pathfinder.traverseGraph(cell(source), cell(target));
+			return pathfinder.path(cell(target)).stream().map(this::tile).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
 	}
 
-	public OptionalInt dirAlongPath(List<Tile> path) {
+	public OptionalInt alongPath(List<Tile> path) {
 		return path.size() < 2 ? OptionalInt.empty() : direction(path.get(0), path.get(1));
 	}
 

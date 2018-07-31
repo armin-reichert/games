@@ -19,11 +19,11 @@ class Bounce implements RoutePlanner {
 	}
 
 	private boolean isReflected(MazeMover<?> bouncer) {
-		Tile touchedTile = bouncer.computeTouchedTile(bouncer.getTile(), bouncer.getDir());
-		if (touchedTile.equals(bouncer.getTile())) {
+		Tile nextTile = bouncer.computeNextTile(bouncer.getTile(), bouncer.getDir());
+		if (nextTile.equals(bouncer.getTile())) {
 			return false;
 		}
-		char c = bouncer.maze.getContent(touchedTile);
+		char c = bouncer.maze.getContent(nextTile);
 		return c == WALL || c == DOOR;
 	}
 }

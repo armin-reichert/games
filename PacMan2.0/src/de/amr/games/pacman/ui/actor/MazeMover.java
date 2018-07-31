@@ -4,7 +4,7 @@ import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.TileContent.WALL;
-import static de.amr.games.pacman.model.TileContent.WORMHOLE;
+import static de.amr.games.pacman.ui.MazeUI.TS;
 import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
@@ -28,6 +28,8 @@ import de.amr.games.pacman.ui.PlaySceneInfo;
  *          maze mover state type
  */
 public abstract class MazeMover<S> extends GameEntity {
+
+	private static final int TELEPORT_LENGTH = 3;
 
 	public final GameEventSupport eventing = new GameEventSupport();
 	public final Maze maze;
@@ -153,12 +155,23 @@ public abstract class MazeMover<S> extends GameEntity {
 		return round(tf.getX()) % MazeUI.TS == 0 && round(tf.getY()) % MazeUI.TS == 0;
 	}
 
+	public boolean isOutsideMaze() {
+		Tile tile = getTile();
+		return tile.row < 0 || tile.row >= maze.numRows() || tile.col < 0 || tile.col >= maze.numCols();
+	}
+
 	public void move() {
 		Tile tile = getTile();
-		if (maze.getContent(tile) == WORMHOLE) {
-			if (dir == Top4.E && tile.col == maze.numCols() - 1 || dir == Top4.W && tile.col == 0) {
-				placeAt(maze.numCols() - 1 - tile.col, tile.row);
+		if (isOutsideMaze()) {
+			// teleport
+			if (tile.col > (maze.numCols() - 1) + TELEPORT_LENGTH) {
+				placeAt(0, tile.row);
+			} else if (tile.col < -TELEPORT_LENGTH) {
+				placeAt(maze.numCols() - 1, tile.row);
+			} else {
+				tf.moveTo(computePosition(dir, fnSpeed.apply(this)));
 			}
+			return;
 		}
 		nextDir = getNavigation().computeRoute(this).getDirection();
 		if (canMove(nextDir)) {
@@ -172,33 +185,38 @@ public abstract class MazeMover<S> extends GameEntity {
 		}
 	}
 
-	public boolean canMove(int dir) {
-		Tile tile = getTile(), touched = computeTouchedTile(tile, dir);
-		if (tile.equals(touched)) {
-			return true;
+	public boolean canMove(int direction) {
+		Tile current = getTile();
+		if (direction == Top4.W && current.col <= 0
+				|| direction == Top4.E && current.col >= maze.numCols() - 1) {
+			return true; // teleport
 		}
-		if (!maze.isValidTile(touched) || maze.getContent(touched) == WALL) {
+		Tile next = computeNextTile(current, direction);
+		if (next.equals(current)) {
+			return true; // move stays inside tile
+		}
+		if (maze.getContent(next) == WALL) {
 			return false;
 		}
-		if (dir == TOPOLOGY.right(this.dir) || dir == TOPOLOGY.left(this.dir)) {
-			placeAt(getTile()); // TODO
+		if (direction == TOPOLOGY.right(dir) || direction == TOPOLOGY.left(dir)) {
+			placeAt(getTile()); // TODO this is not 100% correct
 			return isExactlyOverTile();
 		}
 		return true;
 	}
 
-	public Tile computeTouchedTile(Tile from, int dir) {
-		Vector2f to = computePosition(dir, fnSpeed.apply(this));
-		float x = to.x, y = to.y;
+	public Tile computeNextTile(Tile current, int dir) {
+		Vector2f nextPosition = computePosition(dir, fnSpeed.apply(this));
+		float x = nextPosition.x, y = nextPosition.y;
 		switch (dir) {
 		case Top4.W:
-			return new Tile(round(x) / MazeUI.TS, from.row);
+			return new Tile(round(x) / TS, current.row);
 		case Top4.E:
-			return new Tile(round(x + getWidth()) / MazeUI.TS, from.row);
+			return new Tile(round(x + getWidth()) / TS, current.row);
 		case Top4.N:
-			return new Tile(from.col, round(y) / MazeUI.TS);
+			return new Tile(current.col, round(y) / TS);
 		case Top4.S:
-			return new Tile(from.col, round(y + getHeight()) / MazeUI.TS);
+			return new Tile(current.col, round(y + getHeight()) / TS);
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}

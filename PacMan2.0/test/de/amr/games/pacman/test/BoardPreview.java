@@ -5,7 +5,6 @@ import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 import static de.amr.games.pacman.model.TileContent.PELLET;
 import static de.amr.games.pacman.model.TileContent.TUNNEL;
 import static de.amr.games.pacman.model.TileContent.WALL;
-import static de.amr.games.pacman.model.TileContent.WORMHOLE;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -52,7 +51,6 @@ public class BoardPreview extends JFrame {
 		colors.put(PELLET, Color.WHITE);
 		colors.put(ENERGIZER, Color.GREEN);
 		colors.put(DOOR, Color.ORANGE);
-		colors.put(WORMHOLE, Color.ORANGE);
 		colors.put(TUNNEL, Color.GRAY);
 		ConfigurableGridRenderer r = new WallPassageGridRenderer();
 		r.fnCellSize = () -> TS;

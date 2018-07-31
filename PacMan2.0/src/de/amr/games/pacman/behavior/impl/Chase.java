@@ -17,9 +17,13 @@ class Chase implements RoutePlanner {
 
 	@Override
 	public Route computeRoute(MazeMover<?> chaser) {
-		RouteData result = new RouteData();
-		result.path = chaser.maze.findPath(chaser.getTile(), victim.getTile());
-		result.dir = chaser.maze.dirAlongPath(result.path).orElse(chaser.getNextDir());
-		return result;
+		RouteData route = new RouteData();
+		if (victim.isOutsideMaze()) {
+			route.dir = chaser.getNextDir();
+			return route;
+		}
+		route.path = chaser.maze.findPath(chaser.getTile(), victim.getTile());
+		route.dir = chaser.maze.alongPath(route.path).orElse(chaser.getNextDir());
+		return route;
 	}
 }

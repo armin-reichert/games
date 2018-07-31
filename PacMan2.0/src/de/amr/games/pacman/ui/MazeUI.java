@@ -79,6 +79,7 @@ public class MazeUI extends GameEntity {
 		pinky = createPinky();
 		inky = createInky();
 		clyde = createClyde();
+		
 		addGhost(blinky);
 		addGhost(pinky);
 		addGhost(inky);
