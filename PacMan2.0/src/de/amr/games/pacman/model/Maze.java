@@ -34,9 +34,7 @@ public class Maze {
 	private final GridGraph<Character, Integer> graph;
 
 	public void resetFood() {
-		tiles().filter(tile -> TileContent.isFood(data(tile.row, tile.col))).forEach(tile -> {
-			graph.set(cell(tile), data(tile.row, tile.col));
-		});
+		graph.clearVertexLabels();
 	}
 
 	public Maze(String map) {
