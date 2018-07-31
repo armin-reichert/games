@@ -23,6 +23,16 @@ public class Pen extends GameEntity {
 	}
 
 	@Override
+	public int getWidth() {
+		return thickness;
+	}
+
+	@Override
+	public int getHeight() {
+		return thickness;
+	}
+
+	@Override
 	public void update() {
 		tf.move();
 		if (tf.getY() > image.getHeight() - getHeight() || tf.getY() < 0) {
