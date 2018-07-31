@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.view.ViewController;
 import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
@@ -35,24 +34,19 @@ public class PlayScene implements ViewController {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
 
-	public final StateMachine<State, GameEvent> gameControl;
-	public final Game game;
-	public final Maze maze;
-	public final MazeUI mazeUI;
-	public final HUD hud;
-	public final StatusUI status;
-
-	private final Pulse pulse;
 	private final int width, height;
-
+	private final StateMachine<State, GameEvent> gameControl;
+	private final Game game;
+	private final Maze maze;
+	private final MazeUI mazeUI;
+	private final HUD hud;
+	private final StatusUI status;
 	private final PlaySceneInfo playSceneInfo;
 
 	public PlayScene(PacManApp app) {
 		this.width = app.settings.width;
 		this.height = app.settings.height;
-		this.pulse = app.pulse;
-
-		this.game = new Game(pulse::getFrequency);
+		this.game = new Game(app.pulse::getFrequency);
 		this.maze = app.maze;
 
 		// UI
@@ -71,7 +65,7 @@ public class PlayScene implements ViewController {
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
 
 		// Info
-		playSceneInfo = new PlaySceneInfo(this);
+		playSceneInfo = new PlaySceneInfo(game, mazeUI, maze);
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {
@@ -79,12 +73,12 @@ public class PlayScene implements ViewController {
 		StateMachine<State, GameEvent> fsm = new StateMachine<>("GameController", State.class,
 				State.READY);
 
-		fsm.fnPulse = game.fnPulse;
+		fsm.fnPulse = game.fnTicksPerSecond;
 
 		// -- READY
 
 		fsm.state(State.READY).entry = state -> {
-			state.setDuration(sec(2));
+			state.setDuration(game.sec(2));
 			game.init(maze);
 			mazeUI.initActors(game);
 			mazeUI.enableAnimation(false);
@@ -119,7 +113,7 @@ public class PlayScene implements ViewController {
 		// -- GHOST_DYING
 
 		fsm.state(State.GHOST_DYING).entry = state -> {
-			state.setDuration(sec(0.5f));
+			state.setDuration(game.sec(0.5f));
 			mazeUI.getPacMan().visibility = () -> false;
 		};
 
@@ -137,7 +131,7 @@ public class PlayScene implements ViewController {
 		// -- CHANGING_LEVEL
 
 		fsm.state(State.CHANGING_LEVEL).entry = state -> {
-			state.setDuration(sec(4));
+			state.setDuration(game.sec(4));
 			mazeUI.setFlashing(true);
 		};
 
@@ -158,7 +152,7 @@ public class PlayScene implements ViewController {
 		// -- PACMAN_DYING
 
 		fsm.state(State.PACMAN_DYING).entry = state -> {
-			state.setDuration(sec(3));
+			state.setDuration(game.sec(3));
 			mazeUI.getPacMan().setState(PacMan.State.DYING);
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 			game.lives -= 1;
@@ -219,10 +213,6 @@ public class PlayScene implements ViewController {
 		mazeUI.draw(g);
 		status.draw(g);
 		playSceneInfo.draw(g);
-	}
-
-	private int sec(float seconds) {
-		return pulse.secToTicks(seconds);
 	}
 
 	private void nextLevel() {
@@ -304,9 +294,9 @@ public class PlayScene implements ViewController {
 			return;
 		}
 		if (game.foodEaten == game.DOTS_BONUS_1) {
-			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), sec(9));
+			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
 		} else if (game.foodEaten == game.DOTS_BONUS_2) {
-			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), sec(9));
+			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
 		}
 		if (e.food == ENERGIZER) {
 			startGhostHunting();
@@ -317,6 +307,6 @@ public class PlayScene implements ViewController {
 		BonusFoundEvent e = event(t);
 		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 		game.score += e.value;
-		mazeUI.honorAndRemoveBonus(sec(2));
+		mazeUI.honorAndRemoveBonus(game.sec(2));
 	}
 }

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.PlayScene;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Spritesheet;
 import de.amr.games.pacman.model.Tile;
@@ -24,17 +24,17 @@ import de.amr.games.pacman.ui.actor.PacMan;
 
 public class PlaySceneInfo extends GameEntity {
 
-	private final PlayScene scene;
+	private final Game game;
 	private final MazeUI mazeUI;
 	private final Maze maze;
 	private boolean show_grid;
 	private boolean show_ghost_route;
 	private boolean show_entity_state;
 
-	public PlaySceneInfo(PlayScene scene) {
-		this.scene = scene;
-		this.mazeUI = scene.mazeUI;
-		this.maze = scene.maze;
+	public PlaySceneInfo(Game game, MazeUI mazeUI, Maze maze) {
+		this.game = game;
+		this.mazeUI = mazeUI;
+		this.maze = maze;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class PlaySceneInfo extends GameEntity {
 	private void eatAllPellets() {
 		maze.tiles().filter(tile -> maze.getContent(tile) == PELLET).forEach(tile -> {
 			maze.clearTile(tile);
-			scene.game.foodEaten += 1;
+			game.foodEaten += 1;
 		});
 	}
 

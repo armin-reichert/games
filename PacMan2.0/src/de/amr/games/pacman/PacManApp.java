@@ -22,6 +22,7 @@ public class PacManApp extends Application {
 		settings.height = (maze.numRows() + 5) * MazeUI.TS;
 		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
 		settings.title = "PacMan 2.0";
+		pulse.setFrequency(60);
 	}
 
 	@Override

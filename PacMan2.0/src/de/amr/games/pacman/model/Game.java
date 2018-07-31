@@ -24,7 +24,7 @@ public class Game {
 	public final int DOTS_BONUS_2 = 170;
 	public final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
-	public final IntSupplier fnPulse;
+	public final IntSupplier fnTicksPerSecond;
 
 	private final Object[][] LEVELS = {
 		/*@formatter:off*/
@@ -51,7 +51,12 @@ public class Game {
 
 	/** Tiles per second. */
 	private float tps(float value) {
-		return (value * MazeUI.TS) / fnPulse.getAsInt();
+		return (value * MazeUI.TS) / fnTicksPerSecond.getAsInt();
+	}
+	
+	/** Ticks representing the given seconds. */
+	public int sec(float seconds) {
+		return Math.round(fnTicksPerSecond.getAsInt() * seconds);
 	}
 
 	public BonusSymbol getBonusSymbol() {
@@ -104,8 +109,8 @@ public class Game {
 	public int foodEaten;
 	public int ghostIndex;
 	
-	public Game(IntSupplier fnPulse) {
-		this.fnPulse = fnPulse;
+	public Game(IntSupplier fnTicksPerSecond) {
+		this.fnTicksPerSecond = fnTicksPerSecond;
 	}
 
 	public void init(Maze maze) {
