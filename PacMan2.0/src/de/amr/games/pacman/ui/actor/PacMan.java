@@ -61,7 +61,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return;
 		}
 		move();
-//		currentSprite().enableAnimation(canMove(getDir()));
+		// currentSprite().enableAnimation(canMove(getDir()));
 		if (isOutsideMaze()) {
 			return; // teleporting
 		}

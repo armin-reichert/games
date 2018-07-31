@@ -84,7 +84,7 @@ public class MazeUI extends GameEntity {
 		createPinky();
 		createInky();
 		createClyde();
-		
+
 		setGhostActive(GhostName.BLINKY, true);
 		setGhostActive(GhostName.PINKY, true);
 		setGhostActive(GhostName.INKY, true);

@@ -23,8 +23,7 @@ class Flee implements RoutePlanner {
 		RouteData route = new RouteData();
 		route.dir = refugee.getNextDir();
 		Maze maze = chaser.maze;
-		OptionalInt towardsChaser = maze
-				.alongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
+		OptionalInt towardsChaser = maze.alongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
 		if (towardsChaser.isPresent()) {
 			int dir = towardsChaser.getAsInt();
 			for (int d : Arrays.asList(Maze.TOPOLOGY.inv(dir), Maze.TOPOLOGY.right(dir),

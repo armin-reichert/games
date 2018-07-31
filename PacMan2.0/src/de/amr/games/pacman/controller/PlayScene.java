@@ -6,7 +6,6 @@ import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.view.ViewController;
@@ -45,7 +44,7 @@ public class PlayScene implements ViewController {
 
 	private final Pulse pulse;
 	private final int width, height;
-	
+
 	private final PlaySceneInfo playSceneInfo;
 
 	public PlayScene(PacManApp app) {
@@ -71,8 +70,8 @@ public class PlayScene implements ViewController {
 		mazeUI.eventing.subscribe(gameControl::enqueue);
 		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
-		
-		// Info 
+
+		// Info
 		playSceneInfo = new PlaySceneInfo(this);
 	}
 
