@@ -67,6 +67,7 @@ public class MazeUI extends GameEntity {
 
 	private boolean flashing;
 	private String infoText;
+	private Color infoTextColor;
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
@@ -143,11 +144,13 @@ public class MazeUI extends GameEntity {
 		pacMan.setSpeed(game::getPacManSpeed);
 		pacMan.setDir(Top4.E);
 		pacMan.setNextDir(Top4.E);
+		pacMan.getSprites().forEach(Sprite::resetAnimation);
 
 		activeGhostsByName.values().forEach(ghost -> {
 			ghost.setState(Ghost.State.SAFE);
 			ghost.placeAt(ghost.homeTile);
 			ghost.setSpeed(game::getGhostSpeed);
+			ghost.getSprites().forEach(Sprite::resetAnimation);
 		});
 		getActiveGhost(GhostName.BLINKY).ifPresent(blinky -> blinky.setDir(Top4.E));
 		getActiveGhost(GhostName.PINKY).ifPresent(pinky -> pinky.setDir(Top4.S));
@@ -217,8 +220,9 @@ public class MazeUI extends GameEntity {
 		return Optional.ofNullable(activeGhostsByName.get(name));
 	}
 
-	public void showInfo(String text) {
-		this.infoText = text;
+	public void showInfo(String text, Color color) {
+		infoText = text;
+		infoTextColor = color;
 	}
 
 	public void hideInfo() {
@@ -287,7 +291,7 @@ public class MazeUI extends GameEntity {
 		Tile tile = maze.infoTile;
 		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
 		g.setFont(Assets.font("scoreFont"));
-		g.setColor(Color.YELLOW);
+		g.setColor(infoTextColor);
 		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
 		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
 		g.translate(-tile.col * TS, -tile.row * TS);

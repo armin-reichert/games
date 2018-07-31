@@ -3,6 +3,7 @@ package de.amr.games.pacman.controller;
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
@@ -87,7 +88,7 @@ public class PlayScene implements ViewController {
 			game.init(maze);
 			mazeUI.initActors(game);
 			mazeUI.enableAnimation(false);
-			mazeUI.showInfo("Ready!");
+			mazeUI.showInfo("Ready!", Color.YELLOW);
 		};
 
 		fsm.state(State.READY).exit = state -> {
@@ -143,7 +144,7 @@ public class PlayScene implements ViewController {
 		fsm.state(State.CHANGING_LEVEL).update = state -> {
 			if (state.getRemaining() == state.getDuration() / 2) {
 				nextLevel();
-				mazeUI.showInfo("Ready!");
+				mazeUI.showInfo("Ready!", Color.YELLOW);
 				mazeUI.setFlashing(false);
 				mazeUI.enableAnimation(false);
 			} else if (state.isTerminated()) {
@@ -170,7 +171,6 @@ public class PlayScene implements ViewController {
 		fsm.changeOnTimeout(State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
 
 		fsm.changeOnTimeout(State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
-			mazeUI.getPacMan().currentSprite().resetAnimation();
 			mazeUI.initActors(game);
 		});
 
@@ -178,7 +178,7 @@ public class PlayScene implements ViewController {
 
 		fsm.state(State.GAME_OVER).entry = state -> {
 			mazeUI.enableAnimation(false);
-			mazeUI.showInfo("Game Over!");
+			mazeUI.showInfo("Game Over!", Color.RED);
 		};
 
 		fsm.change(State.GAME_OVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
