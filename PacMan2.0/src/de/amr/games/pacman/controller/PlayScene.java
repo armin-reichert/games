@@ -1,11 +1,12 @@
 package de.amr.games.pacman.controller;
 
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.model.TileContent.ENERGIZER;
-import static de.amr.games.pacman.ui.PlaySceneInfo.LOG;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.view.ViewController;
@@ -44,6 +45,8 @@ public class PlayScene implements ViewController {
 
 	private final Pulse pulse;
 	private final int width, height;
+	
+	private final PlaySceneInfo playSceneInfo;
 
 	public PlayScene(PacManApp app) {
 		this.width = app.settings.width;
@@ -63,11 +66,14 @@ public class PlayScene implements ViewController {
 
 		// Game controller
 		gameControl = createGameControl();
-		gameControl.setLogger(PlaySceneInfo.LOG);
+		gameControl.setLogger(LOG);
 		gameControl.fnFrequency = () -> pulse.getFrequency();
 		mazeUI.eventing.subscribe(gameControl::enqueue);
 		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
+		
+		// Info 
+		playSceneInfo = new PlaySceneInfo(this);
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {
@@ -204,7 +210,7 @@ public class PlayScene implements ViewController {
 
 	@Override
 	public void update() {
-		PlaySceneInfo.update(this);
+		playSceneInfo.update();
 		gameControl.update();
 	}
 
@@ -213,7 +219,7 @@ public class PlayScene implements ViewController {
 		hud.draw(g);
 		mazeUI.draw(g);
 		status.draw(g);
-		PlaySceneInfo.draw(g, this);
+		playSceneInfo.draw(g);
 	}
 
 	private int sec(float seconds) {

@@ -1,5 +1,6 @@
 package de.amr.games.pacman.ui.actor;
 
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
@@ -21,7 +22,6 @@ import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeUI;
-import de.amr.games.pacman.ui.PlaySceneInfo;
 
 /**
  * @param <S>
@@ -84,8 +84,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.state = state;
 		stateEntryTime = System.currentTimeMillis();
 		if (oldState != state) {
-			PlaySceneInfo.LOG
-					.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
+			LOG.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
 		}
 	}
 

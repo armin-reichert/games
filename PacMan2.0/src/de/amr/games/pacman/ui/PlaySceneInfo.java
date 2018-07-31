@@ -1,6 +1,8 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.model.TileContent.PELLET;
+import static de.amr.games.pacman.ui.MazeUI.TS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -8,10 +10,11 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Stream;
 
-import de.amr.easy.game.Application;
+import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.PlayScene;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Spritesheet;
@@ -19,19 +22,33 @@ import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
 
-public class PlaySceneInfo {
+public class PlaySceneInfo extends GameEntity {
 
-	public static final Logger LOG = Application.LOG;
+	private final PlayScene scene;
+	private final MazeUI mazeUI;
+	private final Maze maze;
+	private boolean show_grid;
+	private boolean show_ghost_route;
+	private boolean show_entity_state;
 
-	static {
-		LOG.setLevel(Level.OFF);
+	public PlaySceneInfo(PlayScene scene) {
+		this.scene = scene;
+		this.mazeUI = scene.mazeUI;
+		this.maze = scene.maze;
 	}
 
-	private static boolean show_grid;
-	private static boolean show_ghost_route;
-	private static boolean show_entity_state;
+	@Override
+	public Sprite currentSprite() {
+		return null;
+	}
 
-	public static void update(PlayScene scene) {
+	@Override
+	public Stream<Sprite> getSprites() {
+		return Stream.empty();
+	}
+
+	@Override
+	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
 			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
 		}
@@ -45,89 +62,87 @@ public class PlaySceneInfo {
 			show_ghost_route = !show_ghost_route;
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-			killAllLivingGhosts(scene);
+			killAllLivingGhosts();
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
-			eatAllPellets(scene);
+			eatAllPellets();
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(scene, MazeUI.GhostName.BLINKY);
+			toggleGhost(MazeUI.GhostName.BLINKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(scene, MazeUI.GhostName.PINKY);
+			toggleGhost(MazeUI.GhostName.PINKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(scene, MazeUI.GhostName.INKY);
+			toggleGhost(MazeUI.GhostName.INKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(scene, MazeUI.GhostName.CLYDE);
+			toggleGhost(MazeUI.GhostName.CLYDE);
 		}
 	}
 
-	private static void killAllLivingGhosts(PlayScene scene) {
-		scene.mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRO)
+	private void killAllLivingGhosts() {
+		mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRO)
 				.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 	}
 
-	private static void eatAllPellets(PlayScene scene) {
-		Maze maze = scene.mazeUI.getMaze();
+	private void eatAllPellets() {
 		maze.tiles().filter(tile -> maze.getContent(tile) == PELLET).forEach(tile -> {
 			maze.clearTile(tile);
 			scene.game.foodEaten += 1;
 		});
 	}
 
-	public static void draw(Graphics2D g, PlayScene scene) {
+	@Override
+	public void draw(Graphics2D g) {
 		if (show_grid) {
-			drawGrid(g, scene.mazeUI);
+			drawGrid(g);
 		}
 		if (show_ghost_route) {
-			scene.mazeUI.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost, scene.mazeUI));
+			mazeUI.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost));
 		}
 		if (show_entity_state) {
-			drawPacManTilePosition(g, scene);
-			drawEntityState(g, scene);
+			drawPacManTilePosition(g);
+			drawEntityState(g);
 		}
 	}
 
-	private static void drawGrid(Graphics2D g, MazeUI mazeUI) {
-		Maze maze = mazeUI.getMaze();
+	private void drawGrid(Graphics2D g) {
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		g.setColor(Color.LIGHT_GRAY);
 		for (int row = 0; row < maze.numRows() + 1; ++row) {
-			g.drawLine(0, row * MazeUI.TS, mazeUI.getWidth(), row * MazeUI.TS);
+			g.drawLine(0, row * TS, mazeUI.getWidth(), row * TS);
 		}
 		for (int col = 1; col < maze.numCols(); ++col) {
-			g.drawLine(col * MazeUI.TS, 0, col * MazeUI.TS, mazeUI.getHeight());
+			g.drawLine(col * TS, 0, col * TS, mazeUI.getHeight());
 		}
-		int fontSize = MazeUI.TS * 4 / 10;
+		int fontSize = TS * 4 / 10;
 		if (fontSize > 4) {
-			g.setFont(new Font("Arial Narrow", Font.PLAIN, MazeUI.TS * 40 / 100));
+			g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
 			for (int row = 0; row < maze.numRows(); ++row) {
 				for (int col = 0; col < maze.numCols(); ++col) {
-					g.translate(col * MazeUI.TS, row * MazeUI.TS);
-					g.drawString(String.format("%d,%d", col, row), MazeUI.TS / 8, MazeUI.TS / 2);
-					g.translate(-col * MazeUI.TS, -row * MazeUI.TS);
+					g.translate(col * TS, row * TS);
+					g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
+					g.translate(-col * TS, -row * TS);
 				}
 			}
 		}
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
-	private static void drawEntityState(Graphics2D g, PlayScene scene) {
-		MazeUI mazeUI = scene.mazeUI;
+	private void drawEntityState(Graphics2D g) {
 		PacMan pacMan = mazeUI.getPacMan();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
 		mazeUI.getActiveGhosts().forEach(ghost -> {
 			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
-			drawText(g, color(ghost), ghost.tf.getX() - MazeUI.TS, ghost.tf.getY(), txt);
+			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
 		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
-	private static void toggleGhost(PlayScene scene, MazeUI.GhostName ghostName) {
-		scene.mazeUI.setGhostActive(ghostName, !scene.mazeUI.isGhostActive(ghostName));
+	private void toggleGhost(MazeUI.GhostName ghostName) {
+		mazeUI.setGhostActive(ghostName, !mazeUI.isGhostActive(ghostName));
 	}
 
 	private static Color color(Ghost ghost) {
@@ -145,44 +160,44 @@ public class PlaySceneInfo {
 		}
 	}
 
-	private static void drawText(Graphics2D g, Color color, float x, float y, String text) {
+	private void drawText(Graphics2D g, Color color, float x, float y, String text) {
 		g.translate(x, y);
 		g.setColor(color);
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, MazeUI.TS / 2));
-		g.drawString(text, 0, -MazeUI.TS / 2);
+		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, TS / 2));
+		g.drawString(text, 0, -TS / 2);
 		g.translate(-x, -y);
 	}
 
-	private static void drawPacManTilePosition(Graphics2D g, PlayScene scene) {
-		PacMan pacMan = scene.mazeUI.getPacMan();
+	private void drawPacManTilePosition(Graphics2D g) {
+		PacMan pacMan = mazeUI.getPacMan();
 		if (pacMan.isExactlyOverTile()) {
-			g.translate(scene.mazeUI.tf.getX(), scene.mazeUI.tf.getY());
+			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 			g.translate(pacMan.tf.getX(), pacMan.tf.getY());
 			g.setColor(Color.GREEN);
 			g.drawRect(0, 0, pacMan.getWidth(), pacMan.getHeight());
 			g.translate(-pacMan.tf.getX(), -pacMan.tf.getY());
-			g.translate(-scene.mazeUI.tf.getX(), -scene.mazeUI.tf.getY());
+			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 		}
 	}
 
-	private static void drawGhostPath(Graphics2D g, Ghost ghost, MazeUI mazeUI) {
+	private void drawGhostPath(Graphics2D g, Ghost ghost) {
 		List<Tile> path = ghost.getNavigation().computeRoute(ghost).getPath();
 		if (path.size() > 1) {
 			g.setColor(color(ghost));
 			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 			for (int i = 0; i < path.size() - 1; ++i) {
 				Tile u = path.get(i), v = path.get(i + 1);
-				int u1 = u.col * MazeUI.TS + MazeUI.TS / 2;
-				int u2 = u.row * MazeUI.TS + MazeUI.TS / 2;
-				int v1 = v.col * MazeUI.TS + MazeUI.TS / 2;
-				int v2 = v.row * MazeUI.TS + MazeUI.TS / 2;
+				int u1 = u.col * TS + TS / 2;
+				int u2 = u.row * TS + TS / 2;
+				int v1 = v.col * TS + TS / 2;
+				int v2 = v.row * TS + TS / 2;
 				g.drawLine(u1, u2, v1, v2);
 			}
 			// Target tile
 			Tile tile = path.get(path.size() - 1);
-			g.translate(tile.col * MazeUI.TS, tile.row * MazeUI.TS);
-			g.fillRect(MazeUI.TS / 4, MazeUI.TS / 4, MazeUI.TS / 2, MazeUI.TS / 2);
-			g.translate(-tile.col * MazeUI.TS, -tile.row * MazeUI.TS);
+			g.translate(tile.col * TS, tile.row * TS);
+			g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
+			g.translate(-tile.col * TS, -tile.row * TS);
 			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 		}
 	}
