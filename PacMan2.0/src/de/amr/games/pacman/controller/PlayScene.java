@@ -282,12 +282,16 @@ public class PlayScene implements ViewController {
 		FoodFoundEvent e = event(t);
 		maze.clearTile(e.tile);
 		game.foodEaten += 1;
+		int oldScore = game.score;
 		if (e.food == ENERGIZER) {
 			LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
 			game.score += game.ENERGIZER_VALUE;
 		} else {
 			LOG.info(() -> String.format("PacMan found pellet at %s", e.tile));
 			game.score += game.PELLET_VALUE;
+		}
+		if (oldScore < game.EXTRALIFE_SCORE && game.score >= game.EXTRALIFE_SCORE) {
+			game.lives += 1;
 		}
 		if (game.foodEaten == game.foodTotal) {
 			gameControl.enqueue(new NextLevelEvent());

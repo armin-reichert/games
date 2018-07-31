@@ -22,6 +22,7 @@ public class Game {
 	public final int ENERGIZER_VALUE = 50;
 	public final int DOTS_BONUS_1 = 70;
 	public final int DOTS_BONUS_2 = 170;
+	public final int EXTRALIFE_SCORE = 10_000;
 	public final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
 	public final IntSupplier fnTicksPerSecond;
