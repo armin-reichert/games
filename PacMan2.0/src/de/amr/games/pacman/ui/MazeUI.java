@@ -23,8 +23,9 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -42,6 +43,10 @@ import de.amr.games.pacman.ui.actor.PacMan;
 
 public class MazeUI extends GameEntity {
 
+	public enum GhostName {
+		BLINKY, PINKY, INKY, CLYDE
+	};
+
 	/** Tile size. */
 	public static final int TS = 16;
 
@@ -49,8 +54,8 @@ public class MazeUI extends GameEntity {
 
 	private final Maze maze;
 	private final PacMan pacMan;
-	private final Map<String, Ghost> ghostsByName = new HashMap<>();
-	private final Map<String, Ghost> activeGhostsByName = new HashMap<>();
+	private final Map<GhostName, Ghost> ghostsByName = new EnumMap<>(GhostName.class);
+	private final Map<GhostName, Ghost> activeGhostsByName = new EnumMap<>(GhostName.class);
 	private final Energizer energizer;
 	private final Pellet pellet;
 
@@ -76,6 +81,11 @@ public class MazeUI extends GameEntity {
 		createPinky();
 		createInky();
 		createClyde();
+		
+		setGhostActive(GhostName.BLINKY, true);
+		setGhostActive(GhostName.PINKY, true);
+		setGhostActive(GhostName.INKY, true);
+		setGhostActive(GhostName.CLYDE, true);
 	}
 
 	private PacMan createPacMan() {
@@ -91,8 +101,7 @@ public class MazeUI extends GameEntity {
 		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
 		blinky.setNavigation(Ghost.State.SAFE, bounce());
-		activeGhostsByName.put(blinky.getName(), blinky);
-		ghostsByName.put(blinky.getName(), blinky);
+		ghostsByName.put(GhostName.BLINKY, blinky);
 	}
 
 	private void createPinky() {
@@ -102,8 +111,7 @@ public class MazeUI extends GameEntity {
 		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
 		pinky.setNavigation(Ghost.State.SAFE, bounce());
-		activeGhostsByName.put(pinky.getName(), pinky);
-		ghostsByName.put(pinky.getName(), pinky);
+		ghostsByName.put(GhostName.PINKY, pinky);
 	}
 
 	private void createInky() {
@@ -113,8 +121,7 @@ public class MazeUI extends GameEntity {
 		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.SAFE, bounce());
-		activeGhostsByName.put(inky.getName(), inky);
-		ghostsByName.put(inky.getName(), inky);
+		ghostsByName.put(GhostName.INKY, inky);
 	}
 
 	private void createClyde() {
@@ -124,8 +131,7 @@ public class MazeUI extends GameEntity {
 		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
 		clyde.setNavigation(Ghost.State.SAFE, bounce());
-		activeGhostsByName.put(clyde.getName(), clyde);
-		ghostsByName.put(clyde.getName(), clyde);
+		ghostsByName.put(GhostName.CLYDE, clyde);
 	}
 
 	public void initActors(Game game) {
@@ -140,10 +146,10 @@ public class MazeUI extends GameEntity {
 			ghost.placeAt(ghost.homeTile);
 			ghost.setSpeed(game::getGhostSpeed);
 		});
-		getBlinky().setDir(Top4.E);
-		getPinky().setDir(Top4.S);
-		getInky().setDir(Top4.N);
-		getClyde().setDir(Top4.N);
+		getActiveGhost(GhostName.BLINKY).ifPresent(blinky -> blinky.setDir(Top4.E));
+		getActiveGhost(GhostName.PINKY).ifPresent(pinky -> pinky.setDir(Top4.S));
+		getActiveGhost(GhostName.INKY).ifPresent(inky -> inky.setDir(Top4.N));
+		getActiveGhost(GhostName.CLYDE).ifPresent(clyde -> clyde.setDir(Top4.N));
 	}
 
 	@Override
@@ -185,27 +191,11 @@ public class MazeUI extends GameEntity {
 		return pacMan;
 	}
 
-	public Ghost getBlinky() {
-		return ghostsByName.get("Blinky");
-	}
-
-	public Ghost getPinky() {
-		return ghostsByName.get("Pinky");
-	}
-
-	public Ghost getInky() {
-		return ghostsByName.get("Inky");
-	}
-
-	public Ghost getClyde() {
-		return ghostsByName.get("Clyde");
-	}
-
-	public boolean isGhostActive(String name) {
+	public boolean isGhostActive(GhostName name) {
 		return activeGhostsByName.containsKey(name);
 	}
 
-	public void setGhostActive(String name, boolean activate) {
+	public void setGhostActive(GhostName name, boolean activate) {
 		Ghost ghost = ghostsByName.get(name);
 		if (activate) {
 			activeGhostsByName.put(name, ghost);
@@ -218,6 +208,10 @@ public class MazeUI extends GameEntity {
 
 	public Stream<Ghost> getActiveGhosts() {
 		return activeGhostsByName.values().stream();
+	}
+
+	public Optional<Ghost> getActiveGhost(GhostName name) {
+		return Optional.ofNullable(activeGhostsByName.get(name));
 	}
 
 	public void showInfo(String text) {

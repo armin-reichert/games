@@ -51,16 +51,16 @@ public class PlaySceneInfo {
 			eatAllPellets(scene);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(scene, "Blinky");
+			toggleGhost(scene, MazeUI.GhostName.BLINKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(scene, "Pinky");
+			toggleGhost(scene, MazeUI.GhostName.PINKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(scene, "Inky");
+			toggleGhost(scene, MazeUI.GhostName.INKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(scene, "Clyde");
+			toggleGhost(scene, MazeUI.GhostName.CLYDE);
 		}
 	}
 
@@ -126,7 +126,7 @@ public class PlaySceneInfo {
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
-	private static void toggleGhost(PlayScene scene, String ghostName) {
+	private static void toggleGhost(PlayScene scene, MazeUI.GhostName ghostName) {
 		scene.mazeUI.setGhostActive(ghostName, !scene.mazeUI.isGhostActive(ghostName));
 	}
 
