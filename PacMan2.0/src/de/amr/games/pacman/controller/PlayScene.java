@@ -67,7 +67,7 @@ public class PlayScene implements ViewController {
 		gameControl.fnFrequency = () -> pulse.getFrequency();
 		mazeUI.eventing.subscribe(gameControl::enqueue);
 		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
-		mazeUI.getGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {
@@ -118,7 +118,7 @@ public class PlayScene implements ViewController {
 		};
 
 		fsm.state(State.GHOST_DYING).update = state -> {
-			mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD)
+			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD)
 					.forEach(Ghost::update);
 		};
 
@@ -154,12 +154,12 @@ public class PlayScene implements ViewController {
 		fsm.state(State.PACMAN_DYING).entry = state -> {
 			state.setDuration(sec(3));
 			mazeUI.getPacMan().setState(PacMan.State.DYING);
-			mazeUI.getGhosts().forEach(ghost -> ghost.visibility = () -> false);
+			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 			game.lives -= 1;
 		};
 
 		fsm.state(State.PACMAN_DYING).exit = state -> {
-			mazeUI.getGhosts().forEach(ghost -> ghost.visibility = () -> true);
+			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		};
 
 		fsm.changeOnTimeout(State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
@@ -230,7 +230,7 @@ public class PlayScene implements ViewController {
 
 	private void startGhostHunting() {
 		game.ghostIndex = 0;
-		mazeUI.getGhosts()
+		mazeUI.getActiveGhosts()
 				.filter(
 						ghost -> ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.SAFE)
 				.forEach(ghost -> ghost.setState(Ghost.State.AFRAID));
@@ -279,7 +279,7 @@ public class PlayScene implements ViewController {
 
 	private void onGhostDied(StateTransition<State, GameEvent> t) {
 		// TODO get ghost from transition/event?
-		mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).findFirst()
+		mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).findFirst()
 				.ifPresent(Ghost::onExitus);
 	}
 

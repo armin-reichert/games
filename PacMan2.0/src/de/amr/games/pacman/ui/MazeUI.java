@@ -23,8 +23,8 @@ import static java.awt.event.KeyEvent.VK_UP;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -49,11 +49,8 @@ public class MazeUI extends GameEntity {
 
 	private final Maze maze;
 	private final PacMan pacMan;
-	private final Ghost blinky;
-	private final Ghost pinky;
-	private final Ghost inky;
-	private final Ghost clyde;
-	private final Set<Ghost> ghosts = new HashSet<>();
+	private final Map<String, Ghost> ghostsByName = new HashMap<>();
+	private final Map<String, Ghost> activeGhostsByName = new HashMap<>();
 	private final Energizer energizer;
 	private final Pellet pellet;
 
@@ -75,15 +72,10 @@ public class MazeUI extends GameEntity {
 		pellet = new Pellet();
 
 		pacMan = createPacMan();
-		blinky = createBlinky();
-		pinky = createPinky();
-		inky = createInky();
-		clyde = createClyde();
-		
-		addGhost(blinky);
-		addGhost(pinky);
-		addGhost(inky);
-		addGhost(clyde);
+		createBlinky();
+		createPinky();
+		createInky();
+		createClyde();
 	}
 
 	private PacMan createPacMan() {
@@ -92,44 +84,48 @@ public class MazeUI extends GameEntity {
 		return pacMan;
 	}
 
-	private Ghost createBlinky() {
+	private void createBlinky() {
 		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
 		blinky.setNavigation(Ghost.State.SAFE, bounce());
-		return blinky;
+		activeGhostsByName.put(blinky.getName(), blinky);
+		ghostsByName.put(blinky.getName(), blinky);
 	}
 
-	private Ghost createPinky() {
+	private void createPinky() {
 		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
 		pinky.setNavigation(Ghost.State.SAFE, bounce());
-		return pinky;
+		activeGhostsByName.put(pinky.getName(), pinky);
+		ghostsByName.put(pinky.getName(), pinky);
 	}
 
-	private Ghost createInky() {
+	private void createInky() {
 		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.SAFE, bounce());
-		return inky;
+		activeGhostsByName.put(inky.getName(), inky);
+		ghostsByName.put(inky.getName(), inky);
 	}
 
-	private Ghost createClyde() {
+	private void createClyde() {
 		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
 		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
 		clyde.setNavigation(Ghost.State.SAFE, bounce());
-		return clyde;
+		activeGhostsByName.put(clyde.getName(), clyde);
+		ghostsByName.put(clyde.getName(), clyde);
 	}
 
 	public void initActors(Game game) {
@@ -139,15 +135,15 @@ public class MazeUI extends GameEntity {
 		pacMan.setDir(Top4.E);
 		pacMan.setNextDir(Top4.E);
 
-		ghosts.forEach(ghost -> {
+		activeGhostsByName.values().forEach(ghost -> {
 			ghost.setState(Ghost.State.SAFE);
 			ghost.placeAt(ghost.homeTile);
 			ghost.setSpeed(game::getGhostSpeed);
 		});
-		blinky.setDir(Top4.E);
-		pinky.setDir(Top4.S);
-		inky.setDir(Top4.N);
-		clyde.setDir(Top4.N);
+		getBlinky().setDir(Top4.E);
+		getPinky().setDir(Top4.S);
+		getInky().setDir(Top4.N);
+		getClyde().setDir(Top4.N);
 	}
 
 	@Override
@@ -168,7 +164,7 @@ public class MazeUI extends GameEntity {
 			}
 		}
 		pacMan.update();
-		ghosts.forEach(Ghost::update);
+		activeGhostsByName.values().forEach(Ghost::update);
 	}
 
 	@Override
@@ -190,37 +186,38 @@ public class MazeUI extends GameEntity {
 	}
 
 	public Ghost getBlinky() {
-		return blinky;
+		return ghostsByName.get("Blinky");
 	}
 
 	public Ghost getPinky() {
-		return pinky;
+		return ghostsByName.get("Pinky");
 	}
 
 	public Ghost getInky() {
-		return inky;
+		return ghostsByName.get("Inky");
 	}
 
 	public Ghost getClyde() {
-		return clyde;
+		return ghostsByName.get("Clyde");
 	}
 
-	public void addGhost(Ghost ghost) {
-		ghosts.add(ghost);
-		pacMan.lookFor.add(ghost);
+	public boolean isGhostActive(String name) {
+		return activeGhostsByName.containsKey(name);
 	}
 
-	public void removeGhost(Ghost ghost) {
-		ghosts.remove(ghost);
-		pacMan.lookFor.remove(ghost);
+	public void setGhostActive(String name, boolean activate) {
+		Ghost ghost = ghostsByName.get(name);
+		if (activate) {
+			activeGhostsByName.put(name, ghost);
+			pacMan.lookFor.add(ghost);
+		} else {
+			activeGhostsByName.remove(name);
+			pacMan.lookFor.remove(ghost);
+		}
 	}
 
-	public boolean containsGhost(Ghost ghost) {
-		return ghosts.contains(ghost);
-	}
-
-	public Stream<Ghost> getGhosts() {
-		return ghosts.stream();
+	public Stream<Ghost> getActiveGhosts() {
+		return activeGhostsByName.values().stream();
 	}
 
 	public void showInfo(String text) {
@@ -263,7 +260,7 @@ public class MazeUI extends GameEntity {
 		super.enableAnimation(on);
 		energizer.enableAnimation(on);
 		pacMan.enableAnimation(on);
-		ghosts.forEach(ghost -> ghost.enableAnimation(on));
+		activeGhostsByName.values().forEach(ghost -> ghost.enableAnimation(on));
 	}
 
 	@Override
@@ -274,9 +271,9 @@ public class MazeUI extends GameEntity {
 		} else {
 			s_normal.draw(g);
 			maze.tiles().filter(tile -> isFood(maze.getContent(tile))).forEach(tile -> drawFood(g, tile));
-			ghosts.stream().filter(ghost -> ghost.getState() != Ghost.State.DYING)
+			activeGhostsByName.values().stream().filter(ghost -> ghost.getState() != Ghost.State.DYING)
 					.forEach(ghost -> ghost.draw(g));
-			ghosts.stream().filter(ghost -> ghost.getState() == Ghost.State.DYING)
+			activeGhostsByName.values().stream().filter(ghost -> ghost.getState() == Ghost.State.DYING)
 					.forEach(ghost -> ghost.draw(g));
 			pacMan.draw(g);
 			if (bonus != null) {

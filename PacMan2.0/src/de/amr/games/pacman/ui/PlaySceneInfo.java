@@ -51,21 +51,21 @@ public class PlaySceneInfo {
 			eatAllPellets(scene);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(scene, scene.mazeUI.getBlinky());
+			toggleGhost(scene, "Blinky");
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(scene, scene.mazeUI.getPinky());
+			toggleGhost(scene, "Pinky");
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(scene, scene.mazeUI.getInky());
+			toggleGhost(scene, "Inky");
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(scene, scene.mazeUI.getClyde());
+			toggleGhost(scene, "Clyde");
 		}
 	}
 
 	private static void killAllLivingGhosts(PlayScene scene) {
-		scene.mazeUI.getGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRO)
+		scene.mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRO)
 				.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
 	}
 
@@ -82,7 +82,7 @@ public class PlaySceneInfo {
 			drawGrid(g, scene.mazeUI);
 		}
 		if (show_ghost_route) {
-			scene.mazeUI.getGhosts().forEach(ghost -> drawGhostPath(g, ghost, scene.mazeUI));
+			scene.mazeUI.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost, scene.mazeUI));
 		}
 		if (show_entity_state) {
 			drawPacManTilePosition(g, scene);
@@ -119,19 +119,15 @@ public class PlaySceneInfo {
 		PacMan pacMan = mazeUI.getPacMan();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
-		mazeUI.getGhosts().forEach(ghost -> {
+		mazeUI.getActiveGhosts().forEach(ghost -> {
 			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
 			drawText(g, color(ghost), ghost.tf.getX() - MazeUI.TS, ghost.tf.getY(), txt);
 		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
-	private static void toggleGhost(PlayScene scene, Ghost ghost) {
-		if (scene.mazeUI.containsGhost(ghost)) {
-			scene.mazeUI.removeGhost(ghost);
-		} else {
-			scene.mazeUI.addGhost(ghost);
-		}
+	private static void toggleGhost(PlayScene scene, String ghostName) {
+		scene.mazeUI.setGhostActive(ghostName, !scene.mazeUI.isGhostActive(ghostName));
 	}
 
 	private static Color color(Ghost ghost) {
