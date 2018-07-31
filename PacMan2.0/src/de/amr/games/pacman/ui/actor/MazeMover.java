@@ -16,11 +16,11 @@ import java.util.function.Function;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.behavior.RoutePlanner;
-import de.amr.games.pacman.behavior.impl.NavigationSystem;
 import de.amr.games.pacman.controller.event.GameEventSupport;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.impl.NavigationSystem;
 import de.amr.games.pacman.ui.MazeUI;
 
 /**

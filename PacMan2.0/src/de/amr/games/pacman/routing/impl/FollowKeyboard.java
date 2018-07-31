@@ -1,9 +1,9 @@
-package de.amr.games.pacman.behavior.impl;
+package de.amr.games.pacman.routing.impl;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.behavior.Route;
-import de.amr.games.pacman.behavior.RoutePlanner;
+import de.amr.games.pacman.routing.Route;
+import de.amr.games.pacman.routing.RoutePlanner;
 import de.amr.games.pacman.ui.actor.MazeMover;
 
 class FollowKeyboard implements RoutePlanner {

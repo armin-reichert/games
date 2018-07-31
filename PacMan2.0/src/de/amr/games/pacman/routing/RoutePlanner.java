@@ -1,4 +1,4 @@
-package de.amr.games.pacman.behavior;
+package de.amr.games.pacman.routing;
 
 import de.amr.games.pacman.ui.actor.MazeMover;
 

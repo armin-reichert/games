@@ -1,6 +1,6 @@
-package de.amr.games.pacman.behavior.impl;
+package de.amr.games.pacman.routing.impl;
 
-import de.amr.games.pacman.behavior.RoutePlanner;
+import de.amr.games.pacman.routing.RoutePlanner;
 import de.amr.games.pacman.ui.actor.MazeMover;
 
 public interface NavigationSystem {

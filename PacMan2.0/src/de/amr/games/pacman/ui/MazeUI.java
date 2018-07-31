@@ -1,14 +1,14 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.ambush;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.bounce;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.chase;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.flee;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.followKeyboard;
-import static de.amr.games.pacman.behavior.impl.NavigationSystem.goHome;
 import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 import static de.amr.games.pacman.model.TileContent.PELLET;
 import static de.amr.games.pacman.model.TileContent.isFood;
+import static de.amr.games.pacman.routing.impl.NavigationSystem.ambush;
+import static de.amr.games.pacman.routing.impl.NavigationSystem.bounce;
+import static de.amr.games.pacman.routing.impl.NavigationSystem.chase;
+import static de.amr.games.pacman.routing.impl.NavigationSystem.flee;
+import static de.amr.games.pacman.routing.impl.NavigationSystem.followKeyboard;
+import static de.amr.games.pacman.routing.impl.NavigationSystem.goHome;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;

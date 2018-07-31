@@ -1,10 +1,10 @@
-package de.amr.games.pacman.behavior.impl;
+package de.amr.games.pacman.routing.impl;
 
 import java.util.Collections;
 import java.util.List;
 
-import de.amr.games.pacman.behavior.Route;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.routing.Route;
 
 class RouteData implements Route {
 

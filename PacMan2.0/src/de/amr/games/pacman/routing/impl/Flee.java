@@ -1,13 +1,13 @@
-package de.amr.games.pacman.behavior.impl;
+package de.amr.games.pacman.routing.impl;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import de.amr.games.pacman.behavior.Route;
-import de.amr.games.pacman.behavior.RoutePlanner;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.routing.Route;
+import de.amr.games.pacman.routing.RoutePlanner;
 import de.amr.games.pacman.ui.actor.MazeMover;
 
 class Flee implements RoutePlanner {
