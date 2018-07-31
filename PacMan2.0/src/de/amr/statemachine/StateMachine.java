@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -60,7 +60,7 @@ public class StateMachine<S, E> {
 	private int pauseTime;
 	private Logger logger;
 
-	public Supplier<Integer> fnFrequency = () -> 60;
+	public IntSupplier fnPulse = () -> 60;
 
 	/**
 	 * Creates a new state machine.
@@ -285,7 +285,7 @@ public class StateMachine<S, E> {
 	private void traceStateEntry() {
 		getLogger().ifPresent(log -> {
 			if (state().getDuration() != State.FOREVER) {
-				float seconds = state().getDuration() / fnFrequency.get();
+				float seconds = state().getDuration() / fnPulse.getAsInt();
 				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)",
 						description, currentStateLabel(), seconds, state().getDuration()));
 			} else {

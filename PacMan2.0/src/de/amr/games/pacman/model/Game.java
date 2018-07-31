@@ -22,10 +22,9 @@ public class Game {
 	public final int ENERGIZER_VALUE = 50;
 	public final int DOTS_BONUS_1 = 70;
 	public final int DOTS_BONUS_2 = 170;
-
 	public final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
-	public IntSupplier fnPulse = () -> 60;
+	public final IntSupplier fnPulse;
 
 	private final Object[][] LEVELS = {
 		/*@formatter:off*/
@@ -104,6 +103,10 @@ public class Game {
 	public long foodTotal;
 	public int foodEaten;
 	public int ghostIndex;
+	
+	public Game(IntSupplier fnPulse) {
+		this.fnPulse = fnPulse;
+	}
 
 	public void init(Maze maze) {
 		maze.resetFood();

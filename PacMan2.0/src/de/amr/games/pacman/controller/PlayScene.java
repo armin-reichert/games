@@ -51,8 +51,7 @@ public class PlayScene implements ViewController {
 		this.height = app.settings.height;
 		this.pulse = app.pulse;
 
-		this.game = new Game();
-		game.fnPulse = pulse::getFrequency;
+		this.game = new Game(pulse::getFrequency);
 		this.maze = app.maze;
 
 		// UI
@@ -66,7 +65,6 @@ public class PlayScene implements ViewController {
 		// Game controller
 		gameControl = createGameControl();
 		gameControl.setLogger(LOG);
-		gameControl.fnFrequency = () -> pulse.getFrequency();
 		mazeUI.eventing.subscribe(gameControl::enqueue);
 		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
@@ -79,6 +77,8 @@ public class PlayScene implements ViewController {
 
 		StateMachine<State, GameEvent> fsm = new StateMachine<>("GameController", State.class,
 				State.READY);
+
+		fsm.fnPulse = game.fnPulse;
 
 		// -- READY
 

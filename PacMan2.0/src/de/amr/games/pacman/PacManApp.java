@@ -1,5 +1,7 @@
 package de.amr.games.pacman;
 
+import java.util.logging.Level;
+
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.controller.PlayScene;
@@ -24,6 +26,7 @@ public class PacManApp extends Application {
 
 	@Override
 	public void init() {
+		Application.LOG.setLevel(Level.OFF);
 		setController(new PlayScene(this));
 	}
 }
