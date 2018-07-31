@@ -38,8 +38,11 @@ import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.actor.Bonus;
+import de.amr.games.pacman.ui.actor.Energizer;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
+import de.amr.games.pacman.ui.actor.Pellet;
 
 public class MazeUI extends GameEntity {
 

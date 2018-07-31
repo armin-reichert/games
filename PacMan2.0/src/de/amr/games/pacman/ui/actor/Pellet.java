@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.ui.actor;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.ui.MazeUI;
 
 public class Pellet extends GameEntity {
 

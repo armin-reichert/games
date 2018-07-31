@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.ui.actor;
 
 import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
 import static de.amr.games.pacman.model.Spritesheet.getEnergizer;
@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.ui.MazeUI;
 
 public class Energizer extends GameEntity {
 
