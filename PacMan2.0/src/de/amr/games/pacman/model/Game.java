@@ -115,6 +115,10 @@ public class Game {
 			throw new IllegalStateException();
 		}
 	}
+	
+	public int getLevelChangingTime() {
+		return sec(4);
+	}
 
 	public int level;
 	public int lives;

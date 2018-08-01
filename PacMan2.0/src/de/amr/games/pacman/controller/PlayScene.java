@@ -16,7 +16,7 @@ import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostKilledEvent;
-import de.amr.games.pacman.controller.event.NextLevelEvent;
+import de.amr.games.pacman.controller.event.LevelCompletedEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
@@ -117,7 +117,28 @@ public class PlayScene implements ViewController {
 		fsm.changeOnInput(PacManKilledEvent.class, State.PLAYING, State.PACMAN_DYING,
 				this::onPacManKilled);
 
-		fsm.changeOnInput(NextLevelEvent.class, State.PLAYING, State.CHANGING_LEVEL);
+		fsm.changeOnInput(LevelCompletedEvent.class, State.PLAYING, State.CHANGING_LEVEL);
+
+		// -- CHANGING_LEVEL
+
+		fsm.state(State.CHANGING_LEVEL).entry = state -> {
+			state.setDuration(game.getLevelChangingTime());
+			mazeUI.setFlashing(true);
+		};
+
+		fsm.state(State.CHANGING_LEVEL).update = state -> {
+			if (state.getRemaining() == state.getDuration() / 2) {
+				nextLevel();
+				mazeUI.showInfo("Ready!", Color.YELLOW);
+				mazeUI.setFlashing(false);
+				mazeUI.enableAnimation(false);
+			} else if (state.isTerminated()) {
+				mazeUI.hideInfo();
+				mazeUI.enableAnimation(true);
+			}
+		};
+
+		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.PLAYING);
 
 		// -- GHOST_DYING
 
@@ -136,27 +157,6 @@ public class PlayScene implements ViewController {
 			mazeUI.getPacMan().visibility = () -> true;
 		};
 
-		// -- CHANGING_LEVEL
-
-		fsm.state(State.CHANGING_LEVEL).entry = state -> {
-			state.setDuration(game.sec(4));
-			mazeUI.setFlashing(true);
-		};
-
-		fsm.state(State.CHANGING_LEVEL).update = state -> {
-			if (state.getRemaining() == state.getDuration() / 2) {
-				nextLevel();
-				mazeUI.showInfo("Ready!", Color.YELLOW);
-				mazeUI.setFlashing(false);
-				mazeUI.enableAnimation(false);
-			} else if (state.isTerminated()) {
-				mazeUI.hideInfo();
-				mazeUI.enableAnimation(true);
-			}
-		};
-
-		fsm.changeOnTimeout(State.CHANGING_LEVEL, State.PLAYING);
-
 		// -- PACMAN_DYING
 
 		fsm.state(State.PACMAN_DYING).entry = state -> {
@@ -167,7 +167,7 @@ public class PlayScene implements ViewController {
 		fsm.state(State.PACMAN_DYING).update = state -> {
 			mazeUI.getPacMan().update();
 		};
-		
+
 		fsm.changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.GAME_OVER,
 				() -> game.lives == 0);
 
@@ -306,7 +306,7 @@ public class PlayScene implements ViewController {
 			game.lives += 1;
 		}
 		if (game.foodEaten == game.foodTotal) {
-			gameControl.enqueue(new NextLevelEvent());
+			gameControl.enqueue(new LevelCompletedEvent());
 			return;
 		}
 		if (game.foodEaten == game.DOTS_BONUS_1) {
