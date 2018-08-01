@@ -10,18 +10,16 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.game.view.ViewController;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
 
-public class PlaySceneInfo extends GameEntity {
+public class GameInfo implements ViewController {
 
 	private final Game game;
 	private final MazeUI mazeUI;
@@ -30,20 +28,24 @@ public class PlaySceneInfo extends GameEntity {
 	private boolean show_ghost_route;
 	private boolean show_entity_state;
 
-	public PlaySceneInfo(Game game, MazeUI mazeUI, Maze maze) {
+	public GameInfo(Game game, MazeUI mazeUI, Maze maze) {
 		this.game = game;
 		this.mazeUI = mazeUI;
 		this.maze = maze;
 	}
 
 	@Override
-	public Sprite currentSprite() {
-		return null;
+	public int getWidth() {
+		return mazeUI.getWidth();
 	}
 
 	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
+	public int getHeight() {
+		return mazeUI.getWidth();
+	}
+
+	@Override
+	public void init() {
 	}
 
 	@Override

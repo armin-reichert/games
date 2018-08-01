@@ -19,9 +19,9 @@ import de.amr.games.pacman.controller.event.NextLevelEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.ui.GameInfo;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
-import de.amr.games.pacman.ui.PlaySceneInfo;
 import de.amr.games.pacman.ui.StatusUI;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
@@ -41,7 +41,7 @@ public class PlayScene implements ViewController {
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI status;
-	private final PlaySceneInfo playSceneInfo;
+	private final GameInfo playSceneInfo;
 
 	public PlayScene(PacManApp app) {
 		this.width = app.settings.width;
@@ -65,7 +65,7 @@ public class PlayScene implements ViewController {
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
 
 		// Info
-		playSceneInfo = new PlaySceneInfo(game, mazeUI, maze);
+		playSceneInfo = new GameInfo(game, mazeUI, maze);
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {

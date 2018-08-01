@@ -54,7 +54,7 @@ public class Game {
 	private float tps(float value) {
 		return (value * MazeUI.TS) / fnTicksPerSecond.getAsInt();
 	}
-	
+
 	/** Ticks representing the given seconds. */
 	public int sec(float seconds) {
 		return Math.round(fnTicksPerSecond.getAsInt() * seconds);
@@ -67,7 +67,7 @@ public class Game {
 	public int getBonusValue() {
 		return (int) LEVELS[level][1];
 	}
-	
+
 	public int getGhostValue() {
 		return GHOST_POINTS[ghostIndex];
 	}
@@ -109,7 +109,7 @@ public class Game {
 	public long foodTotal;
 	public int foodEaten;
 	public int ghostIndex;
-	
+
 	public Game(IntSupplier fnTicksPerSecond) {
 		this.fnTicksPerSecond = fnTicksPerSecond;
 	}
