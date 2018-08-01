@@ -14,11 +14,11 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.LevelCompletedEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
 import de.amr.games.pacman.model.Game;
@@ -44,7 +44,7 @@ public class PlayScene implements ViewController {
 	private final Maze maze;
 	private final MazeUI mazeUI;
 	private final HUD hud;
-	private final StatusUI status;
+	private final StatusUI statusUI;
 	private final GameInfo gameInfo;
 
 	public PlayScene(PacManApp app) {
@@ -56,10 +56,10 @@ public class PlayScene implements ViewController {
 		// UI
 		mazeUI = new MazeUI(game, maze);
 		hud = new HUD(game);
-		status = new StatusUI(game);
+		statusUI = new StatusUI(game);
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * Spritesheet.TS);
-		status.tf.moveTo(0, (3 + maze.numRows()) * Spritesheet.TS);
+		statusUI.tf.moveTo(0, (3 + maze.numRows()) * Spritesheet.TS);
 
 		// Game controller
 		gameControl = createGameControl();
@@ -104,7 +104,8 @@ public class PlayScene implements ViewController {
 
 		fsm.changeOnInput(BonusFoundEvent.class, State.PLAYING, State.PLAYING, this::onBonusFound);
 
-		fsm.changeOnInput(GhostContactEvent.class, State.PLAYING, State.PLAYING, this::onGhostContact);
+		fsm.changeOnInput(PacManGhostCollisionEvent.class, State.PLAYING, State.PLAYING,
+				this::onPacManGhostCollision);
 
 		fsm.changeOnInput(GhostKilledEvent.class, State.PLAYING, State.GHOST_DYING,
 				this::onGhostKilled);
@@ -225,7 +226,7 @@ public class PlayScene implements ViewController {
 	public void draw(Graphics2D g) {
 		hud.draw(g);
 		mazeUI.draw(g);
-		status.draw(g);
+		statusUI.draw(g);
 		gameInfo.draw(g);
 	}
 
@@ -244,8 +245,8 @@ public class PlayScene implements ViewController {
 		return (E) t.event().get();
 	}
 
-	private void onGhostContact(StateTransition<State, GameEvent> t) {
-		GhostContactEvent e = event(t);
+	private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
+		PacManGhostCollisionEvent e = event(t);
 		switch (e.ghost.getState()) {
 		case AGGRO:
 		case SAFE:
@@ -258,21 +259,11 @@ public class PlayScene implements ViewController {
 			break;
 		case DYING:
 		case DEAD:
-			// no event should be triggered by collision with ghost corpse
+			// no event should occur for collision with ghost corpse
+			break;
 		default:
 			throw new IllegalStateException();
 		}
-	}
-
-	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
-		PacManGainsPowerEvent e = event(t);
-		e.pacMan.processEvent(e);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
-	}
-
-	private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
-		PacManLosesPowerEvent e = event(t);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
@@ -284,10 +275,8 @@ public class PlayScene implements ViewController {
 
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
 		GhostKilledEvent e = event(t);
-		LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
-		game.score += game.getGhostValue();
-		game.ghostIndex += 1;
 		e.ghost.processEvent(e);
+		LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -313,6 +302,17 @@ public class PlayScene implements ViewController {
 			gameControl
 					.enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan(), game.getPacManEmpoweringTime()));
 		}
+	}
+
+	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
+		PacManGainsPowerEvent e = event(t);
+		e.pacMan.processEvent(e);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+	}
+
+	private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
+		PacManLosesPowerEvent e = event(t);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {

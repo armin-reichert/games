@@ -1,5 +1,6 @@
 package de.amr.games.pacman.ui.actor;
 
+import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostBlue;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostBlueWhite;
@@ -132,6 +133,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 		sm.state(State.DYING).entry = state -> {
 			state.setDuration(game.getGhostDyingTime());
 			s_points = s_dying[game.ghostIndex];
+			game.score += game.getGhostValue();
+			game.ghostIndex += 1;
 		};
 
 		sm.changeOnTimeout(State.DYING, State.DEAD);

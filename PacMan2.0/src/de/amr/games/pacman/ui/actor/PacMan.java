@@ -16,7 +16,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.GhostContactEvent;
+import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
@@ -139,7 +139,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				if (finding instanceof Ghost) {
 					Ghost ghost = (Ghost) finding;
 					if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-						eventMgr.publish(new GhostContactEvent(this, ghost));
+						eventMgr.publish(new PacManGhostCollisionEvent(this, ghost));
 					}
 				} else if (finding instanceof Bonus) {
 					Bonus bonus = (Bonus) finding;

@@ -2,10 +2,16 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.model.TileContent.PELLET;
+import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,10 +34,13 @@ public class GameInfo implements ViewController {
 	private boolean show_ghost_route;
 	private boolean show_entity_state;
 
+	private Image gridImage;
+
 	public GameInfo(Game game, MazeUI mazeUI, Maze maze) {
 		this.game = game;
 		this.mazeUI = mazeUI;
 		this.maze = maze;
+		gridImage = createGridImage(maze.numRows(), maze.numCols());
 	}
 
 	@Override
@@ -97,36 +106,46 @@ public class GameInfo implements ViewController {
 	public void draw(Graphics2D g) {
 		if (show_grid) {
 			drawGrid(g);
+			drawPacManTilePosition(g);
 		}
 		if (show_ghost_route) {
 			mazeUI.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost));
 		}
 		if (show_entity_state) {
-			drawPacManTilePosition(g);
 			drawEntityState(g);
 		}
 	}
 
+	private static Image createGridImage(int numRows, int numCols) {
+		GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getDefaultScreenDevice().getDefaultConfiguration();
+		Image image = conf.createCompatibleImage(numCols * TS, numRows * TS, Transparency.TRANSLUCENT);
+		Graphics g = image.getGraphics();
+		g.setColor(Color.LIGHT_GRAY);
+		for (int row = 0; row < numRows + 1; ++row) {
+			g.drawLine(0, row * TS, numCols * TS, row * TS);
+		}
+		for (int col = 1; col < numCols; ++col) {
+			g.drawLine(col * TS, 0, col * TS, numRows * TS);
+		}
+		return image;
+	}
+
 	private void drawGrid(Graphics2D g) {
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
-		g.setColor(Color.LIGHT_GRAY);
-		for (int row = 0; row < maze.numRows() + 1; ++row) {
-			g.drawLine(0, row * Spritesheet.TS, mazeUI.getWidth(), row * Spritesheet.TS);
-		}
-		for (int col = 1; col < maze.numCols(); ++col) {
-			g.drawLine(col * Spritesheet.TS, 0, col * Spritesheet.TS, mazeUI.getHeight());
-		}
-		int fontSize = Spritesheet.TS * 4 / 10;
-		if (fontSize > 4) {
-			g.setFont(new Font("Arial Narrow", Font.PLAIN, Spritesheet.TS * 40 / 100));
-			for (int row = 0; row < maze.numRows(); ++row) {
-				for (int col = 0; col < maze.numCols(); ++col) {
-					g.translate(col * Spritesheet.TS, row * Spritesheet.TS);
-					g.drawString(String.format("%d,%d", col, row), Spritesheet.TS / 8, Spritesheet.TS / 2);
-					g.translate(-col * Spritesheet.TS, -row * Spritesheet.TS);
-				}
-			}
-		}
+		g.drawImage(gridImage, 0, 0, null);
+		// int fontSize = TS * 4 / 10;
+		// if (fontSize > 4) {
+		// g.setColor(Color.LIGHT_GRAY);
+		// g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
+		// for (int row = 0; row < maze.numRows(); ++row) {
+		// for (int col = 0; col < maze.numCols(); ++col) {
+		// g.translate(col * TS, row * TS);
+		// g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
+		// g.translate(-col * TS, -row * TS);
+		// }
+		// }
+		// }
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
@@ -136,7 +155,7 @@ public class GameInfo implements ViewController {
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
 		mazeUI.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
 			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
-			drawText(g, color(ghost), ghost.tf.getX() - Spritesheet.TS, ghost.tf.getY(), txt);
+			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
 		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
@@ -163,8 +182,8 @@ public class GameInfo implements ViewController {
 	private void drawText(Graphics2D g, Color color, float x, float y, String text) {
 		g.translate(x, y);
 		g.setColor(color);
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, Spritesheet.TS / 2));
-		g.drawString(text, 0, -Spritesheet.TS / 2);
+		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, TS / 2));
+		g.drawString(text, 0, -TS / 2);
 		g.translate(-x, -y);
 	}
 
@@ -187,17 +206,17 @@ public class GameInfo implements ViewController {
 			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 			for (int i = 0; i < path.size() - 1; ++i) {
 				Tile u = path.get(i), v = path.get(i + 1);
-				int u1 = u.col * Spritesheet.TS + Spritesheet.TS / 2;
-				int u2 = u.row * Spritesheet.TS + Spritesheet.TS / 2;
-				int v1 = v.col * Spritesheet.TS + Spritesheet.TS / 2;
-				int v2 = v.row * Spritesheet.TS + Spritesheet.TS / 2;
+				int u1 = u.col * TS + TS / 2;
+				int u2 = u.row * TS + TS / 2;
+				int v1 = v.col * TS + TS / 2;
+				int v2 = v.row * TS + TS / 2;
 				g.drawLine(u1, u2, v1, v2);
 			}
 			// Target tile
 			Tile tile = path.get(path.size() - 1);
-			g.translate(tile.col * Spritesheet.TS, tile.row * Spritesheet.TS);
-			g.fillRect(Spritesheet.TS / 4, Spritesheet.TS / 4, Spritesheet.TS / 2, Spritesheet.TS / 2);
-			g.translate(-tile.col * Spritesheet.TS, -tile.row * Spritesheet.TS);
+			g.translate(tile.col * TS, tile.row * TS);
+			g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
+			g.translate(-tile.col * TS, -tile.row * TS);
 			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 		}
 	}
