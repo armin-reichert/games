@@ -7,14 +7,14 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.Spritesheet;
 
 public class Energizer extends GameEntity {
 
 	private final Sprite s_energizer;
 
 	public Energizer() {
-		s_energizer = new Sprite(getEnergizer()).scale(MazeUI.TS).animation(BACK_AND_FORTH, 250);
+		s_energizer = new Sprite(getEnergizer()).scale(Spritesheet.TS).animation(BACK_AND_FORTH, 250);
 	}
 
 	@Override

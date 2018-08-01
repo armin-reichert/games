@@ -50,9 +50,6 @@ public class MazeUI extends GameEntity {
 		BLINKY, PINKY, INKY, CLYDE
 	};
 
-	/** Tile size. */
-	public static final int TS = 16;
-
 	public final GameEventManager eventing = new GameEventManager();
 
 	private final Game game;
@@ -179,12 +176,12 @@ public class MazeUI extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return maze.numCols() * TS;
+		return maze.numCols() * Spritesheet.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return maze.numRows() * TS;
+		return maze.numRows() * Spritesheet.TS;
 	}
 
 	public Maze getMaze() {
@@ -233,7 +230,8 @@ public class MazeUI extends GameEntity {
 
 	public void addBonus(BonusSymbol symbol, int value, int ticks) {
 		bonus = new Bonus(symbol, value);
-		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
+		bonus.tf.moveTo(maze.infoTile.col * Spritesheet.TS,
+				maze.infoTile.row * Spritesheet.TS - Spritesheet.TS / 2);
 		bonusTimeLeft = ticks;
 		pacMan.lookFor.add(bonus);
 	}
@@ -287,22 +285,22 @@ public class MazeUI extends GameEntity {
 
 	private void drawInfoText(Graphics2D g) {
 		Tile tile = maze.infoTile;
-		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
+		g.translate((tile.col + 1) * Spritesheet.TS, tile.row * Spritesheet.TS + Spritesheet.TS / 4);
 		g.setFont(Assets.font("scoreFont"));
 		g.setColor(infoTextColor);
 		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
 		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-		g.translate(-tile.col * TS, -tile.row * TS);
+		g.translate(-tile.col * Spritesheet.TS, -tile.row * Spritesheet.TS);
 	}
 
 	private void drawFood(Graphics2D g, Tile tile) {
-		g.translate(tile.col * TS, tile.row * TS);
+		g.translate(tile.col * Spritesheet.TS, tile.row * Spritesheet.TS);
 		char c = maze.getContent(tile);
 		if (c == PELLET) {
 			pellet.draw(g);
 		} else if (c == ENERGIZER) {
 			energizer.draw(g);
 		}
-		g.translate(-tile.col * TS, -tile.row * TS);
+		g.translate(-tile.col * Spritesheet.TS, -tile.row * Spritesheet.TS);
 	}
 }

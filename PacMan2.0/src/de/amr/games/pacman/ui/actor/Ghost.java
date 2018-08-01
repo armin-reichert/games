@@ -19,7 +19,7 @@ import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
@@ -47,7 +47,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_points;
 
 	private void createSprites(int color) {
-		int size = 2 * MazeUI.TS;
+		int size = 2 * Spritesheet.TS;
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);
@@ -133,7 +133,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			state.setDuration(game.getGhostDyingTime());
 			s_points = s_dying[game.ghostIndex];
 		};
-		
+
 		sm.changeOnTimeout(State.DYING, State.DEAD);
 
 		// DEAD

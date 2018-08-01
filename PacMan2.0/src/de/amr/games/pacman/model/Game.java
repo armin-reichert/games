@@ -11,19 +11,17 @@ import static de.amr.games.pacman.model.BonusSymbol.STRAWBERRY;
 
 import java.util.function.IntSupplier;
 
-import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.MazeMover;
 import de.amr.games.pacman.ui.actor.PacMan;
 
 public class Game {
 
-	public final int PELLET_VALUE = 10;
-	public final int ENERGIZER_VALUE = 50;
-	public final int DOTS_BONUS_1 = 70;
-	public final int DOTS_BONUS_2 = 170;
-	public final int EXTRALIFE_SCORE = 10_000;
-	public final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
+	public static final int FOOD_EATEN_BONUS_1 = 70;
+	public static final int FOOD_EATEN_BONUS_2 = 170;
+	public static final int EXTRALIFE_SCORE = 10_000;
+	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
 	public final IntSupplier fnTicksPerSecond;
 
@@ -52,7 +50,7 @@ public class Game {
 
 	/** Tiles per second. */
 	private float tps(float value) {
-		return (value * MazeUI.TS) / fnTicksPerSecond.getAsInt();
+		return (value * Spritesheet.TS) / fnTicksPerSecond.getAsInt();
 	}
 
 	/** Ticks representing the given seconds. */
@@ -68,10 +66,20 @@ public class Game {
 		return (int) LEVELS[level][1];
 	}
 
+	public int getFoodValue(char food) {
+		if (food == TileContent.PELLET) {
+			return 10;
+		}
+		if (food == TileContent.ENERGIZER) {
+			return 50;
+		}
+		return 0;
+	}
+
 	public int getGhostValue() {
 		return GHOST_POINTS[ghostIndex];
 	}
-	
+
 	public int getGhostDyingTime() {
 		return sec(0.5f);
 	}
@@ -87,11 +95,11 @@ public class Game {
 			throw new IllegalStateException();
 		}
 	}
-	
+
 	public int getPacManEmpoweringTime() {
 		return sec(6);
 	}
-	
+
 	public int getPacManDyingTime() {
 		return sec(3);
 	}
@@ -115,7 +123,7 @@ public class Game {
 			throw new IllegalStateException();
 		}
 	}
-	
+
 	public int getLevelChangingTime() {
 		return sec(4);
 	}

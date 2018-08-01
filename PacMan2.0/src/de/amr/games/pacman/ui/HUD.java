@@ -18,7 +18,7 @@ public class HUD extends GameEntity {
 	public HUD(Game game) {
 		this.game = game;
 		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN,
-				MazeUI.TS * 3 / 2);
+				Spritesheet.TS * 3 / 2);
 	}
 
 	@Override
@@ -36,9 +36,9 @@ public class HUD extends GameEntity {
 		g.translate(tf.getX(), tf.getY());
 		g.setColor(Color.WHITE);
 		g.setFont(font);
-		g.drawString("SCORE", MazeUI.TS, MazeUI.TS);
-		g.drawString(String.format("%06d", game.score), MazeUI.TS, MazeUI.TS * 2);
-		g.drawString("LEVEL " + game.level, 20 * MazeUI.TS, MazeUI.TS);
+		g.drawString("SCORE", Spritesheet.TS, Spritesheet.TS);
+		g.drawString(String.format("%06d", game.score), Spritesheet.TS, Spritesheet.TS * 2);
+		g.drawString("LEVEL " + game.level, 20 * Spritesheet.TS, Spritesheet.TS);
 		g.translate(-tf.getX(), -tf.getY());
 	}
 }

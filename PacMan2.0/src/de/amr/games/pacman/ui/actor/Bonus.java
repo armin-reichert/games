@@ -1,7 +1,5 @@
 package de.amr.games.pacman.ui.actor;
 
-import static de.amr.games.pacman.ui.MazeUI.TS;
-
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -24,10 +22,12 @@ public class Bonus extends GameEntity {
 		this.symbol = symbol;
 		this.points = points;
 		this.honored = false;
-		s_symbol = new Sprite(Spritesheet.getSymbol(symbol)).scale(2 * TS, 2 * TS);
+		s_symbol = new Sprite(Spritesheet.getSymbol(symbol)).scale(2 * Spritesheet.TS,
+				2 * Spritesheet.TS);
 		int index = Arrays.binarySearch(BONUS_POINTS, points);
 		if (index >= 0) {
-			s_points = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * TS, 2 * TS);
+			s_points = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * Spritesheet.TS,
+					2 * Spritesheet.TS);
 		} else {
 			throw new IllegalArgumentException("Bonus value not supported: " + points);
 		}

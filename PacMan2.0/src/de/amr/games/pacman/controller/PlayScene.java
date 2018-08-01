@@ -26,6 +26,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.GameInfo;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.games.pacman.ui.StatusUI;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.statemachine.StateMachine;
@@ -57,8 +58,8 @@ public class PlayScene implements ViewController {
 		hud = new HUD(game);
 		status = new StatusUI(game);
 		hud.tf.moveTo(0, 0);
-		mazeUI.tf.moveTo(0, 3 * MazeUI.TS);
-		status.tf.moveTo(0, (3 + maze.numRows()) * MazeUI.TS);
+		mazeUI.tf.moveTo(0, 3 * Spritesheet.TS);
+		status.tf.moveTo(0, (3 + maze.numRows()) * Spritesheet.TS);
 
 		// Game controller
 		gameControl = createGameControl();
@@ -265,7 +266,6 @@ public class PlayScene implements ViewController {
 
 	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
 		PacManGainsPowerEvent e = event(t);
-		game.ghostIndex = 0;
 		e.pacMan.processEvent(e);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
@@ -294,27 +294,22 @@ public class PlayScene implements ViewController {
 		FoodFoundEvent e = event(t);
 		maze.clearTile(e.tile);
 		game.foodEaten += 1;
-		int oldScore = game.score;
-		if (e.food == ENERGIZER) {
-			LOG.info(() -> String.format("PacMan found energizer at %s", e.tile));
-			game.score += game.ENERGIZER_VALUE;
-		} else {
-			LOG.info(() -> String.format("PacMan found pellet at %s", e.tile));
-			game.score += game.PELLET_VALUE;
-		}
-		if (oldScore < game.EXTRALIFE_SCORE && game.score >= game.EXTRALIFE_SCORE) {
+		int oldGameScore = game.score;
+		game.score += game.getFoodValue(e.food);
+		if (oldGameScore < Game.EXTRALIFE_SCORE && game.score >= Game.EXTRALIFE_SCORE) {
 			game.lives += 1;
 		}
 		if (game.foodEaten == game.foodTotal) {
 			gameControl.enqueue(new LevelCompletedEvent());
 			return;
 		}
-		if (game.foodEaten == game.DOTS_BONUS_1) {
+		if (game.foodEaten == Game.FOOD_EATEN_BONUS_1) {
 			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
-		} else if (game.foodEaten == game.DOTS_BONUS_2) {
+		} else if (game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
 			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
 		}
 		if (e.food == ENERGIZER) {
+			game.ghostIndex = 0;
 			gameControl
 					.enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan(), game.getPacManEmpoweringTime()));
 		}

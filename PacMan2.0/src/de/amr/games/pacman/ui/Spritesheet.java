@@ -14,6 +14,9 @@ import de.amr.games.pacman.model.BonusSymbol;
 
 public class Spritesheet {
 
+	/** Tile size. */
+	public static final int TS = 16;
+
 	public static final int RED_GHOST = 0;
 	public static final int PINK_GHOST = 1;
 	public static final int TURQUOISE_GHOST = 2;
@@ -37,7 +40,6 @@ public class Spritesheet {
 	static {
 		// Maze
 		maze = $(228, 0, 224, 248);
-		// maze = Assets.image("maze_blue.png");
 		mazeWhite = Assets.image("maze_white.png");
 
 		// Energizer
@@ -47,51 +49,47 @@ public class Spritesheet {
 		// Symbols for boni
 		int offset = 0;
 		for (BonusSymbol symbol : BonusSymbol.values()) {
-			symbolMap.put(symbol, sheet.getSubimage(488 + offset, 48, 16, 16));
+			symbolMap.put(symbol, $(488 + offset, 48));
 			offset += 16;
 		}
 
 		// Pac-Man
-		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0, 16, 16), $(472, 0, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16, 16, 16), $(472, 16, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32, 16, 16), $(472, 32, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48, 16, 16), $(472, 48, 16, 16),
-				$(488, 0, 16, 16) };
-		pacManStanding = $(488, 0, 16, 16);
+		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0), $(472, 0), $(488, 0) };
+		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16), $(472, 16), $(488, 0) };
+		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32), $(472, 32), $(488, 0) };
+		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48), $(472, 48), $(488, 0) };
+		pacManStanding = $(488, 0);
 		for (int i = 0; i < 11; ++i) {
-			pacManDying[i] = $(504 + i * 16, 0, 16, 16);
+			pacManDying[i] = $(504 + i * 16, 0);
 		}
 
 		// Ghosts
 		for (int color = 0; color < 4; ++color) {
 			for (int i = 0; i < 8; ++i) {
-				ghostNormal[color][i] = $(456 + i * 16, 64 + color * 16, 16, 16);
+				ghostNormal[color][i] = $(456 + i * 16, 64 + color * 16);
 			}
 		}
 		for (int i = 0; i < 2; ++i) {
-			ghostFrightened[i] = $(584 + i * 16, 64, 16, 16);
+			ghostFrightened[i] = $(584 + i * 16, 64);
 		}
 		for (int i = 0; i < 4; ++i) {
-			ghostFrightenedEnding[i] = $(584 + i * 16, 64, 16, 16);
+			ghostFrightenedEnding[i] = $(584 + i * 16, 64);
 		}
 		for (int i = 0; i < 4; ++i) {
-			ghostDead[i] = $(584 + i * 16, 80, 16, 16);
+			ghostDead[i] = $(584 + i * 16, 80);
 		}
 
 		// Green numbers (200, 400, 800, 1600)
 		for (int i = 0; i < 4; ++i) {
-			greenNumber[i] = $(456 + i * 16, 128, 16, 16);
+			greenNumber[i] = $(456 + i * 16, 128);
 		}
 
 		// Pink numbers (horizontal: 100, 300, 500, 700, vertikal: 1000, 2000, 3000, 5000)
 		for (int i = 0; i < 4; ++i) {
-			pinkNumber[i] = $(456 + i * 16, 144, 16, 16);
+			pinkNumber[i] = $(456 + i * 16, 144);
 		}
 		for (int j = 0; j < 4; ++j) {
-			pinkNumber[4 + j] = $(520, 144 + j * 16, 16, 16);
+			pinkNumber[4 + j] = $(520, 144 + j * 16);
 		}
 	}
 
@@ -99,15 +97,19 @@ public class Spritesheet {
 		return sheet.getSubimage(x, y, w, h);
 	}
 
+	private static BufferedImage $(int x, int y) {
+		return $(x, y, TS, TS);
+	}
+
 	private static BufferedImage createEnergizerImage(boolean visible) {
-		BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage(TS, TS, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = img.createGraphics();
 		g.setColor(Color.BLACK);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.fillRect(0, 0, img.getWidth(), img.getHeight());
 		if (visible) {
 			g.setColor(Color.PINK);
-			g.fillOval(0, 0, 16, 16);
+			g.fillOval(0, 0, TS, TS);
 		}
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		return img;

@@ -4,7 +4,6 @@ import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.model.TileContent.WALL;
-import static de.amr.games.pacman.ui.MazeUI.TS;
 import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
@@ -23,7 +22,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.RoutePlanner;
 import de.amr.games.pacman.routing.impl.NavigationSystem;
-import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
@@ -108,12 +107,12 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return MazeUI.TS;
+		return Spritesheet.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return MazeUI.TS;
+		return Spritesheet.TS;
 	}
 
 	// Movement
@@ -151,7 +150,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public void placeAt(int col, int row) {
-		tf.moveTo(col * MazeUI.TS, row * MazeUI.TS);
+		tf.moveTo(col * Spritesheet.TS, row * Spritesheet.TS);
 	}
 
 	public void placeAt(Tile tile) {
@@ -163,15 +162,15 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public int row() {
-		return round(tf.getY() + getHeight() / 2) / MazeUI.TS;
+		return round(tf.getY() + getHeight() / 2) / Spritesheet.TS;
 	}
 
 	public int col() {
-		return round(tf.getX() + getWidth() / 2) / MazeUI.TS;
+		return round(tf.getX() + getWidth() / 2) / Spritesheet.TS;
 	}
 
 	public boolean isExactlyOverTile() {
-		return round(tf.getX()) % MazeUI.TS == 0 && round(tf.getY()) % MazeUI.TS == 0;
+		return round(tf.getX()) % Spritesheet.TS == 0 && round(tf.getY()) % Spritesheet.TS == 0;
 	}
 
 	public boolean isOutsideMaze() {
@@ -229,13 +228,13 @@ public abstract class MazeMover<S> extends GameEntity {
 		float x = nextPosition.x, y = nextPosition.y;
 		switch (dir) {
 		case Top4.W:
-			return new Tile(round(x) / TS, current.row);
+			return new Tile(round(x) / Spritesheet.TS, current.row);
 		case Top4.E:
-			return new Tile(round(x + getWidth()) / TS, current.row);
+			return new Tile(round(x + getWidth()) / Spritesheet.TS, current.row);
 		case Top4.N:
-			return new Tile(current.col, round(y) / TS);
+			return new Tile(current.col, round(y) / Spritesheet.TS);
 		case Top4.S:
-			return new Tile(current.col, round(y + getHeight()) / TS);
+			return new Tile(current.col, round(y + getHeight()) / Spritesheet.TS);
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}

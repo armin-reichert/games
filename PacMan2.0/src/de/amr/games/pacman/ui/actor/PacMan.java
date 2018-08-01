@@ -1,7 +1,6 @@
 package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.ui.MazeUI.TS;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManWalking;
 
@@ -26,6 +25,7 @@ import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.model.TileContent;
+import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
@@ -45,7 +45,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Sprite currentSprite;
 
 	private void createSprites() {
-		int size = 2 * TS;
+		int size = 2 * Spritesheet.TS;
 		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size)
@@ -107,7 +107,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			state.setDuration(game.getPacManDyingTime());
 			currentSprite = s_dying;
 		};
-		
+
 		sm.changeOnTimeout(State.DYING, State.NORMAL, t -> {
 			eventMgr.publish(new PacManDiedEvent());
 		});
