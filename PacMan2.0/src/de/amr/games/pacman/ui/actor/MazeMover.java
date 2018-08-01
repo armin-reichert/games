@@ -1,6 +1,5 @@
 package de.amr.games.pacman.ui.actor;
 
-import static de.amr.easy.game.Application.LOG;
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
@@ -13,15 +12,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.event.GameEventSupport;
+import de.amr.games.pacman.controller.event.GameEvent;
+import de.amr.games.pacman.controller.event.GameEventManager;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.RoutePlanner;
 import de.amr.games.pacman.routing.impl.NavigationSystem;
 import de.amr.games.pacman.ui.MazeUI;
+import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateTransition;
 
 /**
  * @param <S>
@@ -31,31 +35,66 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	private static final int TELEPORT_LENGTH = 3;
 
-	public final GameEventSupport eventing = new GameEventSupport();
+	public final GameEventManager eventMgr = new GameEventManager();
+
+	public final Game game;
 	public final Maze maze;
 	public final Tile homeTile;
 	private final String name;
+	protected final StateMachine<S, GameEvent> sm;
 	private final Map<S, RoutePlanner> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
 	private int nextDir;
-	private S state;
-	private long stateEntryTime;
 
-	protected MazeMover(Maze maze, String name, Tile homeTile, Map<S, RoutePlanner> navigation) {
+	protected MazeMover(Game game, Maze maze, String name, Tile homeTile,
+			Map<S, RoutePlanner> navigation) {
+		Objects.requireNonNull(game);
 		Objects.requireNonNull(maze);
 		Objects.requireNonNull(name);
 		Objects.requireNonNull(homeTile);
 		Objects.requireNonNull(navigation);
+		this.game = game;
 		this.maze = maze;
 		this.name = name;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
+		this.sm = createStateMachine();
+		sm.setLogger(Application.LOG);
 	}
 
 	public String getName() {
 		return name;
 	}
+
+	// State machine
+
+	protected abstract StateMachine<S, GameEvent> createStateMachine();
+
+	public S getState() {
+		return sm.currentStateLabel();
+	}
+
+	@Override
+	public void init() {
+		sm.init();
+	}
+
+	@Override
+	public void update() {
+		sm.update();
+	}
+
+	public void processEvent(GameEvent e) {
+		sm.enqueue(e);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <E extends GameEvent> E event(StateTransition<S, GameEvent> t) {
+		return (E) t.event().get();
+	}
+
+	// Display
 
 	@Override
 	public void draw(Graphics2D g) {
@@ -75,25 +114,6 @@ public abstract class MazeMover<S> extends GameEntity {
 	@Override
 	public int getHeight() {
 		return MazeUI.TS;
-	}
-
-	// State support
-
-	public void setState(S state) {
-		S oldState = this.state;
-		this.state = state;
-		stateEntryTime = System.currentTimeMillis();
-		if (oldState != state) {
-			LOG.info(() -> String.format("%s changed from %s to %s", getName(), oldState, state));
-		}
-	}
-
-	public S getState() {
-		return state;
-	}
-
-	public int stateSec() {
-		return (int) (System.currentTimeMillis() - stateEntryTime) / 1000;
 	}
 
 	// Movement

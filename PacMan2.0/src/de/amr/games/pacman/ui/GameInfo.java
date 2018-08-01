@@ -13,6 +13,7 @@ import java.util.logging.Level;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
+import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -83,8 +84,7 @@ public class GameInfo implements ViewController {
 	}
 
 	private void killAllLivingGhosts() {
-		mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.AGGRO)
-				.forEach(ghost -> ghost.setState(Ghost.State.DEAD));
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(new GhostKilledEvent(ghost)));
 	}
 
 	private void eatAllPellets() {
@@ -135,7 +135,7 @@ public class GameInfo implements ViewController {
 		PacMan pacMan = mazeUI.getPacMan();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
-		mazeUI.getActiveGhosts().forEach(ghost -> {
+		mazeUI.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
 			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
 			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
 		});

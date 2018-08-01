@@ -3,7 +3,7 @@ package de.amr.games.pacman.controller.event;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class GameEventSupport {
+public class GameEventManager {
 
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
 

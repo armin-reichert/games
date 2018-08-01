@@ -71,16 +71,29 @@ public class Game {
 	public int getGhostValue() {
 		return GHOST_POINTS[ghostIndex];
 	}
+	
+	public int getGhostDyingTime() {
+		return sec(0.5f);
+	}
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {
 		switch (pacMan.getState()) {
-		case ALIVE:
+		case NORMAL:
+		case EMPOWERED:
 			return tps(8f);
 		case DYING:
 			return 0;
 		default:
 			throw new IllegalStateException();
 		}
+	}
+	
+	public int getPacManEmpoweringTime() {
+		return sec(6);
+	}
+	
+	public int getPacManDyingTime() {
+		return sec(3);
 	}
 
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {

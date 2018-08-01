@@ -33,7 +33,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.event.GameEventSupport;
+import de.amr.games.pacman.controller.event.GameEventManager;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
@@ -53,8 +53,9 @@ public class MazeUI extends GameEntity {
 	/** Tile size. */
 	public static final int TS = 16;
 
-	public final GameEventSupport eventing = new GameEventSupport();
+	public final GameEventManager eventing = new GameEventManager();
 
+	private final Game game;
 	private final Maze maze;
 	private final PacMan pacMan;
 	private final Map<GhostName, Ghost> ghostsByName = new EnumMap<>(GhostName.class);
@@ -71,7 +72,8 @@ public class MazeUI extends GameEntity {
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
-	public MazeUI(Maze maze) {
+	public MazeUI(Game game, Maze maze) {
+		this.game = game;
 		this.maze = maze;
 		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
 		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
@@ -93,13 +95,14 @@ public class MazeUI extends GameEntity {
 	}
 
 	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(maze, maze.pacManHome);
-		pacMan.setNavigation(PacMan.State.ALIVE, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		PacMan pacMan = new PacMan(game, maze, maze.pacManHome);
+		pacMan.setNavigation(PacMan.State.NORMAL, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		pacMan.setNavigation(PacMan.State.EMPOWERED, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		return pacMan;
 	}
 
 	private void createBlinky() {
-		Ghost blinky = new Ghost(maze, "Blinky", RED_GHOST, maze.blinkyHome);
+		Ghost blinky = new Ghost(game, maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -109,7 +112,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createPinky() {
-		Ghost pinky = new Ghost(maze, "Pinky", PINK_GHOST, maze.pinkyHome);
+		Ghost pinky = new Ghost(game, maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -119,7 +122,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createInky() {
-		Ghost inky = new Ghost(maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
+		Ghost inky = new Ghost(game, maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -129,7 +132,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createClyde() {
-		Ghost clyde = new Ghost(maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
+		Ghost clyde = new Ghost(game, maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
 		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
@@ -138,19 +141,14 @@ public class MazeUI extends GameEntity {
 		ghostsByName.put(GhostName.CLYDE, clyde);
 	}
 
-	public void initActors(Game game) {
-		pacMan.setState(PacMan.State.ALIVE);
-		pacMan.placeAt(maze.pacManHome);
-		pacMan.setSpeed(game::getPacManSpeed);
-		pacMan.setDir(Top4.E);
-		pacMan.setNextDir(Top4.E);
-		pacMan.getSprites().forEach(Sprite::resetAnimation);
+	public void initActors() {
+		pacMan.init();
 
 		activeGhostsByName.values().forEach(ghost -> {
-			ghost.setState(Ghost.State.SAFE);
+			ghost.init();
 			ghost.placeAt(ghost.homeTile);
-			ghost.setSpeed(game::getGhostSpeed);
 			ghost.getSprites().forEach(Sprite::resetAnimation);
+			ghost.setSpeed(game::getGhostSpeed);
 		});
 		getActiveGhost(GhostName.BLINKY).ifPresent(blinky -> blinky.setDir(Top4.E));
 		getActiveGhost(GhostName.PINKY).ifPresent(pinky -> pinky.setDir(Top4.S));

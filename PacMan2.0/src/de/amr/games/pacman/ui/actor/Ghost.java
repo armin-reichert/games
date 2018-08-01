@@ -12,17 +12,32 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.controller.event.GameEvent;
+import de.amr.games.pacman.controller.event.GhostKilledEvent;
+import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
+import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.MazeUI;
+import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
-	public enum State {
-		AGGRO, SCATTERING, AFRAID, BRAVE, DYING, DEAD, SAFE
+	private final int color;
+
+	public Ghost(Game game, Maze maze, String name, int color, Tile home) {
+		super(game, maze, name, home, new EnumMap<>(State.class));
+		this.color = color;
+		createSprites(color);
+		createStateMachine();
 	}
 
-	private final int color;
+	public int getColor() {
+		return color;
+	}
+
+	// Sprites
 
 	private Sprite s_normal[] = new Sprite[4];
 	private Sprite s_dying[] = new Sprite[4];
@@ -31,9 +46,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_brave;
 	private Sprite s_points;
 
-	public Ghost(Maze maze, String name, int color, Tile home) {
-		super(maze, name, home, new EnumMap<>(State.class));
-		this.color = color;
+	private void createSprites(int color) {
 		int size = 2 * MazeUI.TS;
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
@@ -74,57 +87,61 @@ public class Ghost extends MazeMover<Ghost.State> {
 		}
 	}
 
-	public int getColor() {
-		return color;
-	}
+	// State machine
 
-	public void onWounded(int ghostIndex) {
-		s_points = s_dying[ghostIndex];
-		setState(State.DYING);
-	}
-
-	public void onExitus() {
-		setState(State.DEAD);
+	public enum State {
+		AGGRO, SCATTERING, AFRAID, BRAVE, DYING, DEAD, SAFE
 	}
 
 	@Override
-	public void update() {
-		switch (getState()) {
-		case AGGRO:
-			move();
-			break;
-		case DEAD:
-			move();
-			if (getTile().equals(homeTile)) {
-				setState(State.SAFE);
-			}
-			break;
-		case DYING:
-			break;
-		case AFRAID:
-			move();
-			if (getTile().equals(homeTile)) {
-				setState(State.SAFE);
-			} else if (stateSec() > 6) {
-				setState(State.BRAVE);
-			}
-			break;
-		case BRAVE:
-			move();
-			if (stateSec() > 2) {
-				setState(State.AGGRO);
-			}
-			break;
-		case SAFE:
-			move();
-			if (stateSec() > 3) {
-				setState(State.AGGRO);
-			}
-		case SCATTERING:
-			move();
-			break;
-		default:
-			throw new IllegalStateException("Illegal ghost state: " + getState());
-		}
+	protected StateMachine<State, GameEvent> createStateMachine() {
+		StateMachine<State, GameEvent> sm = new StateMachine<>(getName(), State.class, State.SAFE);
+
+		// SAFE
+
+		sm.state(State.SAFE).entry = state -> {
+			state.setDuration(game.sec(3));
+		};
+
+		sm.state(State.SAFE).update = state -> move();
+
+		sm.changeOnTimeout(State.SAFE, State.AGGRO);
+		sm.changeOnInput(PacManLosesPowerEvent.class, State.SAFE, State.AGGRO);
+
+		// AGGRO
+		sm.state(State.AGGRO).update = state -> move();
+
+		sm.changeOnInput(PacManGainsPowerEvent.class, State.AGGRO, State.AFRAID);
+
+		// AFRAID
+
+		sm.state(State.AFRAID).update = state -> move();
+
+		sm.change(State.AFRAID, State.SAFE, () -> getTile().equals(homeTile));
+
+		sm.changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, State.AGGRO);
+
+		sm.changeOnInput(GhostKilledEvent.class, State.AFRAID, State.DYING);
+
+		// BRAVE
+
+		sm.state(State.BRAVE).update = state -> move();
+
+		// DYING
+
+		sm.state(State.DYING).entry = state -> {
+			state.setDuration(game.getGhostDyingTime());
+			s_points = s_dying[game.ghostIndex];
+		};
+		
+		sm.changeOnTimeout(State.DYING, State.DEAD);
+
+		// DEAD
+
+		sm.state(State.DEAD).update = state -> move();
+
+		sm.change(State.DEAD, State.SAFE, () -> getTile().equals(homeTile));
+
+		return sm;
 	}
 }

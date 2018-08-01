@@ -236,8 +236,9 @@ public class StateMachine<S, E> {
 			processTransition(t, input);
 		} else {
 			if (input != null) {
-				getLogger().ifPresent(log -> log
-						.info(String.format("Input %s ignored. No matching transition was found", input)));
+				getLogger().ifPresent(log -> log.info(
+						String.format("FSM(%s) in state %s ignored input %s. No matching transition was found",
+								description, currentStateLabel, input)));
 			}
 			state().doUpdate();
 		}

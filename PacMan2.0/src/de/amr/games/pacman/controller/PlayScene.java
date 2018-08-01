@@ -6,6 +6,7 @@ import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
@@ -16,7 +17,10 @@ import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GhostContactEvent;
 import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.NextLevelEvent;
+import de.amr.games.pacman.controller.event.PacManDiedEvent;
+import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
+import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.GameInfo;
@@ -24,7 +28,6 @@ import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.StatusUI;
 import de.amr.games.pacman.ui.actor.Ghost;
-import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
@@ -41,7 +44,7 @@ public class PlayScene implements ViewController {
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI status;
-	private final GameInfo playSceneInfo;
+	private final GameInfo gameInfo;
 
 	public PlayScene(PacManApp app) {
 		this.width = app.settings.width;
@@ -50,7 +53,7 @@ public class PlayScene implements ViewController {
 		this.maze = app.maze;
 
 		// UI
-		mazeUI = new MazeUI(maze);
+		mazeUI = new MazeUI(game, maze);
 		hud = new HUD(game);
 		status = new StatusUI(game);
 		hud.tf.moveTo(0, 0);
@@ -61,11 +64,11 @@ public class PlayScene implements ViewController {
 		gameControl = createGameControl();
 		gameControl.setLogger(LOG);
 		mazeUI.eventing.subscribe(gameControl::enqueue);
-		mazeUI.getPacMan().eventing.subscribe(gameControl::enqueue);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventing.subscribe(gameControl::enqueue));
+		mazeUI.getPacMan().eventMgr.subscribe(gameControl::enqueue);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(gameControl::enqueue));
 
 		// Info
-		playSceneInfo = new GameInfo(game, mazeUI, maze);
+		gameInfo = new GameInfo(game, mazeUI, maze);
 	}
 
 	private StateMachine<State, GameEvent> createGameControl() {
@@ -80,7 +83,7 @@ public class PlayScene implements ViewController {
 		fsm.state(State.READY).entry = state -> {
 			state.setDuration(game.sec(2));
 			game.init(maze);
-			mazeUI.initActors(game);
+			mazeUI.initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!", Color.YELLOW);
 		};
@@ -105,6 +108,12 @@ public class PlayScene implements ViewController {
 		fsm.changeOnInput(GhostKilledEvent.class, State.PLAYING, State.GHOST_DYING,
 				this::onGhostKilled);
 
+		fsm.changeOnInput(PacManGainsPowerEvent.class, State.PLAYING, State.PLAYING,
+				this::onPacManGainsPower);
+
+		fsm.changeOnInput(PacManLosesPowerEvent.class, State.PLAYING, State.PLAYING,
+				this::onPacManLosesPower);
+
 		fsm.changeOnInput(PacManKilledEvent.class, State.PLAYING, State.PACMAN_DYING,
 				this::onPacManKilled);
 
@@ -113,16 +122,15 @@ public class PlayScene implements ViewController {
 		// -- GHOST_DYING
 
 		fsm.state(State.GHOST_DYING).entry = state -> {
-			state.setDuration(game.sec(0.5f));
+			state.setDuration(game.getGhostDyingTime());
 			mazeUI.getPacMan().visibility = () -> false;
 		};
 
 		fsm.state(State.GHOST_DYING).update = state -> {
-			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DEAD)
-					.forEach(Ghost::update);
+			mazeUI.getActiveGhosts().forEach(Ghost::update);
 		};
 
-		fsm.changeOnTimeout(State.GHOST_DYING, State.PLAYING, this::onGhostDied);
+		fsm.changeOnTimeout(State.GHOST_DYING, State.PLAYING);
 
 		fsm.state(State.GHOST_DYING).exit = state -> {
 			mazeUI.getPacMan().visibility = () -> true;
@@ -152,26 +160,31 @@ public class PlayScene implements ViewController {
 		// -- PACMAN_DYING
 
 		fsm.state(State.PACMAN_DYING).entry = state -> {
-			state.setDuration(game.sec(3));
-			mazeUI.getPacMan().setState(PacMan.State.DYING);
-			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 			game.lives -= 1;
+			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 		};
+
+		fsm.state(State.PACMAN_DYING).update = state -> {
+			mazeUI.getPacMan().update();
+		};
+		
+		fsm.changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.GAME_OVER,
+				() -> game.lives == 0);
+
+		fsm.changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.PLAYING,
+				() -> game.lives > 0, t -> {
+					mazeUI.initActors();
+				});
 
 		fsm.state(State.PACMAN_DYING).exit = state -> {
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		};
 
-		fsm.changeOnTimeout(State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
-
-		fsm.changeOnTimeout(State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
-			mazeUI.initActors(game);
-		});
-
 		// -- GAME_OVER
 
 		fsm.state(State.GAME_OVER).entry = state -> {
 			mazeUI.enableAnimation(false);
+			mazeUI.removeBonus();
 			mazeUI.showInfo("Game Over!", Color.RED);
 		};
 
@@ -179,7 +192,6 @@ public class PlayScene implements ViewController {
 
 		fsm.state(State.GAME_OVER).exit = state -> {
 			mazeUI.hideInfo();
-			mazeUI.removeBonus();
 			game.init(maze);
 		};
 
@@ -199,12 +211,13 @@ public class PlayScene implements ViewController {
 	@Override
 	public void init() {
 		gameControl.init();
+		gameControl.getLogger().ifPresent(logger -> logger.setLevel(Level.INFO));
 	}
 
 	@Override
 	public void update() {
-		playSceneInfo.update();
 		gameControl.update();
+		gameInfo.update();
 	}
 
 	@Override
@@ -212,7 +225,7 @@ public class PlayScene implements ViewController {
 		hud.draw(g);
 		mazeUI.draw(g);
 		status.draw(g);
-		playSceneInfo.draw(g);
+		gameInfo.draw(g);
 	}
 
 	private void nextLevel() {
@@ -220,15 +233,7 @@ public class PlayScene implements ViewController {
 		game.foodEaten = 0;
 		game.ghostIndex = 0;
 		maze.resetFood();
-		mazeUI.initActors(game);
-	}
-
-	private void startGhostHunting() {
-		game.ghostIndex = 0;
-		mazeUI.getActiveGhosts()
-				.filter(
-						ghost -> ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.SAFE)
-				.forEach(ghost -> ghost.setState(Ghost.State.AFRAID));
+		mazeUI.initActors();
 	}
 
 	// Game event handling
@@ -244,7 +249,7 @@ public class PlayScene implements ViewController {
 		case AGGRO:
 		case SAFE:
 		case SCATTERING:
-			gameControl.enqueue(new PacManKilledEvent(e.ghost));
+			gameControl.enqueue(new PacManKilledEvent(e.pacMan, e.ghost));
 			break;
 		case AFRAID:
 		case BRAVE:
@@ -258,8 +263,21 @@ public class PlayScene implements ViewController {
 		}
 	}
 
+	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
+		PacManGainsPowerEvent e = event(t);
+		game.ghostIndex = 0;
+		e.pacMan.processEvent(e);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+	}
+
+	private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
+		PacManLosesPowerEvent e = event(t);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+	}
+
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
 		PacManKilledEvent e = event(t);
+		e.pacMan.processEvent(e);
 		LOG.info(
 				() -> String.format("PacMan killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
@@ -267,15 +285,9 @@ public class PlayScene implements ViewController {
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
 		GhostKilledEvent e = event(t);
 		LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
-		e.ghost.onWounded(game.ghostIndex);
 		game.score += game.getGhostValue();
 		game.ghostIndex += 1;
-	}
-
-	private void onGhostDied(StateTransition<State, GameEvent> t) {
-		// TODO get ghost from transition/event?
-		mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).findFirst()
-				.ifPresent(Ghost::onExitus);
+		e.ghost.processEvent(e);
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -303,7 +315,8 @@ public class PlayScene implements ViewController {
 			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
 		}
 		if (e.food == ENERGIZER) {
-			startGhostHunting();
+			gameControl
+					.enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan(), game.getPacManEmpoweringTime()));
 		}
 	}
 
