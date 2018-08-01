@@ -50,46 +50,46 @@ public class Spritesheet {
 		int offset = 0;
 		for (BonusSymbol symbol : BonusSymbol.values()) {
 			symbolMap.put(symbol, $(488 + offset, 48));
-			offset += 16;
+			offset += TS;
 		}
 
 		// Pac-Man
 		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0), $(472, 0), $(488, 0) };
-		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16), $(472, 16), $(488, 0) };
-		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32), $(472, 32), $(488, 0) };
-		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48), $(472, 48), $(488, 0) };
+		pacManWalking[Top4.W] = new BufferedImage[] { $(456, TS), $(472, TS), $(488, 0) };
+		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 2 * TS), $(472, 2 * TS), $(488, 0) };
+		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 3 * TS), $(472, 3 * TS), $(488, 0) };
 		pacManStanding = $(488, 0);
 		for (int i = 0; i < 11; ++i) {
-			pacManDying[i] = $(504 + i * 16, 0);
+			pacManDying[i] = $(504 + i * TS, 0);
 		}
 
 		// Ghosts
 		for (int color = 0; color < 4; ++color) {
 			for (int i = 0; i < 8; ++i) {
-				ghostNormal[color][i] = $(456 + i * 16, 64 + color * 16);
+				ghostNormal[color][i] = $(456 + i * TS, 64 + color * TS);
 			}
 		}
 		for (int i = 0; i < 2; ++i) {
-			ghostFrightened[i] = $(584 + i * 16, 64);
+			ghostFrightened[i] = $(584 + i * TS, 64);
 		}
 		for (int i = 0; i < 4; ++i) {
-			ghostFrightenedEnding[i] = $(584 + i * 16, 64);
+			ghostFrightenedEnding[i] = $(584 + i * TS, 64);
 		}
 		for (int i = 0; i < 4; ++i) {
-			ghostDead[i] = $(584 + i * 16, 80);
+			ghostDead[i] = $(584 + i * TS, 80);
 		}
 
 		// Green numbers (200, 400, 800, 1600)
 		for (int i = 0; i < 4; ++i) {
-			greenNumber[i] = $(456 + i * 16, 128);
+			greenNumber[i] = $(456 + i * TS, 128);
 		}
 
 		// Pink numbers (horizontal: 100, 300, 500, 700, vertikal: 1000, 2000, 3000, 5000)
 		for (int i = 0; i < 4; ++i) {
-			pinkNumber[i] = $(456 + i * 16, 144);
+			pinkNumber[i] = $(456 + i * TS, 144);
 		}
 		for (int j = 0; j < 4; ++j) {
-			pinkNumber[4 + j] = $(520, 144 + j * 16);
+			pinkNumber[4 + j] = $(520, 144 + j * TS);
 		}
 	}
 
