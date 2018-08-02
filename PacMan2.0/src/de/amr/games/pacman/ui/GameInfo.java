@@ -166,14 +166,14 @@ public class GameInfo implements ViewController {
 	}
 
 	private static Color color(Ghost ghost) {
-		switch (ghost.getColor()) {
-		case Spritesheet.TURQUOISE_GHOST:
+		switch (ghost.getName()) {
+		case INKY:
 			return new Color(64, 224, 208);
-		case Spritesheet.ORANGE_GHOST:
+		case CLYDE:
 			return Color.ORANGE;
-		case Spritesheet.PINK_GHOST:
+		case PINKY:
 			return Color.PINK;
-		case Spritesheet.RED_GHOST:
+		case BLINKY:
 			return Color.RED;
 		default:
 			throw new IllegalArgumentException();

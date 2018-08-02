@@ -1,6 +1,7 @@
 package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.ui.Spritesheet.TS;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostBlue;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostBlueWhite;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostEyes;
@@ -20,29 +21,22 @@ import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
 	private final StateMachine<State, GameEvent> sm;
 	private final GhostName name;
-	private final int color;
 
-	public Ghost(Game game, Maze maze, GhostName name, int color, Tile home) {
+	public Ghost(GhostName name, Game game, Maze maze, Tile home, int color) {
 		super(game, maze, home, new EnumMap<>(State.class));
 		this.name = name;
-		this.color = color;
 		sm = createStateMachine();
 		createSprites(color);
 	}
 
 	public GhostName getName() {
 		return name;
-	}
-
-	public int getColor() {
-		return color;
 	}
 
 	// Sprites
@@ -55,7 +49,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_blinking;
 
 	private void createSprites(int color) {
-		int size = 2 * Spritesheet.TS;
+		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_color[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);

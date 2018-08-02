@@ -96,7 +96,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createBlinky() {
-		Ghost blinky = new Ghost(game, maze, GhostName.BLINKY, RED_GHOST, maze.blinkyHome);
+		Ghost blinky = new Ghost(GhostName.BLINKY, game, maze, maze.blinkyHome, RED_GHOST);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -105,7 +105,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createPinky() {
-		Ghost pinky = new Ghost(game, maze, GhostName.PINKY, PINK_GHOST, maze.pinkyHome);
+		Ghost pinky = new Ghost(GhostName.PINKY, game, maze, maze.pinkyHome, PINK_GHOST);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -114,7 +114,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createInky() {
-		Ghost inky = new Ghost(game, maze, GhostName.INKY, TURQUOISE_GHOST, maze.inkyHome);
+		Ghost inky = new Ghost(GhostName.INKY, game, maze, maze.inkyHome, TURQUOISE_GHOST);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
@@ -123,7 +123,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createClyde() {
-		Ghost clyde = new Ghost(game, maze, GhostName.CLYDE, ORANGE_GHOST, maze.clydeHome);
+		Ghost clyde = new Ghost(GhostName.CLYDE, game, maze, maze.clydeHome, ORANGE_GHOST);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
