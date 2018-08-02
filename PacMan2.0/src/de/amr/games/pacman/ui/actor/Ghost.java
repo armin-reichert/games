@@ -25,13 +25,20 @@ import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
+	private final StateMachine<State, GameEvent> sm;
+	private final GhostName name;
 	private final int color;
 
-	public Ghost(Game game, Maze maze, String name, int color, Tile home) {
-		super(game, maze, name, home, new EnumMap<>(State.class));
+	public Ghost(Game game, Maze maze, GhostName name, int color, Tile home) {
+		super(game, maze, home, new EnumMap<>(State.class));
+		this.name = name;
 		this.color = color;
+		sm = createStateMachine();
 		createSprites(color);
-		createStateMachine();
+	}
+
+	public GhostName getName() {
+		return name;
 	}
 
 	public int getColor() {
@@ -79,8 +86,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	@Override
+	protected StateMachine<State, GameEvent> getStateMachine() {
+		return sm;
+	}
+
 	protected StateMachine<State, GameEvent> createStateMachine() {
-		StateMachine<State, GameEvent> sm = new StateMachine<>(getName(), State.class, State.SAFE);
+		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class,
+				State.SAFE);
 
 		// SAFE
 

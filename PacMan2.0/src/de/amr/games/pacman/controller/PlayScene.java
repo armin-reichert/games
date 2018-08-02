@@ -1,7 +1,6 @@
 package de.amr.games.pacman.controller;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.pacman.model.TileContent.ENERGIZER;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -24,11 +23,13 @@ import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.model.TileContent;
 import de.amr.games.pacman.ui.GameInfo;
 import de.amr.games.pacman.ui.HUD;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.games.pacman.ui.StatusUI;
+import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
@@ -245,13 +246,8 @@ public class PlayScene implements ViewController {
 
 	// Game event handling
 
-	@SuppressWarnings("unchecked")
-	private <E extends GameEvent> E event(StateTransition<State, GameEvent> t) {
-		return (E) t.event().get();
-	}
-
 	private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
-		PacManGhostCollisionEvent e = event(t);
+		PacManGhostCollisionEvent e = t.typedEvent();
 		switch (e.ghost.getState()) {
 		case AGGRO:
 		case SAFE:
@@ -271,20 +267,20 @@ public class PlayScene implements ViewController {
 	}
 
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
-		PacManKilledEvent e = event(t);
+		PacManKilledEvent e = t.typedEvent();
 		e.pacMan.processEvent(e);
 		LOG.info(
 				() -> String.format("PacMan killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
-		GhostKilledEvent e = event(t);
+		GhostKilledEvent e = t.typedEvent();
 		e.ghost.processEvent(e);
 		LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onFoodFound(StateTransition<State, GameEvent> t) {
-		FoodFoundEvent e = event(t);
+		FoodFoundEvent e = t.typedEvent();
 		maze.clearTile(e.tile);
 		game.foodEaten += 1;
 		int oldGameScore = game.score;
@@ -296,12 +292,10 @@ public class PlayScene implements ViewController {
 			gameControl.enqueue(new LevelCompletedEvent());
 			return;
 		}
-		if (game.foodEaten == Game.FOOD_EATEN_BONUS_1) {
-			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
-		} else if (game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
-			mazeUI.addBonus(game.getBonusSymbol(), game.getBonusValue(), game.sec(9));
+		if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
+			mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.sec(9));
 		}
-		if (e.food == ENERGIZER) {
+		if (e.food == TileContent.ENERGIZER) {
 			game.ghostIndex = 0;
 			gameControl
 					.enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan(), game.getPacManEmpoweringTime()));
@@ -309,23 +303,23 @@ public class PlayScene implements ViewController {
 	}
 
 	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
-		PacManGainsPowerEvent e = event(t);
+		PacManGainsPowerEvent e = t.typedEvent();
 		e.pacMan.processEvent(e);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 
 	private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
-		PacManLosesPowerEvent e = event(t);
+		PacManLosesPowerEvent e = t.typedEvent();
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 
 	private void onPacManLostPower(StateTransition<State, GameEvent> t) {
-		PacManLostPowerEvent e = event(t);
+		PacManLostPowerEvent e = t.typedEvent();
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 
 	private void onBonusFound(StateTransition<State, GameEvent> t) {
-		BonusFoundEvent e = event(t);
+		BonusFoundEvent e = t.typedEvent();
 		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 		game.score += e.value;
 		mazeUI.honorAndRemoveBonus(game.sec(2));

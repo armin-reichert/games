@@ -23,6 +23,7 @@ import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.GhostName;
 import de.amr.games.pacman.ui.actor.PacMan;
 
 public class GameInfo implements ViewController {
@@ -78,16 +79,16 @@ public class GameInfo implements ViewController {
 			eatAllPellets();
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(MazeUI.GhostName.BLINKY);
+			toggleGhost(GhostName.BLINKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(MazeUI.GhostName.PINKY);
+			toggleGhost(GhostName.PINKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(MazeUI.GhostName.INKY);
+			toggleGhost(GhostName.INKY);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(MazeUI.GhostName.CLYDE);
+			toggleGhost(GhostName.CLYDE);
 		}
 	}
 
@@ -160,7 +161,7 @@ public class GameInfo implements ViewController {
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
 	}
 
-	private void toggleGhost(MazeUI.GhostName ghostName) {
+	private void toggleGhost(GhostName ghostName) {
 		mazeUI.setGhostActive(ghostName, !mazeUI.isGhostActive(ghostName));
 	}
 

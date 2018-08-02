@@ -32,9 +32,11 @@ import de.amr.statemachine.StateMachine;
 public class PacMan extends MazeMover<PacMan.State> {
 
 	public final Set<GameEntity> environment = new HashSet<>();
+	private final StateMachine<State, GameEvent> sm;
 
 	public PacMan(Game game, Maze maze, Tile home) {
-		super(game, maze, "Pac-Man", home, new EnumMap<>(State.class));
+		super(game, maze, home, new EnumMap<>(State.class));
+		sm = createStateMachine();
 		createSprites();
 		currentSprite = s_walking[Top4.E]; // TODO
 	}
@@ -71,6 +73,10 @@ public class PacMan extends MazeMover<PacMan.State> {
 	};
 
 	@Override
+	protected StateMachine<State, GameEvent> getStateMachine() {
+		return sm;
+	}
+
 	protected StateMachine<State, GameEvent> createStateMachine() {
 		StateMachine<State, GameEvent> sm = new StateMachine<>("Pac-Man", State.class, State.NORMAL);
 
@@ -88,7 +94,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		sm.changeOnInput(PacManKilledEvent.class, State.NORMAL, State.DYING);
 
 		sm.changeOnInput(PacManGainsPowerEvent.class, State.NORMAL, State.EMPOWERED, t -> {
-			PacManGainsPowerEvent e = event(t);
+			PacManGainsPowerEvent e = t.typedEvent();
 			sm.state(State.EMPOWERED).setDuration(e.ticks);
 		});
 

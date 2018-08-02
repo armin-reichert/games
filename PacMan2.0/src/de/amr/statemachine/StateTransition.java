@@ -34,4 +34,16 @@ public interface StateTransition<S, E> {
 	 * @return optional input which triggered transition
 	 */
 	public Optional<E> event();
+
+	/**
+	 * Convenience method which returns the event that triggered this transition.
+	 * 
+	 * @return event that triggered this transition cast to the specific event type or {@code null} if
+	 *         no event triggered this transition
+	 */
+	@SuppressWarnings("unchecked")
+	public default <T extends E> T typedEvent() {
+		Optional<E> event = event();
+		return event.isPresent() ? (T) event().get() : null;
+	}
 }

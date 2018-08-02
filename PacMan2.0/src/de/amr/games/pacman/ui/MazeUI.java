@@ -12,6 +12,7 @@ import static de.amr.games.pacman.routing.impl.NavigationSystem.goHome;
 import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
+import static de.amr.games.pacman.ui.Spritesheet.TS;
 import static de.amr.games.pacman.ui.Spritesheet.TURQUOISE_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.getMazeImage;
 import static de.amr.games.pacman.ui.Spritesheet.getMazeImageWhite;
@@ -34,21 +35,17 @@ import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.GameEventManager;
-import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Energizer;
 import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.GhostName;
 import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.games.pacman.ui.actor.Pellet;
 
 public class MazeUI extends GameEntity {
-
-	public enum GhostName {
-		BLINKY, PINKY, INKY, CLYDE
-	};
 
 	public final GameEventManager eventing = new GameEventManager();
 
@@ -99,39 +96,39 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void createBlinky() {
-		Ghost blinky = new Ghost(game, maze, "Blinky", RED_GHOST, maze.blinkyHome);
+		Ghost blinky = new Ghost(game, maze, GhostName.BLINKY, RED_GHOST, maze.blinkyHome);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
 		blinky.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(GhostName.BLINKY, blinky);
+		ghostsByName.put(blinky.getName(), blinky);
 	}
 
 	private void createPinky() {
-		Ghost pinky = new Ghost(game, maze, "Pinky", PINK_GHOST, maze.pinkyHome);
+		Ghost pinky = new Ghost(game, maze, GhostName.PINKY, PINK_GHOST, maze.pinkyHome);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
 		pinky.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(GhostName.PINKY, pinky);
+		ghostsByName.put(pinky.getName(), pinky);
 	}
 
 	private void createInky() {
-		Ghost inky = new Ghost(game, maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
+		Ghost inky = new Ghost(game, maze, GhostName.INKY, TURQUOISE_GHOST, maze.inkyHome);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(GhostName.INKY, inky);
+		ghostsByName.put(inky.getName(), inky);
 	}
 
 	private void createClyde() {
-		Ghost clyde = new Ghost(game, maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
+		Ghost clyde = new Ghost(game, maze, GhostName.CLYDE, ORANGE_GHOST, maze.clydeHome);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
 		clyde.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(GhostName.CLYDE, clyde);
+		ghostsByName.put(clyde.getName(), clyde);
 	}
 
 	public void initActors() {
@@ -172,12 +169,12 @@ public class MazeUI extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return maze.numCols() * Spritesheet.TS;
+		return maze.numCols() * TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return maze.numRows() * Spritesheet.TS;
+		return maze.numRows() * TS;
 	}
 
 	public Maze getMaze() {
@@ -224,10 +221,9 @@ public class MazeUI extends GameEntity {
 		flashing = on;
 	}
 
-	public void addBonus(BonusSymbol symbol, int value, int ticks) {
-		bonus = new Bonus(symbol, value);
-		bonus.tf.moveTo(maze.infoTile.col * Spritesheet.TS,
-				maze.infoTile.row * Spritesheet.TS - Spritesheet.TS / 2);
+	public void addBonus(Bonus bonus, int ticks) {
+		this.bonus = bonus;
+		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 		bonusTimeLeft = ticks;
 		pacMan.environment.add(bonus);
 	}
@@ -281,22 +277,22 @@ public class MazeUI extends GameEntity {
 
 	private void drawInfoText(Graphics2D g) {
 		Tile tile = maze.infoTile;
-		g.translate((tile.col + 1) * Spritesheet.TS, tile.row * Spritesheet.TS + Spritesheet.TS / 4);
+		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
 		g.setFont(Assets.font("scoreFont"));
 		g.setColor(infoTextColor);
 		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
 		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-		g.translate(-tile.col * Spritesheet.TS, -tile.row * Spritesheet.TS);
+		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 
 	private void drawFood(Graphics2D g, Tile tile) {
-		g.translate(tile.col * Spritesheet.TS, tile.row * Spritesheet.TS);
+		g.translate(tile.col * TS, tile.row * TS);
 		char c = maze.getContent(tile);
 		if (c == PELLET) {
 			pellet.draw(g);
 		} else if (c == ENERGIZER) {
 			energizer.draw(g);
 		}
-		g.translate(-tile.col * Spritesheet.TS, -tile.row * Spritesheet.TS);
+		g.translate(-tile.col * TS, -tile.row * TS);
 	}
 }
