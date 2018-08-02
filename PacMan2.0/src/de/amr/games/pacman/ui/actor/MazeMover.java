@@ -129,8 +129,8 @@ public abstract class MazeMover<S> extends GameEntity {
 		return fnSpeed.apply(this);
 	}
 
-	public void setSpeed(Function<MazeMover<S>, Float> speed) {
-		this.fnSpeed = speed;
+	public void setSpeed(Function<MazeMover<S>, Float> fnSpeed) {
+		this.fnSpeed = fnSpeed;
 	}
 
 	public int getDir() {
@@ -187,7 +187,7 @@ public abstract class MazeMover<S> extends GameEntity {
 			} else if (tile.col < -TELEPORT_LENGTH) {
 				placeAt(maze.numCols() - 1, tile.row);
 			} else {
-				tf.moveTo(computePosition(dir, fnSpeed.apply(this)));
+				tf.moveTo(computePosition(dir));
 			}
 			return;
 		}
@@ -196,7 +196,7 @@ public abstract class MazeMover<S> extends GameEntity {
 			dir = nextDir;
 		}
 		if (canMove(dir)) {
-			tf.moveTo(computePosition(dir, fnSpeed.apply(this)));
+			tf.moveTo(computePosition(dir));
 		} else {
 			// adjust exactly over tile
 			setMazePosition(tile);
@@ -224,7 +224,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	}
 
 	public Tile computeNextTile(Tile current, int dir) {
-		Vector2f nextPosition = computePosition(dir, fnSpeed.apply(this));
+		Vector2f nextPosition = computePosition(dir);
 		float x = nextPosition.x, y = nextPosition.y;
 		switch (dir) {
 		case Top4.W:
@@ -240,8 +240,8 @@ public abstract class MazeMover<S> extends GameEntity {
 		}
 	}
 
-	private Vector2f computePosition(int dir, float speed) {
+	private Vector2f computePosition(int dir) {
 		Vector2f v_dir = Vector2f.of(TOPOLOGY.dx(dir), TOPOLOGY.dy(dir));
-		return sum(tf.getPosition(), smul(speed, v_dir));
+		return sum(tf.getPosition(), smul(getSpeed(), v_dir));
 	}
 }
