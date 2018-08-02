@@ -228,11 +228,11 @@ public class GameController extends StateMachine<State, GameEvent> {
 			return;
 		}
 		if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
-			mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.sec(9));
+			mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
 		}
 		if (e.food == TileContent.ENERGIZER) {
 			game.ghostIndex = 0;
-			enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan(), game.getPacManEmpoweringTime()));
+			enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan()));
 		}
 	}
 
@@ -256,7 +256,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		BonusFoundEvent e = t.typedEvent();
 		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 		game.score += e.value;
-		mazeUI.honorAndRemoveBonus(game.sec(2));
+		mazeUI.consumeBonus(game.sec(2));
 	}
-
 }

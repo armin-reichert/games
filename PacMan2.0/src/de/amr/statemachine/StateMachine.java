@@ -246,6 +246,13 @@ public class StateMachine<S, E> {
 
 	private void processTransition(Transition transition, E input) {
 		transition.event = input;
+		getLogger().ifPresent(log -> {
+			if (input != null) {
+				traceInputStateChange(input, transition.from, transition.to);
+			} else {
+				traceStateChange(transition.from, transition.to);
+			}
+		});
 		if (currentStateLabel == transition.to) {
 			// state loop, no exit/entry actions are executed
 			if (transition.action != null) {
@@ -265,13 +272,6 @@ public class StateMachine<S, E> {
 			traceStateEntry();
 			state().doEntry();
 		}
-		getLogger().ifPresent(log -> {
-			if (input != null) {
-				traceInputStateChange(input, transition.from, transition.to);
-			} else {
-				traceStateChange(transition.from, transition.to);
-			}
-		});
 	}
 
 	private List<Transition> transitions(S stateLabel) {
@@ -308,13 +308,7 @@ public class StateMachine<S, E> {
 
 	private void traceInputStateChange(E input, S oldState, S newState) {
 		getLogger().ifPresent(log -> {
-			if (oldState != newState) {
-				log.info(String.format("FSM(%s) processes %s and changes from '%s' to '%s'", description,
-						input, oldState, newState));
-			} else {
-				log.info(String.format("FSM(%s) processes %s and stays in state '%s'", description, input,
-						oldState));
-			}
+			log.info(String.format("FSM(%s) processes %s", description, input));
 		});
 	}
 

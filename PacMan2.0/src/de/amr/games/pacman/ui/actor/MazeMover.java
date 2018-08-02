@@ -55,7 +55,7 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// State machine
 
-	protected abstract StateMachine<S, GameEvent> getStateMachine();
+	public abstract StateMachine<S, GameEvent> getStateMachine();
 
 	public S getState() {
 		return getStateMachine().currentStateLabel();

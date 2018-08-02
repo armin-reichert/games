@@ -80,7 +80,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	@Override
-	protected StateMachine<State, GameEvent> getStateMachine() {
+	public StateMachine<State, GameEvent> getStateMachine() {
 		return sm;
 	}
 

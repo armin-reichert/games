@@ -236,7 +236,7 @@ public class MazeUI extends GameEntity {
 		}
 	}
 
-	public void honorAndRemoveBonus(int ticks) {
+	public void consumeBonus(int ticks) {
 		if (bonus != null) {
 			pacMan.environment.remove(bonus);
 			bonus.setHonored();

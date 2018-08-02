@@ -73,7 +73,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	};
 
 	@Override
-	protected StateMachine<State, GameEvent> getStateMachine() {
+	public StateMachine<State, GameEvent> getStateMachine() {
 		return sm;
 	}
 
@@ -83,6 +83,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 		// NORMAL
 
 		sm.state(State.NORMAL).entry = state -> {
+			setMazePosition(homeTile);
+			setDir(Top4.E);
+			setNextDir(Top4.E);
+			setSpeed(game::getPacManSpeed);
+			getSprites().forEach(Sprite::resetAnimation);
 			currentSprite = s_walking[getDir()];
 		};
 
@@ -93,23 +98,24 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 		sm.changeOnInput(PacManKilledEvent.class, State.NORMAL, State.DYING);
 
-		sm.changeOnInput(PacManGainsPowerEvent.class, State.NORMAL, State.EMPOWERED, t -> {
-			PacManGainsPowerEvent e = t.typedEvent();
-			sm.state(State.EMPOWERED).setDuration(e.ticks);
-		});
+		sm.changeOnInput(PacManGainsPowerEvent.class, State.NORMAL, State.EMPOWERED);
 
 		// EMPOWERED
 
+		sm.state(State.EMPOWERED).entry = state -> {
+			state.setDuration(game.getPacManEmpoweringTime());
+		};
+		
 		sm.state(State.EMPOWERED).update = state -> {
 			currentSprite = s_walking[getDir()];
 			walkMaze();
-			if (state.getRemaining() == state.getDuration() * 80 / 100) {
+			if (state.getRemaining() == state.getDuration() * 20/100) {
 				eventMgr.publish(new PacManLosesPowerEvent(this));
 			}
 		};
 
 		sm.changeOnTimeout(State.EMPOWERED, State.NORMAL,
-				t -> eventMgr.publish(new PacManLostPowerEvent(this)));
+				t -> eventMgr.publish(new PacManLostPowerEvent()));
 
 		// DYING
 
@@ -118,7 +124,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			currentSprite = s_dying;
 		};
 
-		sm.changeOnTimeout(State.DYING, State.NORMAL, t -> {
+		sm.changeOnTimeout(State.DYING, State.DYING, t -> {
 			eventMgr.publish(new PacManDiedEvent());
 		});
 
@@ -127,11 +133,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public void init() {
-		setMazePosition(homeTile);
-		setDir(Top4.E);
-		setNextDir(Top4.E);
-		setSpeed(game::getPacManSpeed);
-		getSprites().forEach(Sprite::resetAnimation);
 		sm.init();
 	}
 
