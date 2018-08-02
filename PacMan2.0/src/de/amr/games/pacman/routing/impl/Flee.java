@@ -26,6 +26,10 @@ class Flee implements RoutePlanner {
 		corners.add(new Tile(1, maze.numRows() - 2));
 		corners.add(new Tile(maze.numCols() - 2, maze.numRows() - 2));
 		RouteData route = new RouteData();
+		if (!maze.isValidTile(chaser.getTile()) || !maze.isValidTile(refugee.getTile())) {
+			route.dir = refugee.getNextDir();
+			return route; // either chaser or refugee is teleporting
+		}
 		int max = 0;
 		Tile farestCorner = null;
 		for (Tile corner : corners) {
