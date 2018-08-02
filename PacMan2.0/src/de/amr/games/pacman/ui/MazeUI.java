@@ -47,7 +47,7 @@ import de.amr.games.pacman.ui.actor.Pellet;
 
 public class MazeUI extends GameEntity {
 
-	public final GameEventManager eventing = new GameEventManager();
+	public final GameEventManager eventMgr = new GameEventManager();
 
 	private final Game game;
 	private final Maze maze;

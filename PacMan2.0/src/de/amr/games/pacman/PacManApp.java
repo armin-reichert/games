@@ -4,8 +4,8 @@ import java.util.logging.Level;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.games.pacman.controller.PlayScene;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.ui.PlayScene;
 import de.amr.games.pacman.ui.Spritesheet;
 
 public class PacManApp extends Application {
@@ -23,11 +23,11 @@ public class PacManApp extends Application {
 		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
 		settings.title = "PacMan 2.0";
 		pulse.setFrequency(60);
+		LOG.setLevel(Level.INFO);
 	}
 
 	@Override
 	public void init() {
-		Application.LOG.setLevel(Level.OFF);
 		setController(new PlayScene(this));
 	}
 }

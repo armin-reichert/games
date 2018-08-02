@@ -73,6 +73,7 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	public void processEvent(GameEvent e) {
 		getStateMachine().enqueue(e);
+		getStateMachine().update();
 	}
 
 	// Display
