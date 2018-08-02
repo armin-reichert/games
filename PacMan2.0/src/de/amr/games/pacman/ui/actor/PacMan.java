@@ -51,8 +51,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		int size = 2 * Spritesheet.TS;
 		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size).animation(AnimationMode.BACK_AND_FORTH,
-					80);
+			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size).animation(AnimationMode.BACK_AND_FORTH, 80);
 		});
 	}
 

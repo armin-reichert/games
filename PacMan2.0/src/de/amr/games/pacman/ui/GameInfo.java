@@ -157,8 +157,8 @@ public class GameInfo implements ViewController {
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
 		mazeUI.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
 			StateObject state = ghost.getStateMachine().state();
-			String txt = state.getDuration() != StateObject.FOREVER ? String.format("%s(%s,%d|%d)",
-					ghost.getState(), ghost.getName(), state.getDuration(), state.getRemaining())
+			String txt = state.getDuration() != StateObject.FOREVER
+					? String.format("%s(%s,%d|%d)", ghost.getState(), ghost.getName(), state.getDuration(), state.getRemaining())
 					: String.format("%s(%s)", ghost.getState(), ghost.getName());
 			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
 		});

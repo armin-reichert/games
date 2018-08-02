@@ -227,15 +227,15 @@ public class StateMachine<S, E> {
 	}
 
 	private void processInput(E input) {
-		Optional<Transition> match = transitions(currentStateLabel).stream()
-				.filter(t -> t.condition.getAsBoolean()).findFirst();
+		Optional<Transition> match = transitions(currentStateLabel).stream().filter(t -> t.condition.getAsBoolean())
+				.findFirst();
 		if (match.isPresent()) {
 			Transition t = match.get();
 			processTransition(t, input);
 		} else {
 			if (input != null) {
-				getLogger().ifPresent(log -> log
-						.info(String.format("FSM(%s) in state %s ignored input %s. No matching transition was found",
+				getLogger().ifPresent(
+						log -> log.info(String.format("FSM(%s) in state %s ignored input %s. No matching transition was found",
 								description, currentStateLabel, input)));
 			}
 			state().doUpdate();
@@ -310,14 +310,12 @@ public class StateMachine<S, E> {
 	}
 
 	private void traceStateExit() {
-		getLogger().ifPresent(
-				log -> log.info(String.format("FSM(%s) exits state '%s'", description, currentStateLabel())));
+		getLogger().ifPresent(log -> log.info(String.format("FSM(%s) exits state '%s'", description, currentStateLabel())));
 	}
 
 	// methods for specifying the transitions
 
-	private void addTransition(S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, E>> action) {
+	private void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		Transition transition = new Transition();
 		transition.from = from;
 		transition.to = to;
@@ -429,8 +427,7 @@ public class StateMachine<S, E> {
 	 * @param action
 	 *                    code which will be executed when this transition occurs
 	 */
-	public void changeOnTimeout(S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, E>> action) {
+	public void changeOnTimeout(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, () -> state(from).isTerminated() && condition.getAsBoolean(), action);
 	}
 
@@ -479,8 +476,7 @@ public class StateMachine<S, E> {
 	 * @param action
 	 *                    performed action
 	 */
-	public void changeOnInput(Class<? extends E> eventType, S from, S to,
-			Consumer<StateTransition<S, E>> action) {
+	public void changeOnInput(Class<? extends E> eventType, S from, S to, Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, () -> hasMatchingInput(eventType), action);
 	}
 

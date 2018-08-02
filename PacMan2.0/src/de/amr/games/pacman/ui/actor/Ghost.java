@@ -53,8 +53,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void createSprites(int color) {
 		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_color[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
-					.animation(AnimationMode.BACK_AND_FORTH, 300);
+			s_color[dir] = new Sprite(getGhostNormal(color, dir)).scale(size).animation(AnimationMode.BACK_AND_FORTH, 300);
 			s_eyes[dir] = new Sprite(getGhostEyes(dir)).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
@@ -66,8 +65,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream
-				.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes), Stream.of(s_blue, s_blinking))
+		return Stream.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes), Stream.of(s_blue, s_blinking))
 				.flatMap(s -> s);
 	}
 

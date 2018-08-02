@@ -81,8 +81,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		// center sprite over collision box
-		int dx = (getWidth() - currentSprite().getWidth()) / 2,
-				dy = (getHeight() - currentSprite().getHeight()) / 2;
+		int dx = (getWidth() - currentSprite().getWidth()) / 2, dy = (getHeight() - currentSprite().getHeight()) / 2;
 		g.translate(dx, dy);
 		super.draw(g);
 		g.translate(-dx, -dy);

@@ -81,8 +81,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 		changeOnInput(BonusFoundEvent.class, State.PLAYING, State.PLAYING, this::onBonusFound);
 
-		changeOnInput(PacManGhostCollisionEvent.class, State.PLAYING, State.PLAYING,
-				this::onPacManGhostCollision);
+		changeOnInput(PacManGhostCollisionEvent.class, State.PLAYING, State.PLAYING, this::onPacManGhostCollision);
 
 		changeOnInput(GhostKilledEvent.class, State.PLAYING, State.GHOST_DYING, this::onGhostKilled);
 
