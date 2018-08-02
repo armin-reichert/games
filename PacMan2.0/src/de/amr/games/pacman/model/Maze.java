@@ -40,8 +40,7 @@ public class Maze {
 	public Maze(String map) {
 		data = map.split("\n");
 		int numCols = data[0].length(), numRows = data.length;
-		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, v -> EMPTY, (u, v) -> 1,
-				UndirectedEdge::new);
+		graph = new GridGraph<>(numCols, numRows, TOPOLOGY, v -> EMPTY, (u, v) -> 1, UndirectedEdge::new);
 		graph.setDefaultVertexLabel(v -> data(graph.row(v), graph.col(v)));
 		foodCount = 0;
 		for (int row = 0; row < numRows; ++row) {
@@ -118,7 +117,7 @@ public class Maze {
 	public boolean hasAdjacentTile(Tile t1, Tile t2) {
 		return graph.adjacent(cell(t1), cell(t2));
 	}
-	
+
 	public Optional<Tile> neighborTile(Tile tile, int dir) {
 		OptionalInt neighbor = graph.neighbor(cell(tile), dir);
 		return neighbor.isPresent() ? Optional.of(tile(neighbor.getAsInt())) : Optional.empty();

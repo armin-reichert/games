@@ -66,8 +66,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes),
-				Stream.of(s_blue, s_blinking)).flatMap(s -> s);
+		return Stream
+				.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes), Stream.of(s_blue, s_blinking))
+				.flatMap(s -> s);
 	}
 
 	@Override
@@ -87,8 +88,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	protected StateMachine<State, GameEvent> createStateMachine() {
-		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class,
-				State.SAFE);
+		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class, State.SAFE);
 
 		// SAFE
 
@@ -102,7 +102,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		sm.changeOnTimeout(State.SAFE, State.AGGRO, () -> pacMan.getState() != PacMan.State.EMPOWERED);
 
 		sm.changeOnTimeout(State.SAFE, State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
-		
+
 		sm.changeOnInput(PacManLosesPowerEvent.class, State.SAFE, State.AGGRO);
 
 		// AGGRO

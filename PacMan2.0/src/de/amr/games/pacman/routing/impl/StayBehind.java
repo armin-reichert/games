@@ -15,8 +15,8 @@ class StayBehind implements RoutePlanner {
 	@Override
 	public Route computeRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
-		result.dir = randomElement(
-				Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(mover.getDir()))).getAsInt();
+		result.dir = randomElement(Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(mover.getDir())))
+				.getAsInt();
 		return result;
 	}
 }

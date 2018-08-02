@@ -188,8 +188,7 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	public boolean canMove(int direction) {
 		Tile current = getTile();
-		if (direction == Top4.W && current.col <= 0
-				|| direction == Top4.E && current.col >= maze.numCols() - 1) {
+		if (direction == Top4.W && current.col <= 0 || direction == Top4.E && current.col >= maze.numCols() - 1) {
 			return true; // teleport
 		}
 		Tile next = computeNextTile(current, direction);

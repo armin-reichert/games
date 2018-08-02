@@ -66,11 +66,11 @@ public class StateMachine<S, E> {
 	 * Creates a new state machine.
 	 * 
 	 * @param description
-	 *          a string describing this state machine, used for logging
+	 *                            a string describing this state machine, used for logging
 	 * @param stateLabelType
-	 *          type used for labeling the states, for example an enumeration type
+	 *                            type used for labeling the states, for example an enumeration type
 	 * @param initialStateLabel
-	 *          the label of the initial state
+	 *                            the label of the initial state
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public StateMachine(String description, Class<S> stateLabelType, S initialStateLabel) {
@@ -85,7 +85,7 @@ public class StateMachine<S, E> {
 	 * Sets a logger.
 	 * 
 	 * @param logger
-	 *          a logger
+	 *                 a logger
 	 */
 	public void setLogger(Logger logger) {
 		this.logger = logger;
@@ -106,8 +106,8 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * Initializes this state machine by switching to the initial state and executing an optional
-	 * entry action.
+	 * Initializes this state machine by switching to the initial state and executing an optional entry
+	 * action.
 	 */
 	public void init() {
 		currentStateLabel = initialStateLabel;
@@ -119,7 +119,7 @@ public class StateMachine<S, E> {
 	 * Adds an input ("event") to the queue of this state machine.
 	 * 
 	 * @param input
-	 *          some input/event
+	 *                some input/event
 	 */
 	public void enqueue(E input) {
 		inputQ.add(input);
@@ -138,7 +138,7 @@ public class StateMachine<S, E> {
 	 * Tells if the state machine is in any of the given states.
 	 * 
 	 * @param stateLabels
-	 *          non-empty list of state labels
+	 *                      non-empty list of state labels
 	 * @return <code>true</code> if the state machine is in any of the given states
 	 */
 	@SuppressWarnings("unchecked")
@@ -151,12 +151,11 @@ public class StateMachine<S, E> {
 
 	/**
 	 * @param state
-	 *          a state object
+	 *                a state object
 	 * @return the label of the given state object
 	 */
 	public Optional<S> label(StateObject state) {
-		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey)
-				.findFirst();
+		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey).findFirst();
 	}
 
 	/**
@@ -183,14 +182,13 @@ public class StateMachine<S, E> {
 	 * Returns the state object with the given label. The state object is created on demand.
 	 * 
 	 * @param stateLabel
-	 *          a state label
+	 *                     a state label
 	 * @return the state object for the given label
 	 */
 	public StateObject state(S stateLabel) {
 		if (!stateMap.containsKey(stateLabel)) {
 			stateMap.put(stateLabel, new StateObject());
-			getLogger().ifPresent(
-					log -> log.info(String.format("Created state %s:%s ", description, stateLabel)));
+			getLogger().ifPresent(log -> log.info(String.format("Created state %s:%s ", description, stateLabel)));
 		}
 		return stateMap.get(stateLabel);
 	}
@@ -199,7 +197,7 @@ public class StateMachine<S, E> {
 	 * Set pause timer for given number of ticks.
 	 * 
 	 * @param ticks
-	 *          number of ticks the state machine should pause updates
+	 *                number of ticks the state machine should pause updates
 	 */
 	public void pause(int ticks) {
 		if (pauseTime < 0) {
@@ -236,8 +234,8 @@ public class StateMachine<S, E> {
 			processTransition(t, input);
 		} else {
 			if (input != null) {
-				getLogger().ifPresent(log -> log.info(
-						String.format("FSM(%s) in state %s ignored input %s. No matching transition was found",
+				getLogger().ifPresent(log -> log
+						.info(String.format("FSM(%s) in state %s ignored input %s. No matching transition was found",
 								description, currentStateLabel, input)));
 			}
 			state().doUpdate();
@@ -287,8 +285,8 @@ public class StateMachine<S, E> {
 		getLogger().ifPresent(log -> {
 			if (state().getDuration() != StateObject.FOREVER) {
 				float seconds = state().getDuration() / fnPulse.getAsInt();
-				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)",
-						description, currentStateLabel(), seconds, state().getDuration()));
+				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description,
+						currentStateLabel(), seconds, state().getDuration()));
 			} else {
 				log.info(String.format("FSM(%s) enters state '%s'", description, currentStateLabel()));
 			}
@@ -298,8 +296,7 @@ public class StateMachine<S, E> {
 	private void traceStateChange(S oldState, S newState) {
 		getLogger().ifPresent(log -> {
 			if (oldState != newState) {
-				log.info(
-						String.format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
+				log.info(String.format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
 			} else {
 				log.info(String.format("FSM(%s) stays in state '%s'", description, oldState));
 			}
@@ -313,8 +310,8 @@ public class StateMachine<S, E> {
 	}
 
 	private void traceStateExit() {
-		getLogger().ifPresent(log -> log
-				.info(String.format("FSM(%s) exits state '%s'", description, currentStateLabel())));
+		getLogger().ifPresent(
+				log -> log.info(String.format("FSM(%s) exits state '%s'", description, currentStateLabel())));
 	}
 
 	// methods for specifying the transitions
@@ -335,16 +332,15 @@ public class StateMachine<S, E> {
 	 * new state is entered.
 	 * 
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param condition
-	 *          the condition which must hold
+	 *                    the condition which must hold
 	 * @param action
-	 *          code which will be executed when this transition occurs
+	 *                    code which will be executed when this transition occurs
 	 */
-	public void change(S from, S to, BooleanSupplier condition,
-			Consumer<StateTransition<S, E>> action) {
+	public void change(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, condition, action);
 	}
 
@@ -353,11 +349,11 @@ public class StateMachine<S, E> {
 	 * holds.
 	 * 
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param condition
-	 *          the condition which must hold
+	 *                    the condition which must hold
 	 */
 	public void change(S from, S to, BooleanSupplier condition) {
 		addTransition(from, to, condition, (Consumer<StateTransition<S, E>>) null);
@@ -367,9 +363,9 @@ public class StateMachine<S, E> {
 	 * Defines a transition between the given states which can always be fired.
 	 * 
 	 * @param from
-	 *          the source state
+	 *               the source state
 	 * @param to
-	 *          the target state
+	 *               the target state
 	 */
 	public void change(S from, S to) {
 		change(from, to, () -> true);
@@ -380,9 +376,9 @@ public class StateMachine<S, E> {
 	 * timeout.
 	 * 
 	 * @param from
-	 *          the source state
+	 *               the source state
 	 * @param to
-	 *          the target state
+	 *               the target state
 	 */
 	public void changeOnTimeout(S from, S to) {
 		changeOnTimeout(from, to, t -> {
@@ -394,11 +390,11 @@ public class StateMachine<S, E> {
 	 * timeout and the given condition holds.
 	 * 
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param condition
-	 *          some condition
+	 *                    some condition
 	 */
 	public void changeOnTimeout(S from, S to, BooleanSupplier condition) {
 		changeOnTimeout(from, to, condition, t -> {
@@ -410,11 +406,11 @@ public class StateMachine<S, E> {
 	 * timeout.
 	 * 
 	 * @param from
-	 *          the source state
+	 *                 the source state
 	 * @param to
-	 *          the target state
+	 *                 the target state
 	 * @param action
-	 *          code which will be executed when this transition occurs
+	 *                 code which will be executed when this transition occurs
 	 */
 	public void changeOnTimeout(S from, S to, Consumer<StateTransition<S, E>> action) {
 		addTransition(from, to, () -> state(from).isTerminated(), action);
@@ -425,13 +421,13 @@ public class StateMachine<S, E> {
 	 * timeout and the given condition holds.
 	 * 
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param condition
-	 *          some condition
+	 *                    some condition
 	 * @param action
-	 *          code which will be executed when this transition occurs
+	 *                    code which will be executed when this transition occurs
 	 */
 	public void changeOnTimeout(S from, S to, BooleanSupplier condition,
 			Consumer<StateTransition<S, E>> action) {
@@ -443,11 +439,11 @@ public class StateMachine<S, E> {
 	 * the transition.
 	 * 
 	 * @param eventType
-	 *          type of events matching the transition
+	 *                    type of events matching the transition
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 */
 	public void changeOnInput(Class<? extends E> eventType, S from, S to) {
 		change(from, to, () -> hasMatchingInput(eventType));
@@ -458,13 +454,13 @@ public class StateMachine<S, E> {
 	 * the transition and the given condition holds.
 	 * 
 	 * @param eventType
-	 *          type of events matching the transition
+	 *                    type of events matching the transition
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param condition
-	 *          some condition
+	 *                    some condition
 	 */
 	public void changeOnInput(Class<? extends E> eventType, S from, S to, BooleanSupplier condition) {
 		change(from, to, () -> hasMatchingInput(eventType) && condition.getAsBoolean());
@@ -475,13 +471,13 @@ public class StateMachine<S, E> {
 	 * the transition.
 	 * 
 	 * @param eventType
-	 *          type of events matching the transition
+	 *                    type of events matching the transition
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param action
-	 *          performed action
+	 *                    performed action
 	 */
 	public void changeOnInput(Class<? extends E> eventType, S from, S to,
 			Consumer<StateTransition<S, E>> action) {
@@ -493,15 +489,15 @@ public class StateMachine<S, E> {
 	 * the transition.
 	 * 
 	 * @param eventType
-	 *          type of events matching the transition
+	 *                    type of events matching the transition
 	 * @param from
-	 *          the source state
+	 *                    the source state
 	 * @param to
-	 *          the target state
+	 *                    the target state
 	 * @param condition
-	 *          some condition
+	 *                    some condition
 	 * @param action
-	 *          performed action
+	 *                    performed action
 	 */
 	public void changeOnInput(Class<? extends E> eventType, S from, S to, BooleanSupplier condition,
 			Consumer<StateTransition<S, E>> action) {

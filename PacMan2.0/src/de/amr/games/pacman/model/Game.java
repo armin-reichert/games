@@ -65,7 +65,7 @@ public class Game {
 	public int getBonusValue() {
 		return (int) LEVELS[level][1];
 	}
-	
+
 	public int getBonusTime() {
 		return sec(9);
 	}

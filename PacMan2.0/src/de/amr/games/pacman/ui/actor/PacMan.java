@@ -51,8 +51,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 		int size = 2 * Spritesheet.TS;
 		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size)
-					.animation(AnimationMode.BACK_AND_FORTH, 80);
+			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size).animation(AnimationMode.BACK_AND_FORTH,
+					80);
 		});
 	}
 
@@ -89,9 +89,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 			getSprites().forEach(Sprite::resetAnimation);
 			currentSprite = s_walking[getDir()];
 		};
-		
+
 		sm.change(State.INITIAL, State.NORMAL);
-		
+
 		// NORMAL
 
 		sm.state(State.NORMAL).entry = state -> {
@@ -112,17 +112,16 @@ public class PacMan extends MazeMover<PacMan.State> {
 		sm.state(State.EMPOWERED).entry = state -> {
 			state.setDuration(game.getPacManEmpoweringTime());
 		};
-		
+
 		sm.state(State.EMPOWERED).update = state -> {
 			currentSprite = s_walking[getDir()];
 			walkMaze();
-			if (state.getRemaining() == state.getDuration() * 20/100) {
+			if (state.getRemaining() == state.getDuration() * 20 / 100) {
 				eventMgr.publish(new PacManLosesPowerEvent(this));
 			}
 		};
 
-		sm.changeOnTimeout(State.EMPOWERED, State.NORMAL,
-				t -> eventMgr.publish(new PacManLostPowerEvent()));
+		sm.changeOnTimeout(State.EMPOWERED, State.NORMAL, t -> eventMgr.publish(new PacManLostPowerEvent()));
 
 		// DYING
 

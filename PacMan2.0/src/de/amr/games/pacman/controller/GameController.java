@@ -59,8 +59,8 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!", Color.YELLOW);
-			
-			//TODO remove
+
+			// TODO remove
 			mazeUI.setGhostActive(GhostName.PINKY, false);
 			mazeUI.setGhostActive(GhostName.INKY, false);
 			mazeUI.setGhostActive(GhostName.CLYDE, false);
@@ -86,14 +86,11 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 		changeOnInput(GhostKilledEvent.class, State.PLAYING, State.GHOST_DYING, this::onGhostKilled);
 
-		changeOnInput(PacManGainsPowerEvent.class, State.PLAYING, State.PLAYING,
-				this::onPacManGainsPower);
+		changeOnInput(PacManGainsPowerEvent.class, State.PLAYING, State.PLAYING, this::onPacManGainsPower);
 
-		changeOnInput(PacManLosesPowerEvent.class, State.PLAYING, State.PLAYING,
-				this::onPacManLosesPower);
+		changeOnInput(PacManLosesPowerEvent.class, State.PLAYING, State.PLAYING, this::onPacManLosesPower);
 
-		changeOnInput(PacManLostPowerEvent.class, State.PLAYING, State.PLAYING,
-				this::onPacManLostPower);
+		changeOnInput(PacManLostPowerEvent.class, State.PLAYING, State.PLAYING, this::onPacManLostPower);
 
 		changeOnInput(PacManKilledEvent.class, State.PLAYING, State.PACMAN_DYING, this::onPacManKilled);
 
@@ -128,8 +125,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		};
 
 		state(State.GHOST_DYING).update = state -> {
-			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING)
-					.forEach(Ghost::update);
+			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(Ghost::update);
 		};
 
 		changeOnTimeout(State.GHOST_DYING, State.PLAYING);
@@ -149,13 +145,11 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.getPacMan().update();
 		};
 
-		changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.GAME_OVER,
-				() -> game.lives == 0);
+		changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
 
-		changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0,
-				t -> {
-					mazeUI.initActors();
-				});
+		changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
+			mazeUI.initActors();
+		});
 
 		state(State.PACMAN_DYING).exit = state -> {
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
@@ -210,8 +204,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
 		PacManKilledEvent e = t.typedEvent();
 		e.pacMan.processEvent(e);
-		LOG.info(
-				() -> String.format("PacMan killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
+		LOG.info(() -> String.format("PacMan killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
 	}
 
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
