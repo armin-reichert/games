@@ -9,6 +9,7 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.ui.actor.GhostName;
 
 public class PlayScene implements ViewController {
 
@@ -42,6 +43,11 @@ public class PlayScene implements ViewController {
 		gameControl.setLogger(LOG);
 		mazeUI.getPacMan().getStateMachine().setLogger(LOG);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
+
+		// TODO remove
+		mazeUI.setGhostActive(GhostName.PINKY, false);
+		mazeUI.setGhostActive(GhostName.INKY, false);
+		mazeUI.setGhostActive(GhostName.CLYDE, false);
 	}
 
 	@Override

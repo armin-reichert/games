@@ -35,6 +35,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		this.name = name;
 		sm = createStateMachine();
 		createSprites(color);
+		currentSprite = s_color[getDir()];
 	}
 
 	public GhostName getName() {
@@ -73,7 +74,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public Sprite currentSprite() {
 		return currentSprite;
 	}
-
+	
 	// State machine
 
 	public enum State {
@@ -92,10 +93,12 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.SAFE).entry = state -> {
 			state.setDuration(game.sec(2));
-			currentSprite = s_color[getDir()];
 		};
 
-		sm.state(State.SAFE).update = state -> move();
+		sm.state(State.SAFE).update = state -> {
+			move();
+			currentSprite = s_color[getDir()];
+		};
 
 		sm.changeOnTimeout(State.SAFE, State.AGGRO, () -> pacMan.getState() != PacMan.State.EMPOWERED);
 
@@ -109,7 +112,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_color[getDir()];
 		};
 
-		sm.state(State.AGGRO).update = state -> move();
+		sm.state(State.AGGRO).update = state -> {
+			move();
+			currentSprite = s_color[getDir()];
+		};
 
 		sm.changeOnInput(PacManGainsPowerEvent.class, State.AGGRO, State.AFRAID);
 
@@ -146,7 +152,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_eyes[getDir()];
 		};
 
-		sm.state(State.DEAD).update = state -> move();
+		sm.state(State.DEAD).update = state -> {
+			move();
+			currentSprite = s_eyes[getDir()];
+		};
 
 		sm.change(State.DEAD, State.SAFE, () -> getTile().equals(homeTile));
 
