@@ -121,10 +121,10 @@ public class GameInfo implements ViewController {
 	private static Image createGridImage(int numRows, int numCols) {
 		GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration();
-		Image image = conf.createCompatibleImage(numCols * TS, numRows * TS, Transparency.TRANSLUCENT);
+		Image image = conf.createCompatibleImage(numCols * TS, numRows * TS + 1, Transparency.TRANSLUCENT);
 		Graphics g = image.getGraphics();
 		g.setColor(Color.LIGHT_GRAY);
-		for (int row = 0; row < numRows + 1; ++row) {
+		for (int row = 0; row <= numRows; ++row) {
 			g.drawLine(0, row * TS, numCols * TS, row * TS);
 		}
 		for (int col = 1; col < numCols; ++col) {

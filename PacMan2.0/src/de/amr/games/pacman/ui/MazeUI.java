@@ -276,13 +276,14 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void drawInfoText(Graphics2D g) {
+		Graphics2D g2 = (Graphics2D)g.create();
 		Tile tile = maze.infoTile;
-		g.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
-		g.setFont(Assets.font("scoreFont"));
-		g.setColor(infoTextColor);
-		Rectangle2D box = g.getFontMetrics().getStringBounds(infoText, g);
-		g.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-		g.translate(-tile.col * TS, -tile.row * TS);
+		g2.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
+		g2.setFont(Assets.font("scoreFont"));
+		g2.setColor(infoTextColor);
+		Rectangle2D box = g2.getFontMetrics().getStringBounds(infoText, g2);
+		g2.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
+		g2.dispose();
 	}
 
 	private void drawFood(Graphics2D g, Tile tile) {

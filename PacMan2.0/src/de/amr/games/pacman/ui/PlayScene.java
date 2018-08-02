@@ -73,9 +73,9 @@ public class PlayScene implements ViewController {
 
 	@Override
 	public void draw(Graphics2D g) {
-		hud.draw(g);
 		mazeUI.draw(g);
-		statusUI.draw(g);
 		gameInfo.draw(g);
+		hud.draw(g);
+		statusUI.draw(g);
 	}
 }
