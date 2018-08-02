@@ -19,14 +19,14 @@ public interface StateTransition<S, E> {
 	 * 
 	 * @return state object
 	 */
-	public State from();
+	public StateObject from();
 
 	/**
 	 * The state where this transition leads to.
 	 * 
 	 * @return state object
 	 */
-	public State to();
+	public StateObject to();
 
 	/**
 	 * The input/event which triggered the execution of this transition.

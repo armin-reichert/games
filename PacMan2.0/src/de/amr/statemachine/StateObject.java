@@ -7,19 +7,19 @@ import java.util.function.Consumer;
  * 
  * @author Armin Reichert
  */
-public class State {
+public class StateObject {
 
 	/** Constant for defining an unlimited duration. */
 	public static final int FOREVER = Integer.MAX_VALUE;
 
 	/** The action performed when entering this state. */
-	public Consumer<State> entry;
+	public Consumer<StateObject> entry;
 
 	/** The action performed when an update occurs during this state. */
-	public Consumer<State> update;
+	public Consumer<StateObject> update;
 
 	/** The action performed when leaving this state. */
-	public Consumer<State> exit;
+	public Consumer<StateObject> exit;
 
 	/** The duration until this state terminates. */
 	private int duration;
@@ -30,7 +30,7 @@ public class State {
 	/**
 	 * Creates a new state with unlimited duration.
 	 */
-	public State() {
+	public StateObject() {
 		duration = FOREVER;
 		resetTimer();
 	}

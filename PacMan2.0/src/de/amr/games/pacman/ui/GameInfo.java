@@ -25,6 +25,7 @@ import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.GhostName;
 import de.amr.games.pacman.ui.actor.PacMan;
+import de.amr.statemachine.StateObject;
 
 public class GameInfo implements ViewController {
 
@@ -155,7 +156,10 @@ public class GameInfo implements ViewController {
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
 		mazeUI.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
-			String txt = String.format("%s(%s)", ghost.getState(), ghost.getName());
+			StateObject state = ghost.getStateMachine().state();
+			String txt = state.getDuration() != StateObject.FOREVER ? String.format("%s(%s,%d|%d)",
+					ghost.getState(), ghost.getName(), state.getDuration(), state.getRemaining())
+					: String.format("%s(%s)", ghost.getState(), ghost.getName());
 			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
 		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());

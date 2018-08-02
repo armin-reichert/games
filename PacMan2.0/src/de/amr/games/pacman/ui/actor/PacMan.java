@@ -69,7 +69,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	// state machine
 
 	public enum State {
-		NORMAL, EMPOWERED, DYING
+		INITIAL, NORMAL, EMPOWERED, DYING
 	};
 
 	@Override
@@ -78,16 +78,23 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	protected StateMachine<State, GameEvent> createStateMachine() {
-		StateMachine<State, GameEvent> sm = new StateMachine<>("Pac-Man", State.class, State.NORMAL);
+		StateMachine<State, GameEvent> sm = new StateMachine<>("Pac-Man", State.class, State.INITIAL);
 
-		// NORMAL
-
-		sm.state(State.NORMAL).entry = state -> {
+		// INITIAL
+		sm.state(State.INITIAL).entry = state -> {
 			setMazePosition(homeTile);
 			setDir(Top4.E);
 			setNextDir(Top4.E);
 			setSpeed(game::getPacManSpeed);
 			getSprites().forEach(Sprite::resetAnimation);
+			currentSprite = s_walking[getDir()];
+		};
+		
+		sm.change(State.INITIAL, State.NORMAL);
+		
+		// NORMAL
+
+		sm.state(State.NORMAL).entry = state -> {
 			currentSprite = s_walking[getDir()];
 		};
 

@@ -35,12 +35,12 @@ public class StateMachine<S, E> {
 		private Consumer<StateTransition<S, E>> action;
 
 		@Override
-		public State from() {
+		public StateObject from() {
 			return state(from);
 		}
 
 		@Override
-		public State to() {
+		public StateObject to() {
 			return state(to);
 		}
 
@@ -52,7 +52,7 @@ public class StateMachine<S, E> {
 
 	private final String description;
 	private final Deque<E> inputQ;
-	private final Map<S, State> stateMap;
+	private final Map<S, StateObject> stateMap;
 	private final Map<S, List<Transition>> transitionMap;
 	private final S initialStateLabel;
 
@@ -154,7 +154,7 @@ public class StateMachine<S, E> {
 	 *          a state object
 	 * @return the label of the given state object
 	 */
-	public Optional<S> label(State state) {
+	public Optional<S> label(StateObject state) {
 		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey)
 				.findFirst();
 	}
@@ -172,7 +172,7 @@ public class StateMachine<S, E> {
 	 * 
 	 * @return the current state object
 	 */
-	public State state() {
+	public StateObject state() {
 		if (currentStateLabel == null) {
 			throw new IllegalStateException("State machine '" + description + "' not initialized");
 		}
@@ -186,9 +186,9 @@ public class StateMachine<S, E> {
 	 *          a state label
 	 * @return the state object for the given label
 	 */
-	public State state(S stateLabel) {
+	public StateObject state(S stateLabel) {
 		if (!stateMap.containsKey(stateLabel)) {
-			stateMap.put(stateLabel, new State());
+			stateMap.put(stateLabel, new StateObject());
 			getLogger().ifPresent(
 					log -> log.info(String.format("Created state %s:%s ", description, stateLabel)));
 		}
@@ -285,7 +285,7 @@ public class StateMachine<S, E> {
 
 	private void traceStateEntry() {
 		getLogger().ifPresent(log -> {
-			if (state().getDuration() != State.FOREVER) {
+			if (state().getDuration() != StateObject.FOREVER) {
 				float seconds = state().getDuration() / fnPulse.getAsInt();
 				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)",
 						description, currentStateLabel(), seconds, state().getDuration()));

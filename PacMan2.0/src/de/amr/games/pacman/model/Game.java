@@ -90,6 +90,8 @@ public class Game {
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {
 		switch (pacMan.getState()) {
+		case INITIAL:
+			return 0;
 		case NORMAL:
 		case EMPOWERED:
 			return tps(8f);
