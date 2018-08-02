@@ -118,7 +118,7 @@ public class Maze {
 	public boolean hasAdjacentTile(Tile t1, Tile t2) {
 		return graph.adjacent(cell(t1), cell(t2));
 	}
-
+	
 	public Optional<Tile> neighborTile(Tile tile, int dir) {
 		OptionalInt neighbor = graph.neighbor(cell(tile), dir);
 		return neighbor.isPresent() ? Optional.of(tile(neighbor.getAsInt())) : Optional.empty();
@@ -143,11 +143,11 @@ public class Maze {
 
 	// convert between vertex numbers ("cells") and tiles
 
-	private int cell(Tile tile) {
+	public int cell(Tile tile) {
 		return graph.cell(tile.col, tile.row);
 	}
 
-	private Tile tile(int cell) {
+	public Tile tile(int cell) {
 		return new Tile(graph.col(cell), graph.row(cell));
 	}
 

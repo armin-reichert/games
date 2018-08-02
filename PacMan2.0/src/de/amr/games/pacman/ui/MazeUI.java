@@ -77,10 +77,10 @@ public class MazeUI extends GameEntity {
 		pellet = new Pellet();
 
 		pacMan = createPacMan();
-		createBlinky();
-		createPinky();
-		createInky();
-		createClyde();
+		createBlinky(pacMan);
+		createPinky(pacMan);
+		createInky(pacMan);
+		createClyde(pacMan);
 
 		setGhostActive(GhostName.BLINKY, true);
 		setGhostActive(GhostName.PINKY, true);
@@ -95,8 +95,8 @@ public class MazeUI extends GameEntity {
 		return pacMan;
 	}
 
-	private void createBlinky() {
-		Ghost blinky = new Ghost(GhostName.BLINKY, game, maze, maze.blinkyHome, RED_GHOST);
+	private void createBlinky(PacMan pacMan) {
+		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, maze, maze.blinkyHome, RED_GHOST);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -104,8 +104,8 @@ public class MazeUI extends GameEntity {
 		ghostsByName.put(blinky.getName(), blinky);
 	}
 
-	private void createPinky() {
-		Ghost pinky = new Ghost(GhostName.PINKY, game, maze, maze.pinkyHome, PINK_GHOST);
+	private void createPinky(PacMan pacMan) {
+		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, maze, maze.pinkyHome, PINK_GHOST);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -113,8 +113,8 @@ public class MazeUI extends GameEntity {
 		ghostsByName.put(pinky.getName(), pinky);
 	}
 
-	private void createInky() {
-		Ghost inky = new Ghost(GhostName.INKY, game, maze, maze.inkyHome, TURQUOISE_GHOST);
+	private void createInky(PacMan pacMan) {
+		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, maze, maze.inkyHome, TURQUOISE_GHOST);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
@@ -122,8 +122,8 @@ public class MazeUI extends GameEntity {
 		ghostsByName.put(inky.getName(), inky);
 	}
 
-	private void createClyde() {
-		Ghost clyde = new Ghost(GhostName.CLYDE, game, maze, maze.clydeHome, ORANGE_GHOST);
+	private void createClyde(PacMan pacMan) {
+		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, maze, maze.clydeHome, ORANGE_GHOST);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
 		clyde.setNavigation(Ghost.State.DEAD, goHome());

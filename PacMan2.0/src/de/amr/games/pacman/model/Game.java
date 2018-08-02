@@ -94,7 +94,7 @@ public class Game {
 			return 0;
 		case NORMAL:
 		case EMPOWERED:
-			return tps(8f);
+			return tps(9f);
 		case DYING:
 			return 0;
 		default:
@@ -103,7 +103,7 @@ public class Game {
 	}
 
 	public int getPacManEmpoweringTime() {
-		return sec(6);
+		return sec(20);
 	}
 
 	public int getPacManDyingTime() {
@@ -113,17 +113,17 @@ public class Game {
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
 		switch (ghost.getState()) {
 		case AGGRO:
-			return tps(6f);
+			return tps(8f);
 		case DYING:
 			return 0;
 		case DEAD:
 			return tps(12f);
 		case AFRAID:
-			return tps(4f);
-		case SAFE:
-			return tps(3f);
-		case SCATTERING:
 			return tps(6f);
+		case SAFE:
+			return tps(6f);
+		case SCATTERING:
+			return tps(8f);
 		default:
 			throw new IllegalStateException();
 		}

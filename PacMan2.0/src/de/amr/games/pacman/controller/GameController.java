@@ -24,6 +24,7 @@ import de.amr.games.pacman.model.TileContent;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.GhostName;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateTransition;
 
@@ -58,6 +59,11 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!", Color.YELLOW);
+			
+			//TODO remove
+			mazeUI.setGhostActive(GhostName.PINKY, false);
+			mazeUI.setGhostActive(GhostName.INKY, false);
+			mazeUI.setGhostActive(GhostName.CLYDE, false);
 		};
 
 		state(State.READY).exit = state -> {

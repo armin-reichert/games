@@ -27,9 +27,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	private final StateMachine<State, GameEvent> sm;
 	private final GhostName name;
+	private final PacMan pacMan;
 
-	public Ghost(GhostName name, Game game, Maze maze, Tile home, int color) {
+	public Ghost(GhostName name, PacMan pacMan, Game game, Maze maze, Tile home, int color) {
 		super(game, maze, home, new EnumMap<>(State.class));
+		this.pacMan = pacMan;
 		this.name = name;
 		sm = createStateMachine();
 		createSprites(color);
@@ -91,14 +93,16 @@ public class Ghost extends MazeMover<Ghost.State> {
 		// SAFE
 
 		sm.state(State.SAFE).entry = state -> {
-			state.setDuration(game.sec(3));
+			state.setDuration(game.sec(2));
 			currentSprite = s_color[getDir()];
 		};
 
 		sm.state(State.SAFE).update = state -> move();
 
-		sm.changeOnTimeout(State.SAFE, State.AGGRO);
+		sm.changeOnTimeout(State.SAFE, State.AGGRO, () -> pacMan.getState() != PacMan.State.EMPOWERED);
 
+		sm.changeOnTimeout(State.SAFE, State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
+		
 		sm.changeOnInput(PacManLosesPowerEvent.class, State.SAFE, State.AGGRO);
 
 		// AGGRO
@@ -118,8 +122,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		};
 
 		sm.state(State.AFRAID).update = state -> move();
-
-		sm.change(State.AFRAID, State.SAFE, () -> getTile().equals(homeTile));
 
 		sm.changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, State.AFRAID, t -> {
 			currentSprite = s_blinking;

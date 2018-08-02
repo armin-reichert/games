@@ -1,8 +1,7 @@
 package de.amr.games.pacman.routing.impl;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -20,21 +19,24 @@ class Flee implements RoutePlanner {
 
 	@Override
 	public Route computeRoute(MazeMover<?> refugee) {
+		Maze maze = refugee.maze;
+		List<Tile> corners = new ArrayList<>();
+		corners.add(new Tile(1, 1));
+		corners.add(new Tile(maze.numCols() - 2, 1));
+		corners.add(new Tile(1, maze.numRows() - 2));
+		corners.add(new Tile(maze.numCols() - 2, maze.numRows() - 2));
 		RouteData route = new RouteData();
-		route.dir = refugee.getNextDir();
-		Maze maze = chaser.maze;
-		OptionalInt towardsChaser = maze.alongPath(maze.findPath(refugee.getTile(), chaser.getTile()));
-		if (towardsChaser.isPresent()) {
-			int dir = towardsChaser.getAsInt();
-			for (int d : Arrays.asList(Maze.TOPOLOGY.inv(dir), Maze.TOPOLOGY.right(dir),
-					Maze.TOPOLOGY.left(dir))) {
-				Optional<Tile> neighbor = maze.neighborTile(refugee.getTile(), d);
-				if (neighbor.isPresent() && maze.hasAdjacentTile(refugee.getTile(), neighbor.get())) {
-					route.dir = d;
-					break;
-				}
+		int max = 0;
+		Tile farestCorner = null;
+		for (Tile corner : corners) {
+			int d = maze.findPath(chaser.getTile(), corner).size();
+			if (d > max) {
+				max = d;
+				farestCorner = corner;
 			}
 		}
+		route.path = maze.findPath(refugee.getTile(), farestCorner);
+		route.dir = maze.alongPath(route.path).orElse(refugee.getNextDir());
 		return route;
 	}
 }
