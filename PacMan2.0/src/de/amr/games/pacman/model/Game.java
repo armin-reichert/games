@@ -113,7 +113,6 @@ public class Game {
 		case DEAD:
 			return tps(12f);
 		case AFRAID:
-		case BRAVE:
 			return tps(4f);
 		case SAFE:
 			return tps(3f);

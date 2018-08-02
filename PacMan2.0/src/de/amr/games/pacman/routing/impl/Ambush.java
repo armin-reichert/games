@@ -24,7 +24,7 @@ class Ambush implements RoutePlanner {
 	@Override
 	public Route computeRoute(MazeMover<?> ambusher) {
 		RouteData route = new RouteData();
-		if (victim.isOutsideMaze()) {
+		if (victim.isTeleporting()) {
 			route.dir = ambusher.getNextDir();
 			return route;
 		}

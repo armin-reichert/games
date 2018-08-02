@@ -102,7 +102,6 @@ public class MazeUI extends GameEntity {
 		Ghost blinky = new Ghost(game, maze, "Blinky", RED_GHOST, maze.blinkyHome);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		blinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
 		blinky.setNavigation(Ghost.State.SAFE, bounce());
 		ghostsByName.put(GhostName.BLINKY, blinky);
@@ -112,7 +111,6 @@ public class MazeUI extends GameEntity {
 		Ghost pinky = new Ghost(game, maze, "Pinky", PINK_GHOST, maze.pinkyHome);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		pinky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
 		pinky.setNavigation(Ghost.State.SAFE, bounce());
 		ghostsByName.put(GhostName.PINKY, pinky);
@@ -122,7 +120,6 @@ public class MazeUI extends GameEntity {
 		Ghost inky = new Ghost(game, maze, "Inky", TURQUOISE_GHOST, maze.inkyHome);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		inky.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.SAFE, bounce());
 		ghostsByName.put(GhostName.INKY, inky);
@@ -132,7 +129,6 @@ public class MazeUI extends GameEntity {
 		Ghost clyde = new Ghost(game, maze, "Clyde", ORANGE_GHOST, maze.clydeHome);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		clyde.setNavigation(Ghost.State.AFRAID, goHome());
-		clyde.setNavigation(Ghost.State.BRAVE, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
 		clyde.setNavigation(Ghost.State.SAFE, bounce());
 		ghostsByName.put(GhostName.CLYDE, clyde);
@@ -143,7 +139,7 @@ public class MazeUI extends GameEntity {
 
 		activeGhostsByName.values().forEach(ghost -> {
 			ghost.init();
-			ghost.placeAt(ghost.homeTile);
+			ghost.setMazePosition(ghost.homeTile);
 			ghost.getSprites().forEach(Sprite::resetAnimation);
 			ghost.setSpeed(game::getGhostSpeed);
 		});
@@ -200,10 +196,10 @@ public class MazeUI extends GameEntity {
 		Ghost ghost = ghostsByName.get(name);
 		if (activate) {
 			activeGhostsByName.put(name, ghost);
-			pacMan.lookFor.add(ghost);
+			pacMan.environment.add(ghost);
 		} else {
 			activeGhostsByName.remove(name);
-			pacMan.lookFor.remove(ghost);
+			pacMan.environment.remove(ghost);
 		}
 	}
 
@@ -233,12 +229,12 @@ public class MazeUI extends GameEntity {
 		bonus.tf.moveTo(maze.infoTile.col * Spritesheet.TS,
 				maze.infoTile.row * Spritesheet.TS - Spritesheet.TS / 2);
 		bonusTimeLeft = ticks;
-		pacMan.lookFor.add(bonus);
+		pacMan.environment.add(bonus);
 	}
 
 	public void removeBonus() {
 		if (bonus != null) {
-			pacMan.lookFor.remove(bonus);
+			pacMan.environment.remove(bonus);
 			bonus = null;
 			bonusTimeLeft = 0;
 		}
@@ -246,7 +242,7 @@ public class MazeUI extends GameEntity {
 
 	public void honorAndRemoveBonus(int ticks) {
 		if (bonus != null) {
-			pacMan.lookFor.remove(bonus);
+			pacMan.environment.remove(bonus);
 			bonus.setHonored();
 			bonusTimeLeft = ticks;
 		}

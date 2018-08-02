@@ -16,11 +16,12 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.PacManDiedEvent;
 import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -30,7 +31,7 @@ import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
-	public final Set<GameEntity> lookFor = new HashSet<>();
+	public final Set<GameEntity> environment = new HashSet<>();
 
 	public PacMan(Game game, Maze maze, Tile home) {
 		super(game, maze, "Pac-Man", home, new EnumMap<>(State.class));
@@ -81,7 +82,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 		sm.state(State.NORMAL).update = s -> {
 			currentSprite = s_walking[getDir()];
-			walkAround();
+			walkMaze();
 		};
 
 		sm.changeOnInput(PacManKilledEvent.class, State.NORMAL, State.DYING);
@@ -93,13 +94,16 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 		// EMPOWERED
 
-		sm.state(State.EMPOWERED).update = s -> {
+		sm.state(State.EMPOWERED).update = state -> {
 			currentSprite = s_walking[getDir()];
-			walkAround();
+			walkMaze();
+			if (state.getRemaining() == state.getDuration() * 80 / 100) {
+				eventMgr.publish(new PacManLosesPowerEvent(this));
+			}
 		};
 
 		sm.changeOnTimeout(State.EMPOWERED, State.NORMAL,
-				t -> eventMgr.publish(new PacManLosesPowerEvent(this)));
+				t -> eventMgr.publish(new PacManLostPowerEvent(this)));
 
 		// DYING
 
@@ -117,35 +121,35 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public void init() {
-		placeAt(maze.pacManHome);
+		setMazePosition(homeTile);
 		setDir(Top4.E);
 		setNextDir(Top4.E);
-		getSprites().forEach(Sprite::resetAnimation);
 		setSpeed(game::getPacManSpeed);
+		getSprites().forEach(Sprite::resetAnimation);
 		sm.init();
 	}
 
-	private void walkAround() {
+	private void walkMaze() {
 		move();
-		if (isOutsideMaze()) {
-			return; // teleporting
+		if (isTeleporting()) {
+			return;
 		}
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (TileContent.isFood(content)) {
 			eventMgr.publish(new FoodFoundEvent(tile, content));
-		} else {
-			lookFor.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
-				if (finding instanceof Ghost) {
-					Ghost ghost = (Ghost) finding;
-					if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-						eventMgr.publish(new PacManGhostCollisionEvent(this, ghost));
-					}
-				} else if (finding instanceof Bonus) {
-					Bonus bonus = (Bonus) finding;
-					eventMgr.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
-				}
-			});
+			return;
 		}
+		environment.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
+			if (finding instanceof Ghost) {
+				Ghost ghost = (Ghost) finding;
+				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
+					eventMgr.publish(new PacManGhostCollisionEvent(this, ghost));
+				}
+			} else if (finding instanceof Bonus) {
+				Bonus bonus = (Bonus) finding;
+				eventMgr.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+			}
+		});
 	}
 }

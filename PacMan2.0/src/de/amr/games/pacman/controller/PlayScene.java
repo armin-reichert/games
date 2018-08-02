@@ -21,6 +21,7 @@ import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.GameInfo;
@@ -116,6 +117,9 @@ public class PlayScene implements ViewController {
 		fsm.changeOnInput(PacManLosesPowerEvent.class, State.PLAYING, State.PLAYING,
 				this::onPacManLosesPower);
 
+		fsm.changeOnInput(PacManLostPowerEvent.class, State.PLAYING, State.PLAYING,
+				this::onPacManLostPower);
+
 		fsm.changeOnInput(PacManKilledEvent.class, State.PLAYING, State.PACMAN_DYING,
 				this::onPacManKilled);
 
@@ -150,7 +154,8 @@ public class PlayScene implements ViewController {
 		};
 
 		fsm.state(State.GHOST_DYING).update = state -> {
-			mazeUI.getActiveGhosts().forEach(Ghost::update);
+			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING)
+					.forEach(Ghost::update);
 		};
 
 		fsm.changeOnTimeout(State.GHOST_DYING, State.PLAYING);
@@ -254,7 +259,6 @@ public class PlayScene implements ViewController {
 			gameControl.enqueue(new PacManKilledEvent(e.pacMan, e.ghost));
 			break;
 		case AFRAID:
-		case BRAVE:
 			gameControl.enqueue(new GhostKilledEvent(e.ghost));
 			break;
 		case DYING:
@@ -312,6 +316,11 @@ public class PlayScene implements ViewController {
 
 	private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
 		PacManLosesPowerEvent e = event(t);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+	}
+
+	private void onPacManLostPower(StateTransition<State, GameEvent> t) {
+		PacManLostPowerEvent e = event(t);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 

@@ -1,6 +1,5 @@
 package de.amr.games.pacman.ui.actor;
 
-import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostBlue;
 import static de.amr.games.pacman.ui.Spritesheet.getGhostBlueWhite;
@@ -17,6 +16,7 @@ import de.amr.games.pacman.controller.event.GameEvent;
 import de.amr.games.pacman.controller.event.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -40,58 +40,42 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	// Sprites
 
-	private Sprite s_normal[] = new Sprite[4];
-	private Sprite s_dying[] = new Sprite[4];
-	private Sprite s_dead[] = new Sprite[4];
-	private Sprite s_afraid;
-	private Sprite s_brave;
-	private Sprite s_points;
+	private Sprite currentSprite;
+	private Sprite s_color[] = new Sprite[4];
+	private Sprite s_number[] = new Sprite[4];
+	private Sprite s_eyes[] = new Sprite[4];
+	private Sprite s_blue;
+	private Sprite s_blinking;
 
 	private void createSprites(int color) {
 		int size = 2 * Spritesheet.TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_normal[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
+			s_color[dir] = new Sprite(getGhostNormal(color, dir)).scale(size)
 					.animation(AnimationMode.BACK_AND_FORTH, 300);
-			s_dead[dir] = new Sprite(getGhostEyes(dir)).scale(size);
+			s_eyes[dir] = new Sprite(getGhostEyes(dir)).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_dying[i] = new Sprite(getGreenNumber(i)).scale(size);
+			s_number[i] = new Sprite(getGreenNumber(i)).scale(size);
 		}
-		s_points = s_dying[0];
-		s_afraid = new Sprite(getGhostBlue()).scale(size).animation(AnimationMode.CYCLIC, 200);
-		s_brave = new Sprite(getGhostBlueWhite()).scale(size).animation(AnimationMode.CYCLIC, 100);
+		s_blue = new Sprite(getGhostBlue()).scale(size).animation(AnimationMode.CYCLIC, 200);
+		s_blinking = new Sprite(getGhostBlueWhite()).scale(size).animation(AnimationMode.CYCLIC, 100);
 	}
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(Stream.of(s_normal), Stream.of(s_dying), Stream.of(s_dead),
-				Stream.of(s_afraid, s_brave, s_points)).flatMap(s -> s);
+		return Stream.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes),
+				Stream.of(s_blue, s_blinking)).flatMap(s -> s);
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		switch (getState()) {
-		case AGGRO:
-		case SAFE:
-		case SCATTERING:
-			return s_normal[getDir()];
-		case DYING:
-			return s_points;
-		case DEAD:
-			return s_dead[getDir()];
-		case AFRAID:
-			return s_afraid;
-		case BRAVE:
-			return s_brave;
-		default:
-			throw new IllegalStateException("Illegal ghost state: " + getState());
-		}
+		return currentSprite;
 	}
 
 	// State machine
 
 	public enum State {
-		AGGRO, SCATTERING, AFRAID, BRAVE, DYING, DEAD, SAFE
+		AGGRO, SCATTERING, AFRAID, DYING, DEAD, SAFE
 	}
 
 	@Override
@@ -102,37 +86,48 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.SAFE).entry = state -> {
 			state.setDuration(game.sec(3));
+			currentSprite = s_color[getDir()];
 		};
 
 		sm.state(State.SAFE).update = state -> move();
 
 		sm.changeOnTimeout(State.SAFE, State.AGGRO);
+
 		sm.changeOnInput(PacManLosesPowerEvent.class, State.SAFE, State.AGGRO);
 
 		// AGGRO
+
+		sm.state(State.AGGRO).entry = state -> {
+			currentSprite = s_color[getDir()];
+		};
+
 		sm.state(State.AGGRO).update = state -> move();
 
 		sm.changeOnInput(PacManGainsPowerEvent.class, State.AGGRO, State.AFRAID);
 
 		// AFRAID
 
+		sm.state(State.AFRAID).entry = state -> {
+			currentSprite = s_blue;
+		};
+
 		sm.state(State.AFRAID).update = state -> move();
 
 		sm.change(State.AFRAID, State.SAFE, () -> getTile().equals(homeTile));
 
-		sm.changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, State.AGGRO);
+		sm.changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, State.AFRAID, t -> {
+			currentSprite = s_blinking;
+		});
+
+		sm.changeOnInput(PacManLostPowerEvent.class, State.AFRAID, State.AGGRO);
 
 		sm.changeOnInput(GhostKilledEvent.class, State.AFRAID, State.DYING);
-
-		// BRAVE
-
-		sm.state(State.BRAVE).update = state -> move();
 
 		// DYING
 
 		sm.state(State.DYING).entry = state -> {
 			state.setDuration(game.getGhostDyingTime());
-			s_points = s_dying[game.ghostIndex];
+			currentSprite = s_number[game.ghostIndex];
 			game.score += game.getGhostValue();
 			game.ghostIndex += 1;
 		};
@@ -140,6 +135,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 		sm.changeOnTimeout(State.DYING, State.DEAD);
 
 		// DEAD
+
+		sm.state(State.DEAD).entry = state -> {
+			currentSprite = s_eyes[getDir()];
+		};
 
 		sm.state(State.DEAD).update = state -> move();
 

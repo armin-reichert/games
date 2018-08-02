@@ -153,7 +153,7 @@ public abstract class MazeMover<S> extends GameEntity {
 		tf.moveTo(col * Spritesheet.TS, row * Spritesheet.TS);
 	}
 
-	public void placeAt(Tile tile) {
+	public void setMazePosition(Tile tile) {
 		placeAt(tile.col, tile.row);
 	}
 
@@ -173,14 +173,14 @@ public abstract class MazeMover<S> extends GameEntity {
 		return round(tf.getX()) % Spritesheet.TS == 0 && round(tf.getY()) % Spritesheet.TS == 0;
 	}
 
-	public boolean isOutsideMaze() {
+	public boolean isTeleporting() {
 		Tile tile = getTile();
 		return tile.row < 0 || tile.row >= maze.numRows() || tile.col < 0 || tile.col >= maze.numCols();
 	}
 
 	public void move() {
 		Tile tile = getTile();
-		if (isOutsideMaze()) {
+		if (isTeleporting()) {
 			// teleport
 			if (tile.col > (maze.numCols() - 1) + TELEPORT_LENGTH) {
 				placeAt(0, tile.row);
@@ -199,7 +199,7 @@ public abstract class MazeMover<S> extends GameEntity {
 			tf.moveTo(computePosition(dir, fnSpeed.apply(this)));
 		} else {
 			// adjust exactly over tile
-			placeAt(tile);
+			setMazePosition(tile);
 		}
 	}
 
@@ -217,7 +217,7 @@ public abstract class MazeMover<S> extends GameEntity {
 			return false;
 		}
 		if (direction == TOPOLOGY.right(dir) || direction == TOPOLOGY.left(dir)) {
-			placeAt(getTile()); // TODO this is not 100% correct
+			setMazePosition(getTile()); // TODO this is not 100% correct
 			return isExactlyOverTile();
 		}
 		return true;
