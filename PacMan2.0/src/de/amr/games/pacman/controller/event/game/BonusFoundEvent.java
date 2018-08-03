@@ -1,5 +1,6 @@
-package de.amr.games.pacman.controller.event;
+package de.amr.games.pacman.controller.event.game;
 
+import de.amr.games.pacman.controller.event.core.GameEvent;
 import de.amr.games.pacman.model.BonusSymbol;
 
 public class BonusFoundEvent extends GameEvent {
@@ -14,6 +15,6 @@ public class BonusFoundEvent extends GameEvent {
 
 	@Override
 	public String toString() {
-		return String.format("Bonus(%s,%d)", symbol, value);
+		return String.format("BonusFound(%s,%d)", symbol, value);
 	}
 }

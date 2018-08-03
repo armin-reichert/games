@@ -18,7 +18,7 @@ import java.util.logging.Level;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
-import de.amr.games.pacman.controller.event.GhostKilledEvent;
+import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;

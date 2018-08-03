@@ -1,4 +1,4 @@
-package de.amr.games.pacman.controller.event;
+package de.amr.games.pacman.controller.event.core;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

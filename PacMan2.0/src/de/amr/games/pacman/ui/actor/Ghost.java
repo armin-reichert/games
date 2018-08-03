@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.GhostKilledEvent;
-import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
-import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
-import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
+import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
+import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;

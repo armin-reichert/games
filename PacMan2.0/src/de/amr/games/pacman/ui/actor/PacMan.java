@@ -13,15 +13,15 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.event.BonusFoundEvent;
-import de.amr.games.pacman.controller.event.FoodFoundEvent;
-import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.PacManDiedEvent;
-import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
-import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
-import de.amr.games.pacman.controller.event.PacManKilledEvent;
-import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
-import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
+import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
+import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
+import de.amr.games.pacman.controller.event.game.PacManDiedEvent;
+import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
+import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
+import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -117,7 +117,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			currentSprite = s_walking[getDir()];
 			walkMaze();
 			if (state.getRemaining() == state.getDuration() * 20 / 100) {
-				eventMgr.publish(new PacManLosesPowerEvent(this));
+				eventMgr.publish(new PacManLosesPowerEvent());
 			}
 		};
 
@@ -163,7 +163,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			if (finding instanceof Ghost) {
 				Ghost ghost = (Ghost) finding;
 				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-					return new PacManGhostCollisionEvent(this, ghost);
+					return new PacManGhostCollisionEvent(ghost);
 				}
 			} else if (finding instanceof Bonus) {
 				Bonus bonus = (Bonus) finding;

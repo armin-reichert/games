@@ -7,17 +7,17 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.controller.GameController.State;
-import de.amr.games.pacman.controller.event.BonusFoundEvent;
-import de.amr.games.pacman.controller.event.FoodFoundEvent;
-import de.amr.games.pacman.controller.event.GameEvent;
-import de.amr.games.pacman.controller.event.GhostKilledEvent;
-import de.amr.games.pacman.controller.event.LevelCompletedEvent;
-import de.amr.games.pacman.controller.event.PacManDiedEvent;
-import de.amr.games.pacman.controller.event.PacManGainsPowerEvent;
-import de.amr.games.pacman.controller.event.PacManGhostCollisionEvent;
-import de.amr.games.pacman.controller.event.PacManKilledEvent;
-import de.amr.games.pacman.controller.event.PacManLosesPowerEvent;
-import de.amr.games.pacman.controller.event.PacManLostPowerEvent;
+import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
+import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
+import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
+import de.amr.games.pacman.controller.event.game.LevelCompletedEvent;
+import de.amr.games.pacman.controller.event.game.PacManDiedEvent;
+import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
+import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
+import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.TileContent;
@@ -176,7 +176,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		case AGGRO:
 		case SAFE:
 		case SCATTERING:
-			enqueue(new PacManKilledEvent(e.pacMan, e.ghost));
+			enqueue(new PacManKilledEvent(e.ghost));
 			break;
 		case AFRAID:
 			enqueue(new GhostKilledEvent(e.ghost));
@@ -192,8 +192,8 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 	private void onPacManKilled(StateTransition<State, GameEvent> t) {
 		PacManKilledEvent e = t.typedEvent();
-		e.pacMan.processEvent(e);
-		LOG.info(() -> String.format("PacMan killed by %s at %s", e.ghost.getName(), e.ghost.getTile()));
+		mazeUI.getPacMan().processEvent(e);
+		LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
 	}
 
 	private void onGhostKilled(StateTransition<State, GameEvent> t) {
@@ -220,13 +220,13 @@ public class GameController extends StateMachine<State, GameEvent> {
 		}
 		if (e.food == TileContent.ENERGIZER) {
 			game.ghostIndex = 0;
-			enqueue(new PacManGainsPowerEvent(mazeUI.getPacMan()));
+			enqueue(new PacManGainsPowerEvent());
 		}
 	}
 
 	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
 		PacManGainsPowerEvent e = t.typedEvent();
-		e.pacMan.processEvent(e);
+		mazeUI.getPacMan().processEvent(e);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 	}
 

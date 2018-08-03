@@ -36,7 +36,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.event.GameEventManager;
+import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
