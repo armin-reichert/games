@@ -114,8 +114,9 @@ public class StateObject<S, E> {
 	 * @param action
 	 *                    code which will be executed when this transition occurs
 	 */
-	public void change(S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
+	public StateObject<S, E> change(S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, to, condition, action);
+		return this;
 	}
 
 	/**
@@ -127,8 +128,9 @@ public class StateObject<S, E> {
 	 * @param condition
 	 *                    the condition which must hold
 	 */
-	public void change(S to, BooleanSupplier condition) {
+	public StateObject<S, E> change(S to, BooleanSupplier condition) {
 		sm.addTransition(label, to, condition, (Consumer<StateTransition<S, E>>) null);
+		return this;
 	};
 
 	/**
@@ -137,8 +139,9 @@ public class StateObject<S, E> {
 	 * @param to
 	 *             the target state
 	 */
-	public void change(S to) {
+	public StateObject<S, E> change(S to) {
 		sm.change(label, to, () -> true);
+		return this;
 	};
 
 	/**
@@ -148,9 +151,10 @@ public class StateObject<S, E> {
 	 * @param to
 	 *             the target state
 	 */
-	public void changeOnTimeout(S to) {
+	public StateObject<S, E> changeOnTimeout(S to) {
 		sm.changeOnTimeout(label, to, t -> {
 		});
+		return this;
 	}
 
 	/**
@@ -162,9 +166,10 @@ public class StateObject<S, E> {
 	 * @param condition
 	 *                    some condition
 	 */
-	public void changeOnTimeout(S to, BooleanSupplier condition) {
+	public StateObject<S, E> changeOnTimeout(S to, BooleanSupplier condition) {
 		sm.changeOnTimeout(label, to, condition, t -> {
 		});
+		return this;
 	}
 
 	/**
@@ -176,8 +181,9 @@ public class StateObject<S, E> {
 	 * @param action
 	 *                 code which will be executed when this transition occurs
 	 */
-	public void changeOnTimeout(S to, Consumer<StateTransition<S, E>> action) {
+	public StateObject<S, E> changeOnTimeout(S to, Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, to, () -> isTerminated(), action);
+		return this;
 	}
 
 	/**
@@ -191,8 +197,9 @@ public class StateObject<S, E> {
 	 * @param action
 	 *                    code which will be executed when this transition occurs
 	 */
-	public void changeOnTimeout(S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
+	public StateObject<S, E> changeOnTimeout(S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, to, () -> isTerminated() && condition.getAsBoolean(), action);
+		return this;
 	}
 
 	/**
@@ -204,8 +211,14 @@ public class StateObject<S, E> {
 	 * @param to
 	 *                    the target state
 	 */
-	public void changeOnInput(Class<? extends E> eventType, S to) {
+	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to) {
 		sm.change(label, to, () -> sm.hasMatchingInput(eventType));
+		return this;
+	}
+
+	public StateObject<S, E> onInput(Class<? extends E> eventType) {
+		sm.change(label, label, () -> sm.hasMatchingInput(eventType));
+		return this;
 	}
 
 	/**
@@ -219,8 +232,14 @@ public class StateObject<S, E> {
 	 * @param condition
 	 *                    some condition
 	 */
-	public void changeOnInput(Class<? extends E> eventType, S to, BooleanSupplier condition) {
+	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to, BooleanSupplier condition) {
 		sm.change(label, to, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean());
+		return this;
+	}
+
+	public StateObject<S, E> onInput(Class<? extends E> eventType, BooleanSupplier condition) {
+		sm.change(label, label, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean());
+		return this;
 	}
 
 	/**
@@ -234,8 +253,14 @@ public class StateObject<S, E> {
 	 * @param action
 	 *                    performed action
 	 */
-	public void changeOnInput(Class<? extends E> eventType, S to, Consumer<StateTransition<S, E>> action) {
+	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to, Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, to, () -> sm.hasMatchingInput(eventType), action);
+		return this;
+	}
+
+	public StateObject<S, E> onInput(Class<? extends E> eventType, Consumer<StateTransition<S, E>> action) {
+		sm.addTransition(label, label, () -> sm.hasMatchingInput(eventType), action);
+		return this;
 	}
 
 	/**
@@ -251,8 +276,16 @@ public class StateObject<S, E> {
 	 * @param action
 	 *                    performed action
 	 */
-	public void changeOnInput(Class<? extends E> eventType, S to, BooleanSupplier condition,
+	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to, BooleanSupplier condition,
 			Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, to, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean(), action);
+		return this;
 	}
+
+	public StateObject<S, E> onInput(Class<? extends E> eventType, BooleanSupplier condition,
+			Consumer<StateTransition<S, E>> action) {
+		sm.addTransition(label, label, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean(), action);
+		return this;
+	}
+
 }

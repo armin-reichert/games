@@ -50,6 +50,8 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 		fnPulse = game.fnTicksPerSecond;
 
+		/*@formatter:off*/
+		
 		// -- READY
 
 		state(State.READY).entry = state -> {
@@ -65,29 +67,23 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.hideInfo();
 		};
 
-		changeOnTimeout(State.READY, State.PLAYING);
+		state(State.READY).changeOnTimeout(State.PLAYING);
 
 		// -- PLAYING
 
 		state(State.PLAYING).update = state -> mazeUI.update();
 
-		changeOnInput(FoodFoundEvent.class, State.PLAYING, State.PLAYING, this::onFoodFound);
-
-		changeOnInput(BonusFoundEvent.class, State.PLAYING, State.PLAYING, this::onBonusFound);
-
-		changeOnInput(PacManGhostCollisionEvent.class, State.PLAYING, State.PLAYING, this::onPacManGhostCollision);
-
-		changeOnInput(GhostKilledEvent.class, State.PLAYING, State.GHOST_DYING, this::onGhostKilled);
-
-		changeOnInput(PacManGainsPowerEvent.class, State.PLAYING, State.PLAYING, this::onPacManGainsPower);
-
-		changeOnInput(PacManLosesPowerEvent.class, State.PLAYING, State.PLAYING, this::onPacManLosesPower);
-
-		changeOnInput(PacManLostPowerEvent.class, State.PLAYING, State.PLAYING, this::onPacManLostPower);
-
-		changeOnInput(PacManKilledEvent.class, State.PLAYING, State.PACMAN_DYING, this::onPacManKilled);
-
-		changeOnInput(LevelCompletedEvent.class, State.PLAYING, State.CHANGING_LEVEL);
+		state(State.PLAYING)
+			.onInput(FoodFoundEvent.class, this::onFoodFound)
+			.onInput(BonusFoundEvent.class, this::onBonusFound)
+			.onInput(PacManGhostCollisionEvent.class, this::onPacManGhostCollision)
+			.onInput(PacManGainsPowerEvent.class, this::onPacManGainsPower)
+			.onInput(PacManLosesPowerEvent.class, this::onPacManLosesPower)
+			.onInput(PacManLostPowerEvent.class, this::onPacManLostPower)
+			.changeOnInput(GhostKilledEvent.class, State.GHOST_DYING, this::onGhostKilled)
+			.changeOnInput(PacManKilledEvent.class, State.PACMAN_DYING, this::onPacManKilled)
+			.changeOnInput(LevelCompletedEvent.class, State.CHANGING_LEVEL);
+			;
 
 		// -- CHANGING_LEVEL
 
@@ -108,7 +104,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 			}
 		};
 
-		changeOnTimeout(State.CHANGING_LEVEL, State.PLAYING);
+		state(State.CHANGING_LEVEL).changeOnTimeout(State.PLAYING);
 
 		// -- GHOST_DYING
 
@@ -121,7 +117,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(Ghost::update);
 		};
 
-		changeOnTimeout(State.GHOST_DYING, State.PLAYING);
+		state(State.GHOST_DYING).changeOnTimeout(State.PLAYING);
 
 		state(State.GHOST_DYING).exit = state -> {
 			mazeUI.getPacMan().visibility = () -> true;
@@ -138,11 +134,9 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.getPacMan().update();
 		};
 
-		changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.GAME_OVER, () -> game.lives == 0);
-
-		changeOnInput(PacManDiedEvent.class, State.PACMAN_DYING, State.PLAYING, () -> game.lives > 0, t -> {
-			mazeUI.initActors();
-		});
+		state(State.PACMAN_DYING)
+			.changeOnInput(PacManDiedEvent.class, State.GAME_OVER, () -> game.lives == 0)
+			.changeOnInput(PacManDiedEvent.class, State.PLAYING, () -> game.lives > 0, t -> mazeUI.initActors());
 
 		state(State.PACMAN_DYING).exit = state -> {
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
@@ -156,12 +150,14 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.showInfo("Game Over!", Color.RED);
 		};
 
-		change(State.GAME_OVER, State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		state(State.GAME_OVER).change(State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 
 		state(State.GAME_OVER).exit = state -> {
 			mazeUI.hideInfo();
 			game.init(maze);
 		};
+		
+		/*@formatter:on*/
 	}
 
 	private void nextLevel() {
