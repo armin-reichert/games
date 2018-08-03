@@ -81,6 +81,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		StateMachine<State, GameEvent> sm = new StateMachine<>("Pac-Man", State.class, State.INITIAL);
 
 		// INITIAL
+
 		sm.state(State.INITIAL).entry = state -> {
 			setMazePosition(homeTile);
 			setDir(Top4.E);
@@ -90,7 +91,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			currentSprite = s_walking[getDir()];
 		};
 
-		sm.change(State.INITIAL, State.NORMAL);
+		sm.state(State.INITIAL).change(State.NORMAL);
 
 		// NORMAL
 

@@ -136,12 +136,8 @@ public class MazeUI extends GameEntity {
 
 	public void initActors() {
 		pacMan.init();
-
 		activeGhostsByName.values().forEach(ghost -> {
 			ghost.init();
-			ghost.setMazePosition(ghost.homeTile);
-			ghost.getSprites().forEach(Sprite::resetAnimation);
-			ghost.setSpeed(game::getGhostSpeed);
 		});
 		getActiveGhost(GhostName.BLINKY).ifPresent(blinky -> blinky.setDir(Top4.E));
 		getActiveGhost(GhostName.PINKY).ifPresent(pinky -> pinky.setDir(Top4.S));

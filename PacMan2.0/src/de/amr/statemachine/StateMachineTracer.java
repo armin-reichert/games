@@ -2,12 +2,12 @@ package de.amr.statemachine;
 
 import java.util.logging.Logger;
 
-public class StateMachineTracer {
+public class StateMachineTracer<S,E> {
 
-	private final StateMachine<?, ?> sm;
+	private final StateMachine<S,E> sm;
 	private Logger log;
 
-	public StateMachineTracer(StateMachine<?, ?> sm) {
+	public StateMachineTracer(StateMachine<S, E> sm) {
 		this.sm = sm;
 	}
 
@@ -15,44 +15,44 @@ public class StateMachineTracer {
 		this.log = log;
 	}
 
-	public void stateCreated(Object stateLabel) {
+	public void stateCreated(S stateLabel) {
 		if (log != null) {
 			log.info(String.format("FSM(%s) created state '%s'", sm.getDescription(), stateLabel));
 		}
 	}
 
-	public void inputIgnored(Object event) {
+	public void ignoredEvent(E event) {
 		if (log != null) {
 			log.info(String.format("FSM(%s) in state %s ignored '%s' (no matching transition).", sm.getDescription(),
-					sm.currentStateLabel(), event));
+					sm.currentState(), event));
 		}
 	}
 
-	public void enteringInitialState() {
+	public void enteringInitialState(S intialState) {
 		if (log != null) {
-			log.info(String.format("FSM(%s) entering initial state '%s'", sm.getDescription(), sm.currentStateLabel()));
+			log.info(String.format("FSM(%s) entering initial state '%s'", sm.getDescription(), intialState));
 		}
 	}
 
-	public void enteringState() {
+	public void enteringState(S enteredState) {
 		if (log != null) {
-			if (sm.state().getDuration() != StateObject.FOREVER) {
-				float seconds = sm.state().getDuration() / sm.fnPulse.getAsInt();
+			if (sm.state(enteredState).getDuration() != StateObject.FOREVER) {
+				float seconds = sm.state(enteredState).getDuration() / sm.fnPulse.getAsInt();
 				log.info(String.format("FSM(%s) entering state '%s' for %.2f seconds (%d frames)", sm.getDescription(),
-						sm.currentStateLabel(), seconds, sm.state().getDuration()));
+						enteredState, seconds, sm.state(enteredState).getDuration()));
 			} else {
-				log.info(String.format("FSM(%s) entering state '%s'", sm.getDescription(), sm.currentStateLabel()));
+				log.info(String.format("FSM(%s) entering state '%s'", sm.getDescription(), enteredState));
 			}
 		}
 	}
 
-	public void exitingState() {
+	public void exitingState(S exitedState) {
 		if (log != null) {
-			log.info(String.format("FSM(%s) exiting state '%s'", sm.getDescription(), sm.currentStateLabel()));
+			log.info(String.format("FSM(%s) exiting state '%s'", sm.getDescription(), exitedState));
 		}
 	}
 
-	public void transition(Object event, Object oldState, Object newState) {
+	public void transition(E event, S oldState, S newState) {
 		if (log != null) {
 			if (event == null) {
 				if (oldState != newState) {

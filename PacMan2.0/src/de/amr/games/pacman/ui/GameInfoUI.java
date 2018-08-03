@@ -162,14 +162,14 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private String pacManStateText(PacMan pacMan) {
-		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().state();
+		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().state(pacMan.getStateMachine().currentState());
 		return state.getDuration() != StateObject.FOREVER
 				? String.format("%s(%d|%d)", state.label, state.getRemaining(), state.getDuration())
 				: String.format("(%s)", state.label);
 	}
 
 	private String ghostStateText(Ghost ghost) {
-		StateObject<Ghost.State, ?> state = ghost.getStateMachine().state();
+		StateObject<Ghost.State, ?> state = ghost.getStateMachine().state(ghost.getStateMachine().currentState());
 		return state.getDuration() != StateObject.FOREVER
 				? String.format("%s(%s,%d|%d)", ghost.getName(), state.label, state.getRemaining(), state.getDuration())
 				: String.format("%s(%s)", ghost.getName(), state.label);

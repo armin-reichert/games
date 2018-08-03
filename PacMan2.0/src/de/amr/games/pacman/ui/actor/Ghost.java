@@ -78,7 +78,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	// State machine
 
 	public enum State {
-		AGGRO, SCATTERING, AFRAID, DYING, DEAD, SAFE
+		INITIAL, AGGRO, SCATTERING, AFRAID, DYING, DEAD, SAFE
 	}
 
 	@Override
@@ -87,8 +87,18 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	protected StateMachine<State, GameEvent> createStateMachine() {
-		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class, State.SAFE);
+		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class, State.INITIAL);
 
+		// INITIAL
+		
+		sm.state(State.INITIAL).entry = state -> {
+			setMazePosition(homeTile);
+			getSprites().forEach(Sprite::resetAnimation);
+			setSpeed(game::getGhostSpeed);
+		};
+
+		sm.state(State.INITIAL).change(State.SAFE);
+		
 		// SAFE
 
 		sm.state(State.SAFE).entry = state -> {

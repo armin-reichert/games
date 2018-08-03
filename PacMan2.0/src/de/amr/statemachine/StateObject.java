@@ -102,6 +102,11 @@ public class StateObject<S, E> {
 
 	// Methods for building state graph
 
+	private final BooleanSupplier ALWAYS_TRUE = () -> true;
+	private final Consumer<StateTransition<S, E>> NO_ACTION = t -> {
+
+	};
+
 	/**
 	 * Defines a transition between the given states which can be fired only if the given condition
 	 * holds. If the transition is executed the given action is also executed. This happens before the
@@ -129,7 +134,7 @@ public class StateObject<S, E> {
 	 *                    the condition which must hold
 	 */
 	public StateObject<S, E> change(S to, BooleanSupplier condition) {
-		sm.addTransition(label, to, condition, (Consumer<StateTransition<S, E>>) null);
+		sm.addTransition(label, to, condition, NO_ACTION);
 		return this;
 	};
 
@@ -140,7 +145,7 @@ public class StateObject<S, E> {
 	 *             the target state
 	 */
 	public StateObject<S, E> change(S to) {
-		sm.change(label, to, () -> true);
+		sm.addTransition(label, to, ALWAYS_TRUE, NO_ACTION);
 		return this;
 	};
 
@@ -152,8 +157,7 @@ public class StateObject<S, E> {
 	 *             the target state
 	 */
 	public StateObject<S, E> changeOnTimeout(S to) {
-		sm.changeOnTimeout(label, to, t -> {
-		});
+		sm.addTransition(label, to, () -> isTerminated(), NO_ACTION);
 		return this;
 	}
 
@@ -167,8 +171,7 @@ public class StateObject<S, E> {
 	 *                    some condition
 	 */
 	public StateObject<S, E> changeOnTimeout(S to, BooleanSupplier condition) {
-		sm.changeOnTimeout(label, to, condition, t -> {
-		});
+		sm.addTransition(label, to, () -> isTerminated() && condition.getAsBoolean(), NO_ACTION);
 		return this;
 	}
 
@@ -182,12 +185,18 @@ public class StateObject<S, E> {
 	 *                 code which will be executed when this transition occurs
 	 */
 	public StateObject<S, E> changeOnTimeout(S to, Consumer<StateTransition<S, E>> action) {
-		sm.addTransition(label, to, () -> isTerminated(), action);
+		sm.addTransition(label, to, this::isTerminated, action);
 		return this;
 	}
 
+	/**
+	 * Defines a transition between the given states which can be fired if this state got a timeout.
+	 * 
+	 * @param action
+	 *                 code which will be executed when this transition occurs
+	 */
 	public StateObject<S, E> onTimeout(Consumer<StateTransition<S, E>> action) {
-		sm.addTransition(label, label, () -> isTerminated(), action);
+		sm.addTransition(label, label, this::isTerminated, action);
 		return this;
 	}
 
@@ -207,6 +216,15 @@ public class StateObject<S, E> {
 		return this;
 	}
 
+	/**
+	 * Defines a transition in this state which can be fired if this state got a timeout and the given
+	 * condition holds.
+	 * 
+	 * @param condition
+	 *                    some condition
+	 * @param action
+	 *                    code which will be executed when this transition occurs
+	 */
 	public StateObject<S, E> onTimeout(BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, label, () -> isTerminated() && condition.getAsBoolean(), action);
 		return this;
@@ -222,12 +240,21 @@ public class StateObject<S, E> {
 	 *                    the target state
 	 */
 	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to) {
-		sm.change(label, to, () -> sm.hasMatchingInput(eventType));
+		sm.addTransition(label, to, () -> sm.isEventMatching(eventType), NO_ACTION);
 		return this;
 	}
 
+	/**
+	 * Defines a transition in this state which can be fired only if the next event matches the
+	 * transition.
+	 * 
+	 * @param eventType
+	 *                    type of events matching the transition
+	 * @param to
+	 *                    the target state
+	 */
 	public StateObject<S, E> onInput(Class<? extends E> eventType) {
-		sm.change(label, label, () -> sm.hasMatchingInput(eventType));
+		sm.addTransition(label, label, () -> sm.isEventMatching(eventType), NO_ACTION);
 		return this;
 	}
 
@@ -243,12 +270,12 @@ public class StateObject<S, E> {
 	 *                    some condition
 	 */
 	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to, BooleanSupplier condition) {
-		sm.change(label, to, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean());
+		sm.addTransition(label, to, () -> sm.isEventMatching(eventType) && condition.getAsBoolean(), NO_ACTION);
 		return this;
 	}
 
 	public StateObject<S, E> onInput(Class<? extends E> eventType, BooleanSupplier condition) {
-		sm.change(label, label, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean());
+		sm.addTransition(label, label, () -> sm.isEventMatching(eventType) && condition.getAsBoolean(), NO_ACTION);
 		return this;
 	}
 
@@ -264,12 +291,12 @@ public class StateObject<S, E> {
 	 *                    performed action
 	 */
 	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to, Consumer<StateTransition<S, E>> action) {
-		sm.addTransition(label, to, () -> sm.hasMatchingInput(eventType), action);
+		sm.addTransition(label, to, () -> sm.isEventMatching(eventType), action);
 		return this;
 	}
 
 	public StateObject<S, E> onInput(Class<? extends E> eventType, Consumer<StateTransition<S, E>> action) {
-		sm.addTransition(label, label, () -> sm.hasMatchingInput(eventType), action);
+		sm.addTransition(label, label, () -> sm.isEventMatching(eventType), action);
 		return this;
 	}
 
@@ -288,13 +315,13 @@ public class StateObject<S, E> {
 	 */
 	public StateObject<S, E> changeOnInput(Class<? extends E> eventType, S to, BooleanSupplier condition,
 			Consumer<StateTransition<S, E>> action) {
-		sm.addTransition(label, to, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean(), action);
+		sm.addTransition(label, to, () -> sm.isEventMatching(eventType) && condition.getAsBoolean(), action);
 		return this;
 	}
 
 	public StateObject<S, E> onInput(Class<? extends E> eventType, BooleanSupplier condition,
 			Consumer<StateTransition<S, E>> action) {
-		sm.addTransition(label, label, () -> sm.hasMatchingInput(eventType) && condition.getAsBoolean(), action);
+		sm.addTransition(label, label, () -> sm.isEventMatching(eventType) && condition.getAsBoolean(), action);
 		return this;
 	}
 
