@@ -41,14 +41,14 @@ public class PlayScene implements ViewController {
 
 		gameControl = new GameController(game, maze, mazeUI);
 		gameControl.setLogger(LOG);
-//		mazeUI.getPacMan().getStateMachine().setLogger(LOG);
-//		mazeUI.getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
+		mazeUI.getPacMan().getStateMachine().setLogger(LOG);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
 
 		// TODO remove
-		mazeUI.setGhostActive(GhostName.BLINKY, false);
-		mazeUI.setGhostActive(GhostName.PINKY, false);
-		mazeUI.setGhostActive(GhostName.INKY, false);
-		mazeUI.setGhostActive(GhostName.CLYDE, false);
+		mazeUI.setGhostActive(GhostName.BLINKY, true);
+		mazeUI.setGhostActive(GhostName.PINKY, true);
+		mazeUI.setGhostActive(GhostName.INKY, true);
+		mazeUI.setGhostActive(GhostName.CLYDE, true);
 	}
 
 	@Override

@@ -38,6 +38,10 @@ public class Bonus extends GameEntity {
 	public BonusSymbol getSymbol() {
 		return symbol;
 	}
+	
+	public boolean isHonored() {
+		return honored;
+	}
 
 	public void setHonored() {
 		honored = true;

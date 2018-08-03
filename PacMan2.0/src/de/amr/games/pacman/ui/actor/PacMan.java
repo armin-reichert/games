@@ -5,8 +5,8 @@ import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.getPacManWalking;
 
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -31,11 +31,12 @@ import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
-	public final Set<GameEntity> environment = new HashSet<>();
 	private final StateMachine<State, GameEvent> sm;
+	private final Set<GameEntity> interests;
 
-	public PacMan(Game game, Maze maze, Tile home) {
+	public PacMan(Game game, Maze maze, Tile home, Set<GameEntity> interests) {
 		super(game, maze, home, new EnumMap<>(State.class));
+		this.interests = interests;
 		sm = createStateMachine();
 		createSprites();
 		currentSprite = s_walking[Top4.E]; // TODO
@@ -144,22 +145,33 @@ public class PacMan extends MazeMover<PacMan.State> {
 		if (isTeleporting()) {
 			return;
 		}
+		GameEvent finding = findInterestingThing();
+		if (finding != null) {
+			eventMgr.publish(finding);
+			return;
+		}
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (TileContent.isFood(content)) {
 			eventMgr.publish(new FoodFoundEvent(tile, content));
 			return;
 		}
-		environment.stream().filter(this::collidesWith).findAny().ifPresent(finding -> {
+	}
+
+	private GameEvent findInterestingThing() {
+		for (GameEntity finding : interests.stream().filter(this::collidesWith).collect(Collectors.toSet())) {
 			if (finding instanceof Ghost) {
 				Ghost ghost = (Ghost) finding;
 				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-					eventMgr.publish(new PacManGhostCollisionEvent(this, ghost));
+					return new PacManGhostCollisionEvent(this, ghost);
 				}
 			} else if (finding instanceof Bonus) {
 				Bonus bonus = (Bonus) finding;
-				eventMgr.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+				if (!bonus.isHonored()) {
+					return new BonusFoundEvent(bonus.getSymbol(), bonus.getValue());
+				}
 			}
-		});
+		}
+		return null;
 	}
 }

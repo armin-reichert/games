@@ -25,8 +25,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
@@ -52,6 +54,7 @@ public class MazeUI extends GameEntity {
 	private final Game game;
 	private final Maze maze;
 	private final PacMan pacMan;
+	private final Set<GameEntity> pacManInterests = new HashSet<>();
 	private final Map<GhostName, Ghost> ghostsByName = new EnumMap<>(GhostName.class);
 	private final Map<GhostName, Ghost> activeGhostsByName = new EnumMap<>(GhostName.class);
 	private final Energizer energizer;
@@ -89,7 +92,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(game, maze, maze.pacManHome);
+		PacMan pacMan = new PacMan(game, maze, maze.pacManHome, pacManInterests);
 		pacMan.setNavigation(PacMan.State.NORMAL, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		pacMan.setNavigation(PacMan.State.EMPOWERED, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
 		return pacMan;
@@ -193,10 +196,10 @@ public class MazeUI extends GameEntity {
 		Ghost ghost = ghostsByName.get(name);
 		if (activate) {
 			activeGhostsByName.put(name, ghost);
-			pacMan.environment.add(ghost);
+			pacManInterests.add(ghost);
 		} else {
 			activeGhostsByName.remove(name);
-			pacMan.environment.remove(ghost);
+			pacManInterests.remove(ghost);
 		}
 	}
 
@@ -225,20 +228,19 @@ public class MazeUI extends GameEntity {
 		this.bonus = bonus;
 		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 		bonusTimeLeft = ticks;
-		pacMan.environment.add(bonus);
+		pacManInterests.add(bonus);
 	}
 
 	public void removeBonus() {
 		if (bonus != null) {
-			pacMan.environment.remove(bonus);
 			bonus = null;
 			bonusTimeLeft = 0;
+			pacManInterests.remove(bonus);
 		}
 	}
 
-	public void consumeBonus(int ticks) {
+	public void consumeBonusAfter(int ticks) {
 		if (bonus != null) {
-			pacMan.environment.remove(bonus);
 			bonus.setHonored();
 			bonusTimeLeft = ticks;
 		}

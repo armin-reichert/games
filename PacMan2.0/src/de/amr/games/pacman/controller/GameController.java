@@ -244,6 +244,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		BonusFoundEvent e = t.typedEvent();
 		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 		game.score += e.value;
-		mazeUI.consumeBonus(game.sec(2));
+		mazeUI.consumeBonusAfter(game.sec(2));
 	}
 }
