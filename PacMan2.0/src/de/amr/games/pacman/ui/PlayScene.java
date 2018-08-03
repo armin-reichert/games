@@ -20,7 +20,7 @@ public class PlayScene implements ViewController {
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI statusUI;
-	private final GameInfo gameInfo;
+	private final GameInfoUI gameInfoUI;
 
 	public PlayScene(PacManApp app) {
 		this.width = app.settings.width;
@@ -32,7 +32,7 @@ public class PlayScene implements ViewController {
 		mazeUI = new MazeUI(game, maze);
 		hud = new HUD(game);
 		statusUI = new StatusUI(game);
-		gameInfo = new GameInfo(game, mazeUI, maze);
+		gameInfoUI = new GameInfoUI(game, mazeUI, maze);
 
 		// Layout
 		hud.tf.moveTo(0, 0);
@@ -44,11 +44,10 @@ public class PlayScene implements ViewController {
 		mazeUI.getPacMan().getStateMachine().setLogger(LOG);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
 
-		// TODO remove
 		mazeUI.setGhostActive(GhostName.BLINKY, true);
-		mazeUI.setGhostActive(GhostName.PINKY, true);
-		mazeUI.setGhostActive(GhostName.INKY, true);
-		mazeUI.setGhostActive(GhostName.CLYDE, true);
+		mazeUI.setGhostActive(GhostName.PINKY, false);
+		mazeUI.setGhostActive(GhostName.INKY, false); //TODO
+		mazeUI.setGhostActive(GhostName.CLYDE, false); //TODO
 	}
 
 	@Override
@@ -69,13 +68,13 @@ public class PlayScene implements ViewController {
 	@Override
 	public void update() {
 		gameControl.update();
-		gameInfo.update();
+		gameInfoUI.update();
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		mazeUI.draw(g);
-		gameInfo.draw(g);
+		gameInfoUI.draw(g);
 		hud.draw(g);
 		statusUI.draw(g);
 	}

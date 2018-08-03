@@ -104,7 +104,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.SAFE).changeOnTimeout(State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
 
-		sm.state(State.SAFE).changeOnInput(PacManLosesPowerEvent.class, State.AGGRO);
+//		sm.state(State.SAFE).changeOnInput(PacManLosesPowerEvent.class, State.AGGRO);
 
 		// AGGRO
 

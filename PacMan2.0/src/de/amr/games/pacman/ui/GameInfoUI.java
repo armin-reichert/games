@@ -27,7 +27,7 @@ import de.amr.games.pacman.ui.actor.GhostName;
 import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateObject;
 
-public class GameInfo implements ViewController {
+public class GameInfoUI implements ViewController {
 
 	private final Game game;
 	private final MazeUI mazeUI;
@@ -38,7 +38,7 @@ public class GameInfo implements ViewController {
 
 	private Image gridImage;
 
-	public GameInfo(Game game, MazeUI mazeUI, Maze maze) {
+	public GameInfoUI(Game game, MazeUI mazeUI, Maze maze) {
 		this.game = game;
 		this.mazeUI = mazeUI;
 		this.maze = maze;
@@ -154,15 +154,25 @@ public class GameInfo implements ViewController {
 	private void drawEntityState(Graphics2D g) {
 		PacMan pacMan = mazeUI.getPacMan();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
-		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacMan.getState().toString());
+		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacManStateText(pacMan));
 		mazeUI.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
-			StateObject state = ghost.getStateMachine().state();
-			String txt = state.getDuration() != StateObject.FOREVER
-					? String.format("%s(%s,%d|%d)", ghost.getState(), ghost.getName(), state.getDuration(), state.getRemaining())
-					: String.format("%s(%s)", ghost.getState(), ghost.getName());
-			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), txt);
+			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), ghostStateText(ghost));
 		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+	}
+
+	private String pacManStateText(PacMan pacMan) {
+		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().state();
+		return state.getDuration() != StateObject.FOREVER
+				? String.format("%s(%d|%d)", state.label, state.getRemaining(), state.getDuration())
+				: String.format("(%s)", state.label);
+	}
+
+	private String ghostStateText(Ghost ghost) {
+		StateObject<Ghost.State, ?> state = ghost.getStateMachine().state();
+		return state.getDuration() != StateObject.FOREVER
+				? String.format("%s(%s,%d|%d)", ghost.getName(), state.label, state.getRemaining(), state.getDuration())
+				: String.format("%s(%s)", ghost.getName(), state.label);
 	}
 
 	private void toggleGhost(GhostName ghostName) {

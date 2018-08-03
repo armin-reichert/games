@@ -39,6 +39,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 	public GameController(Game game, Maze maze, MazeUI mazeUI) {
 		super("GameController", State.class, State.READY);
+		fnPulse = game.fnTicksPerSecond;
 
 		this.game = game;
 		this.maze = maze;
@@ -47,8 +48,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		mazeUI.eventMgr.subscribe(this::enqueue);
 		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
-
-		fnPulse = game.fnTicksPerSecond;
 
 		/*@formatter:off*/
 		

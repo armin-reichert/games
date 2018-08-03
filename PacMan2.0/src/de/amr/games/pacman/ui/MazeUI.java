@@ -100,38 +100,38 @@ public class MazeUI extends GameEntity {
 
 	private void createBlinky(PacMan pacMan) {
 		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, maze, maze.blinkyHome, RED_GHOST);
+		ghostsByName.put(blinky.getName(), blinky);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
 		blinky.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(blinky.getName(), blinky);
 	}
 
 	private void createPinky(PacMan pacMan) {
 		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, maze, maze.pinkyHome, PINK_GHOST);
+		ghostsByName.put(pinky.getName(), pinky);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
 		pinky.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(pinky.getName(), pinky);
 	}
 
 	private void createInky(PacMan pacMan) {
 		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, maze, maze.inkyHome, TURQUOISE_GHOST);
-		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
+		ghostsByName.put(inky.getName(), inky);
+		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); //TODO
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(inky.getName(), inky);
 	}
 
 	private void createClyde(PacMan pacMan) {
 		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, maze, maze.clydeHome, ORANGE_GHOST);
-		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
-		clyde.setNavigation(Ghost.State.AFRAID, goHome());
+		ghostsByName.put(clyde.getName(), clyde);
+		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
+		clyde.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
 		clyde.setNavigation(Ghost.State.SAFE, bounce());
-		ghostsByName.put(clyde.getName(), clyde);
 	}
 
 	public void initActors() {

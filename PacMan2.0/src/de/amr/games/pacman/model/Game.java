@@ -84,6 +84,25 @@ public class Game {
 		return GHOST_POINTS[ghostIndex];
 	}
 
+	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
+		switch (ghost.getState()) {
+		case AGGRO:
+			return tps(8f);
+		case DYING:
+			return 0;
+		case DEAD:
+			return tps(12f);
+		case AFRAID:
+			return tps(6f);
+		case SAFE:
+			return tps(6f);
+		case SCATTERING:
+			return tps(8f);
+		default:
+			throw new IllegalStateException();
+		}
+	}
+
 	public int getGhostDyingTime() {
 		return sec(0.5f);
 	}
@@ -103,30 +122,11 @@ public class Game {
 	}
 
 	public int getPacManEmpoweringTime() {
-		return sec(20);
+		return sec(10);
 	}
 
 	public int getPacManDyingTime() {
 		return sec(3);
-	}
-
-	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
-		switch (ghost.getState()) {
-		case AGGRO:
-			return tps(8f);
-		case DYING:
-			return 0;
-		case DEAD:
-			return tps(12f);
-		case AFRAID:
-			return tps(6f);
-		case SAFE:
-			return tps(6f);
-		case SCATTERING:
-			return tps(8f);
-		default:
-			throw new IllegalStateException();
-		}
 	}
 
 	public int getLevelChangingTime() {
