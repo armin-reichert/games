@@ -101,11 +101,11 @@ public class StateMachine<S, E> {
 	/**
 	 * Adds an input ("event") to the queue of this state machine.
 	 * 
-	 * @param input
+	 * @param event
 	 *                some input/event
 	 */
-	public void enqueue(E input) {
-		eventQ.add(input);
+	public void enqueue(E event) {
+		eventQ.add(event);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class StateMachine<S, E> {
 		if (states.length == 0) {
 			throw new IllegalArgumentException("At least one state ID is needed");
 		}
-		return Stream.of(states).anyMatch(stateLabel -> stateLabel == currentState);
+		return Stream.of(states).anyMatch(state -> state.equals(currentState));
 	}
 
 	/**
@@ -129,7 +129,8 @@ public class StateMachine<S, E> {
 	 * @return the label of the given state object
 	 */
 	public Optional<S> stateLabel(StateObject<S, E> state) {
-		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey).findFirst();
+		return stateMap.entrySet().stream().filter(entry -> entry.getValue().equals(state)).map(Map.Entry::getKey)
+				.findFirst();
 	}
 
 	/**
