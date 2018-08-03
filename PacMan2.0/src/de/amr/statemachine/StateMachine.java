@@ -50,17 +50,15 @@ public class StateMachine<S, E> {
 		}
 	}
 
+	public IntSupplier fnPulse = () -> 60;
 	private final String description;
 	private final Deque<E> inputQ;
 	private final Map<S, StateObject> stateMap;
 	private final Map<S, List<Transition>> transitionMap;
 	private final S initialStateLabel;
-
 	private S currentStateLabel;
 	private int pauseTime;
-	private Logger logger;
-
-	public IntSupplier fnPulse = () -> 60;
+	private StateMachineTracer trace;
 
 	/**
 	 * Creates a new state machine.
@@ -79,23 +77,17 @@ public class StateMachine<S, E> {
 		this.stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>();
 		this.transitionMap = new HashMap<>();
 		this.initialStateLabel = initialStateLabel;
+		this.trace = new StateMachineTracer(this);
 	}
 
 	/**
 	 * Sets a logger.
 	 * 
-	 * @param logger
-	 *                 a logger
+	 * @param log
+	 *              a logger
 	 */
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
-
-	/**
-	 * @return (optional) current logger
-	 */
-	public Optional<Logger> getLogger() {
-		return Optional.ofNullable(logger);
+	public void setLogger(Logger log) {
+		trace.setLog(log);
 	}
 
 	/**
@@ -103,16 +95,6 @@ public class StateMachine<S, E> {
 	 */
 	public String getDescription() {
 		return description;
-	}
-
-	/**
-	 * Initializes this state machine by switching to the initial state and executing an optional entry
-	 * action.
-	 */
-	public void init() {
-		currentStateLabel = initialStateLabel;
-		traceStateEntry();
-		state().doEntry();
 	}
 
 	/**
@@ -188,7 +170,7 @@ public class StateMachine<S, E> {
 	public StateObject state(S stateLabel) {
 		if (!stateMap.containsKey(stateLabel)) {
 			stateMap.put(stateLabel, new StateObject());
-			getLogger().ifPresent(log -> log.info(String.format("Created state %s:%s ", description, stateLabel)));
+			trace.stateCreated(stateLabel);
 		}
 		return stateMap.get(stateLabel);
 	}
@@ -204,6 +186,16 @@ public class StateMachine<S, E> {
 			throw new IllegalArgumentException("Negative pause time is not allowed");
 		}
 		pauseTime = ticks;
+	}
+
+	/**
+	 * Initializes this state machine by switching to the initial state and executing an optional entry
+	 * action.
+	 */
+	public void init() {
+		currentStateLabel = initialStateLabel;
+		state().doEntry();
+		trace.enteringInitialState();
 	}
 
 	/**
@@ -234,9 +226,7 @@ public class StateMachine<S, E> {
 			processTransition(t, input);
 		} else {
 			if (input != null) {
-				getLogger().ifPresent(
-						log -> log.info(String.format("FSM(%s) in state %s ignored input %s. No matching transition was found",
-								description, currentStateLabel, input)));
+				trace.inputIgnored(input);
 			}
 			state().doUpdate();
 		}
@@ -244,30 +234,23 @@ public class StateMachine<S, E> {
 
 	private void processTransition(Transition transition, E input) {
 		transition.event = input;
-		getLogger().ifPresent(log -> {
-			if (input != null) {
-				traceInputStateChange(input, transition.from, transition.to);
-			} else {
-				traceStateChange(transition.from, transition.to);
-			}
-		});
+		trace.transition(input, transition.from, transition.to);
 		if (currentStateLabel == transition.to) {
-			// state loop, no exit/entry actions are executed
+			// keep state: no exit/entry actions are executed
 			if (transition.action != null) {
 				transition.action.accept(transition);
 			}
 		} else {
-			// state transition into other state, exit/entry actions are executed
-			traceStateChange(currentStateLabel, transition.to);
+			// change state, execute exit and entry actions
 			if (currentStateLabel != null) {
+				trace.exitingState();
 				state().doExit();
-				traceStateExit();
 			}
 			if (transition.action != null) {
 				transition.action.accept(transition);
 			}
 			currentStateLabel = transition.to;
-			traceStateEntry();
+			trace.enteringState();
 			state().doEntry();
 		}
 	}
@@ -279,41 +262,7 @@ public class StateMachine<S, E> {
 		return transitionMap.get(stateLabel);
 	}
 
-	// Tracing
-
-	private void traceStateEntry() {
-		getLogger().ifPresent(log -> {
-			if (state().getDuration() != StateObject.FOREVER) {
-				float seconds = state().getDuration() / fnPulse.getAsInt();
-				log.info(String.format("FSM(%s) enters state '%s' for %.2f seconds (%d frames)", description,
-						currentStateLabel(), seconds, state().getDuration()));
-			} else {
-				log.info(String.format("FSM(%s) enters state '%s'", description, currentStateLabel()));
-			}
-		});
-	}
-
-	private void traceStateChange(S oldState, S newState) {
-		getLogger().ifPresent(log -> {
-			if (oldState != newState) {
-				log.info(String.format("FSM(%s) changes from '%s' to '%s'", description, oldState, newState));
-			} else {
-				log.info(String.format("FSM(%s) stays in state '%s'", description, oldState));
-			}
-		});
-	}
-
-	private void traceInputStateChange(E input, S oldState, S newState) {
-		getLogger().ifPresent(log -> {
-			log.info(String.format("FSM(%s) processes %s", description, input));
-		});
-	}
-
-	private void traceStateExit() {
-		getLogger().ifPresent(log -> log.info(String.format("FSM(%s) exits state '%s'", description, currentStateLabel())));
-	}
-
-	// methods for specifying the transitions
+	// Methods for building state graph
 
 	private void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		Transition transition = new Transition();
