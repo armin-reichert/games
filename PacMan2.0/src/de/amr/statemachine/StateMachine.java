@@ -35,12 +35,12 @@ public class StateMachine<S, E> {
 		private Consumer<StateTransition<S, E>> action;
 
 		@Override
-		public StateObject from() {
+		public StateObject<S, E> from() {
 			return state(from);
 		}
 
 		@Override
-		public StateObject to() {
+		public StateObject<S, E> to() {
 			return state(to);
 		}
 
@@ -53,7 +53,7 @@ public class StateMachine<S, E> {
 	public IntSupplier fnPulse = () -> 60;
 	private final String description;
 	private final Deque<E> inputQ;
-	private final Map<S, StateObject> stateMap;
+	private final Map<S, StateObject<S, E>> stateMap;
 	private final Map<S, List<Transition>> transitionMap;
 	private final S initialStateLabel;
 	private S currentStateLabel;
@@ -136,7 +136,7 @@ public class StateMachine<S, E> {
 	 *                a state object
 	 * @return the label of the given state object
 	 */
-	public Optional<S> label(StateObject state) {
+	public Optional<S> label(StateObject<S, E> state) {
 		return stateMap.entrySet().stream().filter(e -> e.getValue() == state).map(Map.Entry::getKey).findFirst();
 	}
 
@@ -153,7 +153,7 @@ public class StateMachine<S, E> {
 	 * 
 	 * @return the current state object
 	 */
-	public StateObject state() {
+	public StateObject<S, E> state() {
 		if (currentStateLabel == null) {
 			throw new IllegalStateException("State machine '" + description + "' not initialized");
 		}
@@ -167,9 +167,9 @@ public class StateMachine<S, E> {
 	 *                     a state label
 	 * @return the state object for the given label
 	 */
-	public StateObject state(S stateLabel) {
+	public StateObject<S, E> state(S stateLabel) {
 		if (!stateMap.containsKey(stateLabel)) {
-			stateMap.put(stateLabel, new StateObject());
+			stateMap.put(stateLabel, new StateObject<>(this, stateLabel));
 			trace.stateCreated(stateLabel);
 		}
 		return stateMap.get(stateLabel);
@@ -214,7 +214,7 @@ public class StateMachine<S, E> {
 		}
 	}
 
-	private boolean hasMatchingInput(Class<? extends E> inputClass) {
+	boolean hasMatchingInput(Class<? extends E> inputClass) {
 		return hasInput() && inputQ.peek().getClass().equals(inputClass);
 	}
 
@@ -264,7 +264,7 @@ public class StateMachine<S, E> {
 
 	// Methods for building state graph
 
-	private void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
+	void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		Transition transition = new Transition();
 		transition.from = from;
 		transition.to = to;
