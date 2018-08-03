@@ -74,7 +74,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	public Sprite currentSprite() {
 		return currentSprite;
 	}
-	
+
 	// State machine
 
 	public enum State {
@@ -100,11 +100,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_color[getDir()];
 		};
 
-		sm.changeOnTimeout(State.SAFE, State.AGGRO, () -> pacMan.getState() != PacMan.State.EMPOWERED);
+		sm.state(State.SAFE).changeOnTimeout(State.AGGRO, () -> pacMan.getState() != PacMan.State.EMPOWERED);
 
-		sm.changeOnTimeout(State.SAFE, State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
+		sm.state(State.SAFE).changeOnTimeout(State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
 
-		sm.changeOnInput(PacManLosesPowerEvent.class, State.SAFE, State.AGGRO);
+		sm.state(State.SAFE).changeOnInput(PacManLosesPowerEvent.class, State.AGGRO);
 
 		// AGGRO
 
@@ -117,7 +117,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_color[getDir()];
 		};
 
-		sm.changeOnInput(PacManGainsPowerEvent.class, State.AGGRO, State.AFRAID);
+		sm.state(State.AGGRO).changeOnInput(PacManGainsPowerEvent.class, State.AFRAID);
 
 		// AFRAID
 
@@ -127,13 +127,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.AFRAID).update = state -> move();
 
-		sm.changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, State.AFRAID, t -> {
+		sm.state(State.AFRAID).changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, t -> {
 			currentSprite = s_blinking;
 		});
 
-		sm.changeOnInput(PacManLostPowerEvent.class, State.AFRAID, State.AGGRO);
+		sm.state(State.AFRAID).changeOnInput(PacManLostPowerEvent.class, State.AGGRO);
 
-		sm.changeOnInput(GhostKilledEvent.class, State.AFRAID, State.DYING);
+		sm.state(State.AFRAID).changeOnInput(GhostKilledEvent.class, State.DYING);
 
 		// DYING
 
@@ -144,7 +144,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			game.ghostIndex += 1;
 		};
 
-		sm.changeOnTimeout(State.DYING, State.DEAD);
+		sm.state(State.DYING).changeOnTimeout(State.DEAD);
 
 		// DEAD
 
@@ -157,7 +157,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_eyes[getDir()];
 		};
 
-		sm.change(State.DEAD, State.SAFE, () -> getTile().equals(homeTile));
+		sm.state(State.DEAD).change(State.SAFE, () -> getTile().equals(homeTile));
 
 		return sm;
 	}

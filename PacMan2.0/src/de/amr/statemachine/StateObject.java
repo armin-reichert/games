@@ -186,6 +186,11 @@ public class StateObject<S, E> {
 		return this;
 	}
 
+	public StateObject<S, E> onTimeout(Consumer<StateTransition<S, E>> action) {
+		sm.addTransition(label, label, () -> isTerminated(), action);
+		return this;
+	}
+
 	/**
 	 * Defines a transition between the given states which can be fired if the source state got a
 	 * timeout and the given condition holds.
@@ -199,6 +204,11 @@ public class StateObject<S, E> {
 	 */
 	public StateObject<S, E> changeOnTimeout(S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
 		sm.addTransition(label, to, () -> isTerminated() && condition.getAsBoolean(), action);
+		return this;
+	}
+
+	public StateObject<S, E> onTimeout(BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
+		sm.addTransition(label, label, () -> isTerminated() && condition.getAsBoolean(), action);
 		return this;
 	}
 

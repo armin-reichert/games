@@ -102,9 +102,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 			walkMaze();
 		};
 
-		sm.changeOnInput(PacManKilledEvent.class, State.NORMAL, State.DYING);
+		sm.state(State.NORMAL).changeOnInput(PacManKilledEvent.class, State.DYING);
 
-		sm.changeOnInput(PacManGainsPowerEvent.class, State.NORMAL, State.EMPOWERED);
+		sm.state(State.NORMAL).changeOnInput(PacManGainsPowerEvent.class, State.EMPOWERED);
 
 		// EMPOWERED
 
@@ -120,7 +120,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			}
 		};
 
-		sm.changeOnTimeout(State.EMPOWERED, State.NORMAL, t -> eventMgr.publish(new PacManLostPowerEvent()));
+		sm.state(State.EMPOWERED).changeOnTimeout(State.NORMAL, t -> eventMgr.publish(new PacManLostPowerEvent()));
 
 		// DYING
 
@@ -129,9 +129,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			currentSprite = s_dying;
 		};
 
-		sm.changeOnTimeout(State.DYING, State.DYING, t -> {
-			eventMgr.publish(new PacManDiedEvent());
-		});
+		sm.state(State.DYING).onTimeout(t -> eventMgr.publish(new PacManDiedEvent()));
 
 		return sm;
 	}
