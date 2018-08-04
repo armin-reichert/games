@@ -1,8 +1,5 @@
 package de.amr.games.pacman.ui.actor;
 
-import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
-import static de.amr.games.pacman.ui.Spritesheet.getEnergizer;
-
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -14,7 +11,7 @@ public class Energizer extends GameEntity {
 	private final Sprite s_energizer;
 
 	public Energizer() {
-		s_energizer = new Sprite(getEnergizer()).scale(Spritesheet.TS).animation(BACK_AND_FORTH, 250);
+		s_energizer = Spritesheet.getEnergizer();
 	}
 
 	@Override

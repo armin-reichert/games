@@ -14,8 +14,6 @@ import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 import static de.amr.games.pacman.ui.Spritesheet.TURQUOISE_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.getMazeImage;
-import static de.amr.games.pacman.ui.Spritesheet.getMazeImageWhite;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -33,7 +31,6 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEventManager;
@@ -72,9 +69,8 @@ public class MazeUI extends GameEntity {
 	public MazeUI(Game game, Maze maze) {
 		this.game = game;
 		this.maze = maze;
-		s_normal = new Sprite(getMazeImage()).scale(getWidth(), getHeight());
-		s_flashing = new Sprite(getMazeImage(), getMazeImageWhite()).scale(getWidth(), getHeight())
-				.animation(AnimationMode.CYCLIC, 100);
+		s_normal = Spritesheet.getMaze().scale(getWidth(), getHeight());
+		s_flashing = Spritesheet.getFlashingMaze().scale(getWidth(), getHeight());
 
 		energizer = new Energizer();
 		pellet = new Pellet();
@@ -119,7 +115,7 @@ public class MazeUI extends GameEntity {
 	private void createInky(PacMan pacMan) {
 		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, maze, maze.inkyHome, TURQUOISE_GHOST);
 		ghostsByName.put(inky.getName(), inky);
-		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); //TODO
+		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
 		inky.setNavigation(Ghost.State.SAFE, bounce());
@@ -274,7 +270,7 @@ public class MazeUI extends GameEntity {
 	}
 
 	private void drawInfoText(Graphics2D g) {
-		Graphics2D g2 = (Graphics2D)g.create();
+		Graphics2D g2 = (Graphics2D) g.create();
 		Tile tile = maze.infoTile;
 		g2.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
 		g2.setFont(Assets.font("scoreFont"));

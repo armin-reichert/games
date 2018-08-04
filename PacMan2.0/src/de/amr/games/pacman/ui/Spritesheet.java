@@ -1,5 +1,7 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -9,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.sprite.AnimationMode;
+import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.BonusSymbol;
 
@@ -115,12 +119,16 @@ public class Spritesheet {
 		return img;
 	}
 
-	public static BufferedImage[] getEnergizer() {
-		return energizer;
+	public static Sprite getEnergizer() {
+		return new Sprite(energizer).animation(BACK_AND_FORTH, 250);
 	}
 
-	public static BufferedImage getMazeImage() {
-		return maze;
+	public static Sprite getMaze() {
+		return new Sprite(maze);
+	}
+	
+	public static Sprite getFlashingMaze() {
+		return new Sprite(maze, mazeWhite).animation(AnimationMode.CYCLIC, 100);
 	}
 
 	public static BufferedImage getMazeImageWhite() {
