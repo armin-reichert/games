@@ -25,7 +25,11 @@ public class Game {
 
 	public final IntSupplier fnTicksPerSecond;
 
-	private final Object[][] LEVELS = {
+	enum Column {
+		BonusSymbol, BonusValue, PacManSpeed, Col3, GhostNormalSpeed, GhostTunnelSpeed
+	};
+
+	private static final Object[][] LEVELDATA = {
 		/*@formatter:off*/
 		{},
 		{ CHERRIES, 		100, 	.80f, .71f, .75f, .40f, 20, .8f, 10, 	.85f, 	.90f, 	.79f, 	.50f, 6 },
@@ -48,6 +52,11 @@ public class Game {
 		/*@formatter:on*/
 	};
 
+	@SuppressWarnings("unchecked")
+	private <T> T levelData(Column column) {
+		return (T) LEVELDATA[level][column.ordinal()];
+	}
+
 	/** Tiles per second. */
 	private float tps(float value) {
 		return (value * Spritesheet.TS) / fnTicksPerSecond.getAsInt();
@@ -59,11 +68,11 @@ public class Game {
 	}
 
 	public BonusSymbol getBonusSymbol() {
-		return (BonusSymbol) LEVELS[level][0];
+		return levelData(Column.BonusSymbol);
 	}
 
 	public int getBonusValue() {
-		return (int) LEVELS[level][1];
+		return levelData(Column.BonusValue);
 	}
 
 	public int getBonusTime() {
@@ -85,9 +94,12 @@ public class Game {
 	}
 
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
+		if (maze.getContent(ghost.getTile()) == Content.TUNNEL) {
+			return baseSpeed * (float) levelData(Column.GhostTunnelSpeed);
+		}
 		switch (ghost.getState()) {
 		case AGGRO:
-			return tps(8f);
+			return baseSpeed * (float) levelData(Column.GhostNormalSpeed);
 		case DYING:
 			return 0;
 		case DEAD:
@@ -97,7 +109,7 @@ public class Game {
 		case SAFE:
 			return tps(6f);
 		case SCATTERING:
-			return tps(8f);
+			return baseSpeed;
 		default:
 			throw new IllegalStateException();
 		}
@@ -113,7 +125,7 @@ public class Game {
 			return 0;
 		case NORMAL:
 		case EMPOWERED:
-			return tps(9f);
+			return baseSpeed * (float) levelData(Column.PacManSpeed);
 		case DYING:
 			return 0;
 		default:
@@ -133,18 +145,23 @@ public class Game {
 		return sec(4);
 	}
 
+	public Maze maze;
 	public int level;
 	public int lives;
 	public int score;
 	public long foodTotal;
 	public int foodEaten;
 	public int ghostIndex;
+	
+	private float baseSpeed;
 
 	public Game(IntSupplier fnTicksPerSecond) {
 		this.fnTicksPerSecond = fnTicksPerSecond;
+		baseSpeed = tps(8f);
 	}
 
 	public void init(Maze maze) {
+		this.maze = maze;
 		maze.resetFood();
 		foodTotal = maze.getFoodCount();
 		level = 1;
