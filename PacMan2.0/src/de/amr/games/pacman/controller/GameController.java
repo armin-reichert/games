@@ -94,6 +94,12 @@ public class GameController extends StateMachine<State, GameEvent> {
 			}
 		}
 
+		private void onPacManKilled(StateTransition<State, GameEvent> t) {
+			PacManKilledEvent e = t.typedEvent();
+			mazeUI.getPacMan().processEvent(e);
+			LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
+		}
+
 		private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
 			PacManGainsPowerEvent e = t.typedEvent();
 			mazeUI.getPacMan().processEvent(e);
@@ -108,6 +114,12 @@ public class GameController extends StateMachine<State, GameEvent> {
 		private void onPacManLostPower(StateTransition<State, GameEvent> t) {
 			PacManLostPowerEvent e = t.typedEvent();
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+		}
+
+		private void onGhostKilled(StateTransition<State, GameEvent> t) {
+			GhostKilledEvent e = t.typedEvent();
+			e.ghost.processEvent(e);
+			LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
 		}
 
 		private void onBonusFound(StateTransition<State, GameEvent> t) {
@@ -202,12 +214,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		public void onExit(StateObject<State, GameEvent> self) {
 			mazeUI.getPacMan().visibility = () -> true;
 		}
-
-		private void onGhostKilled(StateTransition<State, GameEvent> t) {
-			GhostKilledEvent e = t.typedEvent();
-			e.ghost.processEvent(e);
-			LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
-		}
 	}
 
 	private class PacManDyingState extends CustomStateObject<State, GameEvent> {
@@ -232,12 +238,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		@Override
 		public void onExit(StateObject<State, GameEvent> self) {
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
-		}
-
-		private void onPacManKilled(StateTransition<State, GameEvent> t) {
-			PacManKilledEvent e = t.typedEvent();
-			mazeUI.getPacMan().processEvent(e);
-			LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
 		}
 	}
 
@@ -294,8 +294,8 @@ public class GameController extends StateMachine<State, GameEvent> {
 			.onInput(PacManGainsPowerEvent.class, playing::onPacManGainsPower)
 			.onInput(PacManLosesPowerEvent.class, playing::onPacManLosesPower)
 			.onInput(PacManLostPowerEvent.class, playing::onPacManLostPower)
-			.changeOnInput(GhostKilledEvent.class, ghostDying.id, ghostDying::onGhostKilled)
-			.changeOnInput(PacManKilledEvent.class, pacManDying.id, pacManDying::onPacManKilled)
+			.changeOnInput(GhostKilledEvent.class, ghostDying.id, playing::onGhostKilled)
+			.changeOnInput(PacManKilledEvent.class, pacManDying.id, playing::onPacManKilled)
 			.changeOnInput(LevelCompletedEvent.class, changingLevel.id);
 			;
 
