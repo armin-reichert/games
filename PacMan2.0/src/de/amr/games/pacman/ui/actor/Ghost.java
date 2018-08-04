@@ -43,7 +43,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_color[] = new Sprite[4];
 	private Sprite s_number[] = new Sprite[4];
 	private Sprite s_eyes[] = new Sprite[4];
-	private Sprite s_blue;
+	private Sprite s_awed;
 	private Sprite s_blinking;
 
 	private void createSprites(int color) {
@@ -55,13 +55,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 		for (int i = 0; i < 4; ++i) {
 			s_number[i] = Spritesheet.greenNumber(i).scale(size);
 		}
-		s_blue = Spritesheet.ghostAwed().scale(size);
+		s_awed = Spritesheet.ghostAwed().scale(size);
 		s_blinking = Spritesheet.ghostBlinking().scale(size);
 	}
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes), Stream.of(s_blue, s_blinking))
+		return Stream.of(Stream.of(s_color), Stream.of(s_number), Stream.of(s_eyes), Stream.of(s_awed, s_blinking))
 				.flatMap(s -> s);
 	}
 
@@ -109,13 +109,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.SAFE).changeOnTimeout(State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
 
-		// sm.state(State.SAFE).changeOnInput(PacManLosesPowerEvent.class, State.AGGRO);
-
 		// AGGRO
-
-		sm.state(State.AGGRO).entry = state -> {
-			currentSprite = s_color[getDir()];
-		};
 
 		sm.state(State.AGGRO).update = state -> {
 			move();
@@ -126,11 +120,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		// AFRAID
 
-		sm.state(State.AFRAID).entry = state -> {
-			currentSprite = s_blue;
+		sm.state(State.AFRAID).update = state -> {
+			move();
+			currentSprite = s_color[getDir()];
 		};
-
-		sm.state(State.AFRAID).update = state -> move();
 
 		sm.state(State.AFRAID).changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, t -> {
 			currentSprite = s_blinking;

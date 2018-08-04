@@ -91,14 +91,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 		// NORMAL
 
-		sm.state(State.NORMAL).entry = state -> {
-			currentSprite = s_walking[getDir()];
-		};
-
-		sm.state(State.NORMAL).update = s -> {
-			currentSprite = s_walking[getDir()];
-			walkMaze();
-		};
+		sm.state(State.NORMAL).update = s -> walkMaze();
 
 		sm.state(State.NORMAL).changeOnInput(PacManKilledEvent.class, State.DYING);
 
@@ -111,7 +104,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 		};
 
 		sm.state(State.EMPOWERED).update = state -> {
-			currentSprite = s_walking[getDir()];
 			walkMaze();
 			if (state.getRemaining() == state.getDuration() * 20 / 100) {
 				eventMgr.publish(new PacManLosesPowerEvent());
@@ -139,6 +131,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private void walkMaze() {
 		move();
+		currentSprite = s_walking[getDir()];
 		if (isTeleporting()) {
 			return;
 		}
