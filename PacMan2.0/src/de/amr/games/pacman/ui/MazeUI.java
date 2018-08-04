@@ -69,8 +69,8 @@ public class MazeUI extends GameEntity {
 	public MazeUI(Game game, Maze maze) {
 		this.game = game;
 		this.maze = maze;
-		s_normal = Spritesheet.getMaze().scale(getWidth(), getHeight());
-		s_flashing = Spritesheet.getFlashingMaze().scale(getWidth(), getHeight());
+		s_normal = Spritesheet.maze().scale(getWidth(), getHeight());
+		s_flashing = Spritesheet.flashingMaze().scale(getWidth(), getHeight());
 
 		energizer = new Energizer();
 		pellet = new Pellet();

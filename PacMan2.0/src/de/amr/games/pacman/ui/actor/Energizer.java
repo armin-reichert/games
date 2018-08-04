@@ -11,7 +11,7 @@ public class Energizer extends GameEntity {
 	private final Sprite s_energizer;
 
 	public Energizer() {
-		s_energizer = Spritesheet.getEnergizer();
+		s_energizer = Spritesheet.energizer();
 	}
 
 	@Override

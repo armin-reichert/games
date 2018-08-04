@@ -1,8 +1,8 @@
 package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.ui.Spritesheet.getPacManDying;
-import static de.amr.games.pacman.ui.Spritesheet.getPacManWalking;
+import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
+import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
 
 import java.util.EnumMap;
 import java.util.Set;
@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEvent;
@@ -38,7 +37,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		super(game, maze, home, new EnumMap<>(State.class));
 		this.interests = interests;
 		sm = createStateMachine();
-		createSprites();
+		createSprites(2 * Spritesheet.TS);
 		currentSprite = s_walking[Top4.E]; // TODO
 	}
 
@@ -48,12 +47,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Sprite s_dying;
 	private Sprite currentSprite;
 
-	private void createSprites() {
-		int size = 2 * Spritesheet.TS;
-		s_dying = new Sprite(getPacManDying()).scale(size).animation(AnimationMode.LINEAR, 100);
-		TOPOLOGY.dirs().forEach(dir -> {
-			s_walking[dir] = new Sprite(getPacManWalking(dir)).scale(size).animation(AnimationMode.BACK_AND_FORTH, 80);
-		});
+	private void createSprites(int size) {
+		s_dying = pacManDying().scale(size);
+		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = pacManWalking(dir).scale(size));
 	}
 
 	@Override

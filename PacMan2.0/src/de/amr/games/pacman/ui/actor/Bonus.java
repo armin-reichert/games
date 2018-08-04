@@ -22,13 +22,13 @@ public class Bonus extends GameEntity {
 		this.symbol = symbol;
 		this.points = points;
 		this.honored = false;
-		s_symbol = new Sprite(Spritesheet.getSymbol(symbol)).scale(2 * Spritesheet.TS, 2 * Spritesheet.TS);
 		int index = Arrays.binarySearch(BONUS_POINTS, points);
-		if (index >= 0) {
-			s_points = new Sprite(Spritesheet.getPinkNumber(index)).scale(2 * Spritesheet.TS, 2 * Spritesheet.TS);
-		} else {
-			throw new IllegalArgumentException("Bonus value not supported: " + points);
+		if (index < 0) {
+			throw new IllegalArgumentException("Illegal bonus value: " + points);
 		}
+		int size = 2 * Spritesheet.TS;
+		s_symbol = Spritesheet.symbol(symbol).scale(size);
+		s_points = Spritesheet.pinkNumber(index).scale(size);
 	}
 
 	public int getValue() {

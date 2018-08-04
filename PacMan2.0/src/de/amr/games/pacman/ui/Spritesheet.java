@@ -29,26 +29,22 @@ public class Spritesheet {
 	private static BufferedImage sheet = Assets.readImage("sprites.png");
 	private static BufferedImage maze;
 	private static BufferedImage mazeWhite;
-	private static BufferedImage[] energizer = new BufferedImage[2];
 	private static Map<BonusSymbol, BufferedImage> symbolMap = new HashMap<>();
 	private static BufferedImage pacManStanding;
 	private static BufferedImage[][] pacManWalking = new BufferedImage[4][]; // E, W, N, S
 	private static BufferedImage[] pacManDying = new BufferedImage[11];
 	private static BufferedImage[][] ghostNormal = new BufferedImage[4][8];
-	private static BufferedImage[] ghostFrightened = new BufferedImage[2];
-	private static BufferedImage[] ghostFrightenedEnding = new BufferedImage[4];
-	private static BufferedImage[] ghostDead = new BufferedImage[4];
+	private static BufferedImage[] ghostAwed = new BufferedImage[2];
+	private static BufferedImage[] ghostBlinking = new BufferedImage[4];
+	private static BufferedImage[] ghostEyes = new BufferedImage[4];
 	private static BufferedImage[] greenNumber = new BufferedImage[4];
 	private static BufferedImage[] pinkNumber = new BufferedImage[8];
 
-	static {
+	static { // Extract frames
+
 		// Maze
 		maze = $(228, 0, 224, 248);
 		mazeWhite = Assets.image("maze_white.png");
-
-		// Energizer
-		energizer[0] = createEnergizerImage(true);
-		energizer[1] = createEnergizerImage(false);
 
 		// Symbols for boni
 		int offset = 0;
@@ -74,13 +70,13 @@ public class Spritesheet {
 			}
 		}
 		for (int i = 0; i < 2; ++i) {
-			ghostFrightened[i] = $(584 + i * TS, 64);
+			ghostAwed[i] = $(584 + i * TS, 64);
 		}
 		for (int i = 0; i < 4; ++i) {
-			ghostFrightenedEnding[i] = $(584 + i * TS, 64);
+			ghostBlinking[i] = $(584 + i * TS, 64);
 		}
 		for (int i = 0; i < 4; ++i) {
-			ghostDead[i] = $(584 + i * TS, 80);
+			ghostEyes[i] = $(584 + i * TS, 80);
 		}
 
 		// Green numbers (200, 400, 800, 1600)
@@ -105,8 +101,8 @@ public class Spritesheet {
 		return $(x, y, TS, TS);
 	}
 
-	private static BufferedImage createEnergizerImage(boolean visible) {
-		BufferedImage img = new BufferedImage(TS, TS, BufferedImage.TYPE_INT_ARGB);
+	private static BufferedImage energizerImage(boolean visible) {
+		BufferedImage img = new BufferedImage(TS, TS, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = img.createGraphics();
 		g.setColor(Color.BLACK);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -119,80 +115,82 @@ public class Spritesheet {
 		return img;
 	}
 
-	public static Sprite getEnergizer() {
-		return new Sprite(energizer).animation(BACK_AND_FORTH, 250);
+	public static Sprite energizer() {
+		return new Sprite(energizerImage(false), energizerImage(true)).animation(BACK_AND_FORTH, 250);
 	}
 
-	public static Sprite getMaze() {
+	public static Sprite maze() {
 		return new Sprite(maze);
 	}
 
-	public static Sprite getFlashingMaze() {
+	public static Sprite flashingMaze() {
 		return new Sprite(maze, mazeWhite).animation(AnimationMode.CYCLIC, 100);
 	}
 
-	public static BufferedImage getMazeImageWhite() {
-		return mazeWhite;
+	public static Sprite symbol(BonusSymbol symbol) {
+		return new Sprite(symbolMap.get(symbol));
 	}
 
-	public static BufferedImage getSymbol(BonusSymbol symbol) {
-		return symbolMap.get(symbol);
+	public static Sprite pacManStanding() {
+		return new Sprite(pacManStanding);
 	}
 
-	public static BufferedImage getPacManStanding() {
-		return pacManStanding;
+	public static Sprite pacManWalking(int dir) {
+		return new Sprite(pacManWalking[dir]).animation(AnimationMode.BACK_AND_FORTH, 80);
 	}
 
-	public static BufferedImage[] getPacManWalking(int direction) {
-		return pacManWalking[direction];
+	public static Sprite pacManDying() {
+		return new Sprite(pacManDying).animation(AnimationMode.LINEAR, 100);
 	}
 
-	public static BufferedImage[] getPacManDying() {
-		return pacManDying;
-	}
-
-	public static BufferedImage[] getGhostNormal(int color, int direction) {
+	public static Sprite ghostColored(int color, int direction) {
+		BufferedImage[] frames;
 		switch (direction) {
 		case Top4.E:
-			return Arrays.copyOfRange(ghostNormal[color], 0, 2);
+			frames = Arrays.copyOfRange(ghostNormal[color], 0, 2);
+			break;
 		case Top4.W:
-			return Arrays.copyOfRange(ghostNormal[color], 2, 4);
+			frames = Arrays.copyOfRange(ghostNormal[color], 2, 4);
+			break;
 		case Top4.N:
-			return Arrays.copyOfRange(ghostNormal[color], 4, 6);
+			frames = Arrays.copyOfRange(ghostNormal[color], 4, 6);
+			break;
 		case Top4.S:
-			return Arrays.copyOfRange(ghostNormal[color], 6, 8);
+			frames = Arrays.copyOfRange(ghostNormal[color], 6, 8);
+			break;
+		default:
+			throw new IllegalArgumentException("Illegal direction: " + direction);
 		}
-		throw new IllegalArgumentException("Illegal direction: " + direction);
+		return new Sprite(frames).animation(AnimationMode.BACK_AND_FORTH, 300);
 	}
 
-	public static BufferedImage[] getGhostBlue() {
-		return ghostFrightened;
+	public static Sprite ghostAwed() {
+		return new Sprite(ghostAwed).animation(AnimationMode.CYCLIC, 200);
 	}
 
-	public static BufferedImage[] getGhostBlueWhite() {
-		return ghostFrightenedEnding;
+	public static Sprite ghostBlinking() {
+		return new Sprite(ghostBlinking).animation(AnimationMode.CYCLIC, 100);
 	}
 
-	public static BufferedImage getGhostEyes(int direction) {
-		switch (direction) {
+	public static Sprite ghostEyes(int dir) {
+		switch (dir) {
 		case Top4.E:
-			return ghostDead[0];
+			return new Sprite(ghostEyes[0]);
 		case Top4.W:
-			return ghostDead[1];
+			return new Sprite(ghostEyes[1]);
 		case Top4.N:
-			return ghostDead[2];
+			return new Sprite(ghostEyes[2]);
 		case Top4.S:
-			return ghostDead[3];
+			return new Sprite(ghostEyes[3]);
 		}
-		throw new IllegalArgumentException("Illegal direction: " + direction);
+		throw new IllegalArgumentException("Illegal direction: " + dir);
 	}
 
-	public static BufferedImage getGreenNumber(int i) {
-		return greenNumber[i];
+	public static Sprite greenNumber(int i) {
+		return new Sprite(greenNumber[i]);
 	}
 
-	public static BufferedImage getPinkNumber(int i) {
-		return pinkNumber[i];
+	public static Sprite pinkNumber(int i) {
+		return new Sprite(pinkNumber[i]);
 	}
-
 }

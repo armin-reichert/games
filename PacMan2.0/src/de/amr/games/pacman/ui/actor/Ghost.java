@@ -2,16 +2,10 @@ package de.amr.games.pacman.ui.actor;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostBlue;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostBlueWhite;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostEyes;
-import static de.amr.games.pacman.ui.Spritesheet.getGhostNormal;
-import static de.amr.games.pacman.ui.Spritesheet.getGreenNumber;
 
 import java.util.EnumMap;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.sprite.AnimationMode;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.core.GameEvent;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
@@ -21,6 +15,7 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
@@ -54,14 +49,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void createSprites(int color) {
 		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_color[dir] = new Sprite(getGhostNormal(color, dir)).scale(size).animation(AnimationMode.BACK_AND_FORTH, 300);
-			s_eyes[dir] = new Sprite(getGhostEyes(dir)).scale(size);
+			s_color[dir] = Spritesheet.ghostColored(color, dir).scale(size);
+			s_eyes[dir] = Spritesheet.ghostEyes(dir).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_number[i] = new Sprite(getGreenNumber(i)).scale(size);
+			s_number[i] = Spritesheet.greenNumber(i).scale(size);
 		}
-		s_blue = new Sprite(getGhostBlue()).scale(size).animation(AnimationMode.CYCLIC, 200);
-		s_blinking = new Sprite(getGhostBlueWhite()).scale(size).animation(AnimationMode.CYCLIC, 100);
+		s_blue = Spritesheet.ghostAwed().scale(size);
+		s_blinking = Spritesheet.ghostBlinking().scale(size);
 	}
 
 	@Override
