@@ -56,7 +56,7 @@ public class StateMachine<S, E> {
 	private final String description;
 	private final Deque<E> eventQ;
 	private final Map<S, StateObject<S, E>> stateMap;
-	private final Map<S, List<Transition>> transitionsForState;
+	private final Map<S, List<Transition>> transitionsFromState;
 	private final S initialState;
 	private S currentState;
 	private StateMachineTracer<S, E> trace;
@@ -75,7 +75,7 @@ public class StateMachine<S, E> {
 		this.description = description;
 		this.eventQ = new ArrayDeque<>();
 		this.stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>();
-		this.transitionsForState = new HashMap<>();
+		this.transitionsFromState = new HashMap<>();
 		this.initialState = initialState;
 		this.trace = new StateMachineTracer(this);
 	}
@@ -158,7 +158,7 @@ public class StateMachine<S, E> {
 		E event = eventQ.peek();
 		if (event == null) {
 			// find transition without event
-			Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean())
+			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.condition.getAsBoolean())
 					.findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
@@ -168,7 +168,7 @@ public class StateMachine<S, E> {
 			}
 		} else {
 			// find transition for current event
-			Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean())
+			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.condition.getAsBoolean())
 					.findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
@@ -179,7 +179,7 @@ public class StateMachine<S, E> {
 		}
 	}
 
-	//TODO make this configurable
+	// TODO make this configurable
 	boolean hasMatchingEvent(Class<? extends E> eventType) {
 		return !eventQ.isEmpty() && eventQ.peek().getClass().equals(eventType);
 	}
@@ -192,22 +192,20 @@ public class StateMachine<S, E> {
 			transition.action.accept(transition);
 		} else {
 			// change state, execute exit and entry actions
-			if (currentState != null) {
-				trace.exitingState(currentState);
-				state(currentState).doExit();
-			}
+			trace.exitingState(currentState);
+			state(currentState).doExit();
 			transition.action.accept(transition);
 			currentState = transition.to;
-			trace.enteringState(currentState);
+			trace.enteringState(transition.to);
 			state(currentState).doEntry();
 		}
 	}
 
-	private List<Transition> transitions(S stateLabel) {
-		if (!transitionsForState.containsKey(stateLabel)) {
-			transitionsForState.put(stateLabel, new ArrayList<>(3));
+	private List<Transition> transitionsFrom(S state) {
+		if (!transitionsFromState.containsKey(state)) {
+			transitionsFromState.put(state, new ArrayList<>(3));
 		}
-		return transitionsForState.get(stateLabel);
+		return transitionsFromState.get(state);
 	}
 
 	void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
@@ -216,6 +214,6 @@ public class StateMachine<S, E> {
 		transition.to = to;
 		transition.condition = condition;
 		transition.action = action;
-		transitions(from).add(transition);
+		transitionsFrom(from).add(transition);
 	}
 }
