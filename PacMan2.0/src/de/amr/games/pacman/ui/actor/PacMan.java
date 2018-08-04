@@ -5,6 +5,7 @@ import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
 
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -31,11 +32,10 @@ import de.amr.statemachine.StateMachine;
 public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> sm;
-	private final Set<GameEntity> interests;
+	public final Set<GameEntity> interests = new HashSet<>();
 
-	public PacMan(Game game, Maze maze, Tile home, Set<GameEntity> interests) {
+	public PacMan(Game game, Maze maze, Tile home) {
 		super(game, maze, home, new EnumMap<>(State.class));
-		this.interests = interests;
 		sm = createStateMachine();
 		createSprites(2 * Spritesheet.TS);
 		currentSprite = s_walking[Top4.E]; // TODO
