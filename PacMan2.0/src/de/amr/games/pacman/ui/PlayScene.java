@@ -46,8 +46,8 @@ public class PlayScene implements ViewController {
 
 		mazeUI.setGhostActive(GhostName.BLINKY, true);
 		mazeUI.setGhostActive(GhostName.PINKY, false);
-		mazeUI.setGhostActive(GhostName.INKY, false); //TODO
-		mazeUI.setGhostActive(GhostName.CLYDE, false); //TODO
+		mazeUI.setGhostActive(GhostName.INKY, false); // TODO
+		mazeUI.setGhostActive(GhostName.CLYDE, false); // TODO
 	}
 
 	@Override

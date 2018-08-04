@@ -11,14 +11,17 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
  * A finite state machine.
  *
- * @param <S> type for identifying states, for example an enumeration type.
- * @param <E> type of inputs (events).
+ * @param <S>
+ *          type for identifying states, for example an enumeration type.
+ * @param <E>
+ *          type of inputs (events).
  * 
  * @author Armin Reichert
  */
@@ -64,11 +67,12 @@ public class StateMachine<S, E> {
 	/**
 	 * Creates a new state machine.
 	 * 
-	 * @param description    a string describing this state machine, used for
-	 *                       tracing
-	 * @param stateLabelType type used for identifying the states, for example an
-	 *                       enumeration type
-	 * @param initialState   the label of the initial state
+	 * @param description
+	 *                         a string describing this state machine, used for tracing
+	 * @param stateLabelType
+	 *                         type used for identifying the states, for example an enumeration type
+	 * @param initialState
+	 *                         the label of the initial state
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public StateMachine(String description, Class<S> stateLabelType, S initialState) {
@@ -77,13 +81,15 @@ public class StateMachine<S, E> {
 		this.stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>();
 		this.transitionsFromState = new HashMap<>();
 		this.initialState = initialState;
+		this.currentState = initialState;
 		this.trace = new StateMachineTracer(this);
 	}
 
 	/**
 	 * Sets a logger.
 	 * 
-	 * @param log a logger
+	 * @param log
+	 *              a logger
 	 */
 	public void setLogger(Logger log) {
 		trace.setLog(log);
@@ -99,7 +105,8 @@ public class StateMachine<S, E> {
 	/**
 	 * Adds an input ("event") to the queue of this state machine.
 	 * 
-	 * @param event some input/event
+	 * @param event
+	 *                some input/event
 	 */
 	public void enqueue(E event) {
 		eventQ.add(event);
@@ -108,7 +115,8 @@ public class StateMachine<S, E> {
 	/**
 	 * Tells if the state machine is in any of the given states.
 	 * 
-	 * @param states non-empty list of state labels
+	 * @param states
+	 *                 non-empty list of state labels
 	 * @return <code>true</code> if the state machine is in any of the given states
 	 */
 	@SuppressWarnings("unchecked")
@@ -127,23 +135,38 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * Returns the state object with the given identifier. The state object is
-	 * created on demand.
+	 * Returns the state object with the given identifier. The state object is created on demand.
 	 * 
-	 * @param state a state identifier
+	 * @param state
+	 *                a state identifier
 	 * @return the state object for the given state identifier
 	 */
-	public StateObject<S, E> state(S state) {
+	@SuppressWarnings("unchecked")
+	public <C extends StateObject<S, E>> C state(S state) {
 		if (!stateMap.containsKey(state)) {
 			stateMap.put(state, new StateObject<>(this, state));
 			trace.stateCreated(state);
 		}
-		return stateMap.get(state);
+		return (C) stateMap.get(state);
 	}
 
 	/**
-	 * Initializes this state machine by switching to the initial state and
-	 * executing the initial state's (optional) entry action.
+	 * Realizes this state by the given custom state.
+	 * 
+	 * @param state
+	 *                              state identifer
+	 * @param customStateSupplier
+	 *                              custom state constructor function
+	 */
+	public <C extends CustomStateObject<S, E>> C createState(S state, Supplier<C> customStateSupplier) {
+		C customState = customStateSupplier.get();
+		stateMap.put(state, customState);
+		return customState;
+	}
+
+	/**
+	 * Initializes this state machine by switching to the initial state and executing the initial
+	 * state's (optional) entry action.
 	 */
 	public void init() {
 		trace.enteringInitialState(initialState);

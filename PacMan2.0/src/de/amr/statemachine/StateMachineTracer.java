@@ -62,8 +62,8 @@ public class StateMachineTracer<S, E> {
 				}
 			} else {
 				if (t.from != t.to) {
-					log.info(String.format("FSM(%s) changing from '%s' to '%s' on '%s'", sm.getDescription(), t.from,
-							t.to, t.event));
+					log.info(
+							String.format("FSM(%s) changing from '%s' to '%s' on '%s'", sm.getDescription(), t.from, t.to, t.event));
 				} else {
 					log.info(String.format("FSM(%s) keeps '%s' on '%s'", sm.getDescription(), t.from, t.event));
 				}

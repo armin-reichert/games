@@ -126,7 +126,7 @@ public class Game {
 	}
 
 	public int getPacManDyingTime() {
-		return sec(3);
+		return sec(2);
 	}
 
 	public int getLevelChangingTime() {

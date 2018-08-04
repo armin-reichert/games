@@ -22,10 +22,10 @@ import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 

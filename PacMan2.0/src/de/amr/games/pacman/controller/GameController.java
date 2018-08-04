@@ -18,231 +18,296 @@ import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.statemachine.CustomStateObject;
 import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
 
 public class GameController extends StateMachine<State, GameEvent> {
-
-	public enum State {
-		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
-	};
 
 	private final Game game;
 	private final Maze maze;
 	private final MazeUI mazeUI;
 
-	public GameController(Game game, Maze maze, MazeUI mazeUI) {
-		super("GameController", State.class, State.READY);
-		fnPulse = game.fnTicksPerSecond;
+	public enum State {
+		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
+	};
 
-		this.game = game;
-		this.maze = maze;
-		this.mazeUI = mazeUI;
+	private class ReadyState extends CustomStateObject<State, GameEvent> {
 
-		mazeUI.eventMgr.subscribe(this::enqueue);
-		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
+		public ReadyState() {
+			super(GameController.this, State.READY);
+		}
 
-		/*@formatter:off*/
-		
-		// -- READY
-
-		state(State.READY).entry = state -> {
-			state.setDuration(game.sec(2));
+		@Override
+		public void onEntry(StateObject<State, GameEvent> self) {
+			setDuration(game.sec(2));
 			game.init(maze);
 			mazeUI.initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!", Color.YELLOW);
-		};
+		}
 
-		state(State.READY).exit = state -> {
+		@Override
+		public void onExit(StateObject<State, GameEvent> self) {
 			mazeUI.enableAnimation(true);
 			mazeUI.hideInfo();
-		};
+		}
+	}
 
-		state(State.READY).changeOnTimeout(State.PLAYING);
+	private class PlayingState extends CustomStateObject<State, GameEvent> {
 
-		// -- PLAYING
+		public PlayingState() {
+			super(GameController.this, State.PLAYING);
+		}
 
-		state(State.PLAYING).update = state -> mazeUI.update();
+		@Override
+		public void onTick(StateObject<State, GameEvent> self) {
+			mazeUI.update();
+		}
 
-		state(State.PLAYING)
-			.onInput(FoodFoundEvent.class, this::onFoodFound)
-			.onInput(BonusFoundEvent.class, this::onBonusFound)
-			.onInput(PacManGhostCollisionEvent.class, this::onPacManGhostCollision)
-			.onInput(PacManGainsPowerEvent.class, this::onPacManGainsPower)
-			.onInput(PacManLosesPowerEvent.class, this::onPacManLosesPower)
-			.onInput(PacManLostPowerEvent.class, this::onPacManLostPower)
-			.changeOnInput(GhostKilledEvent.class, State.GHOST_DYING, this::onGhostKilled)
-			.changeOnInput(PacManKilledEvent.class, State.PACMAN_DYING, this::onPacManKilled)
-			.changeOnInput(LevelCompletedEvent.class, State.CHANGING_LEVEL);
-			;
+		// Game event handling
 
-		// -- CHANGING_LEVEL
+		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
+			PacManGhostCollisionEvent e = t.typedEvent();
+			switch (e.ghost.getState()) {
+			case AGGRO:
+			case SAFE:
+			case SCATTERING:
+				enqueue(new PacManKilledEvent(e.ghost));
+				break;
+			case AFRAID:
+				enqueue(new GhostKilledEvent(e.ghost));
+				break;
+			case DYING:
+			case DEAD:
+				// no event should occur for collision with ghost corpse
+				break;
+			default:
+				throw new IllegalStateException();
+			}
+		}
 
-		state(State.CHANGING_LEVEL).entry = state -> {
-			state.setDuration(game.getLevelChangingTime());
+		private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
+			PacManGainsPowerEvent e = t.typedEvent();
+			mazeUI.getPacMan().processEvent(e);
+			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+		}
+
+		private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
+			PacManLosesPowerEvent e = t.typedEvent();
+			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+		}
+
+		private void onPacManLostPower(StateTransition<State, GameEvent> t) {
+			PacManLostPowerEvent e = t.typedEvent();
+			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+		}
+
+		private void onBonusFound(StateTransition<State, GameEvent> t) {
+			BonusFoundEvent e = t.typedEvent();
+			LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
+			game.score += e.value;
+			mazeUI.consumeBonusAfter(game.sec(2));
+		}
+
+		private void onFoodFound(StateTransition<State, GameEvent> t) {
+			FoodFoundEvent e = t.typedEvent();
+			maze.clearTile(e.tile);
+			game.foodEaten += 1;
+			int oldGameScore = game.score;
+			game.score += game.getFoodValue(e.food);
+			if (oldGameScore < Game.EXTRALIFE_SCORE && game.score >= Game.EXTRALIFE_SCORE) {
+				game.lives += 1;
+			}
+			if (game.foodEaten == game.foodTotal) {
+				enqueue(new LevelCompletedEvent());
+				return;
+			}
+			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
+				mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
+			}
+			if (e.food == Content.ENERGIZER) {
+				game.ghostIndex = 0;
+				enqueue(new PacManGainsPowerEvent());
+			}
+		}
+
+	}
+
+	private class ChangingLevelState extends CustomStateObject<State, GameEvent> {
+
+		public ChangingLevelState() {
+			super(GameController.this, State.CHANGING_LEVEL);
+		}
+
+		@Override
+		public void defineTransitions() {
+			changeOnTimeout(State.PLAYING);
+		}
+
+		@Override
+		public void onEntry(StateObject<State, GameEvent> self) {
+			setDuration(game.getLevelChangingTime());
 			mazeUI.setFlashing(true);
-		};
+		}
 
-		state(State.CHANGING_LEVEL).update = state -> {
-			if (state.getRemaining() == state.getDuration() / 2) {
+		@Override
+		public void onTick(StateObject<State, GameEvent> self) {
+			if (getRemaining() == getDuration() / 2) {
 				nextLevel();
 				mazeUI.showInfo("Ready!", Color.YELLOW);
 				mazeUI.setFlashing(false);
 				mazeUI.enableAnimation(false);
-			} else if (state.isTerminated()) {
+			} else if (isTerminated()) {
 				mazeUI.hideInfo();
 				mazeUI.enableAnimation(true);
 			}
-		};
+		}
 
-		state(State.CHANGING_LEVEL).changeOnTimeout(State.PLAYING);
+		private void nextLevel() {
+			game.level += 1;
+			game.foodEaten = 0;
+			game.ghostIndex = 0;
+			maze.resetFood();
+			mazeUI.initActors();
+		}
 
-		// -- GHOST_DYING
+	}
 
-		state(State.GHOST_DYING).entry = state -> {
-			state.setDuration(game.getGhostDyingTime());
+	private class GhostDyingState extends CustomStateObject<State, GameEvent> {
+
+		public GhostDyingState() {
+			super(GameController.this, State.GHOST_DYING);
+		}
+
+		@Override
+		public void onEntry(StateObject<State, GameEvent> self) {
+			setDuration(game.getGhostDyingTime());
 			mazeUI.getPacMan().visibility = () -> false;
-		};
+		}
 
-		state(State.GHOST_DYING).update = state -> {
+		@Override
+		public void onTick(StateObject<State, GameEvent> self) {
 			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(Ghost::update);
-		};
+		}
 
-		state(State.GHOST_DYING).changeOnTimeout(State.PLAYING);
-
-		state(State.GHOST_DYING).exit = state -> {
+		@Override
+		public void onExit(StateObject<State, GameEvent> self) {
 			mazeUI.getPacMan().visibility = () -> true;
-		};
+		}
 
-		// -- PACMAN_DYING
+		private void onGhostKilled(StateTransition<State, GameEvent> t) {
+			GhostKilledEvent e = t.typedEvent();
+			e.ghost.processEvent(e);
+			LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
+		}
+	}
 
-		state(State.PACMAN_DYING).entry = state -> {
+	private class PacManDyingState extends CustomStateObject<State, GameEvent> {
+
+		public PacManDyingState() {
+			super(GameController.this, State.PACMAN_DYING);
+		}
+
+		// Game event handling
+
+		@Override
+		public void onEntry(StateObject<State, GameEvent> self) {
 			game.lives -= 1;
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
-		};
+		}
 
-		state(State.PACMAN_DYING).update = state -> {
+		@Override
+		public void onTick(StateObject<State, GameEvent> self) {
 			mazeUI.getPacMan().update();
-		};
+		}
 
-		state(State.PACMAN_DYING)
-			.changeOnInput(PacManDiedEvent.class, State.GAME_OVER, () -> game.lives == 0)
-			.changeOnInput(PacManDiedEvent.class, State.PLAYING, () -> game.lives > 0, t -> mazeUI.initActors());
-
-		state(State.PACMAN_DYING).exit = state -> {
+		@Override
+		public void onExit(StateObject<State, GameEvent> self) {
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
-		};
+		}
 
-		// -- GAME_OVER
+		private void onPacManKilled(StateTransition<State, GameEvent> t) {
+			PacManKilledEvent e = t.typedEvent();
+			mazeUI.getPacMan().processEvent(e);
+			LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
+		}
+	}
 
-		state(State.GAME_OVER).entry = state -> {
+	private class GameOverState extends CustomStateObject<State, GameEvent> {
+
+		public GameOverState() {
+			super(GameController.this, State.GAME_OVER);
+		}
+
+		@Override
+		public void onEntry(StateObject<State, GameEvent> self) {
 			mazeUI.enableAnimation(false);
 			mazeUI.removeBonus();
 			mazeUI.showInfo("Game Over!", Color.RED);
-		};
+		}
 
-		state(State.GAME_OVER).change(State.READY, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-
-		state(State.GAME_OVER).exit = state -> {
+		@Override
+		public void onExit(StateObject<State, GameEvent> self) {
 			mazeUI.hideInfo();
 			game.init(maze);
-		};
-		
+		}
+	}
+
+	public GameController(Game game, Maze maze, MazeUI mazeUI) {
+		super("GameController", State.class, State.READY);
+
+		fnPulse = game.fnTicksPerSecond;
+		this.game = game;
+		this.maze = maze;
+		this.mazeUI = mazeUI;
+
+		// Listen to events from actors
+		mazeUI.eventMgr.subscribe(this::enqueue);
+		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
+
+		// Create states
+		ReadyState ready = createState(State.READY, ReadyState::new);
+		PlayingState playing = createState(State.PLAYING, PlayingState::new);
+		ChangingLevelState changingLevel = createState(State.CHANGING_LEVEL, ChangingLevelState::new);
+		GhostDyingState ghostDying = createState(State.GHOST_DYING, GhostDyingState::new);
+		PacManDyingState pacManDying = createState(State.PACMAN_DYING, PacManDyingState::new);
+		GameOverState gameOver = createState(State.GAME_OVER, GameOverState::new);
+
+		// Define the state transition graph
+		/*@formatter:off*/
+		ready
+			.changeOnTimeout(playing.id);
+
+		playing
+			.onInput(FoodFoundEvent.class, playing::onFoodFound)
+			.onInput(BonusFoundEvent.class, playing::onBonusFound)
+			.onInput(PacManGhostCollisionEvent.class, playing::onPacManGhostCollision)
+			.onInput(PacManGainsPowerEvent.class, playing::onPacManGainsPower)
+			.onInput(PacManLosesPowerEvent.class, playing::onPacManLosesPower)
+			.onInput(PacManLostPowerEvent.class, playing::onPacManLostPower)
+			.changeOnInput(GhostKilledEvent.class, ghostDying.id, ghostDying::onGhostKilled)
+			.changeOnInput(PacManKilledEvent.class, pacManDying.id, pacManDying::onPacManKilled)
+			.changeOnInput(LevelCompletedEvent.class, changingLevel.id);
+			;
+
+		ghostDying
+			.changeOnTimeout(playing.id);
+
+		pacManDying
+			.changeOnInput(PacManDiedEvent.class, gameOver.id, () -> game.lives == 0)
+			.changeOnInput(PacManDiedEvent.class, playing.id, () -> game.lives > 0, t -> mazeUI.initActors());
+
+		gameOver
+			.change(ready.id, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
 		/*@formatter:on*/
-	}
-
-	private void nextLevel() {
-		game.level += 1;
-		game.foodEaten = 0;
-		game.ghostIndex = 0;
-		maze.resetFood();
-		mazeUI.initActors();
-	}
-
-	// Game event handling
-
-	private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
-		PacManGhostCollisionEvent e = t.typedEvent();
-		switch (e.ghost.getState()) {
-		case AGGRO:
-		case SAFE:
-		case SCATTERING:
-			enqueue(new PacManKilledEvent(e.ghost));
-			break;
-		case AFRAID:
-			enqueue(new GhostKilledEvent(e.ghost));
-			break;
-		case DYING:
-		case DEAD:
-			// no event should occur for collision with ghost corpse
-			break;
-		default:
-			throw new IllegalStateException();
-		}
-	}
-
-	private void onPacManKilled(StateTransition<State, GameEvent> t) {
-		PacManKilledEvent e = t.typedEvent();
-		mazeUI.getPacMan().processEvent(e);
-		LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
-	}
-
-	private void onGhostKilled(StateTransition<State, GameEvent> t) {
-		GhostKilledEvent e = t.typedEvent();
-		e.ghost.processEvent(e);
-		LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
-	}
-
-	private void onFoodFound(StateTransition<State, GameEvent> t) {
-		FoodFoundEvent e = t.typedEvent();
-		maze.clearTile(e.tile);
-		game.foodEaten += 1;
-		int oldGameScore = game.score;
-		game.score += game.getFoodValue(e.food);
-		if (oldGameScore < Game.EXTRALIFE_SCORE && game.score >= Game.EXTRALIFE_SCORE) {
-			game.lives += 1;
-		}
-		if (game.foodEaten == game.foodTotal) {
-			enqueue(new LevelCompletedEvent());
-			return;
-		}
-		if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
-			mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
-		}
-		if (e.food == Content.ENERGIZER) {
-			game.ghostIndex = 0;
-			enqueue(new PacManGainsPowerEvent());
-		}
-	}
-
-	private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
-		PacManGainsPowerEvent e = t.typedEvent();
-		mazeUI.getPacMan().processEvent(e);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
-	}
-
-	private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
-		PacManLosesPowerEvent e = t.typedEvent();
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
-	}
-
-	private void onPacManLostPower(StateTransition<State, GameEvent> t) {
-		PacManLostPowerEvent e = t.typedEvent();
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
-	}
-
-	private void onBonusFound(StateTransition<State, GameEvent> t) {
-		BonusFoundEvent e = t.typedEvent();
-		LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
-		game.score += e.value;
-		mazeUI.consumeBonusAfter(game.sec(2));
 	}
 }

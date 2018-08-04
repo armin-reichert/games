@@ -126,7 +126,7 @@ public class Spritesheet {
 	public static Sprite getMaze() {
 		return new Sprite(maze);
 	}
-	
+
 	public static Sprite getFlashingMaze() {
 		return new Sprite(maze, mazeWhite).animation(AnimationMode.CYCLIC, 100);
 	}

@@ -90,7 +90,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class, State.INITIAL);
 
 		// INITIAL
-		
+
 		sm.state(State.INITIAL).entry = state -> {
 			setMazePosition(homeTile);
 			getSprites().forEach(Sprite::resetAnimation);
@@ -98,7 +98,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		};
 
 		sm.state(State.INITIAL).change(State.SAFE);
-		
+
 		// SAFE
 
 		sm.state(State.SAFE).entry = state -> {
@@ -114,7 +114,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.SAFE).changeOnTimeout(State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
 
-//		sm.state(State.SAFE).changeOnInput(PacManLosesPowerEvent.class, State.AGGRO);
+		// sm.state(State.SAFE).changeOnInput(PacManLosesPowerEvent.class, State.AGGRO);
 
 		// AGGRO
 
