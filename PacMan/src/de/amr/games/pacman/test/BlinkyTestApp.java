@@ -26,6 +26,6 @@ public class BlinkyTestApp extends Application {
 
 	@Override
 	public void init() {
-		select(new BlinkyTestScene(this));
+		setController(new BlinkyTestScene(this));
 	}
 }

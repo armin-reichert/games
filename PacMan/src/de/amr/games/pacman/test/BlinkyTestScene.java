@@ -1,7 +1,6 @@
 package de.amr.games.pacman.test;
 
 import static de.amr.easy.grid.impl.Top4.E;
-import static de.amr.easy.grid.impl.Top4.Top4;
 import static de.amr.easy.grid.impl.Top4.W;
 import static de.amr.games.pacman.core.board.TileContent.Energizer;
 import static de.amr.games.pacman.core.board.TileContent.Pellet;
@@ -17,7 +16,8 @@ import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.scene.ActiveScene;
+import de.amr.easy.game.view.ViewController;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.Tile;
 import de.amr.games.pacman.core.entities.PacMan;
@@ -33,16 +33,29 @@ import de.amr.games.pacman.theme.PacManTheme;
  * 
  * @author Armin Reichert
  */
-public class BlinkyTestScene extends ActiveScene<BlinkyTestApp> {
+public class BlinkyTestScene implements ViewController {
+	
+	static Top4 TOPOLOGY = new Top4();
 
+	private final BlinkyTestApp app;
 	private final Random rand = new Random();
 	private final PacManTheme theme;
 	private final Board board;
 
 	public BlinkyTestScene(BlinkyTestApp app) {
-		super(app);
+		this.app = app;
 		board = new Board(Assets.text("board.txt"));
 		theme = new ClassicTheme();
+	}
+
+	@Override
+	public int getWidth() {
+		return app.settings.width;
+	}
+
+	@Override
+	public int getHeight() {
+		return app.settings.height;
 	}
 
 	@Override
@@ -71,13 +84,13 @@ public class BlinkyTestScene extends ActiveScene<BlinkyTestApp> {
 			ghost.setNextMoveDir(dir);
 		};
 
-		app.entities.add(pacMan);
+		app.entities.store(pacMan);
 
 		Ghost blinky = new Ghost(app, board, "Blinky", () -> theme);
 		blinky.control.changeOnInput(GhostEvent.ChasingStarts, Initialized, Chasing);
 		blinky.control.state(Chasing).update = state -> blinky.follow(pacMan.currentTile());
 
-		app.entities.add(blinky);
+		app.entities.store(blinky);
 
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
@@ -129,7 +142,7 @@ public class BlinkyTestScene extends ActiveScene<BlinkyTestApp> {
 				}
 			}
 		}
-		if (dir != Top4.inv(pacMan.getMoveDir())) {
+		if (dir != TOPOLOGY.inv(pacMan.getMoveDir())) {
 			pacMan.setMoveDir(dir);
 		} else {
 			for (int i = 0; i < 4; ++i) {
