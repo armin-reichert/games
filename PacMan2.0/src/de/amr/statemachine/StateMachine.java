@@ -158,7 +158,7 @@ public class StateMachine<S, E> {
 	 * @param customStateSupplier
 	 *                              custom state constructor function
 	 */
-	public <C extends CustomStateObject<S, E>> C createState(S state, Supplier<C> customStateSupplier) {
+	public <C extends StateObject<S, E>> C createState(S state, Supplier<C> customStateSupplier) {
 		C customState = customStateSupplier.get();
 		stateMap.put(state, customState);
 		return customState;

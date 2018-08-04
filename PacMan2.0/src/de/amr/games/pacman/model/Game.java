@@ -152,7 +152,7 @@ public class Game {
 	public long foodTotal;
 	public int foodEaten;
 	public int ghostIndex;
-	
+
 	private float baseSpeed;
 
 	public Game(IntSupplier fnTicksPerSecond) {

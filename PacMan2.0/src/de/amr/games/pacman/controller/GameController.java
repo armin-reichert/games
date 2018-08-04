@@ -24,7 +24,6 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
-import de.amr.statemachine.CustomStateObject;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
@@ -38,16 +37,16 @@ public class GameController extends StateMachine<State, GameEvent> {
 	public GameController(Game game, Maze maze, MazeUI mazeUI) {
 		super("GameController", State.class, State.READY);
 		super.fnPulse = game.fnTicksPerSecond;
-	
+
 		this.game = game;
 		this.maze = maze;
 		this.mazeUI = mazeUI;
-	
+
 		// Listen to events from actors
 		mazeUI.eventMgr.subscribe(this::enqueue);
 		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
-	
+
 		// Create states
 		ReadyState ready = createState(State.READY, ReadyState::new);
 		PlayingState playing = createState(State.PLAYING, PlayingState::new);
@@ -55,7 +54,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		GhostDyingState ghostDying = createState(State.GHOST_DYING, GhostDyingState::new);
 		PacManDyingState pacManDying = createState(State.PACMAN_DYING, PacManDyingState::new);
 		GameOverState gameOver = createState(State.GAME_OVER, GameOverState::new);
-	
+
 		// Define the state transition graph
 		/*@formatter:off*/
 		ready
@@ -89,7 +88,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
 
-	private class ReadyState extends CustomStateObject<State, GameEvent> {
+	private class ReadyState extends StateObject<State, GameEvent> {
 
 		public ReadyState() {
 			super(GameController.this, State.READY);
@@ -111,7 +110,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		}
 	}
 
-	private class PlayingState extends CustomStateObject<State, GameEvent> {
+	private class PlayingState extends StateObject<State, GameEvent> {
 
 		public PlayingState() {
 			super(GameController.this, State.PLAYING);
@@ -200,7 +199,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		}
 	}
 
-	private class ChangingLevelState extends CustomStateObject<State, GameEvent> {
+	private class ChangingLevelState extends StateObject<State, GameEvent> {
 
 		public ChangingLevelState() {
 			super(GameController.this, State.CHANGING_LEVEL);
@@ -240,7 +239,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 	}
 
-	private class GhostDyingState extends CustomStateObject<State, GameEvent> {
+	private class GhostDyingState extends StateObject<State, GameEvent> {
 
 		public GhostDyingState() {
 			super(GameController.this, State.GHOST_DYING);
@@ -263,7 +262,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		}
 	}
 
-	private class PacManDyingState extends CustomStateObject<State, GameEvent> {
+	private class PacManDyingState extends StateObject<State, GameEvent> {
 
 		public PacManDyingState() {
 			super(GameController.this, State.PACMAN_DYING);
@@ -287,7 +286,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		}
 	}
 
-	private class GameOverState extends CustomStateObject<State, GameEvent> {
+	private class GameOverState extends StateObject<State, GameEvent> {
 
 		public GameOverState() {
 			super(GameController.this, State.GAME_OVER);
