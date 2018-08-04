@@ -72,6 +72,9 @@ public class GameController extends StateMachine<State, GameEvent> {
 			.changeOnInput(LevelCompletedEvent.class, changingLevel.id);
 			;
 	
+		changingLevel
+			.changeOnTimeout(playing.id);
+
 		ghostDying
 			.changeOnTimeout(playing.id);
 	
@@ -206,11 +209,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		}
 
 		@Override
-		public void defineTransitions() {
-			changeOnTimeout(State.PLAYING);
-		}
-
-		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {
 			setDuration(game.getLevelChangingTime());
 			mazeUI.setFlashing(true);
@@ -236,7 +234,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 			maze.resetFood();
 			mazeUI.initActors();
 		}
-
 	}
 
 	private class GhostDyingState extends StateObject<State, GameEvent> {
