@@ -263,8 +263,8 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 	public GameController(Game game, Maze maze, MazeUI mazeUI) {
 		super("GameController", State.class, State.READY);
+		super.fnPulse = game.fnTicksPerSecond;
 
-		fnPulse = game.fnTicksPerSecond;
 		this.game = game;
 		this.maze = maze;
 		this.mazeUI = mazeUI;
