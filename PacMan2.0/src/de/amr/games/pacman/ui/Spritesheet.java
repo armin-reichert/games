@@ -1,6 +1,6 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
+import static de.amr.easy.game.sprite.AnimationType.BACK_AND_FORTH;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.sprite.AnimationMode;
+import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.BonusSymbol;
@@ -116,7 +116,7 @@ public class Spritesheet {
 	}
 
 	public static Sprite energizer() {
-		return new Sprite(energizerImage(false), energizerImage(true)).animation(BACK_AND_FORTH, 250);
+		return new Sprite(energizerImage(false), energizerImage(true)).animate(BACK_AND_FORTH, 250);
 	}
 
 	public static Sprite maze() {
@@ -124,7 +124,7 @@ public class Spritesheet {
 	}
 
 	public static Sprite flashingMaze() {
-		return new Sprite(maze, mazeWhite).animation(AnimationMode.CYCLIC, 100);
+		return new Sprite(maze, mazeWhite).animate(AnimationType.CYCLIC, 100);
 	}
 
 	public static Sprite symbol(BonusSymbol symbol) {
@@ -136,11 +136,11 @@ public class Spritesheet {
 	}
 
 	public static Sprite pacManWalking(int dir) {
-		return new Sprite(pacManWalking[dir]).animation(AnimationMode.BACK_AND_FORTH, 80);
+		return new Sprite(pacManWalking[dir]).animate(AnimationType.BACK_AND_FORTH, 80);
 	}
 
 	public static Sprite pacManDying() {
-		return new Sprite(pacManDying).animation(AnimationMode.LINEAR, 100);
+		return new Sprite(pacManDying).animate(AnimationType.LINEAR, 100);
 	}
 
 	public static Sprite ghostColored(int color, int direction) {
@@ -161,15 +161,15 @@ public class Spritesheet {
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + direction);
 		}
-		return new Sprite(frames).animation(AnimationMode.BACK_AND_FORTH, 300);
+		return new Sprite(frames).animate(AnimationType.BACK_AND_FORTH, 300);
 	}
 
 	public static Sprite ghostAwed() {
-		return new Sprite(ghostAwed).animation(AnimationMode.CYCLIC, 200);
+		return new Sprite(ghostAwed).animate(AnimationType.CYCLIC, 200);
 	}
 
 	public static Sprite ghostBlinking() {
-		return new Sprite(ghostBlinking).animation(AnimationMode.CYCLIC, 100);
+		return new Sprite(ghostBlinking).animate(AnimationType.CYCLIC, 100);
 	}
 
 	public static Sprite ghostEyes(int dir) {

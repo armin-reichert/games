@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.sprite.AnimationMode;
+import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.play.BirdyGame;
@@ -115,7 +115,7 @@ public class Bird extends GameEntity {
 
 	private Sprite createFeatherSprite(String birdName) {
 		Sprite sprite = new Sprite(birdName + "_0", birdName + "_1", birdName + "_2");
-		sprite.animation(AnimationMode.BACK_AND_FORTH, app.settings.get("bird flap millis"));
+		sprite.animate(AnimationType.BACK_AND_FORTH, app.settings.get("bird flap millis"));
 		return sprite;
 	}
 

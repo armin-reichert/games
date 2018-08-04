@@ -269,8 +269,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 			super(GameController.this, State.PACMAN_DYING);
 		}
 
-		// Game event handling
-
 		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {
 			game.lives -= 1;

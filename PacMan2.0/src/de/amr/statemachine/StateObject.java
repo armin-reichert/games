@@ -70,11 +70,11 @@ public class StateObject<S, E> {
 	}
 
 	/** Sets the duration of this state and resets the timer. */
-	public void setDuration(int updates) {
-		if (updates < 0) {
+	public void setDuration(int ticks) {
+		if (ticks < 0) {
 			throw new IllegalStateException();
 		}
-		duration = updates;
+		duration = ticks;
 		resetTimer();
 	}
 

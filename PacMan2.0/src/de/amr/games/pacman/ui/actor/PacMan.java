@@ -115,8 +115,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 		// DYING
 
 		sm.state(State.DYING).entry = state -> {
-			state.setDuration(game.getPacManDyingTime());
 			currentSprite = s_dying;
+			state.setDuration(game.sec(1 + currentSprite.getAnimationSeconds()));
 		};
 
 		sm.state(State.DYING).onTimeout(t -> eventMgr.publish(new PacManDiedEvent()));

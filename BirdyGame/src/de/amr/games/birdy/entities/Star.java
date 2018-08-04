@@ -1,7 +1,7 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.sprite.AnimationMode.BACK_AND_FORTH;
-import static de.amr.easy.game.sprite.AnimationMode.CYCLIC;
+import static de.amr.easy.game.sprite.AnimationType.BACK_AND_FORTH;
+import static de.amr.easy.game.sprite.AnimationType.CYCLIC;
 import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.util.Random;
@@ -21,7 +21,7 @@ public class Star extends GameEntity {
 
 	public Star() {
 		s_star = new Sprite("blink_00", "blink_01", "blink_02")
-				.animation(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
+				.animate(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000));
 	}
 
 	@Override
