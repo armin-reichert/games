@@ -35,6 +35,56 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private final Maze maze;
 	private final MazeUI mazeUI;
 
+	public GameController(Game game, Maze maze, MazeUI mazeUI) {
+		super("GameController", State.class, State.READY);
+		super.fnPulse = game.fnTicksPerSecond;
+	
+		this.game = game;
+		this.maze = maze;
+		this.mazeUI = mazeUI;
+	
+		// Listen to events from actors
+		mazeUI.eventMgr.subscribe(this::enqueue);
+		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
+	
+		// Create states
+		ReadyState ready = createState(State.READY, ReadyState::new);
+		PlayingState playing = createState(State.PLAYING, PlayingState::new);
+		ChangingLevelState changingLevel = createState(State.CHANGING_LEVEL, ChangingLevelState::new);
+		GhostDyingState ghostDying = createState(State.GHOST_DYING, GhostDyingState::new);
+		PacManDyingState pacManDying = createState(State.PACMAN_DYING, PacManDyingState::new);
+		GameOverState gameOver = createState(State.GAME_OVER, GameOverState::new);
+	
+		// Define the state transition graph
+		/*@formatter:off*/
+		ready
+			.changeOnTimeout(playing.id);
+	
+		playing
+			.onInput(FoodFoundEvent.class, playing::onFoodFound)
+			.onInput(BonusFoundEvent.class, playing::onBonusFound)
+			.onInput(PacManGhostCollisionEvent.class, playing::onPacManGhostCollision)
+			.onInput(PacManGainsPowerEvent.class, playing::onPacManGainsPower)
+			.onInput(PacManLosesPowerEvent.class, playing::onPacManLosesPower)
+			.onInput(PacManLostPowerEvent.class, playing::onPacManLostPower)
+			.changeOnInput(GhostKilledEvent.class, ghostDying.id, playing::onGhostKilled)
+			.changeOnInput(PacManKilledEvent.class, pacManDying.id, playing::onPacManKilled)
+			.changeOnInput(LevelCompletedEvent.class, changingLevel.id);
+			;
+	
+		ghostDying
+			.changeOnTimeout(playing.id);
+	
+		pacManDying
+			.changeOnInput(PacManDiedEvent.class, gameOver.id, () -> game.lives == 0)
+			.changeOnInput(PacManDiedEvent.class, playing.id, () -> game.lives > 0, t -> mazeUI.initActors());
+	
+		gameOver
+			.change(ready.id, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		/*@formatter:on*/
+	}
+
 	public enum State {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
@@ -71,8 +121,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 		public void onTick(StateObject<State, GameEvent> self) {
 			mazeUI.update();
 		}
-
-		// Game event handling
 
 		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
 			PacManGhostCollisionEvent e = t.typedEvent();
@@ -150,7 +198,6 @@ public class GameController extends StateMachine<State, GameEvent> {
 				enqueue(new PacManGainsPowerEvent());
 			}
 		}
-
 	}
 
 	private class ChangingLevelState extends CustomStateObject<State, GameEvent> {
@@ -259,55 +306,5 @@ public class GameController extends StateMachine<State, GameEvent> {
 			mazeUI.hideInfo();
 			game.init(maze);
 		}
-	}
-
-	public GameController(Game game, Maze maze, MazeUI mazeUI) {
-		super("GameController", State.class, State.READY);
-		super.fnPulse = game.fnTicksPerSecond;
-
-		this.game = game;
-		this.maze = maze;
-		this.mazeUI = mazeUI;
-
-		// Listen to events from actors
-		mazeUI.eventMgr.subscribe(this::enqueue);
-		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
-
-		// Create states
-		ReadyState ready = createState(State.READY, ReadyState::new);
-		PlayingState playing = createState(State.PLAYING, PlayingState::new);
-		ChangingLevelState changingLevel = createState(State.CHANGING_LEVEL, ChangingLevelState::new);
-		GhostDyingState ghostDying = createState(State.GHOST_DYING, GhostDyingState::new);
-		PacManDyingState pacManDying = createState(State.PACMAN_DYING, PacManDyingState::new);
-		GameOverState gameOver = createState(State.GAME_OVER, GameOverState::new);
-
-		// Define the state transition graph
-		/*@formatter:off*/
-		ready
-			.changeOnTimeout(playing.id);
-
-		playing
-			.onInput(FoodFoundEvent.class, playing::onFoodFound)
-			.onInput(BonusFoundEvent.class, playing::onBonusFound)
-			.onInput(PacManGhostCollisionEvent.class, playing::onPacManGhostCollision)
-			.onInput(PacManGainsPowerEvent.class, playing::onPacManGainsPower)
-			.onInput(PacManLosesPowerEvent.class, playing::onPacManLosesPower)
-			.onInput(PacManLostPowerEvent.class, playing::onPacManLostPower)
-			.changeOnInput(GhostKilledEvent.class, ghostDying.id, playing::onGhostKilled)
-			.changeOnInput(PacManKilledEvent.class, pacManDying.id, playing::onPacManKilled)
-			.changeOnInput(LevelCompletedEvent.class, changingLevel.id);
-			;
-
-		ghostDying
-			.changeOnTimeout(playing.id);
-
-		pacManDying
-			.changeOnInput(PacManDiedEvent.class, gameOver.id, () -> game.lives == 0)
-			.changeOnInput(PacManDiedEvent.class, playing.id, () -> game.lives > 0, t -> mazeUI.initActors());
-
-		gameOver
-			.change(ready.id, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-		/*@formatter:on*/
 	}
 }
