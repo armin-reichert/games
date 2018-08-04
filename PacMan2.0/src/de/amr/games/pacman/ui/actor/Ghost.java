@@ -122,7 +122,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 		sm.state(State.AFRAID).update = state -> {
 			move();
-			currentSprite = s_color[getDir()];
+			currentSprite = s_awed;
 		};
 
 		sm.state(State.AFRAID).changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, t -> {

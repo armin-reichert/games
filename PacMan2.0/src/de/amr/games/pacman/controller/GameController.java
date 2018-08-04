@@ -284,6 +284,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 		@Override
 		public void onExit(StateObject<State, GameEvent> self) {
+			mazeUI.removeBonus();
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		}
 	}

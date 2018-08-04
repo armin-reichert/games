@@ -5,8 +5,8 @@ import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
 
 import java.util.EnumMap;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -91,7 +91,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 		// NORMAL
 
-		sm.state(State.NORMAL).update = s -> walkMaze();
+		sm.state(State.NORMAL).update = s -> walkAndInspectMaze();
 
 		sm.state(State.NORMAL).changeOnInput(PacManKilledEvent.class, State.DYING);
 
@@ -104,7 +104,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		};
 
 		sm.state(State.EMPOWERED).update = state -> {
-			walkMaze();
+			walkAndInspectMaze();
 			if (state.getRemaining() == state.getDuration() * 20 / 100) {
 				eventMgr.publish(new PacManLosesPowerEvent());
 			}
@@ -129,39 +129,36 @@ public class PacMan extends MazeMover<PacMan.State> {
 		sm.init();
 	}
 
-	private void walkMaze() {
+	private void walkAndInspectMaze() {
 		move();
 		currentSprite = s_walking[getDir()];
 		if (isTeleporting()) {
 			return;
 		}
-		GameEvent finding = findInterestingThing();
-		if (finding != null) {
-			eventMgr.publish(finding);
-			return;
-		}
-		Tile tile = getTile();
-		char content = maze.getContent(tile);
-		if (Content.isFood(content)) {
-			eventMgr.publish(new FoodFoundEvent(tile, content));
-			return;
+		Optional<GameEvent> find = interests.stream().filter(this::collidesWith).flatMap(this::description).findFirst();
+		if (find.isPresent()) {
+			eventMgr.publish(find.get());
+		} else {
+			Tile tile = getTile();
+			char content = maze.getContent(tile);
+			if (Content.isFood(content)) {
+				eventMgr.publish(new FoodFoundEvent(tile, content));
+			}
 		}
 	}
 
-	private GameEvent findInterestingThing() {
-		for (GameEntity finding : interests.stream().filter(this::collidesWith).collect(Collectors.toSet())) {
-			if (finding instanceof Ghost) {
-				Ghost ghost = (Ghost) finding;
-				if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
-					return new PacManGhostCollisionEvent(ghost);
-				}
-			} else if (finding instanceof Bonus) {
-				Bonus bonus = (Bonus) finding;
-				if (!bonus.isHonored()) {
-					return new BonusFoundEvent(bonus.getSymbol(), bonus.getValue());
-				}
+	private Stream<GameEvent> description(GameEntity find) {
+		if (find instanceof Ghost) {
+			Ghost ghost = (Ghost) find;
+			if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
+				return Stream.of(new PacManGhostCollisionEvent(ghost));
+			}
+		} else if (find instanceof Bonus) {
+			Bonus bonus = (Bonus) find;
+			if (!bonus.isHonored()) {
+				return Stream.of(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 			}
 		}
-		return null;
+		return Stream.empty();
 	}
 }
