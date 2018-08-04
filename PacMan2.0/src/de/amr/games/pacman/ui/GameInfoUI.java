@@ -1,7 +1,7 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.pacman.model.TileContent.PELLET;
+import static de.amr.games.pacman.model.Content.PELLET;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;

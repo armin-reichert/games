@@ -1,8 +1,8 @@
 package de.amr.games.pacman.routing.impl;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.model.TileContent.DOOR;
-import static de.amr.games.pacman.model.TileContent.WALL;
+import static de.amr.games.pacman.model.Content.DOOR;
+import static de.amr.games.pacman.model.Content.WALL;
 
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.Route;

@@ -1,8 +1,8 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.model.TileContent.ENERGIZER;
-import static de.amr.games.pacman.model.TileContent.PELLET;
-import static de.amr.games.pacman.model.TileContent.isFood;
+import static de.amr.games.pacman.model.Content.ENERGIZER;
+import static de.amr.games.pacman.model.Content.PELLET;
+import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.ambush;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.bounce;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.chase;

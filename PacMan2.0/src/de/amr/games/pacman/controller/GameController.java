@@ -20,7 +20,7 @@ import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.model.TileContent;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
@@ -217,7 +217,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 		if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
 			mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
 		}
-		if (e.food == TileContent.ENERGIZER) {
+		if (e.food == Content.ENERGIZER) {
 			game.ghostIndex = 0;
 			enqueue(new PacManGainsPowerEvent());
 		}

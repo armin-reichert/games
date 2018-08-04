@@ -3,7 +3,7 @@ package de.amr.games.pacman.ui.actor;
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.model.TileContent.WALL;
+import static de.amr.games.pacman.model.Content.WALL;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 import static java.lang.Math.round;
 

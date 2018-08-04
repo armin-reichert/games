@@ -1,6 +1,6 @@
 package de.amr.games.pacman.routing.impl;
 
-import static de.amr.games.pacman.model.TileContent.WALL;
+import static de.amr.games.pacman.model.Content.WALL;
 
 import java.util.Optional;
 

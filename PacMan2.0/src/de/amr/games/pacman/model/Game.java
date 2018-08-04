@@ -71,10 +71,10 @@ public class Game {
 	}
 
 	public int getFoodValue(char food) {
-		if (food == TileContent.PELLET) {
+		if (food == Content.PELLET) {
 			return 10;
 		}
-		if (food == TileContent.ENERGIZER) {
+		if (food == Content.ENERGIZER) {
 			return 50;
 		}
 		return 0;

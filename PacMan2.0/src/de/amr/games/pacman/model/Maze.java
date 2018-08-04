@@ -1,13 +1,13 @@
 package de.amr.games.pacman.model;
 
-import static de.amr.games.pacman.model.TileContent.EMPTY;
-import static de.amr.games.pacman.model.TileContent.POS_BLINKY;
-import static de.amr.games.pacman.model.TileContent.POS_CLYDE;
-import static de.amr.games.pacman.model.TileContent.POS_INFO;
-import static de.amr.games.pacman.model.TileContent.POS_INKY;
-import static de.amr.games.pacman.model.TileContent.POS_PACMAN;
-import static de.amr.games.pacman.model.TileContent.POS_PINKY;
-import static de.amr.games.pacman.model.TileContent.WALL;
+import static de.amr.games.pacman.model.Content.EMPTY;
+import static de.amr.games.pacman.model.Content.POS_BLINKY;
+import static de.amr.games.pacman.model.Content.POS_CLYDE;
+import static de.amr.games.pacman.model.Content.POS_INFO;
+import static de.amr.games.pacman.model.Content.POS_INKY;
+import static de.amr.games.pacman.model.Content.POS_PACMAN;
+import static de.amr.games.pacman.model.Content.POS_PINKY;
+import static de.amr.games.pacman.model.Content.WALL;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +58,7 @@ public class Maze {
 					infoTile = new Tile(col, row);
 				} else if (c == POS_PACMAN) {
 					pacManHome = new Tile(col, row);
-				} else if (TileContent.isFood(c)) {
+				} else if (Content.isFood(c)) {
 					foodCount += 1;
 				}
 			}

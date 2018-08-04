@@ -25,7 +25,7 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.model.TileContent;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
 
@@ -153,7 +153,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
-		if (TileContent.isFood(content)) {
+		if (Content.isFood(content)) {
 			eventMgr.publish(new FoodFoundEvent(tile, content));
 			return;
 		}

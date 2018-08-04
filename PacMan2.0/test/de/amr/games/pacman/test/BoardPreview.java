@@ -1,10 +1,10 @@
 package de.amr.games.pacman.test;
 
-import static de.amr.games.pacman.model.TileContent.DOOR;
-import static de.amr.games.pacman.model.TileContent.ENERGIZER;
-import static de.amr.games.pacman.model.TileContent.PELLET;
-import static de.amr.games.pacman.model.TileContent.TUNNEL;
-import static de.amr.games.pacman.model.TileContent.WALL;
+import static de.amr.games.pacman.model.Content.DOOR;
+import static de.amr.games.pacman.model.Content.ENERGIZER;
+import static de.amr.games.pacman.model.Content.PELLET;
+import static de.amr.games.pacman.model.Content.TUNNEL;
+import static de.amr.games.pacman.model.Content.WALL;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
