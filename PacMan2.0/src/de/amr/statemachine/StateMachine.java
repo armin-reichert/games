@@ -17,22 +17,20 @@ import java.util.stream.Stream;
 /**
  * A finite state machine.
  *
- * @param <S>
- *          type of state labels, for example an enumeration type.
- * @param <E>
- *          type of inputs (events).
+ * @param <S> type for identifying states, for example an enumeration type.
+ * @param <E> type of inputs (events).
  * 
  * @author Armin Reichert
  */
 public class StateMachine<S, E> {
 
-	private class Transition implements StateTransition<S, E> {
+	class Transition implements StateTransition<S, E> {
 
-		private S from;
-		private S to;
-		private E event;
-		private BooleanSupplier condition;
-		private Consumer<StateTransition<S, E>> action = t -> {
+		S from;
+		S to;
+		E event;
+		BooleanSupplier condition;
+		Consumer<StateTransition<S, E>> action = t -> {
 
 		};
 
@@ -52,11 +50,13 @@ public class StateMachine<S, E> {
 		}
 	}
 
+	/** Function defining how many ticks per second are sent to the machine. */
 	public IntSupplier fnPulse = () -> 60;
+
 	private final String description;
 	private final Deque<E> eventQ;
 	private final Map<S, StateObject<S, E>> stateMap;
-	private final Map<S, List<Transition>> transitionMap;
+	private final Map<S, List<Transition>> transitionsForState;
 	private final S initialState;
 	private S currentState;
 	private StateMachineTracer<S, E> trace;
@@ -64,19 +64,18 @@ public class StateMachine<S, E> {
 	/**
 	 * Creates a new state machine.
 	 * 
-	 * @param description
-	 *                         a string describing this state machine, used for logging
-	 * @param stateLabelType
-	 *                         type used for labeling the states, for example an enumeration type
-	 * @param initialState
-	 *                         the label of the initial state
+	 * @param description    a string describing this state machine, used for
+	 *                       tracing
+	 * @param stateLabelType type used for identifying the states, for example an
+	 *                       enumeration type
+	 * @param initialState   the label of the initial state
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public StateMachine(String description, Class<S> stateLabelType, S initialState) {
 		this.description = description;
 		this.eventQ = new ArrayDeque<>();
 		this.stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>();
-		this.transitionMap = new HashMap<>();
+		this.transitionsForState = new HashMap<>();
 		this.initialState = initialState;
 		this.trace = new StateMachineTracer(this);
 	}
@@ -84,8 +83,7 @@ public class StateMachine<S, E> {
 	/**
 	 * Sets a logger.
 	 * 
-	 * @param log
-	 *              a logger
+	 * @param log a logger
 	 */
 	public void setLogger(Logger log) {
 		trace.setLog(log);
@@ -101,8 +99,7 @@ public class StateMachine<S, E> {
 	/**
 	 * Adds an input ("event") to the queue of this state machine.
 	 * 
-	 * @param event
-	 *                some input/event
+	 * @param event some input/event
 	 */
 	public void enqueue(E event) {
 		eventQ.add(event);
@@ -111,8 +108,7 @@ public class StateMachine<S, E> {
 	/**
 	 * Tells if the state machine is in any of the given states.
 	 * 
-	 * @param states
-	 *                 non-empty list of state labels
+	 * @param states non-empty list of state labels
 	 * @return <code>true</code> if the state machine is in any of the given states
 	 */
 	@SuppressWarnings("unchecked")
@@ -124,40 +120,30 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * @param state
-	 *                a state object
-	 * @return the label of the given state object
-	 */
-	public Optional<S> stateLabel(StateObject<S, E> state) {
-		return stateMap.entrySet().stream().filter(entry -> entry.getValue().equals(state)).map(Map.Entry::getKey)
-				.findFirst();
-	}
-
-	/**
-	 * @return the current state's label
+	 * @return the current state (identifier)
 	 */
 	public S currentState() {
 		return currentState;
 	}
 
 	/**
-	 * Returns the state object with the given label. The state object is created on demand.
+	 * Returns the state object with the given identifier. The state object is
+	 * created on demand.
 	 * 
-	 * @param stateLabel
-	 *                     a state label
-	 * @return the state object for the given label
+	 * @param state a state identifier
+	 * @return the state object for the given state identifier
 	 */
-	public StateObject<S, E> state(S stateLabel) {
-		if (!stateMap.containsKey(stateLabel)) {
-			stateMap.put(stateLabel, new StateObject<>(this, stateLabel));
-			trace.stateCreated(stateLabel);
+	public StateObject<S, E> state(S state) {
+		if (!stateMap.containsKey(state)) {
+			stateMap.put(state, new StateObject<>(this, state));
+			trace.stateCreated(state);
 		}
-		return stateMap.get(stateLabel);
+		return stateMap.get(state);
 	}
 
 	/**
-	 * Initializes this state machine by switching to the initial state and executing an optional entry
-	 * action.
+	 * Initializes this state machine by switching to the initial state and
+	 * executing the initial state's (optional) entry action.
 	 */
 	public void init() {
 		trace.enteringInitialState(initialState);
@@ -170,28 +156,37 @@ public class StateMachine<S, E> {
 	 */
 	public void update() {
 		E event = eventQ.peek();
-		Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean()).findFirst();
-		if (match.isPresent()) {
-			Transition t = match.get();
-			fireTransition(t, event);
-		} else {
-			if (event != null) {
-				trace.ignoredEvent(event);
+		if (event == null) {
+			// find transition without event
+			Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean())
+					.findFirst();
+			if (match.isPresent()) {
+				fireTransition(match.get(), event);
+			} else {
+				// perform update for current state
+				state(currentState).doUpdate();
 			}
-			state(currentState).doUpdate();
-		}
-		if (event != null) {
+		} else {
+			// find transition for current event
+			Optional<Transition> match = transitions(currentState).stream().filter(t -> t.condition.getAsBoolean())
+					.findFirst();
+			if (match.isPresent()) {
+				fireTransition(match.get(), event);
+			} else {
+				trace.ignoredEvent(event); // TODO should we throw an exception in this case? Maybe configurable?
+			}
 			eventQ.poll();
 		}
 	}
 
-	boolean isEventMatching(Class<? extends E> eventType) {
+	//TODO make this configurable
+	boolean hasMatchingEvent(Class<? extends E> eventType) {
 		return !eventQ.isEmpty() && eventQ.peek().getClass().equals(eventType);
 	}
 
 	private void fireTransition(Transition transition, E event) {
 		transition.event = event;
-		trace.transition(event, transition.from, transition.to);
+		trace.firingTransition(transition);
 		if (currentState == transition.to) {
 			// keep state: no exit/entry actions are executed
 			transition.action.accept(transition);
@@ -209,10 +204,10 @@ public class StateMachine<S, E> {
 	}
 
 	private List<Transition> transitions(S stateLabel) {
-		if (!transitionMap.containsKey(stateLabel)) {
-			transitionMap.put(stateLabel, new ArrayList<>(3));
+		if (!transitionsForState.containsKey(stateLabel)) {
+			transitionsForState.put(stateLabel, new ArrayList<>(3));
 		}
-		return transitionMap.get(stateLabel);
+		return transitionsForState.get(stateLabel);
 	}
 
 	void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {

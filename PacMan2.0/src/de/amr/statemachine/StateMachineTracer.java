@@ -2,9 +2,9 @@ package de.amr.statemachine;
 
 import java.util.logging.Logger;
 
-public class StateMachineTracer<S,E> {
+public class StateMachineTracer<S, E> {
 
-	private final StateMachine<S,E> sm;
+	private final StateMachine<S, E> sm;
 	private Logger log;
 
 	public StateMachineTracer(StateMachine<S, E> sm) {
@@ -52,20 +52,20 @@ public class StateMachineTracer<S,E> {
 		}
 	}
 
-	public void transition(E event, S oldState, S newState) {
+	public void firingTransition(StateMachine<S, E>.Transition t) {
 		if (log != null) {
-			if (event == null) {
-				if (oldState != newState) {
-					log.info(String.format("FSM(%s) changing from '%s' to '%s'", sm.getDescription(), oldState, newState));
+			if (t.event == null) {
+				if (t.from != t.to) {
+					log.info(String.format("FSM(%s) changing from '%s' to '%s'", sm.getDescription(), t.from, t.to));
 				} else {
-					log.info(String.format("FSM(%s) keeps '%s'", sm.getDescription(), oldState));
+					log.info(String.format("FSM(%s) keeps '%s'", sm.getDescription(), t.from));
 				}
 			} else {
-				if (oldState != newState) {
-					log.info(String.format("FSM(%s) changing from '%s' to '%s' on '%s'", sm.getDescription(), oldState,
-							newState, event));
+				if (t.from != t.to) {
+					log.info(String.format("FSM(%s) changing from '%s' to '%s' on '%s'", sm.getDescription(), t.from,
+							t.to, t.event));
 				} else {
-					log.info(String.format("FSM(%s) keeps '%s' on '%s'", sm.getDescription(), oldState, event));
+					log.info(String.format("FSM(%s) keeps '%s' on '%s'", sm.getDescription(), t.from, t.event));
 				}
 			}
 		}
