@@ -13,7 +13,7 @@ public class StateObject<S, E> {
 	public static final int UNLIMITED = Integer.MAX_VALUE;
 
 	/** The label used to identify this state. */
-	public final S id;
+	public final S state;
 
 	/** The state machine this state belongs to. */
 	final StateMachine<S, E> sm;
@@ -36,9 +36,9 @@ public class StateObject<S, E> {
 	/**
 	 * Creates a new state with unlimited duration.
 	 */
-	public StateObject(StateMachine<S, E> sm, S label) {
+	public StateObject(StateMachine<S, E> sm, S state) {
 		this.sm = sm;
-		this.id = label;
+		this.state = state;
 		remaining = duration = UNLIMITED;
 		defineTransitions();
 	}

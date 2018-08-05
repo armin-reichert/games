@@ -8,7 +8,10 @@ public class StateMachineBuilder<S, E> {
 
 	public static void main(String args[]) {
 		/*@formatter:off*/
-		StateMachine<String, Integer> sm = new StateMachineBuilder<String, Integer>("FSM", String.class, "A")
+		StateMachine<String, Integer> sm = new StateMachine<>(String.class);
+		sm = new StateMachineBuilder<>(sm)
+			.description("SampleFSM")
+			.initialState("A")
 			.states()
 				.state("A")
 				.state("B").impl(null)
@@ -24,13 +27,21 @@ public class StateMachineBuilder<S, E> {
 	}
 
 	private StateMachine<S, E> sm;
-
-	public StateMachineBuilder(String description, Class<S> stateLabelType, S initialState) {
-		sm = new StateMachine<>(description, stateLabelType, initialState);
-	}
+	private String description;
+	private S initialState;
 
 	public StateMachineBuilder(StateMachine<S, E> sm) {
 		this.sm = sm;
+	}
+
+	public StateMachineBuilder<S, E> description(String description) {
+		this.description = description != null ? description : getClass().getSimpleName();
+		return this;
+	}
+
+	public StateMachineBuilder<S, E> initialState(S initialState) {
+		this.initialState = initialState;
+		return this;
 	}
 
 	public class TransitionBuilder {
@@ -92,15 +103,17 @@ public class StateMachineBuilder<S, E> {
 			}
 			StateMachine<S, E>.Transition t = sm.addTransition(from, to, guard, guard, action, eventType);
 			if (onTimeout) {
-				t.firingCondition  = () -> sm.state(t.from).isTerminated() && t.guard.getAsBoolean();
+				t.firingCondition = () -> sm.state(t.from).isTerminated() && t.guard.getAsBoolean();
 			} else if (eventType != null) {
-				t.firingCondition  = () -> sm.hasMatchingEvent(t.eventType) && t.guard.getAsBoolean();
+				t.firingCondition = () -> sm.hasMatchingEvent(t.eventType) && t.guard.getAsBoolean();
 			}
 			clear();
 			return this;
 		}
 
 		public StateMachine<S, E> buildStateMachine() {
+			sm.description = description;
+			sm.initialState = initialState;
 			return sm;
 		}
 	}
@@ -118,7 +131,7 @@ public class StateMachineBuilder<S, E> {
 			exit = null;
 			update = null;
 		}
-		
+
 		public StateBuilder state(S state) {
 			this.state = state;
 			return this;
@@ -131,25 +144,25 @@ public class StateMachineBuilder<S, E> {
 			sm.stateMap.put(state, customStateConstructor.get());
 			return this;
 		}
-		
+
 		public StateBuilder onEntry(Consumer<StateObject<S, E>> entry) {
 			this.entry = entry;
 			return this;
 		}
-		
+
 		public StateBuilder onExit(Consumer<StateObject<S, E>> exit) {
 			this.exit = exit;
 			return this;
 		}
-		
+
 		public StateBuilder onTick(Consumer<StateObject<S, E>> update) {
 			this.update = update;
 			return this;
 		}
-		
+
 		public StateBuilder build() {
 			if (!sm.stateMap.containsKey(state)) {
-				sm.stateMap.put(state, sm.state(state));
+				sm.stateMap.put(state, new StateObject<>(sm, state));
 			}
 			sm.state(state).entry = entry;
 			sm.state(state).exit = exit;
@@ -157,7 +170,7 @@ public class StateMachineBuilder<S, E> {
 			clear();
 			return this;
 		}
-		
+
 		public TransitionBuilder transitions() {
 			return new TransitionBuilder();
 		}

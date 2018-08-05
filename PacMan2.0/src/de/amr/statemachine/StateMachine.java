@@ -3,7 +3,6 @@ package de.amr.statemachine;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +57,7 @@ public class StateMachine<S, E> {
 	public IntSupplier fnPulse = () -> 60;
 
 	String description;
+	Class<S> stateLabelType;
 	Deque<E> eventQ;
 	Map<S, StateObject<S, E>> stateMap;
 	Map<S, List<Transition>> transitionsFromState;
@@ -68,26 +68,14 @@ public class StateMachine<S, E> {
 	/**
 	 * Creates a new state machine.
 	 * 
-	 * @param description
-	 *                         a string describing this state machine, used for tracing
 	 * @param stateLabelType
-	 *                         type used for identifying the states, for example an enumeration type
-	 * @param initialState
-	 *                         the label of the initial state
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public StateMachine(String description, Class<S> stateLabelType, S initialState) {
-		this.description = description;
+	public StateMachine(Class<S> stateLabelType) {
 		this.eventQ = new ArrayDeque<>();
-		this.stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>();
+		this.stateMap = new HashMap<>(); // TODO
 		this.transitionsFromState = new HashMap<>();
-		this.initialState = initialState;
-		this.currentState = initialState;
 		this.trace = new StateMachineTracer(this);
-	}
-
-	StateMachine() {
-
 	}
 
 	/**
@@ -150,7 +138,6 @@ public class StateMachine<S, E> {
 	public <C extends StateObject<S, E>> C state(S state) {
 		if (!stateMap.containsKey(state)) {
 			stateMap.put(state, new StateObject<>(this, state));
-			trace.stateCreated(state);
 		}
 		return (C) stateMap.get(state);
 	}

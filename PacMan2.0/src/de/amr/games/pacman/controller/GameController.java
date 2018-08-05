@@ -10,12 +10,12 @@ import static de.amr.games.pacman.controller.GameController.State.READY;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
-import de.amr.games.pacman.controller.GameController.State;
 import de.amr.games.pacman.controller.event.core.GameEvent;
 import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
@@ -36,31 +36,52 @@ import de.amr.statemachine.StateMachineBuilder;
 import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
 
-public class GameController extends StateMachine<State, GameEvent> {
+public class GameController {
 
+	private final StateMachine<State, GameEvent> sm;
 	private final Game game;
 	private final Maze maze;
 	private final MazeUI mazeUI;
 
 	public GameController(Game game, Maze maze, MazeUI mazeUI) {
-		super("GameController", State.class, State.READY);
-		super.fnPulse = game.fnTicksPerSecond;
-
+		
 		this.game = game;
 		this.maze = maze;
 		this.mazeUI = mazeUI;
+		
+		// build the state machine
+		sm = new StateMachine<>(State.class);
+		sm.fnPulse = game.fnTicksPerSecond;
+		buildStateMachine(sm);
 
 		// Listen to events from actors
-		mazeUI.eventMgr.subscribe(this::enqueue);
-		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
-
-		defineStateMachine();
+		mazeUI.eventMgr.subscribe(sm::enqueue);
+		mazeUI.getPacMan().eventMgr.subscribe(sm::enqueue);
+		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(sm::enqueue));
 	}
 
-	private void defineStateMachine() {
+	public void init() {
+		sm.init();
+	}
+
+	public void update() {
+		sm.update();
+	}
+
+	public void setLogger(Logger log) {
+		sm.setLogger(log);
+	}
+
+	public enum State {
+		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
+	};
+
+	private void buildStateMachine(StateMachine<State, GameEvent> sm) {
 		/*@formatter:off*/
-		new StateMachineBuilder<>(this)
+		new StateMachineBuilder<>(sm)
+			.description("GameController")
+			.initialState(State.READY)
+		
 			.states()
 				.state(READY).impl(ReadyState::new).build()
 				.state(PLAYING).impl(PlayingState::new).build()
@@ -68,41 +89,42 @@ public class GameController extends StateMachine<State, GameEvent> {
 				.state(GHOST_DYING).impl(GhostDyingState::new).build()
 				.state(PACMAN_DYING).impl(PacManDyingState::new).build()
 				.state(GAME_OVER).impl(GameOverState::new).build()
+			
 			.transitions()
 				.onTimeout()
 					.change(READY, PLAYING)
 					.build()
 				.on(FoodFoundEvent.class)
 					.keep(PLAYING)
-					.act(getPlayingState()::onFoodFound)
+					.act(((PlayingState) sm.state(PLAYING))::onFoodFound)
 					.build()
 				.on(BonusFoundEvent.class)
 					.keep(PLAYING)
-					.act(getPlayingState()::onBonusFound)
+					.act(((PlayingState) sm.state(PLAYING))::onBonusFound)
 					.build()
 				.on(PacManGhostCollisionEvent.class)
 					.keep(PLAYING)
-					.act(getPlayingState()::onPacManGhostCollision)
+					.act(((PlayingState) sm.state(PLAYING))::onPacManGhostCollision)
 					.build()
 				.on(PacManGainsPowerEvent.class)
 					.keep(PLAYING)
-					.act(getPlayingState()::onPacManGainsPower)
+					.act(((PlayingState) sm.state(PLAYING))::onPacManGainsPower)
 					.build()
 				.on(PacManLosesPowerEvent.class)
 					.keep(PLAYING)
-					.act(getPlayingState()::onPacManLosesPower)
+					.act(((PlayingState) sm.state(PLAYING))::onPacManLosesPower)
 					.build()
 				.on(PacManLostPowerEvent.class)
 					.keep(PLAYING)
-					.act(getPlayingState()::onPacManLostPower)
+					.act(((PlayingState) sm.state(PLAYING))::onPacManLostPower)
 					.build()
 				.on(GhostKilledEvent.class)
 					.change(PLAYING, GHOST_DYING)
-					.act(getPlayingState()::onGhostKilled)
+					.act(((PlayingState) sm.state(PLAYING))::onGhostKilled)
 					.build()
 				.on(PacManKilledEvent.class)
 					.change(PLAYING, PACMAN_DYING)
-					.act(getPlayingState()::onPacManKilled)
+					.act(((PlayingState) sm.state(PLAYING))::onPacManKilled)
 					.build()
 				.on(LevelCompletedEvent.class)
 					.change(PLAYING, CHANGING_LEVEL)
@@ -129,19 +151,10 @@ public class GameController extends StateMachine<State, GameEvent> {
 		/*@formatter:on*/
 	}
 
-	// TODO how to avoid needing this?
-	private PlayingState getPlayingState() {
-		return state(State.PLAYING);
-	}
-
-	public enum State {
-		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
-	};
-
 	private class ReadyState extends StateObject<State, GameEvent> {
 
 		public ReadyState() {
-			super(GameController.this, State.READY);
+			super(sm, State.READY);
 		}
 
 		@Override
@@ -163,7 +176,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private class PlayingState extends StateObject<State, GameEvent> {
 
 		public PlayingState() {
-			super(GameController.this, State.PLAYING);
+			super(sm, State.PLAYING);
 		}
 
 		@Override
@@ -178,14 +191,14 @@ public class GameController extends StateMachine<State, GameEvent> {
 			if (pacManState == PacMan.State.EMPOWERED) {
 				if (ghostState == Ghost.State.AFRAID || ghostState == Ghost.State.AGGRO
 						|| ghostState == Ghost.State.SCATTERING) {
-					enqueue(new GhostKilledEvent(e.ghost));
+					sm.enqueue(new GhostKilledEvent(e.ghost));
 				}
 				return;
 			}
 			if (pacManState == PacMan.State.DYING) {
 				return;
 			}
-			enqueue(new PacManKilledEvent(e.ghost));
+			sm.enqueue(new PacManKilledEvent(e.ghost));
 		}
 
 		private void onPacManKilled(StateTransition<State, GameEvent> t) {
@@ -233,7 +246,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 				game.lives += 1;
 			}
 			if (game.foodEaten == game.foodTotal) {
-				enqueue(new LevelCompletedEvent());
+				sm.enqueue(new LevelCompletedEvent());
 				return;
 			}
 			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
@@ -241,7 +254,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 			}
 			if (e.food == Content.ENERGIZER) {
 				game.ghostIndex = 0;
-				enqueue(new PacManGainsPowerEvent());
+				sm.enqueue(new PacManGainsPowerEvent());
 			}
 		}
 	}
@@ -249,7 +262,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private class ChangingLevelState extends StateObject<State, GameEvent> {
 
 		public ChangingLevelState() {
-			super(GameController.this, State.CHANGING_LEVEL);
+			super(sm, State.CHANGING_LEVEL);
 		}
 
 		@Override
@@ -283,7 +296,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private class GhostDyingState extends StateObject<State, GameEvent> {
 
 		public GhostDyingState() {
-			super(GameController.this, State.GHOST_DYING);
+			super(sm, State.GHOST_DYING);
 		}
 
 		@Override
@@ -306,7 +319,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private class PacManDyingState extends StateObject<State, GameEvent> {
 
 		public PacManDyingState() {
-			super(GameController.this, State.PACMAN_DYING);
+			super(sm, State.PACMAN_DYING);
 		}
 
 		@Override
@@ -330,7 +343,7 @@ public class GameController extends StateMachine<State, GameEvent> {
 	private class GameOverState extends StateObject<State, GameEvent> {
 
 		public GameOverState() {
-			super(GameController.this, State.GAME_OVER);
+			super(sm, State.GAME_OVER);
 		}
 
 		@Override
