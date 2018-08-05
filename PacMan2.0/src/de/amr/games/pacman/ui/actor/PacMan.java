@@ -150,7 +150,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Stream<GameEvent> description(GameEntity find) {
 		if (find instanceof Ghost) {
 			Ghost ghost = (Ghost) find;
-			if (ghost.getState() != Ghost.State.DEAD && ghost.getState() != Ghost.State.DYING) {
+			Ghost.State gs = ghost.getState();
+			if (gs != Ghost.State.DEAD && gs != Ghost.State.DYING && gs != Ghost.State.SAFE) {
 				return Stream.of(new PacManGhostCollisionEvent(ghost));
 			}
 		} else if (find instanceof Bonus) {

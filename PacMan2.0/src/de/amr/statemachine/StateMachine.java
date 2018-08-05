@@ -151,12 +151,12 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * Realizes this state by the given custom state.
+	 * Creates a custom implementation for the given state.
 	 * 
 	 * @param state
-	 *                              state identifer
+	 *                              state identifier
 	 * @param customStateSupplier
-	 *                              custom state constructor function
+	 *                              custom state supplier e.g. constructor
 	 */
 	public <C extends StateObject<S, E>> C createState(S state, Supplier<C> customStateSupplier) {
 		C customState = customStateSupplier.get();
@@ -196,7 +196,10 @@ public class StateMachine<S, E> {
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
-				trace.ignoredEvent(event); // TODO should we throw an exception in this case? Maybe configurable?
+				trace.ignoredEvent(event);
+				// TODO should we always throw an exception? Maybe make it configurable?
+				throw new IllegalStateException(
+						String.format("No transition defined in state '%s' for event '%s'", currentState, event));
 			}
 			eventQ.poll();
 		}

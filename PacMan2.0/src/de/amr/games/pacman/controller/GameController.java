@@ -24,6 +24,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
+import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
@@ -126,22 +127,19 @@ public class GameController extends StateMachine<State, GameEvent> {
 
 		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
 			PacManGhostCollisionEvent e = t.typedEvent();
-			switch (e.ghost.getState()) {
-			case AGGRO:
-			case SAFE:
-			case SCATTERING:
-				enqueue(new PacManKilledEvent(e.ghost));
-				break;
-			case AFRAID:
-				enqueue(new GhostKilledEvent(e.ghost));
-				break;
-			case DYING:
-			case DEAD:
-				// no event should occur for collision with ghost corpse
-				break;
-			default:
-				throw new IllegalStateException();
+			PacMan.State pacManState = mazeUI.getPacMan().getState();
+			Ghost.State ghostState = e.ghost.getState();
+			if (pacManState == PacMan.State.EMPOWERED) {
+				if (ghostState == Ghost.State.AFRAID || ghostState == Ghost.State.AGGRO
+						|| ghostState == Ghost.State.SCATTERING) {
+					enqueue(new GhostKilledEvent(e.ghost));
+				}
+				return;
 			}
+			if (pacManState == PacMan.State.DYING) {
+				return;
+			}
+			enqueue(new PacManKilledEvent(e.ghost));
 		}
 
 		private void onPacManKilled(StateTransition<State, GameEvent> t) {
