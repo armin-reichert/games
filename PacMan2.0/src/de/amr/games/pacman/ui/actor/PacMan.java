@@ -28,6 +28,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateMachineBuilder;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
@@ -74,7 +75,39 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	protected StateMachine<State, GameEvent> createStateMachine() {
-		StateMachine<State, GameEvent> sm = new StateMachine<>("Pac-Man", State.class, State.INITIAL);
+
+		StateMachineBuilder<State, GameEvent> builder = new StateMachineBuilder<>("Pac-Man", State.class, State.INITIAL);
+
+		/*@formatter:off*/
+		StateMachine<State, GameEvent> sm = builder
+
+			.states()
+				.state(State.DYING).state(State.EMPOWERED).state(State.INITIAL).state(State.NORMAL)
+			
+			.transitions()
+				.change(State.INITIAL, State.NORMAL)
+					.build()
+				
+				.on(PacManKilledEvent.class)
+					.change(State.NORMAL, State.DYING)
+					.build()
+
+				.on(PacManGainsPowerEvent.class)
+					.change(State.NORMAL, State.EMPOWERED)
+					.build()
+
+				.onTimeout()
+					.act(t -> eventMgr.publish(new PacManLostPowerEvent()))
+					.change(State.EMPOWERED, State.NORMAL)
+					.build()
+
+				.onTimeout()
+					.act(t -> eventMgr.publish(new PacManDiedEvent()))
+					.keep(State.DYING)
+					.build()
+					
+		.buildStateMachine();
+		/*@formatter:on*/
 
 		// INITIAL
 
@@ -87,15 +120,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 			currentSprite = s_walking[getDir()];
 		};
 
-		sm.state(State.INITIAL).change(State.NORMAL);
-
 		// NORMAL
 
 		sm.state(State.NORMAL).update = s -> walkAndInspectMaze();
-
-		sm.state(State.NORMAL).changeOnInput(PacManKilledEvent.class, State.DYING);
-
-		sm.state(State.NORMAL).changeOnInput(PacManGainsPowerEvent.class, State.EMPOWERED);
 
 		// EMPOWERED
 
@@ -110,16 +137,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 			}
 		};
 
-		sm.state(State.EMPOWERED).changeOnTimeout(State.NORMAL, t -> eventMgr.publish(new PacManLostPowerEvent()));
-
 		// DYING
 
 		sm.state(State.DYING).entry = state -> {
 			currentSprite = s_dying;
 			state.setDuration(game.sec(1 + currentSprite.getAnimationSeconds()));
 		};
-
-		sm.state(State.DYING).onTimeout(t -> eventMgr.publish(new PacManDiedEvent()));
 
 		return sm;
 	}

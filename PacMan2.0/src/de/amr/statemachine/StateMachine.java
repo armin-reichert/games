@@ -32,10 +32,11 @@ public class StateMachine<S, E> {
 		S from;
 		S to;
 		E event;
-		BooleanSupplier condition;
+		BooleanSupplier guard;
+		BooleanSupplier firingCondition;
 		Consumer<StateTransition<S, E>> action = t -> {
-
 		};
+		Class<? extends E> eventType;
 
 		@Override
 		public StateObject<S, E> from() {
@@ -56,13 +57,13 @@ public class StateMachine<S, E> {
 	/** Function defining how many ticks per second are sent to the machine. */
 	public IntSupplier fnPulse = () -> 60;
 
-	private final String description;
-	private final Deque<E> eventQ;
-	private final Map<S, StateObject<S, E>> stateMap;
-	private final Map<S, List<Transition>> transitionsFromState;
-	private final S initialState;
-	private S currentState;
-	private StateMachineTracer<S, E> trace;
+	String description;
+	Deque<E> eventQ;
+	Map<S, StateObject<S, E>> stateMap;
+	Map<S, List<Transition>> transitionsFromState;
+	S initialState;
+	S currentState;
+	StateMachineTracer<S, E> trace;
 
 	/**
 	 * Creates a new state machine.
@@ -83,6 +84,10 @@ public class StateMachine<S, E> {
 		this.initialState = initialState;
 		this.currentState = initialState;
 		this.trace = new StateMachineTracer(this);
+	}
+
+	StateMachine() {
+
 	}
 
 	/**
@@ -181,7 +186,7 @@ public class StateMachine<S, E> {
 		E event = eventQ.peek();
 		if (event == null) {
 			// find transition without event
-			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.condition.getAsBoolean())
+			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.firingCondition.getAsBoolean())
 					.findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
@@ -191,7 +196,7 @@ public class StateMachine<S, E> {
 			}
 		} else {
 			// find transition for current event
-			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.condition.getAsBoolean())
+			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.firingCondition.getAsBoolean())
 					.findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
@@ -234,12 +239,21 @@ public class StateMachine<S, E> {
 		return transitionsFromState.get(state);
 	}
 
-	void addTransition(S from, S to, BooleanSupplier condition, Consumer<StateTransition<S, E>> action) {
-		Transition transition = new Transition();
-		transition.from = from;
-		transition.to = to;
-		transition.condition = condition;
-		transition.action = action;
-		transitionsFrom(from).add(transition);
+	Transition addTransition(S from, S to, BooleanSupplier firingCondition, BooleanSupplier guard,
+			Consumer<StateTransition<S, E>> action) {
+		return addTransition(from, to, firingCondition, guard, action, null);
+	}
+
+	Transition addTransition(S from, S to, BooleanSupplier firingCondition, BooleanSupplier guard,
+			Consumer<StateTransition<S, E>> action, Class<? extends E> eventType) {
+		Transition t = new Transition();
+		t.from = from;
+		t.to = to;
+		t.firingCondition = firingCondition;
+		t.guard = guard;
+		t.action = action;
+		t.eventType = eventType;
+		transitionsFrom(from).add(t);
+		return t;
 	}
 }

@@ -17,6 +17,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateMachineBuilder;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
@@ -82,8 +83,61 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	protected StateMachine<State, GameEvent> createStateMachine() {
-		StateMachine<State, GameEvent> sm = new StateMachine<>(getName().toString(), State.class, State.INITIAL);
 
+		StateMachineBuilder<State, GameEvent> builder = new StateMachineBuilder<>(getName().toString(), State.class,
+				State.INITIAL);
+		
+		/*@formatter:off*/
+		StateMachine<State, GameEvent> sm = builder
+		
+			.states()
+				.state(State.AFRAID).state(State.AGGRO).state(State.DEAD).state(State.DYING).state(State.INITIAL)
+				.state(State.SAFE).state(State.SCATTERING)
+			
+			.transitions()
+				.change(State.INITIAL, State.SAFE)
+					.build()
+
+				.onTimeout()
+					.change(State.SAFE, State.AGGRO)
+					.when(() -> pacMan.getState() != PacMan.State.EMPOWERED)
+					.build()
+				
+				.onTimeout()
+					.change(State.SAFE, State.AFRAID)
+					.when(() -> pacMan.getState() == PacMan.State.EMPOWERED)
+					.build()
+				
+				.on(PacManGainsPowerEvent.class)
+					.change(State.AGGRO, State.AFRAID)
+					.build()
+					
+				.on(PacManLosesPowerEvent.class)
+					.change(State.AFRAID, State.AFRAID)
+					.act(t -> {
+						currentSprite = s_blinking;
+					})
+					.build()
+					
+				.on(PacManLostPowerEvent.class)
+					.change(State.AFRAID, State.AGGRO)
+					.build()
+					
+				.on(GhostKilledEvent.class)
+					.change(State.AFRAID, State.DYING)
+					.build()
+					
+				.onTimeout()
+					.change(State.DYING, State.DEAD)
+					.build()
+					
+				.when(() -> getTile().equals(homeTile))
+					.change(State.DEAD, State.SAFE)
+					.build()
+		
+			.buildStateMachine();
+		/*@formatter:on*/
+		
 		// INITIAL
 
 		sm.state(State.INITIAL).entry = state -> {
@@ -91,8 +145,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			getSprites().forEach(Sprite::resetAnimation);
 			setSpeed(game::getGhostSpeed);
 		};
-
-		sm.state(State.INITIAL).change(State.SAFE);
 
 		// SAFE
 
@@ -105,9 +157,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_color[getDir()];
 		};
 
-		sm.state(State.SAFE).changeOnTimeout(State.AGGRO, () -> pacMan.getState() != PacMan.State.EMPOWERED);
-
-		sm.state(State.SAFE).changeOnTimeout(State.AFRAID, () -> pacMan.getState() == PacMan.State.EMPOWERED);
 
 		// AGGRO
 
@@ -116,7 +165,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_color[getDir()];
 		};
 
-		sm.state(State.AGGRO).changeOnInput(PacManGainsPowerEvent.class, State.AFRAID);
 
 		// AFRAID
 
@@ -125,13 +173,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_awed;
 		};
 
-		sm.state(State.AFRAID).changeOnInput(PacManLosesPowerEvent.class, State.AFRAID, t -> {
-			currentSprite = s_blinking;
-		});
-
-		sm.state(State.AFRAID).changeOnInput(PacManLostPowerEvent.class, State.AGGRO);
-
-		sm.state(State.AFRAID).changeOnInput(GhostKilledEvent.class, State.DYING);
 
 		// DYING
 
@@ -142,7 +183,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			game.ghostIndex += 1;
 		};
 
-		sm.state(State.DYING).changeOnTimeout(State.DEAD);
 
 		// DEAD
 
@@ -155,7 +195,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			currentSprite = s_eyes[getDir()];
 		};
 
-		sm.state(State.DEAD).change(State.SAFE, () -> getTile().equals(homeTile));
 
 		return sm;
 	}

@@ -1,6 +1,12 @@
 package de.amr.games.pacman.controller;
 
 import static de.amr.easy.game.Application.LOG;
+import static de.amr.games.pacman.controller.GameController.State.CHANGING_LEVEL;
+import static de.amr.games.pacman.controller.GameController.State.GAME_OVER;
+import static de.amr.games.pacman.controller.GameController.State.GHOST_DYING;
+import static de.amr.games.pacman.controller.GameController.State.PACMAN_DYING;
+import static de.amr.games.pacman.controller.GameController.State.PLAYING;
+import static de.amr.games.pacman.controller.GameController.State.READY;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -26,6 +32,7 @@ import de.amr.games.pacman.ui.actor.Bonus;
 import de.amr.games.pacman.ui.actor.Ghost;
 import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateMachineBuilder;
 import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
 
@@ -48,44 +55,83 @@ public class GameController extends StateMachine<State, GameEvent> {
 		mazeUI.getPacMan().eventMgr.subscribe(this::enqueue);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(this::enqueue));
 
-		// Create states
-		ReadyState ready = createState(State.READY, ReadyState::new);
-		PlayingState playing = createState(State.PLAYING, PlayingState::new);
-		ChangingLevelState changingLevel = createState(State.CHANGING_LEVEL, ChangingLevelState::new);
-		GhostDyingState ghostDying = createState(State.GHOST_DYING, GhostDyingState::new);
-		PacManDyingState pacManDying = createState(State.PACMAN_DYING, PacManDyingState::new);
-		GameOverState gameOver = createState(State.GAME_OVER, GameOverState::new);
+		defineStateMachine();
+	}
 
-		// Define the state transition graph
+	private void defineStateMachine() {
 		/*@formatter:off*/
-		ready
-			.changeOnTimeout(playing.id);
-	
-		playing
-			.onInput(FoodFoundEvent.class, playing::onFoodFound)
-			.onInput(BonusFoundEvent.class, playing::onBonusFound)
-			.onInput(PacManGhostCollisionEvent.class, playing::onPacManGhostCollision)
-			.onInput(PacManGainsPowerEvent.class, playing::onPacManGainsPower)
-			.onInput(PacManLosesPowerEvent.class, playing::onPacManLosesPower)
-			.onInput(PacManLostPowerEvent.class, playing::onPacManLostPower)
-			.changeOnInput(GhostKilledEvent.class, ghostDying.id, playing::onGhostKilled)
-			.changeOnInput(PacManKilledEvent.class, pacManDying.id, playing::onPacManKilled)
-			.changeOnInput(LevelCompletedEvent.class, changingLevel.id);
-			;
-	
-		changingLevel
-			.changeOnTimeout(playing.id);
-
-		ghostDying
-			.changeOnTimeout(playing.id);
-	
-		pacManDying
-			.changeOnInput(PacManDiedEvent.class, gameOver.id, () -> game.lives == 0)
-			.changeOnInput(PacManDiedEvent.class, playing.id, () -> game.lives > 0, t -> mazeUI.initActors());
-	
-		gameOver
-			.change(ready.id, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+		new StateMachineBuilder<>(this)
+			.states()
+				.state(READY).impl(ReadyState::new)
+				.state(PLAYING).impl(PlayingState::new)
+				.state(CHANGING_LEVEL).impl(ChangingLevelState::new)
+				.state(GHOST_DYING).impl(GhostDyingState::new)
+				.state(PACMAN_DYING).impl(PacManDyingState::new)
+				.state(GAME_OVER).impl(GameOverState::new)
+			.transitions()
+				.onTimeout()
+					.change(READY, PLAYING)
+					.build()
+				.on(FoodFoundEvent.class)
+					.keep(PLAYING)
+					.act(getPlayingState()::onFoodFound)
+					.build()
+				.on(BonusFoundEvent.class)
+					.keep(PLAYING)
+					.act(getPlayingState()::onBonusFound)
+					.build()
+				.on(PacManGhostCollisionEvent.class)
+					.keep(PLAYING)
+					.act(getPlayingState()::onPacManGhostCollision)
+					.build()
+				.on(PacManGainsPowerEvent.class)
+					.keep(PLAYING)
+					.act(getPlayingState()::onPacManGainsPower)
+					.build()
+				.on(PacManLosesPowerEvent.class)
+					.keep(PLAYING)
+					.act(getPlayingState()::onPacManLosesPower)
+					.build()
+				.on(PacManLostPowerEvent.class)
+					.keep(PLAYING)
+					.act(getPlayingState()::onPacManLostPower)
+					.build()
+				.on(GhostKilledEvent.class)
+					.change(PLAYING, GHOST_DYING)
+					.act(getPlayingState()::onGhostKilled)
+					.build()
+				.on(PacManKilledEvent.class)
+					.change(PLAYING, PACMAN_DYING)
+					.act(getPlayingState()::onPacManKilled)
+					.build()
+				.on(LevelCompletedEvent.class)
+					.change(PLAYING, CHANGING_LEVEL)
+					.build()
+				.onTimeout()	
+					.change(State.CHANGING_LEVEL, PLAYING)
+					.build()
+				.onTimeout()
+					.change(GHOST_DYING, PLAYING)
+					.build()
+				.on(PacManDiedEvent.class)
+					.change(PACMAN_DYING, State.GAME_OVER)
+					.when(() -> game.lives == 0)
+					.build()
+				.on(PacManDiedEvent.class)
+					.change(PACMAN_DYING, PLAYING)
+					.when(() -> game.lives > 0)
+					.act(t -> mazeUI.initActors())
+					.build()
+				.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+					.change(GAME_OVER, READY)
+					.build()
+		.buildStateMachine();
 		/*@formatter:on*/
+	}
+
+	// TODO how to avoid needing this?
+	private PlayingState getPlayingState() {
+		return state(State.PLAYING);
 	}
 
 	public enum State {
