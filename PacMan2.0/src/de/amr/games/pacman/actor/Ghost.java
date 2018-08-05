@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui.actor;
+package de.amr.games.pacman.actor;
 
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.TS;

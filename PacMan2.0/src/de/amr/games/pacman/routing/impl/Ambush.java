@@ -4,11 +4,11 @@ import static de.amr.games.pacman.model.Content.WALL;
 
 import java.util.Optional;
 
+import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.Route;
 import de.amr.games.pacman.routing.RoutePlanner;
-import de.amr.games.pacman.ui.actor.MazeMover;
 
 /**
  * Ambush the victim in the maze.

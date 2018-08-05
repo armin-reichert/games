@@ -2,10 +2,10 @@ package de.amr.games.pacman.routing.impl;
 
 import static de.amr.easy.util.StreamUtils.randomElement;
 
+import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.routing.Route;
 import de.amr.games.pacman.routing.RoutePlanner;
-import de.amr.games.pacman.ui.actor.MazeMover;
 
 /**
  * Clyde's behaviour.

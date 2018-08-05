@@ -6,10 +6,10 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.view.ViewController;
 import de.amr.games.pacman.PacManApp;
+import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.actor.GhostName;
 
 public class PlayScene implements ViewController {
 

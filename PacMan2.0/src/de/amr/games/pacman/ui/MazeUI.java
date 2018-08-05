@@ -31,16 +31,16 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
+import de.amr.games.pacman.actor.Bonus;
+import de.amr.games.pacman.actor.Energizer;
+import de.amr.games.pacman.actor.Ghost;
+import de.amr.games.pacman.actor.GhostName;
+import de.amr.games.pacman.actor.PacMan;
+import de.amr.games.pacman.actor.Pellet;
 import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.actor.Bonus;
-import de.amr.games.pacman.ui.actor.Energizer;
-import de.amr.games.pacman.ui.actor.Ghost;
-import de.amr.games.pacman.ui.actor.GhostName;
-import de.amr.games.pacman.ui.actor.PacMan;
-import de.amr.games.pacman.ui.actor.Pellet;
 
 public class MazeUI extends GameEntity {
 

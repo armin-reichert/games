@@ -11,10 +11,10 @@ import static de.amr.games.pacman.model.BonusSymbol.STRAWBERRY;
 
 import java.util.function.IntSupplier;
 
+import de.amr.games.pacman.actor.Ghost;
+import de.amr.games.pacman.actor.MazeMover;
+import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.ui.Spritesheet;
-import de.amr.games.pacman.ui.actor.Ghost;
-import de.amr.games.pacman.ui.actor.MazeMover;
-import de.amr.games.pacman.ui.actor.PacMan;
 
 public class Game {
 

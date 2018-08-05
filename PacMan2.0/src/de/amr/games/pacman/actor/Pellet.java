@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui.actor;
+package de.amr.games.pacman.actor;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

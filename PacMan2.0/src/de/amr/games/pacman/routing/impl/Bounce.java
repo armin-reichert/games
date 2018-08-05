@@ -4,10 +4,10 @@ import static de.amr.games.pacman.model.Content.DOOR;
 import static de.amr.games.pacman.model.Content.WALL;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 
+import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.Route;
 import de.amr.games.pacman.routing.RoutePlanner;
-import de.amr.games.pacman.ui.actor.MazeMover;
 
 class Bounce implements RoutePlanner {
 

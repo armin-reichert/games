@@ -3,11 +3,11 @@ package de.amr.games.pacman.routing.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.Route;
 import de.amr.games.pacman.routing.RoutePlanner;
-import de.amr.games.pacman.ui.actor.MazeMover;
 
 class Flee implements RoutePlanner {
 

@@ -18,13 +18,13 @@ import java.util.logging.Level;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
+import de.amr.games.pacman.actor.Ghost;
+import de.amr.games.pacman.actor.GhostName;
+import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.actor.Ghost;
-import de.amr.games.pacman.ui.actor.GhostName;
-import de.amr.games.pacman.ui.actor.PacMan;
 import de.amr.statemachine.StateObject;
 
 public class GameInfoUI implements ViewController {

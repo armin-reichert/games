@@ -1,4 +1,4 @@
-package de.amr.games.pacman.ui.actor;
+package de.amr.games.pacman.actor;
 
 import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
