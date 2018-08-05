@@ -176,7 +176,7 @@ public class StateMachine<S, E> {
 	public void init() {
 		trace.enteringInitialState(initialState);
 		currentState = initialState;
-		state(currentState).doEntry();
+		state(currentState).onEntry(state(currentState));
 	}
 
 	/**
@@ -192,7 +192,10 @@ public class StateMachine<S, E> {
 				fireTransition(match.get(), event);
 			} else {
 				// perform update for current state
-				state(currentState).doUpdate();
+				if (state(currentState).remaining > 0) {
+					--state(currentState).remaining;
+				}
+				state(currentState).onTick(state(currentState));
 			}
 		} else {
 			// find transition for current event
@@ -224,11 +227,11 @@ public class StateMachine<S, E> {
 		} else {
 			// change state, execute exit and entry actions
 			trace.exitingState(currentState);
-			state(currentState).doExit();
+			state(currentState).onExit(state(currentState));
 			transition.action.accept(transition);
 			currentState = transition.to;
 			trace.enteringState(transition.to);
-			state(currentState).doEntry();
+			state(currentState).onEntry(state(currentState));
 		}
 	}
 

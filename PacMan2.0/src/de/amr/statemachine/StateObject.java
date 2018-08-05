@@ -12,26 +12,26 @@ public class StateObject<S, E> {
 	/** Constant for defining an unlimited duration. */
 	public static final int UNLIMITED = Integer.MAX_VALUE;
 
-	/** The state machine this state belongs to. */
-	public final StateMachine<S, E> sm;
-
 	/** The label used to identify this state. */
 	public final S id;
 
+	/** The state machine this state belongs to. */
+	final StateMachine<S, E> sm;
+
 	/** The client code executed when entering this state. */
-	public Consumer<StateObject<S, E>> entry;
+	Consumer<StateObject<S, E>> entry;
 
 	/** The client code executed when an update occurs for this state. */
-	public Consumer<StateObject<S, E>> update;
+	Consumer<StateObject<S, E>> update;
 
 	/** The client code executed when leaving this state. */
-	public Consumer<StateObject<S, E>> exit;
+	Consumer<StateObject<S, E>> exit;
 
 	/** The duration until this state times out. */
-	private int duration;
+	int duration;
 
 	/** Ticks remaining until time-out */
-	private int remaining;
+	int remaining;
 
 	/**
 	 * Creates a new state with unlimited duration.
@@ -40,43 +40,28 @@ public class StateObject<S, E> {
 		this.sm = sm;
 		this.id = label;
 		remaining = duration = UNLIMITED;
-		entry = this::onEntry;
-		exit = this::onExit;
-		update = this::onTick;
 		defineTransitions();
 	}
 
 	public void onEntry(StateObject<S, E> self) {
-	}
-
-	public void onExit(StateObject<S, E> self) {
-	}
-
-	public void onTick(StateObject<S, E> self) {
-	}
-
-	public void defineTransitions() {
-	}
-
-	void doEntry() {
 		if (entry != null) {
 			entry.accept(this);
 		}
 	}
 
-	void doExit() {
+	public void onExit(StateObject<S, E> self) {
 		if (exit != null) {
 			exit.accept(this);
 		}
 	}
 
-	void doUpdate() {
-		if (remaining > 0) {
-			--remaining;
-		}
+	public void onTick(StateObject<S, E> self) {
 		if (update != null) {
 			update.accept(this);
 		}
+	}
+
+	public void defineTransitions() {
 	}
 
 	/** Tells if this state has timed out. */

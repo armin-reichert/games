@@ -82,67 +82,65 @@ public class PacMan extends MazeMover<PacMan.State> {
 		StateMachine<State, GameEvent> sm = builder
 
 			.states()
-				.state(State.DYING).state(State.EMPOWERED).state(State.INITIAL).state(State.NORMAL)
+				
+				.state(State.INITIAL)
+					.onEntry(state -> {
+						setMazePosition(homeTile);
+						setDir(Top4.E);
+						setNextDir(Top4.E);
+						setSpeed(game::getPacManSpeed);
+						getSprites().forEach(Sprite::resetAnimation);
+						currentSprite = s_walking[getDir()];
+					})
+				.build()
+					
+				.state(State.DYING)
+					.onEntry(state -> {
+						currentSprite = s_dying;
+						state.setDuration(game.sec(1 + currentSprite.getAnimationSeconds()));
+					})
+				.build()
+				
+				.state(State.EMPOWERED)
+					.onEntry(state -> {
+						state.setDuration(game.getPacManEmpoweringTime());
+					})
+					.onTick(state -> {
+						walkAndInspectMaze();
+						if (state.getRemaining() == state.getDuration() * 20 / 100) {
+							eventMgr.publish(new PacManLosesPowerEvent());
+						}
+					})
+				.build()
+				
+				.state(State.NORMAL)
+					.onTick(s -> walkAndInspectMaze())
+				.build()
 			
 			.transitions()
-				.change(State.INITIAL, State.NORMAL)
-					.build()
+				
+				.change(State.INITIAL, State.NORMAL).build()
 				
 				.on(PacManKilledEvent.class)
 					.change(State.NORMAL, State.DYING)
-					.build()
+				.build()
 
 				.on(PacManGainsPowerEvent.class)
 					.change(State.NORMAL, State.EMPOWERED)
-					.build()
+				.build()
 
 				.onTimeout()
 					.act(t -> eventMgr.publish(new PacManLostPowerEvent()))
 					.change(State.EMPOWERED, State.NORMAL)
-					.build()
+				.build()
 
 				.onTimeout()
 					.act(t -> eventMgr.publish(new PacManDiedEvent()))
 					.keep(State.DYING)
-					.build()
+				.build()
 					
 		.buildStateMachine();
 		/*@formatter:on*/
-
-		// INITIAL
-
-		sm.state(State.INITIAL).entry = state -> {
-			setMazePosition(homeTile);
-			setDir(Top4.E);
-			setNextDir(Top4.E);
-			setSpeed(game::getPacManSpeed);
-			getSprites().forEach(Sprite::resetAnimation);
-			currentSprite = s_walking[getDir()];
-		};
-
-		// NORMAL
-
-		sm.state(State.NORMAL).update = s -> walkAndInspectMaze();
-
-		// EMPOWERED
-
-		sm.state(State.EMPOWERED).entry = state -> {
-			state.setDuration(game.getPacManEmpoweringTime());
-		};
-
-		sm.state(State.EMPOWERED).update = state -> {
-			walkAndInspectMaze();
-			if (state.getRemaining() == state.getDuration() * 20 / 100) {
-				eventMgr.publish(new PacManLosesPowerEvent());
-			}
-		};
-
-		// DYING
-
-		sm.state(State.DYING).entry = state -> {
-			currentSprite = s_dying;
-			state.setDuration(game.sec(1 + currentSprite.getAnimationSeconds()));
-		};
 
 		return sm;
 	}

@@ -108,10 +108,19 @@ public class StateMachineBuilder<S, E> {
 	public class StateBuilder {
 
 		private S state;
+		private Consumer<StateObject<S, E>> entry;
+		private Consumer<StateObject<S, E>> exit;
+		private Consumer<StateObject<S, E>> update;
 
+		private void clear() {
+			state = null;
+			entry = null;
+			exit = null;
+			update = null;
+		}
+		
 		public StateBuilder state(S state) {
 			this.state = state;
-			sm.stateMap.put(state, sm.state(state));
 			return this;
 		}
 
@@ -122,7 +131,33 @@ public class StateMachineBuilder<S, E> {
 			sm.stateMap.put(state, customStateConstructor.get());
 			return this;
 		}
-
+		
+		public StateBuilder onEntry(Consumer<StateObject<S, E>> entry) {
+			this.entry = entry;
+			return this;
+		}
+		
+		public StateBuilder onExit(Consumer<StateObject<S, E>> exit) {
+			this.exit = exit;
+			return this;
+		}
+		
+		public StateBuilder onTick(Consumer<StateObject<S, E>> update) {
+			this.update = update;
+			return this;
+		}
+		
+		public StateBuilder build() {
+			if (!sm.stateMap.containsKey(state)) {
+				sm.stateMap.put(state, sm.state(state));
+			}
+			sm.state(state).entry = entry;
+			sm.state(state).exit = exit;
+			sm.state(state).update = update;
+			clear();
+			return this;
+		}
+		
 		public TransitionBuilder transitions() {
 			return new TransitionBuilder();
 		}

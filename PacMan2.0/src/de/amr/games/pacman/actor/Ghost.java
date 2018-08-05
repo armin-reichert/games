@@ -91,9 +91,61 @@ public class Ghost extends MazeMover<Ghost.State> {
 		StateMachine<State, GameEvent> sm = builder
 		
 			.states()
-				.state(State.AFRAID).state(State.AGGRO).state(State.DEAD).state(State.DYING).state(State.INITIAL)
-				.state(State.SAFE).state(State.SCATTERING)
-			
+
+				.state(State.INITIAL)
+					.onEntry(state -> {
+						setMazePosition(homeTile);
+						getSprites().forEach(Sprite::resetAnimation);
+						setSpeed(game::getGhostSpeed);
+					})
+				.build()
+				
+				.state(State.AFRAID)
+					.onTick(state -> {
+						move();
+						currentSprite = s_awed;
+					})
+				.build()
+				
+				.state(State.AGGRO)
+					.onTick(state -> {
+						move();
+						currentSprite = s_color[getDir()];
+					})
+				.build()
+				
+				.state(State.DEAD)
+					.onEntry(state -> {
+						currentSprite = s_eyes[getDir()];
+					})
+					.onTick(state -> {
+						move();
+						currentSprite = s_eyes[getDir()];
+					})
+				.build()
+				
+				.state(State.DYING)
+					.onEntry(state -> {
+						state.setDuration(game.getGhostDyingTime());
+						currentSprite = s_numbers[game.ghostIndex];
+						game.score += game.getGhostValue();
+						game.ghostIndex += 1;
+					})
+				.build()
+				
+				.state(State.SAFE)
+					.onEntry(state -> {
+						state.setDuration(game.sec(2));
+					})
+					.onTick(state -> {
+						move();
+						currentSprite = s_color[getDir()];
+					})
+				.build()
+				
+				.state(State.SCATTERING)
+				.build()
+				
 			.transitions()
 				.change(State.INITIAL, State.SAFE)
 					.build()
@@ -138,64 +190,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 			.buildStateMachine();
 		/*@formatter:on*/
 		
-		// INITIAL
-
-		sm.state(State.INITIAL).entry = state -> {
-			setMazePosition(homeTile);
-			getSprites().forEach(Sprite::resetAnimation);
-			setSpeed(game::getGhostSpeed);
-		};
-
-		// SAFE
-
-		sm.state(State.SAFE).entry = state -> {
-			state.setDuration(game.sec(2));
-		};
-
-		sm.state(State.SAFE).update = state -> {
-			move();
-			currentSprite = s_color[getDir()];
-		};
-
-
-		// AGGRO
-
-		sm.state(State.AGGRO).update = state -> {
-			move();
-			currentSprite = s_color[getDir()];
-		};
-
-
-		// AFRAID
-
-		sm.state(State.AFRAID).update = state -> {
-			move();
-			currentSprite = s_awed;
-		};
-
-
-		// DYING
-
-		sm.state(State.DYING).entry = state -> {
-			state.setDuration(game.getGhostDyingTime());
-			currentSprite = s_numbers[game.ghostIndex];
-			game.score += game.getGhostValue();
-			game.ghostIndex += 1;
-		};
-
-
-		// DEAD
-
-		sm.state(State.DEAD).entry = state -> {
-			currentSprite = s_eyes[getDir()];
-		};
-
-		sm.state(State.DEAD).update = state -> {
-			move();
-			currentSprite = s_eyes[getDir()];
-		};
-
-
 		return sm;
 	}
 }
