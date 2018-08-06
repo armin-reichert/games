@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -26,6 +25,10 @@ import java.util.stream.Stream;
  */
 public class StateMachine<S, E> {
 
+	public static <SS, EE> StateMachineBuilder<SS, EE> builder(Class<SS> stateLabelType, Class<EE> eventType) {
+		return new StateMachineBuilder<SS, EE>(stateLabelType);
+	}
+	
 	class Transition implements StateTransition<S, E> {
 
 		S from;
@@ -55,7 +58,6 @@ public class StateMachine<S, E> {
 
 	/** Function defining how many ticks per second are sent to the machine. */
 	public IntSupplier fnPulse = () -> 60;
-
 	String description;
 	Class<S> stateLabelType;
 	Deque<E> eventQ;
@@ -65,10 +67,6 @@ public class StateMachine<S, E> {
 	S currentState;
 	StateMachineTracer<S, E> trace;
 	
-	public StateMachineBuilder<S,E> builder() {
-		return new StateMachineBuilder<>(this);
-	}
-
 	/**
 	 * Creates a new state machine.
 	 * 
@@ -117,7 +115,7 @@ public class StateMachine<S, E> {
 	 * @return <code>true</code> if the state machine is in any of the given states
 	 */
 	@SuppressWarnings("unchecked")
-	public boolean inOneOf(S... states) {
+	public boolean any(S... states) {
 		if (states.length == 0) {
 			throw new IllegalArgumentException("At least one state ID is needed");
 		}
@@ -144,20 +142,6 @@ public class StateMachine<S, E> {
 			stateMap.put(state, new StateObject<>(this, state));
 		}
 		return (C) stateMap.get(state);
-	}
-
-	/**
-	 * Creates a custom implementation for the given state.
-	 * 
-	 * @param state
-	 *                              state identifier
-	 * @param customStateSupplier
-	 *                              custom state supplier e.g. constructor
-	 */
-	public <C extends StateObject<S, E>> C createState(S state, Supplier<C> customStateSupplier) {
-		C customState = customStateSupplier.get();
-		stateMap.put(state, customState);
-		return customState;
 	}
 
 	/**

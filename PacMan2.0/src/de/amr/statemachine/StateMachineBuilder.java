@@ -8,8 +8,7 @@ public class StateMachineBuilder<S, E> {
 
 	public static void main(String args[]) {
 		/*@formatter:off*/
-		StateMachine<String, Integer> sm = new StateMachine<>(String.class);
-		sm = new StateMachineBuilder<>(sm)
+		StateMachine<String, Integer> sm = StateMachine.builder(String.class, Integer.class)
 			.description("SampleFSM")
 			.initialState("A")
 			.states()
@@ -30,10 +29,10 @@ public class StateMachineBuilder<S, E> {
 	private String description;
 	private S initialState;
 
-	public StateMachineBuilder(StateMachine<S, E> sm) {
-		this.sm = sm;
+	public StateMachineBuilder(Class<S> stateLabelType) {
+		sm = new StateMachine<>(stateLabelType);
 	}
-
+	
 	public StateMachineBuilder<S, E> description(String description) {
 		this.description = description != null ? description : getClass().getSimpleName();
 		return this;
@@ -52,6 +51,10 @@ public class StateMachineBuilder<S, E> {
 		private boolean onTimeout;
 		private Class<? extends E> eventType;
 		private Consumer<StateTransition<S, E>> action;
+		
+		public StateObject<S,E> _state(S state) {
+			return sm.state(state);
+		}
 
 		public TransitionBuilder() {
 			clear();

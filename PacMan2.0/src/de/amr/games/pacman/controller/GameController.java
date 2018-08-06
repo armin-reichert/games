@@ -49,9 +49,9 @@ public class GameController {
 		this.mazeUI = mazeUI;
 		
 		// build the state machine
-		sm = new StateMachine<>(State.class);
+		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
-		buildStateMachine(sm);
+		
 
 		// Listen to events from actors
 		mazeUI.eventMgr.subscribe(sm::enqueue);
@@ -70,14 +70,22 @@ public class GameController {
 	public void setLogger(Logger log) {
 		sm.setLogger(log);
 	}
+	
+	public StateMachine<State, GameEvent> getSm() {
+		return sm;
+	}
 
 	public enum State {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
+	
+	private PlayingState playingState() {
+		return sm.state(PLAYING);
+	}
 
-	private void buildStateMachine(StateMachine<State, GameEvent> sm) {
+	private StateMachine<State, GameEvent> buildStateMachine() {
 		/*@formatter:off*/
-		sm.builder()
+		return StateMachine.builder(State.class, GameEvent.class)
 			.description("GameController")
 			.initialState(State.READY)
 		
@@ -95,35 +103,35 @@ public class GameController {
 					.build()
 				.on(FoodFoundEvent.class)
 					.keep(PLAYING)
-					.act(((PlayingState) sm.state(PLAYING))::onFoodFound)
+					.act(t -> playingState().onFoodFound(t))
 					.build()
 				.on(BonusFoundEvent.class)
 					.keep(PLAYING)
-					.act(((PlayingState) sm.state(PLAYING))::onBonusFound)
+					.act(t -> playingState().onBonusFound(t))
 					.build()
 				.on(PacManGhostCollisionEvent.class)
 					.keep(PLAYING)
-					.act(((PlayingState) sm.state(PLAYING))::onPacManGhostCollision)
+					.act(t -> playingState().onPacManGhostCollision(t))
 					.build()
 				.on(PacManGainsPowerEvent.class)
 					.keep(PLAYING)
-					.act(((PlayingState) sm.state(PLAYING))::onPacManGainsPower)
+					.act(t -> playingState().onPacManGainsPower(t))
 					.build()
 				.on(PacManLosesPowerEvent.class)
 					.keep(PLAYING)
-					.act(((PlayingState) sm.state(PLAYING))::onPacManLosesPower)
+					.act(t -> playingState().onPacManLosesPower(t))
 					.build()
 				.on(PacManLostPowerEvent.class)
 					.keep(PLAYING)
-					.act(((PlayingState) sm.state(PLAYING))::onPacManLostPower)
+					.act(t -> playingState().onPacManLostPower(t))
 					.build()
 				.on(GhostKilledEvent.class)
 					.change(PLAYING, GHOST_DYING)
-					.act(((PlayingState) sm.state(PLAYING))::onGhostKilled)
+					.act(t -> playingState().onGhostKilled(t))
 					.build()
 				.on(PacManKilledEvent.class)
 					.change(PLAYING, PACMAN_DYING)
-					.act(((PlayingState) sm.state(PLAYING))::onPacManKilled)
+					.act(t -> playingState().onPacManKilled(t))
 					.build()
 				.on(LevelCompletedEvent.class)
 					.change(PLAYING, CHANGING_LEVEL)

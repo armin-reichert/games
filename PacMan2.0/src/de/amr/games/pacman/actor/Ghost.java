@@ -28,10 +28,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		super(game, maze, home, new EnumMap<>(State.class));
 		this.pacMan = pacMan;
 		this.name = name;
-		
-		sm = new StateMachine<>(State.class);
-		buildStateMachine(sm);
-		
+		sm = buildStateMachine();
 		createSprites(color);
 		currentSprite = s_color[getDir()];
 	}
@@ -84,9 +81,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return sm;
 	}
 
-	private void buildStateMachine(StateMachine<State, GameEvent> sm) {
+	private StateMachine<State, GameEvent> buildStateMachine() {
 		/*@formatter:off*/
-	  sm.builder()
+	  return StateMachine.builder(State.class, GameEvent.class)
+			 
 			.description(getName().toString())
 			.initialState(State.INITIAL)
 		

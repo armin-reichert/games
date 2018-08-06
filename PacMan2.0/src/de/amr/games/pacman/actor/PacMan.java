@@ -36,8 +36,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	public PacMan(Game game, Maze maze, Tile home) {
 		super(game, maze, home, new EnumMap<>(State.class));
-		sm = new StateMachine<>(State.class);
-		buildStateMachine(sm);
+		sm = buildStateMachine();
 		createSprites(2 * Spritesheet.TS);
 		currentSprite = s_walking[Top4.E]; // TODO
 	}
@@ -74,9 +73,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 		return sm;
 	}
 
-	private void buildStateMachine(StateMachine<State, GameEvent> sm) {
+	private StateMachine<State, GameEvent> buildStateMachine() {
 		/*@formatter:off*/
-		sm.builder()
+		return StateMachine.builder(State.class, GameEvent.class)
 			.description("Pac-Man")
 			.initialState(State.INITIAL)
 
