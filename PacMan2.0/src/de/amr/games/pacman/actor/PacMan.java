@@ -129,6 +129,10 @@ public class PacMan extends MazeMover<PacMan.State> {
 					.change(State.NORMAL, State.EMPOWERED)
 				.build()
 
+				.on(PacManGainsPowerEvent.class)
+					.keep(State.EMPOWERED)
+				.build()
+			
 				.onTimeout()
 					.act(t -> eventMgr.publish(new PacManLostPowerEvent()))
 					.change(State.EMPOWERED, State.NORMAL)

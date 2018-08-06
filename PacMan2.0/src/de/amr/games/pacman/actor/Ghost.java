@@ -160,7 +160,15 @@ public class Ghost extends MazeMover<Ghost.State> {
 					.change(State.SAFE, State.AFRAID)
 					.when(() -> pacMan.getState() == PacMan.State.EMPOWERED)
 					.build()
+
+				.on(PacManLosesPowerEvent.class)
+					.keep(State.SAFE)
+					.build()
 				
+				.on(PacManLostPowerEvent.class)
+					.keep(State.SAFE)
+					.build()
+					
 				.on(PacManGainsPowerEvent.class)
 					.change(State.AGGRO, State.AFRAID)
 					.build()
@@ -170,6 +178,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 					.act(t -> {
 						currentSprite = s_blinking;
 					})
+					.build()
+
+				.on(PacManGainsPowerEvent.class)
+					.keep(State.AFRAID)
 					.build()
 					
 				.on(PacManLostPowerEvent.class)

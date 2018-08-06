@@ -233,7 +233,7 @@ public class GameController {
 			BonusFoundEvent e = t.typedEvent();
 			LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 			game.score += e.value;
-			mazeUI.consumeBonusAfter(game.sec(2));
+			mazeUI.honorBonusAndRemoveAfter(game.sec(2));
 		}
 
 		private void onFoodFound(StateTransition<State, GameEvent> t) {

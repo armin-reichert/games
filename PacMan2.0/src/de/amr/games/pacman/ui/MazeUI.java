@@ -228,7 +228,7 @@ public class MazeUI extends GameEntity {
 		}
 	}
 
-	public void consumeBonusAfter(int ticks) {
+	public void honorBonusAndRemoveAfter(int ticks) {
 		if (bonus != null) {
 			bonus.setHonored();
 			bonusTimeLeft = ticks;
