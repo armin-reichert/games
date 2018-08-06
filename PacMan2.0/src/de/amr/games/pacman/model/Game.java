@@ -144,6 +144,10 @@ public class Game {
 	public int getLevelChangingTime() {
 		return sec(4);
 	}
+	
+	public int getReadyTime() {
+		return sec(2);
+	}
 
 	public Maze maze;
 	public int level;

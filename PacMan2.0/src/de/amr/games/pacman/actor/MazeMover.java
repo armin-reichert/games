@@ -16,7 +16,6 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEvent;
-import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -31,8 +30,6 @@ import de.amr.statemachine.StateMachine;
 public abstract class MazeMover<S> extends GameEntity {
 
 	private static final int TELEPORT_LENGTH = 3;
-
-	public final GameEventManager eventMgr = new GameEventManager();
 
 	public final Game game;
 	public final Maze maze;

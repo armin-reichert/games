@@ -44,7 +44,7 @@ import de.amr.games.pacman.model.Tile;
 
 public class MazeUI extends GameEntity {
 
-	public final GameEventManager eventMgr = new GameEventManager();
+	public final GameEventManager eventMgr = new GameEventManager("MazeUI");
 
 	private final Game game;
 	private final Maze maze;

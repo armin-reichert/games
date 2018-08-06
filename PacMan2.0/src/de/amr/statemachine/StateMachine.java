@@ -28,17 +28,17 @@ public class StateMachine<S, E> {
 	public static <SS, EE> StateMachineBuilder<SS, EE> builder(Class<SS> stateLabelType, Class<EE> eventType) {
 		return new StateMachineBuilder<>(stateLabelType);
 	}
-	
+
 	class Transition implements StateTransition<S, E> {
 
 		S from;
 		S to;
 		E event;
 		BooleanSupplier guard;
-		BooleanSupplier firingCondition;
 		Consumer<StateTransition<S, E>> action = t -> {
 		};
 		Class<? extends E> eventType;
+		boolean timeout;
 
 		@Override
 		public StateObject<S, E> from() {
@@ -66,7 +66,7 @@ public class StateMachine<S, E> {
 	S initialState;
 	S currentState;
 	StateMachineTracer<S, E> trace;
-	
+
 	/**
 	 * Creates a new state machine.
 	 * 
@@ -130,6 +130,14 @@ public class StateMachine<S, E> {
 	}
 
 	/**
+	 * 
+	 * @return the state object of the current state
+	 */
+	public <C extends StateObject<S, E>> C getStateImpl() {
+		return state(currentState);
+	}
+
+	/**
 	 * Returns the state object with the given identifier. The state object is created on demand.
 	 * 
 	 * @param state
@@ -155,7 +163,8 @@ public class StateMachine<S, E> {
 	public void init() {
 		trace.enteringInitialState(initialState);
 		currentState = initialState;
-		state(currentState).onEntry(state(currentState));
+		state(currentState).resetTimer();
+		state(currentState).onEntry();
 	}
 
 	/**
@@ -165,21 +174,17 @@ public class StateMachine<S, E> {
 		E event = eventQ.peek();
 		if (event == null) {
 			// find transition without event
-			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.firingCondition.getAsBoolean())
-					.findFirst();
+			Optional<Transition> match = transitionsFrom(currentState).stream().filter(this::canFire).findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
 				// perform update for current state
-				if (state(currentState).remaining > 0) {
-					--state(currentState).remaining;
-				}
-				state(currentState).onTick(state(currentState));
+				state(currentState).timerStep();
+				state(currentState).onTick();
 			}
 		} else {
 			// find transition for current event
-			Optional<Transition> match = transitionsFrom(currentState).stream().filter(t -> t.firingCondition.getAsBoolean())
-					.findFirst();
+			Optional<Transition> match = transitionsFrom(currentState).stream().filter(this::canFire).findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
@@ -192,8 +197,19 @@ public class StateMachine<S, E> {
 		}
 	}
 
+	private boolean canFire(Transition t) {
+		boolean conditionFulfilled = t.guard == null || t.guard.getAsBoolean();
+		if (t.timeout) {
+			return conditionFulfilled && state(t.from).isTerminated();
+		} else if (t.eventType != null) {
+			return conditionFulfilled && hasMatchingEvent(t.eventType);
+		} else {
+			return conditionFulfilled;
+		}
+	}
+
 	// TODO make this configurable
-	boolean hasMatchingEvent(Class<? extends E> eventType) {
+	private boolean hasMatchingEvent(Class<? extends E> eventType) {
 		return !eventQ.isEmpty() && eventQ.peek().getClass().equals(eventType);
 	}
 
@@ -202,15 +218,22 @@ public class StateMachine<S, E> {
 		trace.firingTransition(transition);
 		if (currentState == transition.to) {
 			// keep state: no exit/entry actions are executed
-			transition.action.accept(transition);
+			if (transition.action != null) {
+				transition.action.accept(transition);
+			}
 		} else {
 			// change state, execute exit and entry actions
+			StateObject<S, E> oldState = state(transition.from);
+			StateObject<S, E> newState = state(transition.to);
 			trace.exitingState(currentState);
-			state(currentState).onExit(state(currentState));
-			transition.action.accept(transition);
+			oldState.onExit();
+			if (transition.action != null) {
+				transition.action.accept(transition);
+			}
 			currentState = transition.to;
 			trace.enteringState(transition.to);
-			state(currentState).onEntry(state(currentState));
+			newState.resetTimer();
+			newState.onEntry();
 		}
 	}
 
@@ -221,21 +244,17 @@ public class StateMachine<S, E> {
 		return transitionsFromState.get(state);
 	}
 
-	Transition addTransition(S from, S to, BooleanSupplier firingCondition, BooleanSupplier guard,
-			Consumer<StateTransition<S, E>> action) {
-		return addTransition(from, to, firingCondition, guard, action, null);
-	}
+	// Builder calls this
 
-	Transition addTransition(S from, S to, BooleanSupplier firingCondition, BooleanSupplier guard,
-			Consumer<StateTransition<S, E>> action, Class<? extends E> eventType) {
+	void addTransition(S from, S to, BooleanSupplier guard, Consumer<StateTransition<S, E>> action,
+			Class<? extends E> eventType, boolean timeout) {
 		Transition t = new Transition();
 		t.from = from;
 		t.to = to;
-		t.firingCondition = firingCondition;
 		t.guard = guard;
 		t.action = action;
 		t.eventType = eventType;
+		t.timeout = timeout;
 		transitionsFrom(from).add(t);
-		return t;
 	}
 }

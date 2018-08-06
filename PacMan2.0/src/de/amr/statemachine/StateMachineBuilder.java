@@ -2,6 +2,7 @@ package de.amr.statemachine;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class StateMachineBuilder<S, E> {
@@ -32,7 +33,7 @@ public class StateMachineBuilder<S, E> {
 	public StateMachineBuilder(Class<S> stateLabelType) {
 		sm = new StateMachine<>(stateLabelType);
 	}
-	
+
 	public StateMachineBuilder<S, E> description(String description) {
 		this.description = description != null ? description : getClass().getSimpleName();
 		return this;
@@ -48,11 +49,11 @@ public class StateMachineBuilder<S, E> {
 		private S from;
 		private S to;
 		private BooleanSupplier guard;
-		private boolean onTimeout;
+		private boolean timeout;
 		private Class<? extends E> eventType;
 		private Consumer<StateTransition<S, E>> action;
-		
-		public StateObject<S,E> _state(S state) {
+
+		public StateObject<S, E> _state(S state) {
 			return sm.state(state);
 		}
 
@@ -61,12 +62,12 @@ public class StateMachineBuilder<S, E> {
 		}
 
 		private void clear() {
-			from = to = null;
-			guard = () -> true;
-			onTimeout = false;
+			from = null;
+			to = null;
+			guard = null;
+			timeout = false;
 			eventType = null;
-			action = t -> {
-			};
+			action = null;
 		}
 
 		public TransitionBuilder change(S from, S to) {
@@ -81,35 +82,39 @@ public class StateMachineBuilder<S, E> {
 		}
 
 		public TransitionBuilder when(BooleanSupplier guard) {
+			if (guard == null) {
+				throw new IllegalArgumentException("Guard cannot be NULL");
+			}
 			this.guard = guard;
 			return this;
 		}
 
 		public TransitionBuilder onTimeout() {
-			this.onTimeout = true;
+			this.timeout = true;
 			return this;
 		}
 
 		public TransitionBuilder on(Class<? extends E> eventType) {
+			if (eventType == null) {
+				throw new IllegalArgumentException("Event type of transition cannot be NULL");
+			}
 			this.eventType = eventType;
 			return this;
 		}
 
 		public TransitionBuilder act(Consumer<StateTransition<S, E>> action) {
+			if (action == null) {
+				throw new IllegalArgumentException("Transition action cannot be NULL");
+			}
 			this.action = action;
 			return this;
 		}
 
 		public TransitionBuilder build() {
-			if (onTimeout && eventType != null) {
+			if (timeout && eventType != null) {
 				throw new IllegalStateException("Cannot specify onTimeout and onEvent for single transition");
 			}
-			StateMachine<S, E>.Transition t = sm.addTransition(from, to, guard, guard, action, eventType);
-			if (onTimeout) {
-				t.firingCondition = () -> sm.state(t.from).isTerminated() && t.guard.getAsBoolean();
-			} else if (eventType != null) {
-				t.firingCondition = () -> sm.hasMatchingEvent(t.eventType) && t.guard.getAsBoolean();
-			}
+			sm.addTransition(from, to, guard, action, eventType, timeout);
 			clear();
 			return this;
 		}
@@ -124,18 +129,21 @@ public class StateMachineBuilder<S, E> {
 	public class StateBuilder {
 
 		private S state;
-		private Consumer<StateObject<S, E>> entry;
-		private Consumer<StateObject<S, E>> exit;
-		private Consumer<StateObject<S, E>> update;
+		private Runnable entry;
+		private Runnable exit;
+		private Runnable update;
+		private IntSupplier fnDuration;
 
 		private void clear() {
 			state = null;
 			entry = null;
 			exit = null;
 			update = null;
+			fnDuration = () -> StateObject.UNLIMITED;
 		}
 
 		public StateBuilder state(S state) {
+			clear();
 			this.state = state;
 			return this;
 		}
@@ -151,31 +159,43 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public StateBuilder onEntry(Consumer<StateObject<S, E>> entry) {
+		public StateBuilder duration(IntSupplier fnDuration) {
+			if (fnDuration == null) {
+				throw new IllegalStateException("Timer function cannot be null for state " + state);
+			}
+			this.fnDuration = fnDuration;
+			return this;
+		}
+
+		public StateBuilder onEntry(Runnable entry) {
 			this.entry = entry;
 			return this;
 		}
 
-		public StateBuilder onExit(Consumer<StateObject<S, E>> exit) {
+		public StateBuilder onExit(Runnable exit) {
 			this.exit = exit;
 			return this;
 		}
 
-		public StateBuilder onTick(Consumer<StateObject<S, E>> update) {
+		public StateBuilder onTick(Runnable update) {
 			this.update = update;
 			return this;
 		}
 
 		public StateBuilder build() {
+			StateObject<S, E> stateObject;
 			if (!sm.stateMap.containsKey(state)) {
-				StateObject<S, E> stateObject = new StateObject<>();
+				stateObject = new StateObject<>();
 				stateObject.sm = sm;
 				stateObject.state = state;
 				sm.stateMap.put(state, stateObject);
+			} else {
+				stateObject = sm.stateMap.get(state);
 			}
-			sm.state(state).entry = entry;
-			sm.state(state).exit = exit;
-			sm.state(state).update = update;
+			stateObject.entry = entry;
+			stateObject.exit = exit;
+			stateObject.update = update;
+			stateObject.fnDuration = fnDuration;
 			clear();
 			return this;
 		}

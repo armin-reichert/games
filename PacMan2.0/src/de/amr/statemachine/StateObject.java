@@ -1,6 +1,6 @@
 package de.amr.statemachine;
 
-import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 /**
  * Implementation of a state in a finite state machine.
@@ -19,63 +19,67 @@ public class StateObject<S, E> {
 	StateMachine<S, E> sm;
 
 	/** The client code executed when entering this state. */
-	Consumer<StateObject<S, E>> entry;
+	Runnable entry;
 
 	/** The client code executed when an update occurs for this state. */
-	Consumer<StateObject<S, E>> update;
+	Runnable update;
 
 	/** The client code executed when leaving this state. */
-	Consumer<StateObject<S, E>> exit;
+	Runnable exit;
 
-	/** The duration until this state times out. */
-	int duration;
+	/** Function returning state duration. */
+	IntSupplier fnDuration;
+
+	/** The number of ticks this state will be active. */
+	int timerTotalTicks;
 
 	/** Ticks remaining until time-out */
-	int remaining;
+	int ticksRemaining;
 
 	protected StateObject() {
-		remaining = duration = UNLIMITED;
+		fnDuration = () -> UNLIMITED;
+		ticksRemaining = timerTotalTicks = UNLIMITED;
 	}
 
 	public S id() {
 		return state;
 	}
 
-	public void onEntry(StateObject<S, E> self) {
+	public void onEntry() {
 		if (entry != null) {
-			entry.accept(this);
+			entry.run();
 		}
 	}
 
-	public void onExit(StateObject<S, E> self) {
+	public void onExit() {
 		if (exit != null) {
-			exit.accept(this);
+			exit.run();
 		}
 	}
 
-	public void onTick(StateObject<S, E> self) {
+	public void onTick() {
 		if (update != null) {
-			update.accept(this);
+			update.run();
 		}
 	}
 
 	/** Tells if this state has timed out. */
 	public boolean isTerminated() {
-		return remaining == 0;
-	}
-
-	/** Sets the duration of this state and resets the timer. */
-	public void setDuration(int ticks) {
-		if (ticks < 0) {
-			throw new IllegalStateException();
-		}
-		duration = ticks;
-		resetTimer();
+		return ticksRemaining == 0;
 	}
 
 	/** Resets the timer to the complete state duration. */
-	public void resetTimer() {
-		remaining = duration;
+	void resetTimer() {
+		if (fnDuration == null) {
+			throw new IllegalStateException(String.format("Timer function is NULL in state '%s'", state));
+		}
+		ticksRemaining = timerTotalTicks = fnDuration.getAsInt();
+	}
+
+	void timerStep() {
+		if (ticksRemaining > 0) {
+			--ticksRemaining;
+		}
 	}
 
 	/**
@@ -84,7 +88,7 @@ public class StateObject<S, E> {
 	 * @return the state duration (number of updates until this state times out)
 	 */
 	public int getDuration() {
-		return duration;
+		return timerTotalTicks;
 	}
 
 	/**
@@ -93,6 +97,6 @@ public class StateObject<S, E> {
 	 * @return the number of updates until timeout occurs
 	 */
 	public int getRemaining() {
-		return remaining;
+		return ticksRemaining;
 	}
 }

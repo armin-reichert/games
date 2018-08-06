@@ -43,15 +43,14 @@ public class GameController {
 	private final MazeUI mazeUI;
 
 	public GameController(Game game, Maze maze, MazeUI mazeUI) {
-		
+
 		this.game = game;
 		this.maze = maze;
 		this.mazeUI = mazeUI;
-		
+
 		// build the state machine
 		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
-		
 
 		// Listen to events from actors
 		mazeUI.eventMgr.subscribe(sm::enqueue);
@@ -70,7 +69,7 @@ public class GameController {
 	public void setLogger(Logger log) {
 		sm.setLogger(log);
 	}
-	
+
 	public StateMachine<State, GameEvent> getSm() {
 		return sm;
 	}
@@ -78,7 +77,7 @@ public class GameController {
 	public enum State {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
-	
+
 	private PlayingState playingState() {
 		return sm.state(PLAYING);
 	}
@@ -90,10 +89,10 @@ public class GameController {
 			.initialState(State.READY)
 		
 			.states()
-				.state(READY).impl(ReadyState::new).build()
+				.state(READY).impl(ReadyState::new).duration(game::getReadyTime).build()
 				.state(PLAYING).impl(PlayingState::new).build()
-				.state(CHANGING_LEVEL).impl(ChangingLevelState::new).build()
-				.state(GHOST_DYING).impl(GhostDyingState::new).build()
+				.state(CHANGING_LEVEL).impl(ChangingLevelState::new).duration(game::getLevelChangingTime).build()
+				.state(GHOST_DYING).impl(GhostDyingState::new).duration(game::getGhostDyingTime).build()
 				.state(PACMAN_DYING).impl(PacManDyingState::new).build()
 				.state(GAME_OVER).impl(GameOverState::new).build()
 			
@@ -161,8 +160,7 @@ public class GameController {
 	private class ReadyState extends StateObject<State, GameEvent> {
 
 		@Override
-		public void onEntry(StateObject<State, GameEvent> self) {
-			setDuration(game.sec(2));
+		public void onEntry() {
 			game.init(maze);
 			mazeUI.initActors();
 			mazeUI.enableAnimation(false);
@@ -170,7 +168,7 @@ public class GameController {
 		}
 
 		@Override
-		public void onExit(StateObject<State, GameEvent> self) {
+		public void onExit() {
 			mazeUI.enableAnimation(true);
 			mazeUI.hideInfo();
 		}
@@ -179,7 +177,7 @@ public class GameController {
 	private class PlayingState extends StateObject<State, GameEvent> {
 
 		@Override
-		public void onTick(StateObject<State, GameEvent> self) {
+		public void onTick() {
 			mazeUI.update();
 		}
 
@@ -261,13 +259,12 @@ public class GameController {
 	private class ChangingLevelState extends StateObject<State, GameEvent> {
 
 		@Override
-		public void onEntry(StateObject<State, GameEvent> self) {
-			setDuration(game.getLevelChangingTime());
+		public void onEntry() {
 			mazeUI.setFlashing(true);
 		}
 
 		@Override
-		public void onTick(StateObject<State, GameEvent> self) {
+		public void onTick() {
 			if (getRemaining() == getDuration() / 2) {
 				nextLevel();
 				mazeUI.showInfo("Ready!", Color.YELLOW);
@@ -291,18 +288,17 @@ public class GameController {
 	private class GhostDyingState extends StateObject<State, GameEvent> {
 
 		@Override
-		public void onEntry(StateObject<State, GameEvent> self) {
-			setDuration(game.getGhostDyingTime());
+		public void onEntry() {
 			mazeUI.getPacMan().visibility = () -> false;
 		}
 
 		@Override
-		public void onTick(StateObject<State, GameEvent> self) {
+		public void onTick() {
 			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(Ghost::update);
 		}
 
 		@Override
-		public void onExit(StateObject<State, GameEvent> self) {
+		public void onExit() {
 			mazeUI.getPacMan().visibility = () -> true;
 		}
 	}
@@ -310,18 +306,18 @@ public class GameController {
 	private class PacManDyingState extends StateObject<State, GameEvent> {
 
 		@Override
-		public void onEntry(StateObject<State, GameEvent> self) {
+		public void onEntry() {
 			game.lives -= 1;
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 		}
 
 		@Override
-		public void onTick(StateObject<State, GameEvent> self) {
+		public void onTick() {
 			mazeUI.getPacMan().update();
 		}
 
 		@Override
-		public void onExit(StateObject<State, GameEvent> self) {
+		public void onExit() {
 			mazeUI.removeBonus();
 			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		}
@@ -330,14 +326,14 @@ public class GameController {
 	private class GameOverState extends StateObject<State, GameEvent> {
 
 		@Override
-		public void onEntry(StateObject<State, GameEvent> self) {
+		public void onEntry() {
 			mazeUI.enableAnimation(false);
 			mazeUI.removeBonus();
 			mazeUI.showInfo("Game Over!", Color.RED);
 		}
 
 		@Override
-		public void onExit(StateObject<State, GameEvent> self) {
+		public void onExit() {
 			mazeUI.hideInfo();
 			game.init(maze);
 		}

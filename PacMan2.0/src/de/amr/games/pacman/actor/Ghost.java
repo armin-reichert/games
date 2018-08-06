@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
@@ -20,6 +21,7 @@ import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
+	public final GameEventManager eventMgr;
 	private final StateMachine<State, GameEvent> sm;
 	private final GhostName name;
 	private final PacMan pacMan;
@@ -29,6 +31,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		this.pacMan = pacMan;
 		this.name = name;
 		sm = buildStateMachine();
+		eventMgr = new GameEventManager(name.toString());
 		createSprites(color);
 		currentSprite = s_color[getDir()];
 	}
@@ -91,7 +94,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 			.states()
 
 				.state(State.INITIAL)
-					.onEntry(state -> {
+					.onEntry(() -> {
 						setMazePosition(homeTile);
 						getSprites().forEach(Sprite::resetAnimation);
 						setSpeed(game::getGhostSpeed);
@@ -99,32 +102,33 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.build()
 				
 				.state(State.AFRAID)
-					.onTick(state -> {
+					.onTick(() -> {
 						move();
 						currentSprite = s_awed;
 					})
 				.build()
 				
 				.state(State.AGGRO)
-					.onTick(state -> {
+					.onTick(() -> {
 						move();
 						currentSprite = s_color[getDir()];
 					})
 				.build()
 				
 				.state(State.DEAD)
-					.onEntry(state -> {
+					.onEntry(() -> {
 						currentSprite = s_eyes[getDir()];
 					})
-					.onTick(state -> {
+					.onTick(() -> {
 						move();
 						currentSprite = s_eyes[getDir()];
 					})
 				.build()
 				
 				.state(State.DYING)
-					.onEntry(state -> {
-						state.setDuration(game.getGhostDyingTime());
+					.duration(game::getGhostDyingTime)
+					.onEntry(() -> {
+//						state.setDuration(game.getGhostDyingTime());
 						currentSprite = s_numbers[game.ghostIndex];
 						game.score += game.getGhostValue();
 						game.ghostIndex += 1;
@@ -132,10 +136,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.build()
 				
 				.state(State.SAFE)
-					.onEntry(state -> {
-						state.setDuration(game.sec(2));
+					.duration(() -> game.sec(2))
+					.onEntry(() -> {
+//						state.setDuration(game.sec(2));
 					})
-					.onTick(state -> {
+					.onTick(() -> {
 						move();
 						currentSprite = s_color[getDir()];
 					})

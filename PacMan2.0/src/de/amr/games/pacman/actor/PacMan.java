@@ -1,5 +1,6 @@
 package de.amr.games.pacman.actor;
 
+import static de.amr.games.pacman.actor.PacMan.State.EMPOWERED;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
@@ -14,6 +15,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.game.PacManDiedEvent;
@@ -31,12 +33,14 @@ import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
+	public final GameEventManager eventMgr;
 	private final StateMachine<State, GameEvent> sm;
 	public final Set<GameEntity> interests = new HashSet<>();
 
 	public PacMan(Game game, Maze maze, Tile home) {
 		super(game, maze, home, new EnumMap<>(State.class));
 		sm = buildStateMachine();
+		eventMgr = new GameEventManager("Pac-Man");
 		createSprites(2 * Spritesheet.TS);
 		currentSprite = s_walking[Top4.E]; // TODO
 	}
@@ -82,7 +86,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			.states()
 				
 				.state(State.INITIAL)
-					.onEntry(state -> {
+					.onEntry(() -> {
 						setMazePosition(homeTile);
 						setDir(Top4.E);
 						setNextDir(Top4.E);
@@ -93,53 +97,54 @@ public class PacMan extends MazeMover<PacMan.State> {
 				.build()
 					
 				.state(State.DYING)
-					.onEntry(state -> {
+					.duration(() -> game.sec(2)) 
+					.onEntry(() -> {
 						currentSprite = s_dying;
-						state.setDuration(game.sec(1 + currentSprite.getAnimationSeconds()));
 					})
 				.build()
 				
-				.state(State.EMPOWERED)
-					.onEntry(state -> {
-						state.setDuration(game.getPacManEmpoweringTime());
+				.state(EMPOWERED)
+					.duration(game::getPacManEmpoweringTime)
+					.onEntry(() -> {
 					})
-					.onTick(state -> {
+					.onTick(() -> {
 						walkAndInspectMaze();
-						if (state.getRemaining() == state.getDuration() * 20 / 100) {
+						if (sm.getStateImpl().getRemaining() == sm.getStateImpl().getDuration() * 20 / 100) {
 							eventMgr.publish(new PacManLosesPowerEvent());
 						}
 					})
 				.build()
 				
 				.state(State.NORMAL)
-					.onTick(s -> walkAndInspectMaze())
+					.onTick(this::walkAndInspectMaze)
 				.build()
 			
 			.transitions()
 				
-				.change(State.INITIAL, State.NORMAL).build()
+				.change(State.INITIAL, State.NORMAL)
+					.build()
+
+				.change(State.NORMAL, State.DYING)
+					.on(PacManKilledEvent.class)
+					.build()
 				
-				.on(PacManKilledEvent.class)
-					.change(State.NORMAL, State.DYING)
-				.build()
-
-				.on(PacManGainsPowerEvent.class)
-					.change(State.NORMAL, State.EMPOWERED)
-				.build()
-
-				.on(PacManGainsPowerEvent.class)
-					.keep(State.EMPOWERED)
-				.build()
-			
-				.onTimeout()
+				.change(State.NORMAL, State.EMPOWERED)
+					.on(PacManGainsPowerEvent.class)
+					.build()
+				
+				.keep(State.EMPOWERED)
+					.on(PacManGainsPowerEvent.class)
+					.build()
+				
+				.change(State.EMPOWERED, State.NORMAL)
+					.onTimeout()
 					.act(t -> eventMgr.publish(new PacManLostPowerEvent()))
-					.change(State.EMPOWERED, State.NORMAL)
-				.build()
-
-				.onTimeout()
+					.build()
+				
+				.keep(State.DYING)
+					.onTimeout()
 					.act(t -> eventMgr.publish(new PacManDiedEvent()))
-					.keep(State.DYING)
-				.build()
+					.build()
 					
 		.buildStateMachine();
 		/*@formatter:on*/
