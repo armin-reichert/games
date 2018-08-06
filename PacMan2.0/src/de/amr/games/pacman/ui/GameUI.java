@@ -5,7 +5,6 @@ import static de.amr.easy.game.Application.LOG;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.view.ViewController;
-import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
@@ -14,16 +13,14 @@ public class GameUI implements ViewController {
 
 	private final int width, height;
 	private final GameController gameControl;
-	private final Game game;
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI statusUI;
 	private final GameInfoUI gameInfoUI;
 
-	public GameUI(PacManApp app) {
-		this.width = app.settings.width;
-		this.height = app.settings.height;
-		this.game = new Game(app.maze, app.pulse::getFrequency);
+	public GameUI(Game game, int width, int height) {
+		this.width = width;
+		this.height = height;
 
 		// UI
 		mazeUI = new MazeUI(game);
@@ -34,7 +31,7 @@ public class GameUI implements ViewController {
 		// Layout
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * Spritesheet.TS);
-		statusUI.tf.moveTo(0, (3 + app.maze.numRows()) * Spritesheet.TS);
+		statusUI.tf.moveTo(0, (3 + game.maze.numRows()) * Spritesheet.TS);
 
 		gameControl = new GameController(game, mazeUI);
 		gameControl.setLogger(LOG);
