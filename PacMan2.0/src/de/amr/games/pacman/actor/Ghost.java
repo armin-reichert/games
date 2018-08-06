@@ -17,7 +17,6 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
-import de.amr.statemachine.StateMachineBuilder;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
@@ -87,7 +86,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	private void buildStateMachine(StateMachine<State, GameEvent> sm) {
 		/*@formatter:off*/
-	  new StateMachineBuilder<>(sm)
+	  sm.builder()
 			.description(getName().toString())
 			.initialState(State.INITIAL)
 		

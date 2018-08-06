@@ -64,6 +64,10 @@ public class StateMachine<S, E> {
 	S initialState;
 	S currentState;
 	StateMachineTracer<S, E> trace;
+	
+	public StateMachineBuilder<S,E> builder() {
+		return new StateMachineBuilder<>(this);
+	}
 
 	/**
 	 * Creates a new state machine.

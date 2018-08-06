@@ -32,7 +32,6 @@ import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.statemachine.StateMachine;
-import de.amr.statemachine.StateMachineBuilder;
 import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
 
@@ -78,7 +77,7 @@ public class GameController {
 
 	private void buildStateMachine(StateMachine<State, GameEvent> sm) {
 		/*@formatter:off*/
-		new StateMachineBuilder<>(sm)
+		sm.builder()
 			.description("GameController")
 			.initialState(State.READY)
 		
