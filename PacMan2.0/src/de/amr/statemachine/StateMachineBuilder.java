@@ -5,6 +5,16 @@ import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
+/**
+ * Builder for state machine instances.
+ * 
+ * @author Armin Reichert
+ *
+ * @param <S>
+ *          Type for identifying states
+ * @param <E>
+ *          Type of events
+ */
 public class StateMachineBuilder<S, E> {
 
 	private StateMachine<S, E> sm;
@@ -25,6 +35,89 @@ public class StateMachineBuilder<S, E> {
 		return this;
 	}
 
+	public StateBuilder states() {
+		return new StateBuilder();
+	}
+
+	public class StateBuilder {
+	
+		private S state;
+		private Runnable entry;
+		private Runnable exit;
+		private Runnable update;
+		private IntSupplier fnDuration;
+	
+		private void clear() {
+			state = null;
+			entry = null;
+			exit = null;
+			update = null;
+			fnDuration = () -> StateObject.ENDLESS;
+		}
+	
+		public StateBuilder state(S state) {
+			clear();
+			this.state = state;
+			return this;
+		}
+	
+		public <C extends StateObject<S, E>> StateBuilder impl(Supplier<C> customStateConstructor) {
+			if (customStateConstructor == null) {
+				throw new IllegalArgumentException("Custom state constructor must be specified");
+			}
+			C customStateObject = customStateConstructor.get();
+			customStateObject.machine = sm;
+			customStateObject.id = state;
+			sm.stateMap.put(state, customStateObject);
+			return this;
+		}
+	
+		public StateBuilder duration(IntSupplier fnDuration) {
+			if (fnDuration == null) {
+				throw new IllegalStateException("Timer function cannot be null for state " + state);
+			}
+			this.fnDuration = fnDuration;
+			return this;
+		}
+	
+		public StateBuilder onEntry(Runnable entry) {
+			this.entry = entry;
+			return this;
+		}
+	
+		public StateBuilder onExit(Runnable exit) {
+			this.exit = exit;
+			return this;
+		}
+	
+		public StateBuilder onTick(Runnable update) {
+			this.update = update;
+			return this;
+		}
+	
+		public StateBuilder build() {
+			StateObject<S, E> stateObject;
+			if (!sm.stateMap.containsKey(state)) {
+				stateObject = new StateObject<>();
+				stateObject.machine = sm;
+				stateObject.id = state;
+				sm.stateMap.put(state, stateObject);
+			} else {
+				stateObject = sm.stateMap.get(state);
+			}
+			stateObject.entry = entry;
+			stateObject.exit = exit;
+			stateObject.update = update;
+			stateObject.fnDuration = fnDuration;
+			clear();
+			return this;
+		}
+	
+		public TransitionBuilder transitions() {
+			return new TransitionBuilder();
+		}
+	}
+
 	public class TransitionBuilder {
 
 		private S from;
@@ -33,10 +126,6 @@ public class StateMachineBuilder<S, E> {
 		private boolean timeout;
 		private Class<? extends E> eventType;
 		private Consumer<StateTransition<S, E>> action;
-
-		public StateObject<S, E> _state(S state) {
-			return sm.state(state);
-		}
 
 		public TransitionBuilder() {
 			clear();
@@ -93,7 +182,7 @@ public class StateMachineBuilder<S, E> {
 
 		public TransitionBuilder build() {
 			if (timeout && eventType != null) {
-				throw new IllegalStateException("Cannot specify onTimeout and onEvent for single transition");
+				throw new IllegalStateException("Cannot specify both, onTimeout and on(Event.class)");
 			}
 			sm.addTransition(from, to, guard, action, eventType, timeout);
 			clear();
@@ -105,88 +194,5 @@ public class StateMachineBuilder<S, E> {
 			sm.initialState = initialState;
 			return sm;
 		}
-	}
-
-	public class StateBuilder {
-
-		private S state;
-		private Runnable entry;
-		private Runnable exit;
-		private Runnable update;
-		private IntSupplier fnDuration;
-
-		private void clear() {
-			state = null;
-			entry = null;
-			exit = null;
-			update = null;
-			fnDuration = () -> StateObject.ENDLESS;
-		}
-
-		public StateBuilder state(S state) {
-			clear();
-			this.state = state;
-			return this;
-		}
-
-		public <C extends StateObject<S, E>> StateBuilder impl(Supplier<C> customStateConstructor) {
-			if (customStateConstructor == null) {
-				throw new IllegalArgumentException("Custom state constructor must be specified");
-			}
-			C customStateObject = customStateConstructor.get();
-			customStateObject.sm = sm;
-			customStateObject.state = state;
-			sm.stateMap.put(state, customStateObject);
-			return this;
-		}
-
-		public StateBuilder duration(IntSupplier fnDuration) {
-			if (fnDuration == null) {
-				throw new IllegalStateException("Timer function cannot be null for state " + state);
-			}
-			this.fnDuration = fnDuration;
-			return this;
-		}
-
-		public StateBuilder onEntry(Runnable entry) {
-			this.entry = entry;
-			return this;
-		}
-
-		public StateBuilder onExit(Runnable exit) {
-			this.exit = exit;
-			return this;
-		}
-
-		public StateBuilder onTick(Runnable update) {
-			this.update = update;
-			return this;
-		}
-
-		public StateBuilder build() {
-			StateObject<S, E> stateObject;
-			if (!sm.stateMap.containsKey(state)) {
-				stateObject = new StateObject<>();
-				stateObject.sm = sm;
-				stateObject.state = state;
-				sm.stateMap.put(state, stateObject);
-			} else {
-				stateObject = sm.stateMap.get(state);
-			}
-			stateObject.entry = entry;
-			stateObject.exit = exit;
-			stateObject.update = update;
-			stateObject.fnDuration = fnDuration;
-			clear();
-			return this;
-		}
-
-		public TransitionBuilder transitions() {
-			return new TransitionBuilder();
-		}
-	}
-
-	public StateBuilder states() {
-		return new StateBuilder();
 	}
 }

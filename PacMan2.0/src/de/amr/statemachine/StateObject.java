@@ -13,10 +13,10 @@ public class StateObject<S, E> {
 	public static final int ENDLESS = Integer.MAX_VALUE;
 
 	/** The label used to identify this state. */
-	S state;
+	S id;
 
 	/** The state machine this state belongs to. */
-	StateMachine<S, E> sm;
+	StateMachine<S, E> machine;
 
 	/** The client code executed when entering this state. */
 	Runnable entry;
@@ -42,7 +42,7 @@ public class StateObject<S, E> {
 	}
 
 	public S id() {
-		return state;
+		return id;
 	}
 
 	public void onEntry() {
@@ -71,7 +71,7 @@ public class StateObject<S, E> {
 	/** Resets the timer to the complete state duration. */
 	void resetTimer() {
 		if (fnDuration == null) {
-			throw new IllegalStateException(String.format("Timer function is NULL in state '%s'", state));
+			throw new IllegalStateException(String.format("Timer function is NULL in state '%s'", id));
 		}
 		ticksRemaining = timerTotalTicks = fnDuration.getAsInt();
 	}

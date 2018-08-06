@@ -148,8 +148,8 @@ public class StateMachine<S, E> {
 	public <C extends StateObject<S, E>> C state(S state) {
 		if (!stateMap.containsKey(state)) {
 			StateObject<S, E> stateObject = new StateObject<>();
-			stateObject.state = state;
-			stateObject.sm = this;
+			stateObject.id = state;
+			stateObject.machine = this;
 			stateMap.put(state, stateObject);
 			return (C) stateObject;
 		}
