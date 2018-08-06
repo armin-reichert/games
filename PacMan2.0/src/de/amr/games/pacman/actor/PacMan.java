@@ -152,6 +152,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public void init() {
+		interests.removeIf(e -> e instanceof Bonus);
 		sm.init();
 	}
 
