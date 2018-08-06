@@ -7,25 +7,6 @@ import java.util.function.Supplier;
 
 public class StateMachineBuilder<S, E> {
 
-	public static void main(String args[]) {
-		/*@formatter:off*/
-		StateMachine<String, Integer> sm = StateMachine.builder(String.class, Integer.class)
-			.description("SampleFSM")
-			.initialState("A")
-			.states()
-				.state("A")
-				.state("B").impl(null)
-				.state("C")
-			.transitions()
-				.change("A", "B").when(() -> 10 > 9).act(t -> {
-					System.out.println("Action");
-				}).build()
-				.keep("B").when(() -> 10 > 9).build()
-			.buildStateMachine();
-		/*@formatter:on*/
-		sm.init();
-	}
-
 	private StateMachine<S, E> sm;
 	private String description;
 	private S initialState;
