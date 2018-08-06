@@ -198,13 +198,13 @@ public class StateMachine<S, E> {
 	}
 
 	private boolean canFire(Transition t) {
-		boolean conditionFulfilled = t.guard == null || t.guard.getAsBoolean();
+		boolean guardOk = t.guard == null || t.guard.getAsBoolean();
 		if (t.timeout) {
-			return conditionFulfilled && state(t.from).isTerminated();
+			return guardOk && state(t.from).isTerminated();
 		} else if (t.eventType != null) {
-			return conditionFulfilled && hasMatchingEvent(t.eventType);
+			return guardOk && hasMatchingEvent(t.eventType);
 		} else {
-			return conditionFulfilled;
+			return guardOk;
 		}
 	}
 
@@ -213,25 +213,25 @@ public class StateMachine<S, E> {
 		return !eventQ.isEmpty() && eventQ.peek().getClass().equals(eventType);
 	}
 
-	private void fireTransition(Transition transition, E event) {
-		transition.event = event;
-		trace.firingTransition(transition);
-		if (currentState == transition.to) {
+	private void fireTransition(Transition t, E event) {
+		t.event = event;
+		trace.firingTransition(t);
+		if (currentState == t.to) {
 			// keep state: no exit/entry actions are executed
-			if (transition.action != null) {
-				transition.action.accept(transition);
+			if (t.action != null) {
+				t.action.accept(t);
 			}
 		} else {
 			// change state, execute exit and entry actions
-			StateObject<S, E> oldState = state(transition.from);
-			StateObject<S, E> newState = state(transition.to);
+			StateObject<S, E> oldState = state(t.from);
+			StateObject<S, E> newState = state(t.to);
 			trace.exitingState(currentState);
 			oldState.onExit();
-			if (transition.action != null) {
-				transition.action.accept(transition);
+			if (t.action != null) {
+				t.action.accept(t);
 			}
-			currentState = transition.to;
-			trace.enteringState(transition.to);
+			currentState = t.to;
+			trace.enteringState(t.to);
 			newState.resetTimer();
 			newState.onEntry();
 		}

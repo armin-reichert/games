@@ -10,7 +10,7 @@ import java.util.function.IntSupplier;
 public class StateObject<S, E> {
 
 	/** Constant for defining an unlimited duration. */
-	public static final int UNLIMITED = Integer.MAX_VALUE;
+	public static final int ENDLESS = Integer.MAX_VALUE;
 
 	/** The label used to identify this state. */
 	S state;
@@ -37,8 +37,8 @@ public class StateObject<S, E> {
 	int ticksRemaining;
 
 	protected StateObject() {
-		fnDuration = () -> UNLIMITED;
-		ticksRemaining = timerTotalTicks = UNLIMITED;
+		fnDuration = () -> ENDLESS;
+		ticksRemaining = timerTotalTicks = ENDLESS;
 	}
 
 	public S id() {

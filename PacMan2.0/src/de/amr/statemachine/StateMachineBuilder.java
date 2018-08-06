@@ -139,7 +139,7 @@ public class StateMachineBuilder<S, E> {
 			entry = null;
 			exit = null;
 			update = null;
-			fnDuration = () -> StateObject.UNLIMITED;
+			fnDuration = () -> StateObject.ENDLESS;
 		}
 
 		public StateBuilder state(S state) {

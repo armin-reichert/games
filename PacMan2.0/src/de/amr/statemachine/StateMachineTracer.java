@@ -36,7 +36,7 @@ public class StateMachineTracer<S, E> {
 
 	public void enteringState(S enteredState) {
 		if (log != null) {
-			if (sm.state(enteredState).getDuration() != StateObject.UNLIMITED) {
+			if (sm.state(enteredState).getDuration() != StateObject.ENDLESS) {
 				float seconds = sm.state(enteredState).getDuration() / sm.fnPulse.getAsInt();
 				log.info(String.format("FSM(%s) entering state '%s' for %.2f seconds (%d frames)", sm.getDescription(),
 						enteredState, seconds, sm.state(enteredState).getDuration()));
