@@ -160,10 +160,6 @@ public class GameController {
 
 	private class ReadyState extends StateObject<State, GameEvent> {
 
-		public ReadyState() {
-			super(sm, State.READY);
-		}
-
 		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {
 			setDuration(game.sec(2));
@@ -181,10 +177,6 @@ public class GameController {
 	}
 
 	private class PlayingState extends StateObject<State, GameEvent> {
-
-		public PlayingState() {
-			super(sm, State.PLAYING);
-		}
 
 		@Override
 		public void onTick(StateObject<State, GameEvent> self) {
@@ -268,10 +260,6 @@ public class GameController {
 
 	private class ChangingLevelState extends StateObject<State, GameEvent> {
 
-		public ChangingLevelState() {
-			super(sm, State.CHANGING_LEVEL);
-		}
-
 		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {
 			setDuration(game.getLevelChangingTime());
@@ -302,10 +290,6 @@ public class GameController {
 
 	private class GhostDyingState extends StateObject<State, GameEvent> {
 
-		public GhostDyingState() {
-			super(sm, State.GHOST_DYING);
-		}
-
 		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {
 			setDuration(game.getGhostDyingTime());
@@ -324,10 +308,6 @@ public class GameController {
 	}
 
 	private class PacManDyingState extends StateObject<State, GameEvent> {
-
-		public PacManDyingState() {
-			super(sm, State.PACMAN_DYING);
-		}
 
 		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {
@@ -348,10 +328,6 @@ public class GameController {
 	}
 
 	private class GameOverState extends StateObject<State, GameEvent> {
-
-		public GameOverState() {
-			super(sm, State.GAME_OVER);
-		}
 
 		@Override
 		public void onEntry(StateObject<State, GameEvent> self) {

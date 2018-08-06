@@ -164,15 +164,15 @@ public class GameInfoUI implements ViewController {
 	private String pacManStateText(PacMan pacMan) {
 		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().state(pacMan.getStateMachine().currentState());
 		return state.getDuration() != StateObject.UNLIMITED
-				? String.format("%s(%d|%d)", state.state, state.getRemaining(), state.getDuration())
-				: String.format("(%s)", state.state);
+				? String.format("%s(%d|%d)", state.id(), state.getRemaining(), state.getDuration())
+				: String.format("(%s)", state.id());
 	}
 
 	private String ghostStateText(Ghost ghost) {
 		StateObject<Ghost.State, ?> state = ghost.getStateMachine().state(ghost.getStateMachine().currentState());
 		return state.getDuration() != StateObject.UNLIMITED
-				? String.format("%s(%s,%d|%d)", ghost.getName(), state.state, state.getRemaining(), state.getDuration())
-				: String.format("%s(%s)", ghost.getName(), state.state);
+				? String.format("%s(%s,%d|%d)", ghost.getName(), state.id(), state.getRemaining(), state.getDuration())
+				: String.format("%s(%s)", ghost.getName(), state.id());
 	}
 
 	private void toggleGhost(GhostName ghostName) {

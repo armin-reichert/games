@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 public class StateMachine<S, E> {
 
 	public static <SS, EE> StateMachineBuilder<SS, EE> builder(Class<SS> stateLabelType, Class<EE> eventType) {
-		return new StateMachineBuilder<SS, EE>(stateLabelType);
+		return new StateMachineBuilder<>(stateLabelType);
 	}
 	
 	class Transition implements StateTransition<S, E> {
@@ -139,7 +139,11 @@ public class StateMachine<S, E> {
 	@SuppressWarnings("unchecked")
 	public <C extends StateObject<S, E>> C state(S state) {
 		if (!stateMap.containsKey(state)) {
-			stateMap.put(state, new StateObject<>(this, state));
+			StateObject<S, E> stateObject = new StateObject<>();
+			stateObject.state = state;
+			stateObject.sm = this;
+			stateMap.put(state, stateObject);
+			return (C) stateObject;
 		}
 		return (C) stateMap.get(state);
 	}

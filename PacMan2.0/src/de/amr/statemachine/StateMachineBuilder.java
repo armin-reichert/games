@@ -144,7 +144,10 @@ public class StateMachineBuilder<S, E> {
 			if (customStateConstructor == null) {
 				throw new IllegalArgumentException("Custom state constructor must be specified");
 			}
-			sm.stateMap.put(state, customStateConstructor.get());
+			C customStateObject = customStateConstructor.get();
+			customStateObject.sm = sm;
+			customStateObject.state = state;
+			sm.stateMap.put(state, customStateObject);
 			return this;
 		}
 
@@ -165,7 +168,10 @@ public class StateMachineBuilder<S, E> {
 
 		public StateBuilder build() {
 			if (!sm.stateMap.containsKey(state)) {
-				sm.stateMap.put(state, new StateObject<>(sm, state));
+				StateObject<S, E> stateObject = new StateObject<>();
+				stateObject.sm = sm;
+				stateObject.state = state;
+				sm.stateMap.put(state, stateObject);
 			}
 			sm.state(state).entry = entry;
 			sm.state(state).exit = exit;

@@ -13,10 +13,10 @@ public class StateObject<S, E> {
 	public static final int UNLIMITED = Integer.MAX_VALUE;
 
 	/** The label used to identify this state. */
-	public final S state;
+	S state;
 
 	/** The state machine this state belongs to. */
-	final StateMachine<S, E> sm;
+	StateMachine<S, E> sm;
 
 	/** The client code executed when entering this state. */
 	Consumer<StateObject<S, E>> entry;
@@ -33,14 +33,12 @@ public class StateObject<S, E> {
 	/** Ticks remaining until time-out */
 	int remaining;
 
-	/**
-	 * Creates a new state with unlimited duration.
-	 */
-	public StateObject(StateMachine<S, E> sm, S state) {
-		this.sm = sm;
-		this.state = state;
+	protected StateObject() {
 		remaining = duration = UNLIMITED;
-		defineTransitions();
+	}
+
+	public S id() {
+		return state;
 	}
 
 	public void onEntry(StateObject<S, E> self) {
@@ -59,9 +57,6 @@ public class StateObject<S, E> {
 		if (update != null) {
 			update.accept(this);
 		}
-	}
-
-	public void defineTransitions() {
 	}
 
 	/** Tells if this state has timed out. */
