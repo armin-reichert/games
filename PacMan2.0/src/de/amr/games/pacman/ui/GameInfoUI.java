@@ -23,7 +23,6 @@ import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.statemachine.StateObject;
 
@@ -31,18 +30,16 @@ public class GameInfoUI implements ViewController {
 
 	private final Game game;
 	private final MazeUI mazeUI;
-	private final Maze maze;
 	private boolean show_grid;
 	private boolean show_ghost_route;
 	private boolean show_entity_state;
 
 	private Image gridImage;
 
-	public GameInfoUI(Game game, MazeUI mazeUI, Maze maze) {
+	public GameInfoUI(Game game, MazeUI mazeUI) {
 		this.game = game;
 		this.mazeUI = mazeUI;
-		this.maze = maze;
-		gridImage = createGridImage(maze.numRows(), maze.numCols());
+		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
 	}
 
 	@Override
@@ -98,8 +95,8 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private void eatAllPellets() {
-		maze.tiles().filter(tile -> maze.getContent(tile) == PELLET).forEach(tile -> {
-			maze.clearTile(tile);
+		game.maze.tiles().filter(tile -> game.maze.getContent(tile) == PELLET).forEach(tile -> {
+			game.maze.clearTile(tile);
 			game.foodEaten += 1;
 		});
 	}

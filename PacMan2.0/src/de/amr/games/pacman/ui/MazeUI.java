@@ -63,9 +63,9 @@ public class MazeUI extends GameEntity {
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
-	public MazeUI(Game game, Maze maze) {
+	public MazeUI(Game game) {
 		this.game = game;
-		this.maze = maze;
+		this.maze = game.maze;
 		s_normal = Spritesheet.maze().scale(getWidth(), getHeight());
 		s_flashing = Spritesheet.flashingMaze().scale(getWidth(), getHeight());
 

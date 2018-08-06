@@ -29,7 +29,6 @@ import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.MazeUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
@@ -39,13 +38,11 @@ public class GameController {
 
 	private final StateMachine<State, GameEvent> sm;
 	private final Game game;
-	private final Maze maze;
 	private final MazeUI mazeUI;
 
-	public GameController(Game game, Maze maze, MazeUI mazeUI) {
+	public GameController(Game game, MazeUI mazeUI) {
 
 		this.game = game;
-		this.maze = maze;
 		this.mazeUI = mazeUI;
 
 		// build the state machine
@@ -161,7 +158,7 @@ public class GameController {
 
 		@Override
 		public void onEntry() {
-			game.init(maze);
+			game.init();
 			mazeUI.initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!", Color.YELLOW);
@@ -235,7 +232,7 @@ public class GameController {
 
 		private void onFoodFound(StateTransition<State, GameEvent> t) {
 			FoodFoundEvent e = t.typedEvent();
-			maze.clearTile(e.tile);
+			game.maze.clearTile(e.tile);
 			game.foodEaten += 1;
 			int oldGameScore = game.score;
 			game.score += game.getFoodValue(e.food);
@@ -280,7 +277,7 @@ public class GameController {
 			game.level += 1;
 			game.foodEaten = 0;
 			game.ghostIndex = 0;
-			maze.resetFood();
+			game.maze.resetFood();
 			mazeUI.initActors();
 		}
 	}
@@ -335,7 +332,7 @@ public class GameController {
 		@Override
 		public void onExit() {
 			mazeUI.hideInfo();
-			game.init(maze);
+			game.init();
 		}
 	}
 }

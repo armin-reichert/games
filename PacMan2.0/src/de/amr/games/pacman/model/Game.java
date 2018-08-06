@@ -23,8 +23,6 @@ public class Game {
 	public static final int EXTRALIFE_SCORE = 10_000;
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
-	public final IntSupplier fnTicksPerSecond;
-
 	enum Column {
 		BonusSymbol, BonusValue, PacManSpeed, Col3, GhostNormalSpeed, GhostTunnelSpeed
 	};
@@ -144,12 +142,13 @@ public class Game {
 	public int getLevelChangingTime() {
 		return sec(4);
 	}
-	
+
 	public int getReadyTime() {
 		return sec(2);
 	}
 
-	public Maze maze;
+	public final IntSupplier fnTicksPerSecond;
+	public final Maze maze;
 	public int level;
 	public int lives;
 	public int score;
@@ -159,13 +158,13 @@ public class Game {
 
 	private float baseSpeed;
 
-	public Game(IntSupplier fnTicksPerSecond) {
+	public Game(Maze maze, IntSupplier fnTicksPerSecond) {
 		this.fnTicksPerSecond = fnTicksPerSecond;
+		this.maze = maze;
 		baseSpeed = tps(8f);
 	}
 
-	public void init(Maze maze) {
-		this.maze = maze;
+	public void init() {
 		maze.resetFood();
 		foodTotal = maze.getFoodCount();
 		level = 1;

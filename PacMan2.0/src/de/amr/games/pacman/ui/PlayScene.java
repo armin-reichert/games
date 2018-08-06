@@ -9,14 +9,12 @@ import de.amr.games.pacman.PacManApp;
 import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Maze;
 
 public class PlayScene implements ViewController {
 
 	private final int width, height;
 	private final GameController gameControl;
 	private final Game game;
-	private final Maze maze;
 	private final MazeUI mazeUI;
 	private final HUD hud;
 	private final StatusUI statusUI;
@@ -25,21 +23,20 @@ public class PlayScene implements ViewController {
 	public PlayScene(PacManApp app) {
 		this.width = app.settings.width;
 		this.height = app.settings.height;
-		this.game = new Game(app.pulse::getFrequency);
-		this.maze = app.maze;
+		this.game = new Game(app.maze, app.pulse::getFrequency);
 
 		// UI
-		mazeUI = new MazeUI(game, maze);
+		mazeUI = new MazeUI(game);
 		hud = new HUD(game);
 		statusUI = new StatusUI(game);
-		gameInfoUI = new GameInfoUI(game, mazeUI, maze);
+		gameInfoUI = new GameInfoUI(game, mazeUI);
 
 		// Layout
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * Spritesheet.TS);
-		statusUI.tf.moveTo(0, (3 + maze.numRows()) * Spritesheet.TS);
+		statusUI.tf.moveTo(0, (3 + app.maze.numRows()) * Spritesheet.TS);
 
-		gameControl = new GameController(game, maze, mazeUI);
+		gameControl = new GameController(game, mazeUI);
 		gameControl.setLogger(LOG);
 		mazeUI.getPacMan().getStateMachine().setLogger(LOG);
 		mazeUI.getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
