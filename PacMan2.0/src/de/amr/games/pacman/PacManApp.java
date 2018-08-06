@@ -21,7 +21,7 @@ public class PacManApp extends Application {
 		settings.width = maze.numCols() * Spritesheet.TS;
 		settings.height = (maze.numRows() + 5) * Spritesheet.TS;
 		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
-		settings.title = "PacMan 2.0";
+		settings.title = "Armin's PacMan";
 		pulse.setFrequency(60);
 		LOG.setLevel(Level.INFO);
 	}
