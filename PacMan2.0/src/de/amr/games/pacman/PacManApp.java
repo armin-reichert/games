@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.PlayScene;
+import de.amr.games.pacman.ui.GameUI;
 import de.amr.games.pacman.ui.Spritesheet;
 
 public class PacManApp extends Application {
@@ -28,6 +28,6 @@ public class PacManApp extends Application {
 
 	@Override
 	public void init() {
-		setController(new PlayScene(this));
+		setController(new GameUI(this));
 	}
 }

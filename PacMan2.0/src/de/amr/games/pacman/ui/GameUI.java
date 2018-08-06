@@ -10,7 +10,7 @@ import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
 
-public class PlayScene implements ViewController {
+public class GameUI implements ViewController {
 
 	private final int width, height;
 	private final GameController gameControl;
@@ -20,7 +20,7 @@ public class PlayScene implements ViewController {
 	private final StatusUI statusUI;
 	private final GameInfoUI gameInfoUI;
 
-	public PlayScene(PacManApp app) {
+	public GameUI(PacManApp app) {
 		this.width = app.settings.width;
 		this.height = app.settings.height;
 		this.game = new Game(app.maze, app.pulse::getFrequency);
