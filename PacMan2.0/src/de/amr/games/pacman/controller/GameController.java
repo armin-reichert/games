@@ -192,15 +192,15 @@ public class GameController implements Controller {
 		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
 			PacManGhostCollisionEvent e = t.typedEvent();
 			PacMan.State pacManState = actors.getPacMan().getState();
-			Ghost.State ghostState = e.ghost.getState();
+			if (pacManState == PacMan.State.DYING) {
+				return;
+			}
 			if (pacManState == PacMan.State.EMPOWERED) {
+				Ghost.State ghostState = e.ghost.getState();
 				if (ghostState == Ghost.State.AFRAID || ghostState == Ghost.State.AGGRO
 						|| ghostState == Ghost.State.SCATTERING) {
 					sm.enqueue(new GhostKilledEvent(e.ghost));
 				}
-				return;
-			}
-			if (pacManState == PacMan.State.DYING) {
 				return;
 			}
 			sm.enqueue(new PacManKilledEvent(e.ghost));
