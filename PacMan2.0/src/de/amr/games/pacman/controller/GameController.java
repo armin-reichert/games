@@ -308,6 +308,7 @@ public class GameController implements Controller {
 		public void onEntry() {
 			game.lives -= 1;
 			actors.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
+			gameUI.mazeUI.init();
 		}
 
 		@Override
@@ -317,7 +318,6 @@ public class GameController implements Controller {
 
 		@Override
 		public void onExit() {
-			gameUI.mazeUI.removeBonus();
 			actors.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		}
 	}
@@ -327,14 +327,13 @@ public class GameController implements Controller {
 		@Override
 		public void onEntry() {
 			gameUI.mazeUI.enableAnimation(false);
-			gameUI.mazeUI.removeBonus();
+			gameUI.mazeUI.init();
 			gameUI.showInfo("Game Over!", Color.RED);
 		}
 
 		@Override
 		public void onExit() {
 			gameUI.hideInfo();
-			game.init();
 		}
 	}
 }

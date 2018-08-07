@@ -50,6 +50,11 @@ public class MazeUI extends GameEntity {
 	public Sprite currentSprite() {
 		return flashing ? s_flashing : s_normal;
 	}
+	
+	@Override
+	public void init() {
+		removeBonus();
+	}
 
 	@Override
 	public void update() {
