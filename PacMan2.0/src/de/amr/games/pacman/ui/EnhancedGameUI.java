@@ -32,6 +32,8 @@ import de.amr.statemachine.StateObject;
  */
 public class EnhancedGameUI extends GameUI {
 
+	private static final String INFTY = Character.toString('\u221E');
+	
 	private final GameUI gameUI;
 	private boolean show_grid;
 	private boolean show_ghost_route;
@@ -151,14 +153,14 @@ public class EnhancedGameUI extends GameUI {
 		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().state(pacMan.getStateMachine().currentState());
 		return state.getDuration() != StateObject.ENDLESS
 				? String.format("%s(%d|%d)", state.id(), state.getRemaining(), state.getDuration())
-				: String.format("(%s)", state.id());
+				: String.format("%s(%s)", state.id(), INFTY);
 	}
 
 	private String ghostStateText(Ghost ghost) {
 		StateObject<Ghost.State, ?> state = ghost.getStateMachine().state(ghost.getStateMachine().currentState());
 		return state.getDuration() != StateObject.ENDLESS
 				? String.format("%s(%s,%d|%d)", ghost.getName(), state.id(), state.getRemaining(), state.getDuration())
-				: String.format("%s(%s)", ghost.getName(), state.id());
+				: String.format("%s(%s),%s", ghost.getName(), state.id(), INFTY);
 	}
 
 	private void toggleGhost(GhostName ghostName) {
