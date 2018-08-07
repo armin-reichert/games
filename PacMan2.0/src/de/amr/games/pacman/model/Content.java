@@ -1,6 +1,6 @@
 package de.amr.games.pacman.model;
 
-public class Content {
+public interface Content {
 
 	// Structure
 	public static final char EMPTY = ' ';
