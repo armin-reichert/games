@@ -18,24 +18,23 @@ public class PacManApp extends Application {
 		launch(new PacManApp(args));
 	}
 
-	private Maze maze;
+	private final Game game;
 
 	public PacManApp(String[] args) {
-		maze = new Maze(Assets.text("maze.txt"));
-		settings.width = maze.numCols() * Spritesheet.TS;
-		settings.height = (maze.numRows() + 5) * Spritesheet.TS;
+		game = new Game(new Maze(Assets.text("maze.txt")), pulse::getFrequency);
+		settings.width = game.maze.numCols() * Spritesheet.TS;
+		settings.height = (game.maze.numRows() + 5) * Spritesheet.TS;
 		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
 		settings.title = "Armin's PacMan";
-		pulse.setFrequency(60);
 	}
 
 	@Override
 	public void init() {
 		LOG.setLevel(Level.INFO);
-		Game game = new Game(maze, pulse::getFrequency);
 		GameActors actors = new GameActors(game);
 		GameUI gameUI = new GameUI(settings.width, settings.height, game, actors);
 		GameController gameController = new GameController(game, actors, new EnhancedGameUI(gameUI));
 		setController(gameController);
+		pulse.setFrequency(60);
 	}
 }

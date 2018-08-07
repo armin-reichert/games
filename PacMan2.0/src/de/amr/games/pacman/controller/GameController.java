@@ -43,10 +43,10 @@ public class GameController implements Controller {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	};
 
-	private StateMachine<State, GameEvent> sm;
 	private final Game game;
 	private final GameActors actors;
 	private final GameUI gameUI;
+	private StateMachine<State, GameEvent> sm;
 
 	public GameController(Game game, GameActors actors, GameUI gameUI) {
 		this.game = game;
@@ -62,17 +62,13 @@ public class GameController implements Controller {
 	public void init() {
 		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
-		// forward events from actors to state machine
-		actors.getPacMan().eventMgr.subscribe(sm::enqueue);
-		//TODO handle change of active ghosts at runtime
-		actors.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(sm::enqueue));
-
 		sm.init();
+		actors.addEventHandler(sm::enqueue);
 	}
 
 	public void update() {
-		gameUI.update();
 		sm.update();
+		gameUI.update();
 	}
 
 	public void setLogger(Logger log) {

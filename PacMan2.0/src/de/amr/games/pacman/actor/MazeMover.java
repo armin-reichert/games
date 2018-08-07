@@ -9,13 +9,13 @@ import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -34,16 +34,15 @@ public abstract class MazeMover<S> extends GameEntity {
 	public final Game game;
 	public final Maze maze;
 	public final Tile homeTile;
+	protected final GameEventManager eventMgr;
 	private final Map<S, RoutePlanner> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
 	private int nextDir;
 
-	protected MazeMover(Game game, Tile homeTile, Map<S, RoutePlanner> navigation) {
-		Objects.requireNonNull(game);
-		Objects.requireNonNull(homeTile);
-		Objects.requireNonNull(navigation);
+	protected MazeMover(Game game, GameEventManager eventMgr, Tile homeTile, Map<S, RoutePlanner> navigation) {
 		this.game = game;
+		this.eventMgr = eventMgr;
 		this.maze = game.maze;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
