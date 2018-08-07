@@ -87,7 +87,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		/*@formatter:off*/
 		return StateMachine.builder(State.class, GameEvent.class)
 			 
-			.description(getName().toString())
+			.description(String.format("[%s]", getName()))
 			.initialState(State.INITIAL)
 		
 			.states()

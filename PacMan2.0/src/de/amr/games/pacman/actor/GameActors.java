@@ -42,8 +42,8 @@ public class GameActors {
 		setGhostActive(GhostName.PINKY, false);
 		setGhostActive(GhostName.INKY, false);
 		setGhostActive(GhostName.CLYDE, false);
-		pacMan.getStateMachine().setLogger(LOG);
-		getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
+		pacMan.getStateMachine().traceTo(LOG);
+		getActiveGhosts().forEach(ghost -> ghost.getStateMachine().traceTo(LOG));
 	}
 
 	private PacMan createPacMan() {

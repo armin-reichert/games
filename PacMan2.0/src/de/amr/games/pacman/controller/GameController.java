@@ -69,7 +69,7 @@ public class GameController {
 	}
 
 	public void setLogger(Logger log) {
-		sm.setLogger(log);
+		sm.traceTo(log);
 	}
 
 	private PlayingState playingState() {
@@ -79,7 +79,7 @@ public class GameController {
 	private StateMachine<State, GameEvent> buildStateMachine() {
 		/*@formatter:off*/
 		return StateMachine.builder(State.class, GameEvent.class)
-			.description("GameController")
+			.description("[GameController]")
 			.initialState(State.READY)
 		
 			.states()

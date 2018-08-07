@@ -16,10 +16,8 @@ import java.util.stream.Stream;
 /**
  * A finite state machine.
  *
- * @param <S>
- *          type for identifying states, for example an enumeration type.
- * @param <E>
- *          type of inputs (events).
+ * @param <S> type for identifying states, for example an enumeration type.
+ * @param <E> type of inputs (events).
  * 
  * @author Armin Reichert
  */
@@ -65,29 +63,27 @@ public class StateMachine<S, E> {
 	Map<S, List<Transition>> transitionsFromState;
 	S initialState;
 	S currentState;
-	StateMachineTracer<S, E> trace;
+	StateMachineTracer<S, E> tracer;
 
 	/**
 	 * Creates a new state machine.
 	 * 
 	 * @param stateLabelType
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public StateMachine(Class<S> stateLabelType) {
 		this.eventQ = new ArrayDeque<>();
-		this.stateMap = new HashMap<>(); // TODO
+		this.stateMap = new HashMap<>(); // TODO enum map if possible
 		this.transitionsFromState = new HashMap<>();
-		this.trace = new StateMachineTracer(this);
+		this.tracer = new StateMachineTracer<>(this, Logger.getGlobal());
 	}
 
 	/**
-	 * Sets a logger.
+	 * Forwards tracing to the given logger.
 	 * 
-	 * @param log
-	 *              a logger
+	 * @param log a logger
 	 */
-	public void setLogger(Logger log) {
-		trace.setLog(log);
+	public void traceTo(Logger log) {
+		tracer = new StateMachineTracer<>(this, log);
 	}
 
 	/**
@@ -100,8 +96,7 @@ public class StateMachine<S, E> {
 	/**
 	 * Adds an input ("event") to the queue of this state machine.
 	 * 
-	 * @param event
-	 *                some input/event
+	 * @param event some input/event
 	 */
 	public void enqueue(E event) {
 		eventQ.add(event);
@@ -110,8 +105,7 @@ public class StateMachine<S, E> {
 	/**
 	 * Tells if the state machine is in any of the given states.
 	 * 
-	 * @param states
-	 *                 non-empty list of state labels
+	 * @param states non-empty list of state labels
 	 * @return <code>true</code> if the state machine is in any of the given states
 	 */
 	@SuppressWarnings("unchecked")
@@ -138,10 +132,10 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * Returns the state object with the given identifier. The state object is created on demand.
+	 * Returns the state object with the given identifier. The state object is
+	 * created on demand.
 	 * 
-	 * @param state
-	 *                a state identifier
+	 * @param state a state identifier
 	 * @return the state object for the given state identifier
 	 */
 	@SuppressWarnings("unchecked")
@@ -157,11 +151,11 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * Initializes this state machine by switching to the initial state and executing the initial
-	 * state's (optional) entry action.
+	 * Initializes this state machine by switching to the initial state and
+	 * executing the initial state's (optional) entry action.
 	 */
 	public void init() {
-		trace.enteringInitialState(initialState);
+		tracer.enteringInitialState(initialState);
 		currentState = initialState;
 		state(currentState).resetTimer();
 		state(currentState).onEntry();
@@ -188,7 +182,7 @@ public class StateMachine<S, E> {
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
-				trace.ignoredEvent(event);
+				tracer.ignoredEvent(event);
 				// TODO should we always throw an exception? Maybe make it configurable?
 				throw new IllegalStateException(
 						String.format("No transition defined in state '%s' for event '%s'", currentState, event));
@@ -215,7 +209,7 @@ public class StateMachine<S, E> {
 
 	private void fireTransition(Transition t, E event) {
 		t.event = event;
-		trace.firingTransition(t);
+		tracer.firingTransition(t);
 		if (currentState == t.to) {
 			// keep state: no exit/entry actions are executed
 			if (t.action != null) {
@@ -225,13 +219,13 @@ public class StateMachine<S, E> {
 			// change state, execute exit and entry actions
 			StateObject<S, E> oldState = state(t.from);
 			StateObject<S, E> newState = state(t.to);
-			trace.exitingState(currentState);
+			tracer.exitingState(currentState);
 			oldState.onExit();
 			if (t.action != null) {
 				t.action.accept(t);
 			}
 			currentState = t.to;
-			trace.enteringState(t.to);
+			tracer.enteringState(t.to);
 			newState.resetTimer();
 			newState.onEntry();
 		}
