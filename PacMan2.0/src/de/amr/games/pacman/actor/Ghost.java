@@ -204,7 +204,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 					.when(() -> getTile().equals(homeTile))
 					.build()
 		
-			.buildStateMachine();
+			.endStateMachine();
 		/*@formatter:on*/
 	}
 }

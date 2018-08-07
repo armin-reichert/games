@@ -153,7 +153,7 @@ public class GameController implements Controller {
 				.change(GAME_OVER, READY)
 					.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 					.build()
-		.buildStateMachine();
+		.endStateMachine();
 		/*@formatter:on*/
 	}
 

@@ -22,7 +22,6 @@ import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
-import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Spritesheet;
@@ -80,9 +79,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
 		/* @formatter:off */
-		return StateMachine.builder(State.class, GameEvent.class).description("[Pac-Man]").initialState(State.INITIAL)
+		return StateMachine.builder(State.class, GameEvent.class)
+				
+			.description("[Pac-Man]")
+			.initialState(State.INITIAL)
 
-				.states()
+			.states()
 
 				.state(State.INITIAL).onEntry(() -> {
 					setMazePosition(homeTile);
@@ -101,28 +103,39 @@ public class PacMan extends MazeMover<PacMan.State> {
 				}).onTick(() -> {
 					walkAndInspectMaze();
 					if (sm.getStateImpl().getRemaining() == sm.getStateImpl().getDuration() * 20 / 100) {
-						eventMgr.publish(new PacManLosesPowerEvent());
+						publishEvent(new PacManLosesPowerEvent());
 					}
 				}).build()
 
 				.state(State.NORMAL).onTick(this::walkAndInspectMaze).build()
 
-				.transitions()
+			.transitions()
 
 				.change(State.INITIAL, State.NORMAL).build()
 
-				.change(State.NORMAL, State.DYING).on(PacManKilledEvent.class).build()
+				.change(State.NORMAL, State.DYING)
+					.on(PacManKilledEvent.class)
+					.build()
 
-				.change(State.NORMAL, State.EMPOWERED).on(PacManGainsPowerEvent.class).build()
+				.change(State.NORMAL, State.EMPOWERED)
+					.on(PacManGainsPowerEvent.class)
+					.build()
 
-				.keep(State.EMPOWERED).on(PacManGainsPowerEvent.class).build()
+				.keep(State.EMPOWERED)
+					.on(PacManGainsPowerEvent.class)
+					.build()
 
-				.change(State.EMPOWERED, State.NORMAL).onTimeout()
-				.act(t -> eventMgr.publish(new PacManLostPowerEvent())).build()
+				.change(State.EMPOWERED, State.NORMAL)
+					.onTimeout()
+					.act(t -> publishEvent(new PacManLostPowerEvent()))
+					.build()
 
-				.keep(State.DYING).onTimeout().act(t -> eventMgr.publish(new PacManDiedEvent())).build()
+				.keep(State.DYING)
+					.onTimeout()
+					.act(t -> publishEvent(new PacManDiedEvent()))
+					.build()
 
-				.buildStateMachine();
+		.endStateMachine();
 		/* @formatter:on */
 	}
 
@@ -150,21 +163,21 @@ public class PacMan extends MazeMover<PacMan.State> {
 				.findFirst();
 		/*@formatter:on*/
 		if (collidingGhost.isPresent()) {
-			eventMgr.publish(new PacManGhostCollisionEvent(collidingGhost.get()));
+			publishEvent(new PacManGhostCollisionEvent(collidingGhost.get()));
 		}
 
 		// Bonus discovered?
 		Optional<Bonus> activeBonus = environment.bonus().filter(this::collidesWith).filter(bonus -> !bonus.isHonored());
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
-			eventMgr.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+			publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 		}
 
 		// Food found on current tile?
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
-			eventMgr.publish(new FoodFoundEvent(tile, content));
+			publishEvent(new FoodFoundEvent(tile, content));
 		}
 	}
 }

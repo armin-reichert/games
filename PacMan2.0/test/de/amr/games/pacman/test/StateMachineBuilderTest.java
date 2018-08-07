@@ -34,7 +34,7 @@ public class StateMachineBuilderTest {
 					System.out.println("Action");
 				}).build()
 				.keep("B").when(() -> 10 > 9).build()
-			.buildStateMachine();
+			.endStateMachine();
 		/*@formatter:on*/
 
 		sm.init();

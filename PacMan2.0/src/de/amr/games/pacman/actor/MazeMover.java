@@ -34,7 +34,7 @@ public abstract class MazeMover<S> extends GameEntity {
 	public final Game game;
 	public final Maze maze;
 	public final Tile homeTile;
-	protected final GameEventManager eventMgr;
+	private final GameEventManager eventMgr;
 	private final Map<S, RoutePlanner> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
@@ -47,6 +47,12 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.homeTile = homeTile;
 		this.navigation = navigation;
 		this.fnSpeed = mover -> 0f;
+	}
+	
+	// Eventing
+	
+	protected void publishEvent(GameEvent event) {
+		eventMgr.publish(event);
 	}
 
 	// State machine

@@ -187,7 +187,7 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public StateMachine<S, E> buildStateMachine() {
+		public StateMachine<S, E> endStateMachine() {
 			sm.description = description;
 			sm.initialState = initialState;
 			return sm;
