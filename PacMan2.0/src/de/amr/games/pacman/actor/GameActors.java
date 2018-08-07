@@ -89,7 +89,7 @@ public class GameActors {
 		clyde.setNavigation(Ghost.State.SAFE, bounce());
 	}
 
-	public void initActors() {
+	public void init() {
 		pacMan.init();
 		activeGhostsByName.values().forEach(ghost -> {
 			ghost.init();

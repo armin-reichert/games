@@ -149,7 +149,7 @@ public class GameController implements Controller {
 				.on(PacManDiedEvent.class)
 					.change(PACMAN_DYING, PLAYING)
 					.when(() -> game.lives > 0)
-					.act(t -> actors.initActors())
+					.act(t -> actors.init())
 					.build()
 				.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 					.change(GAME_OVER, READY)
@@ -163,7 +163,7 @@ public class GameController implements Controller {
 		@Override
 		public void onEntry() {
 			game.init();
-			actors.initActors();
+			actors.init();
 			gameUI.mazeUI.enableAnimation(false);
 			gameUI.mazeUI.showInfo("Ready!", Color.YELLOW);
 		}
@@ -282,7 +282,7 @@ public class GameController implements Controller {
 			game.foodEaten = 0;
 			game.ghostIndex = 0;
 			game.maze.resetFood();
-			actors.initActors();
+			actors.init();
 		}
 	}
 
