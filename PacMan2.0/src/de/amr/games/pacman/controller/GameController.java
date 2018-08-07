@@ -56,7 +56,6 @@ public class GameController {
 		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
 		// forward events from actors to state machine
-		mazeUI.eventMgr.subscribe(sm::enqueue);
 		actors.getPacMan().eventMgr.subscribe(sm::enqueue);
 		//TODO handle change of active ghosts at runtime
 		actors.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(sm::enqueue));

@@ -18,13 +18,10 @@ import de.amr.games.pacman.actor.Energizer;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.Pellet;
-import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
 public class MazeUI extends GameEntity {
-
-	public final GameEventManager eventMgr = new GameEventManager("MazeUI");
 
 	private final Maze maze;
 	private final GameActors actors;
