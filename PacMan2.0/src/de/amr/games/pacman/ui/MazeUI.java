@@ -6,10 +6,13 @@ import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Graphics2D;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
+import de.amr.games.pacman.actor.ActiveEntityProvider;
 import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.Energizer;
 import de.amr.games.pacman.actor.GameActors;
@@ -18,7 +21,7 @@ import de.amr.games.pacman.actor.Pellet;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-public class MazeUI extends GameEntity {
+public class MazeUI extends GameEntity implements ActiveEntityProvider {
 
 	private final Maze maze;
 	private final GameActors actors;
@@ -50,7 +53,7 @@ public class MazeUI extends GameEntity {
 	public Sprite currentSprite() {
 		return flashing ? s_flashing : s_normal;
 	}
-	
+
 	@Override
 	public void init() {
 		removeBonus();
@@ -63,8 +66,6 @@ public class MazeUI extends GameEntity {
 				removeBonus();
 			}
 		}
-		actors.getPacMan().update();
-		actors.getActiveGhosts().forEach(Ghost::update);
 	}
 
 	@Override
@@ -85,18 +86,25 @@ public class MazeUI extends GameEntity {
 		flashing = on;
 	}
 
+	@Override
+	public Stream<GameEntity> activeEntities() {
+		List<GameEntity> activeEntities = actors.getActiveGhosts().collect(Collectors.toList());
+		if (bonus != null) {
+			activeEntities.add(bonus);
+		}
+		return activeEntities.stream();
+	}
+
 	public void addBonus(Bonus bonus, int ticks) {
 		this.bonus = bonus;
 		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 		bonusTimeLeft = ticks;
-		actors.getPacMan().interests.add(bonus);
 	}
 
 	public void removeBonus() {
 		if (bonus != null) {
 			bonus = null;
 			bonusTimeLeft = 0;
-			actors.getPacMan().interests.remove(bonus);
 		}
 	}
 

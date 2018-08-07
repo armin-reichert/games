@@ -120,10 +120,8 @@ public class GameActors {
 		Ghost ghost = ghostsByName.get(name);
 		if (activate) {
 			activeGhostsByName.put(name, ghost);
-			pacMan.interests.add(ghost);
 		} else {
 			activeGhostsByName.remove(name);
-			pacMan.interests.remove(ghost);
 		}
 	}
 

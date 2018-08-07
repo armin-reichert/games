@@ -65,6 +65,7 @@ public class GameController implements Controller {
 		sm.fnPulse = game.fnTicksPerSecond;
 		sm.init();
 		actors.addEventHandler(sm::enqueue);
+		actors.getPacMan().setActiveEntityProvider(gameUI.mazeUI);
 	}
 
 	@Override
@@ -178,6 +179,8 @@ public class GameController implements Controller {
 		@Override
 		public void onTick() {
 			gameUI.mazeUI.update();
+			actors.getPacMan().update();
+			actors.getActiveGhosts().forEach(Ghost::update);
 		}
 
 		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {

@@ -6,9 +6,7 @@ import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
 
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -33,14 +31,19 @@ import de.amr.statemachine.StateMachine;
 public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> sm;
-	public final Set<GameEntity> interests = new HashSet<>();
+	private ActiveEntityProvider activeEntityProvider;
 
 	public PacMan(Game game, GameEventManager eventMgr, Tile home) {
 		super(game, eventMgr, home, new EnumMap<>(State.class));
 		sm = buildStateMachine();
 		eventMgr = new GameEventManager("[Pac-Man]");
+		activeEntityProvider = () -> Stream.empty();
 		createSprites(2 * Spritesheet.TS);
-		currentSprite = s_walking[Top4.E]; // TODO
+		currentSprite = s_walking[Top4.E];
+	}
+
+	public void setActiveEntityProvider(ActiveEntityProvider activeEntityProvider) {
+		this.activeEntityProvider = activeEntityProvider;
 	}
 
 	// Sprites
@@ -125,7 +128,6 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public void init() {
-		interests.removeIf(e -> e instanceof Bonus);
 		sm.init();
 	}
 
@@ -135,7 +137,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 		if (isTeleporting()) {
 			return;
 		}
-		Optional<GameEvent> find = interests.stream().filter(this::collidesWith).flatMap(this::description).findFirst();
+		inspectMaze();
+	}
+
+	private void inspectMaze() {
+		Optional<GameEvent> find = activeEntityProvider.activeEntities().filter(this::collidesWith)
+				.flatMap(this::description).findFirst();
 		if (find.isPresent()) {
 			eventMgr.publish(find.get());
 		} else {
