@@ -23,6 +23,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEventListener;
 import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.routing.RoutePlanner;
 
 public class GameActors {
 
@@ -40,7 +41,6 @@ public class GameActors {
 		pinky = createPinky();
 		inky = createInky();
 		clyde = createClyde();
-		activeGhosts.add(blinky); // TODO
 	}
 
 	public void addEventHandler(GameEventListener observer) {
@@ -64,9 +64,10 @@ public class GameActors {
 	}
 
 	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(game, eventMgr, game.maze.pacManHome);
-		pacMan.setNavigation(PacMan.State.NORMAL, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
-		pacMan.setNavigation(PacMan.State.EMPOWERED, followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT));
+		PacMan pacMan = new PacMan(game, eventMgr);
+		RoutePlanner manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
+		pacMan.setNavigation(PacMan.State.NORMAL, manual);
+		pacMan.setNavigation(PacMan.State.EMPOWERED, manual);
 		return pacMan;
 	}
 

@@ -32,8 +32,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final StateMachine<State, GameEvent> sm;
 	private Environment environment;
 
-	public PacMan(Game game, GameEventManager eventMgr, Tile home) {
-		super(game, eventMgr, home, new EnumMap<>(State.class));
+	public PacMan(Game game, GameEventManager eventMgr) {
+		super(game, eventMgr, game.maze.pacManHome, new EnumMap<>(State.class));
 		sm = buildStateMachine();
 		eventMgr = new GameEventManager("[Pac-Man]");
 		environment = Environment.EMPTYNESS;

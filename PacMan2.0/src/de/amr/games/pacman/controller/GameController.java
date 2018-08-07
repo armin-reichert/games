@@ -71,6 +71,7 @@ public class GameController implements Controller {
 		actors.getPinky().getStateMachine().traceTo(LOG);
 		actors.getInky().getStateMachine().traceTo(LOG);
 		actors.getClyde().getStateMachine().traceTo(LOG);
+		actors.setGhostActive(actors.getBlinky(), true);
 	}
 
 	@Override
