@@ -5,12 +5,9 @@ import static de.amr.games.pacman.model.Content.PELLET;
 import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.actor.Bonus;
@@ -32,8 +29,6 @@ public class MazeUI extends GameEntity {
 	private final Sprite s_flashing;
 
 	private boolean flashing;
-	private String infoText;
-	private Color infoTextColor;
 	private Bonus bonus;
 	private int bonusTimeLeft;
 
@@ -81,16 +76,6 @@ public class MazeUI extends GameEntity {
 		return maze;
 	}
 
-
-	public void showInfo(String text, Color color) {
-		infoText = text;
-		infoTextColor = color;
-	}
-
-	public void hideInfo() {
-		this.infoText = null;
-	}
-
 	public void setFlashing(boolean on) {
 		flashing = on;
 	}
@@ -133,30 +118,14 @@ public class MazeUI extends GameEntity {
 		} else {
 			s_normal.draw(g);
 			maze.tiles().filter(tile -> isFood(maze.getContent(tile))).forEach(tile -> drawFood(g, tile));
-			actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING)
-					.forEach(ghost -> ghost.draw(g));
-			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING)
-					.forEach(ghost -> ghost.draw(g));
+			actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
+			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
 			actors.getPacMan().draw(g);
 			if (bonus != null) {
 				bonus.draw(g);
 			}
-			if (infoText != null) {
-				drawInfoText(g);
-			}
 		}
 		g.translate(-tf.getX(), -tf.getY());
-	}
-
-	private void drawInfoText(Graphics2D g) {
-		Graphics2D g2 = (Graphics2D) g.create();
-		Tile tile = maze.infoTile;
-		g2.translate((tile.col + 1) * TS, tile.row * TS + TS / 4);
-		g2.setFont(Assets.font("scoreFont"));
-		g2.setColor(infoTextColor);
-		Rectangle2D box = g2.getFontMetrics().getStringBounds(infoText, g2);
-		g2.drawString(infoText, (int) (-box.getWidth() / 2), (int) (box.getHeight() / 2));
-		g2.dispose();
 	}
 
 	private void drawFood(Graphics2D g, Tile tile) {

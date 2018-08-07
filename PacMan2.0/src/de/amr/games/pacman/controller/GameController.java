@@ -53,12 +53,13 @@ public class GameController implements Controller {
 		this.actors = actors;
 		this.gameUI = gameUI;
 	}
-	
+
 	@Override
 	public View currentView() {
 		return gameUI;
 	}
-	
+
+	@Override
 	public void init() {
 		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
@@ -66,6 +67,7 @@ public class GameController implements Controller {
 		actors.addEventHandler(sm::enqueue);
 	}
 
+	@Override
 	public void update() {
 		sm.update();
 		gameUI.update();
@@ -94,61 +96,61 @@ public class GameController implements Controller {
 				.state(GAME_OVER).impl(new GameOverState()).build()
 			
 			.transitions()
-				.onTimeout()
-					.change(READY, PLAYING)
+				.change(READY, PLAYING)
+					.onTimeout()
 					.build()
-				.on(FoodFoundEvent.class)
-					.keep(PLAYING)
+				.keep(PLAYING)
+					.on(FoodFoundEvent.class)
 					.act(t -> playingState().onFoodFound(t))
 					.build()
-				.on(BonusFoundEvent.class)
-					.keep(PLAYING)
+				.keep(PLAYING)
+					.on(BonusFoundEvent.class)
 					.act(t -> playingState().onBonusFound(t))
 					.build()
-				.on(PacManGhostCollisionEvent.class)
-					.keep(PLAYING)
+				.keep(PLAYING)
+					.on(PacManGhostCollisionEvent.class)
 					.act(t -> playingState().onPacManGhostCollision(t))
 					.build()
-				.on(PacManGainsPowerEvent.class)
-					.keep(PLAYING)
+				.keep(PLAYING)
+					.on(PacManGainsPowerEvent.class)
 					.act(t -> playingState().onPacManGainsPower(t))
 					.build()
-				.on(PacManLosesPowerEvent.class)
-					.keep(PLAYING)
+				.keep(PLAYING)
+					.on(PacManLosesPowerEvent.class)
 					.act(t -> playingState().onPacManLosesPower(t))
 					.build()
-				.on(PacManLostPowerEvent.class)
-					.keep(PLAYING)
+				.keep(PLAYING)
+					.on(PacManLostPowerEvent.class)
 					.act(t -> playingState().onPacManLostPower(t))
 					.build()
-				.on(GhostKilledEvent.class)
-					.change(PLAYING, GHOST_DYING)
+				.change(PLAYING, GHOST_DYING)
+					.on(GhostKilledEvent.class)
 					.act(t -> playingState().onGhostKilled(t))
 					.build()
-				.on(PacManKilledEvent.class)
-					.change(PLAYING, PACMAN_DYING)
+				.change(PLAYING, PACMAN_DYING)
+					.on(PacManKilledEvent.class)
 					.act(t -> playingState().onPacManKilled(t))
 					.build()
-				.on(LevelCompletedEvent.class)
-					.change(PLAYING, CHANGING_LEVEL)
+				.change(PLAYING, CHANGING_LEVEL)
+					.on(LevelCompletedEvent.class)
 					.build()
-				.onTimeout()	
-					.change(State.CHANGING_LEVEL, PLAYING)
+				.change(State.CHANGING_LEVEL, PLAYING)
+					.onTimeout()	
 					.build()
-				.onTimeout()
-					.change(GHOST_DYING, PLAYING)
+				.change(GHOST_DYING, PLAYING)
+					.onTimeout()
 					.build()
-				.on(PacManDiedEvent.class)
-					.change(PACMAN_DYING, State.GAME_OVER)
+				.change(PACMAN_DYING, State.GAME_OVER)
+					.on(PacManDiedEvent.class)
 					.when(() -> game.lives == 0)
 					.build()
-				.on(PacManDiedEvent.class)
-					.change(PACMAN_DYING, PLAYING)
+				.change(PACMAN_DYING, PLAYING)
+					.on(PacManDiedEvent.class)
 					.when(() -> game.lives > 0)
 					.act(t -> actors.init())
 					.build()
-				.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
-					.change(GAME_OVER, READY)
+				.change(GAME_OVER, READY)
+					.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 					.build()
 		.buildStateMachine();
 		/*@formatter:on*/
@@ -161,13 +163,13 @@ public class GameController implements Controller {
 			game.init();
 			actors.init();
 			gameUI.mazeUI.enableAnimation(false);
-			gameUI.mazeUI.showInfo("Ready!", Color.YELLOW);
+			gameUI.showInfo("Ready!", Color.YELLOW);
 		}
 
 		@Override
 		public void onExit() {
 			gameUI.mazeUI.enableAnimation(true);
-			gameUI.mazeUI.hideInfo();
+			gameUI.hideInfo();
 		}
 	}
 
@@ -264,11 +266,11 @@ public class GameController implements Controller {
 		public void onTick() {
 			if (getRemaining() == getDuration() / 2) {
 				nextLevel();
-				gameUI.mazeUI.showInfo("Ready!", Color.YELLOW);
+				gameUI.showInfo("Ready!", Color.YELLOW);
 				gameUI.mazeUI.setFlashing(false);
 				gameUI.mazeUI.enableAnimation(false);
 			} else if (isTerminated()) {
-				gameUI.mazeUI.hideInfo();
+				gameUI.hideInfo();
 				gameUI.mazeUI.enableAnimation(true);
 			}
 		}
@@ -326,12 +328,12 @@ public class GameController implements Controller {
 		public void onEntry() {
 			gameUI.mazeUI.enableAnimation(false);
 			gameUI.mazeUI.removeBonus();
-			gameUI.mazeUI.showInfo("Game Over!", Color.RED);
+			gameUI.showInfo("Game Over!", Color.RED);
 		}
 
 		@Override
 		public void onExit() {
-			gameUI.mazeUI.hideInfo();
+			gameUI.hideInfo();
 			game.init();
 		}
 	}
