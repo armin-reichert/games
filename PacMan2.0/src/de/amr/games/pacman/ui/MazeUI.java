@@ -86,13 +86,13 @@ public class MazeUI extends GameEntity implements Environment {
 	}
 
 	@Override
-	public Stream<Ghost> ghosts() {
+	public Stream<Ghost> activeGhosts() {
 		return actors.getActiveGhosts();
 	}
 
 	@Override
-	public Optional<Bonus> bonus() {
-		return Optional.ofNullable(bonus);
+	public Optional<Bonus> activeBonus() {
+		return bonus != null && !bonus.isHonored() ? Optional.ofNullable(bonus) : Optional.empty();
 	}
 
 	public void addBonus(Bonus bonus, int ticks) {

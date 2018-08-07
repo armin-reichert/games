@@ -155,7 +155,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private void inspectMaze() {
 		// Ghost colliding?
 		/*@formatter:off*/
-		Optional<Ghost> collidingGhost = environment.ghosts()
+		Optional<Ghost> collidingGhost = environment.activeGhosts()
 				.filter(this::collidesWith)
 				.filter(ghost -> ghost.getState() != Ghost.State.DEAD)
 				.filter(ghost -> ghost.getState() != Ghost.State.DYING)
@@ -167,7 +167,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 
 		// Bonus discovered?
-		Optional<Bonus> activeBonus = environment.bonus().filter(this::collidesWith).filter(bonus -> !bonus.isHonored());
+		Optional<Bonus> activeBonus = environment.activeBonus().filter(this::collidesWith);
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
 			publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));

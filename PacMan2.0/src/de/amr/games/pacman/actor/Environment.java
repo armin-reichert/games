@@ -8,18 +8,18 @@ public interface Environment {
 	static Environment EMPTYNESS = new Environment() {
 
 		@Override
-		public Stream<Ghost> ghosts() {
+		public Stream<Ghost> activeGhosts() {
 			return Stream.empty();
 		}
 
 		@Override
-		public Optional<Bonus> bonus() {
+		public Optional<Bonus> activeBonus() {
 			return Optional.empty();
 		}
 	};
 
-	Stream<Ghost> ghosts();
+	Stream<Ghost> activeGhosts();
 
-	Optional<Bonus> bonus();
+	Optional<Bonus> activeBonus();
 
 }
