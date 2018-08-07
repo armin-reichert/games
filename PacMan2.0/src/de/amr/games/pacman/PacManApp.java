@@ -12,6 +12,12 @@ import de.amr.games.pacman.ui.EnhancedGameUI;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.games.pacman.ui.Spritesheet;
 
+/**
+ * Pac-Man game.
+ * 
+ * @author Armin Reichert
+ *
+ */
 public class PacManApp extends Application {
 
 	public static void main(String[] args) {

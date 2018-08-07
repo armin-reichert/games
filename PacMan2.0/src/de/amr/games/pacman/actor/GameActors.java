@@ -1,6 +1,5 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.easy.game.Application.LOG;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.ambush;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.bounce;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.chase;
@@ -42,8 +41,6 @@ public class GameActors {
 		inky = createInky();
 		clyde = createClyde();
 		activeGhosts.add(blinky); // TODO
-		pacMan.getStateMachine().traceTo(LOG);
-		getActiveGhosts().forEach(ghost -> ghost.getStateMachine().traceTo(LOG));
 	}
 
 	public void addEventHandler(GameEventListener observer) {

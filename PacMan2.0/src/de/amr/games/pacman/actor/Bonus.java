@@ -13,18 +13,18 @@ public class Bonus extends GameEntity {
 	private static final int[] BONUS_POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
 	private BonusSymbol symbol;
-	private int points;
+	private int value;
 	private boolean honored;
 	private Sprite s_symbol;
 	private Sprite s_points;
 
-	public Bonus(BonusSymbol symbol, int points) {
+	public Bonus(BonusSymbol symbol, int value) {
 		this.symbol = symbol;
-		this.points = points;
+		this.value = value;
 		this.honored = false;
-		int index = Arrays.binarySearch(BONUS_POINTS, points);
+		int index = Arrays.binarySearch(BONUS_POINTS, value);
 		if (index < 0) {
-			throw new IllegalArgumentException("Illegal bonus value: " + points);
+			throw new IllegalArgumentException("Illegal bonus value: " + value);
 		}
 		int size = 2 * Spritesheet.TS;
 		s_symbol = Spritesheet.symbol(symbol).scale(size);
@@ -32,7 +32,7 @@ public class Bonus extends GameEntity {
 	}
 
 	public int getValue() {
-		return points;
+		return value;
 	}
 
 	public BonusSymbol getSymbol() {
@@ -59,6 +59,6 @@ public class Bonus extends GameEntity {
 
 	@Override
 	public String toString() {
-		return String.format("Bonus(%s)", symbol);
+		return String.format("Bonus(%s,%d)", symbol, value);
 	}
 }

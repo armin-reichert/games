@@ -66,6 +66,11 @@ public class GameController implements Controller {
 		sm.init();
 		actors.addEventHandler(sm::enqueue);
 		actors.getPacMan().setEnvironment(gameUI.mazeUI);
+		actors.getPacMan().getStateMachine().traceTo(LOG);
+		actors.getBlinky().getStateMachine().traceTo(LOG);
+		actors.getPinky().getStateMachine().traceTo(LOG);
+		actors.getInky().getStateMachine().traceTo(LOG);
+		actors.getClyde().getStateMachine().traceTo(LOG);
 	}
 
 	@Override
