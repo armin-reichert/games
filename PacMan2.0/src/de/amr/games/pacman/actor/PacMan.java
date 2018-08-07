@@ -102,7 +102,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				.state(EMPOWERED).duration(game::getPacManEmpoweringTime).onEntry(() -> {
 				}).onTick(() -> {
 					walkAndInspectMaze();
-					if (sm.getStateImpl().getRemaining() == sm.getStateImpl().getDuration() * 20 / 100) {
+					if (sm.currentStateObject().getRemaining() == sm.currentStateObject().getDuration() * 20 / 100) {
 						publishEvent(new PacManLosesPowerEvent());
 					}
 				}).build()
@@ -123,6 +123,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 				.keep(State.EMPOWERED)
 					.on(PacManGainsPowerEvent.class)
+					.act(t -> sm.currentStateObject().resetTimer())
 					.build()
 
 				.change(State.EMPOWERED, State.NORMAL)

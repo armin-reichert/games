@@ -127,7 +127,7 @@ public class StateMachine<S, E> {
 	 * 
 	 * @return the state object of the current state
 	 */
-	public <C extends StateObject<S, E>> C getStateImpl() {
+	public <C extends StateObject<S, E>> C currentStateObject() {
 		return state(currentState);
 	}
 

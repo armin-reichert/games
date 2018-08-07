@@ -69,7 +69,7 @@ public class StateObject<S, E> {
 	}
 
 	/** Resets the timer to the complete state duration. */
-	void resetTimer() {
+	public void resetTimer() {
 		if (fnDuration == null) {
 			throw new IllegalStateException(String.format("Timer function is NULL in state '%s'", id));
 		}
