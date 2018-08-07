@@ -18,6 +18,7 @@ import java.util.logging.Level;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
+import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.actor.PacMan;
@@ -29,6 +30,7 @@ import de.amr.statemachine.StateObject;
 public class GameInfoUI implements ViewController {
 
 	private final Game game;
+	private final GameActors actors;
 	private final MazeUI mazeUI;
 	private boolean show_grid;
 	private boolean show_ghost_route;
@@ -36,8 +38,9 @@ public class GameInfoUI implements ViewController {
 
 	private Image gridImage;
 
-	public GameInfoUI(Game game, MazeUI mazeUI) {
+	public GameInfoUI(Game game, GameActors actors, MazeUI mazeUI) {
 		this.game = game;
+		this.actors = actors;
 		this.mazeUI = mazeUI;
 		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
 	}
@@ -91,7 +94,7 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private void killAllLivingGhosts() {
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(new GhostKilledEvent(ghost)));
+		actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(new GhostKilledEvent(ghost)));
 	}
 
 	private void eatAllPellets() {
@@ -108,7 +111,7 @@ public class GameInfoUI implements ViewController {
 			drawPacManTilePosition(g);
 		}
 		if (show_ghost_route) {
-			mazeUI.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost));
+			actors.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost));
 		}
 		if (show_entity_state) {
 			drawEntityState(g);
@@ -149,10 +152,10 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private void drawEntityState(Graphics2D g) {
-		PacMan pacMan = mazeUI.getPacMan();
+		PacMan pacMan = actors.getPacMan();
 		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacManStateText(pacMan));
-		mazeUI.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
+		actors.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
 			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), ghostStateText(ghost));
 		});
 		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
@@ -173,7 +176,7 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private void toggleGhost(GhostName ghostName) {
-		mazeUI.setGhostActive(ghostName, !mazeUI.isGhostActive(ghostName));
+		actors.setGhostActive(ghostName, !actors.isGhostActive(ghostName));
 	}
 
 	private static Color color(Ghost ghost) {
@@ -200,7 +203,7 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private void drawPacManTilePosition(Graphics2D g) {
-		PacMan pacMan = mazeUI.getPacMan();
+		PacMan pacMan = actors.getPacMan();
 		if (pacMan.isExactlyOverTile()) {
 			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 			g.translate(pacMan.tf.getX(), pacMan.tf.getY());

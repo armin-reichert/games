@@ -39,13 +39,12 @@ public abstract class MazeMover<S> extends GameEntity {
 	private int dir;
 	private int nextDir;
 
-	protected MazeMover(Game game, Maze maze, Tile homeTile, Map<S, RoutePlanner> navigation) {
+	protected MazeMover(Game game, Tile homeTile, Map<S, RoutePlanner> navigation) {
 		Objects.requireNonNull(game);
-		Objects.requireNonNull(maze);
 		Objects.requireNonNull(homeTile);
 		Objects.requireNonNull(navigation);
 		this.game = game;
-		this.maze = maze;
+		this.maze = game.maze;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
 		this.fnSpeed = mover -> 0f;

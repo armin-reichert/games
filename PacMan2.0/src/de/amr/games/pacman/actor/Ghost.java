@@ -14,7 +14,6 @@ import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
@@ -26,8 +25,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final GhostName name;
 	private final PacMan pacMan;
 
-	public Ghost(GhostName name, PacMan pacMan, Game game, Maze maze, Tile home, int color) {
-		super(game, maze, home, new EnumMap<>(State.class));
+	public Ghost(GhostName name, PacMan pacMan, Game game, Tile home, int color) {
+		super(game, home, new EnumMap<>(State.class));
 		this.pacMan = pacMan;
 		this.name = name;
 		sm = buildStateMachine();
@@ -86,7 +85,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
 		/*@formatter:off*/
-	  return StateMachine.builder(State.class, GameEvent.class)
+		return StateMachine.builder(State.class, GameEvent.class)
 			 
 			.description(getName().toString())
 			.initialState(State.INITIAL)
@@ -128,7 +127,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.state(State.DYING)
 					.duration(game::getGhostDyingTime)
 					.onEntry(() -> {
-//						state.setDuration(game.getGhostDyingTime());
 						currentSprite = s_numbers[game.ghostIndex];
 						game.score += game.getGhostValue();
 						game.ghostIndex += 1;
@@ -138,7 +136,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.state(State.SAFE)
 					.duration(() -> game.sec(2))
 					.onEntry(() -> {
-//						state.setDuration(game.sec(2));
 					})
 					.onTick(() -> {
 						move();
@@ -150,56 +147,62 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.build()
 				
 			.transitions()
+				
 				.change(State.INITIAL, State.SAFE)
 					.build()
 
-				.onTimeout()
-					.change(State.SAFE, State.AGGRO)
+				.change(State.SAFE, State.AGGRO)
+					.onTimeout()
 					.when(() -> pacMan.getState() != PacMan.State.EMPOWERED)
 					.build()
 				
-				.onTimeout()
-					.change(State.SAFE, State.AFRAID)
+				.change(State.SAFE, State.AFRAID)
+					.onTimeout()
 					.when(() -> pacMan.getState() == PacMan.State.EMPOWERED)
 					.build()
 
-				.on(PacManLosesPowerEvent.class)
-					.keep(State.SAFE)
+				
+				.keep(State.SAFE)
+					.on(PacManGainsPowerEvent.class)
+					.build()
+					
+				.keep(State.SAFE)
+					.on(PacManLosesPowerEvent.class)
 					.build()
 				
-				.on(PacManLostPowerEvent.class)
-					.keep(State.SAFE)
+				.keep(State.SAFE)
+					.on(PacManLostPowerEvent.class)
 					.build()
 					
-				.on(PacManGainsPowerEvent.class)
-					.change(State.AGGRO, State.AFRAID)
+				.change(State.AGGRO, State.AFRAID)
+					.on(PacManGainsPowerEvent.class)
 					.build()
 					
-				.on(PacManLosesPowerEvent.class)
-					.change(State.AFRAID, State.AFRAID)
+				.change(State.AFRAID, State.AFRAID)
+					.on(PacManLosesPowerEvent.class)
 					.act(t -> {
 						currentSprite = s_blinking;
 					})
 					.build()
 
-				.on(PacManGainsPowerEvent.class)
-					.keep(State.AFRAID)
+				.keep(State.AFRAID)
+					.on(PacManGainsPowerEvent.class)
 					.build()
 					
-				.on(PacManLostPowerEvent.class)
-					.change(State.AFRAID, State.AGGRO)
+				.change(State.AFRAID, State.AGGRO)
+					.on(PacManLostPowerEvent.class)
 					.build()
 					
-				.on(GhostKilledEvent.class)
-					.change(State.AFRAID, State.DYING)
+				.change(State.AFRAID, State.DYING)
+					.on(GhostKilledEvent.class)
 					.build()
 					
-				.onTimeout()
-					.change(State.DYING, State.DEAD)
+				.change(State.DYING, State.DEAD)
+					.onTimeout()
 					.build()
 					
-				.when(() -> getTile().equals(homeTile))
-					.change(State.DEAD, State.SAFE)
+				.change(State.DEAD, State.SAFE)
+					.when(() -> getTile().equals(homeTile))
 					.build()
 		
 			.buildStateMachine();

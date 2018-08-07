@@ -5,7 +5,7 @@ import static de.amr.easy.game.Application.LOG;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.view.ViewController;
-import de.amr.games.pacman.actor.GhostName;
+import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
 
@@ -18,30 +18,21 @@ public class GameUI implements ViewController {
 	private final StatusUI statusUI;
 	private final GameInfoUI gameInfoUI;
 
-	public GameUI(Game game, int width, int height) {
+	public GameUI(int width, int height, Game game, GameActors actors) {
 		this.width = width;
 		this.height = height;
 
-		// UI
-		mazeUI = new MazeUI(game);
+		mazeUI = new MazeUI(game.maze, actors);
 		hud = new HUD(game);
 		statusUI = new StatusUI(game);
-		gameInfoUI = new GameInfoUI(game, mazeUI);
+		gameInfoUI = new GameInfoUI(game, actors, mazeUI);
 
-		// Layout
 		hud.tf.moveTo(0, 0);
 		mazeUI.tf.moveTo(0, 3 * Spritesheet.TS);
 		statusUI.tf.moveTo(0, (3 + game.maze.numRows()) * Spritesheet.TS);
 
-		gameControl = new GameController(game, mazeUI);
+		gameControl = new GameController(game, actors, mazeUI);
 		gameControl.setLogger(LOG);
-		mazeUI.getPacMan().getStateMachine().setLogger(LOG);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.getStateMachine().setLogger(LOG));
-
-		mazeUI.setGhostActive(GhostName.BLINKY, true);
-		mazeUI.setGhostActive(GhostName.PINKY, false);
-		mazeUI.setGhostActive(GhostName.INKY, false); // TODO
-		mazeUI.setGhostActive(GhostName.CLYDE, false); // TODO
 	}
 
 	@Override

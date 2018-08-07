@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.games.pacman.actor.Bonus;
+import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.core.GameEvent;
@@ -38,21 +39,22 @@ public class GameController {
 
 	private final StateMachine<State, GameEvent> sm;
 	private final Game game;
+	private final GameActors actors;
 	private final MazeUI mazeUI;
 
-	public GameController(Game game, MazeUI mazeUI) {
-
+	public GameController(Game game, GameActors actors, MazeUI mazeUI) {
 		this.game = game;
+		this.actors = actors;
 		this.mazeUI = mazeUI;
 
-		// build the state machine
 		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
 
-		// Listen to events from actors
+		// forward events from actors to state machine
 		mazeUI.eventMgr.subscribe(sm::enqueue);
-		mazeUI.getPacMan().eventMgr.subscribe(sm::enqueue);
-		mazeUI.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(sm::enqueue));
+		actors.getPacMan().eventMgr.subscribe(sm::enqueue);
+		//TODO handle change of active ghosts at runtime
+		actors.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(sm::enqueue));
 	}
 
 	public void init() {
@@ -145,7 +147,7 @@ public class GameController {
 				.on(PacManDiedEvent.class)
 					.change(PACMAN_DYING, PLAYING)
 					.when(() -> game.lives > 0)
-					.act(t -> mazeUI.initActors())
+					.act(t -> actors.initActors())
 					.build()
 				.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 					.change(GAME_OVER, READY)
@@ -159,7 +161,7 @@ public class GameController {
 		@Override
 		public void onEntry() {
 			game.init();
-			mazeUI.initActors();
+			actors.initActors();
 			mazeUI.enableAnimation(false);
 			mazeUI.showInfo("Ready!", Color.YELLOW);
 		}
@@ -180,7 +182,7 @@ public class GameController {
 
 		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
 			PacManGhostCollisionEvent e = t.typedEvent();
-			PacMan.State pacManState = mazeUI.getPacMan().getState();
+			PacMan.State pacManState = actors.getPacMan().getState();
 			Ghost.State ghostState = e.ghost.getState();
 			if (pacManState == PacMan.State.EMPOWERED) {
 				if (ghostState == Ghost.State.AFRAID || ghostState == Ghost.State.AGGRO
@@ -197,24 +199,24 @@ public class GameController {
 
 		private void onPacManKilled(StateTransition<State, GameEvent> t) {
 			PacManKilledEvent e = t.typedEvent();
-			mazeUI.getPacMan().processEvent(e);
+			actors.getPacMan().processEvent(e);
 			LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
 		}
 
 		private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
 			PacManGainsPowerEvent e = t.typedEvent();
-			mazeUI.getPacMan().processEvent(e);
-			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+			actors.getPacMan().processEvent(e);
+			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
 		private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
 			PacManLosesPowerEvent e = t.typedEvent();
-			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
 		private void onPacManLostPower(StateTransition<State, GameEvent> t) {
 			PacManLostPowerEvent e = t.typedEvent();
-			mazeUI.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
+			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
 		private void onGhostKilled(StateTransition<State, GameEvent> t) {
@@ -278,7 +280,7 @@ public class GameController {
 			game.foodEaten = 0;
 			game.ghostIndex = 0;
 			game.maze.resetFood();
-			mazeUI.initActors();
+			actors.initActors();
 		}
 	}
 
@@ -286,17 +288,17 @@ public class GameController {
 
 		@Override
 		public void onEntry() {
-			mazeUI.getPacMan().visibility = () -> false;
+			actors.getPacMan().visibility = () -> false;
 		}
 
 		@Override
 		public void onTick() {
-			mazeUI.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(Ghost::update);
+			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(Ghost::update);
 		}
 
 		@Override
 		public void onExit() {
-			mazeUI.getPacMan().visibility = () -> true;
+			actors.getPacMan().visibility = () -> true;
 		}
 	}
 
@@ -305,18 +307,18 @@ public class GameController {
 		@Override
 		public void onEntry() {
 			game.lives -= 1;
-			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
+			actors.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 		}
 
 		@Override
 		public void onTick() {
-			mazeUI.getPacMan().update();
+			actors.getPacMan().update();
 		}
 
 		@Override
 		public void onExit() {
 			mazeUI.removeBonus();
-			mazeUI.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
+			actors.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		}
 	}
 

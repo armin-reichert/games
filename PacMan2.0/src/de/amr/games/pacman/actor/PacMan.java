@@ -26,7 +26,6 @@ import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.ui.Spritesheet;
 import de.amr.statemachine.StateMachine;
@@ -37,8 +36,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private final StateMachine<State, GameEvent> sm;
 	public final Set<GameEntity> interests = new HashSet<>();
 
-	public PacMan(Game game, Maze maze, Tile home) {
-		super(game, maze, home, new EnumMap<>(State.class));
+	public PacMan(Game game, Tile home) {
+		super(game, home, new EnumMap<>(State.class));
 		sm = buildStateMachine();
 		eventMgr = new GameEventManager("Pac-Man");
 		createSprites(2 * Spritesheet.TS);
