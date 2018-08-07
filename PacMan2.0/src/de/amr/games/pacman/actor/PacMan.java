@@ -86,28 +86,37 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 			.states()
 
-				.state(State.INITIAL).onEntry(() -> {
-					setMazePosition(homeTile);
-					setDir(Top4.E);
-					setNextDir(Top4.E);
-					setSpeed(game::getPacManSpeed);
-					getSprites().forEach(Sprite::resetAnimation);
-					currentSprite = s_walking[getDir()];
-				}).build()
+				.state(State.INITIAL)
+					.onEntry(() -> {
+						setMazePosition(homeTile);
+						setDir(Top4.E);
+						setNextDir(Top4.E);
+						setSpeed(game::getPacManSpeed);
+						getSprites().forEach(Sprite::resetAnimation);
+						currentSprite = s_walking[getDir()];
+					})
+					.build()
 
-				.state(State.DYING).duration(() -> game.sec(2)).onEntry(() -> {
-					currentSprite = s_dying;
-				}).build()
+				.state(State.DYING)
+					.duration(() -> game.sec(2))
+					.onEntry(() -> {
+						currentSprite = s_dying;
+					})
+					.build()
 
-				.state(EMPOWERED).duration(game::getPacManEmpoweringTime).onEntry(() -> {
-				}).onTick(() -> {
-					walkAndInspectMaze();
-					if (sm.currentStateObject().getRemaining() == sm.currentStateObject().getDuration() * 20 / 100) {
-						publishEvent(new PacManLosesPowerEvent());
-					}
-				}).build()
+				.state(EMPOWERED)
+					.duration(game::getPacManEmpoweringTime)
+					.onTick(() -> {
+						walkAndInspectMaze();
+						if (sm.currentStateObject().getRemaining() == sm.currentStateObject().getDuration() * 20 / 100) {
+							publishEvent(new PacManLosesPowerEvent());
+						}
+					})
+					.build()
 
-				.state(State.NORMAL).onTick(this::walkAndInspectMaze).build()
+				.state(State.NORMAL)
+					.onTick(this::walkAndInspectMaze)
+					.build()
 
 			.transitions()
 
