@@ -120,6 +120,7 @@ public class GameActors {
 		Ghost ghost = ghostsByName.get(name);
 		if (activate) {
 			activeGhostsByName.put(name, ghost);
+			ghost.init();
 		} else {
 			activeGhostsByName.remove(name);
 		}
