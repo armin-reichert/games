@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
 import de.amr.games.pacman.actor.Ghost;
-import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.model.Tile;
@@ -33,7 +32,7 @@ import de.amr.statemachine.StateObject;
 public class EnhancedGameUI extends GameUI {
 
 	private static final String INFTY = Character.toString('\u221E');
-	
+
 	private final GameUI gameUI;
 	private boolean show_grid;
 	private boolean show_ghost_route;
@@ -79,16 +78,16 @@ public class EnhancedGameUI extends GameUI {
 			eatAllPellets();
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(GhostName.BLINKY);
+			toggleGhost(actors.getBlinky());
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(GhostName.PINKY);
+			toggleGhost(actors.getPinky());
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(GhostName.INKY);
+			toggleGhost(actors.getInky());
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(GhostName.CLYDE);
+			toggleGhost(actors.getClyde());
 		}
 	}
 
@@ -163,8 +162,8 @@ public class EnhancedGameUI extends GameUI {
 				: String.format("%s(%s,%s)", ghost.getName(), state.id(), INFTY);
 	}
 
-	private void toggleGhost(GhostName ghostName) {
-		actors.setGhostActive(ghostName, !actors.isGhostActive(ghostName));
+	private void toggleGhost(Ghost ghost) {
+		actors.setGhostActive(ghost, !actors.isGhostActive(ghost));
 	}
 
 	private static Color color(Ghost ghost) {
