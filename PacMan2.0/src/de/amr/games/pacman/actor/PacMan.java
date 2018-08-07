@@ -1,6 +1,7 @@
 package de.amr.games.pacman.actor;
 
 import static de.amr.games.pacman.actor.PacMan.State.EMPOWERED;
+import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
 import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
@@ -9,7 +10,6 @@ import java.util.EnumMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEvent;
@@ -31,19 +31,19 @@ import de.amr.statemachine.StateMachine;
 public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> sm;
-	private ActiveEntityProvider activeEntityProvider;
+	private Environment environment;
 
 	public PacMan(Game game, GameEventManager eventMgr, Tile home) {
 		super(game, eventMgr, home, new EnumMap<>(State.class));
 		sm = buildStateMachine();
 		eventMgr = new GameEventManager("[Pac-Man]");
-		activeEntityProvider = () -> Stream.empty();
+		environment = Environment.EMPTYNESS;
 		createSprites(2 * Spritesheet.TS);
 		currentSprite = s_walking[Top4.E];
 	}
 
-	public void setActiveEntityProvider(ActiveEntityProvider activeEntityProvider) {
-		this.activeEntityProvider = activeEntityProvider;
+	public void setEnvironment(Environment mazeLife) {
+		this.environment = mazeLife;
 	}
 
 	// Sprites
@@ -134,39 +134,37 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private void walkAndInspectMaze() {
 		move();
 		currentSprite = s_walking[getDir()];
-		if (isTeleporting()) {
-			return;
+		if (!isTeleporting()) {
+			inspectMaze();
 		}
-		inspectMaze();
 	}
 
 	private void inspectMaze() {
-		Optional<GameEvent> find = activeEntityProvider.activeEntities().filter(this::collidesWith)
-				.flatMap(this::description).findFirst();
-		if (find.isPresent()) {
-			eventMgr.publish(find.get());
-		} else {
-			Tile tile = getTile();
-			char content = maze.getContent(tile);
-			if (Content.isFood(content)) {
-				eventMgr.publish(new FoodFoundEvent(tile, content));
-			}
+		// Ghost colliding?
+		/*@formatter:off*/
+		Optional<Ghost> collidingGhost = environment.ghosts()
+				.filter(this::collidesWith)
+				.filter(ghost -> ghost.getState() != Ghost.State.DEAD)
+				.filter(ghost -> ghost.getState() != Ghost.State.DYING)
+				.filter(ghost -> ghost.getState() != Ghost.State.SAFE)
+				.findFirst();
+		/*@formatter:on*/
+		if (collidingGhost.isPresent()) {
+			eventMgr.publish(new PacManGhostCollisionEvent(collidingGhost.get()));
 		}
-	}
 
-	private Stream<GameEvent> description(GameEntity find) {
-		if (find instanceof Ghost) {
-			Ghost ghost = (Ghost) find;
-			Ghost.State gs = ghost.getState();
-			if (gs != Ghost.State.DEAD && gs != Ghost.State.DYING && gs != Ghost.State.SAFE) {
-				return Stream.of(new PacManGhostCollisionEvent(ghost));
-			}
-		} else if (find instanceof Bonus) {
-			Bonus bonus = (Bonus) find;
-			if (!bonus.isHonored()) {
-				return Stream.of(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
-			}
+		// Bonus discovered?
+		Optional<Bonus> activeBonus = environment.bonus().filter(this::collidesWith).filter(bonus -> !bonus.isHonored());
+		if (activeBonus.isPresent()) {
+			Bonus bonus = activeBonus.get();
+			eventMgr.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 		}
-		return Stream.empty();
+
+		// Food found on current tile?
+		Tile tile = getTile();
+		char content = maze.getContent(tile);
+		if (isFood(content)) {
+			eventMgr.publish(new FoodFoundEvent(tile, content));
+		}
 	}
 }

@@ -65,7 +65,7 @@ public class GameController implements Controller {
 		sm.fnPulse = game.fnTicksPerSecond;
 		sm.init();
 		actors.addEventHandler(sm::enqueue);
-		actors.getPacMan().setActiveEntityProvider(gameUI.mazeUI);
+		actors.getPacMan().setEnvironment(gameUI.mazeUI);
 	}
 
 	@Override

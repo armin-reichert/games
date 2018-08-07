@@ -6,22 +6,21 @@ import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Graphics2D;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.actor.ActiveEntityProvider;
 import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.Energizer;
+import de.amr.games.pacman.actor.Environment;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.Pellet;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-public class MazeUI extends GameEntity implements ActiveEntityProvider {
+public class MazeUI extends GameEntity implements Environment {
 
 	private final Maze maze;
 	private final GameActors actors;
@@ -87,12 +86,13 @@ public class MazeUI extends GameEntity implements ActiveEntityProvider {
 	}
 
 	@Override
-	public Stream<GameEntity> activeEntities() {
-		List<GameEntity> activeEntities = actors.getActiveGhosts().collect(Collectors.toList());
-		if (bonus != null) {
-			activeEntities.add(bonus);
-		}
-		return activeEntities.stream();
+	public Stream<Ghost> ghosts() {
+		return actors.getActiveGhosts();
+	}
+
+	@Override
+	public Optional<Bonus> bonus() {
+		return Optional.ofNullable(bonus);
 	}
 
 	public void addBonus(Bonus bonus, int ticks) {
