@@ -13,6 +13,8 @@ import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
@@ -30,12 +32,12 @@ import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.ui.MazeUI;
+import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 import de.amr.statemachine.StateTransition;
 
-public class GameController {
+public class GameController implements Controller {
 
 	public enum State {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
@@ -44,12 +46,17 @@ public class GameController {
 	private StateMachine<State, GameEvent> sm;
 	private final Game game;
 	private final GameActors actors;
-	private final MazeUI mazeUI;
+	private final GameUI gameUI;
 
-	public GameController(Game game, GameActors actors, MazeUI mazeUI) {
+	public GameController(Game game, GameActors actors, GameUI gameUI) {
 		this.game = game;
 		this.actors = actors;
-		this.mazeUI = mazeUI;
+		this.gameUI = gameUI;
+	}
+	
+	@Override
+	public View currentView() {
+		return gameUI;
 	}
 	
 	public void init() {
@@ -64,6 +71,7 @@ public class GameController {
 	}
 
 	public void update() {
+		gameUI.update();
 		sm.update();
 	}
 
@@ -156,14 +164,14 @@ public class GameController {
 		public void onEntry() {
 			game.init();
 			actors.initActors();
-			mazeUI.enableAnimation(false);
-			mazeUI.showInfo("Ready!", Color.YELLOW);
+			gameUI.mazeUI.enableAnimation(false);
+			gameUI.mazeUI.showInfo("Ready!", Color.YELLOW);
 		}
 
 		@Override
 		public void onExit() {
-			mazeUI.enableAnimation(true);
-			mazeUI.hideInfo();
+			gameUI.mazeUI.enableAnimation(true);
+			gameUI.mazeUI.hideInfo();
 		}
 	}
 
@@ -171,7 +179,7 @@ public class GameController {
 
 		@Override
 		public void onTick() {
-			mazeUI.update();
+			gameUI.mazeUI.update();
 		}
 
 		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
@@ -223,7 +231,7 @@ public class GameController {
 			BonusFoundEvent e = t.typedEvent();
 			LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 			game.score += e.value;
-			mazeUI.honorBonusAndRemoveAfter(game.sec(2));
+			gameUI.mazeUI.honorBonusAndRemoveAfter(game.sec(2));
 		}
 
 		private void onFoodFound(StateTransition<State, GameEvent> t) {
@@ -240,7 +248,7 @@ public class GameController {
 				return;
 			}
 			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
-				mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
+				gameUI.mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
 			}
 			if (e.food == Content.ENERGIZER) {
 				game.ghostIndex = 0;
@@ -253,19 +261,19 @@ public class GameController {
 
 		@Override
 		public void onEntry() {
-			mazeUI.setFlashing(true);
+			gameUI.mazeUI.setFlashing(true);
 		}
 
 		@Override
 		public void onTick() {
 			if (getRemaining() == getDuration() / 2) {
 				nextLevel();
-				mazeUI.showInfo("Ready!", Color.YELLOW);
-				mazeUI.setFlashing(false);
-				mazeUI.enableAnimation(false);
+				gameUI.mazeUI.showInfo("Ready!", Color.YELLOW);
+				gameUI.mazeUI.setFlashing(false);
+				gameUI.mazeUI.enableAnimation(false);
 			} else if (isTerminated()) {
-				mazeUI.hideInfo();
-				mazeUI.enableAnimation(true);
+				gameUI.mazeUI.hideInfo();
+				gameUI.mazeUI.enableAnimation(true);
 			}
 		}
 
@@ -311,7 +319,7 @@ public class GameController {
 
 		@Override
 		public void onExit() {
-			mazeUI.removeBonus();
+			gameUI.mazeUI.removeBonus();
 			actors.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> true);
 		}
 	}
@@ -320,14 +328,14 @@ public class GameController {
 
 		@Override
 		public void onEntry() {
-			mazeUI.enableAnimation(false);
-			mazeUI.removeBonus();
-			mazeUI.showInfo("Game Over!", Color.RED);
+			gameUI.mazeUI.enableAnimation(false);
+			gameUI.mazeUI.removeBonus();
+			gameUI.mazeUI.showInfo("Game Over!", Color.RED);
 		}
 
 		@Override
 		public void onExit() {
-			mazeUI.hideInfo();
+			gameUI.mazeUI.hideInfo();
 			game.init();
 		}
 	}

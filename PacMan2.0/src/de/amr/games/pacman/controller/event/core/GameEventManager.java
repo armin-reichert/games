@@ -24,6 +24,6 @@ public class GameEventManager {
 
 	public void publish(GameEvent event) {
 		observers.forEach(observer -> observer.onGameEvent(event));
-		Application.LOG.info(String.format("[%s] fired event '%s'", description, event));
+		Application.LOG.info(String.format("%s fired event '%s'", description, event));
 	}
 }

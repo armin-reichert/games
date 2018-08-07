@@ -17,50 +17,47 @@ import java.util.List;
 import java.util.logging.Level;
 
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.ViewController;
-import de.amr.games.pacman.actor.GameActors;
+import de.amr.easy.game.view.View;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.GhostName;
 import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.statemachine.StateObject;
 
-public class GameInfoUI implements ViewController {
+/**
+ * Decorates game UI by showing states, routes etc.
+ * 
+ * @author Armin Reichert
+ */
+public class EnhancedGameUI extends GameUI {
 
-	private final Game game;
-	private final GameActors actors;
-	private final MazeUI mazeUI;
+	private final GameUI gameUI;
 	private boolean show_grid;
 	private boolean show_ghost_route;
 	private boolean show_entity_state;
 
 	private Image gridImage;
 
-	public GameInfoUI(Game game, GameActors actors, MazeUI mazeUI) {
-		this.game = game;
-		this.actors = actors;
-		this.mazeUI = mazeUI;
+	public EnhancedGameUI(GameUI gameUI) {
+		super(gameUI.width, gameUI.height, gameUI.game, gameUI.actors);
+		this.gameUI = gameUI;
 		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
 	}
 
 	@Override
-	public int getWidth() {
-		return mazeUI.getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return mazeUI.getWidth();
+	public View currentView() {
+		return this;
 	}
 
 	@Override
 	public void init() {
+		super.init();
 	}
 
 	@Override
 	public void update() {
+		super.update();
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
 			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
 		}
@@ -106,6 +103,7 @@ public class GameInfoUI implements ViewController {
 
 	@Override
 	public void draw(Graphics2D g) {
+		super.draw(g);
 		if (show_grid) {
 			drawGrid(g);
 			drawPacManTilePosition(g);
@@ -134,31 +132,19 @@ public class GameInfoUI implements ViewController {
 	}
 
 	private void drawGrid(Graphics2D g) {
-		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+		g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
 		g.drawImage(gridImage, 0, 0, null);
-		// int fontSize = TS * 4 / 10;
-		// if (fontSize > 4) {
-		// g.setColor(Color.LIGHT_GRAY);
-		// g.setFont(new Font("Arial Narrow", Font.PLAIN, TS * 40 / 100));
-		// for (int row = 0; row < maze.numRows(); ++row) {
-		// for (int col = 0; col < maze.numCols(); ++col) {
-		// g.translate(col * TS, row * TS);
-		// g.drawString(String.format("%d,%d", col, row), TS / 8, TS / 2);
-		// g.translate(-col * TS, -row * TS);
-		// }
-		// }
-		// }
-		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+		g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
 	}
 
 	private void drawEntityState(Graphics2D g) {
 		PacMan pacMan = actors.getPacMan();
-		g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+		g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacManStateText(pacMan));
 		actors.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
 			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), ghostStateText(ghost));
 		});
-		g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+		g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
 	}
 
 	private String pacManStateText(PacMan pacMan) {
@@ -205,12 +191,12 @@ public class GameInfoUI implements ViewController {
 	private void drawPacManTilePosition(Graphics2D g) {
 		PacMan pacMan = actors.getPacMan();
 		if (pacMan.isExactlyOverTile()) {
-			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+			g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
 			g.translate(pacMan.tf.getX(), pacMan.tf.getY());
 			g.setColor(Color.GREEN);
 			g.drawRect(0, 0, pacMan.getWidth(), pacMan.getHeight());
 			g.translate(-pacMan.tf.getX(), -pacMan.tf.getY());
-			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+			g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
 		}
 	}
 
@@ -218,7 +204,7 @@ public class GameInfoUI implements ViewController {
 		List<Tile> path = ghost.getNavigation().computeRoute(ghost).getPath();
 		if (path.size() > 1) {
 			g.setColor(color(ghost));
-			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
+			g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
 			for (int i = 0; i < path.size() - 1; ++i) {
 				Tile u = path.get(i), v = path.get(i + 1);
 				int u1 = u.col * TS + TS / 2;
@@ -232,7 +218,7 @@ public class GameInfoUI implements ViewController {
 			g.translate(tile.col * TS, tile.row * TS);
 			g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
 			g.translate(-tile.col * TS, -tile.row * TS);
-			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
+			g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
 		}
 	}
 }

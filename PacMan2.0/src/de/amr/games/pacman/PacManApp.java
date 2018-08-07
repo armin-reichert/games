@@ -5,8 +5,10 @@ import java.util.logging.Level;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.pacman.actor.GameActors;
+import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
+import de.amr.games.pacman.ui.EnhancedGameUI;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.games.pacman.ui.Spritesheet;
 
@@ -33,6 +35,7 @@ public class PacManApp extends Application {
 		Game game = new Game(maze, pulse::getFrequency);
 		GameActors actors = new GameActors(game);
 		GameUI gameUI = new GameUI(settings.width, settings.height, game, actors);
-		setController(gameUI);
+		GameController gameController = new GameController(game, actors, new EnhancedGameUI(gameUI));
+		setController(gameController);
 	}
 }

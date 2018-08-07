@@ -1,7 +1,5 @@
 package de.amr.statemachine;
 
-import static de.amr.easy.game.Application.LOG;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
