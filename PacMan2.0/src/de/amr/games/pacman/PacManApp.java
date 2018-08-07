@@ -21,9 +21,10 @@ public class PacManApp extends Application {
 	private final Game game;
 
 	public PacManApp(String[] args) {
-		game = new Game(new Maze(Assets.text("maze.txt")), pulse::getFrequency);
-		settings.width = game.maze.numCols() * Spritesheet.TS;
-		settings.height = (game.maze.numRows() + 5) * Spritesheet.TS;
+		Maze maze = new Maze(Assets.text("maze.txt"));
+		game = new Game(maze, pulse::getFrequency);
+		settings.width = maze.numCols() * Spritesheet.TS;
+		settings.height = (maze.numRows() + 5) * Spritesheet.TS;
 		settings.scale = args.length > 0 ? Float.parseFloat(args[0]) : 1;
 		settings.title = "Armin's PacMan";
 	}
