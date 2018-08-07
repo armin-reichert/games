@@ -37,7 +37,11 @@ import de.amr.statemachine.StateTransition;
 
 public class GameController {
 
-	private final StateMachine<State, GameEvent> sm;
+	public enum State {
+		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
+	};
+
+	private StateMachine<State, GameEvent> sm;
 	private final Game game;
 	private final GameActors actors;
 	private final MazeUI mazeUI;
@@ -46,18 +50,17 @@ public class GameController {
 		this.game = game;
 		this.actors = actors;
 		this.mazeUI = mazeUI;
-
+	}
+	
+	public void init() {
 		sm = buildStateMachine();
 		sm.fnPulse = game.fnTicksPerSecond;
-
 		// forward events from actors to state machine
 		mazeUI.eventMgr.subscribe(sm::enqueue);
 		actors.getPacMan().eventMgr.subscribe(sm::enqueue);
 		//TODO handle change of active ghosts at runtime
 		actors.getActiveGhosts().forEach(ghost -> ghost.eventMgr.subscribe(sm::enqueue));
-	}
 
-	public void init() {
 		sm.init();
 	}
 
@@ -68,14 +71,6 @@ public class GameController {
 	public void setLogger(Logger log) {
 		sm.setLogger(log);
 	}
-
-	public StateMachine<State, GameEvent> getSm() {
-		return sm;
-	}
-
-	public enum State {
-		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
-	};
 
 	private PlayingState playingState() {
 		return sm.state(PLAYING);
@@ -88,12 +83,12 @@ public class GameController {
 			.initialState(State.READY)
 		
 			.states()
-				.state(READY).impl(ReadyState::new).duration(game::getReadyTime).build()
-				.state(PLAYING).impl(PlayingState::new).build()
-				.state(CHANGING_LEVEL).impl(ChangingLevelState::new).duration(game::getLevelChangingTime).build()
-				.state(GHOST_DYING).impl(GhostDyingState::new).duration(game::getGhostDyingTime).build()
-				.state(PACMAN_DYING).impl(PacManDyingState::new).build()
-				.state(GAME_OVER).impl(GameOverState::new).build()
+				.state(READY).impl(new ReadyState()).duration(game::getReadyTime).build()
+				.state(PLAYING).impl(new PlayingState()).build()
+				.state(CHANGING_LEVEL).impl(new ChangingLevelState()).duration(game::getLevelChangingTime).build()
+				.state(GHOST_DYING).impl(new GhostDyingState()).duration(game::getGhostDyingTime).build()
+				.state(PACMAN_DYING).impl(new PacManDyingState()).build()
+				.state(GAME_OVER).impl(new GameOverState()).build()
 			
 			.transitions()
 				.onTimeout()

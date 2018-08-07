@@ -1,9 +1,10 @@
 package de.amr.statemachine;
 
+import static de.amr.easy.game.Application.LOG;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
-import java.util.function.Supplier;
 
 /**
  * Builder for state machine instances.
@@ -61,11 +62,10 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 	
-		public <C extends StateObject<S, E>> StateBuilder impl(Supplier<C> customStateConstructor) {
-			if (customStateConstructor == null) {
-				throw new IllegalArgumentException("Custom state constructor must be specified");
+		public <C extends StateObject<S, E>> StateBuilder impl(C customStateObject) {
+			if (customStateObject == null) {
+				throw new IllegalArgumentException("Custom state object cannot be NULL");
 			}
-			C customStateObject = customStateConstructor.get();
 			customStateObject.machine = sm;
 			customStateObject.id = state;
 			sm.stateMap.put(state, customStateObject);

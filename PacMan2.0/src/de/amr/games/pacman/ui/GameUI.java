@@ -32,7 +32,6 @@ public class GameUI implements ViewController {
 		statusUI.tf.moveTo(0, (3 + game.maze.numRows()) * Spritesheet.TS);
 
 		gameControl = new GameController(game, actors, mazeUI);
-		gameControl.setLogger(LOG);
 	}
 
 	@Override
@@ -48,6 +47,7 @@ public class GameUI implements ViewController {
 	@Override
 	public void init() {
 		gameControl.init();
+		gameControl.setLogger(LOG);
 	}
 
 	@Override
