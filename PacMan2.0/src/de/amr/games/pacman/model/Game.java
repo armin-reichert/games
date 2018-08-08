@@ -24,7 +24,7 @@ public class Game {
 	public static final int[] GHOST_POINTS = new int[] { 200, 400, 800, 1600 };
 
 	enum Column {
-		BonusSymbol, BonusValue, PacManSpeed, Col3, GhostNormalSpeed, GhostTunnelSpeed
+		BonusSymbol, BonusValue, PacManSpeed, GhostAfraidSpeed, GhostNormalSpeed, GhostTunnelSpeed
 	};
 
 	private static final Object[][] LEVELDATA = {
@@ -101,13 +101,13 @@ public class Game {
 		case DYING:
 			return 0;
 		case DEAD:
-			return tps(12f);
+			return baseSpeed *1.5f;
 		case AFRAID:
-			return tps(6f);
+			return baseSpeed * (float) levelData(Column.GhostAfraidSpeed);
 		case SAFE:
-			return tps(6f);
+			return baseSpeed * 0.75f;
 		case SCATTERING:
-			return baseSpeed;
+			return baseSpeed * (float) levelData(Column.GhostNormalSpeed);
 		default:
 			throw new IllegalStateException();
 		}
