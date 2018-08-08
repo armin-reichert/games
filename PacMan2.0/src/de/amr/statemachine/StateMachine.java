@@ -225,6 +225,17 @@ public class StateMachine<S, E> {
 	}
 
 	/**
+	 * @return percentage of remaining time if this state has a timer, otherwise 100.
+	 */
+	public int getRemainingTimePercentage() {
+		StateObject<S, E> stateObject = currentStateObject();
+		if (stateObject.getDuration() == StateObject.ENDLESS) {
+			return 100;
+		}
+		return Math.round(100f * stateObject.getRemaining() / stateObject.getDuration());
+	}
+
+	/**
 	 * Initializes this state machine by switching to the initial state and executing the initial
 	 * state's (optional) entry action.
 	 */

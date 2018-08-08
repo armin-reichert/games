@@ -54,14 +54,14 @@ public class StateMachineTracer<S> {
 			if (t.from != t.to) {
 				log.info(String.format("%s changing from '%s' to '%s'", sm.getDescription(), t.from, t.to));
 			} else {
-				log.info(String.format("%s keeps '%s'", sm.getDescription(), t.from));
+				log.info(String.format("%s stays '%s'", sm.getDescription(), t.from));
 			}
 		} else {
 			if (t.from != t.to) {
 				log.info(
 						String.format("%s changing from '%s' to '%s' on '%s'", sm.getDescription(), t.from, t.to, t.getEvent()));
 			} else {
-				log.info(String.format("%s keeps '%s' on '%s'", sm.getDescription(), t.from, t.getEvent()));
+				log.info(String.format("%s stays '%s' on '%s'", sm.getDescription(), t.from, t.getEvent()));
 			}
 		}
 	}

@@ -20,9 +20,9 @@ import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.game.PacManDiedEvent;
 import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
 import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
-import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
@@ -111,8 +111,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 					.timeout(game::getPacManEmpoweringTime)
 					.onTick(() -> {
 						walkAndInspectMaze();
-						if (sm.currentStateObject().getRemaining() == sm.currentStateObject().getDuration() * 20 / 100) {
-							publishEvent(new PacManLosesPowerEvent());
+						if (sm.getRemainingTimePercentage() == 20) {
+							//TODO this happens several times!
+							publishEvent(new PacManGettingWeakerEvent());
 						}
 					})
 

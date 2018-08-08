@@ -26,9 +26,9 @@ import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.game.LevelCompletedEvent;
 import de.amr.games.pacman.controller.event.game.PacManDiedEvent;
 import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
 import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
-import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
@@ -135,8 +135,8 @@ public class GameController implements Controller {
 					.act(e -> playingState().onPacManGainsPower(e))
 					
 				.when(PLAYING)
-					.on(PacManLosesPowerEvent.class)
-					.act(e -> playingState().onPacManLosesPower(e))
+					.on(PacManGettingWeakerEvent.class)
+					.act(e -> playingState().onPacManGettingWeaker(e))
 					
 				.when(PLAYING)
 					.on(PacManLostPowerEvent.class)
@@ -161,15 +161,15 @@ public class GameController implements Controller {
 					
 				.when(PACMAN_DYING).become(GAME_OVER)
 					.on(PacManDiedEvent.class)
-					.incase(() -> game.lives == 0)
+					.inCase(() -> game.lives == 0)
 					
 				.when(PACMAN_DYING).become(PLAYING)
 					.on(PacManDiedEvent.class)
-					.incase(() -> game.lives > 0)
+					.inCase(() -> game.lives > 0)
 					.act(t -> actors.init())
 			
 				.when(GAME_OVER).become(READY)
-					.incase(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+					.inCase(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 							
 		.endStateMachine();
 		//@formatter:on
@@ -230,8 +230,8 @@ public class GameController implements Controller {
 			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
-		private void onPacManLosesPower(GameEvent event) {
-			PacManLosesPowerEvent e = (PacManLosesPowerEvent) event;
+		private void onPacManGettingWeaker(GameEvent event) {
+			PacManGettingWeakerEvent e = (PacManGettingWeakerEvent) event;
 			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 

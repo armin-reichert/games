@@ -4,8 +4,9 @@ import static de.amr.games.pacman.actor.Ghost.State.AFRAID;
 import static de.amr.games.pacman.actor.Ghost.State.AGGRO;
 import static de.amr.games.pacman.actor.Ghost.State.DEAD;
 import static de.amr.games.pacman.actor.Ghost.State.DYING;
-import static de.amr.games.pacman.actor.Ghost.State.INITIAL;
+import static de.amr.games.pacman.actor.Ghost.State.HOME;
 import static de.amr.games.pacman.actor.Ghost.State.SAFE;
+import static de.amr.games.pacman.actor.Ghost.State.SCATTERING;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
@@ -17,7 +18,7 @@ import de.amr.games.pacman.controller.event.core.GameEvent;
 import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
-import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
+import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
@@ -80,7 +81,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	// State machine
 
 	public enum State {
-		INITIAL, AGGRO, SCATTERING, AFRAID, DYING, DEAD, SAFE
+		HOME, AGGRO, SCATTERING, AFRAID, DYING, DEAD, SAFE
 	}
 
 	@Override
@@ -93,86 +94,78 @@ public class Ghost extends MazeMover<Ghost.State> {
 		return StateMachine.define(State.class, GameEvent.class)
 			 
 			.description(String.format("[%s]", getName()))
-			.initialState(State.INITIAL)
+			.initialState(HOME)
 		
 			.states()
 
-				.state(State.INITIAL)
+				.state(HOME)
 					.onEntry(() -> {
 						setMazePosition(homeTile);
 						getSprites().forEach(Sprite::resetAnimation);
 						setSpeed(game::getGhostSpeed);
 					})
 				
-				.state(State.AFRAID)
-					.onTick(() -> {
-						move();
-						currentSprite = s_awed;
-					})
+				.state(AFRAID)
+					.onEntry(() -> currentSprite = s_awed)
+					.onTick(() -> move())
 				
-				.state(State.AGGRO)
+				.state(AGGRO)
 					.onTick(() -> {
 						move();
 						currentSprite = s_color[getDir()];
 					})
 				
-				.state(State.DEAD)
-					.onEntry(() -> {
-						currentSprite = s_eyes[getDir()];
-					})
+				.state(DEAD)
+					.onEntry(() -> currentSprite = s_eyes[getDir()])
 					.onTick(() -> {
 						move();
 						currentSprite = s_eyes[getDir()];
 					})
 				
-				.state(State.DYING)
-					.timeout(game::getGhostDyingTime)
+				.state(DYING)
 					.onEntry(() -> {
 						currentSprite = s_numbers[game.ghostIndex];
 						game.score += game.getGhostValue();
 						game.ghostIndex += 1;
 					})
+					.timeout(game::getGhostDyingTime)
 				
-				.state(State.SAFE)
+				.state(SAFE)
 					.timeout(() -> game.sec(2))
-					.onEntry(() -> {
-					})
 					.onTick(() -> {
 						move();
 						currentSprite = s_color[getDir()];
 					})
 				
-				.state(State.SCATTERING)
+				.state(SCATTERING) //TODO
 				
 			.transitions()
 				
-				.when(INITIAL).become(SAFE)
+				.when(HOME).become(SAFE)
 
 				.when(SAFE).become(AGGRO)
 					.onTimeout()
-					.incase(() -> pacMan.getState() != PacMan.State.EMPOWERED)
+					.inCase(() -> pacMan.getState() != PacMan.State.EMPOWERED)
 				
 				.when(SAFE).become(AFRAID)
 					.onTimeout()
-					.incase(() -> pacMan.getState() == PacMan.State.EMPOWERED)
+					.inCase(() -> pacMan.getState() == PacMan.State.EMPOWERED)
 				
-				.when(State.SAFE)
+				.when(SAFE)
 					.on(PacManGainsPowerEvent.class)
 					
-				.when(State.SAFE)
-					.on(PacManLosesPowerEvent.class)
+				.when(SAFE)
+					.on(PacManGettingWeakerEvent.class)
 				
-				.when(State.SAFE)
+				.when(SAFE)
 					.on(PacManLostPowerEvent.class)
 					
 				.when(AGGRO).become(AFRAID)
 					.on(PacManGainsPowerEvent.class)
 					
-				.when(AFRAID).become(AFRAID)
-					.on(PacManLosesPowerEvent.class)
-					.act(t -> {
-						currentSprite = s_blinking;
-					})
+				.when(AFRAID)
+					.on(PacManGettingWeakerEvent.class)
+					.act(e -> currentSprite = s_blinking)
 
 				.when(AFRAID)
 					.on(PacManGainsPowerEvent.class)
@@ -187,7 +180,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 					.onTimeout()
 					
 				.when(DEAD).become(SAFE)
-					.incase(() -> getTile().equals(homeTile))
+					.inCase(() -> getTile().equals(homeTile))
 		
 			.endStateMachine();
 		/*@formatter:on*/

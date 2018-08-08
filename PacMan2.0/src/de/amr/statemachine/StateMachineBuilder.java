@@ -152,7 +152,7 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public TransitionBuilder incase(BooleanSupplier guard) {
+		public TransitionBuilder inCase(BooleanSupplier guard) {
 			if (guard == null) {
 				throw new IllegalArgumentException("Transition guard must not be NULL");
 			}
