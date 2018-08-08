@@ -1,5 +1,6 @@
 package de.amr.games.pacman.actor;
 
+import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -56,6 +57,16 @@ public class Bonus extends GameEntity {
 	public Stream<Sprite> getSprites() {
 		return Stream.of(s_points, s_symbol);
 	}
+	
+	@Override
+	public void draw(Graphics2D g) {
+		// center sprite over tile
+		int dx = (getWidth() - currentSprite().getWidth()) / 2, dy = (getHeight() - currentSprite().getHeight()) / 2;
+		g.translate(dx, dy);
+		super.draw(g);
+		g.translate(-dx, -dy);
+	}
+
 
 	@Override
 	public String toString() {

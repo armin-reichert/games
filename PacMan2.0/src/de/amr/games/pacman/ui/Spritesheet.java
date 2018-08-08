@@ -84,12 +84,16 @@ public class Spritesheet {
 			greenNumber[i] = $(456 + i * TS, 128);
 		}
 
-		// Pink numbers (horizontal: 100, 300, 500, 700, vertikal: 1000, 2000, 3000, 5000)
+		// Pink numbers
+		// horizontal: 100, 300, 500, 700
 		for (int i = 0; i < 4; ++i) {
 			pinkNumber[i] = $(456 + i * TS, 144);
 		}
-		for (int j = 0; j < 4; ++j) {
-			pinkNumber[4 + j] = $(520, 144 + j * TS);
+		// 1000
+		pinkNumber[4] = $(520,144,19,16);
+		// vertical: 2000, 3000, 5000)
+		for (int j = 0; j < 3; ++j) {
+			pinkNumber[5 + j] = $(512, 160 + j * TS, 2*TS, TS);
 		}
 	}
 
