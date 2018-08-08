@@ -9,32 +9,30 @@ import java.util.logging.Logger;
  *
  * @param <S>
  *          state identifier type
- * @param <E>
- *          event type
  */
-public class StateMachineTracer<S, E> {
+public class StateMachineTracer<S> {
 
-	private final StateMachine<S, E> sm;
+	private final StateMachine<S, ?> sm;
 	private final Logger log;
 	private final IntSupplier fnTicksPerSecond;
 
-	public StateMachineTracer(StateMachine<S, E> sm, Logger log, IntSupplier fnTicksPerSecond) {
+	public StateMachineTracer(StateMachine<S, ?> sm, Logger log, IntSupplier fnTicksPerSecond) {
 		this.sm = sm;
 		this.log = log;
 		this.fnTicksPerSecond = fnTicksPerSecond;
 	}
 
-	public void stateCreated(S stateLabel) {
-		log.info(String.format("%s created state '%s'", sm.getDescription(), stateLabel));
+	public void stateCreated(S state) {
+		log.info(String.format("%s created state '%s'", sm.getDescription(), state));
 	}
 
-	public void ignoredEvent(E event) {
+	public void ignoredEvent(Object event) {
 		log.info(String.format("%s in state %s ignored '%s' (no matching transition).", sm.getDescription(),
 				sm.currentState(), event));
 	}
 
-	public void enteringInitialState(S intialState) {
-		log.info(String.format("%s entering initial state '%s'", sm.getDescription(), intialState));
+	public void enteringInitialState(S initialState) {
+		log.info(String.format("%s entering initial state '%s'", sm.getDescription(), initialState));
 	}
 
 	public void enteringState(S enteredState) {
@@ -51,7 +49,7 @@ public class StateMachineTracer<S, E> {
 		log.info(String.format("%s exiting state '%s'", sm.getDescription(), exitedState));
 	}
 
-	public void firingTransition(Transition<S, E> t) {
+	public void firingTransition(Transition<?, ?> t) {
 		if (t.getEvent() == null) {
 			if (t.from != t.to) {
 				log.info(String.format("%s changing from '%s' to '%s'", sm.getDescription(), t.from, t.to));

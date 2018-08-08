@@ -37,7 +37,7 @@ public class StateMachine<S, E> {
 
 	private final Map<S, List<Transition<S, E>>> transitionsFromState;
 
-	private StateMachineTracer<S, E> tracer;
+	private StateMachineTracer<S> tracer;
 
 	private String description;
 
