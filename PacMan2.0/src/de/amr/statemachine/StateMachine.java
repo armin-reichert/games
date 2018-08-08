@@ -3,6 +3,7 @@ package de.amr.statemachine;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,27 +29,31 @@ public class StateMachine<S, E> {
 		return new StateMachineBuilder<>(stateLabelType);
 	}
 
-	/** Function defining how many ticks per second are sent to the machine. */
-	public IntSupplier fnPulse = () -> 60;
-	String description;
-	Class<S> stateLabelType;
-	Deque<E> eventQ;
-	Map<S, StateObject<S, E>> stateMap;
-	Map<S, List<Transition<S, E>>> transitionsFromState;
-	S initialState;
-	S currentState;
-	StateMachineTracer<S, E> tracer;
+	private final Deque<E> eventQ;
+
+	private final Map<S, StateObject<S, E>> stateMap;
+
+	private final Map<S, List<Transition<S, E>>> transitionsFromState;
+
+	private StateMachineTracer<S, E> tracer;
+
+	private String description;
+
+	private S initialState;
+
+	private S currentState;
 
 	/**
 	 * Creates a new state machine.
 	 * 
-	 * @param stateLabelType
+	 * @param stateLabelType type for state identifiers
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public StateMachine(Class<S> stateLabelType) {
-		this.eventQ = new ArrayDeque<>();
-		this.stateMap = new HashMap<>(); // TODO enum map if possible
-		this.transitionsFromState = new HashMap<>();
-		this.tracer = new StateMachineTracer<>(this, Logger.getGlobal());
+		eventQ = new ArrayDeque<>();
+		stateMap = stateLabelType.isEnum() ? new EnumMap(stateLabelType) : new HashMap<>(7);
+		transitionsFromState = new HashMap<>(7);
+		tracer = new StateMachineTracer<>(this, Logger.getGlobal(), () -> 60);
 	}
 
 	/**
@@ -56,8 +61,8 @@ public class StateMachine<S, E> {
 	 * 
 	 * @param log a logger
 	 */
-	public void traceTo(Logger log) {
-		tracer = new StateMachineTracer<>(this, log);
+	public void traceTo(Logger log, IntSupplier fnTicksPerSecond) {
+		tracer = new StateMachineTracer<>(this, log, fnTicksPerSecond);
 	}
 
 	/**
@@ -67,13 +72,61 @@ public class StateMachine<S, E> {
 		return description;
 	}
 
+	/**
+	 * Sets the description for this state machine.
+	 * 
+	 * @param description description text (used by tracing)
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Sets the initial state for this state machine.
+	 * 
+	 * @param initialState initial state
+	 */
+	public void setInitialState(S initialState) {
+		if (initialState == null) {
+			throw new IllegalStateException("Initial state cannot be NULL");
+		}
+		this.initialState = initialState;
+	}
+
+	/**
+	 * 
+	 * @return the initial state of this state machine
+	 */
+	public S getInitialState() {
+		return initialState;
+	}
+
+	/**
+	 * Adds a state transition.
+	 * 
+	 * @param from      transition source state
+	 * @param to        transition target state
+	 * @param guard     condition guarding transition or {@code  null} for always
+	 *                  fulfilled
+	 * @param action    action for transition or {@code null} for no action
+	 * @param eventType type of event for transition or {@code null} for no event
+	 *                  condition
+	 * @param timeout   if transition is fired on a timeout
+	 */
 	public void addTransition(S from, S to, BooleanSupplier guard, Consumer<StateTransition<S, E>> action,
 			Class<? extends E> eventType, boolean timeout) {
 		Objects.nonNull(from);
 		Objects.nonNull(to);
-		Objects.nonNull(guard);
-		Objects.nonNull(action);
-		Objects.nonNull(eventType);
+		if (guard == null) {
+			guard = () -> true;
+		}
+		if (action == null) {
+			action = t -> {
+			};
+		}
+		if (timeout && eventType != null) {
+			throw new IllegalStateException("Cannot specify timeout and event condition on same transition");
+		}
 		transitionsFrom(from).add(new Transition<>(this, from, to, guard, action, eventType, timeout));
 	}
 
@@ -83,7 +136,19 @@ public class StateMachine<S, E> {
 	 * @param event some input/event
 	 */
 	public void enqueue(E event) {
+		Objects.nonNull(event);
 		eventQ.add(event);
+	}
+	
+	/**
+	 * Processes the given event.
+	 * 
+	 * @param event some input / event
+	 */
+	public void process(E event) {
+		Objects.nonNull(event);
+		eventQ.add(event);
+		update();
 	}
 
 	/**

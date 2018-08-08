@@ -92,15 +92,7 @@ public class StateMachineBuilder<S, E> {
 		}
 	
 		public StateBuilder build() {
-			StateObject<S, E> stateObject;
-			if (!sm.stateMap.containsKey(state)) {
-				stateObject = new StateObject<>();
-				stateObject.machine = sm;
-				stateObject.id = state;
-				sm.stateMap.put(state, stateObject);
-			} else {
-				stateObject = sm.stateMap.get(state);
-			}
+			StateObject<S, E> stateObject = sm.state(state);
 			stateObject.entry = entry;
 			stateObject.exit = exit;
 			stateObject.update = update;
@@ -177,17 +169,14 @@ public class StateMachineBuilder<S, E> {
 		}
 
 		public TransitionBuilder build() {
-			if (timeout && eventType != null) {
-				throw new IllegalStateException("Cannot specify both, onTimeout and on(Event.class)");
-			}
 			sm.addTransition(from, to, guard, action, eventType, timeout);
 			clear();
 			return this;
 		}
 
 		public StateMachine<S, E> endStateMachine() {
-			sm.description = description;
-			sm.initialState = initialState;
+			sm.setDescription(description == null ? sm.getClass().getSimpleName() : description);
+			sm.setInitialState(initialState);
 			return sm;
 		}
 	}

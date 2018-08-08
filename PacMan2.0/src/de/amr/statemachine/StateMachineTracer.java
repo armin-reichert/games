@@ -1,5 +1,6 @@
 package de.amr.statemachine;
 
+import java.util.function.IntSupplier;
 import java.util.logging.Logger;
 
 /**
@@ -13,10 +14,12 @@ public class StateMachineTracer<S, E> {
 
 	private final StateMachine<S, E> sm;
 	private final Logger log;
+	private final IntSupplier fnTicksPerSecond;
 
-	public StateMachineTracer(StateMachine<S, E> sm, Logger log) {
+	public StateMachineTracer(StateMachine<S, E> sm, Logger log, IntSupplier fnTicksPerSecond) {
 		this.sm = sm;
 		this.log = log;
+		this.fnTicksPerSecond = fnTicksPerSecond;
 	}
 
 	public void stateCreated(S stateLabel) {
@@ -34,7 +37,7 @@ public class StateMachineTracer<S, E> {
 
 	public void enteringState(S enteredState) {
 		if (sm.state(enteredState).getDuration() != StateObject.ENDLESS) {
-			float seconds = sm.state(enteredState).getDuration() / sm.fnPulse.getAsInt();
+			float seconds = sm.state(enteredState).getDuration() / fnTicksPerSecond.getAsInt();
 			log.info(String.format("%s entering state '%s' for %.2f seconds (%d frames)", sm.getDescription(),
 					enteredState, seconds, sm.state(enteredState).getDuration()));
 		} else {

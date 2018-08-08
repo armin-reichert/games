@@ -62,15 +62,9 @@ public class GameController implements Controller {
 	@Override
 	public void init() {
 		sm = buildStateMachine();
-		sm.fnPulse = game.fnTicksPerSecond;
 		sm.init();
-		actors.addEventHandler(sm::enqueue);
+		actors.addEventHandler(sm::process);
 		actors.getPacMan().setEnvironment(gameUI.mazeUI);
-		actors.getPacMan().getStateMachine().traceTo(LOG);
-		actors.getBlinky().getStateMachine().traceTo(LOG);
-		actors.getPinky().getStateMachine().traceTo(LOG);
-		actors.getInky().getStateMachine().traceTo(LOG);
-		actors.getClyde().getStateMachine().traceTo(LOG);
 		actors.setGhostActive(actors.getBlinky(), true);
 	}
 
@@ -81,7 +75,9 @@ public class GameController implements Controller {
 	}
 
 	public void setLogger(Logger log) {
-		sm.traceTo(log);
+		sm.traceTo(log, game.fnTicksPerSecond);
+		actors.getPacMan().getStateMachine().traceTo(log, game.fnTicksPerSecond);
+		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(log, game.fnTicksPerSecond));
 	}
 
 	private PlayingState playingState() {
@@ -89,78 +85,113 @@ public class GameController implements Controller {
 	}
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
-		/*@formatter:off*/
-		return StateMachine.builder(State.class, GameEvent.class)
+		return
+		//@formatter:off
+		StateMachine.builder(State.class, GameEvent.class)
 			.description("[GameController]")
 			.initialState(State.READY)
-		
 			.states()
-				.state(READY).impl(new ReadyState()).duration(game::getReadyTime).build()
-				.state(PLAYING).impl(new PlayingState()).build()
-				.state(CHANGING_LEVEL).impl(new ChangingLevelState()).duration(game::getLevelChangingTime).build()
-				.state(GHOST_DYING).impl(new GhostDyingState()).duration(game::getGhostDyingTime).build()
-				.state(PACMAN_DYING).impl(new PacManDyingState()).build()
-				.state(GAME_OVER).impl(new GameOverState()).build()
-			
+				.state(READY)
+					.impl(new ReadyState())
+					.duration(game::getReadyTime)
+					.build()
+				
+				.state(PLAYING)
+					.impl(new PlayingState())
+				.build()
+				
+				.state(CHANGING_LEVEL)
+					.impl(new ChangingLevelState())
+					.duration(game::getLevelChangingTime)
+					.build()
+				
+				.state(GHOST_DYING)
+					.impl(new GhostDyingState())
+					.duration(game::getGhostDyingTime)
+					.build()
+				
+				.state(PACMAN_DYING)
+					.impl(new PacManDyingState())
+					.build()
+				
+				.state(GAME_OVER)
+					.impl(new GameOverState())
+					.build()
+	
 			.transitions()
 				.change(READY, PLAYING)
 					.onTimeout()
 					.build()
+					
 				.keep(PLAYING)
 					.on(FoodFoundEvent.class)
 					.act(t -> playingState().onFoodFound(t))
 					.build()
+					
 				.keep(PLAYING)
 					.on(BonusFoundEvent.class)
 					.act(t -> playingState().onBonusFound(t))
 					.build()
+					
 				.keep(PLAYING)
 					.on(PacManGhostCollisionEvent.class)
 					.act(t -> playingState().onPacManGhostCollision(t))
 					.build()
+					
 				.keep(PLAYING)
 					.on(PacManGainsPowerEvent.class)
 					.act(t -> playingState().onPacManGainsPower(t))
 					.build()
+					
 				.keep(PLAYING)
 					.on(PacManLosesPowerEvent.class)
 					.act(t -> playingState().onPacManLosesPower(t))
 					.build()
+					
 				.keep(PLAYING)
 					.on(PacManLostPowerEvent.class)
 					.act(t -> playingState().onPacManLostPower(t))
 					.build()
+			
 				.change(PLAYING, GHOST_DYING)
 					.on(GhostKilledEvent.class)
 					.act(t -> playingState().onGhostKilled(t))
 					.build()
+					
 				.change(PLAYING, PACMAN_DYING)
 					.on(PacManKilledEvent.class)
 					.act(t -> playingState().onPacManKilled(t))
 					.build()
+					
 				.change(PLAYING, CHANGING_LEVEL)
 					.on(LevelCompletedEvent.class)
 					.build()
+					
 				.change(State.CHANGING_LEVEL, PLAYING)
-					.onTimeout()	
+					.onTimeout()
 					.build()
+			
 				.change(GHOST_DYING, PLAYING)
 					.onTimeout()
 					.build()
+					
 				.change(PACMAN_DYING, State.GAME_OVER)
 					.on(PacManDiedEvent.class)
 					.when(() -> game.lives == 0)
 					.build()
+					
 				.change(PACMAN_DYING, PLAYING)
 					.on(PacManDiedEvent.class)
 					.when(() -> game.lives > 0)
 					.act(t -> actors.init())
 					.build()
+			
 				.change(GAME_OVER, READY)
 					.when(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 					.build()
+							
 		.endStateMachine();
-		/*@formatter:on*/
+		//@formatter:on
 	}
 
 	private class ReadyState extends StateObject<State, GameEvent> {

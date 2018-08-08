@@ -174,6 +174,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		/*@formatter:on*/
 		if (collidingGhost.isPresent()) {
 			publishEvent(new PacManGhostCollisionEvent(collidingGhost.get()));
+			return;
 		}
 
 		// Bonus discovered?
@@ -181,6 +182,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
 			publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+			return;
 		}
 
 		// Food found on current tile?
