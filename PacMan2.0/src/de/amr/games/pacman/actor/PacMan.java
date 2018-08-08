@@ -26,7 +26,7 @@ import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.Spritesheet;
+import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
@@ -39,7 +39,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		sm = buildStateMachine();
 		eventMgr = new GameEventManager("[Pac-Man]");
 		environment = Environment.EMPTYNESS;
-		createSprites(2*TS);
+		createSprites(2 * TS);
 	}
 
 	public void setEnvironment(Environment mazeLife) {
@@ -54,9 +54,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Sprite currentSprite;
 
 	private void createSprites(int size) {
-		s_dying = Spritesheet.pacManDying().scale(size);
-		s_full = Spritesheet.pacManFull().scale(size);
-		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = Spritesheet.pacManWalking(dir).scale(size));
+		s_dying = GameUI.PACMAN_SPRITES.pacManDying().scale(size);
+		s_full = GameUI.PACMAN_SPRITES.pacManFull().scale(size);
+		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = GameUI.PACMAN_SPRITES.pacManWalking(dir).scale(size));
 		currentSprite = s_walking[Top4.E];
 	}
 
@@ -149,7 +149,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public void init() {
 		sm.init();
 	}
-	
+
 	// Pac-Man activities
 
 	private void walkAndInspectMaze() {

@@ -14,6 +14,8 @@ import de.amr.games.pacman.model.Game;
 
 public class GameUI implements ViewController {
 
+	public static final Spritesheet PACMAN_SPRITES = new Spritesheet();
+
 	public final int width, height;
 	public final Game game;
 	public final GameActors actors;

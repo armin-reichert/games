@@ -4,14 +4,14 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.ui.Spritesheet;
+import de.amr.games.pacman.ui.GameUI;
 
 public class Energizer extends GameEntity {
 
 	private final Sprite s_energizer;
 
 	public Energizer() {
-		s_energizer = Spritesheet.energizer();
+		s_energizer = GameUI.PACMAN_SPRITES.energizer();
 	}
 
 	@Override

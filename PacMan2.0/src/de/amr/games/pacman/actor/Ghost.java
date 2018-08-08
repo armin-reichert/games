@@ -1,6 +1,11 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.actor.Ghost.State.*;
+import static de.amr.games.pacman.actor.Ghost.State.AFRAID;
+import static de.amr.games.pacman.actor.Ghost.State.AGGRO;
+import static de.amr.games.pacman.actor.Ghost.State.DEAD;
+import static de.amr.games.pacman.actor.Ghost.State.DYING;
+import static de.amr.games.pacman.actor.Ghost.State.INITIAL;
+import static de.amr.games.pacman.actor.Ghost.State.SAFE;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
@@ -16,7 +21,7 @@ import de.amr.games.pacman.controller.event.game.PacManLosesPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.Spritesheet;
+import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
@@ -51,14 +56,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void createSprites(int color) {
 		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_color[dir] = Spritesheet.ghostColored(color, dir).scale(size);
-			s_eyes[dir] = Spritesheet.ghostEyes(dir).scale(size);
+			s_color[dir] = GameUI.PACMAN_SPRITES.ghostColored(color, dir).scale(size);
+			s_eyes[dir] = GameUI.PACMAN_SPRITES.ghostEyes(dir).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_numbers[i] = Spritesheet.greenNumber(i).scale(size);
+			s_numbers[i] = GameUI.PACMAN_SPRITES.greenNumber(i).scale(size);
 		}
-		s_awed = Spritesheet.ghostAwed().scale(size);
-		s_blinking = Spritesheet.ghostBlinking().scale(size);
+		s_awed = GameUI.PACMAN_SPRITES.ghostAwed().scale(size);
+		s_blinking = GameUI.PACMAN_SPRITES.ghostBlinking().scale(size);
 	}
 
 	@Override

@@ -143,7 +143,7 @@ public class StateMachineBuilder<S, E> {
 			this.from = this.to = from;
 			return this;
 		}
-		
+
 		public TransitionBuilder become(S to) {
 			if (to == null) {
 				throw new IllegalArgumentException("Transition target state must not be NULL");
