@@ -93,29 +93,23 @@ public class GameController implements Controller {
 				.state(READY)
 					.impl(new ReadyState())
 					.duration(game::getReadyTime)
-					.build()
 				
 				.state(PLAYING)
 					.impl(new PlayingState())
-				.build()
 				
 				.state(CHANGING_LEVEL)
 					.impl(new ChangingLevelState())
 					.duration(game::getLevelChangingTime)
-					.build()
 				
 				.state(GHOST_DYING)
 					.impl(new GhostDyingState())
 					.duration(game::getGhostDyingTime)
-					.build()
 				
 				.state(PACMAN_DYING)
 					.impl(new PacManDyingState())
-					.build()
 				
 				.state(GAME_OVER)
 					.impl(new GameOverState())
-					.build()
 	
 			.transitions()
 				.change(READY, PLAYING)

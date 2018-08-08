@@ -55,6 +55,11 @@ public class StateMachineBuilder<S, E> {
 		}
 
 		public StateBuilder state(S state) {
+			// commit previous build if any
+			if (this.state != null) {
+				commit();
+			}
+			// start new build
 			clear();
 			this.state = state;
 			return this;
@@ -91,17 +96,20 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public StateBuilder build() {
+		private StateBuilder commit() {
 			StateObject<S, E> stateObject = sm.state(state);
 			stateObject.entry = entry;
 			stateObject.exit = exit;
 			stateObject.update = update;
 			stateObject.fnDuration = fnDuration;
-			clear();
 			return this;
 		}
 
 		public TransitionBuilder transitions() {
+			// commit previous build if any
+			if (this.state != null) {
+				commit();
+			}
 			return new TransitionBuilder();
 		}
 	}

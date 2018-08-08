@@ -97,21 +97,18 @@ public class Ghost extends MazeMover<Ghost.State> {
 						getSprites().forEach(Sprite::resetAnimation);
 						setSpeed(game::getGhostSpeed);
 					})
-				.build()
 				
 				.state(State.AFRAID)
 					.onTick(() -> {
 						move();
 						currentSprite = s_awed;
 					})
-				.build()
 				
 				.state(State.AGGRO)
 					.onTick(() -> {
 						move();
 						currentSprite = s_color[getDir()];
 					})
-				.build()
 				
 				.state(State.DEAD)
 					.onEntry(() -> {
@@ -121,7 +118,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 						move();
 						currentSprite = s_eyes[getDir()];
 					})
-				.build()
 				
 				.state(State.DYING)
 					.duration(game::getGhostDyingTime)
@@ -130,7 +126,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 						game.score += game.getGhostValue();
 						game.ghostIndex += 1;
 					})
-				.build()
 				
 				.state(State.SAFE)
 					.duration(() -> game.sec(2))
@@ -140,10 +135,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 						move();
 						currentSprite = s_color[getDir()];
 					})
-				.build()
 				
 				.state(State.SCATTERING)
-				.build()
 				
 			.transitions()
 				

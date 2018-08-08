@@ -95,14 +95,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 						getSprites().forEach(Sprite::resetAnimation);
 						currentSprite = s_walking[getDir()];
 					})
-					.build()
 
 				.state(State.DYING)
 					.duration(() -> game.sec(2))
 					.onEntry(() -> {
 						currentSprite = s_dying;
 					})
-					.build()
 
 				.state(EMPOWERED)
 					.duration(game::getPacManEmpoweringTime)
@@ -112,11 +110,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 							publishEvent(new PacManLosesPowerEvent());
 						}
 					})
-					.build()
 
 				.state(State.NORMAL)
 					.onTick(this::walkAndInspectMaze)
-					.build()
 
 			.transitions()
 
