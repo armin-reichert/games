@@ -1,10 +1,11 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.actor.PacMan.State.*;
+import static de.amr.games.pacman.actor.PacMan.State.DYING;
+import static de.amr.games.pacman.actor.PacMan.State.EMPOWERED;
+import static de.amr.games.pacman.actor.PacMan.State.INITIAL;
+import static de.amr.games.pacman.actor.PacMan.State.NORMAL;
 import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
-import static de.amr.games.pacman.ui.Spritesheet.pacManWalking;
 
 import java.util.EnumMap;
 import java.util.Optional;
@@ -49,11 +50,13 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private Sprite s_walking[] = new Sprite[4];
 	private Sprite s_dying;
+	private Sprite s_full;
 	private Sprite currentSprite;
 
 	private void createSprites(int size) {
-		s_dying = pacManDying().scale(size);
-		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = pacManWalking(dir).scale(size));
+		s_dying = Spritesheet.pacManDying().scale(size);
+		s_full = Spritesheet.pacManFull().scale(size);
+		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = Spritesheet.pacManWalking(dir).scale(size));
 	}
 
 	@Override
@@ -87,13 +90,14 @@ public class PacMan extends MazeMover<PacMan.State> {
 			.states()
 
 				.state(INITIAL)
+					.timeout(() ->game.sec(0.1f))
 					.onEntry(() -> {
 						setMazePosition(homeTile);
 						setDir(Top4.E);
 						setNextDir(Top4.E);
 						setSpeed(game::getPacManSpeed);
 						getSprites().forEach(Sprite::resetAnimation);
-						currentSprite = s_walking[getDir()];
+						currentSprite = s_full;
 					})
 
 				.state(DYING)
@@ -116,7 +120,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 			.transitions()
 
-				.when(INITIAL).become(NORMAL)
+				.when(INITIAL).become(NORMAL).onTimeout()
 
 				.when(NORMAL).become(DYING)
 					.on(PacManKilledEvent.class)

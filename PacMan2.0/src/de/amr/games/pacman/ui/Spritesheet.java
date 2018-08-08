@@ -135,7 +135,7 @@ public class Spritesheet {
 		return new Sprite(symbolMap.get(symbol));
 	}
 
-	public static Sprite pacManStanding() {
+	public static Sprite pacManFull() {
 		return new Sprite(pacManStanding);
 	}
 
