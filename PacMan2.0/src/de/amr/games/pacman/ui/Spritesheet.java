@@ -90,10 +90,10 @@ public class Spritesheet {
 			pinkNumber[i] = $(456 + i * TS, 144);
 		}
 		// 1000
-		pinkNumber[4] = $(520,144,19,16);
+		pinkNumber[4] = $(520, 144, 19, 16);
 		// vertical: 2000, 3000, 5000)
 		for (int j = 0; j < 3; ++j) {
-			pinkNumber[5 + j] = $(512, 160 + j * TS, 2*TS, TS);
+			pinkNumber[5 + j] = $(512, 160 + j * TS, 2 * TS, TS);
 		}
 	}
 

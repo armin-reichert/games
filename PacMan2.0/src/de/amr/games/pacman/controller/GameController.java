@@ -35,7 +35,6 @@ import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
-import de.amr.statemachine.StateTransition;
 
 public class GameController implements Controller {
 
@@ -125,42 +124,42 @@ public class GameController implements Controller {
 					
 				.keep(PLAYING)
 					.on(FoodFoundEvent.class)
-					.act(t -> playingState().onFoodFound(t))
+					.act(e -> playingState().onFoodFound(e))
 					.build()
 					
 				.keep(PLAYING)
 					.on(BonusFoundEvent.class)
-					.act(t -> playingState().onBonusFound(t))
+					.act(e -> playingState().onBonusFound(e))
 					.build()
 					
 				.keep(PLAYING)
 					.on(PacManGhostCollisionEvent.class)
-					.act(t -> playingState().onPacManGhostCollision(t))
+					.act(e -> playingState().onPacManGhostCollision(e))
 					.build()
 					
 				.keep(PLAYING)
 					.on(PacManGainsPowerEvent.class)
-					.act(t -> playingState().onPacManGainsPower(t))
+					.act(e -> playingState().onPacManGainsPower(e))
 					.build()
 					
 				.keep(PLAYING)
 					.on(PacManLosesPowerEvent.class)
-					.act(t -> playingState().onPacManLosesPower(t))
+					.act(e -> playingState().onPacManLosesPower(e))
 					.build()
 					
 				.keep(PLAYING)
 					.on(PacManLostPowerEvent.class)
-					.act(t -> playingState().onPacManLostPower(t))
+					.act(e -> playingState().onPacManLostPower(e))
 					.build()
 			
 				.change(PLAYING, GHOST_DYING)
 					.on(GhostKilledEvent.class)
-					.act(t -> playingState().onGhostKilled(t))
+					.act(e -> playingState().onGhostKilled(e))
 					.build()
 					
 				.change(PLAYING, PACMAN_DYING)
 					.on(PacManKilledEvent.class)
-					.act(t -> playingState().onPacManKilled(t))
+					.act(e -> playingState().onPacManKilled(e))
 					.build()
 					
 				.change(PLAYING, CHANGING_LEVEL)
@@ -220,8 +219,8 @@ public class GameController implements Controller {
 			actors.getActiveGhosts().forEach(Ghost::update);
 		}
 
-		private void onPacManGhostCollision(StateTransition<State, GameEvent> t) {
-			PacManGhostCollisionEvent e = t.typedEvent();
+		private void onPacManGhostCollision(GameEvent event) {
+			PacManGhostCollisionEvent e = (PacManGhostCollisionEvent) event;
 			PacMan.State pacManState = actors.getPacMan().getState();
 			if (pacManState == PacMan.State.DYING) {
 				return;
@@ -237,43 +236,43 @@ public class GameController implements Controller {
 			sm.enqueue(new PacManKilledEvent(e.ghost));
 		}
 
-		private void onPacManKilled(StateTransition<State, GameEvent> t) {
-			PacManKilledEvent e = t.typedEvent();
+		private void onPacManKilled(GameEvent event) {
+			PacManKilledEvent e = (PacManKilledEvent) event;
 			actors.getPacMan().processEvent(e);
 			LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
 		}
 
-		private void onPacManGainsPower(StateTransition<State, GameEvent> t) {
-			PacManGainsPowerEvent e = t.typedEvent();
+		private void onPacManGainsPower(GameEvent event) {
+			PacManGainsPowerEvent e = (PacManGainsPowerEvent) event;
 			actors.getPacMan().processEvent(e);
 			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
-		private void onPacManLosesPower(StateTransition<State, GameEvent> t) {
-			PacManLosesPowerEvent e = t.typedEvent();
+		private void onPacManLosesPower(GameEvent event) {
+			PacManLosesPowerEvent e = (PacManLosesPowerEvent) event;
 			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
-		private void onPacManLostPower(StateTransition<State, GameEvent> t) {
-			PacManLostPowerEvent e = t.typedEvent();
+		private void onPacManLostPower(GameEvent event) {
+			PacManLostPowerEvent e = (PacManLostPowerEvent) event;
 			actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(e));
 		}
 
-		private void onGhostKilled(StateTransition<State, GameEvent> t) {
-			GhostKilledEvent e = t.typedEvent();
+		private void onGhostKilled(GameEvent event) {
+			GhostKilledEvent e = (GhostKilledEvent) event;
 			e.ghost.processEvent(e);
 			LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
 		}
 
-		private void onBonusFound(StateTransition<State, GameEvent> t) {
-			BonusFoundEvent e = t.typedEvent();
+		private void onBonusFound(GameEvent event) {
+			BonusFoundEvent e = (BonusFoundEvent) event;
 			LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
 			game.score += e.value;
 			gameUI.mazeUI.honorBonusAndRemoveAfter(game.sec(2));
 		}
 
-		private void onFoodFound(StateTransition<State, GameEvent> t) {
-			FoodFoundEvent e = t.typedEvent();
+		private void onFoodFound(GameEvent event) {
+			FoodFoundEvent e = (FoodFoundEvent) event;
 			game.maze.clearTile(e.tile);
 			game.foodEaten += 1;
 			int oldGameScore = game.score;

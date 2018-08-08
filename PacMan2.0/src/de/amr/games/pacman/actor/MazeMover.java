@@ -48,9 +48,9 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.navigation = navigation;
 		this.fnSpeed = mover -> 0f;
 	}
-	
+
 	// Eventing
-	
+
 	protected void publishEvent(GameEvent event) {
 		eventMgr.publish(event);
 	}

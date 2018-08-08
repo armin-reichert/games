@@ -57,7 +57,7 @@ public class Bonus extends GameEntity {
 	public Stream<Sprite> getSprites() {
 		return Stream.of(s_points, s_symbol);
 	}
-	
+
 	@Override
 	public void draw(Graphics2D g) {
 		// center sprite over tile
@@ -66,7 +66,6 @@ public class Bonus extends GameEntity {
 		super.draw(g);
 		g.translate(-dx, -dy);
 	}
-
 
 	@Override
 	public String toString() {

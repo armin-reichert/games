@@ -39,13 +39,13 @@ public class StateMachineBuilder<S, E> {
 	}
 
 	public class StateBuilder {
-	
+
 		private S state;
 		private Runnable entry;
 		private Runnable exit;
 		private Runnable update;
 		private IntSupplier fnDuration;
-	
+
 		private void clear() {
 			state = null;
 			entry = null;
@@ -53,13 +53,13 @@ public class StateMachineBuilder<S, E> {
 			update = null;
 			fnDuration = () -> StateObject.ENDLESS;
 		}
-	
+
 		public StateBuilder state(S state) {
 			clear();
 			this.state = state;
 			return this;
 		}
-	
+
 		public <C extends StateObject<S, E>> StateBuilder impl(C customStateObject) {
 			if (customStateObject == null) {
 				throw new IllegalArgumentException("Custom state object cannot be NULL");
@@ -67,7 +67,7 @@ public class StateMachineBuilder<S, E> {
 			sm.replaceState(state, customStateObject);
 			return this;
 		}
-	
+
 		public StateBuilder duration(IntSupplier fnDuration) {
 			if (fnDuration == null) {
 				throw new IllegalStateException("Timer function cannot be null for state " + state);
@@ -75,22 +75,22 @@ public class StateMachineBuilder<S, E> {
 			this.fnDuration = fnDuration;
 			return this;
 		}
-	
+
 		public StateBuilder onEntry(Runnable entry) {
 			this.entry = entry;
 			return this;
 		}
-	
+
 		public StateBuilder onExit(Runnable exit) {
 			this.exit = exit;
 			return this;
 		}
-	
+
 		public StateBuilder onTick(Runnable update) {
 			this.update = update;
 			return this;
 		}
-	
+
 		public StateBuilder build() {
 			StateObject<S, E> stateObject = sm.state(state);
 			stateObject.entry = entry;
@@ -100,7 +100,7 @@ public class StateMachineBuilder<S, E> {
 			clear();
 			return this;
 		}
-	
+
 		public TransitionBuilder transitions() {
 			return new TransitionBuilder();
 		}
@@ -113,7 +113,7 @@ public class StateMachineBuilder<S, E> {
 		private BooleanSupplier guard;
 		private boolean timeout;
 		private Class<? extends E> eventType;
-		private Consumer<StateTransition<S, E>> action;
+		private Consumer<E> action;
 
 		public TransitionBuilder() {
 			clear();
@@ -160,7 +160,7 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public TransitionBuilder act(Consumer<StateTransition<S, E>> action) {
+		public TransitionBuilder act(Consumer<E> action) {
 			if (action == null) {
 				throw new IllegalArgumentException("Transition action cannot be NULL");
 			}

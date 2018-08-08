@@ -136,8 +136,8 @@ public class GameActors {
 	public Stream<Ghost> getActiveGhosts() {
 		return activeGhosts.stream();
 	}
-	
+
 	public Stream<Ghost> getGhosts() {
-		return Stream.of(blinky,pinky,inky,clyde);
+		return Stream.of(blinky, pinky, inky, clyde);
 	}
 }

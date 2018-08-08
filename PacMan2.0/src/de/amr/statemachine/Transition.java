@@ -10,8 +10,10 @@ import java.util.function.Consumer;
  * 
  * @author Armin Reichert
  *
- * @param <S> state identifier type
- * @param <E> event type
+ * @param <S>
+ *          state identifier type
+ * @param <E>
+ *          event type
  */
 class Transition<S, E> implements StateTransition<S, E> {
 
@@ -19,13 +21,13 @@ class Transition<S, E> implements StateTransition<S, E> {
 	final S from;
 	final S to;
 	final BooleanSupplier guard;
-	final Consumer<StateTransition<S, E>> action;
+	final Consumer<E> action;
 	final Class<? extends E> eventType;
 	final boolean timeout;
 	private E event;
 
-	public Transition(StateMachine<S, E> sm, S from, S to, BooleanSupplier guard,
-			Consumer<StateTransition<S, E>> action, Class<? extends E> eventType, boolean timeout) {
+	public Transition(StateMachine<S, E> sm, S from, S to, BooleanSupplier guard, Consumer<E> action,
+			Class<? extends E> eventType, boolean timeout) {
 		this.sm = sm;
 		this.from = from;
 		this.to = to;

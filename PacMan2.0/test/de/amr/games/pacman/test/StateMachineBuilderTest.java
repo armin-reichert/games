@@ -8,12 +8,12 @@ import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 
 public class StateMachineBuilderTest {
-	
+
 	interface Event {
 	}
-	
+
 	class EventX implements Event {
-		
+
 	}
 
 	class StateB extends StateObject<String, Event> {
@@ -39,7 +39,7 @@ public class StateMachineBuilderTest {
 
 		sm.init();
 		assertTrue(sm.currentState().equals("A"));
-		
+
 		sm.enqueue(new EventX());
 		sm.update();
 		assertTrue(sm.currentState().equals("B"));

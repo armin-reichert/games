@@ -101,7 +101,7 @@ public class Game {
 		case DYING:
 			return 0;
 		case DEAD:
-			return baseSpeed *1.5f;
+			return baseSpeed * 1.5f;
 		case AFRAID:
 			return baseSpeed * (float) levelData(Column.GhostAfraidSpeed);
 		case SAFE:

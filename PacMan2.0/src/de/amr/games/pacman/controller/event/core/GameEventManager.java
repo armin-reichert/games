@@ -9,7 +9,7 @@ public class GameEventManager {
 
 	private final String description;
 	private final Set<GameEventListener> observers = new LinkedHashSet<>();
-	
+
 	public GameEventManager(String description) {
 		this.description = description;
 	}

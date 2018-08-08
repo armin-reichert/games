@@ -24,7 +24,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final GhostName name;
 	private final PacMan pacMan;
 
-	public Ghost(GhostName name, PacMan pacMan, Game game, GameEventManager eventMgr,  Tile home, int color) {
+	public Ghost(GhostName name, PacMan pacMan, Game game, GameEventManager eventMgr, Tile home, int color) {
 		super(game, eventMgr, home, new EnumMap<>(State.class));
 		this.pacMan = pacMan;
 		this.name = name;
