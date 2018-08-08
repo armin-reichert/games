@@ -1,6 +1,6 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.actor.PacMan.State.EMPOWERED;
+import static de.amr.games.pacman.actor.PacMan.State.*;
 import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.pacManDying;
@@ -79,14 +79,14 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
 		/* @formatter:off */
-		return StateMachine.builder(State.class, GameEvent.class)
+		return StateMachine.define(State.class, GameEvent.class)
 				
 			.description("[Pac-Man]")
-			.initialState(State.INITIAL)
+			.initialState(INITIAL)
 
 			.states()
 
-				.state(State.INITIAL)
+				.state(INITIAL)
 					.onEntry(() -> {
 						setMazePosition(homeTile);
 						setDir(Top4.E);
@@ -96,14 +96,14 @@ public class PacMan extends MazeMover<PacMan.State> {
 						currentSprite = s_walking[getDir()];
 					})
 
-				.state(State.DYING)
-					.duration(() -> game.sec(2))
+				.state(DYING)
+					.timeout(() -> game.sec(2))
 					.onEntry(() -> {
 						currentSprite = s_dying;
 					})
 
 				.state(EMPOWERED)
-					.duration(game::getPacManEmpoweringTime)
+					.timeout(game::getPacManEmpoweringTime)
 					.onTick(() -> {
 						walkAndInspectMaze();
 						if (sm.currentStateObject().getRemaining() == sm.currentStateObject().getDuration() * 20 / 100) {
@@ -111,35 +111,30 @@ public class PacMan extends MazeMover<PacMan.State> {
 						}
 					})
 
-				.state(State.NORMAL)
+				.state(NORMAL)
 					.onTick(this::walkAndInspectMaze)
 
 			.transitions()
 
-				.change(State.INITIAL, State.NORMAL).build()
+				.when(INITIAL).become(NORMAL)
 
-				.change(State.NORMAL, State.DYING)
+				.when(NORMAL).become(DYING)
 					.on(PacManKilledEvent.class)
-					.build()
 
-				.change(State.NORMAL, State.EMPOWERED)
+				.when(NORMAL).become(EMPOWERED)
 					.on(PacManGainsPowerEvent.class)
-					.build()
 
-				.keep(State.EMPOWERED)
+				.when(EMPOWERED)
 					.on(PacManGainsPowerEvent.class)
 					.act(t -> sm.currentStateObject().resetTimer())
-					.build()
 
-				.change(State.EMPOWERED, State.NORMAL)
+				.when(EMPOWERED).become(NORMAL)
 					.onTimeout()
 					.act(t -> publishEvent(new PacManLostPowerEvent()))
-					.build()
 
-				.keep(State.DYING)
+				.when(State.DYING)
 					.onTimeout()
 					.act(t -> publishEvent(new PacManDiedEvent()))
-					.build()
 
 		.endStateMachine();
 		/* @formatter:on */

@@ -22,7 +22,7 @@ public class StateMachineBuilderTest {
 	@Test
 	public void test() {
 		/*@formatter:off*/
-		StateMachine<String, Event> sm = StateMachine.builder(String.class, Event.class)
+		StateMachine<String, Event> sm = StateMachine.define(String.class, Event.class)
 			.description("SampleFSM")
 			.initialState("A")
 			.states()
@@ -30,10 +30,10 @@ public class StateMachineBuilderTest {
 				.state("B").impl(new StateB())
 				.state("C")
 			.transitions()
-				.change("A", "B").on(EventX.class).act(t -> {
+				.when("A").become("B").on(EventX.class).act(t -> {
 					System.out.println("Action");
-				}).build()
-				.keep("B").when(() -> 10 > 9).build()
+				})
+				.when("B").incase(() -> 10 > 9)
 			.endStateMachine();
 		/*@formatter:on*/
 

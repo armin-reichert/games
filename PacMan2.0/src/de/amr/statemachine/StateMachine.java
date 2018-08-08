@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  */
 public class StateMachine<S, E> {
 
-	public static <SS, EE> StateMachineBuilder<SS, EE> builder(Class<SS> stateLabelType, Class<EE> eventType) {
+	public static <SS, EE> StateMachineBuilder<SS, EE> define(Class<SS> stateLabelType, Class<EE> eventType) {
 		return new StateMachineBuilder<>(stateLabelType);
 	}
 

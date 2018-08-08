@@ -73,7 +73,7 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public StateBuilder duration(IntSupplier fnDuration) {
+		public StateBuilder timeout(IntSupplier fnDuration) {
 			if (fnDuration == null) {
 				throw new IllegalStateException("Timer function cannot be null for state " + state);
 			}
@@ -123,10 +123,6 @@ public class StateMachineBuilder<S, E> {
 		private Class<? extends E> eventType;
 		private Consumer<E> action;
 
-		public TransitionBuilder() {
-			clear();
-		}
-
 		private void clear() {
 			from = null;
 			to = null;
@@ -136,33 +132,45 @@ public class StateMachineBuilder<S, E> {
 			action = null;
 		}
 
-		public TransitionBuilder change(S from, S to) {
-			this.from = from;
+		public TransitionBuilder when(S from) {
+			if (from == null) {
+				throw new IllegalArgumentException("Transition source state must not be NULL");
+			}
+			if (this.from != null) {
+				commit();
+			}
+			clear();
+			this.from = this.to = from;
+			return this;
+		}
+		
+		public TransitionBuilder become(S to) {
+			if (to == null) {
+				throw new IllegalArgumentException("Transition target state must not be NULL");
+			}
 			this.to = to;
 			return this;
 		}
 
-		public TransitionBuilder keep(S state) {
-			this.from = this.to = state;
-			return this;
-		}
-
-		public TransitionBuilder when(BooleanSupplier guard) {
+		public TransitionBuilder incase(BooleanSupplier guard) {
 			if (guard == null) {
-				throw new IllegalArgumentException("Guard cannot be NULL");
+				throw new IllegalArgumentException("Transition guard must not be NULL");
 			}
 			this.guard = guard;
 			return this;
 		}
 
 		public TransitionBuilder onTimeout() {
+			if (timeout) {
+				throw new IllegalArgumentException("Transition timeout must only be set once");
+			}
 			this.timeout = true;
 			return this;
 		}
 
 		public TransitionBuilder on(Class<? extends E> eventType) {
 			if (eventType == null) {
-				throw new IllegalArgumentException("Event type of transition cannot be NULL");
+				throw new IllegalArgumentException("Event type of transition must not be NULL");
 			}
 			this.eventType = eventType;
 			return this;
@@ -170,19 +178,22 @@ public class StateMachineBuilder<S, E> {
 
 		public TransitionBuilder act(Consumer<E> action) {
 			if (action == null) {
-				throw new IllegalArgumentException("Transition action cannot be NULL");
+				throw new IllegalArgumentException("Transition action must not be NULL");
 			}
 			this.action = action;
 			return this;
 		}
 
-		public TransitionBuilder build() {
+		private TransitionBuilder commit() {
 			sm.addTransition(from, to, guard, action, eventType, timeout);
 			clear();
 			return this;
 		}
 
 		public StateMachine<S, E> endStateMachine() {
+			if (from != null) {
+				commit();
+			}
 			sm.setDescription(description == null ? sm.getClass().getSimpleName() : description);
 			sm.setInitialState(initialState);
 			return sm;
