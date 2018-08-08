@@ -37,8 +37,8 @@ public class MazeUI extends GameEntity implements Environment {
 	public MazeUI(Maze maze, GameActors actors) {
 		this.maze = maze;
 		this.actors = actors;
-		s_normal = GameUI.PACMAN_SPRITES.maze().scale(getWidth(), getHeight());
-		s_flashing = GameUI.PACMAN_SPRITES.flashingMaze().scale(getWidth(), getHeight());
+		s_normal = GameUI.SPRITES.maze().scale(getWidth(), getHeight());
+		s_flashing = GameUI.SPRITES.flashingMaze().scale(getWidth(), getHeight());
 		energizer = new Energizer();
 		pellet = new Pellet();
 	}

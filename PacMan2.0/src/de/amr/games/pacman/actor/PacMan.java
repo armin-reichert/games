@@ -1,11 +1,12 @@
 package de.amr.games.pacman.actor;
 
+import static de.amr.games.pacman.actor.PacMan.State.SAFE;
+import static de.amr.games.pacman.actor.PacMan.State.STEROIDS;
 import static de.amr.games.pacman.actor.PacMan.State.DYING;
-import static de.amr.games.pacman.actor.PacMan.State.EMPOWERED;
-import static de.amr.games.pacman.actor.PacMan.State.INITIAL;
-import static de.amr.games.pacman.actor.PacMan.State.NORMAL;
+import static de.amr.games.pacman.actor.PacMan.State.VULNERABLE;
 import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.ui.GameUI.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.util.EnumMap;
@@ -26,7 +27,6 @@ import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
@@ -48,32 +48,32 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	// Pac-Man look
 
-	private Sprite s_walking[] = new Sprite[4];
+	private Sprite s_walking_to[] = new Sprite[4];
 	private Sprite s_dying;
 	private Sprite s_full;
-	private Sprite currentSprite;
+	private Sprite s_current;
 
 	private void createSprites(int size) {
-		s_dying = GameUI.PACMAN_SPRITES.pacManDying().scale(size);
-		s_full = GameUI.PACMAN_SPRITES.pacManFull().scale(size);
-		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = GameUI.PACMAN_SPRITES.pacManWalking(dir).scale(size));
-		currentSprite = s_walking[Top4.E];
+		TOPOLOGY.dirs().forEach(dir -> s_walking_to[dir] = SPRITES.pacManWalking(dir).scale(size));
+		s_dying = SPRITES.pacManDying().scale(size);
+		s_full = SPRITES.pacManFull().scale(size);
+		s_current = s_full;
 	}
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(Stream.of(s_walking), Stream.of(s_dying)).flatMap(s -> s);
+		return Stream.of(Stream.of(s_walking_to), Stream.of(s_dying)).flatMap(s -> s);
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return currentSprite;
+		return s_current;
 	}
 
 	// Pac-Man behavior
 
 	public enum State {
-		INITIAL, NORMAL, EMPOWERED, DYING
+		SAFE, VULNERABLE, STEROIDS, DYING
 	};
 
 	@Override
@@ -86,61 +86,48 @@ public class PacMan extends MazeMover<PacMan.State> {
 		return StateMachine.define(State.class, GameEvent.class)
 				
 			.description("[Pac-Man]")
-			.initialState(INITIAL)
+			.initialState(SAFE)
 
 			.states()
 
-				.state(INITIAL)
-					.timeout(() ->game.sec(0.1f))
-					.onEntry(() -> {
-						setMazePosition(homeTile);
-						setDir(Top4.E);
-						setNextDir(Top4.E);
-						setSpeed(game::getPacManSpeed);
-						getSprites().forEach(Sprite::resetAnimation);
-						currentSprite = s_full;
-					})
+				.state(SAFE)
+						.onEntry(() -> {
+							setMazePosition(homeTile);
+							setNextDir(Top4.E);
+							setSpeed(game::getPacManSpeed);
+							getSprites().forEach(Sprite::resetAnimation);
+							s_current = s_full;
+						})
+						.timeout(() -> game.sec(0.1f))
+
+				.state(VULNERABLE).onTick(this::walkAndInspectMaze)
+					
+				.state(STEROIDS)
+						.onTick(() -> {
+							walkAndInspectMaze();
+							if (sm.getRemainingPct() == 20) { //TODO this can occur multiple times!
+								publish(new PacManGettingWeakerEvent());
+							}
+						})
+						.timeout(game::getPacManEmpoweringTime)
 
 				.state(DYING)
-					.timeout(() -> game.sec(2))
-					.onEntry(() -> {
-						currentSprite = s_dying;
-					})
-
-				.state(EMPOWERED)
-					.timeout(game::getPacManEmpoweringTime)
-					.onTick(() -> {
-						walkAndInspectMaze();
-						if (sm.getRemainingTimePercentage() == 20) {
-							//TODO this happens several times!
-							publishEvent(new PacManGettingWeakerEvent());
-						}
-					})
-
-				.state(NORMAL)
-					.onTick(this::walkAndInspectMaze)
+						.onEntry(() -> s_current = s_dying)
+						.timeout(() -> game.sec(2))
 
 			.transitions()
 
-				.when(INITIAL).become(NORMAL).onTimeout()
+					.when(SAFE).become(VULNERABLE).onTimeout()
 
-				.when(NORMAL).become(DYING)
-					.on(PacManKilledEvent.class)
-
-				.when(NORMAL).become(EMPOWERED)
-					.on(PacManGainsPowerEvent.class)
-
-				.when(EMPOWERED)
-					.on(PacManGainsPowerEvent.class)
-					.act(t -> sm.currentStateObject().resetTimer())
-
-				.when(EMPOWERED).become(NORMAL)
-					.onTimeout()
-					.act(t -> publishEvent(new PacManLostPowerEvent()))
-
-				.when(State.DYING)
-					.onTimeout()
-					.act(t -> publishEvent(new PacManDiedEvent()))
+					.when(VULNERABLE).become(DYING).on(PacManKilledEvent.class)
+	
+					.when(VULNERABLE).become(STEROIDS).on(PacManGainsPowerEvent.class)
+	
+					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(e -> sm.resetTimer())
+	
+					.when(STEROIDS).become(VULNERABLE).onTimeout().act(e -> publish(new PacManLostPowerEvent()))
+	
+					.when(DYING).onTimeout().act(e -> publish(new PacManDiedEvent()))
 
 		.endStateMachine();
 		/* @formatter:on */
@@ -152,10 +139,15 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	// Pac-Man activities
+	
+	@Override
+	public void move() {
+		super.move();
+		s_current = s_walking_to[getDir()];
+	}
 
 	private void walkAndInspectMaze() {
 		move();
-		currentSprite = s_walking[getDir()];
 		if (!isTeleporting()) {
 			inspectMaze();
 		}
@@ -172,7 +164,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				.findFirst();
 		/*@formatter:on*/
 		if (collidingGhost.isPresent()) {
-			publishEvent(new PacManGhostCollisionEvent(collidingGhost.get()));
+			publish(new PacManGhostCollisionEvent(collidingGhost.get()));
 			return;
 		}
 
@@ -180,7 +172,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Optional<Bonus> activeBonus = environment.activeBonus().filter(this::collidesWith);
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
-			publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+			publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 			return;
 		}
 
@@ -188,7 +180,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
-			publishEvent(new FoodFoundEvent(tile, content));
+			publish(new FoodFoundEvent(tile, content));
 		}
 	}
 }

@@ -17,7 +17,7 @@ public class StatusUI extends GameEntity {
 
 	public StatusUI(Game gameState) {
 		this.gameState = gameState;
-		s_pacMan = new Sprite(GameUI.PACMAN_SPRITES.pacManWalking(Top4.W).frame(1)).scale(TS * 2);
+		s_pacMan = new Sprite(GameUI.SPRITES.pacManWalking(Top4.W).frame(1)).scale(TS * 2);
 	}
 
 	@Override

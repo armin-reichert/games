@@ -225,14 +225,18 @@ public class StateMachine<S, E> {
 	}
 
 	/**
-	 * @return percentage of remaining time if this state has a timer, otherwise 100.
+	 * @return Percentage of remaining time, if this state has a timer, otherwise 100.
 	 */
-	public int getRemainingTimePercentage() {
+	public int getRemainingPct() {
 		StateObject<S, E> stateObject = currentStateObject();
 		if (stateObject.getDuration() == StateObject.ENDLESS) {
 			return 100;
 		}
 		return Math.round(100f * stateObject.getRemaining() / stateObject.getDuration());
+	}
+	
+	public void resetTimer() {
+		currentStateObject().resetTimer();
 	}
 
 	/**
@@ -268,9 +272,8 @@ public class StateMachine<S, E> {
 				fireTransition(match.get(), event);
 			} else {
 				tracer.ignoredEvent(event);
-				// TODO should we always throw an exception? Maybe make it configurable?
 				throw new IllegalStateException(
-						String.format("No transition defined in state '%s' for event '%s'", currentState, event));
+						String.format("%s: No transition defined in state '%s' for event '%s'", description, currentState, event));
 			}
 			eventQ.poll();
 		}

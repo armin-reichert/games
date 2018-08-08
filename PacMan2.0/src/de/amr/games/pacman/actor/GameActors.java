@@ -66,8 +66,8 @@ public class GameActors {
 	private PacMan createPacMan() {
 		PacMan pacMan = new PacMan(game, eventMgr);
 		RoutePlanner manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
-		pacMan.setNavigation(PacMan.State.NORMAL, manual);
-		pacMan.setNavigation(PacMan.State.EMPOWERED, manual);
+		pacMan.setNavigation(PacMan.State.VULNERABLE, manual);
+		pacMan.setNavigation(PacMan.State.STEROIDS, manual);
 		return pacMan;
 	}
 

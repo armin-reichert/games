@@ -11,7 +11,7 @@ public class Energizer extends GameEntity {
 	private final Sprite s_energizer;
 
 	public Energizer() {
-		s_energizer = GameUI.PACMAN_SPRITES.energizer();
+		s_energizer = GameUI.SPRITES.energizer();
 	}
 
 	@Override

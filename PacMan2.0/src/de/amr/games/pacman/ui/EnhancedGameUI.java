@@ -149,7 +149,7 @@ public class EnhancedGameUI extends GameUI {
 	}
 
 	private String pacManStateText(PacMan pacMan) {
-		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().state(pacMan.getStateMachine().currentState());
+		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().currentStateObject();
 		return state.getDuration() != StateObject.ENDLESS
 				? String.format("(%s,%d|%d)", state.id(), state.getRemaining(), state.getDuration())
 				: String.format("(%s,%s)", state.id(), INFTY);

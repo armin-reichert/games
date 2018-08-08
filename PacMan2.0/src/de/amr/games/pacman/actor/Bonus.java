@@ -29,8 +29,8 @@ public class Bonus extends GameEntity {
 			throw new IllegalArgumentException("Illegal bonus value: " + value);
 		}
 		int size = 2 * Spritesheet.TS;
-		s_symbol = GameUI.PACMAN_SPRITES.symbol(symbol).scale(size);
-		s_points = GameUI.PACMAN_SPRITES.pinkNumber(index).scale(size);
+		s_symbol = GameUI.SPRITES.symbol(symbol).scale(size);
+		s_points = GameUI.SPRITES.pinkNumber(index).scale(size);
 	}
 
 	public int getValue() {

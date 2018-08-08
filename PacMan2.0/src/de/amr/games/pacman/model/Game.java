@@ -119,10 +119,10 @@ public class Game {
 
 	public float getPacManSpeed(MazeMover<PacMan.State> pacMan) {
 		switch (pacMan.getState()) {
-		case INITIAL:
+		case SAFE:
 			return 0;
-		case NORMAL:
-		case EMPOWERED:
+		case VULNERABLE:
+		case STEROIDS:
 			return baseSpeed * (float) levelData(Column.PacManSpeed);
 		case DYING:
 			return 0;

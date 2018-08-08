@@ -57,14 +57,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void createSprites(int color) {
 		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_color[dir] = GameUI.PACMAN_SPRITES.ghostColored(color, dir).scale(size);
-			s_eyes[dir] = GameUI.PACMAN_SPRITES.ghostEyes(dir).scale(size);
+			s_color[dir] = GameUI.SPRITES.ghostColored(color, dir).scale(size);
+			s_eyes[dir] = GameUI.SPRITES.ghostEyes(dir).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_numbers[i] = GameUI.PACMAN_SPRITES.greenNumber(i).scale(size);
+			s_numbers[i] = GameUI.SPRITES.greenNumber(i).scale(size);
 		}
-		s_awed = GameUI.PACMAN_SPRITES.ghostAwed().scale(size);
-		s_blinking = GameUI.PACMAN_SPRITES.ghostBlinking().scale(size);
+		s_awed = GameUI.SPRITES.ghostAwed().scale(size);
+		s_blinking = GameUI.SPRITES.ghostBlinking().scale(size);
 	}
 
 	@Override
@@ -145,11 +145,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 				.when(SAFE).become(AGGRO)
 					.onTimeout()
-					.inCase(() -> pacMan.getState() != PacMan.State.EMPOWERED)
+					.inCase(() -> pacMan.getState() != PacMan.State.STEROIDS)
 				
 				.when(SAFE).become(AFRAID)
 					.onTimeout()
-					.inCase(() -> pacMan.getState() == PacMan.State.EMPOWERED)
+					.inCase(() -> pacMan.getState() == PacMan.State.STEROIDS)
 				
 				.when(SAFE)
 					.on(PacManGainsPowerEvent.class)
@@ -179,6 +179,9 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.when(DYING).become(DEAD)
 					.onTimeout()
 					
+				.when(DEAD)
+					.on(PacManGettingWeakerEvent.class)
+		
 				.when(DEAD).become(SAFE)
 					.inCase(() -> getTile().equals(homeTile))
 		

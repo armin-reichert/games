@@ -207,7 +207,7 @@ public class GameController implements Controller {
 			if (pacManState == PacMan.State.DYING) {
 				return;
 			}
-			if (pacManState == PacMan.State.EMPOWERED) {
+			if (pacManState == PacMan.State.STEROIDS) {
 				Ghost.State ghostState = e.ghost.getState();
 				if (ghostState == Ghost.State.AFRAID || ghostState == Ghost.State.AGGRO
 						|| ghostState == Ghost.State.SCATTERING) {
