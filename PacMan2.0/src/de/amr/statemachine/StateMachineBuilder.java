@@ -64,9 +64,7 @@ public class StateMachineBuilder<S, E> {
 			if (customStateObject == null) {
 				throw new IllegalArgumentException("Custom state object cannot be NULL");
 			}
-			customStateObject.machine = sm;
-			customStateObject.id = state;
-			sm.stateMap.put(state, customStateObject);
+			sm.replaceState(state, customStateObject);
 			return this;
 		}
 	

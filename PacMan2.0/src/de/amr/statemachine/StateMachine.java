@@ -125,13 +125,23 @@ public class StateMachine<S, E> {
 	@SuppressWarnings("unchecked")
 	public <C extends StateObject<S, E>> C state(S state) {
 		if (!stateMap.containsKey(state)) {
-			StateObject<S, E> stateObject = new StateObject<>();
-			stateObject.id = state;
-			stateObject.machine = this;
-			stateMap.put(state, stateObject);
-			return (C) stateObject;
+			return (C) replaceState(state, new StateObject<>());
 		}
 		return (C) stateMap.get(state);
+	}
+
+	/**
+	 * Replaces the state object for the given state by the given object.
+	 * 
+	 * @param state       state identifier
+	 * @param stateObject state object
+	 * @return the new state object
+	 */
+	public <C extends StateObject<S, E>> C replaceState(S state, C stateObject) {
+		stateObject.id = state;
+		stateObject.machine = this;
+		stateMap.put(state, stateObject);
+		return stateObject;
 	}
 
 	/**
