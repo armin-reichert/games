@@ -2,6 +2,13 @@ package de.amr.statemachine;
 
 import java.util.logging.Logger;
 
+/**
+ * 
+ * @author Armin Reichert
+ *
+ * @param <S> state identifier type
+ * @param <E> event type
+ */
 public class StateMachineTracer<S, E> {
 
 	private final StateMachine<S, E> sm;
@@ -39,8 +46,8 @@ public class StateMachineTracer<S, E> {
 		log.info(String.format("%s exiting state '%s'", sm.getDescription(), exitedState));
 	}
 
-	public void firingTransition(StateMachine<S, E>.Transition t) {
-		if (t.event == null) {
+	public void firingTransition(Transition<S, E> t) {
+		if (t.getEvent() == null) {
 			if (t.from != t.to) {
 				log.info(String.format("%s changing from '%s' to '%s'", sm.getDescription(), t.from, t.to));
 			} else {
@@ -49,9 +56,9 @@ public class StateMachineTracer<S, E> {
 		} else {
 			if (t.from != t.to) {
 				log.info(String.format("%s changing from '%s' to '%s' on '%s'", sm.getDescription(), t.from, t.to,
-						t.event));
+						t.getEvent()));
 			} else {
-				log.info(String.format("%s keeps '%s' on '%s'", sm.getDescription(), t.from, t.event));
+				log.info(String.format("%s keeps '%s' on '%s'", sm.getDescription(), t.from, t.getEvent()));
 			}
 		}
 	}

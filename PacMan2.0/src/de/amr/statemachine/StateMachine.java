@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -27,40 +28,13 @@ public class StateMachine<S, E> {
 		return new StateMachineBuilder<>(stateLabelType);
 	}
 
-	class Transition implements StateTransition<S, E> {
-
-		S from;
-		S to;
-		E event;
-		BooleanSupplier guard;
-		Consumer<StateTransition<S, E>> action = t -> {
-		};
-		Class<? extends E> eventType;
-		boolean timeout;
-
-		@Override
-		public StateObject<S, E> from() {
-			return state(from);
-		}
-
-		@Override
-		public StateObject<S, E> to() {
-			return state(to);
-		}
-
-		@Override
-		public Optional<E> event() {
-			return Optional.ofNullable(event);
-		}
-	}
-
 	/** Function defining how many ticks per second are sent to the machine. */
 	public IntSupplier fnPulse = () -> 60;
 	String description;
 	Class<S> stateLabelType;
 	Deque<E> eventQ;
 	Map<S, StateObject<S, E>> stateMap;
-	Map<S, List<Transition>> transitionsFromState;
+	Map<S, List<Transition<S, E>>> transitionsFromState;
 	S initialState;
 	S currentState;
 	StateMachineTracer<S, E> tracer;
@@ -91,6 +65,16 @@ public class StateMachine<S, E> {
 	 */
 	public String getDescription() {
 		return description;
+	}
+
+	public void addTransition(S from, S to, BooleanSupplier guard, Consumer<StateTransition<S, E>> action,
+			Class<? extends E> eventType, boolean timeout) {
+		Objects.nonNull(from);
+		Objects.nonNull(to);
+		Objects.nonNull(guard);
+		Objects.nonNull(action);
+		Objects.nonNull(eventType);
+		transitionsFrom(from).add(new Transition<>(this, from, to, guard, action, eventType, timeout));
 	}
 
 	/**
@@ -168,7 +152,7 @@ public class StateMachine<S, E> {
 		E event = eventQ.peek();
 		if (event == null) {
 			// find transition without event
-			Optional<Transition> match = transitionsFrom(currentState).stream().filter(this::canFire).findFirst();
+			Optional<Transition<S, E>> match = transitionsFrom(currentState).stream().filter(this::canFire).findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
@@ -178,7 +162,7 @@ public class StateMachine<S, E> {
 			}
 		} else {
 			// find transition for current event
-			Optional<Transition> match = transitionsFrom(currentState).stream().filter(this::canFire).findFirst();
+			Optional<Transition<S, E>> match = transitionsFrom(currentState).stream().filter(this::canFire).findFirst();
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
@@ -191,7 +175,7 @@ public class StateMachine<S, E> {
 		}
 	}
 
-	private boolean canFire(Transition t) {
+	private boolean canFire(Transition<S, E> t) {
 		boolean guardOk = t.guard == null || t.guard.getAsBoolean();
 		if (t.timeout) {
 			return guardOk && state(t.from).isTerminated();
@@ -207,8 +191,8 @@ public class StateMachine<S, E> {
 		return !eventQ.isEmpty() && eventQ.peek().getClass().equals(eventType);
 	}
 
-	private void fireTransition(Transition t, E event) {
-		t.event = event;
+	private void fireTransition(Transition<S, E> t, E event) {
+		t.setEvent(event);
 		tracer.firingTransition(t);
 		if (currentState == t.to) {
 			// keep state: no exit/entry actions are executed
@@ -231,24 +215,10 @@ public class StateMachine<S, E> {
 		}
 	}
 
-	private List<Transition> transitionsFrom(S state) {
+	private List<Transition<S, E>> transitionsFrom(S state) {
 		if (!transitionsFromState.containsKey(state)) {
 			transitionsFromState.put(state, new ArrayList<>(3));
 		}
 		return transitionsFromState.get(state);
-	}
-
-	// Builder calls this
-
-	void addTransition(S from, S to, BooleanSupplier guard, Consumer<StateTransition<S, E>> action,
-			Class<? extends E> eventType, boolean timeout) {
-		Transition t = new Transition();
-		t.from = from;
-		t.to = to;
-		t.guard = guard;
-		t.action = action;
-		t.eventType = eventType;
-		t.timeout = timeout;
-		transitionsFrom(from).add(t);
 	}
 }
