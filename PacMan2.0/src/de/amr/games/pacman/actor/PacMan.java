@@ -6,6 +6,7 @@ import static de.amr.games.pacman.actor.PacMan.State.INITIAL;
 import static de.amr.games.pacman.actor.PacMan.State.NORMAL;
 import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.util.EnumMap;
 import java.util.Optional;
@@ -38,15 +39,14 @@ public class PacMan extends MazeMover<PacMan.State> {
 		sm = buildStateMachine();
 		eventMgr = new GameEventManager("[Pac-Man]");
 		environment = Environment.EMPTYNESS;
-		createSprites(2 * Spritesheet.TS);
-		currentSprite = s_walking[Top4.E];
+		createSprites(2*TS);
 	}
 
 	public void setEnvironment(Environment mazeLife) {
 		this.environment = mazeLife;
 	}
 
-	// Sprites
+	// Pac-Man look
 
 	private Sprite s_walking[] = new Sprite[4];
 	private Sprite s_dying;
@@ -57,6 +57,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		s_dying = Spritesheet.pacManDying().scale(size);
 		s_full = Spritesheet.pacManFull().scale(size);
 		TOPOLOGY.dirs().forEach(dir -> s_walking[dir] = Spritesheet.pacManWalking(dir).scale(size));
+		currentSprite = s_walking[Top4.E];
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		return currentSprite;
 	}
 
-	// state machine
+	// Pac-Man behavior
 
 	public enum State {
 		INITIAL, NORMAL, EMPOWERED, DYING
@@ -148,6 +149,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 	public void init() {
 		sm.init();
 	}
+	
+	// Pac-Man activities
 
 	private void walkAndInspectMaze() {
 		move();
