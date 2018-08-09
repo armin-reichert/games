@@ -120,27 +120,27 @@ public class GameController implements Controller {
 				
 				.when(READY).then(PLAYING).onTimeout()
 					
-				.when(PLAYING)
+				.stay(PLAYING)
 					.on(FoodFoundEvent.class)
 					.act(e -> playingState().onFoodFound(e))
 					
-				.when(PLAYING)
+				.stay(PLAYING)
 					.on(BonusFoundEvent.class)
 					.act(e -> playingState().onBonusFound(e))
 					
-				.when(PLAYING)
+				.stay(PLAYING)
 					.on(PacManGhostCollisionEvent.class)
 					.act(e -> playingState().onPacManGhostCollision(e))
 					
-				.when(PLAYING)
+				.stay(PLAYING)
 					.on(PacManGainsPowerEvent.class)
 					.act(e -> playingState().onPacManGainsPower(e))
 					
-				.when(PLAYING)
+				.stay(PLAYING)
 					.on(PacManGettingWeakerEvent.class)
 					.act(e -> playingState().onPacManGettingWeaker(e))
 					
-				.when(PLAYING)
+				.stay(PLAYING)
 					.on(PacManLostPowerEvent.class)
 					.act(e -> playingState().onPacManLostPower(e))
 			
