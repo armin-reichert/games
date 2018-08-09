@@ -4,16 +4,16 @@ import static de.amr.easy.util.StreamUtils.randomElement;
 
 import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.routing.Route;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.MazeRoute;
+import de.amr.games.pacman.routing.Navigation;
 
 /**
  * Clyde's behaviour.
  */
-class StayBehind implements RoutePlanner {
+class StayBehind implements Navigation<MazeMover<?>> {
 
 	@Override
-	public Route computeRoute(MazeMover<?> mover) {
+	public MazeRoute computeRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
 		result.dir = randomElement(Maze.TOPOLOGY.dirs().filter(dir -> dir != Maze.TOPOLOGY.inv(mover.getDir()))).getAsInt();
 		return result;

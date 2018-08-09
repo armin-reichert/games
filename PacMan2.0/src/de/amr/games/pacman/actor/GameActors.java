@@ -23,7 +23,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEventListener;
 import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.Navigation;
 
 public class GameActors {
 
@@ -35,7 +35,7 @@ public class GameActors {
 
 	public GameActors(Game game) {
 		this.game = game;
-		this.eventMgr = new GameEventManager("[GameActorEvents]");
+		eventMgr = new GameEventManager("[GameActors]");
 		pacMan = createPacMan();
 		blinky = createBlinky();
 		pinky = createPinky();
@@ -43,7 +43,7 @@ public class GameActors {
 		clyde = createClyde();
 	}
 
-	public void addEventHandler(GameEventListener observer) {
+	public void addGameEventListener(GameEventListener observer) {
 		eventMgr.subscribe(observer);
 	}
 
@@ -65,7 +65,7 @@ public class GameActors {
 
 	private PacMan createPacMan() {
 		PacMan pacMan = new PacMan(game, eventMgr);
-		RoutePlanner manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
+		Navigation manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
 		pacMan.setNavigation(PacMan.State.VULNERABLE, manual);
 		pacMan.setNavigation(PacMan.State.STEROIDS, manual);
 		return pacMan;

@@ -3,10 +3,10 @@ package de.amr.games.pacman.routing.impl;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.actor.MazeMover;
-import de.amr.games.pacman.routing.Route;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.MazeRoute;
+import de.amr.games.pacman.routing.Navigation;
 
-class FollowKeyboard implements RoutePlanner {
+class FollowKeyboard implements Navigation<MazeMover<?>> {
 
 	private final int[] nesw;
 
@@ -18,7 +18,7 @@ class FollowKeyboard implements RoutePlanner {
 	}
 
 	@Override
-	public Route computeRoute(MazeMover<?> mover) {
+	public MazeRoute computeRoute(MazeMover<?> mover) {
 		RouteData result = new RouteData();
 		result.dir = mover.getNextDir();
 		if (Keyboard.keyDown(nesw[0])) {

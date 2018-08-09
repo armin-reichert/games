@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.routing.Route;
+import de.amr.games.pacman.routing.MazeRoute;
 
-class RouteData implements Route {
+class RouteData implements MazeRoute {
 
 	int dir;
 	List<Tile> path = Collections.emptyList();

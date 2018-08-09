@@ -1,13 +1,13 @@
 package de.amr.games.pacman.routing.impl;
 
 import de.amr.games.pacman.actor.MazeMover;
-import de.amr.games.pacman.routing.Route;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.MazeRoute;
+import de.amr.games.pacman.routing.Navigation;
 
 /**
  * Chasing a refugee through the maze.
  */
-class Chase implements RoutePlanner {
+class Chase implements Navigation<MazeMover<?>> {
 
 	private final MazeMover<?> victim;
 
@@ -16,7 +16,7 @@ class Chase implements RoutePlanner {
 	}
 
 	@Override
-	public Route computeRoute(MazeMover<?> chaser) {
+	public MazeRoute computeRoute(MazeMover<?> chaser) {
 		RouteData route = new RouteData();
 		if (victim.isTeleporting()) {
 			route.dir = chaser.getNextDir();

@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.amr.games.pacman.model.Tile;
 
-public interface Route {
+public interface MazeRoute {
 
 	int getDirection();
 

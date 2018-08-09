@@ -62,7 +62,7 @@ public class GameController implements Controller {
 	public void init() {
 		sm = buildStateMachine();
 		sm.init();
-		actors.addEventHandler(sm::process);
+		actors.addGameEventListener(sm::process);
 		actors.getPacMan().setEnvironment(gameUI.mazeUI);
 		actors.setGhostActive(actors.getBlinky(), true);
 	}

@@ -1,13 +1,13 @@
 package de.amr.games.pacman.routing.impl;
 
 import de.amr.games.pacman.actor.MazeMover;
-import de.amr.games.pacman.routing.Route;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.MazeRoute;
+import de.amr.games.pacman.routing.Navigation;
 
-class GoHome implements RoutePlanner {
+class GoHome implements Navigation<MazeMover<?>> {
 
 	@Override
-	public Route computeRoute(MazeMover<?> mover) {
+	public MazeRoute computeRoute(MazeMover<?> mover) {
 		RouteData route = new RouteData();
 		route.path = mover.maze.findPath(mover.getTile(), mover.homeTile);
 		route.dir = mover.maze.alongPath(route.path).orElse(mover.getNextDir());

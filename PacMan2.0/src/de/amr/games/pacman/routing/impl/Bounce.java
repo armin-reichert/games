@@ -6,13 +6,13 @@ import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 
 import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.routing.Route;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.MazeRoute;
+import de.amr.games.pacman.routing.Navigation;
 
-class Bounce implements RoutePlanner {
+class Bounce implements Navigation<MazeMover<?>> {
 
 	@Override
-	public Route computeRoute(MazeMover<?> bouncer) {
+	public MazeRoute computeRoute(MazeMover<?> bouncer) {
 		RouteData route = new RouteData();
 		route.dir = isReflected(bouncer) ? TOPOLOGY.inv(bouncer.getDir()) : bouncer.getDir();
 		return route;

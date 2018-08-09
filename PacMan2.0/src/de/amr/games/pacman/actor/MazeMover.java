@@ -19,7 +19,7 @@ import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.Navigation;
 import de.amr.games.pacman.routing.impl.NavigationSystem;
 import de.amr.statemachine.StateMachine;
 
@@ -35,12 +35,12 @@ public abstract class MazeMover<S> extends GameEntity {
 	public final Maze maze;
 	public final Tile homeTile;
 	private final GameEventManager eventMgr;
-	private final Map<S, RoutePlanner> navigation;
+	private final Map<S, Navigation> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
 	private int nextDir;
 
-	protected MazeMover(Game game, GameEventManager eventMgr, Tile homeTile, Map<S, RoutePlanner> navigation) {
+	protected MazeMover(Game game, GameEventManager eventMgr, Tile homeTile, Map<S, Navigation> navigation) {
 		this.game = game;
 		this.eventMgr = eventMgr;
 		this.maze = game.maze;
@@ -101,11 +101,11 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// Movement
 
-	public void setNavigation(S state, RoutePlanner navigation) {
+	public void setNavigation(S state, Navigation navigation) {
 		this.navigation.put(state, navigation);
 	}
 
-	public RoutePlanner getNavigation() {
+	public Navigation getNavigation() {
 		return navigation.getOrDefault(getState(), NavigationSystem.forward());
 	}
 

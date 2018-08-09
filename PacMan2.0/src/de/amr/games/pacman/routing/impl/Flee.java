@@ -6,10 +6,10 @@ import java.util.List;
 import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.routing.Route;
-import de.amr.games.pacman.routing.RoutePlanner;
+import de.amr.games.pacman.routing.MazeRoute;
+import de.amr.games.pacman.routing.Navigation;
 
-class Flee implements RoutePlanner {
+class Flee implements Navigation<MazeMover<?>> {
 
 	private final MazeMover<?> chaser;
 
@@ -18,7 +18,7 @@ class Flee implements RoutePlanner {
 	}
 
 	@Override
-	public Route computeRoute(MazeMover<?> refugee) {
+	public MazeRoute computeRoute(MazeMover<?> refugee) {
 		Maze maze = refugee.maze;
 		List<Tile> corners = new ArrayList<>();
 		corners.add(new Tile(1, 1));
