@@ -93,7 +93,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		/*@formatter:off*/
 		return StateMachine.define(State.class, GameEvent.class)
 			 
-			.description(String.format("[%s]", getName()))
+			.description(String.format("[Ghost %s]", getName()))
 			.initialState(HOME)
 		
 			.states()
