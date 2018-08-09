@@ -20,22 +20,23 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.controller.event.core.GameEventListener;
-import de.amr.games.pacman.controller.event.core.GameEventManager;
+import de.amr.games.pacman.controller.event.core.EventManager;
+import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.core.Observer;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.routing.Navigation;
 
 public class GameActors {
 
 	private final Game game;
-	private final GameEventManager eventMgr;
+	private final EventManager<GameEvent> eventMgr;
 	private final PacMan pacMan;
 	private final Ghost blinky, pinky, inky, clyde;
 	private final Set<Ghost> activeGhosts = new HashSet<>();
 
 	public GameActors(Game game) {
 		this.game = game;
-		eventMgr = new GameEventManager("[GameActors]");
+		eventMgr = new EventManager<>("[GameActors]");
 		pacMan = createPacMan();
 		blinky = createBlinky();
 		pinky = createPinky();
@@ -43,7 +44,7 @@ public class GameActors {
 		clyde = createClyde();
 	}
 
-	public void addGameEventListener(GameEventListener observer) {
+	public void subscribe(Observer<GameEvent> observer) {
 		eventMgr.subscribe(observer);
 	}
 
@@ -65,14 +66,14 @@ public class GameActors {
 
 	private PacMan createPacMan() {
 		PacMan pacMan = new PacMan(game, eventMgr);
-		Navigation manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
+		Navigation<MazeMover<?>> manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
 		pacMan.setNavigation(PacMan.State.VULNERABLE, manual);
 		pacMan.setNavigation(PacMan.State.STEROIDS, manual);
 		return pacMan;
 	}
 
 	private Ghost createBlinky() {
-		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, eventMgr, game.maze.blinkyHome, RED_GHOST);
+		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, game.maze.blinkyHome, RED_GHOST);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -81,7 +82,7 @@ public class GameActors {
 	}
 
 	private Ghost createPinky() {
-		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, eventMgr, game.maze.pinkyHome, PINK_GHOST);
+		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, game.maze.pinkyHome, PINK_GHOST);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -90,7 +91,7 @@ public class GameActors {
 	}
 
 	private Ghost createInky() {
-		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, eventMgr, game.maze.inkyHome, TURQUOISE_GHOST);
+		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, game.maze.inkyHome, TURQUOISE_GHOST);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
@@ -99,7 +100,7 @@ public class GameActors {
 	}
 
 	private Ghost createClyde() {
-		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, eventMgr, game.maze.clydeHome, ORANGE_GHOST);
+		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, game.maze.clydeHome, ORANGE_GHOST);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		clyde.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
@@ -124,8 +125,8 @@ public class GameActors {
 		return activeGhosts.contains(ghost);
 	}
 
-	public void setGhostActive(Ghost ghost, boolean activate) {
-		if (activate) {
+	public void setGhostActive(Ghost ghost, boolean active) {
+		if (active) {
 			activeGhosts.add(ghost);
 			ghost.init();
 		} else {

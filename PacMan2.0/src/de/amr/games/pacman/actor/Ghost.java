@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.controller.event.core.GameEvent;
-import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
@@ -31,12 +30,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final GhostName name;
 	private final PacMan pacMan;
 
-	public Ghost(GhostName name, PacMan pacMan, Game game, GameEventManager eventMgr, Tile home, int color) {
-		super(game, eventMgr, home, new EnumMap<>(State.class));
+	public Ghost(GhostName name, PacMan pacMan, Game game, Tile home, int color) {
+		super(game, home, new EnumMap<>(State.class));
 		this.pacMan = pacMan;
 		this.name = name;
 		sm = buildStateMachine();
-		eventMgr = new GameEventManager(name.toString());
 		createSprites(color);
 		currentSprite = s_color[getDir()];
 	}

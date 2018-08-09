@@ -15,7 +15,6 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.GameEvent;
-import de.amr.games.pacman.controller.event.core.GameEventManager;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
@@ -24,8 +23,7 @@ import de.amr.games.pacman.routing.impl.NavigationSystem;
 import de.amr.statemachine.StateMachine;
 
 /**
- * @param <S>
- *          maze mover state type
+ * @param <S> maze mover state type
  */
 public abstract class MazeMover<S> extends GameEntity {
 
@@ -34,25 +32,17 @@ public abstract class MazeMover<S> extends GameEntity {
 	public final Game game;
 	public final Maze maze;
 	public final Tile homeTile;
-	private final GameEventManager eventMgr;
-	private final Map<S, Navigation> navigation;
+	private final Map<S, Navigation<MazeMover<?>>> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
 	private int nextDir;
 
-	protected MazeMover(Game game, GameEventManager eventMgr, Tile homeTile, Map<S, Navigation> navigation) {
+	protected MazeMover(Game game, Tile homeTile, Map<S, Navigation<MazeMover<?>>> navigation) {
 		this.game = game;
-		this.eventMgr = eventMgr;
 		this.maze = game.maze;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
 		this.fnSpeed = mover -> 0f;
-	}
-
-	// Eventing
-
-	protected void publish(GameEvent event) {
-		eventMgr.publish(event);
 	}
 
 	// State machine
@@ -101,11 +91,11 @@ public abstract class MazeMover<S> extends GameEntity {
 
 	// Movement
 
-	public void setNavigation(S state, Navigation navigation) {
+	public void setNavigation(S state, Navigation<MazeMover<?>> navigation) {
 		this.navigation.put(state, navigation);
 	}
 
-	public Navigation getNavigation() {
+	public Navigation<MazeMover<?>> getNavigation() {
 		return navigation.getOrDefault(getState(), NavigationSystem.forward());
 	}
 
