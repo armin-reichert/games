@@ -38,7 +38,6 @@ public class Ghost extends MazeMover<Ghost.State> {
 		this.initialDir = initialDir;
 		brain = buildStateMachine();
 		createSprites(color);
-		s_current = s_color[getDir()];
 	}
 
 	public GameActors.Name getName() {
@@ -51,6 +50,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		setNextDir(initialDir);
 		getSprites().forEach(Sprite::resetAnimation);
 		setSpeed(game::getGhostSpeed);
+		s_current = s_color[getDir()];
 	}
 
 	// Sprites

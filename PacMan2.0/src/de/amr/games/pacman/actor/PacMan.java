@@ -153,7 +153,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private void checkHealth() {
 		if (brain.stateTimeExpiredPct(50)) {
-			// TODO this can occur multiple times!
+			// TODO this can occur multiple times or getting missed!
 			events.publishEvent(new PacManGettingWeakerEvent());
 		}
 	}

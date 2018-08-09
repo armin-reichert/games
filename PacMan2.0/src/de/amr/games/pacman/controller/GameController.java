@@ -66,7 +66,7 @@ public class GameController implements Controller {
 	@Override
 	public void init() {
 		sm.init();
-		actors.setGhostActive(actors.getBlinky(), true);
+		actors.getGhosts().forEach(ghost -> actors.setGhostActive(ghost, true));
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class GameController implements Controller {
 		//@formatter:off
 		StateMachine.define(State.class, GameEvent.class)
 			
-			.description("[GameController]")
+			.description("[GameControl]")
 			.initialState(READY)
 			
 			.states()
