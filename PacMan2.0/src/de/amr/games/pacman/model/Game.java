@@ -154,7 +154,8 @@ public class Game {
 	}
 
 	public int getPacManSteroidTime() {
-		return sec((float) levelData(DataColumn.PacManSteroidSeconds));
+		int seconds = levelData(DataColumn.PacManSteroidSeconds); 
+		return sec(seconds);
 	}
 
 	public int getPacManDyingTime() {
@@ -162,7 +163,8 @@ public class Game {
 	}
 
 	public int getLevelChangingTime() {
-		return sec(4);
+		int numFlashes = levelData(DataColumn.NumFlashes);
+		return sec(numFlashes);
 	}
 
 	public int getReadyTime() {

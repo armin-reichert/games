@@ -130,7 +130,7 @@ public class Spritesheet {
 	}
 
 	public Sprite flashingMaze() {
-		return new Sprite(maze, mazeWhite).animate(AnimationType.CYCLIC, 100);
+		return new Sprite(maze, mazeWhite).animate(AnimationType.CYCLIC, 250);
 	}
 
 	public Sprite symbol(BonusSymbol symbol) {
