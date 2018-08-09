@@ -29,23 +29,29 @@ import de.amr.games.pacman.routing.Navigation;
 public class GameActors {
 
 	private final Game game;
-	private final EventManager<GameEvent> eventMgr;
 	private final PacMan pacMan;
 	private final Ghost blinky, pinky, inky, clyde;
 	private final Set<Ghost> activeGhosts = new HashSet<>();
+	private EventManager<GameEvent> eventMgr;
 
 	public GameActors(Game game) {
 		this.game = game;
-		eventMgr = new EventManager<>("[GameActors]");
 		pacMan = createPacMan();
 		blinky = createBlinky();
 		pinky = createPinky();
 		inky = createInky();
 		clyde = createClyde();
 	}
+	
+	public void setEventMgr(EventManager<GameEvent> eventMgr) {
+		this.eventMgr = eventMgr;
+		pacMan.setEventMgr(eventMgr);
+	}
 
 	public void subscribe(Observer<GameEvent> observer) {
-		eventMgr.subscribe(observer);
+		if (eventMgr != null) {
+			eventMgr.subscribe(observer);
+		}
 	}
 
 	public Ghost getBlinky() {
@@ -65,7 +71,7 @@ public class GameActors {
 	}
 
 	private PacMan createPacMan() {
-		PacMan pacMan = new PacMan(game, eventMgr);
+		PacMan pacMan = new PacMan(game);
 		Navigation<MazeMover<?>> manual = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
 		pacMan.setNavigation(PacMan.State.VULNERABLE, manual);
 		pacMan.setNavigation(PacMan.State.STEROIDS, manual);

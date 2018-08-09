@@ -32,15 +32,18 @@ import de.amr.statemachine.StateMachine;
 public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> sm;
-	private final EventManager<GameEvent> eventMgr;
+	private EventManager<GameEvent> eventMgr;
 	private Environment environment;
 
-	public PacMan(Game game, EventManager<GameEvent> eventMgr) {
+	public PacMan(Game game) {
 		super(game, game.maze.pacManHome, new EnumMap<>(State.class));
 		sm = buildStateMachine();
-		this.eventMgr = eventMgr;
 		environment = Environment.EMPTYNESS;
 		createSprites(2 * TS);
+	}
+	
+	public void setEventMgr(EventManager<GameEvent> eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 
 	public void setEnvironment(Environment mazeLife) {

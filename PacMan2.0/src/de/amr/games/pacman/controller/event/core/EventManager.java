@@ -23,7 +23,7 @@ public class EventManager<E> {
 	}
 
 	public void publish(E event) {
+		LOG.info(String.format("%s publishing event '%s'", description, event));
 		observers.forEach(observer -> observer.observe(event));
-		LOG.info(String.format("%s published event '%s'", description, event));
 	}
 }

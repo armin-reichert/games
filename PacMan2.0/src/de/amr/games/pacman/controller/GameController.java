@@ -19,6 +19,7 @@ import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
+import de.amr.games.pacman.controller.event.core.EventManager;
 import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.game.GameEvent;
@@ -62,6 +63,7 @@ public class GameController implements Controller {
 	public void init() {
 		sm = buildStateMachine();
 		sm.init();
+		actors.setEventMgr(new EventManager<>("[GameEventManager]"));
 		actors.subscribe(sm::process);
 		actors.getPacMan().setEnvironment(gameUI.mazeUI);
 		actors.setGhostActive(actors.getBlinky(), true);
