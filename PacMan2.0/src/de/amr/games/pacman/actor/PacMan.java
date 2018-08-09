@@ -46,8 +46,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 		this.eventMgr = eventMgr;
 	}
 
-	public void setEnvironment(Environment mazeLife) {
-		this.environment = mazeLife;
+	public void setEnvironment(Environment env) {
+		this.environment = env;
 	}
 
 	// Pac-Man look
@@ -61,12 +61,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 		TOPOLOGY.dirs().forEach(dir -> s_walking_to[dir] = SPRITES.pacManWalking(dir).scale(size));
 		s_dying = SPRITES.pacManDying().scale(size);
 		s_full = SPRITES.pacManFull().scale(size);
-		s_current = s_full;
 	}
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(Stream.of(s_walking_to), Stream.of(s_dying)).flatMap(s -> s);
+		return Stream.of(Stream.of(s_walking_to), Stream.of(s_dying, s_full)).flatMap(s -> s);
 	}
 
 	@Override
@@ -81,8 +80,21 @@ public class PacMan extends MazeMover<PacMan.State> {
 	};
 
 	@Override
+	public void init() {
+		sm.init();
+	}
+
+	@Override
 	public StateMachine<State, GameEvent> getStateMachine() {
 		return sm;
+	}
+
+	private void initState() {
+		setMazePosition(homeTile);
+		setNextDir(Top4.E);
+		setSpeed(game::getPacManSpeed);
+		getSprites().forEach(Sprite::resetAnimation);
+		s_current = s_full;
 	}
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
@@ -95,25 +107,17 @@ public class PacMan extends MazeMover<PacMan.State> {
 			.states()
 
 				.state(SAFE)
-						.onEntry(() -> {
-							setMazePosition(homeTile);
-							setNextDir(Top4.E);
-							setSpeed(game::getPacManSpeed);
-							getSprites().forEach(Sprite::resetAnimation);
-							s_current = s_full;
-						})
-						.timeout(() -> game.sec(0.1f))
+					.onEntry(this::initState)
+					.timeout(() -> game.sec(0.1f))
 
-				.state(VULNERABLE).onTick(this::walkAndInspectMaze)
+				.state(VULNERABLE).onTick(this::inspectMaze)
 					
 				.state(STEROIDS)
 						.onTick(() -> {
-							walkAndInspectMaze();
-							if (sm.getRemainingPct() == 20) { //TODO this can occur multiple times!
-								eventMgr.publish(new PacManGettingWeakerEvent());
-							}
+							inspectMaze();
+							checkHealth();
 						})
-						.timeout(game::getPacManEmpoweringTime)
+						.timeout(game::getPacManSteroidTime)
 
 				.state(DYING)
 						.onEntry(() -> s_current = s_dying)
@@ -127,9 +131,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	
 					.when(VULNERABLE).become(STEROIDS).on(PacManGainsPowerEvent.class)
 	
-					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(e -> sm.resetTimer())
+					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(() -> sm.resetTimer())
 	
-					.when(STEROIDS).become(VULNERABLE).onTimeout().act(e -> eventMgr.publish(new PacManLostPowerEvent()))
+					.when(STEROIDS).become(VULNERABLE).onTimeout().act(() -> eventMgr.publish(new PacManLostPowerEvent()))
 	
 					.when(DYING).onTimeout().act(e -> eventMgr.publish(new PacManDiedEvent()))
 
@@ -137,27 +141,28 @@ public class PacMan extends MazeMover<PacMan.State> {
 		/* @formatter:on */
 	}
 
-	@Override
-	public void init() {
-		sm.init();
-	}
-
 	// Pac-Man activities
-
+	
 	@Override
 	public void move() {
 		super.move();
 		s_current = s_walking_to[getDir()];
 	}
-
-	private void walkAndInspectMaze() {
-		move();
-		if (!isTeleporting()) {
-			inspectMaze();
+	
+	private void checkHealth() {
+		if (sm.getRemainingPct() == 20) {
+			//TODO this can occur multiple times!
+			eventMgr.publish(new PacManGettingWeakerEvent());
 		}
 	}
 
 	private void inspectMaze() {
+		
+		move();
+		if (isTeleporting()) {
+			return;
+		}
+		
 		// Ghost colliding?
 		/*@formatter:off*/
 		Optional<Ghost> collidingGhost = environment.activeGhosts()

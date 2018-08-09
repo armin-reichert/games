@@ -131,7 +131,7 @@ public class Game {
 		}
 	}
 
-	public int getPacManEmpoweringTime() {
+	public int getPacManSteroidTime() {
 		return sec(10);
 	}
 

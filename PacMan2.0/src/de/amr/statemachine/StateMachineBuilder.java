@@ -183,6 +183,14 @@ public class StateMachineBuilder<S, E> {
 			this.action = action;
 			return this;
 		}
+		
+		public TransitionBuilder act(Runnable action) {
+			if (action == null) {
+				throw new IllegalArgumentException("Transition action must not be NULL");
+			}
+			this.action = e -> action.run();
+			return this;
+		}
 
 		private TransitionBuilder commit() {
 			sm.addTransition(from, to, guard, action, eventType, timeout);
