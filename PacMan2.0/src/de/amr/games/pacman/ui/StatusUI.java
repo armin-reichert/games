@@ -33,7 +33,7 @@ public class StatusUI extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
-		for (int i = 0; i < gameState.lives; ++i) {
+		for (int i = 0; i < gameState.livesRemaining; ++i) {
 			g.translate(i * s_pacMan.getWidth(), 0);
 			s_pacMan.draw(g);
 			g.translate(-i * s_pacMan.getWidth(), 0);

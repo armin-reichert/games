@@ -88,7 +88,7 @@ public class Game {
 	}
 
 	public int getGhostValue() {
-		return GHOST_POINTS[ghostIndex];
+		return GHOST_POINTS[ghostsKilledInSeries];
 	}
 
 	public float getGhostSpeed(MazeMover<Ghost.State> ghost) {
@@ -150,11 +150,11 @@ public class Game {
 	public final IntSupplier fnTicksPerSecond;
 	public final Maze maze;
 	public int level;
-	public int lives;
+	public int livesRemaining;
 	public int score;
 	public long foodTotal;
 	public int foodEaten;
-	public int ghostIndex;
+	public int ghostsKilledInSeries;
 
 	private float baseSpeed;
 
@@ -168,9 +168,9 @@ public class Game {
 		maze.resetFood();
 		foodTotal = maze.getFoodCount();
 		level = 1;
-		lives = 3;
+		livesRemaining = 3;
 		score = 0;
 		foodEaten = 0;
-		ghostIndex = 0;
+		ghostsKilledInSeries = 0;
 	}
 }

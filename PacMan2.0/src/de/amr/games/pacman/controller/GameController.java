@@ -163,11 +163,11 @@ public class GameController implements Controller {
 					
 				.when(PACMAN_DYING).then(GAME_OVER)
 					.on(PacManDiedEvent.class)
-					.condition(() -> game.lives == 0)
+					.condition(() -> game.livesRemaining == 0)
 					
 				.when(PACMAN_DYING).then(PLAYING)
 					.on(PacManDiedEvent.class)
-					.condition(() -> game.lives > 0)
+					.condition(() -> game.livesRemaining > 0)
 					.act(() -> actors.init())
 			
 				.when(GAME_OVER).then(READY)
@@ -262,7 +262,7 @@ public class GameController implements Controller {
 			int oldGameScore = game.score;
 			game.score += game.getFoodValue(e.food);
 			if (oldGameScore < Game.EXTRALIFE_SCORE && game.score >= Game.EXTRALIFE_SCORE) {
-				game.lives += 1;
+				game.livesRemaining += 1;
 			}
 			if (game.foodEaten == game.foodTotal) {
 				sm.enqueue(new LevelCompletedEvent());
@@ -272,7 +272,7 @@ public class GameController implements Controller {
 				gameUI.mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
 			}
 			if (e.food == Content.ENERGIZER) {
-				game.ghostIndex = 0;
+				game.ghostsKilledInSeries = 0;
 				sm.enqueue(new PacManGainsPowerEvent());
 			}
 		}
@@ -301,7 +301,7 @@ public class GameController implements Controller {
 		private void nextLevel() {
 			game.level += 1;
 			game.foodEaten = 0;
-			game.ghostIndex = 0;
+			game.ghostsKilledInSeries = 0;
 			game.maze.resetFood();
 			actors.init();
 		}
@@ -312,6 +312,7 @@ public class GameController implements Controller {
 		@Override
 		public void onEntry() {
 			actors.getPacMan().visibility = () -> false;
+			game.score += game.getGhostValue();
 		}
 
 		@Override
@@ -321,6 +322,7 @@ public class GameController implements Controller {
 
 		@Override
 		public void onExit() {
+			game.ghostsKilledInSeries += 1;
 			actors.getPacMan().visibility = () -> true;
 		}
 	}
@@ -329,7 +331,7 @@ public class GameController implements Controller {
 
 		@Override
 		public void onEntry() {
-			game.lives -= 1;
+			game.livesRemaining -= 1;
 			actors.getActiveGhosts().forEach(ghost -> ghost.visibility = () -> false);
 			gameUI.mazeUI.init();
 		}

@@ -8,6 +8,7 @@ import static de.amr.games.pacman.actor.Ghost.State.HOME;
 import static de.amr.games.pacman.actor.Ghost.State.SAFE;
 import static de.amr.games.pacman.actor.Ghost.State.SCATTERING;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
+import static de.amr.games.pacman.ui.GameUI.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.util.EnumMap;
@@ -21,7 +22,6 @@ import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
-import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
@@ -38,16 +38,24 @@ public class Ghost extends MazeMover<Ghost.State> {
 		this.initialDir = initialDir;
 		sm = buildStateMachine();
 		createSprites(color);
-		currentSprite = s_color[getDir()];
+		s_current = s_color[getDir()];
 	}
 
 	public GameActors.Name getName() {
 		return name;
 	}
 
+	private void initGhost() {
+		placeAt(homeTile);
+		setDir(initialDir);
+		setNextDir(initialDir);
+		getSprites().forEach(Sprite::resetAnimation);
+		setSpeed(game::getGhostSpeed);
+	}
+
 	// Sprites
 
-	private Sprite currentSprite;
+	private Sprite s_current;
 	private Sprite s_color[] = new Sprite[4];
 	private Sprite s_eyes[] = new Sprite[4];
 	private Sprite s_awed;
@@ -57,14 +65,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void createSprites(int color) {
 		int size = 2 * TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_color[dir] = GameUI.SPRITES.ghostColored(color, dir).scale(size);
-			s_eyes[dir] = GameUI.SPRITES.ghostEyes(dir).scale(size);
+			s_color[dir] = SPRITES.ghostColored(color, dir).scale(size);
+			s_eyes[dir] = SPRITES.ghostEyes(dir).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_numbers[i] = GameUI.SPRITES.greenNumber(i).scale(size);
+			s_numbers[i] = SPRITES.greenNumber(i).scale(size);
 		}
-		s_awed = GameUI.SPRITES.ghostAwed().scale(size);
-		s_blinking = GameUI.SPRITES.ghostBlinking().scale(size);
+		s_awed = SPRITES.ghostAwed().scale(size);
+		s_blinking = SPRITES.ghostBlinking().scale(size);
 	}
 
 	@Override
@@ -75,7 +83,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public Sprite currentSprite() {
-		return currentSprite;
+		return s_current;
 	}
 
 	// State machine
@@ -90,107 +98,67 @@ public class Ghost extends MazeMover<Ghost.State> {
 	}
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
+		return
 		/*@formatter:off*/
-		return StateMachine.define(State.class, GameEvent.class)
+		StateMachine.define(State.class, GameEvent.class)
 			 
 			.description(String.format("[Ghost %s]", getName()))
 			.initialState(HOME)
 		
 			.states()
 
-				.state(HOME)
-					.onEntry(() -> {
-						placeAt(homeTile);
-						setDir(initialDir);
-						setNextDir(initialDir);
-						getSprites().forEach(Sprite::resetAnimation);
-						setSpeed(game::getGhostSpeed);
-					})
-				
-				.state(AFRAID)
-					.onEntry(() -> currentSprite = s_awed)
-					.onTick(() -> move())
-				
-				.state(AGGRO)
-					.onTick(() -> {
-						move();
-						currentSprite = s_color[getDir()];
-					})
-				
-				.state(DEAD)
-					.onEntry(() -> currentSprite = s_eyes[getDir()])
-					.onTick(() -> {
-						move();
-						currentSprite = s_eyes[getDir()];
-					})
-				
-				.state(DYING)
-					.onEntry(() -> {
-						currentSprite = s_numbers[game.ghostIndex];
-						game.score += game.getGhostValue();
-						game.ghostIndex += 1;
-					})
-					.timeoutAfter(game::getGhostDyingTime)
-				
-				.state(SAFE)
-					.timeoutAfter(() -> game.sec(2))
-					.onTick(() -> {
-						move();
-						currentSprite = s_color[getDir()];
-					})
-				
-				.state(SCATTERING) //TODO
+					.state(HOME)
+						.onEntry(this::initGhost)
+					
+					.state(AFRAID)
+						.onTick(() -> { move(); s_current = s_awed; })
+					
+					.state(AGGRO)
+						.onTick(() -> {	move();	s_current = s_color[getDir()]; })
+					
+					.state(DEAD)
+						.onTick(() -> {	move();	s_current = s_eyes[getDir()]; })
+					
+					.state(DYING)
+						.onEntry(() -> s_current = s_numbers[game.ghostsKilledInSeries] )
+						.timeoutAfter(game::getGhostDyingTime)
+					
+					.state(SAFE)
+						.onTick(() -> {	move();	s_current = s_color[getDir()]; })
+						.timeoutAfter(() -> game.sec(2))
+					
+					.state(SCATTERING) //TODO
 				
 			.transitions()
-				
-				.when(HOME).then(SAFE)
 
-				.when(SAFE).then(AGGRO)
-					.onTimeout()
-					.condition(() -> pacMan.getState() != PacMan.State.STEROIDS)
-				
-				.when(SAFE).then(AFRAID)
-					.onTimeout()
-					.condition(() -> pacMan.getState() == PacMan.State.STEROIDS)
-				
-				.when(SAFE)
-					.on(PacManGainsPowerEvent.class)
-					
-				.when(SAFE)
-					.on(PacManGettingWeakerEvent.class)
-				
-				.when(SAFE)
-					.on(PacManLostPowerEvent.class)
-					
-				.when(AGGRO).then(AFRAID)
-					.on(PacManGainsPowerEvent.class)
-					
-				.when(AFRAID)
-					.on(PacManGettingWeakerEvent.class)
-					.act(e -> currentSprite = s_blinking)
+					.when(HOME).then(SAFE)
 
-				.when(AFRAID)
-					.on(PacManGainsPowerEvent.class)
-					
-				.when(AFRAID).then(AGGRO)
-					.on(PacManLostPowerEvent.class)
-					
-				.when(AFRAID).then(DYING)
-					.on(GhostKilledEvent.class)
-					
-				.when(DYING).then(DEAD)
-					.onTimeout()
-					
-				.when(DEAD)
-					.on(PacManGettingWeakerEvent.class)
-		
-				.when(DEAD)
-					.on(PacManLostPowerEvent.class)
+					.when(SAFE)
+						.onTimeout().condition(() -> pacMan.getState() != PacMan.State.STEROIDS)
+						.then(AGGRO)
+						
+					.when(SAFE)
+						.onTimeout().condition(() -> pacMan.getState() == PacMan.State.STEROIDS)
+						.then(AFRAID)
+						
+					.stay(SAFE).on(PacManGainsPowerEvent.class)
+					.stay(SAFE).on(PacManGettingWeakerEvent.class)
+					.stay(SAFE).on(PacManLostPowerEvent.class)
+						
+					.when(AGGRO).on(PacManGainsPowerEvent.class).then(AFRAID)
+						
+					.stay(AFRAID).on(PacManGettingWeakerEvent.class).act(e -> s_current = s_blinking)
+					.stay(AFRAID).on(PacManGainsPowerEvent.class)
+					.when(AFRAID).on(PacManLostPowerEvent.class).then(AGGRO)
+					.when(AFRAID).on(GhostKilledEvent.class).then(DYING)
+						
+					.when(DYING).then(DEAD).onTimeout()
+						
+					.stay(DEAD).on(PacManGettingWeakerEvent.class)
+					.stay(DEAD).on(PacManLostPowerEvent.class)
+					.when(DEAD).condition(() -> getTile().equals(homeTile)).then(SAFE)
 
-				.when(DEAD).then(SAFE)
-					.condition(() -> getTile().equals(homeTile))
-		
-			.endStateMachine();
+		.endStateMachine();
 		/*@formatter:on*/
 	}
 }

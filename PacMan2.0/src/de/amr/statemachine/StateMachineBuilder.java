@@ -132,6 +132,10 @@ public class StateMachineBuilder<S, E> {
 			action = null;
 		}
 
+		public TransitionBuilder stay(S state) {
+			return when(state);
+		}
+
 		public TransitionBuilder when(S from) {
 			if (from == null) {
 				throw new IllegalArgumentException("Transition source state must not be NULL");
@@ -143,7 +147,7 @@ public class StateMachineBuilder<S, E> {
 			this.from = this.to = from;
 			return this;
 		}
-
+		
 		public TransitionBuilder then(S to) {
 			if (to == null) {
 				throw new IllegalArgumentException("Transition target state must not be NULL");
