@@ -25,6 +25,7 @@ import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
 import de.amr.games.pacman.controller.event.game.PacManGhostCollisionEvent;
 import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
 import de.amr.statemachine.StateMachine;
@@ -33,12 +34,13 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> sm;
 	private EventManager<GameEvent> events;
-	private Environment environment;
+	private Environment env;
+	private int pauseTicks;
 
 	public PacMan(Game game) {
 		super(game, game.maze.pacManHome, new EnumMap<>(State.class));
 		sm = buildStateMachine();
-		environment = Environment.EMPTYNESS;
+		env = Environment.EMPTYNESS;
 		createSprites(2 * TS);
 	}
 
@@ -47,7 +49,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	public void setEnvironment(Environment env) {
-		this.environment = env;
+		this.env = env;
 	}
 
 	// Pac-Man look
@@ -95,6 +97,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		setSpeed(game::getPacManSpeed);
 		getSprites().forEach(Sprite::resetAnimation);
 		s_current = s_full;
+		pauseTicks = 0;
 	}
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
@@ -124,7 +127,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 			.transitions()
 
 					.when(SAFE).then(VULNERABLE).onTimeout()
-
+					
 					.when(VULNERABLE).then(DYING).on(PacManKilledEvent.class)
 	
 					.when(VULNERABLE).then(STEROIDS).on(PacManGainsPowerEvent.class)
@@ -155,16 +158,19 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private void inspectMaze() {
-
+		if (pauseTicks > 0) {
+			--pauseTicks;
+			return;
+		}
 		move();
 		if (isOutsideMaze()) {
 			return;
 		}
 
-		// Ghost colliding?
+		// Ghost collision?
+		Optional<Ghost> collidingGhost = env.activeGhosts()
 		/*@formatter:off*/
-		Optional<Ghost> collidingGhost = environment.activeGhosts()
-				.filter(this::collidesWith)
+				.filter(ghost -> ghost.getTile().equals(getTile()))
 				.filter(ghost -> ghost.getState() != Ghost.State.DEAD)
 				.filter(ghost -> ghost.getState() != Ghost.State.DYING)
 				.filter(ghost -> ghost.getState() != Ghost.State.SAFE)
@@ -176,7 +182,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 
 		// Bonus discovered?
-		Optional<Bonus> activeBonus = environment.activeBonus().filter(this::collidesWith);
+		Optional<Bonus> activeBonus = env.activeBonus().filter(bonus -> bonus.getTile().equals(getTile()));
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
 			events.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
@@ -187,6 +193,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
+			pauseTicks = (content == Content.PELLET ? 1 : 3);
 			events.publish(new FoodFoundEvent(tile, content));
 		}
 	}
