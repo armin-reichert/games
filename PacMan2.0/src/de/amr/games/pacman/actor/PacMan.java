@@ -148,7 +148,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private void checkHealth() {
-		if (sm.getRemainingPct() == 20) {
+		if (sm.inStateForPct(70)) {
 			// TODO this can occur multiple times!
 			events.publish(new PacManGettingWeakerEvent());
 		}
