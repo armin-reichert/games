@@ -91,7 +91,7 @@ public class GameController implements Controller {
 		StateMachine.define(State.class, GameEvent.class)
 			
 			.description("[GameController]")
-			.initialState(State.READY)
+			.initialState(READY)
 			
 			.states()
 			
@@ -144,7 +144,7 @@ public class GameController implements Controller {
 					.on(PacManLostPowerEvent.class)
 					.act(e -> playingState().onPacManLostPower(e))
 			
-				.when(PLAYING).then( GHOST_DYING)
+				.when(PLAYING).then(GHOST_DYING)
 					.on(GhostKilledEvent.class)
 					.act(e -> playingState().onGhostKilled(e))
 					
@@ -163,15 +163,15 @@ public class GameController implements Controller {
 					
 				.when(PACMAN_DYING).then(GAME_OVER)
 					.on(PacManDiedEvent.class)
-					.inCase(() -> game.lives == 0)
+					.condition(() -> game.lives == 0)
 					
 				.when(PACMAN_DYING).then(PLAYING)
 					.on(PacManDiedEvent.class)
-					.inCase(() -> game.lives > 0)
+					.condition(() -> game.lives > 0)
 					.act(() -> actors.init())
 			
 				.when(GAME_OVER).then(READY)
-					.inCase(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+					.condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 							
 		.endStateMachine();
 		//@formatter:on

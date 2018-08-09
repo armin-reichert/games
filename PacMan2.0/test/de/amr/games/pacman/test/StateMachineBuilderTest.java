@@ -33,7 +33,7 @@ public class StateMachineBuilderTest {
 				.when("A").then("B").on(EventX.class).act(t -> {
 					System.out.println("Action");
 				})
-				.when("B").inCase(() -> 10 > 9)
+				.when("B").condition(() -> 10 > 9)
 			.endStateMachine();
 		/*@formatter:on*/
 
