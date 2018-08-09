@@ -97,18 +97,18 @@ public class GameController implements Controller {
 			
 				.state(READY)
 					.impl(new ReadyState())
-					.timeout(game::getReadyTime)
+					.timeoutAfter(game::getReadyTime)
 				
 				.state(PLAYING)
 					.impl(new PlayingState())
 				
 				.state(CHANGING_LEVEL)
 					.impl(new ChangingLevelState())
-					.timeout(game::getLevelChangingTime)
+					.timeoutAfter(game::getLevelChangingTime)
 				
 				.state(GHOST_DYING)
 					.impl(new GhostDyingState())
-					.timeout(game::getGhostDyingTime)
+					.timeoutAfter(game::getGhostDyingTime)
 				
 				.state(PACMAN_DYING)
 					.impl(new PacManDyingState())

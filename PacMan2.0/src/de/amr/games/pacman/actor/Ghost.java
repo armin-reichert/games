@@ -130,10 +130,10 @@ public class Ghost extends MazeMover<Ghost.State> {
 						game.score += game.getGhostValue();
 						game.ghostIndex += 1;
 					})
-					.timeout(game::getGhostDyingTime)
+					.timeoutAfter(game::getGhostDyingTime)
 				
 				.state(SAFE)
-					.timeout(() -> game.sec(2))
+					.timeoutAfter(() -> game.sec(2))
 					.onTick(() -> {
 						move();
 						currentSprite = s_color[getDir()];

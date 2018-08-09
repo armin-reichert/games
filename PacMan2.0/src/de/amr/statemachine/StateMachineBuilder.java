@@ -73,7 +73,7 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public StateBuilder timeout(IntSupplier fnDuration) {
+		public StateBuilder timeoutAfter(IntSupplier fnDuration) {
 			if (fnDuration == null) {
 				throw new IllegalStateException("Timer function cannot be null for state " + state);
 			}
