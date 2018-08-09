@@ -32,24 +32,24 @@ import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
-	private final StateMachine<State, GameEvent> sm;
+	private final StateMachine<State, GameEvent> brain;
 	private EventManager<GameEvent> events;
-	private Environment env;
+	private MazeWorld world;
 	private int pauseTicks;
 
 	public PacMan(Game game) {
 		super(game, game.maze.pacManHome, new EnumMap<>(State.class));
-		sm = buildStateMachine();
-		env = Environment.EMPTYNESS;
+		brain = buildStateMachine();
+		world = MazeWorld.EMPTY_WORLD;
 		createSprites(2 * TS);
 	}
 
-	public void setEventMgr(EventManager<GameEvent> events) {
+	public void setEventManager(EventManager<GameEvent> events) {
 		this.events = events;
 	}
 
-	public void setEnvironment(Environment env) {
-		this.env = env;
+	public void setMazeWorld(MazeWorld world) {
+		this.world = world;
 	}
 
 	// Pac-Man look
@@ -83,15 +83,15 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	@Override
 	public void init() {
-		sm.init();
+		brain.init();
 	}
 
 	@Override
 	public StateMachine<State, GameEvent> getStateMachine() {
-		return sm;
+		return brain;
 	}
 
-	private void initState() {
+	private void initPacMan() {
 		placeAt(homeTile);
 		setNextDir(Top4.E);
 		setSpeed(game::getPacManSpeed);
@@ -101,8 +101,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
+		return
 		/* @formatter:off */
-		return StateMachine.define(State.class, GameEvent.class)
+		StateMachine.define(State.class, GameEvent.class)
 				
 			.description("[Pac-Man]")
 			.initialState(SAFE)
@@ -110,8 +111,8 @@ public class PacMan extends MazeMover<PacMan.State> {
 			.states()
 
 				.state(SAFE)
-					.onEntry(this::initState)
-					.timeoutAfter(() -> game.sec(0.1f))
+					.onEntry(this::initPacMan)
+					.timeoutAfter(() -> game.sec(0.25f))
 
 				.state(VULNERABLE)
 					.onTick(this::inspectMaze)
@@ -132,7 +133,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	
 					.when(VULNERABLE).then(STEROIDS).on(PacManGainsPowerEvent.class)
 	
-					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(() -> sm.resetTimer())
+					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(() -> brain.resetTimer())
 	
 					.when(STEROIDS).then(VULNERABLE).onTimeout().act(() -> events.publishEvent(new PacManLostPowerEvent()))
 	
@@ -151,7 +152,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private void checkHealth() {
-		if (sm.stateTimeExpiredPct(70)) {
+		if (brain.stateTimeExpiredPct(50)) {
 			// TODO this can occur multiple times!
 			events.publishEvent(new PacManGettingWeakerEvent());
 		}
@@ -168,7 +169,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 
 		// Ghost collision?
-		Optional<Ghost> collidingGhost = env.activeGhosts()
+		Optional<Ghost> collidingGhost = world.activeGhosts()
 		/*@formatter:off*/
 				.filter(ghost -> ghost.getTile().equals(getTile()))
 				.filter(ghost -> ghost.getState() != Ghost.State.DEAD)
@@ -182,7 +183,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 
 		// Bonus discovered?
-		Optional<Bonus> activeBonus = env.activeBonus().filter(bonus -> bonus.getTile().equals(getTile()));
+		Optional<Bonus> activeBonus = world.activeBonus().filter(bonus -> bonus.getTile().equals(getTile()));
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
 			events.publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));

@@ -55,7 +55,7 @@ public class GameController implements Controller {
 		gameUI = new EnhancedGameUI(new GameUI(settings.width, settings.height, game, actors));
 		sm = buildStateMachine();
 		actors.addObserver(sm::process);
-		actors.getPacMan().setEnvironment(gameUI.mazeUI);
+		actors.getPacMan().setMazeWorld(gameUI.mazeUI);
 	}
 
 	@Override

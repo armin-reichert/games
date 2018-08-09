@@ -42,7 +42,7 @@ public class GameActors {
 		Navigation<MazeMover<?>> keySteering = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
 		pacMan.setNavigation(PacMan.State.VULNERABLE, keySteering);
 		pacMan.setNavigation(PacMan.State.STEROIDS, keySteering);
-		pacMan.setEventMgr(eventMgr);
+		pacMan.setEventManager(eventMgr);
 		return pacMan;
 	}
 

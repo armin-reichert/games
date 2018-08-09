@@ -3,9 +3,9 @@ package de.amr.games.pacman.actor;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface Environment {
+public interface MazeWorld {
 
-	static Environment EMPTYNESS = new Environment() {
+	static MazeWorld EMPTY_WORLD = new MazeWorld() {
 
 		@Override
 		public Stream<Ghost> activeGhosts() {

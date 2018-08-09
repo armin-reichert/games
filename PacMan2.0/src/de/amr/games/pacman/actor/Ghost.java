@@ -26,7 +26,7 @@ import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
-	private final StateMachine<State, GameEvent> sm;
+	private final StateMachine<State, GameEvent> brain;
 	private final GameActors.Name name;
 	private final PacMan pacMan;
 	private final int initialDir;
@@ -36,7 +36,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		this.pacMan = pacMan;
 		this.name = name;
 		this.initialDir = initialDir;
-		sm = buildStateMachine();
+		brain = buildStateMachine();
 		createSprites(color);
 		s_current = s_color[getDir()];
 	}
@@ -94,7 +94,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	@Override
 	public StateMachine<State, GameEvent> getStateMachine() {
-		return sm;
+		return brain;
 	}
 
 	private StateMachine<State, GameEvent> buildStateMachine() {
@@ -111,7 +111,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 						.onEntry(this::initGhost)
 					
 					.state(AFRAID)
-						.onTick(() -> { move(); s_current = s_awed; })
+						.onEntry(() -> s_current = s_awed)
+						.onTick(() -> move())
 					
 					.state(AGGRO)
 						.onTick(() -> {	move();	s_current = s_color[getDir()]; })

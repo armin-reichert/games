@@ -13,14 +13,14 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.Energizer;
-import de.amr.games.pacman.actor.Environment;
+import de.amr.games.pacman.actor.MazeWorld;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.Pellet;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-public class MazeUI extends GameEntity implements Environment {
+public class MazeUI extends GameEntity implements MazeWorld {
 
 	private final Maze maze;
 	private final GameActors actors;
