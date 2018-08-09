@@ -144,7 +144,7 @@ public class StateMachineBuilder<S, E> {
 			return this;
 		}
 
-		public TransitionBuilder become(S to) {
+		public TransitionBuilder then(S to) {
 			if (to == null) {
 				throw new IllegalArgumentException("Transition target state must not be NULL");
 			}

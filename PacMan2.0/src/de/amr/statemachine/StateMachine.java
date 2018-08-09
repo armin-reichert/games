@@ -271,7 +271,7 @@ public class StateMachine<S, E> {
 			if (match.isPresent()) {
 				fireTransition(match.get(), event);
 			} else {
-				tracer.ignoredEvent(event);
+				tracer.unhandledEvent(event);
 				throw new IllegalStateException(
 						String.format("%s: No transition defined in state '%s' for event '%s'", description, currentState, event));
 			}

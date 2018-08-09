@@ -26,8 +26,8 @@ public class StateMachineTracer<S> {
 		log.info(String.format("%s created state '%s'", sm.getDescription(), state));
 	}
 
-	public void ignoredEvent(Object event) {
-		log.info(String.format("%s in state %s ignored '%s' (no matching transition).", sm.getDescription(),
+	public void unhandledEvent(Object event) {
+		log.info(String.format("%s in state %s could not handle '%s'", sm.getDescription(),
 				sm.currentState(), event));
 	}
 

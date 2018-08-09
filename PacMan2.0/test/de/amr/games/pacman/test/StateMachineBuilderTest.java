@@ -30,7 +30,7 @@ public class StateMachineBuilderTest {
 				.state("B").impl(new StateB())
 				.state("C")
 			.transitions()
-				.when("A").become("B").on(EventX.class).act(t -> {
+				.when("A").then("B").on(EventX.class).act(t -> {
 					System.out.println("Action");
 				})
 				.when("B").inCase(() -> 10 > 9)

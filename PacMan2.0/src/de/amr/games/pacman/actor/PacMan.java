@@ -125,15 +125,15 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 			.transitions()
 
-					.when(SAFE).become(VULNERABLE).onTimeout()
+					.when(SAFE).then(VULNERABLE).onTimeout()
 
-					.when(VULNERABLE).become(DYING).on(PacManKilledEvent.class)
+					.when(VULNERABLE).then(DYING).on(PacManKilledEvent.class)
 	
-					.when(VULNERABLE).become(STEROIDS).on(PacManGainsPowerEvent.class)
+					.when(VULNERABLE).then(STEROIDS).on(PacManGainsPowerEvent.class)
 	
 					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(() -> sm.resetTimer())
 	
-					.when(STEROIDS).become(VULNERABLE).onTimeout().act(() -> eventMgr.publish(new PacManLostPowerEvent()))
+					.when(STEROIDS).then(VULNERABLE).onTimeout().act(() -> eventMgr.publish(new PacManLostPowerEvent()))
 	
 					.when(DYING).onTimeout().act(e -> eventMgr.publish(new PacManDiedEvent()))
 

@@ -143,13 +143,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 				
 			.transitions()
 				
-				.when(HOME).become(SAFE)
+				.when(HOME).then(SAFE)
 
-				.when(SAFE).become(AGGRO)
+				.when(SAFE).then(AGGRO)
 					.onTimeout()
 					.inCase(() -> pacMan.getState() != PacMan.State.STEROIDS)
 				
-				.when(SAFE).become(AFRAID)
+				.when(SAFE).then(AFRAID)
 					.onTimeout()
 					.inCase(() -> pacMan.getState() == PacMan.State.STEROIDS)
 				
@@ -162,7 +162,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.when(SAFE)
 					.on(PacManLostPowerEvent.class)
 					
-				.when(AGGRO).become(AFRAID)
+				.when(AGGRO).then(AFRAID)
 					.on(PacManGainsPowerEvent.class)
 					
 				.when(AFRAID)
@@ -172,19 +172,22 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.when(AFRAID)
 					.on(PacManGainsPowerEvent.class)
 					
-				.when(AFRAID).become(AGGRO)
+				.when(AFRAID).then(AGGRO)
 					.on(PacManLostPowerEvent.class)
 					
-				.when(AFRAID).become(DYING)
+				.when(AFRAID).then(DYING)
 					.on(GhostKilledEvent.class)
 					
-				.when(DYING).become(DEAD)
+				.when(DYING).then(DEAD)
 					.onTimeout()
 					
 				.when(DEAD)
 					.on(PacManGettingWeakerEvent.class)
 		
-				.when(DEAD).become(SAFE)
+				.when(DEAD)
+					.on(PacManLostPowerEvent.class)
+
+				.when(DEAD).then(SAFE)
 					.inCase(() -> getTile().equals(homeTile))
 		
 			.endStateMachine();

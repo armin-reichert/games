@@ -20,7 +20,6 @@ import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
-import de.amr.games.pacman.controller.event.core.EventManager;
 import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
 import de.amr.games.pacman.controller.event.game.FoodFoundEvent;
 import de.amr.games.pacman.controller.event.game.GameEvent;
@@ -34,6 +33,7 @@ import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.ui.EnhancedGameUI;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
@@ -52,8 +52,10 @@ public class GameController implements Controller {
 	public GameController(Game game, AppSettings settings) {
 		this.game = game;
 		actors = new GameActors(game);
-		gameUI = new GameUI(settings.width, settings.height, game, actors);
+		gameUI = new EnhancedGameUI(new GameUI(settings.width, settings.height, game, actors));
 		sm = buildStateMachine();
+		actors.subscribeActorEvents(sm::process);
+		actors.getPacMan().setEnvironment(gameUI.mazeUI);
 	}
 
 	@Override
@@ -64,9 +66,6 @@ public class GameController implements Controller {
 	@Override
 	public void init() {
 		sm.init();
-		actors.setEventMgr(new EventManager<>("[GameEventManager]"));
-		actors.subscribe(sm::process);
-		actors.getPacMan().setEnvironment(gameUI.mazeUI);
 		actors.setGhostActive(actors.getBlinky(), true);
 	}
 
@@ -119,7 +118,7 @@ public class GameController implements Controller {
 	
 			.transitions()
 				
-				.when(READY).become(PLAYING).onTimeout()
+				.when(READY).then(PLAYING).onTimeout()
 					
 				.when(PLAYING)
 					.on(FoodFoundEvent.class)
@@ -145,33 +144,33 @@ public class GameController implements Controller {
 					.on(PacManLostPowerEvent.class)
 					.act(e -> playingState().onPacManLostPower(e))
 			
-				.when(PLAYING).become( GHOST_DYING)
+				.when(PLAYING).then( GHOST_DYING)
 					.on(GhostKilledEvent.class)
 					.act(e -> playingState().onGhostKilled(e))
 					
-				.when(PLAYING).become(PACMAN_DYING)
+				.when(PLAYING).then(PACMAN_DYING)
 					.on(PacManKilledEvent.class)
 					.act(e -> playingState().onPacManKilled(e))
 					
-				.when(PLAYING).become(CHANGING_LEVEL)
+				.when(PLAYING).then(CHANGING_LEVEL)
 					.on(LevelCompletedEvent.class)
 					
-				.when(CHANGING_LEVEL).become(PLAYING)
+				.when(CHANGING_LEVEL).then(PLAYING)
 					.onTimeout()
 			
-				.when(GHOST_DYING).become(PLAYING)
+				.when(GHOST_DYING).then(PLAYING)
 					.onTimeout()
 					
-				.when(PACMAN_DYING).become(GAME_OVER)
+				.when(PACMAN_DYING).then(GAME_OVER)
 					.on(PacManDiedEvent.class)
 					.inCase(() -> game.lives == 0)
 					
-				.when(PACMAN_DYING).become(PLAYING)
+				.when(PACMAN_DYING).then(PLAYING)
 					.on(PacManDiedEvent.class)
 					.inCase(() -> game.lives > 0)
 					.act(() -> actors.init())
 			
-				.when(GAME_OVER).become(READY)
+				.when(GAME_OVER).then(READY)
 					.inCase(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
 							
 		.endStateMachine();
