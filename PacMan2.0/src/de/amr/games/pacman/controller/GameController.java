@@ -46,12 +46,13 @@ public class GameController implements Controller {
 	private final Game game;
 	private final GameActors actors;
 	private final GameUI gameUI;
-	private StateMachine<State, GameEvent> sm;
+	private final StateMachine<State, GameEvent> sm;
 
 	public GameController(Game game, GameActors actors, GameUI gameUI) {
 		this.game = game;
 		this.actors = actors;
 		this.gameUI = gameUI;
+		sm = buildStateMachine();
 	}
 
 	@Override
@@ -61,7 +62,6 @@ public class GameController implements Controller {
 
 	@Override
 	public void init() {
-		sm = buildStateMachine();
 		sm.init();
 		actors.setEventMgr(new EventManager<>("[GameEventManager]"));
 		actors.subscribe(sm::process);
@@ -168,7 +168,7 @@ public class GameController implements Controller {
 				.when(PACMAN_DYING).become(PLAYING)
 					.on(PacManDiedEvent.class)
 					.inCase(() -> game.lives > 0)
-					.act(t -> actors.init())
+					.act(() -> actors.init())
 			
 				.when(GAME_OVER).become(READY)
 					.inCase(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
