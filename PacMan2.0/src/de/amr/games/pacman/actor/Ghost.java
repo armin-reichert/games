@@ -27,11 +27,11 @@ import de.amr.statemachine.StateMachine;
 public class Ghost extends MazeMover<Ghost.State> {
 
 	private final StateMachine<State, GameEvent> sm;
-	private final GhostName name;
+	private final GameActors.Name name;
 	private final PacMan pacMan;
 	private final int initialDir;
 
-	public Ghost(GhostName name, PacMan pacMan, Game game, Tile home, int initialDir, int color) {
+	public Ghost(GameActors.Name name, PacMan pacMan, Game game, Tile home, int initialDir, int color) {
 		super(game, home, new EnumMap<>(State.class));
 		this.pacMan = pacMan;
 		this.name = name;
@@ -41,7 +41,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		currentSprite = s_color[getDir()];
 	}
 
-	public GhostName getName() {
+	public GameActors.Name getName() {
 		return name;
 	}
 

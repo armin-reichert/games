@@ -33,6 +33,10 @@ import de.amr.games.pacman.routing.Navigation;
  */
 public class GameActors {
 
+	public enum Name {
+		PacMan, Blinky, Pinky, Inky, Clyde
+	}
+
 	private static PacMan createPacMan(Game game, EventManager<GameEvent> eventMgr) {
 		PacMan pacMan = new PacMan(game);
 		Navigation<MazeMover<?>> keySteering = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
@@ -43,39 +47,39 @@ public class GameActors {
 	}
 
 	private static Ghost createBlinky(Game game, PacMan pacMan) {
-		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, game.maze.blinkyHome, Top4.E, RED_GHOST);
-		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
-		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		blinky.setNavigation(Ghost.State.DEAD, goHome());
-		blinky.setNavigation(Ghost.State.SAFE, bounce());
-		return blinky;
+		Ghost ghost = new Ghost(Name.Blinky, pacMan, game, game.maze.blinkyHome, Top4.E, RED_GHOST);
+		ghost.setNavigation(Ghost.State.AGGRO, chase(pacMan));
+		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		ghost.setNavigation(Ghost.State.DEAD, goHome());
+		ghost.setNavigation(Ghost.State.SAFE, bounce());
+		return ghost;
 	}
 
 	private static Ghost createPinky(Game game, PacMan pacMan) {
-		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, game.maze.pinkyHome, Top4.S, PINK_GHOST);
-		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
-		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		pinky.setNavigation(Ghost.State.DEAD, goHome());
-		pinky.setNavigation(Ghost.State.SAFE, bounce());
-		return pinky;
+		Ghost ghost = new Ghost(Name.Pinky, pacMan, game, game.maze.pinkyHome, Top4.S, PINK_GHOST);
+		ghost.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
+		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		ghost.setNavigation(Ghost.State.DEAD, goHome());
+		ghost.setNavigation(Ghost.State.SAFE, bounce());
+		return ghost;
 	}
 
 	private static Ghost createInky(Game game, PacMan pacMan) {
-		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, game.maze.inkyHome, Top4.N, TURQUOISE_GHOST);
-		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
-		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		inky.setNavigation(Ghost.State.DEAD, goHome());
-		inky.setNavigation(Ghost.State.SAFE, bounce());
-		return inky;
+		Ghost ghost = new Ghost(Name.Inky, pacMan, game, game.maze.inkyHome, Top4.N, TURQUOISE_GHOST);
+		ghost.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
+		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		ghost.setNavigation(Ghost.State.DEAD, goHome());
+		ghost.setNavigation(Ghost.State.SAFE, bounce());
+		return ghost;
 	}
 
 	private static Ghost createClyde(Game game, PacMan pacMan) {
-		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, game.maze.clydeHome, Top4.N, ORANGE_GHOST);
-		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
-		clyde.setNavigation(Ghost.State.AFRAID, flee(pacMan));
-		clyde.setNavigation(Ghost.State.DEAD, goHome());
-		clyde.setNavigation(Ghost.State.SAFE, bounce());
-		return clyde;
+		Ghost ghost = new Ghost(Name.Clyde, pacMan, game, game.maze.clydeHome, Top4.N, ORANGE_GHOST);
+		ghost.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
+		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
+		ghost.setNavigation(Ghost.State.DEAD, goHome());
+		ghost.setNavigation(Ghost.State.SAFE, bounce());
+		return ghost;
 	}
 
 	private final EventManager<GameEvent> eventMgr;

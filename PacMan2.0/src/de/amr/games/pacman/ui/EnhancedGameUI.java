@@ -168,14 +168,14 @@ public class EnhancedGameUI extends GameUI {
 
 	private static Color color(Ghost ghost) {
 		switch (ghost.getName()) {
-		case INKY:
-			return new Color(64, 224, 208);
-		case CLYDE:
-			return Color.ORANGE;
-		case PINKY:
-			return Color.PINK;
-		case BLINKY:
+		case Blinky:
 			return Color.RED;
+		case Pinky:
+			return Color.PINK;
+		case Inky:
+			return new Color(64, 224, 208);
+		case Clyde:
+			return Color.ORANGE;
 		default:
 			throw new IllegalArgumentException();
 		}
