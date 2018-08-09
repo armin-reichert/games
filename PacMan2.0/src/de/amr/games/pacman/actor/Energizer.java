@@ -2,11 +2,10 @@ package de.amr.games.pacman.actor;
 
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.ui.GameUI;
 
-public class Energizer extends GameEntity {
+public class Energizer extends MazeEntity {
 
 	private final Sprite s_energizer;
 

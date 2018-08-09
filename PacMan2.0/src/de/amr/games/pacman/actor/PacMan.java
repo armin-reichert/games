@@ -90,7 +90,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	}
 
 	private void initState() {
-		setMazePosition(homeTile);
+		placeAt(homeTile);
 		setNextDir(Top4.E);
 		setSpeed(game::getPacManSpeed);
 		getSprites().forEach(Sprite::resetAnimation);
@@ -157,7 +157,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private void inspectMaze() {
 
 		move();
-		if (isTeleporting()) {
+		if (isOutsideMaze()) {
 			return;
 		}
 

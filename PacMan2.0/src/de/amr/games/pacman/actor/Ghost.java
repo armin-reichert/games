@@ -100,7 +100,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 				.state(HOME)
 					.onEntry(() -> {
-						setMazePosition(homeTile);
+						placeAt(homeTile);
 						setDir(initialDir);
 						setNextDir(initialDir);
 						getSprites().forEach(Sprite::resetAnimation);

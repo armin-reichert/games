@@ -7,11 +7,9 @@ import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 import static java.lang.Math.round;
 
-import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.function.Function;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.game.GameEvent;
@@ -25,9 +23,9 @@ import de.amr.statemachine.StateMachine;
 /**
  * @param <S> maze mover state type
  */
-public abstract class MazeMover<S> extends GameEntity {
+public abstract class MazeMover<S> extends MazeEntity {
 
-	private static final int TELEPORT_LENGTH = 3;
+	private static final int TELEPORT_TILES = 6;
 
 	public final Game game;
 	public final Maze maze;
@@ -68,27 +66,6 @@ public abstract class MazeMover<S> extends GameEntity {
 		getStateMachine().update();
 	}
 
-	// Display
-
-	@Override
-	public void draw(Graphics2D g) {
-		// center sprite over collision box
-		int dx = (getWidth() - currentSprite().getWidth()) / 2, dy = (getHeight() - currentSprite().getHeight()) / 2;
-		g.translate(dx, dy);
-		super.draw(g);
-		g.translate(-dx, -dy);
-	}
-
-	@Override
-	public int getWidth() {
-		return TS;
-	}
-
-	@Override
-	public int getHeight() {
-		return TS;
-	}
-
 	// Movement
 
 	public void setNavigation(S state, Navigation<MazeMover<?>> navigation) {
@@ -123,46 +100,14 @@ public abstract class MazeMover<S> extends GameEntity {
 		this.nextDir = dir;
 	}
 
-	public void placeAt(int col, int row) {
-		tf.moveTo(col * TS, row * TS);
-	}
-
-	public void setMazePosition(Tile tile) {
-		placeAt(tile.col, tile.row);
-	}
-
-	public Tile getTile() {
-		return new Tile(col(), row());
-	}
-
-	public int row() {
-		return round(tf.getY() + getHeight() / 2) / TS;
-	}
-
-	public int col() {
-		return round(tf.getX() + getWidth() / 2) / TS;
-	}
-
-	public boolean isExactlyOverTile() {
-		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
-	}
-
-	public boolean isTeleporting() {
+	public boolean isOutsideMaze() {
 		Tile tile = getTile();
 		return tile.row < 0 || tile.row >= maze.numRows() || tile.col < 0 || tile.col >= maze.numCols();
 	}
 
 	public void move() {
-		Tile tile = getTile();
-		if (isTeleporting()) {
-			// teleport
-			if (tile.col > (maze.numCols() - 1) + TELEPORT_LENGTH) {
-				placeAt(0, tile.row);
-			} else if (tile.col < -TELEPORT_LENGTH) {
-				placeAt(maze.numCols() - 1, tile.row);
-			} else {
-				tf.moveTo(computePosition(dir));
-			}
+		if (isOutsideMaze()) {
+			teleport();
 			return;
 		}
 		nextDir = getNavigation().computeRoute(this).getDirection();
@@ -172,25 +117,43 @@ public abstract class MazeMover<S> extends GameEntity {
 		if (canMove(dir)) {
 			tf.moveTo(computePosition(dir));
 		} else {
-			// adjust exactly over tile
-			setMazePosition(tile);
+			placeAt(getTile());
+		}
+	}
+	
+	private void teleport() {
+		Tile tile = getTile();
+		if (tile.col > (maze.numCols() - 1) + TELEPORT_TILES) {
+			// return to the maze from the left
+			placeAt(0, tile.row);
+		} else if (tile.col < -TELEPORT_TILES) {
+			// return to the maze from the right
+			placeAt(maze.numCols() - 1, tile.row);
+		} else {
+			tf.moveTo(computePosition(dir));
 		}
 	}
 
-	public boolean canMove(int direction) {
-		Tile current = getTile();
-		if (direction == Top4.W && current.col <= 0 || direction == Top4.E && current.col >= maze.numCols() - 1) {
-			return true; // teleport
+	public boolean canMove(int goal) {
+		if (isOutsideMaze()) {
+			return true;
 		}
-		Tile next = computeNextTile(current, direction);
+		Tile current = getTile();
+		if (goal == Top4.W && current.col <= 0) {
+			return true; // enter teleport space on the left
+		}
+		if (goal == Top4.E && current.col >= maze.numCols() - 1) {
+			return true; // enter teleport space on the right
+		}
+		Tile next = computeNextTile(current, goal);
 		if (next.equals(current)) {
-			return true; // move stays inside tile
+			return true; // move doesn't leave current tile
 		}
 		if (maze.getContent(next) == WALL) {
 			return false;
 		}
-		if (direction == TOPOLOGY.right(dir) || direction == TOPOLOGY.left(dir)) {
-			setMazePosition(getTile()); // TODO this is not 100% correct
+		if (goal == TOPOLOGY.right(dir) || goal == TOPOLOGY.left(dir)) {
+			placeAt(getTile()); // TODO this is not 100% correct
 			return isExactlyOverTile();
 		}
 		return true;

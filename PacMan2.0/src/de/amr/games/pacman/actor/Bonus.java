@@ -1,16 +1,17 @@
 package de.amr.games.pacman.actor;
 
+import static de.amr.games.pacman.ui.Spritesheet.TS;
+
 import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.games.pacman.ui.Spritesheet;
 
-public class Bonus extends GameEntity {
+public class Bonus extends MazeEntity {
 
 	private static final int[] BONUS_POINTS = { 100, 300, 500, 700, 1000, 2000, 3000, 5000 };
 
@@ -55,17 +56,15 @@ public class Bonus extends GameEntity {
 	}
 
 	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(s_points, s_symbol);
+	public void draw(Graphics2D g) {
+		g.translate(TS / 2, TS / 2);
+		super.draw(g);
+		g.translate(-TS / 2, -TS / 2);
 	}
 
 	@Override
-	public void draw(Graphics2D g) {
-		// center sprite over tile
-		int dx = (getWidth() - currentSprite().getWidth()) / 2, dy = (getHeight() - currentSprite().getHeight()) / 2;
-		g.translate(dx, dy);
-		super.draw(g);
-		g.translate(-dx, -dy);
+	public Stream<Sprite> getSprites() {
+		return Stream.of(s_points, s_symbol);
 	}
 
 	@Override

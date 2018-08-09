@@ -6,10 +6,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
 
-public class Pellet extends GameEntity {
+public class Pellet extends MazeEntity {
 
 	private int size = TS / 8;
 
