@@ -10,13 +10,13 @@ import static de.amr.games.pacman.controller.GameController.State.READY;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.function.IntSupplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.amr.easy.game.config.AppSettings;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
@@ -33,6 +33,7 @@ import de.amr.games.pacman.controller.event.game.PacManKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
+import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.ui.EnhancedGameUI;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
@@ -49,13 +50,12 @@ public class GameController implements Controller {
 	private final GameUI gameUI;
 	private final StateMachine<State, GameEvent> sm;
 
-	public GameController(Game game, AppSettings settings) {
-		this.game = game;
+	public GameController(Maze maze, int width, int height, IntSupplier fnFrequency) {
+		game = new Game(maze, fnFrequency);
 		actors = new GameActors(game);
-		gameUI = new EnhancedGameUI(new GameUI(settings.width, settings.height, game, actors));
+		gameUI = new EnhancedGameUI(new GameUI(width, height, game, actors));
 		sm = buildStateMachine();
 		actors.addObserver(sm::process);
-		actors.getPacMan().setMazeWorld(gameUI.mazeUI);
 	}
 
 	@Override
@@ -65,8 +65,10 @@ public class GameController implements Controller {
 
 	@Override
 	public void init() {
+		LOG.setLevel(Level.INFO);
 		sm.init();
-		actors.getGhosts().forEach(ghost -> actors.setGhostActive(ghost, true));
+//		actors.getGhosts().forEach(ghost -> actors.setGhostActive(ghost, true));
+		actors.setGhostActive(actors.getBlinky(), true);
 	}
 
 	@Override
@@ -249,10 +251,12 @@ public class GameController implements Controller {
 		}
 
 		private void onBonusFound(GameEvent event) {
-			BonusFoundEvent e = (BonusFoundEvent) event;
-			LOG.info(() -> String.format("PacMan found bonus %s of value %d", e.symbol, e.value));
-			game.score += e.value;
-			gameUI.mazeUI.honorBonusAndRemoveAfter(game.sec(2));
+			actors.getBonus().ifPresent(bonus -> {
+				LOG.info(() -> String.format("PacMan found bonus %s of value %d", bonus.getSymbol(), bonus.getValue()));
+				bonus.setHonored();
+				game.score += bonus.getValue();
+				gameUI.mazeUI.showBonus(game.sec(1));
+			});
 		}
 
 		private void onFoodFound(GameEvent event) {
@@ -269,7 +273,8 @@ public class GameController implements Controller {
 				return;
 			}
 			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
-				gameUI.mazeUI.addBonus(new Bonus(game.getBonusSymbol(), game.getBonusValue()), game.getBonusTime());
+				actors.addBonus(game.getBonusSymbol(), game.getBonusValue());
+				gameUI.mazeUI.showBonus(game.getBonusTime());
 			}
 			if (e.food == Content.ENERGIZER) {
 				game.ghostsKilledInSeries = 0;

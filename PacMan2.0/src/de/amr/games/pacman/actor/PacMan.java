@@ -34,13 +34,12 @@ public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> brain;
 	private EventManager<GameEvent> events;
-	private MazeWorld world;
+	private PacManWorld world;
 	private int pauseTicks;
 
 	public PacMan(Game game) {
 		super(game, game.maze.pacManHome, new EnumMap<>(State.class));
 		brain = buildStateMachine();
-		world = MazeWorld.EMPTY_WORLD;
 		createSprites(2 * TS);
 	}
 
@@ -48,7 +47,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		this.events = events;
 	}
 
-	public void setMazeWorld(MazeWorld world) {
+	public void setWorld(PacManWorld world) {
 		this.world = world;
 	}
 
@@ -169,7 +168,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		}
 
 		// Ghost collision?
-		Optional<Ghost> collidingGhost = world.activeGhosts()
+		Optional<Ghost> collidingGhost = world.getActiveGhosts()
 		/*@formatter:off*/
 				.filter(ghost -> ghost.getTile().equals(getTile()))
 				.filter(ghost -> ghost.getState() != Ghost.State.DEAD)
@@ -182,15 +181,19 @@ public class PacMan extends MazeMover<PacMan.State> {
 			return;
 		}
 
-		// Bonus discovered?
-		Optional<Bonus> activeBonus = world.activeBonus().filter(bonus -> bonus.getTile().equals(getTile()));
+		// Unhonored bonus?
+		Optional<Bonus> activeBonus = world.getBonus()
+		/*@formatter:off*/
+				.filter(bonus -> !bonus.isHonored())
+				.filter(bonus -> bonus.getTile().equals(getTile()));
+		/*@formatter:on*/
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
 			events.publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 			return;
 		}
 
-		// Food found on current tile?
+		// Food?
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {

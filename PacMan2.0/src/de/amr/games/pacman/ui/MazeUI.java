@@ -6,21 +6,18 @@ import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Graphics2D;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.actor.Bonus;
 import de.amr.games.pacman.actor.Energizer;
-import de.amr.games.pacman.actor.MazeWorld;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.Pellet;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
-public class MazeUI extends GameEntity implements MazeWorld {
+public class MazeUI extends GameEntity {
 
 	private final Maze maze;
 	private final GameActors actors;
@@ -31,8 +28,7 @@ public class MazeUI extends GameEntity implements MazeWorld {
 	private final Sprite s_flashing;
 
 	private boolean flashing;
-	private Bonus bonus;
-	private int bonusTimeLeft;
+	private int bonusTimer;
 
 	public MazeUI(Maze maze, GameActors actors) {
 		this.maze = maze;
@@ -54,15 +50,11 @@ public class MazeUI extends GameEntity implements MazeWorld {
 	}
 
 	@Override
-	public void init() {
-		removeBonus();
-	}
-
-	@Override
 	public void update() {
-		if (bonus != null) {
-			if (bonusTimeLeft-- == 0) {
-				removeBonus();
+		if (bonusTimer > 0) {
+			bonusTimer -= 1;
+			if (bonusTimer == 0) {
+				actors.removeBonus();
 			}
 		}
 	}
@@ -86,41 +78,15 @@ public class MazeUI extends GameEntity implements MazeWorld {
 	}
 
 	@Override
-	public Stream<Ghost> activeGhosts() {
-		return actors.getActiveGhosts();
-	}
-
-	@Override
-	public Optional<Bonus> activeBonus() {
-		return bonus != null && !bonus.isHonored() ? Optional.ofNullable(bonus) : Optional.empty();
-	}
-
-	public void addBonus(Bonus bonus, int ticks) {
-		this.bonus = bonus;
-		bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
-		bonusTimeLeft = ticks;
-	}
-
-	public void removeBonus() {
-		if (bonus != null) {
-			bonus = null;
-			bonusTimeLeft = 0;
-		}
-	}
-
-	public void honorBonusAndRemoveAfter(int ticks) {
-		if (bonus != null) {
-			bonus.setHonored();
-			bonusTimeLeft = ticks;
-		}
-	}
-
-	@Override
 	public void enableAnimation(boolean on) {
 		super.enableAnimation(on);
 		energizer.enableAnimation(on);
 		actors.getPacMan().enableAnimation(on);
 		actors.getActiveGhosts().forEach(ghost -> ghost.enableAnimation(on));
+	}
+
+	public void showBonus(int ticks) {
+		bonusTimer = ticks;
 	}
 
 	@Override
@@ -134,9 +100,10 @@ public class MazeUI extends GameEntity implements MazeWorld {
 			actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
 			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
 			actors.getPacMan().draw(g);
-			if (bonus != null) {
+			actors.getBonus().ifPresent(bonus -> {
+				bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
 				bonus.draw(g);
-			}
+			});
 		}
 		g.translate(-tf.getX(), -tf.getY());
 	}

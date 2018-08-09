@@ -16,6 +16,7 @@ import static java.awt.event.KeyEvent.VK_RIGHT;
 import static java.awt.event.KeyEvent.VK_UP;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -23,6 +24,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.EventManager;
 import de.amr.games.pacman.controller.event.core.Observer;
 import de.amr.games.pacman.controller.event.game.GameEvent;
+import de.amr.games.pacman.model.BonusSymbol;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.routing.Navigation;
 
@@ -31,7 +33,7 @@ import de.amr.games.pacman.routing.Navigation;
  * 
  * @author Armin Reichert
  */
-public class GameActors {
+public class GameActors implements PacManWorld {
 
 	public enum Name {
 		PacMan, Blinky, Pinky, Inky, Clyde
@@ -86,10 +88,12 @@ public class GameActors {
 	private final PacMan pacMan;
 	private final Ghost blinky, pinky, inky, clyde;
 	private final Set<Ghost> activeGhosts = new HashSet<>();
+	private Bonus bonus;
 
 	public GameActors(Game game) {
 		events = new EventManager<>("[GameActorEvents]");
 		pacMan = createPacMan(game, events);
+		pacMan.setWorld(this);
 		blinky = createBlinky(game, pacMan);
 		pinky = createPinky(game, pacMan);
 		inky = createInky(game, pacMan);
@@ -119,6 +123,7 @@ public class GameActors {
 	public void init() {
 		pacMan.init();
 		activeGhosts.forEach(Ghost::init);
+		removeBonus();
 	}
 
 	public PacMan getPacMan() {
@@ -138,11 +143,25 @@ public class GameActors {
 		}
 	}
 
+	@Override
 	public Stream<Ghost> getActiveGhosts() {
 		return activeGhosts.stream();
 	}
 
 	public Stream<Ghost> getGhosts() {
 		return Stream.of(blinky, pinky, inky, clyde);
+	}
+	
+	public void addBonus(BonusSymbol symbol, int value) {
+		bonus = new Bonus(symbol, value);
+	}
+	
+	public void removeBonus() {
+		bonus = null;
+	}
+	
+	@Override
+	public Optional<Bonus> getBonus() {
+		return Optional.ofNullable(bonus);
 	}
 }

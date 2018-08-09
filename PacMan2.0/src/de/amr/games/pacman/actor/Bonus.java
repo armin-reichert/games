@@ -41,7 +41,7 @@ public class Bonus extends MazeEntity {
 	public BonusSymbol getSymbol() {
 		return symbol;
 	}
-
+	
 	public boolean isHonored() {
 		return honored;
 	}
@@ -54,7 +54,7 @@ public class Bonus extends MazeEntity {
 	public Sprite currentSprite() {
 		return honored ? s_points : s_symbol;
 	}
-
+	
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(TS / 2, TS / 2);
