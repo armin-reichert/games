@@ -4,12 +4,9 @@ import java.util.logging.Level;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.controller.GameController;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.EnhancedGameUI;
-import de.amr.games.pacman.ui.GameUI;
 import de.amr.games.pacman.ui.Spritesheet;
 
 /**
@@ -38,9 +35,7 @@ public class PacManApp extends Application {
 	@Override
 	public void init() {
 		LOG.setLevel(Level.INFO);
-		GameActors actors = new GameActors(game);
-		GameUI gameUI = new GameUI(settings.width, settings.height, game, actors);
-		GameController gameController = new GameController(game, actors, new EnhancedGameUI(gameUI));
+		GameController gameController = new GameController(game, settings);
 		setController(gameController);
 		pulse.setFrequency(60);
 	}

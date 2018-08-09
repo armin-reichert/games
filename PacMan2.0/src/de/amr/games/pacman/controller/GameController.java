@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import de.amr.easy.game.config.AppSettings;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
@@ -48,10 +49,10 @@ public class GameController implements Controller {
 	private final GameUI gameUI;
 	private final StateMachine<State, GameEvent> sm;
 
-	public GameController(Game game, GameActors actors, GameUI gameUI) {
+	public GameController(Game game, AppSettings settings) {
 		this.game = game;
-		this.actors = actors;
-		this.gameUI = gameUI;
+		actors = new GameActors(game);
+		gameUI = new GameUI(settings.width, settings.height, game, actors);
 		sm = buildStateMachine();
 	}
 
