@@ -32,7 +32,7 @@ import de.amr.statemachine.StateMachine;
 public class PacMan extends MazeMover<PacMan.State> {
 
 	private final StateMachine<State, GameEvent> sm;
-	private EventManager<GameEvent> eventMgr;
+	private EventManager<GameEvent> events;
 	private Environment environment;
 
 	public PacMan(Game game) {
@@ -41,9 +41,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 		environment = Environment.EMPTYNESS;
 		createSprites(2 * TS);
 	}
-	
-	public void setEventMgr(EventManager<GameEvent> eventMgr) {
-		this.eventMgr = eventMgr;
+
+	public void setEventMgr(EventManager<GameEvent> events) {
+		this.events = events;
 	}
 
 	public void setEnvironment(Environment env) {
@@ -110,13 +110,11 @@ public class PacMan extends MazeMover<PacMan.State> {
 					.onEntry(this::initState)
 					.timeoutAfter(() -> game.sec(0.1f))
 
-				.state(VULNERABLE).onTick(this::inspectMaze)
+				.state(VULNERABLE)
+					.onTick(this::inspectMaze)
 					
 				.state(STEROIDS)
-						.onTick(() -> {
-							inspectMaze();
-							checkHealth();
-						})
+						.onTick(() -> {	inspectMaze(); checkHealth(); })
 						.timeoutAfter(game::getPacManSteroidTime)
 
 				.state(DYING)
@@ -133,36 +131,36 @@ public class PacMan extends MazeMover<PacMan.State> {
 	
 					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(() -> sm.resetTimer())
 	
-					.when(STEROIDS).then(VULNERABLE).onTimeout().act(() -> eventMgr.publish(new PacManLostPowerEvent()))
+					.when(STEROIDS).then(VULNERABLE).onTimeout().act(() -> events.publish(new PacManLostPowerEvent()))
 	
-					.when(DYING).onTimeout().act(e -> eventMgr.publish(new PacManDiedEvent()))
+					.when(DYING).onTimeout().act(e -> events.publish(new PacManDiedEvent()))
 
 		.endStateMachine();
 		/* @formatter:on */
 	}
 
 	// Pac-Man activities
-	
+
 	@Override
 	public void move() {
 		super.move();
 		s_current = s_walking_to[getDir()];
 	}
-	
+
 	private void checkHealth() {
 		if (sm.getRemainingPct() == 20) {
-			//TODO this can occur multiple times!
-			eventMgr.publish(new PacManGettingWeakerEvent());
+			// TODO this can occur multiple times!
+			events.publish(new PacManGettingWeakerEvent());
 		}
 	}
 
 	private void inspectMaze() {
-		
+
 		move();
 		if (isTeleporting()) {
 			return;
 		}
-		
+
 		// Ghost colliding?
 		/*@formatter:off*/
 		Optional<Ghost> collidingGhost = environment.activeGhosts()
@@ -173,7 +171,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				.findFirst();
 		/*@formatter:on*/
 		if (collidingGhost.isPresent()) {
-			eventMgr.publish(new PacManGhostCollisionEvent(collidingGhost.get()));
+			events.publish(new PacManGhostCollisionEvent(collidingGhost.get()));
 			return;
 		}
 
@@ -181,7 +179,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Optional<Bonus> activeBonus = environment.activeBonus().filter(this::collidesWith);
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
-			eventMgr.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+			events.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 			return;
 		}
 
@@ -189,7 +187,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
-			eventMgr.publish(new FoodFoundEvent(tile, content));
+			events.publish(new FoodFoundEvent(tile, content));
 		}
 	}
 }
