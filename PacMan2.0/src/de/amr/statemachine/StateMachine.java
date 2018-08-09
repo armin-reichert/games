@@ -218,7 +218,7 @@ public class StateMachine<S, E> {
 	 * @return {@code true} if the given percentage of the state's time has been
 	 *         consumed. If the current state has no timer returns {@code false}.
 	 */
-	public boolean inStateForPct(int pct) {
+	public boolean stateTimeExpiredPct(int pct) {
 		StateObject<S, E> stateObject = currentStateObject();
 		if (stateObject.timerTotalTicks == StateObject.ENDLESS) {
 			return false;
