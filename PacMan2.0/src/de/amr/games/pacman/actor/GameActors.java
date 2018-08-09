@@ -73,7 +73,7 @@ public class GameActors {
 	}
 
 	private Ghost createBlinky() {
-		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, game.maze.blinkyHome, RED_GHOST);
+		Ghost blinky = new Ghost(GhostName.BLINKY, pacMan, game, game.maze.blinkyHome, Top4.E, RED_GHOST);
 		blinky.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		blinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		blinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -82,7 +82,7 @@ public class GameActors {
 	}
 
 	private Ghost createPinky() {
-		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, game.maze.pinkyHome, PINK_GHOST);
+		Ghost pinky = new Ghost(GhostName.PINKY, pacMan, game, game.maze.pinkyHome, Top4.S, PINK_GHOST);
 		pinky.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		pinky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		pinky.setNavigation(Ghost.State.DEAD, goHome());
@@ -91,7 +91,7 @@ public class GameActors {
 	}
 
 	private Ghost createInky() {
-		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, game.maze.inkyHome, TURQUOISE_GHOST);
+		Ghost inky = new Ghost(GhostName.INKY, pacMan, game, game.maze.inkyHome, Top4.N, TURQUOISE_GHOST);
 		inky.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		inky.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		inky.setNavigation(Ghost.State.DEAD, goHome());
@@ -100,7 +100,7 @@ public class GameActors {
 	}
 
 	private Ghost createClyde() {
-		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, game.maze.clydeHome, ORANGE_GHOST);
+		Ghost clyde = new Ghost(GhostName.CLYDE, pacMan, game, game.maze.clydeHome, Top4.N, ORANGE_GHOST);
 		clyde.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		clyde.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		clyde.setNavigation(Ghost.State.DEAD, goHome());
@@ -111,10 +111,6 @@ public class GameActors {
 	public void init() {
 		pacMan.init();
 		activeGhosts.forEach(ghost -> ghost.init());
-		blinky.setDir(Top4.E);
-		pinky.setDir(Top4.S);
-		inky.setDir(Top4.N);
-		clyde.setDir(Top4.N);
 	}
 
 	public PacMan getPacMan() {

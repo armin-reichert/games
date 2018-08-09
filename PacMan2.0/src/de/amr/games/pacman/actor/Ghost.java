@@ -29,11 +29,13 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private final StateMachine<State, GameEvent> sm;
 	private final GhostName name;
 	private final PacMan pacMan;
+	private final int initialDir;
 
-	public Ghost(GhostName name, PacMan pacMan, Game game, Tile home, int color) {
+	public Ghost(GhostName name, PacMan pacMan, Game game, Tile home, int initialDir, int color) {
 		super(game, home, new EnumMap<>(State.class));
 		this.pacMan = pacMan;
 		this.name = name;
+		this.initialDir = initialDir;
 		sm = buildStateMachine();
 		createSprites(color);
 		currentSprite = s_color[getDir()];
@@ -99,6 +101,8 @@ public class Ghost extends MazeMover<Ghost.State> {
 				.state(HOME)
 					.onEntry(() -> {
 						setMazePosition(homeTile);
+						setDir(initialDir);
+						setNextDir(initialDir);
 						getSprites().forEach(Sprite::resetAnimation);
 						setSpeed(game::getGhostSpeed);
 					})
