@@ -134,9 +134,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	
 					.when(STEROIDS).on(PacManGainsPowerEvent.class).act(() -> sm.resetTimer())
 	
-					.when(STEROIDS).then(VULNERABLE).onTimeout().act(() -> events.publish(new PacManLostPowerEvent()))
+					.when(STEROIDS).then(VULNERABLE).onTimeout().act(() -> events.publishEvent(new PacManLostPowerEvent()))
 	
-					.when(DYING).onTimeout().act(e -> events.publish(new PacManDiedEvent()))
+					.when(DYING).onTimeout().act(e -> events.publishEvent(new PacManDiedEvent()))
 
 		.endStateMachine();
 		/* @formatter:on */
@@ -153,7 +153,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private void checkHealth() {
 		if (sm.stateTimeExpiredPct(70)) {
 			// TODO this can occur multiple times!
-			events.publish(new PacManGettingWeakerEvent());
+			events.publishEvent(new PacManGettingWeakerEvent());
 		}
 	}
 
@@ -177,7 +177,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 				.findFirst();
 		/*@formatter:on*/
 		if (collidingGhost.isPresent()) {
-			events.publish(new PacManGhostCollisionEvent(collidingGhost.get()));
+			events.publishEvent(new PacManGhostCollisionEvent(collidingGhost.get()));
 			return;
 		}
 
@@ -185,7 +185,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		Optional<Bonus> activeBonus = env.activeBonus().filter(bonus -> bonus.getTile().equals(getTile()));
 		if (activeBonus.isPresent()) {
 			Bonus bonus = activeBonus.get();
-			events.publish(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
+			events.publishEvent(new BonusFoundEvent(bonus.getSymbol(), bonus.getValue()));
 			return;
 		}
 
@@ -194,7 +194,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		char content = maze.getContent(tile);
 		if (isFood(content)) {
 			pauseTicks = (content == Content.PELLET ? 1 : 3);
-			events.publish(new FoodFoundEvent(tile, content));
+			events.publishEvent(new FoodFoundEvent(tile, content));
 		}
 	}
 }

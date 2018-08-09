@@ -14,15 +14,15 @@ public class EventManager<E> {
 		this.description = description;
 	}
 
-	public void subscribe(Observer<E> observer) {
+	public void addObserver(Observer<E> observer) {
 		observers.add(observer);
 	}
 
-	public void unsubscribe(Observer<E> observer) {
+	public void removeObserver(Observer<E> observer) {
 		observers.remove(observer);
 	}
 
-	public void publish(E event) {
+	public void publishEvent(E event) {
 		LOG.info(String.format("%s publishing event '%s'", description, event));
 		observers.forEach(observer -> observer.observe(event));
 	}

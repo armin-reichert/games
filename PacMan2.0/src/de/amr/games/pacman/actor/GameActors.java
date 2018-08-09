@@ -82,22 +82,22 @@ public class GameActors {
 		return ghost;
 	}
 
-	private final EventManager<GameEvent> eventMgr;
+	private final EventManager<GameEvent> events;
 	private final PacMan pacMan;
 	private final Ghost blinky, pinky, inky, clyde;
 	private final Set<Ghost> activeGhosts = new HashSet<>();
 
 	public GameActors(Game game) {
-		eventMgr = new EventManager<>("[GameActorEvents]");
-		pacMan = createPacMan(game, eventMgr);
+		events = new EventManager<>("[GameActorEvents]");
+		pacMan = createPacMan(game, events);
 		blinky = createBlinky(game, pacMan);
 		pinky = createPinky(game, pacMan);
 		inky = createInky(game, pacMan);
 		clyde = createClyde(game, pacMan);
 	}
 
-	public void subscribeActorEvents(Observer<GameEvent> observer) {
-		eventMgr.subscribe(observer);
+	public void addObserver(Observer<GameEvent> observer) {
+		events.addObserver(observer);
 	}
 
 	public Ghost getBlinky() {
