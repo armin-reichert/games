@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.core.EventManager;
-import de.amr.games.pacman.controller.event.core.GameEvent;
 import de.amr.games.pacman.controller.event.core.Observer;
+import de.amr.games.pacman.controller.event.game.GameEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.routing.Navigation;
 

@@ -1,9 +1,9 @@
 package de.amr.games.pacman.controller.event.core;
 
+import static de.amr.easy.game.Application.LOG;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import de.amr.easy.game.Application;
 
 public class EventManager<E> {
 
@@ -24,6 +24,6 @@ public class EventManager<E> {
 
 	public void publish(E event) {
 		observers.forEach(observer -> observer.observe(event));
-		Application.LOG.info(String.format("%s published event '%s'", description, event));
+		LOG.info(String.format("%s published event '%s'", description, event));
 	}
 }

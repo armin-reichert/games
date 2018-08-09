@@ -14,7 +14,7 @@ import java.util.EnumMap;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.controller.event.core.GameEvent;
+import de.amr.games.pacman.controller.event.game.GameEvent;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
 import de.amr.games.pacman.controller.event.game.PacManGainsPowerEvent;
 import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
