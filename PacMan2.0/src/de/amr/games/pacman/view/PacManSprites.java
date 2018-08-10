@@ -14,10 +14,7 @@ import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.BonusSymbol;
 
-public class Spritesheet {
-
-	/** Tile size. */
-	public static final int TS = 16;
+public class PacManSprites {
 
 	public static final int RED_GHOST = 0;
 	public static final int PINK_GHOST = 1;
@@ -25,27 +22,34 @@ public class Spritesheet {
 	public static final int ORANGE_GHOST = 3;
 
 	private final BufferedImage sheet;
+	private final BufferedImage mazeEmpty;
+	private final BufferedImage mazeFull;
+	private final BufferedImage mazeWhite;
+	private final BufferedImage pacManFull;
+	private final BufferedImage pacManWalking[][];
+	private final BufferedImage pacManDying[];
+	private final BufferedImage ghostNormal[][];
+	private final BufferedImage ghostAwed[];
+	private final BufferedImage ghostBlinking[];
+	private final BufferedImage ghostEyes[];
+	private final BufferedImage greenNumbers[];
+	private final BufferedImage pinkNumbers[];
+	private final Map<BonusSymbol, BufferedImage> symbolMap = new HashMap<>();
 
-	private BufferedImage mazeEmpty;
-	private BufferedImage mazeFull;
-	private BufferedImage mazeWhite;
-	private Map<BonusSymbol, BufferedImage> symbolMap = new HashMap<>();
-	private BufferedImage pacManFull;
-	private BufferedImage pacManWalking[][] = new BufferedImage[4][]; // E, W, N, S
-	private BufferedImage pacManDying[] = new BufferedImage[11];
-	private BufferedImage ghostNormal[][] = new BufferedImage[4][8];
-	private BufferedImage ghostAwed[] = new BufferedImage[2];
-	private BufferedImage ghostBlinking[] = new BufferedImage[4];
-	private BufferedImage ghostEyes[] = new BufferedImage[4];
-	private BufferedImage greenNumbers[] = new BufferedImage[4];
-	private BufferedImage pinkNumbers[] = new BufferedImage[8];
+	private BufferedImage $(int x, int y, int w, int h) {
+		return sheet.getSubimage(x, y, w, h);
+	}
 
-	public Spritesheet() {
+	private BufferedImage $(int x, int y) {
+		return $(x, y, 16, 16);
+	}
+
+	public PacManSprites() {
 		sheet = Assets.readImage("sprites.png");
 
-		// Maze
-		mazeEmpty = $(228, 0, 224, 248);
+		// Mazes
 		mazeFull = $(0, 0, 224, 248);
+		mazeEmpty = $(228, 0, 224, 248);
 		mazeWhite = Assets.image("maze_white.png");
 
 		// Symbols for bonuses
@@ -56,37 +60,50 @@ public class Spritesheet {
 		}
 
 		// Pac-Man
-		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0), $(472, 0), $(488, 0) };
-		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16), $(472, 16), $(488, 0) };
-		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 2 * 16), $(472, 2 * 16), $(488, 0) };
-		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 3 * 16), $(472, 3 * 16), $(488, 0) };
 		pacManFull = $(488, 0);
-		for (int i = 0; i < 11; ++i) {
-			pacManDying[i] = $(504 + i * 16, 0);
+
+		pacManWalking = new BufferedImage[4][];
+		pacManWalking[Top4.E] = new BufferedImage[] { $(456, 0), $(472, 0), pacManFull };
+		pacManWalking[Top4.W] = new BufferedImage[] { $(456, 16), $(472, 16), pacManFull };
+		pacManWalking[Top4.N] = new BufferedImage[] { $(456, 32), $(472, 32), pacManFull };
+		pacManWalking[Top4.S] = new BufferedImage[] { $(456, 48), $(472, 48), pacManFull };
+
+		pacManDying = new BufferedImage[12];
+		for (int i = 0; i < 12; ++i) {
+			pacManDying[i] = $(488 + i * 16, 0);
 		}
 
 		// Ghosts
+		ghostNormal = new BufferedImage[4][8];
 		for (int color = 0; color < 4; ++color) {
 			for (int i = 0; i < 8; ++i) {
 				ghostNormal[color][i] = $(456 + i * 16, 64 + color * 16);
 			}
 		}
+
+		ghostAwed = new BufferedImage[2];
 		for (int i = 0; i < 2; ++i) {
 			ghostAwed[i] = $(584 + i * 16, 64);
 		}
+
+		ghostBlinking = new BufferedImage[4];
 		for (int i = 0; i < 4; ++i) {
 			ghostBlinking[i] = $(584 + i * 16, 64);
 		}
+
+		ghostEyes = new BufferedImage[4];
 		for (int i = 0; i < 4; ++i) {
 			ghostEyes[i] = $(584 + i * 16, 80);
 		}
 
 		// Green numbers (200, 400, 800, 1600)
+		greenNumbers = new BufferedImage[4];
 		for (int i = 0; i < 4; ++i) {
 			greenNumbers[i] = $(456 + i * 16, 128);
 		}
 
 		// Pink numbers
+		pinkNumbers = new BufferedImage[8];
 		// horizontal: 100, 300, 500, 700
 		for (int i = 0; i < 4; ++i) {
 			pinkNumbers[i] = $(456 + i * 16, 144);
@@ -97,14 +114,6 @@ public class Spritesheet {
 		for (int j = 0; j < 3; ++j) {
 			pinkNumbers[5 + j] = $(512, 160 + j * 16, 2 * 16, 16);
 		}
-	}
-
-	private BufferedImage $(int x, int y, int w, int h) {
-		return sheet.getSubimage(x, y, w, h);
-	}
-
-	private BufferedImage $(int x, int y) {
-		return $(x, y, 16, 16);
 	}
 
 	public Sprite mazeEmpty() {

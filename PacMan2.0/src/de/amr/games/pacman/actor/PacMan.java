@@ -5,8 +5,7 @@ import static de.amr.games.pacman.actor.PacMan.State.SAFE;
 import static de.amr.games.pacman.actor.PacMan.State.STEROIDS;
 import static de.amr.games.pacman.actor.PacMan.State.VULNERABLE;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.view.GamePanel.SPRITES;
-import static de.amr.games.pacman.view.Spritesheet.TS;
+import static de.amr.games.pacman.view.BasicGamePanel.SPRITES;
 
 import java.util.EnumMap;
 import java.util.Optional;
@@ -27,6 +26,7 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.view.PacManGameUI;
 import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
@@ -41,7 +41,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		super(game.maze, game.maze.pacManHome, new EnumMap<>(State.class));
 		this.game = game;
 		brain = buildStateMachine();
-		createSprites(2 * TS);
+		createSprites(2 * PacManGameUI.TS);
 	}
 
 	public void setEventManager(EventManager<GameEvent> events) {

@@ -7,7 +7,6 @@ import static de.amr.games.pacman.controller.GameController.PlayState.GHOST_DYIN
 import static de.amr.games.pacman.controller.GameController.PlayState.PACMAN_DYING;
 import static de.amr.games.pacman.controller.GameController.PlayState.PLAYING;
 import static de.amr.games.pacman.controller.GameController.PlayState.READY;
-import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -35,9 +34,9 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.view.GamePanel;
-import de.amr.games.pacman.view.GameViewController;
-import de.amr.games.pacman.view.GamePanelDecorator;
+import de.amr.games.pacman.view.BasicGamePanel;
+import de.amr.games.pacman.view.ExtendedGamePanel;
+import de.amr.games.pacman.view.PacManGameUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 
@@ -50,14 +49,14 @@ public class GameController implements Controller {
 	private final Maze maze;
 	private final Game game;
 	private final Cast actors;
-	private final GameViewController currentView;
+	private final PacManGameUI currentView;
 	private final StateMachine<PlayState, GameEvent> gameControl;
 
 	public GameController(IntSupplier fnFrequency) {
 		maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
 		actors = new Cast(game);
-		currentView = new GamePanelDecorator(new GamePanel(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
+		currentView = new ExtendedGamePanel(new BasicGamePanel(maze.numCols() * PacManGameUI.TS, (maze.numRows() + 5) * PacManGameUI.TS, game, actors));
 		gameControl = createGameControl();
 		actors.addObserver(gameControl::process);
 	}

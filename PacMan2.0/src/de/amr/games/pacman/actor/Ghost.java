@@ -8,8 +8,7 @@ import static de.amr.games.pacman.actor.Ghost.State.HOME;
 import static de.amr.games.pacman.actor.Ghost.State.SAFE;
 import static de.amr.games.pacman.actor.Ghost.State.SCATTERING;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.view.GamePanel.SPRITES;
-import static de.amr.games.pacman.view.Spritesheet.TS;
+import static de.amr.games.pacman.view.BasicGamePanel.SPRITES;
 
 import java.util.EnumMap;
 import java.util.stream.Stream;
@@ -22,6 +21,7 @@ import de.amr.games.pacman.controller.event.game.PacManGettingWeakerEvent;
 import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.view.PacManGameUI;
 import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
@@ -65,7 +65,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private Sprite s_numbers[] = new Sprite[4];
 
 	private void createSprites(int color) {
-		int size = 2 * TS;
+		int size = 2 * PacManGameUI.TS;
 		TOPOLOGY.dirs().forEach(dir -> {
 			s_color[dir] = SPRITES.ghostColored(color, dir).scale(size);
 			s_eyes[dir] = SPRITES.ghostEyes(dir).scale(size);

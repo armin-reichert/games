@@ -4,7 +4,10 @@ import java.awt.Color;
 
 import de.amr.easy.game.view.ViewController;
 
-public interface GameViewController extends ViewController {
+public interface PacManGameUI extends ViewController {
+
+	/** Tile size. */
+	int TS = 16;
 
 	void enableAnimation(boolean enable);
 

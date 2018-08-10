@@ -1,9 +1,8 @@
 package de.amr.games.pacman;
 
-import static de.amr.games.pacman.view.Spritesheet.TS;
-
 import de.amr.easy.game.Application;
 import de.amr.games.pacman.controller.GameController;
+import de.amr.games.pacman.view.PacManGameUI;
 
 /**
  * Pac-Man game.
@@ -25,8 +24,8 @@ public class PacManApp extends Application {
 	}
 
 	public PacManApp(float scale) {
-		settings.width = 28 * TS;
-		settings.height = 36 * TS;
+		settings.width = 28 * PacManGameUI.TS;
+		settings.height = 36 * PacManGameUI.TS;
 		settings.scale = scale;
 		settings.title = "Armin's PacMan";
 	}

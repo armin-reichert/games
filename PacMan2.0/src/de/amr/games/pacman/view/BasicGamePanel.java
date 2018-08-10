@@ -1,7 +1,5 @@
 package de.amr.games.pacman.view;
 
-import static de.amr.games.pacman.view.Spritesheet.TS;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -14,28 +12,28 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.actor.Cast;
 import de.amr.games.pacman.model.Game;
 
-public class GamePanel implements GameViewController {
+public class BasicGamePanel implements PacManGameUI {
 
-	public static final Spritesheet SPRITES = new Spritesheet();
+	public static final PacManSprites SPRITES = new PacManSprites();
 
 	protected final int width, height;
 	protected final Game game;
 	protected final Cast actors;
-	protected final MazeUI mazeUI;
+	protected final MazePanel mazeUI;
 	protected final Font font;
 	protected final Image lifeImage;
 	protected String infoText;
 	protected Color infoTextColor;
 
-	public GamePanel(int width, int height, Game game, Cast actors) {
+	public BasicGamePanel(int width, int height, Game game, Cast actors) {
 		this.width = width;
 		this.height = height;
 		this.game = game;
 		this.actors = actors;
-		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, TS * 3 / 2);
+		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, PacManGameUI.TS * 3 / 2);
 		lifeImage = SPRITES.pacManWalking(Top4.W).frame(1);
-		mazeUI = new MazeUI(game.maze, actors);
-		mazeUI.tf.moveTo(0, 3 * TS);
+		mazeUI = new MazePanel(game.maze, actors);
+		mazeUI.tf.moveTo(0, 3 * PacManGameUI.TS);
 	}
 
 	@Override
@@ -87,16 +85,16 @@ public class GamePanel implements GameViewController {
 	public void draw(Graphics2D g) {
 		g.setColor(Color.WHITE);
 		g.setFont(font);
-		g.drawString("SCORE", TS, TS);
-		g.drawString(String.format("%06d", game.score), TS, TS * 2);
-		g.drawString("LEVEL " + game.level, 20 * TS, TS);
-		g.translate(0, getHeight() - 2 * TS);
+		g.drawString("SCORE", PacManGameUI.TS, PacManGameUI.TS);
+		g.drawString(String.format("%06d", game.score), PacManGameUI.TS, PacManGameUI.TS * 2);
+		g.drawString("LEVEL " + game.level, 20 * PacManGameUI.TS, PacManGameUI.TS);
+		g.translate(0, getHeight() - 2 * PacManGameUI.TS);
 		for (int i = 0; i < game.livesRemaining; ++i) {
 			g.translate(i * lifeImage.getWidth(null), 0);
 			g.drawImage(lifeImage, 0, 0, null);
 			g.translate(-i * lifeImage.getWidth(null), 0);
 		}
-		g.translate(0, -getHeight() + 2 * TS);
+		g.translate(0, -getHeight() + 2 * PacManGameUI.TS);
 		mazeUI.draw(g);
 		if (infoText != null) {
 			drawInfoText(g);
@@ -109,7 +107,7 @@ public class GamePanel implements GameViewController {
 		g2.setFont(Assets.font("scoreFont"));
 		g2.setColor(infoTextColor);
 		Rectangle box = g2.getFontMetrics().getStringBounds(infoText, g2).getBounds();
-		g2.translate((width - box.width) / 2, (game.maze.infoTile.row + 1) * TS);
+		g2.translate((width - box.width) / 2, (game.maze.infoTile.row + 1) * PacManGameUI.TS);
 		g2.drawString(infoText, 0, 0);
 		g2.dispose();
 	}

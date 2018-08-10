@@ -1,15 +1,13 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.view.Spritesheet.TS;
-
 import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
-import de.amr.games.pacman.view.GamePanel;
-import de.amr.games.pacman.view.Spritesheet;
+import de.amr.games.pacman.view.BasicGamePanel;
+import de.amr.games.pacman.view.PacManGameUI;
 
 public class Bonus extends MazeEntity {
 
@@ -29,9 +27,9 @@ public class Bonus extends MazeEntity {
 		if (index < 0) {
 			throw new IllegalArgumentException("Illegal bonus value: " + value);
 		}
-		int size = 2 * Spritesheet.TS;
-		s_symbol = GamePanel.SPRITES.symbol(symbol).scale(size);
-		s_points = GamePanel.SPRITES.pinkNumber(index).scale(size);
+		int size = 2 * PacManGameUI.TS;
+		s_symbol = BasicGamePanel.SPRITES.symbol(symbol).scale(size);
+		s_points = BasicGamePanel.SPRITES.pinkNumber(index).scale(size);
 	}
 
 	public int getValue() {
@@ -57,9 +55,9 @@ public class Bonus extends MazeEntity {
 	
 	@Override
 	public void draw(Graphics2D g) {
-		g.translate(TS / 2, TS / 2);
+		g.translate(PacManGameUI.TS / 2, PacManGameUI.TS / 2);
 		super.draw(g);
-		g.translate(-TS / 2, -TS / 2);
+		g.translate(-PacManGameUI.TS / 2, -PacManGameUI.TS / 2);
 	}
 
 	@Override

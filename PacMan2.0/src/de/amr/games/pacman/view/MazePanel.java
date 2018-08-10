@@ -2,8 +2,7 @@ package de.amr.games.pacman.view;
 
 import static de.amr.games.pacman.model.Content.EATEN;
 import static de.amr.games.pacman.model.Content.ENERGIZER;
-import static de.amr.games.pacman.view.GamePanel.SPRITES;
-import static de.amr.games.pacman.view.Spritesheet.TS;
+import static de.amr.games.pacman.view.BasicGamePanel.SPRITES;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -17,7 +16,7 @@ import de.amr.games.pacman.actor.Cast;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.model.Maze;
 
-public class MazeUI extends GameEntity {
+public class MazePanel extends GameEntity {
 
 	private final Maze maze;
 	private final Cast actors;
@@ -27,7 +26,7 @@ public class MazeUI extends GameEntity {
 	private boolean flashing;
 	private int bonusTimer;
 
-	public MazeUI(Maze maze, Cast actors) {
+	public MazePanel(Maze maze, Cast actors) {
 		this.maze = maze;
 		this.actors = actors;
 		s_maze_normal = SPRITES.mazeFull().scale(getWidth(), getHeight());
@@ -59,12 +58,12 @@ public class MazeUI extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return maze.numCols() * TS;
+		return maze.numCols() * PacManGameUI.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return maze.numRows() * TS;
+		return maze.numRows() * PacManGameUI.TS;
 	}
 
 	public void setFlashing(boolean on) {
@@ -99,9 +98,9 @@ public class MazeUI extends GameEntity {
 	private void drawActors(Graphics2D g) {
 		actors.getBonus().ifPresent(bonus -> {
 			bonus.placeAt(maze.infoTile);
-			g.translate(0, -TS/2);
+			g.translate(0, -PacManGameUI.TS/2);
 			bonus.draw(g);
-			g.translate(0, TS/2);
+			g.translate(0, PacManGameUI.TS/2);
 		});
 		actors.getPacMan().draw(g);
 		actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
@@ -112,10 +111,10 @@ public class MazeUI extends GameEntity {
 		maze.tiles().forEach(tile -> {
 			char c = maze.getContent(tile);
 			if (c == EATEN || c == ENERGIZER && energizerBlinking.currentFrame() % 2 != 0) {
-				g.translate(tile.col * TS, tile.row * TS);
+				g.translate(tile.col * PacManGameUI.TS, tile.row * PacManGameUI.TS);
 				g.setColor(Color.BLACK);
-				g.fillRect(0, 0, TS, TS);
-				g.translate(-tile.col * TS, -tile.row * TS);
+				g.fillRect(0, 0, PacManGameUI.TS, PacManGameUI.TS);
+				g.translate(-tile.col * PacManGameUI.TS, -tile.row * PacManGameUI.TS);
 			}
 		});
 	}

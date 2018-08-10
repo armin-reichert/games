@@ -1,7 +1,6 @@
 package de.amr.games.pacman.view;
 
 import static de.amr.easy.game.Application.logger;
-import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -29,32 +28,32 @@ import de.amr.statemachine.StateObject;
  * 
  * @author Armin Reichert
  */
-public class GamePanelDecorator extends GamePanel {
+public class ExtendedGamePanel extends BasicGamePanel {
 
 	private static Image createGridImage(int numRows, int numCols) {
 		GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 				.getDefaultConfiguration();
-		Image image = conf.createCompatibleImage(numCols * TS, numRows * TS + 1, Transparency.TRANSLUCENT);
+		Image image = conf.createCompatibleImage(numCols * PacManGameUI.TS, numRows * PacManGameUI.TS + 1, Transparency.TRANSLUCENT);
 		Graphics g = image.getGraphics();
 		g.setColor(Color.LIGHT_GRAY);
 		for (int row = 0; row <= numRows; ++row) {
-			g.drawLine(0, row * TS, numCols * TS, row * TS);
+			g.drawLine(0, row * PacManGameUI.TS, numCols * PacManGameUI.TS, row * PacManGameUI.TS);
 		}
 		for (int col = 1; col < numCols; ++col) {
-			g.drawLine(col * TS, 0, col * TS, numRows * TS);
+			g.drawLine(col * PacManGameUI.TS, 0, col * PacManGameUI.TS, numRows * PacManGameUI.TS);
 		}
 		return image;
 	}
 
 	private static final String INFTY = Character.toString('\u221E');
 
-	private final GamePanel base;
+	private final BasicGamePanel base;
 	private final Image gridImage;
 	private boolean showGrid;
 	private boolean showRoutes;
 	private boolean showStates;
 
-	public GamePanelDecorator(GamePanel base) {
+	public ExtendedGamePanel(BasicGamePanel base) {
 		super(base.width, base.height, base.game, base.actors);
 		this.base = base;
 		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
@@ -137,7 +136,7 @@ public class GamePanelDecorator extends GamePanel {
 		PacMan pacMan = actors.getPacMan();
 		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacManState(pacMan));
 		actors.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
-			drawText(g, ghostColor(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), ghostState(ghost));
+			drawText(g, ghostColor(ghost), ghost.tf.getX() - PacManGameUI.TS, ghost.tf.getY(), ghostState(ghost));
 		});
 		g.translate(-base.mazeUI.tf.getX(), -base.mazeUI.tf.getY());
 	}
@@ -178,8 +177,8 @@ public class GamePanelDecorator extends GamePanel {
 	private void drawText(Graphics2D g, Color color, float x, float y, String text) {
 		g.translate(x, y);
 		g.setColor(color);
-		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, TS / 2));
-		g.drawString(text, 0, -TS / 2);
+		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, PacManGameUI.TS / 2));
+		g.drawString(text, 0, -PacManGameUI.TS / 2);
 		g.translate(-x, -y);
 	}
 
@@ -202,17 +201,17 @@ public class GamePanelDecorator extends GamePanel {
 			g.translate(base.mazeUI.tf.getX(), base.mazeUI.tf.getY());
 			for (int i = 0; i < path.size() - 1; ++i) {
 				Tile u = path.get(i), v = path.get(i + 1);
-				int u1 = u.col * TS + TS / 2;
-				int u2 = u.row * TS + TS / 2;
-				int v1 = v.col * TS + TS / 2;
-				int v2 = v.row * TS + TS / 2;
+				int u1 = u.col * PacManGameUI.TS + PacManGameUI.TS / 2;
+				int u2 = u.row * PacManGameUI.TS + PacManGameUI.TS / 2;
+				int v1 = v.col * PacManGameUI.TS + PacManGameUI.TS / 2;
+				int v2 = v.row * PacManGameUI.TS + PacManGameUI.TS / 2;
 				g.drawLine(u1, u2, v1, v2);
 			}
 			// Target tile
 			Tile tile = path.get(path.size() - 1);
-			g.translate(tile.col * TS, tile.row * TS);
-			g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
-			g.translate(-tile.col * TS, -tile.row * TS);
+			g.translate(tile.col * PacManGameUI.TS, tile.row * PacManGameUI.TS);
+			g.fillRect(PacManGameUI.TS / 4, PacManGameUI.TS / 4, PacManGameUI.TS / 2, PacManGameUI.TS / 2);
+			g.translate(-tile.col * PacManGameUI.TS, -tile.row * PacManGameUI.TS);
 			g.translate(-base.mazeUI.tf.getX(), -base.mazeUI.tf.getY());
 		}
 	}

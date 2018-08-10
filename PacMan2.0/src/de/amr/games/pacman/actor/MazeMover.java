@@ -4,7 +4,6 @@ import static de.amr.easy.game.math.Vector2f.smul;
 import static de.amr.easy.game.math.Vector2f.sum;
 import static de.amr.games.pacman.model.Content.WALL;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.view.Spritesheet.TS;
 import static java.lang.Math.round;
 
 import java.util.Map;
@@ -17,6 +16,7 @@ import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.Navigation;
 import de.amr.games.pacman.routing.impl.NavigationSystem;
+import de.amr.games.pacman.view.PacManGameUI;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -161,13 +161,13 @@ public abstract class MazeMover<S> extends MazeEntity {
 		float x = nextPosition.x, y = nextPosition.y;
 		switch (dir) {
 		case Top4.W:
-			return new Tile(round(x) / TS, current.row);
+			return new Tile(round(x) / PacManGameUI.TS, current.row);
 		case Top4.E:
-			return new Tile(round(x + getWidth()) / TS, current.row);
+			return new Tile(round(x + getWidth()) / PacManGameUI.TS, current.row);
 		case Top4.N:
-			return new Tile(current.col, round(y) / TS);
+			return new Tile(current.col, round(y) / PacManGameUI.TS);
 		case Top4.S:
-			return new Tile(current.col, round(y + getHeight()) / TS);
+			return new Tile(current.col, round(y + getHeight()) / PacManGameUI.TS);
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + dir);
 		}

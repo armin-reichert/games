@@ -14,7 +14,7 @@ import java.util.function.IntSupplier;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.actor.PacMan;
-import de.amr.games.pacman.view.Spritesheet;
+import de.amr.games.pacman.view.PacManGameUI;
 
 public class Game {
 
@@ -78,7 +78,7 @@ public class Game {
 
 	/** Tiles per second. */
 	private float tps(float value) {
-		return (value * Spritesheet.TS) / fnTicksPerSecond.getAsInt();
+		return (value * PacManGameUI.TS) / fnTicksPerSecond.getAsInt();
 	}
 
 	/** Ticks representing the given seconds. */

@@ -1,21 +1,21 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.view.Spritesheet.TS;
 import static java.lang.Math.round;
 
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.games.pacman.model.Tile;
+import de.amr.games.pacman.view.PacManGameUI;
 
 public abstract class MazeEntity extends GameEntity {
 
 	public int row() {
-		return round(tf.getY() + getHeight() / 2) / TS;
+		return round(tf.getY() + getHeight() / 2) / PacManGameUI.TS;
 	}
 
 	public int col() {
-		return round(tf.getX() + getWidth() / 2) / TS;
+		return round(tf.getX() + getWidth() / 2) / PacManGameUI.TS;
 	}
 
 	public Tile getTile() {
@@ -27,11 +27,11 @@ public abstract class MazeEntity extends GameEntity {
 	}
 
 	public void placeAt(int col, int row) {
-		tf.moveTo(col * TS, row * TS);
+		tf.moveTo(col * PacManGameUI.TS, row * PacManGameUI.TS);
 	}
 
 	public boolean isExactlyOverTile() {
-		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
+		return round(tf.getX()) % PacManGameUI.TS == 0 && round(tf.getY()) % PacManGameUI.TS == 0;
 	}
 
 	@Override
@@ -46,11 +46,11 @@ public abstract class MazeEntity extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return TS;
+		return PacManGameUI.TS;
 	}
 
 	@Override
 	public int getHeight() {
-		return TS;
+		return PacManGameUI.TS;
 	}
 }
