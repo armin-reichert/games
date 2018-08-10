@@ -56,6 +56,9 @@ public class GameUI implements ViewController {
 
 	@Override
 	public void update() {
+		mazeUI.update();
+		hud.update();
+		statusUI.update();
 	}
 
 	@Override

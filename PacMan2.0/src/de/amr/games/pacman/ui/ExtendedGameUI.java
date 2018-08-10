@@ -29,7 +29,7 @@ import de.amr.statemachine.StateObject;
  * 
  * @author Armin Reichert
  */
-public class EnhancedGameUI extends GameUI {
+public class ExtendedGameUI extends GameUI {
 
 	private static final String INFTY = Character.toString('\u221E');
 
@@ -40,7 +40,7 @@ public class EnhancedGameUI extends GameUI {
 
 	private Image gridImage;
 
-	public EnhancedGameUI(GameUI gameUI) {
+	public ExtendedGameUI(GameUI gameUI) {
 		super(gameUI.width, gameUI.height, gameUI.game, gameUI.actors);
 		this.gameUI = gameUI;
 		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());

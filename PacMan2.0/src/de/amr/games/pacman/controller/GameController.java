@@ -35,7 +35,7 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.EnhancedGameUI;
+import de.amr.games.pacman.ui.ExtendedGameUI;
 import de.amr.games.pacman.ui.GameUI;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
@@ -55,7 +55,7 @@ public class GameController implements Controller {
 		Maze maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
 		actors = new GameActors(game);
-		gameUI = new EnhancedGameUI(new GameUI(28 * TS, 36 * TS, game, actors));
+		gameUI = new ExtendedGameUI(new GameUI(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
 		gameControl = createGameControl();
 		actors.addObserver(gameControl::process);
 	}
@@ -67,15 +67,15 @@ public class GameController implements Controller {
 
 	@Override
 	public void init() {
-		// Logging
 		LOG.setLevel(Level.INFO);
 		gameControl.traceTo(LOG, game.fnTicksPerSecond);
 		actors.getPacMan().getStateMachine().traceTo(LOG, game.fnTicksPerSecond);
 		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(LOG, game.fnTicksPerSecond));
-
-		gameControl.init();
-//		actors.getGhosts().forEach(ghost -> actors.setGhostActive(ghost, true));
 		actors.setGhostActive(actors.getBlinky(), true);
+		actors.setGhostActive(actors.getPinky(), false);
+		actors.setGhostActive(actors.getInky(), false);
+		actors.setGhostActive(actors.getClyde(), false);
+		gameControl.init();
 	}
 
 	@Override
