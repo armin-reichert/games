@@ -259,7 +259,7 @@ public class GameController implements Controller {
 				LOG.info(() -> String.format("PacMan found bonus %s of value %d", bonus.getSymbol(), bonus.getValue()));
 				bonus.setHonored();
 				game.score += bonus.getValue();
-				gameUI.mazeUI.showBonus(game.sec(1));
+				gameUI.mazeUI.setBonusTimer(game.sec(1));
 			});
 		}
 
@@ -278,7 +278,7 @@ public class GameController implements Controller {
 			}
 			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
 				actors.addBonus(game.getBonusSymbol(), game.getBonusValue());
-				gameUI.mazeUI.showBonus(game.getBonusTime());
+				gameUI.mazeUI.setBonusTimer(game.getBonusTime());
 			}
 			if (e.food == Content.ENERGIZER) {
 				game.ghostsKilledInSeries = 0;

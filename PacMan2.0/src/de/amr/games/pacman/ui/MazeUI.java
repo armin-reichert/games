@@ -1,5 +1,7 @@
 package de.amr.games.pacman.ui;
 
+import static de.amr.games.pacman.model.Content.EATEN;
+import static de.amr.games.pacman.model.Content.ENERGIZER;
 import static de.amr.games.pacman.ui.GameUI.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
@@ -13,19 +15,15 @@ import de.amr.easy.game.sprite.CyclicAnimation;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
-import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.model.Tile;
 
 public class MazeUI extends GameEntity {
 
 	private final Maze maze;
 	private final GameActors actors;
 	private final Animation energizerBlinking;
-
 	private final Sprite s_maze_normal;
 	private final Sprite s_maze_flashing;
-
 	private boolean flashing;
 	private int bonusTimer;
 
@@ -69,24 +67,20 @@ public class MazeUI extends GameEntity {
 		return maze.numRows() * TS;
 	}
 
-	public Maze getMaze() {
-		return maze;
-	}
-
 	public void setFlashing(boolean on) {
 		flashing = on;
 	}
 
+	public void setBonusTimer(int ticks) {
+		bonusTimer = ticks;
+	}
+	
 	@Override
 	public void enableAnimation(boolean on) {
 		super.enableAnimation(on);
 		energizerBlinking.setEnabled(on);
 		actors.getPacMan().enableAnimation(on);
 		actors.getActiveGhosts().forEach(ghost -> ghost.enableAnimation(on));
-	}
-
-	public void showBonus(int ticks) {
-		bonusTimer = ticks;
 	}
 
 	@Override
@@ -96,28 +90,33 @@ public class MazeUI extends GameEntity {
 			s_maze_flashing.draw(g);
 		} else {
 			s_maze_normal.draw(g);
-			maze.tiles().filter(tile -> Content.isFood(maze.getContent(tile))).forEach(tile -> drawFood(g, tile));
-			actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING)
-					.forEach(ghost -> ghost.draw(g));
-			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING)
-					.forEach(ghost -> ghost.draw(g));
-			actors.getPacMan().draw(g);
-			actors.getBonus().ifPresent(bonus -> {
-				bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
-				bonus.draw(g);
-			});
+			drawFood(g);
+			drawActors(g);
 		}
 		g.translate(-tf.getX(), -tf.getY());
 	}
 
-	private void drawFood(Graphics2D g, Tile tile) {
-		g.translate(tile.col * TS, tile.row * TS);
-		g.setColor(Color.BLACK);
-		if (maze.getContent(tile) == Content.EATEN) {
-			g.fillRect(0, 0, TS, TS);
-		} else if (maze.getContent(tile) == Content.ENERGIZER && energizerBlinking.currentFrame() % 2 != 0) {
-			g.fillRect(0, 0, TS, TS);
-		}
-		g.translate(-tile.col * TS, -tile.row * TS);
+	private void drawActors(Graphics2D g) {
+		actors.getBonus().ifPresent(bonus -> {
+			bonus.placeAt(maze.infoTile);
+			g.translate(0, -TS/2);
+			bonus.draw(g);
+			g.translate(0, TS/2);
+		});
+		actors.getPacMan().draw(g);
+		actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
+		actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
+	}
+
+	private void drawFood(Graphics2D g) {
+		maze.tiles().forEach(tile -> {
+			char c = maze.getContent(tile);
+			if (c == EATEN || c == ENERGIZER && energizerBlinking.currentFrame() % 2 != 0) {
+				g.translate(tile.col * TS, tile.row * TS);
+				g.setColor(Color.BLACK);
+				g.fillRect(0, 0, TS, TS);
+				g.translate(-tile.col * TS, -tile.row * TS);
+			}
+		});
 	}
 }

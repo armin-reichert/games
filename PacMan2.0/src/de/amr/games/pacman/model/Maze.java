@@ -1,6 +1,8 @@
 package de.amr.games.pacman.model;
 
 import static de.amr.games.pacman.model.Content.EMPTY;
+import static de.amr.games.pacman.model.Content.ENERGIZER;
+import static de.amr.games.pacman.model.Content.PELLET;
 import static de.amr.games.pacman.model.Content.POS_BLINKY;
 import static de.amr.games.pacman.model.Content.POS_CLYDE;
 import static de.amr.games.pacman.model.Content.POS_INFO;
@@ -58,7 +60,7 @@ public class Maze {
 					infoTile = new Tile(col, row);
 				} else if (c == POS_PACMAN) {
 					pacManHome = new Tile(col, row);
-				} else if (Content.isFood(c)) {
+				} else if (c == PELLET || c == ENERGIZER) {
 					foodCount += 1;
 				}
 			}

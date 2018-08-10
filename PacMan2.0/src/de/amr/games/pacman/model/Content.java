@@ -20,8 +20,4 @@ public interface Content {
 	public static final char PELLET = '.';
 	public static final char ENERGIZER = '*';
 	public static final char EATEN = ':';
-
-	public static boolean isFood(char c) {
-		return c == PELLET || c == ENERGIZER || c == EATEN;
-	}
 }
