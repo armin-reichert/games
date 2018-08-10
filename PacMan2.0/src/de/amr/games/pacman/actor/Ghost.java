@@ -8,7 +8,6 @@ import static de.amr.games.pacman.actor.Ghost.State.HOME;
 import static de.amr.games.pacman.actor.Ghost.State.SAFE;
 import static de.amr.games.pacman.actor.Ghost.State.SCATTERING;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.view.BasicGamePanel.SPRITES;
 
 import java.util.EnumMap;
 import java.util.stream.Stream;
@@ -67,14 +66,14 @@ public class Ghost extends MazeMover<Ghost.State> {
 	private void createSprites(int color) {
 		int size = 2 * PacManGameUI.TS;
 		TOPOLOGY.dirs().forEach(dir -> {
-			s_color[dir] = SPRITES.ghostColored(color, dir).scale(size);
-			s_eyes[dir] = SPRITES.ghostEyes(dir).scale(size);
+			s_color[dir] = PacManGameUI.SPRITES.ghostColored(color, dir).scale(size);
+			s_eyes[dir] = PacManGameUI.SPRITES.ghostEyes(dir).scale(size);
 		});
 		for (int i = 0; i < 4; ++i) {
-			s_numbers[i] = SPRITES.greenNumber(i).scale(size);
+			s_numbers[i] = PacManGameUI.SPRITES.greenNumber(i).scale(size);
 		}
-		s_awed = SPRITES.ghostAwed().scale(size);
-		s_blinking = SPRITES.ghostBlinking().scale(size);
+		s_awed = PacManGameUI.SPRITES.ghostAwed().scale(size);
+		s_blinking = PacManGameUI.SPRITES.ghostBlinking().scale(size);
 	}
 
 	@Override

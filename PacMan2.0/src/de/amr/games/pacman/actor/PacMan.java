@@ -5,7 +5,6 @@ import static de.amr.games.pacman.actor.PacMan.State.SAFE;
 import static de.amr.games.pacman.actor.PacMan.State.STEROIDS;
 import static de.amr.games.pacman.actor.PacMan.State.VULNERABLE;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.view.BasicGamePanel.SPRITES;
 
 import java.util.EnumMap;
 import java.util.Optional;
@@ -60,9 +59,9 @@ public class PacMan extends MazeMover<PacMan.State> {
 	private Sprite s_current;
 
 	private void createSprites(int size) {
-		TOPOLOGY.dirs().forEach(dir -> s_walking_to[dir] = SPRITES.pacManWalking(dir).scale(size));
-		s_dying = SPRITES.pacManDying().scale(size);
-		s_full = SPRITES.pacManFull().scale(size);
+		TOPOLOGY.dirs().forEach(dir -> s_walking_to[dir] = PacManGameUI.SPRITES.pacManWalking(dir).scale(size));
+		s_dying = PacManGameUI.SPRITES.pacManDying().scale(size);
+		s_full = PacManGameUI.SPRITES.pacManFull().scale(size);
 	}
 
 	@Override

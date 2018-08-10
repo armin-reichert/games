@@ -14,8 +14,6 @@ import de.amr.games.pacman.model.Game;
 
 public class BasicGamePanel implements PacManGameUI {
 
-	public static final PacManSprites SPRITES = new PacManSprites();
-
 	protected final int width, height;
 	protected final Game game;
 	protected final Cast actors;
@@ -31,7 +29,7 @@ public class BasicGamePanel implements PacManGameUI {
 		this.game = game;
 		this.actors = actors;
 		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, PacManGameUI.TS * 3 / 2);
-		lifeImage = SPRITES.pacManWalking(Top4.W).frame(1);
+		lifeImage = PacManGameUI.SPRITES.pacManWalking(Top4.W).frame(1);
 		mazeUI = new MazePanel(game.maze, actors);
 		mazeUI.tf.moveTo(0, 3 * PacManGameUI.TS);
 	}

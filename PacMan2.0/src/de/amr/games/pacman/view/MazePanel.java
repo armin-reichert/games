@@ -2,7 +2,6 @@ package de.amr.games.pacman.view;
 
 import static de.amr.games.pacman.model.Content.EATEN;
 import static de.amr.games.pacman.model.Content.ENERGIZER;
-import static de.amr.games.pacman.view.BasicGamePanel.SPRITES;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -29,8 +28,8 @@ public class MazePanel extends GameEntity {
 	public MazePanel(Maze maze, Cast actors) {
 		this.maze = maze;
 		this.actors = actors;
-		s_maze_normal = SPRITES.mazeFull().scale(getWidth(), getHeight());
-		s_maze_flashing = SPRITES.mazeFlashing().scale(getWidth(), getHeight());
+		s_maze_normal = PacManGameUI.SPRITES.mazeFull().scale(getWidth(), getHeight());
+		s_maze_flashing = PacManGameUI.SPRITES.mazeFlashing().scale(getWidth(), getHeight());
 		energizerBlinking = new CyclicAnimation(2);
 		energizerBlinking.setFrameDuration(250);
 	}

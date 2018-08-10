@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
-import de.amr.games.pacman.view.BasicGamePanel;
 import de.amr.games.pacman.view.PacManGameUI;
 
 public class Bonus extends MazeEntity {
@@ -28,8 +27,8 @@ public class Bonus extends MazeEntity {
 			throw new IllegalArgumentException("Illegal bonus value: " + value);
 		}
 		int size = 2 * PacManGameUI.TS;
-		s_symbol = BasicGamePanel.SPRITES.symbol(symbol).scale(size);
-		s_points = BasicGamePanel.SPRITES.pinkNumber(index).scale(size);
+		s_symbol = PacManGameUI.SPRITES.symbol(symbol).scale(size);
+		s_points = PacManGameUI.SPRITES.pinkNumber(index).scale(size);
 	}
 
 	public int getValue() {
