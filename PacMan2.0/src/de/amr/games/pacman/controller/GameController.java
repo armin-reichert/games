@@ -1,12 +1,12 @@
 package de.amr.games.pacman.controller;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.pacman.controller.GameController.State.CHANGING_LEVEL;
-import static de.amr.games.pacman.controller.GameController.State.GAME_OVER;
-import static de.amr.games.pacman.controller.GameController.State.GHOST_DYING;
-import static de.amr.games.pacman.controller.GameController.State.PACMAN_DYING;
-import static de.amr.games.pacman.controller.GameController.State.PLAYING;
-import static de.amr.games.pacman.controller.GameController.State.READY;
+import static de.amr.games.pacman.controller.GameController.PlayState.CHANGING_LEVEL;
+import static de.amr.games.pacman.controller.GameController.PlayState.GAME_OVER;
+import static de.amr.games.pacman.controller.GameController.PlayState.GHOST_DYING;
+import static de.amr.games.pacman.controller.GameController.PlayState.PACMAN_DYING;
+import static de.amr.games.pacman.controller.GameController.PlayState.PLAYING;
+import static de.amr.games.pacman.controller.GameController.PlayState.READY;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;
@@ -42,14 +42,14 @@ import de.amr.statemachine.StateObject;
 
 public class GameController implements Controller {
 
-	public enum State {
+	public enum PlayState {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
-	};
+	}
 
 	private final Game game;
 	private final GameActors actors;
 	private final GameUI gameUI;
-	private final StateMachine<State, GameEvent> gameControl;
+	private final StateMachine<PlayState, GameEvent> gameControl;
 
 	public GameController(IntSupplier fnFrequency) {
 		Maze maze = new Maze(Assets.text("maze.txt"));
@@ -88,10 +88,10 @@ public class GameController implements Controller {
 		return gameControl.state(PLAYING);
 	}
 
-	private StateMachine<State, GameEvent> createGameControl() {
+	private StateMachine<PlayState, GameEvent> createGameControl() {
 		return
 		//@formatter:off
-		StateMachine.define(State.class, GameEvent.class)
+		StateMachine.define(PlayState.class, GameEvent.class)
 			
 			.description("[GameControl]")
 			.initialState(READY)
@@ -183,7 +183,7 @@ public class GameController implements Controller {
 		//@formatter:on
 	}
 
-	private class ReadyState extends StateObject<State, GameEvent> {
+	private class ReadyState extends StateObject<PlayState, GameEvent> {
 
 		@Override
 		public void onEntry() {
@@ -200,7 +200,7 @@ public class GameController implements Controller {
 		}
 	}
 
-	private class PlayingState extends StateObject<State, GameEvent> {
+	private class PlayingState extends StateObject<PlayState, GameEvent> {
 
 		@Override
 		public void onTick() {
@@ -287,7 +287,7 @@ public class GameController implements Controller {
 		}
 	}
 
-	private class ChangingLevelState extends StateObject<State, GameEvent> {
+	private class ChangingLevelState extends StateObject<PlayState, GameEvent> {
 
 		@Override
 		public void onEntry() {
@@ -316,7 +316,7 @@ public class GameController implements Controller {
 		}
 	}
 
-	private class GhostDyingState extends StateObject<State, GameEvent> {
+	private class GhostDyingState extends StateObject<PlayState, GameEvent> {
 
 		@Override
 		public void onEntry() {
@@ -336,7 +336,7 @@ public class GameController implements Controller {
 		}
 	}
 
-	private class PacManDyingState extends StateObject<State, GameEvent> {
+	private class PacManDyingState extends StateObject<PlayState, GameEvent> {
 
 		@Override
 		public void onEntry() {
@@ -356,7 +356,7 @@ public class GameController implements Controller {
 		}
 	}
 
-	private class GameOverState extends StateObject<State, GameEvent> {
+	private class GameOverState extends StateObject<PlayState, GameEvent> {
 
 		@Override
 		public void onEntry() {
