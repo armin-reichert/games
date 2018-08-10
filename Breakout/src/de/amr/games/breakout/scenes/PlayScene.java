@@ -45,7 +45,7 @@ public class PlayScene implements ViewController {
 	public PlayScene(BreakoutGame app) {
 		this.app = app;
 		control = new PlaySceneControl();
-		control.setLogger(Application.LOG);
+		control.setLogger(Application.logger);
 	}
 
 	@Override

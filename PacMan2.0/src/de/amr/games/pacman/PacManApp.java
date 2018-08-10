@@ -1,6 +1,6 @@
 package de.amr.games.pacman;
 
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import de.amr.easy.game.Application;
 import de.amr.games.pacman.controller.GameController;
@@ -18,7 +18,7 @@ public class PacManApp extends Application {
 			try {
 				scale = Float.parseFloat(args[0]);
 			} catch (NumberFormatException e) {
-				Application.LOG.info("Illegal scaling value: " + args[0]);
+				Application.logger.info("Illegal scaling value: " + args[0]);
 			}
 		}
 		launch(new PacManApp(scale));

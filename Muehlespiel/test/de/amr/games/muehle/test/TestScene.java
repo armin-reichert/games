@@ -1,6 +1,6 @@
 package de.amr.games.muehle.test;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.muehle.model.board.Board.positions;
 import static de.amr.games.muehle.model.board.StoneColor.BLACK;
 import static de.amr.games.muehle.model.board.StoneColor.WHITE;
@@ -75,15 +75,15 @@ public class TestScene implements ViewController {
 	}
 
 	private void printBoardInfo() {
-		LOG.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
-		LOG.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
-		LOG.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
-		LOG.info("Positions opening one black mill: " + toCSV(board.positionsOpeningMill(BLACK)));
-		LOG.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
-		LOG.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
-		LOG.info("Positions from where can close white mill: "
+		logger.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
+		logger.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
+		logger.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
+		logger.info("Positions opening one black mill: " + toCSV(board.positionsOpeningMill(BLACK)));
+		logger.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
+		logger.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
+		logger.info("Positions from where can close white mill: "
 				+ toCSV(positions().filter(p -> board.canCloseMillMovingFrom(p, WHITE))));
-		LOG.info("Positions from where can close black mill: "
+		logger.info("Positions from where can close black mill: "
 				+ toCSV(positions().filter(p -> board.canCloseMillMovingFrom(p, BLACK))));
 	}
 

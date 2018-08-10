@@ -1,9 +1,9 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.view;
 
 import static de.amr.games.pacman.model.Content.EATEN;
 import static de.amr.games.pacman.model.Content.ENERGIZER;
-import static de.amr.games.pacman.ui.GamePanel.SPRITES;
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.games.pacman.view.GamePanel.SPRITES;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -1,6 +1,6 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.birdy.entities.City.CityEvent.SunGoesDown;
 import static de.amr.games.birdy.entities.City.CityEvent.SunGoesUp;
 import static de.amr.games.birdy.entities.City.CityState.Day;
@@ -74,7 +74,7 @@ public class City extends GameEntity {
 	@Override
 	public void init() {
 		control.init();
-		control.setLogger(LOG);
+		control.setLogger(logger);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class City extends GameEntity {
 			Star star = app.entities.store(new Star());
 			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		});
-		LOG.info("Created " + numStars + " new stars");
+		logger.info("Created " + numStars + " new stars");
 	}
 
 	public boolean isNight() {

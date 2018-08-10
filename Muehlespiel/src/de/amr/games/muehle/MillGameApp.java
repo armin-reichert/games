@@ -34,7 +34,7 @@ public class MillGameApp extends Application {
 		MillGameController controller = new MillGameController(this, pulse, model);
 		controller.setMoveTimeSeconds(0.75f);
 		controller.setPlacingTimeSeconds(1.5f);
-		controller.setLogger(Application.LOG);
+		controller.setLogger(Application.logger);
 		setController(controller);
 	}
 }

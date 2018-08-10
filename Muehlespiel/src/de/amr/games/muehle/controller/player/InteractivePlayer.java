@@ -1,6 +1,6 @@
 package de.amr.games.muehle.controller.player;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.muehle.model.board.Board.areNeighbors;
 import static de.amr.games.muehle.model.board.Board.neighbor;
 import static de.amr.games.muehle.model.board.Direction.EAST;
@@ -92,21 +92,21 @@ public class InteractivePlayer implements Player {
 		if (!move.from().isPresent()) {
 			boardPositionClicked().ifPresent(p -> {
 				if (model.board.isEmptyPosition(p)) {
-					LOG.info(Messages.text("stone_at_position_not_existing", p));
+					logger.info(Messages.text("stone_at_position_not_existing", p));
 				} else if (!model.board.hasStoneAt(p, color)) {
-					LOG.info(Messages.text("stone_at_position_wrong_color", p));
+					logger.info(Messages.text("stone_at_position_wrong_color", p));
 				} else if (!canJump() && !model.board.hasEmptyNeighbor(p)) {
-					LOG.info(Messages.text("stone_at_position_cannot_move", p));
+					logger.info(Messages.text("stone_at_position_cannot_move", p));
 				} else {
 					move.setFrom(p);
-					LOG.info("Move starts from " + p);
+					logger.info("Move starts from " + p);
 				}
 			});
 		} else if (!move.to().isPresent()) {
 			supplyMoveEndPosition().ifPresent(p -> move.setTo(p));
 			if (move.to().isPresent() && model.board.isEmptyPosition(move.to().get())
 					&& (canJump() || areNeighbors(move.from().get(), move.to().get()))) {
-				LOG.info("Move leads to " + move.to().get());
+				logger.info("Move leads to " + move.to().get());
 				return Optional.of(move);
 			} else {
 				move.clearTo();

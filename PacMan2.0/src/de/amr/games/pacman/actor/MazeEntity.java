@@ -1,6 +1,6 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 import static java.lang.Math.round;
 
 import java.awt.Graphics2D;

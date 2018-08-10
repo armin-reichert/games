@@ -32,7 +32,7 @@ public class MenuScene implements ViewController {
 	public MenuScene(PongGame app) {
 		this.app = app;
 		control = createStateMachine();
-		control.setLogger(Application.LOG);
+		control.setLogger(Application.logger);
 	}
 
 	@Override

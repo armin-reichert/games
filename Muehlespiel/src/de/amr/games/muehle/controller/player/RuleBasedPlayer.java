@@ -1,6 +1,6 @@
 package de.amr.games.muehle.controller.player;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static java.lang.String.format;
 
 import java.util.Optional;
@@ -70,19 +70,19 @@ public abstract class RuleBasedPlayer implements Player {
 
 	private OptionalInt tryPlacingRule(PlacingRule rule) {
 		OptionalInt optPos = rule.supplyPlacingPosition(this);
-		optPos.ifPresent(pos -> LOG.info(name() + ": " + format(rule.getDescription(), pos)));
+		optPos.ifPresent(pos -> logger.info(name() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
 	private OptionalInt tryRemovalRule(RemovalRule rule) {
 		OptionalInt optPos = rule.supplyRemovalPosition(this, color().other());
-		optPos.ifPresent(pos -> LOG.info(name() + ": " + format(rule.getDescription(), pos)));
+		optPos.ifPresent(pos -> logger.info(name() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
 	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
-		optMove.ifPresent(move -> LOG
+		optMove.ifPresent(move -> logger
 				.info(name() + ": " + format(rule.getDescription(), move.from().get(), move.to().get())));
 		return optMove;
 	}

@@ -1,6 +1,6 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.view;
 
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,7 +14,7 @@ import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.model.Game;
 
-public class GamePanel implements GameView {
+public class GamePanel implements GameViewController {
 
 	public static final Spritesheet SPRITES = new Spritesheet();
 

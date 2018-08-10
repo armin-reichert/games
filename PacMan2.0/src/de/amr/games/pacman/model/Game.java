@@ -14,7 +14,7 @@ import java.util.function.IntSupplier;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.actor.PacMan;
-import de.amr.games.pacman.ui.Spritesheet;
+import de.amr.games.pacman.view.Spritesheet;
 
 public class Game {
 

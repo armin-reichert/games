@@ -1,6 +1,6 @@
 package de.amr.games.birdy.play.scenes;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.Finished;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowCredits;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowGameTitle;
@@ -94,7 +94,7 @@ public class IntroScene implements ViewController {
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
 		creditsText.visibility = () -> control.is(ShowCredits, Wait);
 
-		control.setLogger(LOG);
+		control.setLogger(logger);
 		control.init();
 	}
 

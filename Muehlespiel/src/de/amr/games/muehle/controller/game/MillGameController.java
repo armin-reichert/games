@@ -1,6 +1,6 @@
 package de.amr.games.muehle.controller.game;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
@@ -167,7 +167,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	private void turnMovingTo(Player player) {
 		turn = player;
 		moveControl = new MoveController(turn, view, pulse, moveTimeSeconds);
-		moveControl.setLogger(LOG);
+		moveControl.setLogger(logger);
 		moveControl.init();
 		view.showMessage("must_move", turn.name());
 	}
@@ -219,7 +219,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 					addInput(STONE_PLACED);
 				}
 			} else {
-				LOG.info(Messages.text("stone_at_position", placedAt));
+				logger.info(Messages.text("stone_at_position", placedAt));
 			}
 		});
 	}
@@ -229,16 +229,16 @@ public class MillGameController extends MillGameStateMachine implements Controll
 		turn.supplyRemovalPosition().ifPresent(p -> {
 			StoneColor colorToRemove = playerNotInTurn().color();
 			if (model.board.isEmptyPosition(p)) {
-				LOG.info(Messages.text("stone_at_position_not_existing", p));
+				logger.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (model.board.getStoneAt(p).get() != colorToRemove) {
-				LOG.info(Messages.text("stone_at_position_wrong_color", p));
+				logger.info(Messages.text("stone_at_position_wrong_color", p));
 			} else if (model.board.inMill(p, colorToRemove)
 					&& !model.board.allStonesInMills(colorToRemove)) {
-				LOG.info(Messages.text("stone_cannot_be_removed_from_mill"));
+				logger.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				view.removeStoneAt(p);
 				addInput(STONE_REMOVED);
-				LOG.info(Messages.text("removed_stone_at_position", turn.name(), p));
+				logger.info(Messages.text("removed_stone_at_position", turn.name(), p));
 			}
 		});
 	}

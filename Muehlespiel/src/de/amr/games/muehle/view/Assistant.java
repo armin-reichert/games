@@ -1,6 +1,6 @@
 package de.amr.games.muehle.view;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.muehle.model.board.Board.neighbors;
 import static de.amr.games.muehle.model.board.Board.positions;
 
@@ -72,10 +72,10 @@ public class Assistant extends GameEntity {
 	public void setHelpLevel(HelpLevel level) {
 		helpLevel = level;
 		if (helpLevel == HelpLevel.OFF) {
-			LOG.info(Messages.text("assistant_off"));
+			logger.info(Messages.text("assistant_off"));
 		} else {
 			tellYoFine();
-			LOG.info(Messages.text("assistant_on"));
+			logger.info(Messages.text("assistant_on"));
 		}
 	}
 

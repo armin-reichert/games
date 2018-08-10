@@ -1,10 +1,10 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.view;
 
 import java.awt.Color;
 
 import de.amr.easy.game.view.ViewController;
 
-public interface GameView extends ViewController {
+public interface GameViewController extends ViewController {
 
 	void enableAnimation(boolean enable);
 

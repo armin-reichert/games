@@ -1,6 +1,6 @@
 package de.amr.games.pacman.actor;
 
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Graphics2D;
 import java.util.Arrays;
@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pacman.model.BonusSymbol;
-import de.amr.games.pacman.ui.GamePanel;
-import de.amr.games.pacman.ui.Spritesheet;
+import de.amr.games.pacman.view.GamePanel;
+import de.amr.games.pacman.view.Spritesheet;
 
 public class Bonus extends MazeEntity {
 

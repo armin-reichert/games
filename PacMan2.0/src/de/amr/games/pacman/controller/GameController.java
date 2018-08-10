@@ -1,13 +1,13 @@
 package de.amr.games.pacman.controller;
 
-import static de.amr.easy.game.Application.LOG;
+import static de.amr.easy.game.Application.logger;
 import static de.amr.games.pacman.controller.GameController.PlayState.CHANGING_LEVEL;
 import static de.amr.games.pacman.controller.GameController.PlayState.GAME_OVER;
 import static de.amr.games.pacman.controller.GameController.PlayState.GHOST_DYING;
 import static de.amr.games.pacman.controller.GameController.PlayState.PACMAN_DYING;
 import static de.amr.games.pacman.controller.GameController.PlayState.PLAYING;
 import static de.amr.games.pacman.controller.GameController.PlayState.READY;
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -35,9 +35,9 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.InternalsGamePanel;
-import de.amr.games.pacman.ui.GamePanel;
-import de.amr.games.pacman.ui.GameView;
+import de.amr.games.pacman.view.GamePanel;
+import de.amr.games.pacman.view.GameViewController;
+import de.amr.games.pacman.view.GamePanelDecorator;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 
@@ -50,40 +50,40 @@ public class GameController implements Controller {
 	private final Maze maze;
 	private final Game game;
 	private final GameActors actors;
-	private final GameView gameUI;
+	private final GameViewController currentView;
 	private final StateMachine<PlayState, GameEvent> gameControl;
 
 	public GameController(IntSupplier fnFrequency) {
 		maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
 		actors = new GameActors(game);
-		gameUI = new InternalsGamePanel(new GamePanel(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
+		currentView = new GamePanelDecorator(new GamePanel(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
 		gameControl = createGameControl();
 		actors.addObserver(gameControl::process);
 	}
 
 	@Override
 	public View currentView() {
-		return gameUI;
+		return currentView;
 	}
 
 	@Override
 	public void init() {
-		LOG.setLevel(Level.INFO);
-		gameControl.traceTo(LOG, game.fnTicksPerSecond);
-		actors.getPacMan().getStateMachine().traceTo(LOG, game.fnTicksPerSecond);
-		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(LOG, game.fnTicksPerSecond));
-		actors.setGhostActive(actors.getBlinky(), true);
-		actors.setGhostActive(actors.getPinky(), false);
-		actors.setGhostActive(actors.getInky(), false);
-		actors.setGhostActive(actors.getClyde(), false);
+		logger.setLevel(Level.INFO);
+		actors.getPacMan().getStateMachine().traceTo(logger, game.fnTicksPerSecond);
+		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(logger, game.fnTicksPerSecond));
+		actors.setActive(actors.getBlinky(), true);
+		actors.setActive(actors.getPinky(), false);
+		actors.setActive(actors.getInky(), false);
+		actors.setActive(actors.getClyde(), false);
+		gameControl.traceTo(logger, game.fnTicksPerSecond);
 		gameControl.init();
 	}
 
 	@Override
 	public void update() {
 		gameControl.update();
-		gameUI.update();
+		currentView.update();
 	}
 
 	private PlayingState playingState() {
@@ -191,14 +191,14 @@ public class GameController implements Controller {
 		public void onEntry() {
 			game.init();
 			actors.init();
-			gameUI.enableAnimation(false);
-			gameUI.showInfo("Ready!", Color.YELLOW);
+			currentView.enableAnimation(false);
+			currentView.showInfo("Ready!", Color.YELLOW);
 		}
 
 		@Override
 		public void onExit() {
-			gameUI.enableAnimation(true);
-			gameUI.hideInfo();
+			currentView.enableAnimation(true);
+			currentView.hideInfo();
 		}
 	}
 
@@ -230,7 +230,7 @@ public class GameController implements Controller {
 		private void onPacManKilled(GameEvent event) {
 			PacManKilledEvent e = (PacManKilledEvent) event;
 			actors.getPacMan().processEvent(e);
-			LOG.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
+			logger.info(() -> String.format("PacMan killed by %s at %s", e.killer.getName(), e.killer.getTile()));
 		}
 
 		private void onPacManGainsPower(GameEvent event) {
@@ -252,15 +252,15 @@ public class GameController implements Controller {
 		private void onGhostKilled(GameEvent event) {
 			GhostKilledEvent e = (GhostKilledEvent) event;
 			e.ghost.processEvent(e);
-			LOG.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
+			logger.info(() -> String.format("Ghost %s killed at %s", e.ghost.getName(), e.ghost.getTile()));
 		}
 
 		private void onBonusFound(GameEvent event) {
 			actors.getBonus().ifPresent(bonus -> {
-				LOG.info(() -> String.format("PacMan found bonus %s of value %d", bonus.getSymbol(), bonus.getValue()));
+				logger.info(() -> String.format("PacMan found bonus %s of value %d", bonus.getSymbol(), bonus.getValue()));
 				bonus.setHonored();
 				game.score += bonus.getValue();
-				gameUI.setBonusTimer(game.sec(1));
+				currentView.setBonusTimer(game.sec(1));
 			});
 		}
 
@@ -279,7 +279,7 @@ public class GameController implements Controller {
 			}
 			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
 				actors.addBonus(game.getBonusSymbol(), game.getBonusValue());
-				gameUI.setBonusTimer(game.getBonusTime());
+				currentView.setBonusTimer(game.getBonusTime());
 			}
 			if (e.food == Content.ENERGIZER) {
 				game.ghostsKilledInSeries = 0;
@@ -292,19 +292,19 @@ public class GameController implements Controller {
 
 		@Override
 		public void onEntry() {
-			gameUI.setMazeFlashing(true);
+			currentView.setMazeFlashing(true);
 		}
 
 		@Override
 		public void onTick() {
 			if (getRemaining() == getDuration() / 2) {
 				nextLevel();
-				gameUI.showInfo("Ready!", Color.YELLOW);
-				gameUI.setMazeFlashing(false);
-				gameUI.enableAnimation(false);
+				currentView.showInfo("Ready!", Color.YELLOW);
+				currentView.setMazeFlashing(false);
+				currentView.enableAnimation(false);
 			} else if (isTerminated()) {
-				gameUI.hideInfo();
-				gameUI.enableAnimation(true);
+				currentView.hideInfo();
+				currentView.enableAnimation(true);
 			}
 		}
 
@@ -360,13 +360,13 @@ public class GameController implements Controller {
 
 		@Override
 		public void onEntry() {
-			gameUI.enableAnimation(false);
-			gameUI.showInfo("Game Over!", Color.RED);
+			currentView.enableAnimation(false);
+			currentView.showInfo("Game Over!", Color.RED);
 		}
 
 		@Override
 		public void onExit() {
-			gameUI.hideInfo();
+			currentView.hideInfo();
 		}
 	}
 }

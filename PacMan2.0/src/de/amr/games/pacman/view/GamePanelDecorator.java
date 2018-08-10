@@ -1,7 +1,7 @@
-package de.amr.games.pacman.ui;
+package de.amr.games.pacman.view;
 
-import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.pacman.ui.Spritesheet.TS;
+import static de.amr.easy.game.Application.logger;
+import static de.amr.games.pacman.view.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -29,7 +29,7 @@ import de.amr.statemachine.StateObject;
  * 
  * @author Armin Reichert
  */
-public class InternalsGamePanel extends GamePanel {
+public class GamePanelDecorator extends GamePanel {
 
 	private static Image createGridImage(int numRows, int numCols) {
 		GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
@@ -54,7 +54,7 @@ public class InternalsGamePanel extends GamePanel {
 	private boolean showRoutes;
 	private boolean showStates;
 
-	public InternalsGamePanel(GamePanel base) {
+	public GamePanelDecorator(GamePanel base) {
 		super(base.width, base.height, base.game, base.actors);
 		this.base = base;
 		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
@@ -68,7 +68,7 @@ public class InternalsGamePanel extends GamePanel {
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
-			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
+			logger.setLevel(logger.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
 		}
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_G)) {
 			showGrid = !showGrid;
@@ -157,7 +157,7 @@ public class InternalsGamePanel extends GamePanel {
 	}
 
 	private void toggleGhostActivity(Ghost ghost) {
-		actors.setGhostActive(ghost, !actors.isGhostActive(ghost));
+		actors.setActive(ghost, !actors.isGhostActive(ghost));
 	}
 
 	private static Color ghostColor(Ghost ghost) {

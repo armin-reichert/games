@@ -6,10 +6,10 @@ import static de.amr.games.pacman.routing.impl.NavigationSystem.chase;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.flee;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.followKeyboard;
 import static de.amr.games.pacman.routing.impl.NavigationSystem.goHome;
-import static de.amr.games.pacman.ui.Spritesheet.ORANGE_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.PINK_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.RED_GHOST;
-import static de.amr.games.pacman.ui.Spritesheet.TURQUOISE_GHOST;
+import static de.amr.games.pacman.view.Spritesheet.ORANGE_GHOST;
+import static de.amr.games.pacman.view.Spritesheet.PINK_GHOST;
+import static de.amr.games.pacman.view.Spritesheet.RED_GHOST;
+import static de.amr.games.pacman.view.Spritesheet.TURQUOISE_GHOST;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_LEFT;
 import static java.awt.event.KeyEvent.VK_RIGHT;
@@ -134,7 +134,7 @@ public class GameActors implements PacManWorld {
 		return activeGhosts.contains(ghost);
 	}
 
-	public void setGhostActive(Ghost ghost, boolean active) {
+	public void setActive(Ghost ghost, boolean active) {
 		if (active) {
 			activeGhosts.add(ghost);
 			ghost.init();
