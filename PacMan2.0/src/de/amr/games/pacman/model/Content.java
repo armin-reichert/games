@@ -9,7 +9,7 @@ public interface Content {
 	public static final char TUNNEL = 'T';
 
 	// Position markers
-	public static final char POS_INFO = '$';
+	public static final char POS_BONUS = '$';
 	public static final char POS_PACMAN = 'O';
 	public static final char POS_BLINKY = 'B';
 	public static final char POS_INKY = 'I';

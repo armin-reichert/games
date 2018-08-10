@@ -5,7 +5,7 @@ import static de.amr.games.pacman.model.Content.ENERGIZER;
 import static de.amr.games.pacman.model.Content.PELLET;
 import static de.amr.games.pacman.model.Content.POS_BLINKY;
 import static de.amr.games.pacman.model.Content.POS_CLYDE;
-import static de.amr.games.pacman.model.Content.POS_INFO;
+import static de.amr.games.pacman.model.Content.POS_BONUS;
 import static de.amr.games.pacman.model.Content.POS_INKY;
 import static de.amr.games.pacman.model.Content.POS_PACMAN;
 import static de.amr.games.pacman.model.Content.POS_PINKY;
@@ -56,7 +56,7 @@ public class Maze {
 					inkyHome = new Tile(col, row);
 				} else if (c == POS_CLYDE) {
 					clydeHome = new Tile(col, row);
-				} else if (c == POS_INFO) {
+				} else if (c == POS_BONUS) {
 					infoTile = new Tile(col, row);
 				} else if (c == POS_PACMAN) {
 					pacManHome = new Tile(col, row);
