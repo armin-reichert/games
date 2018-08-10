@@ -49,15 +49,15 @@ public class GameController implements Controller {
 	private final Game game;
 	private final GameActors actors;
 	private final GameUI gameUI;
-	private final StateMachine<State, GameEvent> sm;
+	private final StateMachine<State, GameEvent> gameControl;
 
 	public GameController(IntSupplier fnFrequency) {
 		Maze maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
 		actors = new GameActors(game);
 		gameUI = new EnhancedGameUI(new GameUI(28 * TS, 36 * TS, game, actors));
-		sm = buildStateMachine();
-		actors.addObserver(sm::process);
+		gameControl = createGameControl();
+		actors.addObserver(gameControl::process);
 	}
 
 	@Override
@@ -69,26 +69,26 @@ public class GameController implements Controller {
 	public void init() {
 		// Logging
 		LOG.setLevel(Level.INFO);
-		sm.traceTo(LOG, game.fnTicksPerSecond);
+		gameControl.traceTo(LOG, game.fnTicksPerSecond);
 		actors.getPacMan().getStateMachine().traceTo(LOG, game.fnTicksPerSecond);
 		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(LOG, game.fnTicksPerSecond));
 
-		sm.init();
+		gameControl.init();
 //		actors.getGhosts().forEach(ghost -> actors.setGhostActive(ghost, true));
 		actors.setGhostActive(actors.getBlinky(), true);
 	}
 
 	@Override
 	public void update() {
-		sm.update();
+		gameControl.update();
 		gameUI.update();
 	}
 
 	private PlayingState playingState() {
-		return sm.state(PLAYING);
+		return gameControl.state(PLAYING);
 	}
 
-	private StateMachine<State, GameEvent> buildStateMachine() {
+	private StateMachine<State, GameEvent> createGameControl() {
 		return
 		//@formatter:off
 		StateMachine.define(State.class, GameEvent.class)
@@ -219,11 +219,11 @@ public class GameController implements Controller {
 				Ghost.State ghostState = e.ghost.getState();
 				if (ghostState == Ghost.State.AFRAID || ghostState == Ghost.State.AGGRO
 						|| ghostState == Ghost.State.SCATTERING) {
-					sm.enqueue(new GhostKilledEvent(e.ghost));
+					gameControl.enqueue(new GhostKilledEvent(e.ghost));
 				}
 				return;
 			}
-			sm.enqueue(new PacManKilledEvent(e.ghost));
+			gameControl.enqueue(new PacManKilledEvent(e.ghost));
 		}
 
 		private void onPacManKilled(GameEvent event) {
@@ -273,7 +273,7 @@ public class GameController implements Controller {
 				game.livesRemaining += 1;
 			}
 			if (game.foodEaten == game.foodTotal) {
-				sm.enqueue(new LevelCompletedEvent());
+				gameControl.enqueue(new LevelCompletedEvent());
 				return;
 			}
 			if (game.foodEaten == Game.FOOD_EATEN_BONUS_1 || game.foodEaten == Game.FOOD_EATEN_BONUS_2) {
@@ -282,7 +282,7 @@ public class GameController implements Controller {
 			}
 			if (e.food == Content.ENERGIZER) {
 				game.ghostsKilledInSeries = 0;
-				sm.enqueue(new PacManGainsPowerEvent());
+				gameControl.enqueue(new PacManGainsPowerEvent());
 			}
 		}
 	}
