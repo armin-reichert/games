@@ -35,8 +35,8 @@ import de.amr.games.pacman.routing.Navigation;
  */
 public class GameActors implements PacManWorld {
 
-	public enum Name {
-		PacMan, Blinky, Pinky, Inky, Clyde
+	public enum Ghosts {
+		Blinky, Pinky, Inky, Clyde
 	}
 
 	private static PacMan createPacMan(Game game, EventManager<GameEvent> events) {
@@ -49,7 +49,7 @@ public class GameActors implements PacManWorld {
 	}
 
 	private static Ghost createBlinky(Game game, PacMan pacMan) {
-		Ghost ghost = new Ghost(Name.Blinky, pacMan, game, game.maze.blinkyHome, Top4.E, RED_GHOST);
+		Ghost ghost = new Ghost(Ghosts.Blinky, pacMan, game, game.maze.blinkyHome, Top4.E, RED_GHOST);
 		ghost.setNavigation(Ghost.State.AGGRO, chase(pacMan));
 		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		ghost.setNavigation(Ghost.State.DEAD, goHome());
@@ -58,7 +58,7 @@ public class GameActors implements PacManWorld {
 	}
 
 	private static Ghost createPinky(Game game, PacMan pacMan) {
-		Ghost ghost = new Ghost(Name.Pinky, pacMan, game, game.maze.pinkyHome, Top4.S, PINK_GHOST);
+		Ghost ghost = new Ghost(Ghosts.Pinky, pacMan, game, game.maze.pinkyHome, Top4.S, PINK_GHOST);
 		ghost.setNavigation(Ghost.State.AGGRO, ambush(pacMan));
 		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		ghost.setNavigation(Ghost.State.DEAD, goHome());
@@ -67,7 +67,7 @@ public class GameActors implements PacManWorld {
 	}
 
 	private static Ghost createInky(Game game, PacMan pacMan) {
-		Ghost ghost = new Ghost(Name.Inky, pacMan, game, game.maze.inkyHome, Top4.N, TURQUOISE_GHOST);
+		Ghost ghost = new Ghost(Ghosts.Inky, pacMan, game, game.maze.inkyHome, Top4.N, TURQUOISE_GHOST);
 		ghost.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		ghost.setNavigation(Ghost.State.DEAD, goHome());
@@ -76,7 +76,7 @@ public class GameActors implements PacManWorld {
 	}
 
 	private static Ghost createClyde(Game game, PacMan pacMan) {
-		Ghost ghost = new Ghost(Name.Clyde, pacMan, game, game.maze.clydeHome, Top4.N, ORANGE_GHOST);
+		Ghost ghost = new Ghost(Ghosts.Clyde, pacMan, game, game.maze.clydeHome, Top4.N, ORANGE_GHOST);
 		ghost.setNavigation(Ghost.State.AGGRO, ambush(pacMan)); // TODO
 		ghost.setNavigation(Ghost.State.AFRAID, flee(pacMan));
 		ghost.setNavigation(Ghost.State.DEAD, goHome());
