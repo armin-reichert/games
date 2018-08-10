@@ -105,9 +105,9 @@ public class Maze {
 	public char getContent(Tile tile) {
 		return isValidTile(tile) ? graph.get(cell(tile)) : Content.EMPTY;
 	}
-
-	public void clearTile(Tile tile) {
-		graph.set(cell(tile), EMPTY);
+	
+	public void setContent(Tile tile, char c) {
+		graph.set(cell(tile), c);
 	}
 
 	public OptionalInt direction(Tile t1, Tile t2) {

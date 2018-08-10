@@ -265,7 +265,7 @@ public class GameController implements Controller {
 
 		private void onFoodFound(GameEvent event) {
 			FoodFoundEvent e = (FoodFoundEvent) event;
-			game.maze.clearTile(e.tile);
+			game.maze.setContent(e.tile, Content.EATEN);
 			game.foodEaten += 1;
 			int oldGameScore = game.score;
 			game.score += game.getFoodValue(e.food);

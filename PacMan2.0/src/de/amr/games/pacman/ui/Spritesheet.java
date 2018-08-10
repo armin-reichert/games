@@ -4,9 +4,6 @@ import static de.amr.easy.game.sprite.AnimationType.BACK_AND_FORTH;
 import static de.amr.easy.game.sprite.AnimationType.CYCLIC;
 import static de.amr.easy.game.sprite.AnimationType.LINEAR;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +26,8 @@ public class Spritesheet {
 
 	private final BufferedImage sheet;
 
-	private BufferedImage maze;
+	private BufferedImage mazeEmpty;
+	private BufferedImage mazeFull;
 	private BufferedImage mazeWhite;
 	private Map<BonusSymbol, BufferedImage> symbolMap = new HashMap<>();
 	private BufferedImage pacManFull;
@@ -41,13 +39,13 @@ public class Spritesheet {
 	private BufferedImage ghostEyes[] = new BufferedImage[4];
 	private BufferedImage greenNumbers[] = new BufferedImage[4];
 	private BufferedImage pinkNumbers[] = new BufferedImage[8];
-	private BufferedImage energizerImage;
 
 	public Spritesheet() {
 		sheet = Assets.readImage("sprites.png");
 
 		// Maze
-		maze = $(228, 0, 224, 248);
+		mazeEmpty = $(228, 0, 224, 248);
+		mazeFull = $(0, 0, 224, 248);
 		mazeWhite = Assets.image("maze_white.png");
 
 		// Symbols for bonuses
@@ -99,9 +97,6 @@ public class Spritesheet {
 		for (int j = 0; j < 3; ++j) {
 			pinkNumbers[5 + j] = $(512, 160 + j * 16, 2 * 16, 16);
 		}
-
-		// Energizer
-		energizerImage = createEnergizerImage();
 	}
 
 	private BufferedImage $(int x, int y, int w, int h) {
@@ -112,26 +107,16 @@ public class Spritesheet {
 		return $(x, y, 16, 16);
 	}
 
-	private BufferedImage createEnergizerImage() {
-		BufferedImage img = new BufferedImage(TS, TS, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = img.createGraphics();
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(Color.PINK);
-		g.fillOval(0, 0, TS, TS);
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-		return img;
+	public Sprite mazeEmpty() {
+		return new Sprite(mazeEmpty);
 	}
 
-	public Sprite energizer() {
-		return new Sprite(null, energizerImage).animate(CYCLIC, 250);
+	public Sprite mazeFull() {
+		return new Sprite(mazeFull);
 	}
 
-	public Sprite maze() {
-		return new Sprite(maze);
-	}
-
-	public Sprite flashingMaze() {
-		return new Sprite(maze, mazeWhite).animate(CYCLIC, 250);
+	public Sprite mazeFlashing() {
+		return new Sprite(mazeEmpty, mazeWhite).animate(CYCLIC, 250);
 	}
 
 	public Sprite symbol(BonusSymbol symbol) {

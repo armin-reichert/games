@@ -1,7 +1,6 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.easy.game.Application.LOG;
-import static de.amr.games.pacman.model.Content.PELLET;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;
@@ -21,6 +20,7 @@ import de.amr.easy.game.view.View;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.game.GhostKilledEvent;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Tile;
 import de.amr.statemachine.StateObject;
 
@@ -96,8 +96,8 @@ public class EnhancedGameUI extends GameUI {
 	}
 
 	private void eatAllPellets() {
-		game.maze.tiles().filter(tile -> game.maze.getContent(tile) == PELLET).forEach(tile -> {
-			game.maze.clearTile(tile);
+		game.maze.tiles().filter(tile -> game.maze.getContent(tile) == Content.PELLET).forEach(tile -> {
+			game.maze.setContent(tile, Content.EATEN);
 			game.foodEaten += 1;
 		});
 	}

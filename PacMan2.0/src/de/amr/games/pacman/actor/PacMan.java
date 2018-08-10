@@ -4,7 +4,6 @@ import static de.amr.games.pacman.actor.PacMan.State.DYING;
 import static de.amr.games.pacman.actor.PacMan.State.SAFE;
 import static de.amr.games.pacman.actor.PacMan.State.STEROIDS;
 import static de.amr.games.pacman.actor.PacMan.State.VULNERABLE;
-import static de.amr.games.pacman.model.Content.isFood;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
 import static de.amr.games.pacman.ui.GameUI.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
@@ -198,7 +197,7 @@ public class PacMan extends MazeMover<PacMan.State> {
 		// Food?
 		Tile tile = getTile();
 		char content = maze.getContent(tile);
-		if (isFood(content)) {
+		if (content == Content.PELLET || content == Content.ENERGIZER) {
 			pauseTicks = (content == Content.PELLET ? 1 : 3);
 			events.publishEvent(new FoodFoundEvent(tile, content));
 		}

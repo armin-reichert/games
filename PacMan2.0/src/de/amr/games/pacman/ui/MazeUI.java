@@ -1,19 +1,19 @@
 package de.amr.games.pacman.ui;
 
-import static de.amr.games.pacman.model.Content.ENERGIZER;
-import static de.amr.games.pacman.model.Content.PELLET;
-import static de.amr.games.pacman.model.Content.isFood;
+import static de.amr.games.pacman.ui.GameUI.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.sprite.Animation;
+import de.amr.easy.game.sprite.CyclicAnimation;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.actor.Energizer;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.actor.Ghost;
-import de.amr.games.pacman.actor.Pellet;
+import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 
@@ -21,11 +21,10 @@ public class MazeUI extends GameEntity {
 
 	private final Maze maze;
 	private final GameActors actors;
-	private final Energizer energizer;
-	private final Pellet pellet;
+	private final Animation energizerBlinking;
 
-	private final Sprite s_normal;
-	private final Sprite s_flashing;
+	private final Sprite s_maze_normal;
+	private final Sprite s_maze_flashing;
 
 	private boolean flashing;
 	private int bonusTimer;
@@ -33,20 +32,20 @@ public class MazeUI extends GameEntity {
 	public MazeUI(Maze maze, GameActors actors) {
 		this.maze = maze;
 		this.actors = actors;
-		s_normal = GameUI.SPRITES.maze().scale(getWidth(), getHeight());
-		s_flashing = GameUI.SPRITES.flashingMaze().scale(getWidth(), getHeight());
-		energizer = new Energizer();
-		pellet = new Pellet();
+		s_maze_normal = SPRITES.mazeFull().scale(getWidth(), getHeight());
+		s_maze_flashing = SPRITES.mazeFlashing().scale(getWidth(), getHeight());
+		energizerBlinking = new CyclicAnimation(2);
+		energizerBlinking.setFrameDuration(250);
 	}
 
 	@Override
 	public Stream<Sprite> getSprites() {
-		return Stream.of(s_normal, s_flashing);
+		return Stream.of(s_maze_normal, s_maze_flashing);
 	}
 
 	@Override
 	public Sprite currentSprite() {
-		return flashing ? s_flashing : s_normal;
+		return flashing ? s_maze_flashing : s_maze_normal;
 	}
 
 	@Override
@@ -57,6 +56,7 @@ public class MazeUI extends GameEntity {
 				actors.removeBonus();
 			}
 		}
+		energizerBlinking.update();
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class MazeUI extends GameEntity {
 	@Override
 	public void enableAnimation(boolean on) {
 		super.enableAnimation(on);
-		energizer.enableAnimation(on);
+		energizerBlinking.setEnabled(on);
 		actors.getPacMan().enableAnimation(on);
 		actors.getActiveGhosts().forEach(ghost -> ghost.enableAnimation(on));
 	}
@@ -93,12 +93,14 @@ public class MazeUI extends GameEntity {
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
 		if (flashing) {
-			s_flashing.draw(g);
+			s_maze_flashing.draw(g);
 		} else {
-			s_normal.draw(g);
-			maze.tiles().filter(tile -> isFood(maze.getContent(tile))).forEach(tile -> drawFood(g, tile));
-			actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
-			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING).forEach(ghost -> ghost.draw(g));
+			s_maze_normal.draw(g);
+			maze.tiles().filter(tile -> Content.isFood(maze.getContent(tile))).forEach(tile -> drawFood(g, tile));
+			actors.getActiveGhosts().filter(ghost -> ghost.getState() != Ghost.State.DYING)
+					.forEach(ghost -> ghost.draw(g));
+			actors.getActiveGhosts().filter(ghost -> ghost.getState() == Ghost.State.DYING)
+					.forEach(ghost -> ghost.draw(g));
 			actors.getPacMan().draw(g);
 			actors.getBonus().ifPresent(bonus -> {
 				bonus.tf.moveTo(maze.infoTile.col * TS, maze.infoTile.row * TS - TS / 2);
@@ -110,11 +112,11 @@ public class MazeUI extends GameEntity {
 
 	private void drawFood(Graphics2D g, Tile tile) {
 		g.translate(tile.col * TS, tile.row * TS);
-		char c = maze.getContent(tile);
-		if (c == PELLET) {
-			pellet.draw(g);
-		} else if (c == ENERGIZER) {
-			energizer.draw(g);
+		g.setColor(Color.BLACK);
+		if (maze.getContent(tile) == Content.EATEN) {
+			g.fillRect(0, 0, TS, TS);
+		} else if (maze.getContent(tile) == Content.ENERGIZER && energizerBlinking.currentFrame() % 2 != 0) {
+			g.fillRect(0, 0, TS, TS);
 		}
 		g.translate(-tile.col * TS, -tile.row * TS);
 	}
