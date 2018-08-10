@@ -25,97 +25,11 @@ import de.amr.games.pacman.model.Tile;
 import de.amr.statemachine.StateObject;
 
 /**
- * Decorates game UI by showing states, routes etc.
+ * Game panel subclass displaying internal info (states, routes etc.).
  * 
  * @author Armin Reichert
  */
-public class ExtendedGameUI extends GameUI {
-
-	private static final String INFTY = Character.toString('\u221E');
-
-	private final GameUI gameUI;
-	private boolean show_grid;
-	private boolean show_ghost_route;
-	private boolean show_entity_state;
-
-	private Image gridImage;
-
-	public ExtendedGameUI(GameUI gameUI) {
-		super(gameUI.width, gameUI.height, gameUI.game, gameUI.actors);
-		this.gameUI = gameUI;
-		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
-	}
-
-	@Override
-	public View currentView() {
-		return this;
-	}
-
-	@Override
-	public void init() {
-		super.init();
-	}
-
-	@Override
-	public void update() {
-		super.update();
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
-			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_G)) {
-			show_grid = !show_grid;
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_S)) {
-			show_entity_state = !show_entity_state;
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_R)) {
-			show_ghost_route = !show_ghost_route;
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
-			killAllLivingGhosts();
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
-			eatAllPellets();
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
-			toggleGhost(actors.getBlinky());
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
-			toggleGhost(actors.getPinky());
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
-			toggleGhost(actors.getInky());
-		}
-		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
-			toggleGhost(actors.getClyde());
-		}
-	}
-
-	private void killAllLivingGhosts() {
-		actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(new GhostKilledEvent(ghost)));
-	}
-
-	private void eatAllPellets() {
-		game.maze.tiles().filter(tile -> game.maze.getContent(tile) == Content.PELLET).forEach(tile -> {
-			game.maze.setContent(tile, Content.EATEN);
-			game.foodEaten += 1;
-		});
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		super.draw(g);
-		if (show_grid) {
-			drawGrid(g);
-			drawPacManTilePosition(g);
-		}
-		if (show_ghost_route) {
-			actors.getActiveGhosts().forEach(ghost -> drawGhostPath(g, ghost));
-		}
-		if (show_entity_state) {
-			drawEntityState(g);
-		}
-	}
+public class InternalsGamePanel extends GamePanel {
 
 	private static Image createGridImage(int numRows, int numCols) {
 		GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
@@ -132,41 +46,121 @@ public class ExtendedGameUI extends GameUI {
 		return image;
 	}
 
-	private void drawGrid(Graphics2D g) {
-		g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
-		g.drawImage(gridImage, 0, 0, null);
-		g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
+	private static final String INFTY = Character.toString('\u221E');
+
+	private final GamePanel base;
+	private final Image gridImage;
+	private boolean showGrid;
+	private boolean showRoutes;
+	private boolean showStates;
+
+	public InternalsGamePanel(GamePanel base) {
+		super(base.width, base.height, base.game, base.actors);
+		this.base = base;
+		gridImage = createGridImage(game.maze.numRows(), game.maze.numCols());
 	}
 
-	private void drawEntityState(Graphics2D g) {
-		PacMan pacMan = actors.getPacMan();
-		g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
-		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacManStateText(pacMan));
-		actors.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
-			drawText(g, color(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), ghostStateText(ghost));
+	@Override
+	public View currentView() {
+		return this;
+	}
+
+	@Override
+	public void update() {
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_L)) {
+			LOG.setLevel(LOG.getLevel() == Level.OFF ? Level.INFO : Level.OFF);
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_G)) {
+			showGrid = !showGrid;
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_S)) {
+			showStates = !showStates;
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_R)) {
+			showRoutes = !showRoutes;
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_K)) {
+			killActiveGhosts();
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_E)) {
+			eatPellets();
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_B)) {
+			toggleGhostActivity(actors.getBlinky());
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_P)) {
+			toggleGhostActivity(actors.getPinky());
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_I)) {
+			toggleGhostActivity(actors.getInky());
+		}
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_C)) {
+			toggleGhostActivity(actors.getClyde());
+		}
+		super.update();
+	}
+
+	private void killActiveGhosts() {
+		actors.getActiveGhosts().forEach(ghost -> ghost.processEvent(new GhostKilledEvent(ghost)));
+	}
+
+	private void eatPellets() {
+		game.maze.tiles().filter(tile -> game.maze.getContent(tile) == Content.PELLET).forEach(tile -> {
+			game.maze.setContent(tile, Content.EATEN);
+			game.foodEaten += 1;
 		});
-		g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
 	}
 
-	private String pacManStateText(PacMan pacMan) {
-		StateObject<PacMan.State, ?> state = pacMan.getStateMachine().currentStateObject();
+	@Override
+	public void draw(Graphics2D g) {
+		super.draw(g);
+		if (showGrid) {
+			drawGrid(g);
+			drawPacManTilePosition(g);
+		}
+		if (showRoutes) {
+			actors.getActiveGhosts().forEach(ghost -> drawRoute(g, ghost));
+		}
+		if (showStates) {
+			drawEntityStates(g);
+		}
+	}
+
+	private void drawGrid(Graphics2D g) {
+		g.translate(base.mazeUI.tf.getX(), base.mazeUI.tf.getY());
+		g.drawImage(gridImage, 0, 0, null);
+		g.translate(-base.mazeUI.tf.getX(), -base.mazeUI.tf.getY());
+	}
+
+	private void drawEntityStates(Graphics2D g) {
+		g.translate(base.mazeUI.tf.getX(), base.mazeUI.tf.getY());
+		PacMan pacMan = actors.getPacMan();
+		drawText(g, Color.YELLOW, pacMan.tf.getX(), pacMan.tf.getY(), pacManState(pacMan));
+		actors.getActiveGhosts().filter(Ghost::isVisible).forEach(ghost -> {
+			drawText(g, ghostColor(ghost), ghost.tf.getX() - TS, ghost.tf.getY(), ghostState(ghost));
+		});
+		g.translate(-base.mazeUI.tf.getX(), -base.mazeUI.tf.getY());
+	}
+
+	private String pacManState(PacMan pacMan) {
+		StateObject<?, ?> state = pacMan.getStateMachine().currentStateObject();
 		return state.getDuration() != StateObject.ENDLESS
 				? String.format("(%s,%d|%d)", state.id(), state.getRemaining(), state.getDuration())
 				: String.format("(%s,%s)", state.id(), INFTY);
 	}
 
-	private String ghostStateText(Ghost ghost) {
-		StateObject<Ghost.State, ?> state = ghost.getStateMachine().state(ghost.getStateMachine().currentState());
+	private String ghostState(Ghost ghost) {
+		StateObject<?, ?> state = ghost.getStateMachine().currentStateObject();
 		return state.getDuration() != StateObject.ENDLESS
 				? String.format("%s(%s,%d|%d)", ghost.getName(), state.id(), state.getRemaining(), state.getDuration())
 				: String.format("%s(%s,%s)", ghost.getName(), state.id(), INFTY);
 	}
 
-	private void toggleGhost(Ghost ghost) {
+	private void toggleGhostActivity(Ghost ghost) {
 		actors.setGhostActive(ghost, !actors.isGhostActive(ghost));
 	}
 
-	private static Color color(Ghost ghost) {
+	private static Color ghostColor(Ghost ghost) {
 		switch (ghost.getName()) {
 		case Blinky:
 			return Color.RED;
@@ -192,20 +186,20 @@ public class ExtendedGameUI extends GameUI {
 	private void drawPacManTilePosition(Graphics2D g) {
 		PacMan pacMan = actors.getPacMan();
 		if (pacMan.isExactlyOverTile()) {
-			g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
+			g.translate(base.mazeUI.tf.getX(), base.mazeUI.tf.getY());
 			g.translate(pacMan.tf.getX(), pacMan.tf.getY());
 			g.setColor(Color.GREEN);
 			g.drawRect(0, 0, pacMan.getWidth(), pacMan.getHeight());
 			g.translate(-pacMan.tf.getX(), -pacMan.tf.getY());
-			g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
+			g.translate(-base.mazeUI.tf.getX(), -base.mazeUI.tf.getY());
 		}
 	}
 
-	private void drawGhostPath(Graphics2D g, Ghost ghost) {
+	private void drawRoute(Graphics2D g, Ghost ghost) {
 		List<Tile> path = ghost.getNavigation().computeRoute(ghost).getPath();
 		if (path.size() > 1) {
-			g.setColor(color(ghost));
-			g.translate(gameUI.mazeUI.tf.getX(), gameUI.mazeUI.tf.getY());
+			g.setColor(ghostColor(ghost));
+			g.translate(base.mazeUI.tf.getX(), base.mazeUI.tf.getY());
 			for (int i = 0; i < path.size() - 1; ++i) {
 				Tile u = path.get(i), v = path.get(i + 1);
 				int u1 = u.col * TS + TS / 2;
@@ -219,7 +213,7 @@ public class ExtendedGameUI extends GameUI {
 			g.translate(tile.col * TS, tile.row * TS);
 			g.fillRect(TS / 4, TS / 4, TS / 2, TS / 2);
 			g.translate(-tile.col * TS, -tile.row * TS);
-			g.translate(-gameUI.mazeUI.tf.getX(), -gameUI.mazeUI.tf.getY());
+			g.translate(-base.mazeUI.tf.getX(), -base.mazeUI.tf.getY());
 		}
 	}
 }

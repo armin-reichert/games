@@ -8,7 +8,7 @@ import static de.amr.games.pacman.actor.Ghost.State.HOME;
 import static de.amr.games.pacman.actor.Ghost.State.SAFE;
 import static de.amr.games.pacman.actor.Ghost.State.SCATTERING;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.ui.GameUI.SPRITES;
+import static de.amr.games.pacman.ui.GamePanel.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.util.EnumMap;

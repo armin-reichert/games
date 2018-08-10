@@ -5,7 +5,7 @@ import static de.amr.games.pacman.actor.PacMan.State.SAFE;
 import static de.amr.games.pacman.actor.PacMan.State.STEROIDS;
 import static de.amr.games.pacman.actor.PacMan.State.VULNERABLE;
 import static de.amr.games.pacman.model.Maze.TOPOLOGY;
-import static de.amr.games.pacman.ui.GameUI.SPRITES;
+import static de.amr.games.pacman.ui.GamePanel.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.util.EnumMap;

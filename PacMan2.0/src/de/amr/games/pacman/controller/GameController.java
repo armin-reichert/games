@@ -35,8 +35,9 @@ import de.amr.games.pacman.controller.event.game.PacManLostPowerEvent;
 import de.amr.games.pacman.model.Content;
 import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
-import de.amr.games.pacman.ui.ExtendedGameUI;
-import de.amr.games.pacman.ui.GameUI;
+import de.amr.games.pacman.ui.InternalsGamePanel;
+import de.amr.games.pacman.ui.GamePanel;
+import de.amr.games.pacman.ui.GameView;
 import de.amr.statemachine.StateMachine;
 import de.amr.statemachine.StateObject;
 
@@ -46,16 +47,17 @@ public class GameController implements Controller {
 		READY, PLAYING, GHOST_DYING, PACMAN_DYING, CHANGING_LEVEL, GAME_OVER
 	}
 
+	private final Maze maze;
 	private final Game game;
 	private final GameActors actors;
-	private final GameUI gameUI;
+	private final GameView gameUI;
 	private final StateMachine<PlayState, GameEvent> gameControl;
 
 	public GameController(IntSupplier fnFrequency) {
-		Maze maze = new Maze(Assets.text("maze.txt"));
+		maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
 		actors = new GameActors(game);
-		gameUI = new ExtendedGameUI(new GameUI(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
+		gameUI = new InternalsGamePanel(new GamePanel(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
 		gameControl = createGameControl();
 		actors.addObserver(gameControl::process);
 	}

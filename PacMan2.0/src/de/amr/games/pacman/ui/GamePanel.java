@@ -3,16 +3,18 @@ package de.amr.games.pacman.ui;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.view.View;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.actor.GameActors;
 import de.amr.games.pacman.model.Game;
 
-public class GameUI implements ViewController {
+public class GamePanel implements GameView {
 
 	public static final Spritesheet SPRITES = new Spritesheet();
 
@@ -20,24 +22,20 @@ public class GameUI implements ViewController {
 	protected final Game game;
 	protected final GameActors actors;
 	protected final MazeUI mazeUI;
-	protected final HUD hud;
-	protected final StatusUI statusUI;
+	protected final Font font;
+	protected final Image lifeImage;
 	protected String infoText;
 	protected Color infoTextColor;
 
-	public GameUI(int width, int height, Game game, GameActors actors) {
+	public GamePanel(int width, int height, Game game, GameActors actors) {
 		this.width = width;
 		this.height = height;
 		this.game = game;
 		this.actors = actors;
-
+		font = Assets.storeTrueTypeFont("scoreFont", "arcadeclassic.ttf", Font.PLAIN, TS * 3 / 2);
+		lifeImage = SPRITES.pacManWalking(Top4.W).frame(1);
 		mazeUI = new MazeUI(game.maze, actors);
-		hud = new HUD(game);
-		statusUI = new StatusUI(game);
-
-		hud.tf.moveTo(0, 0);
-		mazeUI.tf.moveTo(0, 3 * Spritesheet.TS);
-		statusUI.tf.moveTo(0, (3 + game.maze.numRows()) * Spritesheet.TS);
+		mazeUI.tf.moveTo(0, 3 * TS);
 	}
 
 	@Override
@@ -52,31 +50,26 @@ public class GameUI implements ViewController {
 
 	@Override
 	public void init() {
-		mazeUI.init();
-		hud.init();
-		statusUI.init();
 	}
 
 	@Override
 	public void update() {
 		mazeUI.update();
-		hud.update();
-		statusUI.update();
 	}
 
 	@Override
 	public View currentView() {
 		return this;
 	}
-	
+
 	public void enableAnimation(boolean enable) {
 		mazeUI.enableAnimation(enable);
 	}
-	
+
 	public void setBonusTimer(int ticks) {
 		mazeUI.setBonusTimer(ticks);
 	}
-	
+
 	public void setMazeFlashing(boolean flashing) {
 		mazeUI.setFlashing(flashing);
 	}
@@ -90,8 +83,29 @@ public class GameUI implements ViewController {
 		this.infoText = null;
 	}
 
+	@Override
+	public void draw(Graphics2D g) {
+		g.setColor(Color.WHITE);
+		g.setFont(font);
+		g.drawString("SCORE", TS, TS);
+		g.drawString(String.format("%06d", game.score), TS, TS * 2);
+		g.drawString("LEVEL " + game.level, 20 * TS, TS);
+		g.translate(0, getHeight() - 2 * TS);
+		for (int i = 0; i < game.livesRemaining; ++i) {
+			g.translate(i * lifeImage.getWidth(null), 0);
+			g.drawImage(lifeImage, 0, 0, null);
+			g.translate(-i * lifeImage.getWidth(null), 0);
+		}
+		g.translate(0, -getHeight() + 2 * TS);
+		mazeUI.draw(g);
+		if (infoText != null) {
+			drawInfoText(g);
+		}
+	}
+
 	private void drawInfoText(Graphics2D g) {
 		Graphics2D g2 = (Graphics2D) g.create();
+		g2.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
 		g2.setFont(Assets.font("scoreFont"));
 		g2.setColor(infoTextColor);
 		Rectangle box = g2.getFontMetrics().getStringBounds(infoText, g2).getBounds();
@@ -100,15 +114,4 @@ public class GameUI implements ViewController {
 		g2.dispose();
 	}
 
-	@Override
-	public void draw(Graphics2D g) {
-		mazeUI.draw(g);
-		hud.draw(g);
-		statusUI.draw(g);
-		if (infoText != null) {
-			g.translate(mazeUI.tf.getX(), mazeUI.tf.getY());
-			drawInfoText(g);
-			g.translate(-mazeUI.tf.getX(), -mazeUI.tf.getY());
-		}
-	}
 }

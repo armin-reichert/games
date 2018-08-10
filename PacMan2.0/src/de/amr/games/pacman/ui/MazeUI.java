@@ -2,7 +2,7 @@ package de.amr.games.pacman.ui;
 
 import static de.amr.games.pacman.model.Content.EATEN;
 import static de.amr.games.pacman.model.Content.ENERGIZER;
-import static de.amr.games.pacman.ui.GameUI.SPRITES;
+import static de.amr.games.pacman.ui.GamePanel.SPRITES;
 import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;
