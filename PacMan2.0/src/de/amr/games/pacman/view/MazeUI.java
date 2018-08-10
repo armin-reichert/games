@@ -13,21 +13,21 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.sprite.Animation;
 import de.amr.easy.game.sprite.CyclicAnimation;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.pacman.actor.GameActors;
+import de.amr.games.pacman.actor.Cast;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.model.Maze;
 
 public class MazeUI extends GameEntity {
 
 	private final Maze maze;
-	private final GameActors actors;
+	private final Cast actors;
 	private final Animation energizerBlinking;
 	private final Sprite s_maze_normal;
 	private final Sprite s_maze_flashing;
 	private boolean flashing;
 	private int bonusTimer;
 
-	public MazeUI(Maze maze, GameActors actors) {
+	public MazeUI(Maze maze, Cast actors) {
 		this.maze = maze;
 		this.actors = actors;
 		s_maze_normal = SPRITES.mazeFull().scale(getWidth(), getHeight());

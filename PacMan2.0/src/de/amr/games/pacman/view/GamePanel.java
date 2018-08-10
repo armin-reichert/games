@@ -11,7 +11,7 @@ import java.awt.Rectangle;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.view.View;
 import de.amr.easy.grid.impl.Top4;
-import de.amr.games.pacman.actor.GameActors;
+import de.amr.games.pacman.actor.Cast;
 import de.amr.games.pacman.model.Game;
 
 public class GamePanel implements GameViewController {
@@ -20,14 +20,14 @@ public class GamePanel implements GameViewController {
 
 	protected final int width, height;
 	protected final Game game;
-	protected final GameActors actors;
+	protected final Cast actors;
 	protected final MazeUI mazeUI;
 	protected final Font font;
 	protected final Image lifeImage;
 	protected String infoText;
 	protected Color infoTextColor;
 
-	public GamePanel(int width, int height, Game game, GameActors actors) {
+	public GamePanel(int width, int height, Game game, Cast actors) {
 		this.width = width;
 		this.height = height;
 		this.game = game;

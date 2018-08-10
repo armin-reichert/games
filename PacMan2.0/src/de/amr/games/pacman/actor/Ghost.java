@@ -28,11 +28,11 @@ public class Ghost extends MazeMover<Ghost.State> {
 
 	private final Game game;
 	private final StateMachine<State, GameEvent> brain;
-	private final GameActors.Ghosts name;
+	private final Cast.Ghosts name;
 	private final PacMan pacMan;
 	private final int initialDir;
 
-	public Ghost(GameActors.Ghosts name, PacMan pacMan, Game game, Tile home, int initialDir, int color) {
+	public Ghost(Cast.Ghosts name, PacMan pacMan, Game game, Tile home, int initialDir, int color) {
 		super(game.maze, home, new EnumMap<>(State.class));
 		this.game = game;
 		this.pacMan = pacMan;
@@ -42,7 +42,7 @@ public class Ghost extends MazeMover<Ghost.State> {
 		createSprites(color);
 	}
 
-	public GameActors.Ghosts getName() {
+	public Cast.Ghosts getName() {
 		return name;
 	}
 

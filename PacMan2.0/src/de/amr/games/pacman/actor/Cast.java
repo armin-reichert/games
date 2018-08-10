@@ -33,7 +33,7 @@ import de.amr.games.pacman.routing.Navigation;
  * 
  * @author Armin Reichert
  */
-public class GameActors implements PacManWorld {
+public class Cast implements PacManWorld {
 
 	public enum Ghosts {
 		Blinky, Pinky, Inky, Clyde
@@ -90,7 +90,7 @@ public class GameActors implements PacManWorld {
 	private final Set<Ghost> activeGhosts = new HashSet<>();
 	private Bonus bonus;
 
-	public GameActors(Game game) {
+	public Cast(Game game) {
 		events = new EventManager<>("[GameActorEvents]");
 		pacMan = createPacMan(game, events);
 		pacMan.setWorld(this);

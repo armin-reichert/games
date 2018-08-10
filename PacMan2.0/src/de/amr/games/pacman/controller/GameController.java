@@ -18,7 +18,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.games.pacman.actor.GameActors;
+import de.amr.games.pacman.actor.Cast;
 import de.amr.games.pacman.actor.Ghost;
 import de.amr.games.pacman.actor.PacMan;
 import de.amr.games.pacman.controller.event.game.BonusFoundEvent;
@@ -49,14 +49,14 @@ public class GameController implements Controller {
 
 	private final Maze maze;
 	private final Game game;
-	private final GameActors actors;
+	private final Cast actors;
 	private final GameViewController currentView;
 	private final StateMachine<PlayState, GameEvent> gameControl;
 
 	public GameController(IntSupplier fnFrequency) {
 		maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
-		actors = new GameActors(game);
+		actors = new Cast(game);
 		currentView = new GamePanelDecorator(new GamePanel(maze.numCols() * TS, (maze.numRows() + 5) * TS, game, actors));
 		gameControl = createGameControl();
 		actors.addObserver(gameControl::process);
