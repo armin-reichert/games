@@ -103,7 +103,7 @@ public class Maze {
 	}
 
 	public char getContent(Tile tile) {
-		return graph.get(cell(tile));
+		return isValidTile(tile) ? graph.get(cell(tile)) : Content.EMPTY;
 	}
 
 	public void clearTile(Tile tile) {

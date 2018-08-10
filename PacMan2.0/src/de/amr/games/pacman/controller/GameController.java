@@ -7,13 +7,14 @@ import static de.amr.games.pacman.controller.GameController.State.GHOST_DYING;
 import static de.amr.games.pacman.controller.GameController.State.PACMAN_DYING;
 import static de.amr.games.pacman.controller.GameController.State.PLAYING;
 import static de.amr.games.pacman.controller.GameController.State.READY;
+import static de.amr.games.pacman.ui.Spritesheet.TS;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.function.IntSupplier;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
@@ -50,10 +51,11 @@ public class GameController implements Controller {
 	private final GameUI gameUI;
 	private final StateMachine<State, GameEvent> sm;
 
-	public GameController(Maze maze, int width, int height, IntSupplier fnFrequency) {
+	public GameController(IntSupplier fnFrequency) {
+		Maze maze = new Maze(Assets.text("maze.txt"));
 		game = new Game(maze, fnFrequency);
 		actors = new GameActors(game);
-		gameUI = new EnhancedGameUI(new GameUI(width, height, game, actors));
+		gameUI = new EnhancedGameUI(new GameUI(28 * TS, 36 * TS, game, actors));
 		sm = buildStateMachine();
 		actors.addObserver(sm::process);
 	}
@@ -65,7 +67,12 @@ public class GameController implements Controller {
 
 	@Override
 	public void init() {
+		// Logging
 		LOG.setLevel(Level.INFO);
+		sm.traceTo(LOG, game.fnTicksPerSecond);
+		actors.getPacMan().getStateMachine().traceTo(LOG, game.fnTicksPerSecond);
+		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(LOG, game.fnTicksPerSecond));
+
 		sm.init();
 //		actors.getGhosts().forEach(ghost -> actors.setGhostActive(ghost, true));
 		actors.setGhostActive(actors.getBlinky(), true);
@@ -75,12 +82,6 @@ public class GameController implements Controller {
 	public void update() {
 		sm.update();
 		gameUI.update();
-	}
-
-	public void setLogger(Logger log) {
-		sm.traceTo(log, game.fnTicksPerSecond);
-		actors.getPacMan().getStateMachine().traceTo(log, game.fnTicksPerSecond);
-		actors.getGhosts().map(Ghost::getStateMachine).forEach(sm -> sm.traceTo(log, game.fnTicksPerSecond));
 	}
 
 	private PlayingState playingState() {

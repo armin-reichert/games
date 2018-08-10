@@ -39,12 +39,12 @@ public class GameActors implements PacManWorld {
 		PacMan, Blinky, Pinky, Inky, Clyde
 	}
 
-	private static PacMan createPacMan(Game game, EventManager<GameEvent> eventMgr) {
+	private static PacMan createPacMan(Game game, EventManager<GameEvent> events) {
 		PacMan pacMan = new PacMan(game);
 		Navigation<MazeMover<?>> keySteering = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
 		pacMan.setNavigation(PacMan.State.VULNERABLE, keySteering);
 		pacMan.setNavigation(PacMan.State.STEROIDS, keySteering);
-		pacMan.setEventManager(eventMgr);
+		pacMan.setEventManager(events);
 		return pacMan;
 	}
 
