@@ -6,7 +6,6 @@ import static de.amr.games.pong.scenes.play.PlaySceneState.Initialized;
 import static de.amr.games.pong.scenes.play.PlaySceneState.Playing;
 import static de.amr.games.pong.scenes.play.PlaySceneState.Serving;
 import static java.awt.event.KeyEvent.VK_C;
-import static java.awt.event.KeyEvent.VK_CONTROL;
 import static java.awt.event.KeyEvent.VK_SPACE;
 
 import java.awt.Font;
@@ -17,6 +16,7 @@ import java.util.Random;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
@@ -130,7 +130,7 @@ public class PlayScene implements ViewController {
 
 	@Override
 	public void update() {
-		if (keyPressedOnce(VK_CONTROL, VK_C)) {
+		if (Keyboard.keyPressedOnce(VK_C) && Keyboard.isControlDown()) {
 			app.setController(app.menuScene);
 		}
 		control.update();
