@@ -6,8 +6,8 @@ import de.amr.easy.game.view.ViewController;
 
 public interface PacManGameUI extends ViewController {
 
-	/** Tile size. */
 	int TS = 16;
+	
 	PacManSprites SPRITES = new PacManSprites();
 
 	void enableAnimation(boolean enable);
