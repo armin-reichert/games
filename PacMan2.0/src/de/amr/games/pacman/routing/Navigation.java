@@ -1,6 +1,8 @@
 package de.amr.games.pacman.routing;
 
-public interface Navigation<T> {
+import de.amr.games.pacman.actor.MazeMover;
 
-	MazeRoute computeRoute(T target);
+public interface Navigation {
+
+	MazeRoute computeRoute(MazeMover<?> mover);
 }

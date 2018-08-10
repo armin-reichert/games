@@ -7,7 +7,7 @@ import de.amr.games.pacman.routing.Navigation;
 /**
  * Chasing a refugee through the maze.
  */
-class Chase implements Navigation<MazeMover<?>> {
+class Chase implements Navigation {
 
 	private final MazeMover<?> victim;
 

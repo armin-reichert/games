@@ -16,14 +16,14 @@ public class GameUI implements ViewController {
 
 	public static final Spritesheet SPRITES = new Spritesheet();
 
-	public final int width, height;
-	public final Game game;
-	public final GameActors actors;
-	public final MazeUI mazeUI;
-	private final HUD hud;
-	private final StatusUI statusUI;
-	private String infoText;
-	private Color infoTextColor;
+	protected final int width, height;
+	protected final Game game;
+	protected final GameActors actors;
+	protected final MazeUI mazeUI;
+	protected final HUD hud;
+	protected final StatusUI statusUI;
+	protected String infoText;
+	protected Color infoTextColor;
 
 	public GameUI(int width, int height, Game game, GameActors actors) {
 		this.width = width;
@@ -52,6 +52,9 @@ public class GameUI implements ViewController {
 
 	@Override
 	public void init() {
+		mazeUI.init();
+		hud.init();
+		statusUI.init();
 	}
 
 	@Override
@@ -64,6 +67,18 @@ public class GameUI implements ViewController {
 	@Override
 	public View currentView() {
 		return this;
+	}
+	
+	public void enableAnimation(boolean enable) {
+		mazeUI.enableAnimation(enable);
+	}
+	
+	public void setBonusTimer(int ticks) {
+		mazeUI.setBonusTimer(ticks);
+	}
+	
+	public void setMazeFlashing(boolean flashing) {
+		mazeUI.setFlashing(flashing);
 	}
 
 	public void showInfo(String text, Color color) {

@@ -10,7 +10,7 @@ import de.amr.games.pacman.routing.Navigation;
 /**
  * Clyde's behaviour.
  */
-class StayBehind implements Navigation<MazeMover<?>> {
+class StayBehind implements Navigation {
 
 	@Override
 	public MazeRoute computeRoute(MazeMover<?> mover) {

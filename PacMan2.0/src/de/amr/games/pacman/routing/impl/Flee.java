@@ -9,7 +9,7 @@ import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.MazeRoute;
 import de.amr.games.pacman.routing.Navigation;
 
-class Flee implements Navigation<MazeMover<?>> {
+class Flee implements Navigation {
 
 	private final MazeMover<?> chaser;
 

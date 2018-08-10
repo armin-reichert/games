@@ -13,7 +13,7 @@ import de.amr.games.pacman.routing.Navigation;
 /**
  * Ambush the victim in the maze.
  */
-class Ambush implements Navigation<MazeMover<?>> {
+class Ambush implements Navigation {
 
 	private final MazeMover<?> victim;
 

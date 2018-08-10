@@ -5,39 +5,39 @@ import de.amr.games.pacman.routing.Navigation;
 
 public interface NavigationSystem {
 
-	public static Navigation<MazeMover<?>> ambush(MazeMover<?> victim) {
+	public static Navigation ambush(MazeMover<?> victim) {
 		return new Ambush(victim);
 	}
 
-	public static Navigation<MazeMover<?>> bounce() {
+	public static Navigation bounce() {
 		return new Bounce();
 	}
 
-	public static Navigation<MazeMover<?>> chase(MazeMover<?> victim) {
+	public static Navigation chase(MazeMover<?> victim) {
 		return new Chase(victim);
 	}
 
-	public static Navigation<MazeMover<?>> flee(MazeMover<?> chaser) {
+	public static Navigation flee(MazeMover<?> chaser) {
 		return new Flee(chaser);
 	}
 
-	public static Navigation<MazeMover<?>> followKeyboard(int... nesw) {
+	public static Navigation followKeyboard(int... nesw) {
 		return new FollowKeyboard(nesw);
 	}
 
-	public static Navigation<MazeMover<?>> forward() {
+	public static Navigation forward() {
 		return new Forward();
 	}
 
-	public static Navigation<MazeMover<?>> goHome() {
+	public static Navigation goHome() {
 		return new GoHome();
 	}
 
-	public static Navigation<MazeMover<?>> moody() {
+	public static Navigation moody() {
 		return new Moody();
 	}
 
-	public static Navigation<MazeMover<?>> stayBehind() {
+	public static Navigation stayBehind() {
 		return new StayBehind();
 	}
 }

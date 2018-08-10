@@ -28,12 +28,12 @@ public abstract class MazeMover<S> extends MazeEntity {
 
 	public final Maze maze;
 	public final Tile homeTile;
-	private final Map<S, Navigation<MazeMover<?>>> navigation;
+	private final Map<S, Navigation> navigation;
 	private Function<MazeMover<S>, Float> fnSpeed;
 	private int dir;
 	private int nextDir;
 
-	protected MazeMover(Maze maze, Tile homeTile, Map<S, Navigation<MazeMover<?>>> navigation) {
+	protected MazeMover(Maze maze, Tile homeTile, Map<S, Navigation> navigation) {
 		this.maze = maze;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
@@ -65,11 +65,11 @@ public abstract class MazeMover<S> extends MazeEntity {
 
 	// Movement
 
-	public void setNavigation(S state, Navigation<MazeMover<?>> navigation) {
+	public void setNavigation(S state, Navigation navigation) {
 		this.navigation.put(state, navigation);
 	}
 
-	public Navigation<MazeMover<?>> getNavigation() {
+	public Navigation getNavigation() {
 		return navigation.getOrDefault(getState(), NavigationSystem.forward());
 	}
 

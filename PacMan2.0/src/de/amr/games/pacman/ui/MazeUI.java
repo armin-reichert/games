@@ -76,11 +76,11 @@ public class MazeUI extends GameEntity {
 	}
 	
 	@Override
-	public void enableAnimation(boolean on) {
-		super.enableAnimation(on);
-		energizerBlinking.setEnabled(on);
-		actors.getPacMan().enableAnimation(on);
-		actors.getActiveGhosts().forEach(ghost -> ghost.enableAnimation(on));
+	public void enableAnimation(boolean enable) {
+		super.enableAnimation(enable);
+		energizerBlinking.setEnabled(enable);
+		actors.getPacMan().enableAnimation(enable);
+		actors.getActiveGhosts().forEach(ghost -> ghost.enableAnimation(enable));
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.routing.MazeRoute;
 import de.amr.games.pacman.routing.Navigation;
 
-class GoHome implements Navigation<MazeMover<?>> {
+class GoHome implements Navigation {
 
 	@Override
 	public MazeRoute computeRoute(MazeMover<?> mover) {

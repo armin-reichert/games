@@ -10,7 +10,7 @@ import de.amr.games.pacman.routing.Navigation;
 /**
  * Inky's behaviour.
  */
-class Moody implements Navigation<MazeMover<?>> {
+class Moody implements Navigation {
 
 	@Override
 	public MazeRoute computeRoute(MazeMover<?> mover) {

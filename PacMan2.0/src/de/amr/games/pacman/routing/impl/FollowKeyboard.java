@@ -6,7 +6,7 @@ import de.amr.games.pacman.actor.MazeMover;
 import de.amr.games.pacman.routing.MazeRoute;
 import de.amr.games.pacman.routing.Navigation;
 
-class FollowKeyboard implements Navigation<MazeMover<?>> {
+class FollowKeyboard implements Navigation {
 
 	private final int[] nesw;
 

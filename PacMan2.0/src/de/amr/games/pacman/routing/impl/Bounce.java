@@ -9,7 +9,7 @@ import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.MazeRoute;
 import de.amr.games.pacman.routing.Navigation;
 
-class Bounce implements Navigation<MazeMover<?>> {
+class Bounce implements Navigation {
 
 	@Override
 	public MazeRoute computeRoute(MazeMover<?> bouncer) {

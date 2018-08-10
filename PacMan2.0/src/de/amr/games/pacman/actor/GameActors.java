@@ -41,7 +41,7 @@ public class GameActors implements PacManWorld {
 
 	private static PacMan createPacMan(Game game, EventManager<GameEvent> events) {
 		PacMan pacMan = new PacMan(game);
-		Navigation<MazeMover<?>> keySteering = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
+		Navigation keySteering = followKeyboard(VK_UP, VK_RIGHT, VK_DOWN, VK_LEFT);
 		pacMan.setNavigation(PacMan.State.VULNERABLE, keySteering);
 		pacMan.setNavigation(PacMan.State.STEROIDS, keySteering);
 		pacMan.setEventManager(events);
