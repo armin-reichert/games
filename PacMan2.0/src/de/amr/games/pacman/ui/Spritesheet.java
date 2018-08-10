@@ -1,6 +1,8 @@
 package de.amr.games.pacman.ui;
 
 import static de.amr.easy.game.sprite.AnimationType.BACK_AND_FORTH;
+import static de.amr.easy.game.sprite.AnimationType.CYCLIC;
+import static de.amr.easy.game.sprite.AnimationType.LINEAR;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -11,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.model.BonusSymbol;
@@ -40,6 +41,7 @@ public class Spritesheet {
 	private BufferedImage ghostEyes[] = new BufferedImage[4];
 	private BufferedImage greenNumbers[] = new BufferedImage[4];
 	private BufferedImage pinkNumbers[] = new BufferedImage[8];
+	private BufferedImage energizerImage;
 
 	public Spritesheet() {
 		sheet = Assets.readImage("sprites.png");
@@ -97,6 +99,9 @@ public class Spritesheet {
 		for (int j = 0; j < 3; ++j) {
 			pinkNumbers[5 + j] = $(512, 160 + j * 16, 2 * 16, 16);
 		}
+
+		// Energizer
+		energizerImage = createEnergizerImage();
 	}
 
 	private BufferedImage $(int x, int y, int w, int h) {
@@ -107,22 +112,18 @@ public class Spritesheet {
 		return $(x, y, 16, 16);
 	}
 
-	private BufferedImage energizerImage(boolean visible) {
+	private BufferedImage createEnergizerImage() {
 		BufferedImage img = new BufferedImage(TS, TS, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = img.createGraphics();
-		g.setColor(Color.BLACK);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.fillRect(0, 0, img.getWidth(), img.getHeight());
-		if (visible) {
-			g.setColor(Color.PINK);
-			g.fillOval(0, 0, TS, TS);
-		}
+		g.setColor(Color.PINK);
+		g.fillOval(0, 0, TS, TS);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		return img;
 	}
 
 	public Sprite energizer() {
-		return new Sprite(energizerImage(false), energizerImage(true)).animate(BACK_AND_FORTH, 250);
+		return new Sprite(null, energizerImage).animate(CYCLIC, 250);
 	}
 
 	public Sprite maze() {
@@ -130,7 +131,7 @@ public class Spritesheet {
 	}
 
 	public Sprite flashingMaze() {
-		return new Sprite(maze, mazeWhite).animate(AnimationType.CYCLIC, 250);
+		return new Sprite(maze, mazeWhite).animate(CYCLIC, 250);
 	}
 
 	public Sprite symbol(BonusSymbol symbol) {
@@ -142,11 +143,11 @@ public class Spritesheet {
 	}
 
 	public Sprite pacManWalking(int dir) {
-		return new Sprite(pacManWalking[dir]).animate(AnimationType.BACK_AND_FORTH, 80);
+		return new Sprite(pacManWalking[dir]).animate(BACK_AND_FORTH, 80);
 	}
 
 	public Sprite pacManDying() {
-		return new Sprite(pacManDying).animate(AnimationType.LINEAR, 100);
+		return new Sprite(pacManDying).animate(LINEAR, 100);
 	}
 
 	public Sprite ghostColored(int color, int direction) {
@@ -167,15 +168,15 @@ public class Spritesheet {
 		default:
 			throw new IllegalArgumentException("Illegal direction: " + direction);
 		}
-		return new Sprite(frames).animate(AnimationType.BACK_AND_FORTH, 300);
+		return new Sprite(frames).animate(BACK_AND_FORTH, 300);
 	}
 
 	public Sprite ghostAwed() {
-		return new Sprite(ghostAwed).animate(AnimationType.CYCLIC, 200);
+		return new Sprite(ghostAwed).animate(CYCLIC, 200);
 	}
 
 	public Sprite ghostBlinking() {
-		return new Sprite(ghostBlinking).animate(AnimationType.CYCLIC, 100);
+		return new Sprite(ghostBlinking).animate(CYCLIC, 100);
 	}
 
 	public Sprite ghostEyes(int dir) {
