@@ -10,6 +10,18 @@ import de.amr.games.pacman.model.Tile;
 
 public abstract class MazeEntity extends GameEntity {
 
+	public int row() {
+		return round(tf.getY() + getHeight() / 2) / TS;
+	}
+
+	public int col() {
+		return round(tf.getX() + getWidth() / 2) / TS;
+	}
+
+	public Tile getTile() {
+		return new Tile(col(), row());
+	}
+
 	public void placeAt(Tile tile) {
 		placeAt(tile.col, tile.row);
 	}
@@ -20,18 +32,6 @@ public abstract class MazeEntity extends GameEntity {
 
 	public boolean isExactlyOverTile() {
 		return round(tf.getX()) % TS == 0 && round(tf.getY()) % TS == 0;
-	}
-
-	public Tile getTile() {
-		return new Tile(col(), row());
-	}
-
-	public int row() {
-		return round(tf.getY() + getHeight() / 2) / TS;
-	}
-
-	public int col() {
-		return round(tf.getX() + getWidth() / 2) / TS;
 	}
 
 	@Override

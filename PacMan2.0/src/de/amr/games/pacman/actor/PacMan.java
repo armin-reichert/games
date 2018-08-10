@@ -32,13 +32,15 @@ import de.amr.statemachine.StateMachine;
 
 public class PacMan extends MazeMover<PacMan.State> {
 
+	private final Game game;
 	private final StateMachine<State, GameEvent> brain;
 	private EventManager<GameEvent> events;
 	private PacManWorld world;
 	private int pauseTicks;
 
 	public PacMan(Game game) {
-		super(game, game.maze.pacManHome, new EnumMap<>(State.class));
+		super(game.maze, game.maze.pacManHome, new EnumMap<>(State.class));
+		this.game = game;
 		brain = buildStateMachine();
 		createSprites(2 * TS);
 	}

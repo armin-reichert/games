@@ -26,13 +26,15 @@ import de.amr.statemachine.StateMachine;
 
 public class Ghost extends MazeMover<Ghost.State> {
 
+	private final Game game;
 	private final StateMachine<State, GameEvent> brain;
 	private final GameActors.Name name;
 	private final PacMan pacMan;
 	private final int initialDir;
 
 	public Ghost(GameActors.Name name, PacMan pacMan, Game game, Tile home, int initialDir, int color) {
-		super(game, home, new EnumMap<>(State.class));
+		super(game.maze, home, new EnumMap<>(State.class));
+		this.game = game;
 		this.pacMan = pacMan;
 		this.name = name;
 		this.initialDir = initialDir;

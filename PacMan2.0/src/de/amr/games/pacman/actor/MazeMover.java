@@ -13,7 +13,6 @@ import java.util.function.Function;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.grid.impl.Top4;
 import de.amr.games.pacman.controller.event.game.GameEvent;
-import de.amr.games.pacman.model.Game;
 import de.amr.games.pacman.model.Maze;
 import de.amr.games.pacman.model.Tile;
 import de.amr.games.pacman.routing.Navigation;
@@ -27,7 +26,6 @@ public abstract class MazeMover<S> extends MazeEntity {
 
 	private static final int TELEPORT_TILES = 6;
 
-	public final Game game;
 	public final Maze maze;
 	public final Tile homeTile;
 	private final Map<S, Navigation<MazeMover<?>>> navigation;
@@ -35,9 +33,8 @@ public abstract class MazeMover<S> extends MazeEntity {
 	private int dir;
 	private int nextDir;
 
-	protected MazeMover(Game game, Tile homeTile, Map<S, Navigation<MazeMover<?>>> navigation) {
-		this.game = game;
-		this.maze = game.maze;
+	protected MazeMover(Maze maze, Tile homeTile, Map<S, Navigation<MazeMover<?>>> navigation) {
+		this.maze = maze;
 		this.homeTile = homeTile;
 		this.navigation = navigation;
 		this.fnSpeed = mover -> 0f;
