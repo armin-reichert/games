@@ -1,5 +1,6 @@
 package de.amr.games.birdy.play.scenes;
 
+import static de.amr.easy.game.Application.PULSE;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.play.scenes.StartScene.State.GameOver;
@@ -64,7 +65,7 @@ public class StartScene implements ViewController {
 			// Ready ---
 
 			state(Ready).entry = s -> {
-				s.setDuration(app.pulse.secToTicks(app.settings.getAsFloat("ready time sec")));
+				s.setDuration(PULSE.secToTicks(app.settings.getAsFloat("ready time sec")));
 				displayText("readyText");
 			};
 
@@ -166,8 +167,7 @@ public class StartScene implements ViewController {
 		}
 
 		app.collisionHandler.clear();
-		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(),
-				BirdLeftWorld);
+		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(), BirdLeftWorld);
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 
 		displayText("title");
@@ -197,7 +197,7 @@ public class StartScene implements ViewController {
 		}
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(),
-				control.stateID(), bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
+		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(), control.stateID(),
+				bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

@@ -30,8 +30,7 @@ public class ScoreDisplay extends GameEntity {
 		this.digits = new Image[10];
 		for (int d = 0; d <= 9; d++) {
 			BufferedImage digitImage = Assets.image("number_score_0" + d);
-			digits[d] = digitImage.getScaledInstance(-1, round(scale) * digitImage.getHeight(),
-					Image.SCALE_SMOOTH);
+			digits[d] = digitImage.getScaledInstance(-1, round(scale) * digitImage.getHeight(), Image.SCALE_SMOOTH);
 		}
 		scoreText = pointsText();
 	}
@@ -69,8 +68,7 @@ public class ScoreDisplay extends GameEntity {
 	public void draw(Graphics2D g) {
 		for (int i = 0; i < scoreText.length(); i++) {
 			int digit = "0123456789".indexOf(scoreText.charAt(i));
-			g.drawImage(digits[digit],
-					(int) tf.getX() + i * (digits[0].getWidth(null) - round(3 * scale)), (int) tf.getY(),
+			g.drawImage(digits[digit], (int) tf.getX() + i * (digits[0].getWidth(null) - round(3 * scale)), (int) tf.getY(),
 					null);
 		}
 	}

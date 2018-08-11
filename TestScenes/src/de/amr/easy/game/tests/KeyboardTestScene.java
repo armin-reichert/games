@@ -34,7 +34,7 @@ public class KeyboardTestScene implements ViewController {
 			}
 		}
 		if (modifiers.length() > 1) {
-			Application.logger.info(String.format("(%s) + A", modifiers));
+			Application.LOGGER.info(String.format("(%s) + A", modifiers));
 		}
 	}
 

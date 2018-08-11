@@ -1,6 +1,6 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.Application.logger;
+import static de.amr.easy.game.Application.PULSE;
 import static de.amr.games.birdy.entities.City.CityEvent.SunGoesDown;
 import static de.amr.games.birdy.entities.City.CityEvent.SunGoesUp;
 import static de.amr.games.birdy.entities.City.CityState.Day;
@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
@@ -51,7 +52,7 @@ public class City extends GameEntity {
 		control.changeOnInput(SunGoesDown, Day, Night);
 
 		control.state(Night).entry = s -> {
-			s.setDuration(app.pulse.secToTicks(10));
+			s.setDuration(PULSE.secToTicks(10));
 			replaceStars();
 		};
 
@@ -74,7 +75,7 @@ public class City extends GameEntity {
 	@Override
 	public void init() {
 		control.init();
-		control.setLogger(logger);
+		control.setLogger(Application.LOGGER);
 	}
 
 	@Override
@@ -94,7 +95,7 @@ public class City extends GameEntity {
 			Star star = app.entities.store(new Star());
 			star.tf.moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
 		});
-		logger.info("Created " + numStars + " new stars");
+		Application.LOGGER.info("Created " + numStars + " new stars");
 	}
 
 	public boolean isNight() {

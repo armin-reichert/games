@@ -14,7 +14,7 @@ public class Diashow extends Application {
 		settings.title = "Diashow";
 		settings.width = 900;
 		settings.height = 600;
-		pulse.setFrequency(10);
+		PULSE.setFrequency(10);
 	}
 
 	@Override

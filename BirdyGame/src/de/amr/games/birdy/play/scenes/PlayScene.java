@@ -94,8 +94,7 @@ public class PlayScene implements ViewController {
 			state(GameOver).entry = s -> stop();
 
 			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver,
-					t -> Assets.sound("music/bgmusic.mp3").stop());
+			changeOnInput(BirdTouchedGround, GameOver, GameOver, t -> Assets.sound("music/bgmusic.mp3").stop());
 
 			state(StartingNewGame).entry = s -> app.setController(app.getStartScene());
 		}
@@ -186,7 +185,7 @@ public class PlayScene implements ViewController {
 	private void showState(Graphics2D g) {
 		g.setColor(Color.BLACK);
 		g.setFont(stateTextFont);
-		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(),
-				bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
+		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(), bird.getFlightState(),
+				bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

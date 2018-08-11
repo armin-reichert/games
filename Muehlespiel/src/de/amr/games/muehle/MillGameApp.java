@@ -24,17 +24,17 @@ public class MillGameApp extends Application {
 		settings.width = 800;
 		settings.height = 800;
 		settings.fullScreenMode = null;
-		pulse.setFrequency(25);
+		PULSE.setFrequency(25);
 	}
 
 	@Override
 	public void init() {
 		MillGameModel model = new MillGameModel();
 
-		MillGameController controller = new MillGameController(this, pulse, model);
+		MillGameController controller = new MillGameController(this, model);
 		controller.setMoveTimeSeconds(0.75f);
 		controller.setPlacingTimeSeconds(1.5f);
-		controller.setLogger(Application.logger);
+		controller.setLogger(Application.LOGGER);
 		setController(controller);
 	}
 }

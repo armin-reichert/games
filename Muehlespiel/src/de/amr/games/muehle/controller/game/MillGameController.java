@@ -1,6 +1,6 @@
 package de.amr.games.muehle.controller.game;
 
-import static de.amr.easy.game.Application.logger;
+import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
@@ -10,9 +10,9 @@ import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 import java.awt.event.KeyEvent;
 import java.util.OptionalInt;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.State;
@@ -39,7 +39,6 @@ import de.amr.games.muehle.view.MillGameUI;
 public class MillGameController extends MillGameStateMachine implements Controller {
 
 	public final MillGameApp app;
-	public final Pulse pulse;
 	public final MillGameModel model;
 	public final Assistant assistant;
 	private MillGameUI view;
@@ -52,9 +51,8 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	private float placingTimeSeconds;
 	private OptionalInt positionNearMouse;
 
-	public MillGameController(MillGameApp app, Pulse pulse, MillGameModel model) {
+	public MillGameController(MillGameApp app, MillGameModel model) {
 		this.app = app;
-		this.pulse = pulse;
 		this.model = model;
 		this.assistant = new Assistant(this);
 		this.moveTimeSeconds = 0.75f;
@@ -166,8 +164,8 @@ public class MillGameController extends MillGameStateMachine implements Controll
 
 	private void turnMovingTo(Player player) {
 		turn = player;
-		moveControl = new MoveController(turn, view, pulse, moveTimeSeconds);
-		moveControl.setLogger(logger);
+		moveControl = new MoveController(turn, view, moveTimeSeconds);
+		moveControl.setLogger(LOGGER);
 		moveControl.init();
 		view.showMessage("must_move", turn.name());
 	}
@@ -183,7 +181,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	protected void switchPlacing(Transition<MillGameState, MillGameEvent> change) {
 		turnPlacingTo(playerNotInTurn());
 		if (!turn.isInteractive()) {
-			pause(pulse.secToTicks(placingTimeSeconds));
+			pause(Application.PULSE.secToTicks(placingTimeSeconds));
 		}
 	}
 
@@ -219,7 +217,7 @@ public class MillGameController extends MillGameStateMachine implements Controll
 					addInput(STONE_PLACED);
 				}
 			} else {
-				logger.info(Messages.text("stone_at_position", placedAt));
+				LOGGER.info(Messages.text("stone_at_position", placedAt));
 			}
 		});
 	}
@@ -229,16 +227,15 @@ public class MillGameController extends MillGameStateMachine implements Controll
 		turn.supplyRemovalPosition().ifPresent(p -> {
 			StoneColor colorToRemove = playerNotInTurn().color();
 			if (model.board.isEmptyPosition(p)) {
-				logger.info(Messages.text("stone_at_position_not_existing", p));
+				LOGGER.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (model.board.getStoneAt(p).get() != colorToRemove) {
-				logger.info(Messages.text("stone_at_position_wrong_color", p));
-			} else if (model.board.inMill(p, colorToRemove)
-					&& !model.board.allStonesInMills(colorToRemove)) {
-				logger.info(Messages.text("stone_cannot_be_removed_from_mill"));
+				LOGGER.info(Messages.text("stone_at_position_wrong_color", p));
+			} else if (model.board.inMill(p, colorToRemove) && !model.board.allStonesInMills(colorToRemove)) {
+				LOGGER.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				view.removeStoneAt(p);
 				addInput(STONE_REMOVED);
-				logger.info(Messages.text("removed_stone_at_position", turn.name(), p));
+				LOGGER.info(Messages.text("removed_stone_at_position", turn.name(), p));
 			}
 		});
 	}
@@ -284,12 +281,11 @@ public class MillGameController extends MillGameStateMachine implements Controll
 	@Override
 	protected void onGameOver(State state) {
 		announceWinner(playerNotInTurn());
-		pause(pulse.secToTicks(3));
+		pause(Application.PULSE.secToTicks(3));
 	}
 
 	@Override
 	protected boolean shallStartNewGame() {
-		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive()
-				|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);
+		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive() || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);
 	}
 }

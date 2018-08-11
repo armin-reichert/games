@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.view.ViewController;
 
 public class MainScene implements ViewController {
@@ -15,7 +16,7 @@ public class MainScene implements ViewController {
 	private int stepX = 20;
 
 	public MainScene(GamePerformanceApp app) {
-		app.pulse.addRenderListener(e -> {
+		Application.PULSE.addRenderListener(e -> {
 			if ("fps".equals(e.getPropertyName())) {
 				fpsValues[sampleIndex++] = (Integer) e.getNewValue();
 				if (sampleIndex * stepX >= getWidth()) {

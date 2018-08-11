@@ -49,7 +49,7 @@ public class PlayScene implements ViewController {
 		// Serving
 
 		fsm.state(Serving).entry = s -> {
-			s.setDuration(app.pulse.secToTicks(2));
+			s.setDuration(Application.PULSE.secToTicks(2));
 			prepareService();
 		};
 
@@ -87,7 +87,7 @@ public class PlayScene implements ViewController {
 	public PlayScene(PongGame app) {
 		this.app = app;
 		control = createStateMachine();
-		control.setLogger(Application.logger);
+		control.setLogger(Application.LOGGER);
 	}
 
 	@Override

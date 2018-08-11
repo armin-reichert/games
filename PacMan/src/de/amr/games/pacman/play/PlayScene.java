@@ -132,7 +132,7 @@ public class PlayScene extends ActiveScene<PacManGame> {
 
 		private void configureTracing() {
 			setLogger(LOG);
-			ticksToSec = app.pulse::ticksToSec;
+			ticksToSec = app.PULSE::ticksToSec;
 			// ghostAttackTimer.setLogger(Log);
 			// pacMan.setLogger(Log);
 			ghosts.forEach(ghost -> ghost.setLogger(LOG));
@@ -259,7 +259,7 @@ public class PlayScene extends ActiveScene<PacManGame> {
 		super(app);
 		playControl = new PlayControl();
 		board = new Board(Assets.text("board.txt"));
-		model = new PlaySceneModel(board, app.pulse, 8 * TILE_SIZE);
+		model = new PlaySceneModel(board, app.PULSE, 8 * TILE_SIZE);
 		highscore = new Highscore("pacman-hiscore.txt");
 		bonusList = new ArrayList<>();
 	}
@@ -382,7 +382,7 @@ public class PlayScene extends ActiveScene<PacManGame> {
 
 		// Aggressive
 		pacMan.control.state(Aggressive).entry = state -> {
-			state.setDuration(app.pulse.secToTicks(model.getPacManAggressiveSeconds(level)));
+			state.setDuration(app.PULSE.secToTicks(model.getPacManAggressiveSeconds(level)));
 			pacMan.enemies().forEach(ghost -> ghost.control.addInput(GhostEvent.PacManAttackStarts));
 			Assets.sound("sfx/waza.mp3").loop();
 		};
@@ -475,7 +475,7 @@ public class PlayScene extends ActiveScene<PacManGame> {
 			// When Pac-Man gets empowered, become frightened for the same duration
 			Stream.of(GhostState.Waiting, GhostState.Scattering, GhostState.Chasing).forEach(ghostState -> {
 				ghost.control.changeOnInput(GhostEvent.PacManAttackStarts, ghostState, GhostState.Frightened,
-						t -> t.to().setDuration(app.pulse.secToTicks(model.getPacManAggressiveSeconds(level))));
+						t -> t.to().setDuration(app.PULSE.secToTicks(model.getPacManAggressiveSeconds(level))));
 			});
 
 			// When in "frightened" state, ghosts move randomly:
@@ -649,7 +649,7 @@ public class PlayScene extends ActiveScene<PacManGame> {
 		long pelletsLeft = board.count(Pellet);
 		if (pelletsLeft == BONUS1_PELLETS_LEFT || pelletsLeft == BONUS2_PELLETS_LEFT) {
 			board.setContent(BONUS_TILE, Bonus);
-			bonusTimeRemaining = app.pulse.secToTicks(9);
+			bonusTimeRemaining = app.PULSE.secToTicks(9);
 		}
 	}
 
@@ -671,7 +671,7 @@ public class PlayScene extends ActiveScene<PacManGame> {
 		}
 		FlashText.show(app, String.valueOf(object),
 				app.themeManager.getTheme().getTextFont().deriveFont(Font.PLAIN, SPRITE_SIZE), Color.YELLOW,
-				app.pulse.secToTicks(1), Vector2f.of(x, y), Vector2f.of(0, -0.2f));
+				app.PULSE.secToTicks(1), Vector2f.of(x, y), Vector2f.of(0, -0.2f));
 	}
 
 	@Override

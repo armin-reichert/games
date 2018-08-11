@@ -1,12 +1,12 @@
 package de.amr.games.muehle.controller.player;
 
-import static de.amr.easy.game.Application.logger;
 import static java.lang.String.format;
 
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.Application;
 import de.amr.games.muehle.model.MillGameModel;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
@@ -70,19 +70,19 @@ public abstract class RuleBasedPlayer implements Player {
 
 	private OptionalInt tryPlacingRule(PlacingRule rule) {
 		OptionalInt optPos = rule.supplyPlacingPosition(this);
-		optPos.ifPresent(pos -> logger.info(name() + ": " + format(rule.getDescription(), pos)));
+		optPos.ifPresent(pos -> Application.LOGGER.info(name() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
 	private OptionalInt tryRemovalRule(RemovalRule rule) {
 		OptionalInt optPos = rule.supplyRemovalPosition(this, color().other());
-		optPos.ifPresent(pos -> logger.info(name() + ": " + format(rule.getDescription(), pos)));
+		optPos.ifPresent(pos -> Application.LOGGER.info(name() + ": " + format(rule.getDescription(), pos)));
 		return optPos;
 	}
 
 	private Optional<Move> tryMoveRule(MovingRule rule) {
 		Optional<Move> optMove = rule.supplyMove(this);
-		optMove.ifPresent(move -> logger
+		optMove.ifPresent(move -> Application.LOGGER
 				.info(name() + ": " + format(rule.getDescription(), move.from().get(), move.to().get())));
 		return optMove;
 	}

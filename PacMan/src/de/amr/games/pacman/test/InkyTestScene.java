@@ -80,7 +80,7 @@ public class InkyTestScene extends ActiveScene<InkyTestApp> {
 
 		pacMan.init();
 		pacMan.placeAt(PACMAN_HOME);
-		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.pulse.getFrequency());
+		pacMan.speed = () -> (float) Math.round(4f * TILE_SIZE / app.PULSE.getFrequency());
 
 		blinky.init();
 		blinky.setAnimated(true);
@@ -88,16 +88,16 @@ public class InkyTestScene extends ActiveScene<InkyTestApp> {
 		blinky.speed = () -> pacMan.speed.get() * .9f;
 		blinky.placeAt(GHOST_HOUSE_ENTRY);
 		blinky.setMoveDir(E);
-		blinky.control.state(Initialized).setDuration(app.pulse.secToTicks(1));
-		blinky.control.state(Waiting).setDuration(app.pulse.secToTicks(1));
+		blinky.control.state(Initialized).setDuration(app.PULSE.secToTicks(1));
+		blinky.control.state(Waiting).setDuration(app.PULSE.secToTicks(1));
 
 		inky.init();
 		inky.setAnimated(true);
 		inky.color = new Color(64, 224, 208);
 		inky.speed = () -> pacMan.speed.get() * .9f;
 		inky.placeAt(GHOST_HOUSE_ENTRY);
-		inky.control.state(Initialized).setDuration(app.pulse.secToTicks(1));
-		inky.control.state(Waiting).setDuration(app.pulse.secToTicks(1));
+		inky.control.state(Initialized).setDuration(app.PULSE.secToTicks(1));
+		inky.control.state(Waiting).setDuration(app.PULSE.secToTicks(1));
 
 		pacMan.receiveEvent(PacManEvent.StartWalking);
 	};

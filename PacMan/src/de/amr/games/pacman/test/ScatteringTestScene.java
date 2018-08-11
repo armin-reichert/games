@@ -58,7 +58,7 @@ public class ScatteringTestScene extends ActiveScene<ScatteringTestApp> {
 		addGhost("Clyde", Color.ORANGE, CLYDE_HOME, LEFT_LOWER_CORNER, E, false);
 		ghosts.forEach(ghost -> {
 			ghost.init();
-			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.pulse.getFrequency());
+			ghost.speed = () -> (float) Math.round(8f * TILE_SIZE / app.PULSE.getFrequency());
 			ghost.setAnimated(true);
 			ghost.receiveEvent(GhostEvent.ScatteringStarts);
 		});

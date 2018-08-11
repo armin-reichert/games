@@ -1,6 +1,6 @@
 package de.amr.games.birdy.play.scenes;
 
-import static de.amr.easy.game.Application.logger;
+import static de.amr.easy.game.Application.PULSE;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.Finished;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowCredits;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.ShowGameTitle;
@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.util.Random;
 import java.util.stream.Stream;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.controls.TextArea;
@@ -52,12 +53,11 @@ public class IntroScene implements ViewController {
 
 		control.state(ShowCredits).update = s -> creditsText.update();
 
-		control.change(ShowCredits, Wait,
-				() -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
-				t -> t.to().setDuration(app.pulse.secToTicks(2)));
+		control.change(ShowCredits, Wait, () -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
+				t -> t.to().setDuration(PULSE.secToTicks(2)));
 
 		// Wait
-		control.changeOnTimeout(Wait, ShowGameTitle, t -> t.to().setDuration(app.pulse.secToTicks(3)));
+		control.changeOnTimeout(Wait, ShowGameTitle, t -> t.to().setDuration(PULSE.secToTicks(3)));
 
 		// ShowGameTitle
 		control.changeOnTimeout(ShowGameTitle, Finished);
@@ -94,7 +94,7 @@ public class IntroScene implements ViewController {
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
 		creditsText.visibility = () -> control.is(ShowCredits, Wait);
 
-		control.setLogger(logger);
+		control.setLogger(Application.LOGGER);
 		control.init();
 	}
 

@@ -1,5 +1,6 @@
 package de.amr.games.birdy.entities;
 
+import static de.amr.easy.game.Application.PULSE;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Birth;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Breeding;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Stopped;
@@ -38,8 +39,8 @@ public class ObstacleManager extends GameEntity {
 
 		// Stay breeding for some random time from interval [MIN_PIPE_TIME, MAX_PIPE_TIME]:
 		control.state(Breeding).entry = s -> {
-			int minCreationTime = app.pulse.secToTicks(app.settings.getAsFloat("min pipe creation sec"));
-			int maxCreationTime = app.pulse.secToTicks(app.settings.getAsFloat("max pipe creation sec"));
+			int minCreationTime = PULSE.secToTicks(app.settings.getAsFloat("min pipe creation sec"));
+			int maxCreationTime = PULSE.secToTicks(app.settings.getAsFloat("max pipe creation sec"));
 			s.setDuration(randomInt(minCreationTime, maxCreationTime));
 		};
 

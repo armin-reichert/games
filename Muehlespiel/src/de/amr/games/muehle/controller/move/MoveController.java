@@ -1,6 +1,5 @@
 package de.amr.games.muehle.controller.move;
 
-import static de.amr.easy.game.Application.logger;
 import static de.amr.games.muehle.controller.move.MoveEvent.GOT_MOVE_FROM_PLAYER;
 import static de.amr.games.muehle.controller.move.MoveState.ANIMATION;
 import static de.amr.games.muehle.controller.move.MoveState.COMPLETE;
@@ -13,8 +12,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Optional;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.game.timing.Pulse;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.muehle.controller.player.Player;
@@ -33,16 +32,14 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 
 	private final Player player;
 	private final MillGameUI gameUI;
-	private final Pulse pulse;
 	private final float moveTimeSec;
 	private Move move;
 
-	public MoveController(Player player, MillGameUI gameUI, Pulse pulse, float moveTimeSec) {
+	public MoveController(Player player, MillGameUI gameUI, float moveTimeSec) {
 		super("Move Control", MoveState.class, READING_MOVE);
 
 		this.player = player;
 		this.gameUI = gameUI;
-		this.pulse = pulse;
 		this.moveTimeSec = moveTimeSec;
 		this.move = null;
 
@@ -68,7 +65,7 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 
 		// JUMPING
 
-		state(JUMPING).entry = s -> logger.info(player.name() + ": "
+		state(JUMPING).entry = s -> Application.LOGGER.info(player.name() + ": "
 				+ Messages.text("jumping_from_to", move.from().get(), move.to().get()));
 
 		change(JUMPING, COMPLETE);
@@ -102,7 +99,7 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 			int from = move.from().get(), to = move.to().get();
 			gameUI.getStoneAt(from).ifPresent(stone -> {
 				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to))
-						/ pulse.secToTicks(moveTimeSec);
+						/ Application.PULSE.secToTicks(moveTimeSec);
 				Direction dir = getDirection(from, to).get();
 				if (dir == Direction.NORTH) {
 					stone.tf.setVelocity(0, -speed);
@@ -113,7 +110,7 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 				} else if (dir == Direction.WEST) {
 					stone.tf.setVelocity(-speed, 0);
 				}
-				logger.info(player.name() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
+				Application.LOGGER.info(player.name() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
 			});
 		}
 	}
@@ -150,23 +147,23 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 		int from = move.from().get(), to = move.to().get();
 		Optional<Stone> optStone = gameUI.getStoneAt(from);
 		if (!optStone.isPresent()) {
-			logger.info(Messages.text("stone_at_position_not_existing", from));
+			Application.LOGGER.info(Messages.text("stone_at_position_not_existing", from));
 			return false;
 		}
 		Stone stone = optStone.get();
 		if (stone.getColor() != player.color()) {
-			logger.info(Messages.text("stone_at_position_wrong_color", from));
+			Application.LOGGER.info(Messages.text("stone_at_position_wrong_color", from));
 			return false;
 		}
 		if (!player.model().board.isEmptyPosition(to)) {
-			logger.info(Messages.text("stone_at_position", to));
+			Application.LOGGER.info(Messages.text("stone_at_position", to));
 			return false;
 		}
 		if (player.canJump()) {
 			return true;
 		}
 		if (!areNeighbors(from, to)) {
-			logger.info(Messages.text("not_neighbors", from, to));
+			Application.LOGGER.info(Messages.text("not_neighbors", from, to));
 			return false;
 		}
 		return true;

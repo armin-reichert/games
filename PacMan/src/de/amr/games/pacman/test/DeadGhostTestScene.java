@@ -59,7 +59,7 @@ public class DeadGhostTestScene extends ActiveScene<DeadGhostTestApp> {
 
 		app.entities.filter(Ghost.class).forEach(ghost -> {
 			int seconds = rand.nextInt(3) + 1;
-			ghost.control.state().setDuration(app.pulse.secToTicks(seconds));
+			ghost.control.state().setDuration(app.PULSE.secToTicks(seconds));
 		});
 	}
 

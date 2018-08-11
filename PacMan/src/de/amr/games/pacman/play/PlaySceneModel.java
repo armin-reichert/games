@@ -13,7 +13,7 @@ import static de.amr.games.pacman.core.board.TileContent.Tunnel;
 
 import java.util.Random;
 
-import de.amr.easy.game.timing.Pulse;
+import de.amr.easy.game.timing.PULSE;
 import de.amr.games.pacman.core.board.Board;
 import de.amr.games.pacman.core.board.BonusSymbol;
 import de.amr.games.pacman.core.board.TileContent;
@@ -82,10 +82,10 @@ public class PlaySceneModel {
 
 	private final Random rand = new Random();
 	private final Board board;
-	private final Pulse motor;
+	private final PULSE motor;
 	private final float baseSpeed;
 
-	public PlaySceneModel(Board board, Pulse motor, float pixelsPerSecond) {
+	public PlaySceneModel(Board board, PULSE motor, float pixelsPerSecond) {
 		this.board = board;
 		this.motor = motor;
 		this.baseSpeed = pixelsPerSecond / motor.getFrequency();

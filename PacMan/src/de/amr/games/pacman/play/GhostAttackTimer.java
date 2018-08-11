@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.timing.Pulse;
+import de.amr.easy.game.timing.PULSE;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pacman.core.entities.ghost.Ghost;
 import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
@@ -22,18 +22,18 @@ import de.amr.games.pacman.core.entities.ghost.behaviors.GhostEvent;
 public class GhostAttackTimer {
 
 	private final StateMachine<GhostAttackState, String> fsm;
-	private final Pulse pulse;
+	private final PULSE PULSE;
 	private int level;
 	private int wave;
 
 	private int computeFrames(int[][] times) {
 		int row = (level == 1) ? 0 : (level <= 4) ? 1 : 2;
 		int n = times[0].length, col = wave <= n ? wave - 1 : n - 1;
-		return pulse.secToTicks(times[row][col]);
+		return PULSE.secToTicks(times[row][col]);
 	}
 
 	public GhostAttackTimer(Application app, Set<Ghost> ghosts, int[][] scatteringSeconds, int[][] chasingSeconds) {
-		this.pulse = app.pulse;
+		this.PULSE = app.PULSE;
 
 		fsm = new StateMachine<>("GhostAttackTimer", GhostAttackState.class, Initialized);
 
@@ -72,7 +72,7 @@ public class GhostAttackTimer {
 
 	public void setLogger(Logger logger) {
 		fsm.setLogger(logger);
-		fsm.ticksToSec = pulse::ticksToSec;
+		fsm.ticksToSec = PULSE::ticksToSec;
 	}
 
 	public void setLevel(int level) {

@@ -8,9 +8,9 @@ public class Util {
 
 	/**
 	 * @param min
-	 *          lower bound (inclusive)
+	 *              lower bound (inclusive)
 	 * @param max
-	 *          upper bound (inclusive)
+	 *              upper bound (inclusive)
 	 * @return random integer from given closed interval
 	 */
 	public static int randomInt(int min, int max) {

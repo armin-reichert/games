@@ -79,7 +79,7 @@ public class Ghost extends BoardMover {
 
 	public void setLogger(Logger logger) {
 		control.setLogger(logger);
-		control.ticksToSec = app.pulse::ticksToSec;
+		control.ticksToSec = app.PULSE::ticksToSec;
 	}
 
 	public void receiveEvent(GhostEvent event) {
