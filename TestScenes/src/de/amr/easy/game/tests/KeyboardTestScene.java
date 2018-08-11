@@ -5,11 +5,12 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
 
 public class KeyboardTestScene implements ViewController {
-
+	
 	@Override
 	public int getWidth() {
 		return 600;
@@ -21,34 +22,26 @@ public class KeyboardTestScene implements ViewController {
 	}
 
 	@Override
-	public void draw(Graphics2D g) {
-		int fontSize = 30;
-		int x = 2 * fontSize;
-		g.setColor(Color.YELLOW);
-		g.setFont(new Font(Font.MONOSPACED, Font.BOLD, fontSize));
-		if (Keyboard.isAltDown()) {
-			g.drawString("Alt", x, 2 * fontSize);
-		}
-		if (Keyboard.isShiftDown()) {
-			g.drawString("Shift", x, 2 * fontSize + getHeight() / 3);
-		}
-		if (Keyboard.isControlDown()) {
-			g.drawString("Control", x, 2 * fontSize + 2 * getHeight() / 3);
-		}
-		g.setFont((new Font(Font.MONOSPACED, Font.BOLD, 100)));
-		for (int key = 0x25; key < 512; ++key) {
-			if (Keyboard.keyDown(key)) {
-				g.drawString(KeyEvent.getKeyText(key), getWidth() / 2, getHeight() / 2);
-			}
-		}
-	}
-
-	@Override
 	public void init() {
 	}
 
 	@Override
 	public void update() {
+		String modifiers = " ";
+		for (Keyboard.Modifier modifier : Keyboard.Modifier.values()) {
+			if (Keyboard.keyPressedOnce(modifier, KeyEvent.VK_A)) {
+				modifiers += modifier + " ";
+			}
+		}
+		if (modifiers.length() > 1) {
+			Application.logger.info(String.format("(%s) + A", modifiers));
+		}
 	}
 
+	@Override
+	public void draw(Graphics2D g) {
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial", Font.BOLD, 30));
+		g.drawString("Press {ALT, CONTROL, SHIFT}+A", 20, getHeight()/2);
+	}
 }
