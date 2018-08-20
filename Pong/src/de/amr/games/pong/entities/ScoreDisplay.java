@@ -46,4 +46,16 @@ public class ScoreDisplay extends GameEntity {
 		g.drawString("" + scoreLeft.points, (int) tf.getX() - 100, 50);
 		g.drawString("" + scoreRight.points, (int) tf.getX() + 100, 50);
 	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
 }

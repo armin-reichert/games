@@ -74,4 +74,10 @@ public class Paddle extends GameEntity {
 	public boolean hitsBall(Ball ball) {
 		return getCollisionBox().intersects(ball.getCollisionBox());
 	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
 }

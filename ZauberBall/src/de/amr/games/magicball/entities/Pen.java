@@ -76,4 +76,10 @@ public class Pen extends GameEntity {
 		Random random = new Random();
 		return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256), 255);
 	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
 }

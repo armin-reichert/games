@@ -51,4 +51,16 @@ public class Court extends GameEntity {
 	public int getHeight() {
 		return height;
 	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
 }

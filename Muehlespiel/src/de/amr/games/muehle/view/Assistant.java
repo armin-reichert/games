@@ -185,4 +185,10 @@ public class Assistant extends GameEntity {
 		play(SoundID.WIN);
 	}
 
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

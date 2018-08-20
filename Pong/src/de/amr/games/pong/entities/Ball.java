@@ -58,4 +58,10 @@ public class Ball extends GameEntity {
 	public int getSize() {
 		return size;
 	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
 }
