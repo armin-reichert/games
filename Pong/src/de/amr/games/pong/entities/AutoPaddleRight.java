@@ -32,8 +32,8 @@ public class AutoPaddleRight extends Paddle {
 	private void computeBallPositionRight() {
 		Ball ball = game.entities.ofClass(Ball.class).findFirst().get();
 		ballRightY = ball.tf.getY() + ball.getHeight() / 2;
-		for (float x = ball.tf.getX(); x < game.settings.width - getWidth()
-				- ball.getWidth(); x += ball.tf.getVelocityX()) {
+		for (float x = ball.tf.getX(); x < game.settings.width - getWidth() - ball.getWidth(); x += ball.tf
+				.getVelocityX()) {
 			if (ballRightY < 0) {
 				ballRightY += ball.tf.getVelocityY();
 			} else if (ballRightY >= game.settings.height) {

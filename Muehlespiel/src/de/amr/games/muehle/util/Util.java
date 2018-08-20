@@ -10,13 +10,12 @@ public class Util {
 
 	/**
 	 * @param stream
-	 *          stream of integers
+	 *                 stream of integers
 	 * @return a random value from the stream
 	 */
 	public static OptionalInt randomElement(IntStream stream) {
 		int[] elements = stream.toArray();
-		return elements.length == 0 ? OptionalInt.empty()
-				: OptionalInt.of(elements[RAND.nextInt(elements.length)]);
+		return elements.length == 0 ? OptionalInt.empty() : OptionalInt.of(elements[RAND.nextInt(elements.length)]);
 	}
 
 }

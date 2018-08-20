@@ -39,8 +39,8 @@ public class PlayScene implements ViewController {
 	 */
 	private StateMachine<PlaySceneState, PlaySceneEvent> createStateMachine() {
 
-		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl",
-				PlaySceneState.class, Initialized);
+		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl", PlaySceneState.class,
+				Initialized);
 
 		// Initialized
 

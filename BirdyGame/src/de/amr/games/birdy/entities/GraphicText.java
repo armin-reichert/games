@@ -23,4 +23,12 @@ public class GraphicText extends GameEntity {
 	public Stream<Sprite> getSprites() {
 		return Stream.of(s_text);
 	}
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void update() {
+	}
 }

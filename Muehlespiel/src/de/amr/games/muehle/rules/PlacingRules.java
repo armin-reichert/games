@@ -40,10 +40,8 @@ public enum PlacingRules implements PlacingRule {
 	NEAR_OWN_COLOR(
 			"Setze Stein auf Position %d, weil es eine freie Position neben eigenem Stein ist",
 			(board, player, color) -> {
-				OptionalInt emptyNeighbor = randomElement(
-						board.positions(color).filter(board::hasEmptyNeighbor));
-				return emptyNeighbor.isPresent()
-						? randomElement(board.emptyNeighbors(emptyNeighbor.getAsInt()))
+				OptionalInt emptyNeighbor = randomElement(board.positions(color).filter(board::hasEmptyNeighbor));
+				return emptyNeighbor.isPresent() ? randomElement(board.emptyNeighbors(emptyNeighbor.getAsInt()))
 						: OptionalInt.empty();
 			}),
 
@@ -65,16 +63,14 @@ public enum PlacingRules implements PlacingRule {
 		return description;
 	}
 
-	private PlacingRules(String description,
-			TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier,
+	private PlacingRules(String description, TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier,
 			TriFunction<Board, Player, StoneColor, Boolean> condition) {
 		this.description = description;
 		this.positionSupplier = positionSupplier;
 		this.condition = condition;
 	}
 
-	private PlacingRules(String description,
-			TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier) {
+	private PlacingRules(String description, TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier) {
 		this(description, positionSupplier, (board, player, color) -> true);
 	}
 

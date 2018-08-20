@@ -15,16 +15,16 @@ public class ClockRenderer {
 	private static final int TICK_SIZE = 30;
 	private static final int BULLET_SIZE = 10;
 	private static final Image[] TICK_IMAGE = new Image[8];
-	private static final int[] TICK_IMAGE_INDEX = new int[] { 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2,
-			2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6,
-			6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 0, 0, 0, 0, 0 };
+	private static final int[] TICK_IMAGE_INDEX = new int[] { 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+			2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 0, 0, 0,
+			0, 0 };
 
 	static {
 		int i = 0;
-		for (String d : Arrays.asList("east", "south_east", "south", "south_west", "west", "north_west",
-				"north", "north_east")) {
-			TICK_IMAGE[i++] = Tools.loadImageIcon("images/pacman_" + d + ".jpg").getImage()
-					.getScaledInstance(TICK_SIZE, TICK_SIZE, Image.SCALE_SMOOTH);
+		for (String d : Arrays.asList("east", "south_east", "south", "south_west", "west", "north_west", "north",
+				"north_east")) {
+			TICK_IMAGE[i++] = Tools.loadImageIcon("images/pacman_" + d + ".jpg").getImage().getScaledInstance(TICK_SIZE,
+					TICK_SIZE, Image.SCALE_SMOOTH);
 		}
 	}
 

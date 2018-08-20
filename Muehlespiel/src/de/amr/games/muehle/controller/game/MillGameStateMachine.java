@@ -75,8 +75,7 @@ public abstract class MillGameStateMachine extends StateMachine<MillGameState, M
 
 		state(PLACING_REMOVING).update = this::tryToRemoveStone;
 
-		changeOnInput(STONE_REMOVED, PLACING_REMOVING, MOVING, this::areAllStonesPlaced,
-				this::switchMoving);
+		changeOnInput(STONE_REMOVED, PLACING_REMOVING, MOVING, this::areAllStonesPlaced, this::switchMoving);
 
 		changeOnInput(STONE_REMOVED, PLACING_REMOVING, PLACING, this::switchPlacing);
 

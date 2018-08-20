@@ -72,7 +72,6 @@ public class Lever extends GameEntity {
 
 	@Override
 	public Rectangle getCollisionBox() {
-		return new Rectangle((int) tf.getX() - size / 2, (int) tf.getY() - size / 2, size / 2,
-				size / 2);
+		return new Rectangle((int) tf.getX() - size / 2, (int) tf.getY() - size / 2, size / 2, size / 2);
 	}
 }

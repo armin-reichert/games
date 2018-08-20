@@ -144,7 +144,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          some number
+	 *            some number
 	 * @return if the given number denotes a valid board position
 	 */
 	public static boolean isValidPosition(int p) {
@@ -160,7 +160,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @return a stream of the neighbor positions
 	 */
 	public static IntStream neighbors(int p) {
@@ -170,9 +170,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *              a position
 	 * @param dir
-	 *          a direction
+	 *              a direction
 	 * @return the (optional) neighbor in the given direction
 	 */
 	public static OptionalInt neighbor(int p, Direction dir) {
@@ -184,7 +184,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @return stream of all positions which have distance 2 from given position
 	 */
 	public static IntStream nextToNeighbors(int p) {
@@ -194,9 +194,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @param q
-	 *          a position
+	 *            a position
 	 * @return if the given positions are neighbors
 	 */
 	public static boolean areNeighbors(int p, int q) {
@@ -207,9 +207,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @param q
-	 *          a position
+	 *            a position
 	 * @return the (optional) direction from <code>p</code> to <code>q</code> if <code>p</code> and
 	 *         <code>q</code> are neighbors
 	 */
@@ -221,11 +221,11 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @param q
-	 *          a position
+	 *            a position
 	 * @param r
-	 *          a position
+	 *            a position
 	 * @return if the given positions form a row
 	 */
 	public static boolean inRow(int p, int q, int r) {
@@ -238,11 +238,11 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @param q
-	 *          a position
+	 *            a position
 	 * @param r
-	 *          a position
+	 *            a position
 	 * @return if the given positions form a column
 	 */
 	public static boolean inCol(int p, int q, int r) {
@@ -285,7 +285,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return a stream of the positions with a stone of the given color
 	 */
 	public IntStream positions(StoneColor color) {
@@ -302,7 +302,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return the number of stones with the given color
 	 */
 	public long stoneCount(StoneColor color) {
@@ -315,9 +315,9 @@ public class Board {
 	 * already.
 	 * 
 	 * @param p
-	 *          a position
+	 *                a position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 */
 	public void putStoneAt(int p, StoneColor color) {
 		checkPosition(p);
@@ -332,7 +332,7 @@ public class Board {
 	 * Removes a stone from the given position. Empty positions are allowed.
 	 * 
 	 * @param p
-	 *          a valid position
+	 *            a valid position
 	 */
 	public void removeStoneAt(int p) {
 		checkPosition(p);
@@ -344,9 +344,9 @@ public class Board {
 	 * position is empty or the target position is not empty, an exception is thrown.
 	 * 
 	 * @param from
-	 *          the source position
+	 *               the source position
 	 * @param to
-	 *          the target position
+	 *               the target position
 	 */
 	public void moveStone(int from, int to) {
 		checkPosition(from);
@@ -363,7 +363,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a position
+	 *            a position
 	 * @return the (optional) content at this position
 	 */
 	public Optional<StoneColor> getStoneAt(int p) {
@@ -373,7 +373,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *            a valid position
 	 * @return if the position is empty
 	 */
 	public boolean isEmptyPosition(int p) {
@@ -390,7 +390,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *            a valid position
 	 * @return if there is a stone at the position
 	 */
 	public boolean hasStoneAt(int p) {
@@ -400,9 +400,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if there is a stone of the given color at this position
 	 */
 	public boolean hasStoneAt(int p, StoneColor color) {
@@ -413,7 +413,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *            a valid position
 	 * @return if the position p has an empty neighbor position
 	 */
 	public boolean hasEmptyNeighbor(int p) {
@@ -423,7 +423,7 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *            a valid position
 	 * @return a stream of the empty neighbor positions of p
 	 */
 	public IntStream emptyNeighbors(int p) {
@@ -433,7 +433,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return a stream of the positions carrying a stone of the given color and having an empty
 	 *         neighbor position
 	 */
@@ -443,7 +443,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if no stone of the given color can move (jumping not possible)
 	 */
 	public boolean isTrapped(StoneColor color) {
@@ -455,13 +455,13 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param q
-	 *          a valid position
+	 *                a valid position
 	 * @param r
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given positions form a horizontal mill of the given color
 	 */
 	public boolean hasHMill(int p, int q, int r, StoneColor color) {
@@ -474,13 +474,13 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param q
-	 *          a valid position
+	 *                a valid position
 	 * @param r
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given positions form a vertical mill of the given color
 	 */
 	public boolean hasVMill(int p, int q, int r, StoneColor color) {
@@ -493,9 +493,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given position is inside a horizontal mill of the given color
 	 */
 	public boolean inHMill(int p, StoneColor color) {
@@ -506,9 +506,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given position is inside a vertical mill of the given color
 	 */
 	public boolean inVMill(int p, StoneColor color) {
@@ -519,9 +519,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given position is inside a mill of the given color
 	 */
 	public boolean inMill(int p, StoneColor color) {
@@ -530,9 +530,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given position is part of an open mill of the given color
 	 */
 	public boolean isPartOfOpenMill(int p, StoneColor color) {
@@ -541,9 +541,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given position is part of an open horizontal mill of the given color
 	 */
 	public boolean isPartOfOpenHMill(int p, StoneColor color) {
@@ -554,9 +554,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if the given position is part of an open vertical mill of the given color
 	 */
 	public boolean isPartOfOpenVMill(int p, StoneColor color) {
@@ -567,13 +567,12 @@ public class Board {
 
 	private boolean isPartOfOpenXMill(int p, StoneColor color, int[][] mill) {
 		int q = mill[p][0], r = mill[p][1];
-		return has(p, color) && has(q, color) && has(r, null)
-				|| has(p, color) && has(q, null) && has(r, color);
+		return has(p, color) && has(q, color) && has(r, null) || has(p, color) && has(q, null) && has(r, color);
 	}
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if all stones of the given color are inside some mill
 	 */
 	public boolean allStonesInMills(StoneColor color) {
@@ -582,7 +581,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return a stream of all positions where a mill of the given color could be closed
 	 */
 	public IntStream positionsClosingMill(StoneColor color) {
@@ -591,7 +590,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return a stream of all positions where a mill of the given color could be opened
 	 */
 	public IntStream positionsOpeningMill(StoneColor color) {
@@ -600,7 +599,7 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return a stream of all positions where two mills of the given color could be opened at once
 	 */
 	public IntStream positionsOpeningTwoMills(StoneColor color) {
@@ -609,9 +608,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if placing a stone of the given color at the given position opens a horizontal mill
 	 */
 	public boolean isHMillOpenedAt(int p, StoneColor color) {
@@ -622,9 +621,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if placing a stone of the given color at the given position opens a vertical mill
 	 */
 	public boolean isVMillOpenedAt(int p, StoneColor color) {
@@ -635,15 +634,14 @@ public class Board {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return has(p, null) && has(q, color) && has(r, null)
-				|| has(p, null) && has(q, null) && has(r, color);
+		return has(p, null) && has(q, color) && has(r, null) || has(p, null) && has(q, null) && has(r, color);
 	}
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if placing a stone of the given color at the given position would open a mill
 	 */
 	public boolean isMillOpenedAt(int p, StoneColor color) {
@@ -654,11 +652,11 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
-	 * @return if placing a stone of the given color at the given position would open two mills of
-	 *         that color
+	 *                a stone color
+	 * @return if placing a stone of the given color at the given position would open two mills of that
+	 *         color
 	 */
 	public boolean areTwoMillsOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
@@ -668,9 +666,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          a valid position
+	 *                a valid position
 	 * @param color
-	 *          a stone color
+	 *                a stone color
 	 * @return if a mill of the given color is closed by placing a stone of that color at the given
 	 *         position
 	 */
@@ -690,11 +688,11 @@ public class Board {
 
 	/**
 	 * @param fromMil
-	 *          move start position
+	 *                  move start position
 	 * @param to
-	 *          move end position
+	 *                  move end position
 	 * @param color
-	 *          stone color
+	 *                  stone color
 	 * @return if a mill of the given color is closed when moving a stone of the given color from the
 	 *         start to the end position
 	 */
@@ -725,9 +723,9 @@ public class Board {
 
 	/**
 	 * @param p
-	 *          valid position
+	 *                valid position
 	 * @param color
-	 *          stone color
+	 *                stone color
 	 * @return if a mill of the given color can be closed when moving from p
 	 */
 	public boolean canCloseMillMovingFrom(int p, StoneColor color) {
@@ -759,28 +757,25 @@ public class Board {
 
 	/**
 	 * @param color
-	 *          stone color
+	 *                stone color
 	 * @return positions where by placing a stone two mills of the same color could be opened later
 	 */
 	public IntStream positionsOpeningTwoMillsLater(StoneColor color) {
 		checkStoneColor(color);
-		return positions().filter(this::isEmptyPosition)
-				.filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
+		return positions().filter(this::isEmptyPosition).filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
 	}
 
 	/**
 	 * @param p
-	 *          valid position
+	 *                valid position
 	 * @param color
-	 *          stone color
-	 * @return if by placing a stone of the given color at the position later two mills could be
-	 *         opened
+	 *                stone color
+	 * @return if by placing a stone of the given color at the position later two mills could be opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return nextToNeighbors(p).filter(q -> get(q) == color)
-				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
+		return nextToNeighbors(p).filter(q -> get(q) == color).anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
@@ -798,7 +793,7 @@ public class Board {
 		if (!otherNeighbor2.isPresent()) {
 			otherNeighbor2 = neighbor(commonNeighbor, dir2);
 		}
-		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt())
-				&& otherNeighbor2.isPresent() && isEmptyPosition(otherNeighbor2.getAsInt());
+		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt()) && otherNeighbor2.isPresent()
+				&& isEmptyPosition(otherNeighbor2.getAsInt());
 	}
 }

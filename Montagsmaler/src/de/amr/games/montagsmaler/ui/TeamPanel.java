@@ -166,8 +166,7 @@ public class TeamPanel extends JPanel {
 			playerInfo.setText(player.getName());
 			ImageIcon photo = player.getImage();
 			if (photo != null) {
-				Image scaledImage = photo.getImage().getScaledInstance(TEAMPANEL_WIDTH - 20, -1,
-						Image.SCALE_SMOOTH);
+				Image scaledImage = photo.getImage().getScaledInstance(TEAMPANEL_WIDTH - 20, -1, Image.SCALE_SMOOTH);
 				photo.setImage(scaledImage);
 			}
 			playerInfo.setIcon(photo);

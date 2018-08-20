@@ -62,6 +62,6 @@ public class Ball extends GameEntity {
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

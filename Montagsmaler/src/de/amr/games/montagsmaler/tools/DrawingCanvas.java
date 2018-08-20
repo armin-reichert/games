@@ -22,8 +22,8 @@ import de.amr.games.montagsmaler.Tools;
  */
 public class DrawingCanvas extends JPanel {
 
-	private static final Cursor BRUSH_CURSOR = Tools.createCursor("icons32/bullet_brush.png",
-			new Point(0, 31), "Brush Cursor");
+	private static final Cursor BRUSH_CURSOR = Tools.createCursor("icons32/bullet_brush.png", new Point(0, 31),
+			"Brush Cursor");
 
 	private static final int CLEAR_AREA_SIZE = 80;
 	private static final Image CLEAR_DRAWING = Tools.loadImageIcon("images/remove_256.png").getImage()

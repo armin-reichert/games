@@ -10,7 +10,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
 
 public class KeyboardTestScene implements ViewController {
-	
+
 	@Override
 	public int getWidth() {
 		return 600;
@@ -42,6 +42,6 @@ public class KeyboardTestScene implements ViewController {
 	public void draw(Graphics2D g) {
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Arial", Font.BOLD, 30));
-		g.drawString("Press {ALT, CONTROL, SHIFT}+A", 20, getHeight()/2);
+		g.drawString("Press {ALT, CONTROL, SHIFT}+A", 20, getHeight() / 2);
 	}
 }

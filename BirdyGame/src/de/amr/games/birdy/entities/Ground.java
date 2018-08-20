@@ -56,4 +56,8 @@ public class Ground extends GameEntity {
 			g.drawImage(image, (int) x, (int) tf.getY(), null);
 		}
 	}
+
+	@Override
+	public void init() {
+	}
 }

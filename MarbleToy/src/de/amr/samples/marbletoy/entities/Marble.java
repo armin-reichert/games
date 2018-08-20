@@ -27,4 +27,8 @@ public class Marble extends GameEntity {
 	public void update() {
 		tf.move();
 	}
+
+	@Override
+	public void init() {
+	}
 }

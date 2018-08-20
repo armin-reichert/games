@@ -9,11 +9,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public enum Sound {
-	SOLVED("fanfare.wav"),
-	GAMEOVER("gong.wav"),
-	HYMN("olympic.wav"),
-	GAMESTART("pacman.wav"),
-	TICK("tick.wav");
+	SOLVED("fanfare.wav"), GAMEOVER("gong.wav"), HYMN("olympic.wav"), GAMESTART("pacman.wav"), TICK("tick.wav");
 
 	private final URL url;
 	private Clip clip;

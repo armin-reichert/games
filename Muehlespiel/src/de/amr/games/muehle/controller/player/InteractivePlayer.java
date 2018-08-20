@@ -40,8 +40,8 @@ public class InteractivePlayer implements Player {
 	private final Move move;
 	private BiFunction<Integer, Integer, OptionalInt> boardPositionFinder;
 
-	public InteractivePlayer(MillGameModel model,
-			BiFunction<Integer, Integer, OptionalInt> boardPositionFinder, StoneColor color) {
+	public InteractivePlayer(MillGameModel model, BiFunction<Integer, Integer, OptionalInt> boardPositionFinder,
+			StoneColor color) {
 		this.model = model;
 		this.boardPositionFinder = boardPositionFinder;
 		this.color = color;
@@ -143,7 +143,6 @@ public class InteractivePlayer implements Player {
 	}
 
 	private OptionalInt boardPositionClicked() {
-		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY())
-				: OptionalInt.empty();
+		return Mouse.clicked() ? boardPositionFinder.apply(Mouse.getX(), Mouse.getY()) : OptionalInt.empty();
 	}
 }

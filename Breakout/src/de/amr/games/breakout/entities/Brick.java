@@ -44,4 +44,12 @@ public class Brick extends GameEntity {
 	public int getValue() {
 		return value;
 	}
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void update() {
+	}
 }

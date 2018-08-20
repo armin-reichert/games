@@ -16,16 +16,14 @@ import java.util.List;
  */
 public class WindFarm {
 
-	private static final File FILE = new File(
-			System.getProperty("user.dir") + File.separator + "windpark.txt");
+	private static final File FILE = new File(System.getProperty("user.dir") + File.separator + "windpark.txt");
 
 	public final Point2D.Float sunCenter = new Point2D.Float();
 	public final List<WindTurbine> turbines = new ArrayList<>();
 
 	public void save() {
 		try (PrintWriter w = new PrintWriter(new FileWriter(FILE))) {
-			w.println(
-					"# x, y, turmHöhe, turmBreiteUnten, turmBreiteOben, nabenRadius, rotorLänge, rotorBreite");
+			w.println("# x, y, turmHöhe, turmBreiteUnten, turmBreiteOben, nabenRadius, rotorLänge, rotorBreite");
 			for (WindTurbine turbine : turbines) {
 				saveTurbine(w, turbine);
 			}
@@ -71,8 +69,8 @@ public class WindFarm {
 				float nacelleRadius = Float.parseFloat(record[i++]);
 				float rotorLength = Float.parseFloat(record[i++]);
 				float rotorWidth = Float.parseFloat(record[i++]);
-				windFarm.turbines.add(new WindTurbine(x, y, towerHeight, towerWidthBottom, towerWidthTop,
-						nacelleRadius, rotorLength, rotorWidth));
+				windFarm.turbines.add(new WindTurbine(x, y, towerHeight, towerWidthBottom, towerWidthTop, nacelleRadius,
+						rotorLength, rotorWidth));
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Windparkdatei nicht gefunden " + FILE);

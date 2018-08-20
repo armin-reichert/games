@@ -41,8 +41,7 @@ public class Tools {
 	}
 
 	public static Cursor createCursor(String path, Point hotspot, String name) {
-		return Toolkit.getDefaultToolkit().createCustomCursor(loadImageIcon(path).getImage(), hotspot,
-				name);
+		return Toolkit.getDefaultToolkit().createCustomCursor(loadImageIcon(path).getImage(), hotspot, name);
 	}
 
 	public static Color randomPenColor() {

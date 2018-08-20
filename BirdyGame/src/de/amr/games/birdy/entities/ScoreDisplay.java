@@ -72,4 +72,8 @@ public class ScoreDisplay extends GameEntity {
 					null);
 		}
 	}
+
+	@Override
+	public void init() {
+	}
 }

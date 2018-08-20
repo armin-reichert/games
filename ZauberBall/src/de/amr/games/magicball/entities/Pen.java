@@ -80,6 +80,6 @@ public class Pen extends GameEntity {
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

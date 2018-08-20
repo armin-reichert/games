@@ -78,6 +78,6 @@ public class Paddle extends GameEntity {
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

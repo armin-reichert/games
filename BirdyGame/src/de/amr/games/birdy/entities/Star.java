@@ -33,4 +33,12 @@ public class Star extends GameEntity {
 	public Stream<Sprite> getSprites() {
 		return Stream.of(s_star);
 	}
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void update() {
+	}
 }

@@ -53,4 +53,8 @@ public class Ball extends GameEntity {
 	public boolean isOut() {
 		return tf.getY() > boardSize.height;
 	}
+
+	@Override
+	public void init() {
+	}
 }

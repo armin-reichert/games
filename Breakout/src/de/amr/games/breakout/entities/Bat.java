@@ -44,4 +44,9 @@ public class Bat extends GameEntity {
 			tf.setX(min(boardWidth - getWidth(), max(0, tf.getX())));
 		}
 	}
+
+	@Override
+	public void init() {
+
+	}
 }
