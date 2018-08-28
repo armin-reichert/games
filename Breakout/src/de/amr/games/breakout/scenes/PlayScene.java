@@ -84,7 +84,7 @@ public class PlayScene implements ViewController {
 			};
 
 			changeOnInput(BallHitsBat, Playing, Playing, t -> {
-				ball.tf.setVelocityY(-ball.tf.getVelocityY());
+				ball.tf().setVelocityY(-ball.tf().getVelocityY());
 				Assets.sound("Sounds/plop.mp3").play();
 			});
 
@@ -97,7 +97,7 @@ public class PlayScene implements ViewController {
 					Assets.sound("Sounds/point.mp3").play();
 				} else {
 					brick.damage();
-					ball.tf.setVelocityY(-ball.tf.getVelocityY());
+					ball.tf().setVelocityY(-ball.tf().getVelocityY());
 				}
 			});
 
@@ -152,7 +152,7 @@ public class PlayScene implements ViewController {
 			int value = 5 * (numRows - row);
 			for (int col = 0; col < numCols; ++col) {
 				Brick brick = new Brick(brickWidth, brickHeight, type, value);
-				brick.tf.moveTo(x, y);
+				brick.tf().moveTo(x, y);
 				app.entities.store(brick);
 				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
 				x += hSpace;
@@ -164,10 +164,10 @@ public class PlayScene implements ViewController {
 
 	private void resetBatAndBall() {
 		bat.speed = getWidth() / 48;
-		bat.tf.moveTo((getWidth() - bat.getWidth()) / 2, getHeight() - bat.getHeight());
-		bat.tf.setVelocity(0, 0);
-		ball.tf.moveTo((getWidth() - ball.getWidth()) / 2, bat.tf.getY() - ball.getHeight());
-		ball.tf.setVelocity(0, 0);
+		bat.tf().moveTo((getWidth() - bat.getWidth()) / 2, getHeight() - bat.getHeight());
+		bat.tf().setVelocity(0, 0);
+		ball.tf().moveTo((getWidth() - ball.getWidth()) / 2, bat.tf().getY() - ball.getHeight());
+		ball.tf().setVelocity(0, 0);
 	}
 
 	private void launchBall() {
@@ -177,7 +177,7 @@ public class PlayScene implements ViewController {
 			vx = -vx;
 		}
 		float vy = -(6 + random.nextFloat() * 6);
-		ball.tf.setVelocity(vx, vy);
+		ball.tf().setVelocity(vx, vy);
 	}
 
 	private void handleCollisions() {

@@ -46,14 +46,14 @@ public class IntroScene implements ViewController {
 
 		// ShowCredits
 		control.state(ShowCredits).entry = s -> {
-			creditsText.tf.setY(getHeight());
+			creditsText.tf().setY(getHeight());
 			creditsText.setScrollSpeed(-.75f);
 			Assets.sound("music/bgmusic.mp3").loop();
 		};
 
 		control.state(ShowCredits).update = s -> creditsText.update();
 
-		control.change(ShowCredits, Wait, () -> creditsText.tf.getY() < (getHeight() - creditsText.getHeight()) / 2,
+		control.change(ShowCredits, Wait, () -> creditsText.tf().getY() < (getHeight() - creditsText.getHeight()) / 2,
 				t -> t.to().setDuration(PULSE.secToTicks(2)));
 
 		// Wait
@@ -105,7 +105,7 @@ public class IntroScene implements ViewController {
 
 	@Override
 	public void draw(Graphics2D pen) {
-		creditsText.hCenter(getWidth());
+		creditsText.centerHorizontally(getWidth());
 		gameTitleImage.center(getWidth(), getHeight());
 		Stream.of(city, gameTitleImage, creditsText).forEach(e -> e.draw(pen));
 	}

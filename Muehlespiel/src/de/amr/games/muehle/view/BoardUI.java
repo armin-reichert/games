@@ -89,7 +89,7 @@ public class BoardUI extends GameEntity {
 	public void putStoneAt(int p, StoneColor color) {
 		board.putStoneAt(p, color);
 		Stone stone = new Stone(color, getStoneRadius());
-		stone.tf.moveTo(centerPoint(p));
+		stone.tf().moveTo(centerPoint(p));
 		stones[p] = stone;
 	}
 
@@ -102,7 +102,7 @@ public class BoardUI extends GameEntity {
 			int from = move.from().get(), to = move.to().get();
 			board.moveStone(from, to);
 			Stone stone = stones[from];
-			stone.tf.moveTo(centerPoint(to));
+			stone.tf().moveTo(centerPoint(to));
 			stones[to] = stone;
 			stones[from] = null;
 		}
@@ -128,8 +128,8 @@ public class BoardUI extends GameEntity {
 	}
 
 	public OptionalInt findBoardPosition(float x, float y) {
-		x -= tf.getX();
-		y -= tf.getY();
+		x -= tf().getX();
+		y -= tf().getY();
 		if (x < 0) {
 			x = 0;
 		} else if (x > size) {
@@ -161,7 +161,7 @@ public class BoardUI extends GameEntity {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.translate(tf.getX(), tf.getY());
+		g.translate(tf().getX(), tf().getY());
 		// Background
 		g.setColor(bgColor);
 		g.fillRect(0, 0, size, size);
@@ -186,24 +186,24 @@ public class BoardUI extends GameEntity {
 		});
 		// Stones
 		Stream.of(stones).filter(Objects::nonNull).forEach(stone -> stone.draw(g));
-		g.translate(-tf.getX(), -tf.getY());
+		g.translate(-tf().getX(), -tf().getY());
 	}
 
 	public void markPosition(Graphics2D g, int p, Color color) {
-		g.translate(tf.getX(), tf.getY());
+		g.translate(tf().getX(), tf().getY());
 		g.setColor(color);
 		aa_on(g);
 		g.fillOval(round(center[p].x) - posRadius / 2, round(center[p].y) - posRadius / 2, posRadius, posRadius);
 		aa_off(g);
-		g.translate(-tf.getX(), -tf.getY());
+		g.translate(-tf().getX(), -tf().getY());
 	}
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
 		boolean allStonesInMills = board.allStonesInMills(stoneColor);
 		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor)).forEach(p -> {
 			stoneAt(p).ifPresent(stone -> {
-				float offsetX = tf.getX() + stone.tf.getX() - stone.getWidth() / 2;
-				float offsetY = tf.getY() + stone.tf.getY() - stone.getHeight() / 2;
+				float offsetX = tf().getX() + stone.tf().getX() - stone.getWidth() / 2;
+				float offsetY = tf().getY() + stone.tf().getY() - stone.getHeight() / 2;
 				// draw red cross
 				g.translate(offsetX, offsetY);
 				g.setColor(Color.RED);

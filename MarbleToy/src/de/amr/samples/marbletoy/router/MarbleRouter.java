@@ -77,12 +77,12 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private void placeMarbleCenteredAt(RoutingPoint p) {
-		marble.tf.moveTo(p.getLocation().x - marble.getWidth() / 2, p.getLocation().y - marble.getHeight() / 2);
+		marble.tf().moveTo(p.getLocation().x - marble.getWidth() / 2, p.getLocation().y - marble.getHeight() / 2);
 	}
 
 	private void routeMarble(RoutingPoint from, RoutingPoint to) {
 		placeMarbleCenteredAt(from);
-		marble.tf.setVelocity(smul(MARBLE_SPEED, diff(to.getLocation(), from.getLocation()).normalized()));
+		marble.tf().setVelocity(smul(MARBLE_SPEED, diff(to.getLocation(), from.getLocation()).normalized()));
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {
