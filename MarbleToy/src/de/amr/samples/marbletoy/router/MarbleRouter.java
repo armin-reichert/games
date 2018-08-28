@@ -86,7 +86,7 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {
-		Vector2f leverLocation = toy.getLever(leverIndex).getCenter();
+		Vector2f leverLocation = toy.getLever(leverIndex).tf().getCenter();
 		return marble.getCollisionBox().contains(leverLocation.roundedX(), leverLocation.roundedY());
 	}
 
