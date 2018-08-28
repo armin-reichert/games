@@ -2,10 +2,8 @@ package de.amr.games.pong.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.Sprite;
 
 public class Ball extends GameEntity {
 
@@ -30,16 +28,6 @@ public class Ball extends GameEntity {
 	}
 
 	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
-	}
-
-	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(color);
 		g.fillOval((int) tf.getX(), (int) tf.getY(), size, size);
@@ -61,7 +49,5 @@ public class Ball extends GameEntity {
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
-
 	}
 }

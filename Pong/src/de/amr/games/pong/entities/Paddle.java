@@ -2,11 +2,9 @@ package de.amr.games.pong.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.pong.PongGame;
 
 public class Paddle extends GameEntity {
@@ -46,16 +44,6 @@ public class Paddle extends GameEntity {
 	}
 
 	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
-	}
-
-	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(color);
 		g.fillRect((int) tf.getX(), (int) tf.getY(), getWidth(), getHeight());
@@ -77,7 +65,5 @@ public class Paddle extends GameEntity {
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
-
 	}
 }

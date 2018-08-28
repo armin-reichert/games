@@ -4,10 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.Sprite;
 
 public class Lever extends GameEntity {
 
@@ -43,16 +41,6 @@ public class Lever extends GameEntity {
 
 	public void setPointsLeft(boolean left) {
 		this.pointsLeft = left;
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
 	}
 
 	@Override

@@ -5,10 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.Sprite;
 
 public class Pen extends GameEntity {
 
@@ -45,16 +43,6 @@ public class Pen extends GameEntity {
 		draw();
 	}
 
-	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
-	}
-
 	public void draw() {
 		Graphics2D g = (Graphics2D) image.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -79,7 +67,9 @@ public class Pen extends GameEntity {
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+	}
 
+	@Override
+	public void draw(Graphics2D g) {
 	}
 }

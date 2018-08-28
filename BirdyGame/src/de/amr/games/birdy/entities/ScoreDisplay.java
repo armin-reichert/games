@@ -5,12 +5,10 @@ import static java.lang.Math.round;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.Sprite;
 
 /**
  * Displays the game score.
@@ -52,16 +50,6 @@ public class ScoreDisplay extends GameEntity {
 	@Override
 	public void update() {
 		scoreText = pointsText();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
 	}
 
 	@Override

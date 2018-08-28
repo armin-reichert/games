@@ -1,9 +1,8 @@
 package de.amr.games.birdy.entities;
 
-import java.util.stream.Stream;
+import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.Sprite;
 
 /**
  * A transparent area used for collision handling.
@@ -21,21 +20,15 @@ public class Area extends GameEntity {
 	}
 
 	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
-	}
-
-	@Override
 	public void init() {
 	}
 
 	@Override
 	public void update() {
+	}
+	
+	@Override
+	public void draw(Graphics2D g) {
 	}
 
 	@Override

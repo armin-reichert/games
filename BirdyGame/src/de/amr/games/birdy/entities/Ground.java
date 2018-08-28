@@ -5,7 +5,7 @@ import java.awt.Image;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.play.BirdyGame;
 
@@ -14,7 +14,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class Ground extends GameEntity {
+public class Ground extends GameEntityUsingSprites {
 
 	private float startX;
 	private Sprite s_land;

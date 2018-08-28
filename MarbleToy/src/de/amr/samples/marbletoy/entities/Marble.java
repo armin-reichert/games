@@ -2,10 +2,10 @@ package de.amr.samples.marbletoy.entities;
 
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 
-public class Marble extends GameEntity {
+public class Marble extends GameEntityUsingSprites {
 
 	private Sprite sprite;
 

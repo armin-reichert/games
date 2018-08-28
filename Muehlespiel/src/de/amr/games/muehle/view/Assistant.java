@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
@@ -23,7 +23,7 @@ import de.amr.games.muehle.msg.Messages;
 /**
  * An assistant providing visual and acoustic hints to the assisted player.
  */
-public class Assistant extends GameEntity {
+public class Assistant extends GameEntityUsingSprites {
 
 	public enum HelpLevel {
 		OFF, NORMAL, HIGH
@@ -112,38 +112,30 @@ public class Assistant extends GameEntity {
 	@Override
 	public void draw(Graphics2D g) {
 		// draw assistant only if any sound is running
-		if (helpLevel != HelpLevel.OFF
-				&& Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
+		if (helpLevel != HelpLevel.OFF && Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
 			if (helpLevel == HelpLevel.HIGH && control.playerInTurn().isInteractive()) {
 				if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
-					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().color()),
-							Color.GREEN);
-					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().color()),
-							Color.YELLOW);
-					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().color()),
-							Color.RED);
+					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().color()), Color.GREEN);
+					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().color()), Color.YELLOW);
+					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().color()), Color.RED);
 				} else if (control.is(MillGameState.MOVING, MillGameState.MOVING_REMOVING)) {
 					markPossibleMoveStarts(g, control.playerInTurn().color(), Color.GREEN);
-					markTrappingPosition(g, control.playerInTurn().color(), control.playerNotInTurn().color(),
-							Color.RED);
+					markTrappingPosition(g, control.playerInTurn().color(), control.playerNotInTurn().color(), Color.RED);
 				}
 			}
 		}
 	}
 
 	private void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
-		(control.playerInTurn().canJump() ? board.positions(stoneColor)
-				: board.positionsWithEmptyNeighbor(stoneColor))
-						.forEach(p -> view.markPosition(g, p, color));
+		(control.playerInTurn().canJump() ? board.positions(stoneColor) : board.positionsWithEmptyNeighbor(stoneColor))
+				.forEach(p -> view.markPosition(g, p, color));
 	}
 
-	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other,
-			Color color) {
+	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
 		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
-			if (neighbors(singleFreePosition).filter(board::hasStoneAt)
-					.anyMatch(p -> board.getStoneAt(p).get() == either)) {
+			if (neighbors(singleFreePosition).filter(board::hasStoneAt).anyMatch(p -> board.getStoneAt(p).get() == either)) {
 				view.markPosition(g, singleFreePosition, color);
 			}
 		}
@@ -197,8 +189,5 @@ public class Assistant extends GameEntity {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-
 	}
-
 }

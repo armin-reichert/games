@@ -13,12 +13,11 @@ import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
 import static java.lang.Math.PI;
 
-import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
@@ -31,7 +30,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class Bird extends GameEntity {
+public class Bird extends GameEntityUsingSprites {
 
 	public final Sprite YELLOW_FEATHERS;
 	public final Sprite BLUE_FEATHERS;
@@ -151,13 +150,6 @@ public class Bird extends GameEntity {
 		flightControl.update();
 		healthControl.update();
 		currentSprite().enableAnimation(tf.getVelocityY() < 0);
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
-		super.draw(g);
-		// g.setColor(Color.BLACK);
-		// g.draw(getCollisionBox());
 	}
 
 	public void receiveEvent(BirdyGameEvent event) {

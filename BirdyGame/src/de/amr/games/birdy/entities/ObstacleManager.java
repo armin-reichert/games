@@ -13,10 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGame;
@@ -91,22 +89,12 @@ public class ObstacleManager extends GameEntity {
 
 	@Override
 	public int getWidth() {
-		return currentSprite().getWidth();
+		return 0;
 	}
 
 	@Override
 	public int getHeight() {
-		return currentSprite().getHeight();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
+		return 0;
 	}
 
 	@Override

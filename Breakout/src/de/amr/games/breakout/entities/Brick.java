@@ -2,10 +2,10 @@ package de.amr.games.breakout.entities;
 
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 
-public class Brick extends GameEntity {
+public class Brick extends GameEntityUsingSprites {
 
 	public enum Type {
 		pink, blue, green, violet, yellow;

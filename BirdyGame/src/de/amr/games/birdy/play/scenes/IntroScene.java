@@ -87,12 +87,12 @@ public class IntroScene implements ViewController {
 
 		gameTitleImage = new PumpingImage(Assets.image("title"));
 		gameTitleImage.setScale(3);
-		gameTitleImage.visibility = () -> control.is(ShowGameTitle);
+		gameTitleImage.fnVisibility = () -> control.is(ShowGameTitle);
 
 		creditsText = new TextArea(CREDITS_TEXT);
 		creditsText.setFont(Assets.font("Pacifico-Regular"));
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
-		creditsText.visibility = () -> control.is(ShowCredits, Wait);
+		creditsText.fnVisibility = () -> control.is(ShowCredits, Wait);
 
 		control.setLogger(Application.LOGGER);
 		control.init();

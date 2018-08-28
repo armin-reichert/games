@@ -6,12 +6,10 @@ import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.CollisionSensitive;
-import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.play.BirdyGame;
 
 /**
@@ -59,16 +57,6 @@ public class Obstacle extends GameEntity {
 	@Override
 	public void update() {
 		tf.move();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return null;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.empty();
 	}
 
 	@Override

@@ -3,11 +3,11 @@ package de.amr.games.breakout.entities;
 import java.awt.Dimension;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.breakout.BreakoutGame;
 
-public class Ball extends GameEntity {
+public class Ball extends GameEntityUsingSprites {
 
 	private final Dimension boardSize;
 	private Sprite s_ball;

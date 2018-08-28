@@ -19,12 +19,13 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.samples.marbletoy.fsm.LeverControl;
 import de.amr.samples.marbletoy.router.MarbleRouter;
 import de.amr.samples.marbletoy.router.RoutingPoint;
 
-public class MarbleToy extends GameEntity {
+public class MarbleToy extends GameEntityUsingSprites {
 
 	private static final Font LABEL_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 18);
 

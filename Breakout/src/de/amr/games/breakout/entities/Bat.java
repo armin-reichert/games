@@ -6,11 +6,11 @@ import static java.lang.Math.min;
 import java.awt.event.KeyEvent;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 
-public class Bat extends GameEntity {
+public class Bat extends GameEntityUsingSprites {
 
 	private final int boardWidth;
 	public int speed;
@@ -57,6 +57,5 @@ public class Bat extends GameEntity {
 
 	@Override
 	public void init() {
-
 	}
 }
