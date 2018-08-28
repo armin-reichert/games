@@ -120,6 +120,11 @@ public class City extends GameEntity {
 	}
 
 	@Override
+	public int getHeight() {
+		return currentSprite().getHeight();
+	}
+
+	@Override
 	public Sprite currentSprite() {
 		return isNight() ? s_night : s_day;
 	}

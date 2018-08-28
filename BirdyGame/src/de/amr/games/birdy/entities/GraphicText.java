@@ -15,6 +15,16 @@ public class GraphicText extends GameEntity {
 	}
 
 	@Override
+	public int getWidth() {
+		return currentSprite().getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return currentSprite().getHeight();
+	}
+
+	@Override
 	public Sprite currentSprite() {
 		return s_text;
 	}

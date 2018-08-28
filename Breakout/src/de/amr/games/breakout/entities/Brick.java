@@ -24,6 +24,16 @@ public class Brick extends GameEntity {
 	}
 
 	@Override
+	public int getWidth() {
+		return currentSprite().getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return currentSprite().getHeight();
+	}
+
+	@Override
 	public Sprite currentSprite() {
 		return damaged ? s_damaged : s_intact;
 	}

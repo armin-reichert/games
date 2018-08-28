@@ -34,6 +34,16 @@ public class Ground extends GameEntity {
 	}
 
 	@Override
+	public int getWidth() {
+		return currentSprite().getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return currentSprite().getHeight();
+	}
+
+	@Override
 	public void update() {
 		startX -= tf.getVelocityX();
 		if (startX < 0) {

@@ -89,6 +89,16 @@ public class MarbleToy extends GameEntity {
 	}
 
 	@Override
+	public int getWidth() {
+		return currentSprite().getWidth();
+	}
+
+	@Override
+	public int getHeight() {
+		return currentSprite().getHeight();
+	}
+
+	@Override
 	public Sprite currentSprite() {
 		return sprite;
 	}
