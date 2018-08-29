@@ -13,6 +13,9 @@ public class Ball extends GameEntityUsingSprites {
 	public Ball(BreakoutGame app, int size) {
 		boardSize = new Dimension(app.settings.width, app.settings.height);
 		addSprite("s_ball", new Sprite("ball_green.png").scaleFrame(0, size, size));
+		setCurrentSprite("s_ball");
+		tf.setWidth(currentSprite().getWidth());
+		tf.setHeight(currentSprite().getHeight());
 	}
 
 	@Override
