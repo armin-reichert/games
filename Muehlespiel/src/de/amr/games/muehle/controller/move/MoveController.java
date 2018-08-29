@@ -102,13 +102,13 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 						/ Application.PULSE.secToTicks(moveTimeSec);
 				Direction dir = getDirection(from, to).get();
 				if (dir == Direction.NORTH) {
-					stone.tf().setVelocity(0, -speed);
+					stone.tf.setVelocity(0, -speed);
 				} else if (dir == Direction.EAST) {
-					stone.tf().setVelocity(speed, 0);
+					stone.tf.setVelocity(speed, 0);
 				} else if (dir == Direction.SOUTH) {
-					stone.tf().setVelocity(0, speed);
+					stone.tf.setVelocity(0, speed);
 				} else if (dir == Direction.WEST) {
-					stone.tf().setVelocity(-speed, 0);
+					stone.tf.setVelocity(-speed, 0);
 				}
 				Application.LOGGER.info(player.name() + ": " + Messages.text("moving_from_to_towards", from, to, dir));
 			});
@@ -116,11 +116,11 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 	}
 
 	private void updateAnimation(State state) {
-		move.from().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf().move()));
+		move.from().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.move()));
 	}
 
 	private void stopAnimation(State state) {
-		move.from().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf().setVelocity(0, 0)));
+		move.from().ifPresent(from -> gameUI.getStoneAt(from).ifPresent(stone -> stone.tf.setVelocity(0, 0)));
 	}
 
 	private boolean isMoveTargetReached() {
@@ -129,8 +129,8 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 			Optional<Stone> optStone = gameUI.getStoneAt(from);
 			if (optStone.isPresent()) {
 				Stone stone = optStone.get();
-				float speed = stone.tf().getVelocity().length();
-				Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf().getX() - speed, stone.tf().getY() - speed, 2 * speed,
+				float speed = stone.tf.getVelocity().length();
+				Ellipse2D stoneSpot = new Ellipse2D.Float(stone.tf.getX() - speed, stone.tf.getY() - speed, 2 * speed,
 						2 * speed);
 				Vector2f toCenter = gameUI.getLocation(to);
 				return stoneSpot.contains(new Point2D.Float(toCenter.x, toCenter.y));

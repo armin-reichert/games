@@ -119,7 +119,7 @@ public class PlayScene implements View, Controller {
 		ball = app.entities.ofClass(Ball.class).findFirst().get();
 		score = app.entities.ofClass(ScoreDisplay.class).findFirst().get();
 		score.centerHorizontally(width);
-		score.tf().setY(100);
+		score.tf.setY(100);
 		control.init();
 	}
 
@@ -154,9 +154,9 @@ public class PlayScene implements View, Controller {
 	}
 
 	private void resetPaddles() {
-		paddleLeft.tf().setX(0);
+		paddleLeft.tf.setX(0);
 		paddleLeft.centerVertically(height);
-		paddleRight.tf().setX(width - paddleRight.tf().getWidth());
+		paddleRight.tf.setX(width - paddleRight.tf.getWidth());
 		paddleRight.centerVertically(height);
 	}
 
@@ -168,48 +168,48 @@ public class PlayScene implements View, Controller {
 	private void prepareService() {
 		resetPaddles();
 		if (!isBallOutRight()) {
-			ball.tf().moveTo(paddleLeft.tf().getX() + paddleLeft.tf().getWidth(),
-					paddleLeft.tf().getY() + paddleLeft.tf().getHeight() / 2 - ball.tf().getHeight() / 2);
+			ball.tf.moveTo(paddleLeft.tf.getX() + paddleLeft.tf.getWidth(),
+					paddleLeft.tf.getY() + paddleLeft.tf.getHeight() / 2 - ball.tf.getHeight() / 2);
 		} else {
-			ball.tf().moveTo(paddleRight.tf().getX() - ball.tf().getWidth(),
-					paddleRight.tf().getY() + paddleRight.tf().getHeight() / 2 - ball.tf().getHeight() / 2);
+			ball.tf.moveTo(paddleRight.tf.getX() - ball.tf.getWidth(),
+					paddleRight.tf.getY() + paddleRight.tf.getHeight() / 2 - ball.tf.getHeight() / 2);
 		}
-		ball.tf().setVelocity(0, 0);
+		ball.tf.setVelocity(0, 0);
 	}
 
 	private void serveBall() {
 		Random rnd = new Random();
 		int ballSpeed = 10;
-		ball.tf().setVelocityX(isBallOutRight() ? -ballSpeed : ballSpeed);
-		ball.tf().setVelocityY((ballSpeed / 4) + (rnd.nextFloat() * ballSpeed / 4));
+		ball.tf.setVelocityX(isBallOutRight() ? -ballSpeed : ballSpeed);
+		ball.tf.setVelocityY((ballSpeed / 4) + (rnd.nextFloat() * ballSpeed / 4));
 		if (rnd.nextBoolean()) {
-			ball.tf().setVelocityY(-ball.tf().getVelocityY());
+			ball.tf.setVelocityY(-ball.tf.getVelocityY());
 		}
 	}
 
 	private boolean isBallOutLeft() {
-		return ball.tf().getX() + ball.tf().getWidth() < 0;
+		return ball.tf.getX() + ball.tf.getWidth() < 0;
 	}
 
 	private boolean isBallOutRight() {
-		return ball.tf().getX() > width;
+		return ball.tf.getX() > width;
 	}
 
 	private boolean leftPaddleHitsBall() {
-		return ball.tf().getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
+		return ball.tf.getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
 	}
 
 	private boolean rightPaddleHitsBall() {
-		return ball.tf().getVelocityX() >= 0 && paddleRight.hitsBall(ball);
+		return ball.tf.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
 	}
 
 	private void bounceBallFromLeftPaddle() {
-		ball.tf().setVelocityX(-ball.tf().getVelocityX());
+		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plop.mp3").play();
 	}
 
 	private void bounceBallFromRightPaddle() {
-		ball.tf().setVelocityX(-ball.tf().getVelocityX());
+		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plip.mp3").play();
 	}
 

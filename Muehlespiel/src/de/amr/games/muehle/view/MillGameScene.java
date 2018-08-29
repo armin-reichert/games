@@ -67,7 +67,7 @@ public class MillGameScene implements View,Controller, MillGameUI {
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
 		boardUI.centerHorizontally(getWidth());
-		boardUI.tf().setY(50);
+		boardUI.tf.setY(50);
 
 		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
@@ -75,10 +75,10 @@ public class MillGameScene implements View,Controller, MillGameUI {
 		messageArea.setColor(Color.BLUE);
 		messageArea.setFont(
 				Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
-		messageArea.tf().moveTo(0, getHeight() - 90);
+		messageArea.tf.moveTo(0, getHeight() - 90);
 
 		controller.assistant.centerHorizontally(getWidth());
-		controller.assistant.tf().setY(getHeight() / 2 - 100);
+		controller.assistant.tf.setY(getHeight() / 2 - 100);
 	}
 
 	public Controller getController() {

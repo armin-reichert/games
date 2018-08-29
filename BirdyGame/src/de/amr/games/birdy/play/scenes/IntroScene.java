@@ -52,7 +52,7 @@ public class IntroScene implements View,Controller {
 
 		// ShowCredits
 		control.state(ShowCredits).entry = s -> {
-			textAnimation.tf().setY(height);
+			textAnimation.tf.setY(height);
 			textAnimation.setScrollSpeed(-.75f);
 			logoAnimation.setVisible(false);
 			Assets.sound("music/bgmusic.mp3").loop();
@@ -61,7 +61,7 @@ public class IntroScene implements View,Controller {
 		control.state(ShowCredits).update = s -> textAnimation.update();
 
 		control.change(ShowCredits, Wait,
-				() -> textAnimation.tf().getY() < (height - textAnimation.getHeight()) / 2,
+				() -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2,
 				t -> t.to().setDuration(PULSE.secToTicks(2)));
 
 		// Wait

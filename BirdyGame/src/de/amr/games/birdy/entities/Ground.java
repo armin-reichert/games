@@ -18,7 +18,7 @@ public class Ground extends GameEntityUsingSprites {
 	private float startX;
 
 	public Ground(BirdyGameApp app) {
-		addSprite("s_land", new Sprite(Assets.image("land")));
+		setSprite("s_land", new Sprite(Assets.image("land")));
 		setCurrentSprite("s_land");
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());

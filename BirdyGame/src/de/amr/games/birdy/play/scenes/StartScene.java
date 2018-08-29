@@ -115,11 +115,11 @@ public class StartScene implements View,Controller {
 	}
 
 	private void stop() {
-		ground.tf().setVelocity(0, 0);
+		ground.tf.setVelocity(0, 0);
 	}
 
 	private void keepBirdInAir() {
-		while (bird.tf().getY() > ground.tf().getY() / 2) {
+		while (bird.tf.getY() > ground.tf.getY() / 2) {
 			bird.flap(randomInt(1, 4));
 		}
 	}
@@ -135,13 +135,13 @@ public class StartScene implements View,Controller {
 
 		ground = app.entities.ofClass(Ground.class).findAny().get();
 		ground.setWidth(getWidth());
-		ground.tf().moveTo(0, getHeight() - ground.tf().getHeight());
-		ground.tf().setVelocity(app.settings.getAsFloat("world speed"), 0);
+		ground.tf.moveTo(0, getHeight() - ground.tf.getHeight());
+		ground.tf.setVelocity(app.settings.getAsFloat("world speed"), 0);
 
 		bird = app.entities.ofClass(Bird.class).findAny().get();
 		bird.init();
-		bird.tf().moveTo(getWidth() / 8, ground.tf().getY() / 2);
-		bird.tf().setVelocity(0, 0);
+		bird.tf.moveTo(getWidth() / 8, ground.tf.getY() / 2);
+		bird.tf.setVelocity(0, 0);
 
 		if (!app.entities.contains("title")) {
 			GameEntity titleText = new GraphicText(Assets.image("title"));
@@ -160,7 +160,7 @@ public class StartScene implements View,Controller {
 
 		if (!app.entities.contains("world")) {
 			Area world = new Area(getWidth(), 2 * getHeight());
-			world.tf().moveTo(0, -getHeight());
+			world.tf.moveTo(0, -getHeight());
 			app.entities.store("world", world);
 		}
 
@@ -191,7 +191,7 @@ public class StartScene implements View,Controller {
 		ground.draw(g);
 		bird.draw(g);
 		if (displayedText != null) {
-			displayedText.center(getWidth(), getHeight() - ground.tf().getHeight());
+			displayedText.center(getWidth(), getHeight() - ground.tf.getHeight());
 			displayedText.draw(g);
 		}
 		g.setColor(Color.BLACK);

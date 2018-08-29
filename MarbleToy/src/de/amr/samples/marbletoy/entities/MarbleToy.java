@@ -34,10 +34,10 @@ public class MarbleToy extends GameEntityUsingSprites {
 	private MarbleRouter router;
 
 	public MarbleToy(Sprite sprite, Marble marble) {
-		addSprite("s_toy", sprite);
+		setSprite("s_toy", sprite);
 		setCurrentSprite("s_toy");
 		this.marble = marble;
-		marble.tf().moveTo(-marble.tf().getWidth(), -marble.tf().getHeight());
+		marble.tf.moveTo(-marble.tf.getWidth(), -marble.tf.getHeight());
 		levers[0] = new Lever(178, 82);
 		levers[1] = new Lever(424, 82);
 		levers[2] = new Lever(301, 204);

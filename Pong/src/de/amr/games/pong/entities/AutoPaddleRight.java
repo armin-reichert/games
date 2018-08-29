@@ -16,28 +16,28 @@ public class AutoPaddleRight extends Paddle {
 	public void update() {
 		Ball ball = game.entities.ofClass(Ball.class).findFirst().get();
 		float targetY = game.settings.height / 2 + tf.getHeight();
-		if (ball.tf().getVelocityX() > 0) {
+		if (ball.tf.getVelocityX() > 0) {
 			computeBallPositionRight();
 			targetY = ballRightY;
 		}
-		float diff = tf().getY() + tf.getHeight() / 2 - targetY;
+		float diff = tf.getY() + tf.getHeight() / 2 - targetY;
 		if (diff < -ball.getSize()) {
-			tf().setVelocityY(speed);
+			tf.setVelocityY(speed);
 		} else if (diff > ball.getSize()) {
-			tf().setVelocityY(-speed);
+			tf.setVelocityY(-speed);
 		}
 		moveAndStopAtBorder();
 	}
 
 	private void computeBallPositionRight() {
 		Ball ball = game.entities.ofClass(Ball.class).findFirst().get();
-		ballRightY = ball.tf().getY() + ball.tf().getHeight() / 2;
-		for (float x = ball.tf().getX(); x < game.settings.width - tf.getWidth()
-				- ball.tf().getWidth(); x += ball.tf().getVelocityX()) {
+		ballRightY = ball.tf.getY() + ball.tf.getHeight() / 2;
+		for (float x = ball.tf.getX(); x < game.settings.width - tf.getWidth()
+				- ball.tf.getWidth(); x += ball.tf.getVelocityX()) {
 			if (ballRightY < 0) {
-				ballRightY += ball.tf().getVelocityY();
+				ballRightY += ball.tf.getVelocityY();
 			} else if (ballRightY >= game.settings.height) {
-				ballRightY -= ball.tf().getVelocityY();
+				ballRightY -= ball.tf.getVelocityY();
 			}
 		}
 	}

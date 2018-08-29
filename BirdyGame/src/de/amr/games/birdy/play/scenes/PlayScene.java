@@ -66,8 +66,8 @@ public class PlayScene implements View,Controller {
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, t -> {
 				score.points -= 3;
-				bird.tf()
-						.setX(bird.tf().getX() + app.settings.getAsInt("pipe width") + bird.tf().getWidth());
+				bird.tf
+						.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.tf.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				Assets.sound("sfx/hit.mp3").play();
 			});
@@ -128,11 +128,11 @@ public class PlayScene implements View,Controller {
 		bird = app.entities.ofClass(Bird.class).findAny().get();
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
 		scoreDisplay.centerHorizontally(getWidth());
-		scoreDisplay.tf().setY(ground.tf().getY() / 4);
+		scoreDisplay.tf.setY(ground.tf.getY() / 4);
 		gameOverText = app.entities.store(new GraphicText(Assets.image("text_game_over")));
 		gameOverText.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
-		world.tf().moveTo(0, -getHeight());
+		world.tf.moveTo(0, -getHeight());
 
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 		app.collisionHandler.registerEnd(bird, world, BirdLeftWorld);
@@ -170,7 +170,7 @@ public class PlayScene implements View,Controller {
 	}
 
 	private void start() {
-		ground.tf().setVelocity(app.settings.get("world speed"), 0);
+		ground.tf.setVelocity(app.settings.get("world speed"), 0);
 		obstacleManager.start();
 	}
 

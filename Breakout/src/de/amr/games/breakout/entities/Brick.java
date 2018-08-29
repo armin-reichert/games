@@ -17,8 +17,8 @@ public class Brick extends GameEntityUsingSprites {
 		damaged = false;
 		tf.setWidth(width);
 		tf.setHeight(height);
-		addSprite("s_intact", new Sprite("Bricks/brick_" + color + "_small.png").scale(width, height));
-		addSprite("s_damaged", new Sprite("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
+		setSprite("s_intact", new Sprite("Bricks/brick_" + color + "_small.png").scale(width, height));
+		setSprite("s_damaged", new Sprite("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
 		setCurrentSprite("s_intact");
 	}
 

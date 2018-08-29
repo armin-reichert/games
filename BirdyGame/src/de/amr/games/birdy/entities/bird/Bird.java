@@ -112,9 +112,9 @@ public class Bird extends GameEntityUsingSprites {
 		flightControl.setLogger(Application.LOGGER);
 		healthControl = new HealthControl();
 		healthControl.setLogger(Application.LOGGER);
-		addSprite("s_yellow", createFeatherSprite("bird0"));
-		addSprite("s_blue", createFeatherSprite("bird1"));
-		addSprite("s_red", createFeatherSprite("bird2"));
+		setSprite("s_yellow", createFeatherSprite("bird0"));
+		setSprite("s_blue", createFeatherSprite("bird1"));
+		setSprite("s_red", createFeatherSprite("bird2"));
 		setCurrentSprite("s_yellow");
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());

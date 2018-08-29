@@ -57,7 +57,7 @@ public class Assistant extends GameEntityUsingSprites {
 		this.control = control;
 		this.board = control.model.board;
 		this.helpLevel = HelpLevel.OFF;
-		addSprite("s_alien", new Sprite(Assets.image("images/alien.png")).scale(100, 100));
+		setSprite("s_alien", new Sprite(Assets.image("images/alien.png")).scale(100, 100));
 		setCurrentSprite("s_alien");
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());

@@ -40,8 +40,8 @@ public class City extends GameEntityUsingSprites {
 
 	public City(BirdyGameApp app) {
 		this.app = app;
-		addSprite("s_night", new Sprite("bg_night"));
-		addSprite("s_day", new Sprite("bg_day"));
+		setSprite("s_night", new Sprite("bg_night"));
+		setSprite("s_day", new Sprite("bg_day"));
 		setCurrentSprite("s_day");
 		tf.setWidth(currentSprite().getWidth());
 
@@ -96,7 +96,7 @@ public class City extends GameEntityUsingSprites {
 		int numStars = randomInt(1, app.settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
 			Star star = app.entities.store(new Star());
-			star.tf().moveTo(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
+			star.tf.moveTo(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
 		});
 		Application.LOGGER.info("Created " + numStars + " new stars");
 	}
