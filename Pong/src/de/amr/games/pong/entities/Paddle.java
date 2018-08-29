@@ -5,9 +5,10 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.view.ViewController;
 import de.amr.games.pong.PongGame;
 
-public class Paddle extends GameEntity {
+public class Paddle extends GameEntity implements ViewController {
 
 	protected int width = 15;
 	protected int height = 60;

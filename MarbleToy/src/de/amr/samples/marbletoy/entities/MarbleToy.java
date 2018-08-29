@@ -17,7 +17,6 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.samples.marbletoy.fsm.LeverControl;
@@ -30,7 +29,7 @@ public class MarbleToy extends GameEntityUsingSprites {
 
 	public final Lever[] levers = new Lever[3];
 	private final EnumSet<RoutingPoint> auxPoints = EnumSet.of(E, F, G, H);
-	private final GameEntity marble;
+	private final Marble marble;
 	private LeverControl leverControl;
 	private MarbleRouter router;
 
@@ -70,7 +69,7 @@ public class MarbleToy extends GameEntityUsingSprites {
 		router.update();
 	}
 
-	public GameEntity getMarble() {
+	public Marble getMarble() {
 		return marble;
 	}
 

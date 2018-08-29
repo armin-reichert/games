@@ -7,49 +7,57 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.view.ViewController;
 
-public class Pen extends GameEntity {
+public class PenBall extends GameEntity implements ViewController {
 
-	private final BufferedImage image;
-	private Color color;
+	private final BufferedImage canvas;
 	private int thickness;
+	private Color color;
 
-	public Pen(BufferedImage image) {
-		this.image = image;
-		thickness = 20;
+	public PenBall(BufferedImage canvas) {
+		this.canvas = canvas;
+		thickness = 5;
 		color = randomColor();
+		tf.setWidth(thickness);
+		tf.setHeight(thickness);
 	}
 
 	@Override
 	public int getWidth() {
-		return thickness;
+		return tf.getWidth();
 	}
 
 	@Override
 	public int getHeight() {
-		return thickness;
+		return tf.getHeight();
 	}
 
 	@Override
 	public void update() {
 		tf.move();
-		if (tf.getY() > image.getHeight() - getHeight() || tf.getY() < 0) {
+		if (tf.getY() > canvas.getHeight() - getHeight() || tf.getY() < 0) {
 			tf.setVelocityY(-tf.getVelocityY());
 		}
-		if (tf.getX() < 0 || tf.getX() > image.getWidth() - getWidth()) {
+		if (tf.getX() < 0 || tf.getX() > canvas.getWidth() - getWidth()) {
 			tf.setVelocityX(-tf.getVelocityX());
 		}
 		color = randomColor();
-		draw();
+		updateImage();
 	}
 
-	public void draw() {
-		Graphics2D g = (Graphics2D) image.getGraphics();
+	public void updateImage() {
+		Graphics2D g = (Graphics2D) canvas.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
 		g.translate(tf.getX() + getWidth() / 2, tf.getY() + getHeight() / 2);
 		g.fillOval(0, 0, thickness, thickness);
 		g.translate(-tf.getX() - getWidth() / 2, -tf.getY() - getHeight() / 2);
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		g.drawImage(canvas, 0, 0, null);
 	}
 
 	public void setSpeed(float vx, float vy) {
@@ -63,13 +71,5 @@ public class Pen extends GameEntity {
 	private Color randomColor() {
 		Random random = new Random();
 		return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256), 255);
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void draw(Graphics2D g) {
 	}
 }

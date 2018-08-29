@@ -2,55 +2,56 @@ package de.amr.games.magicball.views;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import de.amr.easy.game.view.ViewController;
-import de.amr.games.magicball.MagicBallApp;
-import de.amr.games.magicball.entities.Pen;
+import de.amr.games.magicball.entities.PenBall;
 
 public class DrawingScene implements ViewController {
 
-	private final MagicBallApp app;
-	private final BufferedImage image;
-	private final Pen pen;
-	private final Pen pen2;
+	private final int width;
+	private final int height;
+	private final BufferedImage canvas;
+	private final List<PenBall> balls = new ArrayList<>();
 
-	public DrawingScene(MagicBallApp app) {
-		this.app = app;
-		image = new BufferedImage(app.settings.width, app.settings.height, BufferedImage.TYPE_INT_ARGB);
-		pen = app.entities.store(new Pen(image));
-		pen2 = app.entities.store(new Pen(image));
+	public DrawingScene(int width, int height, int nBalls) {
+		this.width = width;
+		this.height = height;
+		canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		for (int i = 0; i < nBalls; ++i) {
+			balls.add(new PenBall(canvas));
+		}
 	}
 
 	@Override
 	public int getWidth() {
-		return app.settings.width;
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return app.settings.height;
+		return height;
 	}
 
 	@Override
 	public void init() {
 		Random rnd = new Random();
-		pen.setSpeed(5 + rnd.nextInt(5), 10 + rnd.nextInt(5));
-		pen2.setSpeed(5 + rnd.nextInt(5), 10 + rnd.nextInt(5));
-		pen.setThickness(10);
-		pen2.setThickness(5);
+		for (PenBall ball : balls) {
+			ball.setSpeed(4 + rnd.nextInt(6), 6 + rnd.nextInt(14));
+			ball.setThickness(3 + rnd.nextInt(12));
+		}
 	}
 
 	@Override
 	public void update() {
-		pen.update();
-		pen2.update();
+		balls.forEach(PenBall::update);
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.drawImage(image, 0, 0, null);
-		pen.draw(g);
-		pen2.draw(g);
+		g.drawImage(canvas, 0, 0, null);
+		balls.forEach(ball -> ball.draw(g));
 	}
 }

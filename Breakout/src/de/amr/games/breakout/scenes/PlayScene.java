@@ -21,6 +21,7 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
+import de.amr.easy.game.view.View;
 import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.breakout.BreakoutGame;
@@ -112,9 +113,11 @@ public class PlayScene implements ViewController {
 
 	@Override
 	public void init() {
-		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
+		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
+				BufferedImage.SCALE_SMOOTH);
 		ball = app.entities.store(new Ball(app, app.settings.get("ball_size")));
-		bat = app.entities.store(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
+		bat = app.entities
+				.store(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -130,7 +133,11 @@ public class PlayScene implements ViewController {
 		if (bgImage != null) {
 			g.drawImage(bgImage, 0, 0, null);
 		}
-		app.entities.all().forEach(entity -> entity.draw(g));
+		app.entities.all().forEach(entity -> {
+			if (entity instanceof View) {
+				((View) entity).draw(g);
+			}
+		});
 		drawScore(g);
 	}
 
@@ -197,10 +204,12 @@ public class PlayScene implements ViewController {
 	private final Font scoreFont = new Font(Font.SANS_SERIF, Font.PLAIN, 48);
 
 	private void drawScore(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setFont(scoreFont);
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
-		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
+		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2,
+				getHeight() * 3 / 4);
 	}
 }

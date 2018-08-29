@@ -17,7 +17,6 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.Score;
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.ViewController;
@@ -46,7 +45,7 @@ public class PlayScene implements ViewController {
 	private Bird bird;
 	private City city;
 	private Ground ground;
-	private GameEntity gameOverText;
+	private GraphicText gameOverText;
 	private ScoreDisplay scoreDisplay;
 
 	public enum State {
@@ -104,7 +103,6 @@ public class PlayScene implements ViewController {
 		this.app = game;
 		control = new PlaySceneControl();
 		obstacleManager = new ObstacleManager(app);
-		// control.setLogger(Application.LOG);
 	}
 
 	public void receive(BirdyGameEvent event) {

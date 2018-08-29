@@ -6,8 +6,9 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.view.ViewController;
 
-public class ScoreDisplay extends GameEntity {
+public class ScoreDisplay extends GameEntity implements ViewController {
 
 	private final Score scoreLeft;
 	private final Score scoreRight;
@@ -15,16 +16,6 @@ public class ScoreDisplay extends GameEntity {
 	public ScoreDisplay(Score scoreLeft, Score scoreRight) {
 		this.scoreLeft = scoreLeft;
 		this.scoreRight = scoreRight;
-	}
-
-	@Override
-	public int getWidth() {
-		return 0;
-	}
-
-	@Override
-	public int getHeight() {
-		return 0;
 	}
 
 	@Override
@@ -36,10 +27,12 @@ public class ScoreDisplay extends GameEntity {
 	}
 
 	@Override
-	public void init() {
+	public int getWidth() {
+		return 0;
 	}
 
 	@Override
-	public void update() {
+	public int getHeight() {
+		return 0;
 	}
 }

@@ -4,8 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.view.ViewController;
 
-public class Court extends GameEntity {
+public class Court extends GameEntity implements ViewController {
 
 	private int width;
 	private int height;

@@ -10,6 +10,7 @@ import java.util.Random;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collider;
+import de.amr.easy.game.view.ViewController;
 import de.amr.games.birdy.play.BirdyGame;
 
 /**
@@ -17,7 +18,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class Obstacle extends GameEntity {
+public class Obstacle extends GameEntity implements ViewController {
 
 	private int width;
 	private int height;

@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
+import de.amr.easy.game.view.ViewController;
 import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.model.board.Move;
 import de.amr.games.muehle.model.board.StoneColor;
@@ -28,10 +29,12 @@ import de.amr.games.muehle.model.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class BoardUI extends GameEntity {
+public class BoardUI extends GameEntity implements ViewController {
 
-	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3, 5, 0, 3, 6 };
-	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
+	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3,
+			5, 0, 3, 6 };
+	private static final int[] GRID_Y = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5,
+			5, 6, 6, 6 };
 
 	private final Board board;
 	private final Stone[] stones;
@@ -55,7 +58,8 @@ public class BoardUI extends GameEntity {
 		this.size = size;
 		this.gridSize = size / 6;
 		this.posRadius = size / 60;
-		positions().forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
+		positions()
+				.forEach(p -> center[p] = Vector2f.smul(gridSize, Vector2f.of(GRID_X[p], GRID_Y[p])));
 		this.numbersFont = new Font("Arial", Font.PLAIN, size / 30);
 	}
 
@@ -169,19 +173,23 @@ public class BoardUI extends GameEntity {
 		g.setColor(lineColor);
 		g.setStroke(new BasicStroke(posRadius / 2));
 		positions().forEach(from -> Board.neighbors(from).filter(to -> to > from).forEach(to -> {
-			g.drawLine(center[from].roundedX(), center[from].roundedY(), center[to].roundedX(), center[to].roundedY());
+			g.drawLine(center[from].roundedX(), center[from].roundedY(), center[to].roundedX(),
+					center[to].roundedY());
 		}));
 		// Positions
 		positions().forEach(p -> {
 			g.setColor(lineColor);
 			aa_on(g);
-			g.fillOval(center[p].roundedX() - posRadius, center[p].roundedY() - posRadius, 2 * posRadius, 2 * posRadius);
+			g.fillOval(center[p].roundedX() - posRadius, center[p].roundedY() - posRadius, 2 * posRadius,
+					2 * posRadius);
 			aa_off(g);
 			if (numbersOn) {
 				g.setFont(numbersFont);
-				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+						RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				g.drawString(String.valueOf(p), center[p].x + 2 * posRadius, center[p].y + 4 * posRadius);
-				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+						RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 			}
 		});
 		// Stones
@@ -193,27 +201,29 @@ public class BoardUI extends GameEntity {
 		g.translate(tf().getX(), tf().getY());
 		g.setColor(color);
 		aa_on(g);
-		g.fillOval(round(center[p].x) - posRadius / 2, round(center[p].y) - posRadius / 2, posRadius, posRadius);
+		g.fillOval(round(center[p].x) - posRadius / 2, round(center[p].y) - posRadius / 2, posRadius,
+				posRadius);
 		aa_off(g);
 		g.translate(-tf().getX(), -tf().getY());
 	}
 
 	public void markRemovableStones(Graphics2D g, StoneColor stoneColor) {
 		boolean allStonesInMills = board.allStonesInMills(stoneColor);
-		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor)).forEach(p -> {
-			stoneAt(p).ifPresent(stone -> {
-				float offsetX = tf().getX() + stone.tf().getX() - stone.getWidth() / 2;
-				float offsetY = tf().getY() + stone.tf().getY() - stone.getHeight() / 2;
-				// draw red cross
-				g.translate(offsetX, offsetY);
-				g.setColor(Color.RED);
-				aa_on(g);
-				g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-				g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
-				aa_off(g);
-				g.translate(-offsetX, -offsetY);
-			});
-		});
+		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor))
+				.forEach(p -> {
+					stoneAt(p).ifPresent(stone -> {
+						float offsetX = tf().getX() + stone.tf().getX() - stone.getWidth() / 2;
+						float offsetY = tf().getY() + stone.tf().getY() - stone.getHeight() / 2;
+						// draw red cross
+						g.translate(offsetX, offsetY);
+						g.setColor(Color.RED);
+						aa_on(g);
+						g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
+						g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+						aa_off(g);
+						g.translate(-offsetX, -offsetY);
+					});
+				});
 	}
 
 	@Override

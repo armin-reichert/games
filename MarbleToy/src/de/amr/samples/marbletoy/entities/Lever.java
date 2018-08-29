@@ -6,8 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.view.ViewController;
 
-public class Lever extends GameEntity {
+public class Lever extends GameEntity implements ViewController {
 
 	private int size = 30;
 	private int legLen = size * 75 / 100;
@@ -60,6 +61,7 @@ public class Lever extends GameEntity {
 
 	@Override
 	public Rectangle getCollisionBox() {
-		return new Rectangle((int) tf.getX() - size / 2, (int) tf.getY() - size / 2, size / 2, size / 2);
+		return new Rectangle((int) tf.getX() - size / 2, (int) tf.getY() - size / 2, size / 2,
+				size / 2);
 	}
 }

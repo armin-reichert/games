@@ -15,9 +15,9 @@ import static de.amr.samples.marbletoy.router.RoutingPoint.X1;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X2;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X3;
 
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.samples.marbletoy.entities.Marble;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 
 public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
@@ -25,7 +25,7 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	private static final float MARBLE_SPEED = 1.5f;
 
 	private final MarbleToy toy;
-	private final GameEntity marble;
+	private final Marble marble;
 
 	public MarbleRouter(MarbleToy toy) {
 		super("Marble Router", RoutingPoint.class, RoutingPoint.Initial);
@@ -77,12 +77,14 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private void placeMarbleCenteredAt(RoutingPoint p) {
-		marble.tf().moveTo(p.getLocation().x - marble.getWidth() / 2, p.getLocation().y - marble.getHeight() / 2);
+		marble.tf().moveTo(p.getLocation().x - marble.getWidth() / 2,
+				p.getLocation().y - marble.getHeight() / 2);
 	}
 
 	private void routeMarble(RoutingPoint from, RoutingPoint to) {
 		placeMarbleCenteredAt(from);
-		marble.tf().setVelocity(smul(MARBLE_SPEED, diff(to.getLocation(), from.getLocation()).normalized()));
+		marble.tf()
+				.setVelocity(smul(MARBLE_SPEED, diff(to.getLocation(), from.getLocation()).normalized()));
 	}
 
 	private boolean isMarbleAtLever(int leverIndex) {
