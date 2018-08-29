@@ -11,12 +11,10 @@ import de.amr.easy.game.view.ViewController;
 
 public class KeyboardTestScene implements ViewController {
 
-	@Override
 	public int getWidth() {
 		return 600;
 	}
 
-	@Override
 	public int getHeight() {
 		return 400;
 	}

@@ -10,8 +10,6 @@ import de.amr.games.pong.PongGame;
 
 public class Paddle extends GameEntity implements ViewController {
 
-	protected int width = 15;
-	protected int height = 60;
 	protected int speed = 5;
 	protected Color color = Color.LIGHT_GRAY;
 	protected PongGame game;
@@ -21,6 +19,8 @@ public class Paddle extends GameEntity implements ViewController {
 		this.game = game;
 		this.paddleUpKey = keyUp;
 		this.paddleDownKey = keyDown;
+		tf.setWidth(15);
+		tf.setHeight(60);
 	}
 
 	@Override
@@ -38,8 +38,8 @@ public class Paddle extends GameEntity implements ViewController {
 		tf.move();
 		if (tf.getY() < 0) {
 			tf.setY(0);
-		} else if (tf.getY() >= game.settings.height - getHeight()) {
-			tf.setY(game.settings.height - getHeight());
+		} else if (tf.getY() >= game.settings.height - tf.getHeight()) {
+			tf.setY(game.settings.height - tf.getHeight());
 		}
 		tf.setVelocityY(0);
 	}
@@ -47,24 +47,10 @@ public class Paddle extends GameEntity implements ViewController {
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(color);
-		g.fillRect((int) tf.getX(), (int) tf.getY(), getWidth(), getHeight());
-	}
-
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
+		g.fillRect((int) tf.getX(), (int) tf.getY(), tf.getWidth(), tf.getHeight());
 	}
 
 	public boolean hitsBall(Ball ball) {
 		return getCollisionBox().intersects(ball.getCollisionBox());
-	}
-
-	@Override
-	public void init() {
 	}
 }

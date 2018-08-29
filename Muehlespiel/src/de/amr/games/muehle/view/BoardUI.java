@@ -56,6 +56,8 @@ public class BoardUI extends GameEntity implements ViewController {
 
 	public void setSize(int size) {
 		this.size = size;
+		tf.setWidth(size);
+		tf.setHeight(size);
 		this.gridSize = size / 6;
 		this.posRadius = size / 60;
 		positions()
@@ -69,16 +71,6 @@ public class BoardUI extends GameEntity implements ViewController {
 
 	public void setLineColor(Color lineColor) {
 		this.lineColor = lineColor;
-	}
-
-	@Override
-	public int getWidth() {
-		return size;
-	}
-
-	@Override
-	public int getHeight() {
-		return size;
 	}
 
 	public int getStoneRadius() {
@@ -212,29 +204,17 @@ public class BoardUI extends GameEntity implements ViewController {
 		board.positions(stoneColor).filter(p -> allStonesInMills || !board.inMill(p, stoneColor))
 				.forEach(p -> {
 					stoneAt(p).ifPresent(stone -> {
-						float offsetX = tf().getX() + stone.tf().getX() - stone.getWidth() / 2;
-						float offsetY = tf().getY() + stone.tf().getY() - stone.getHeight() / 2;
+						float offsetX = tf().getX() + stone.tf().getX() - stone.tf().getWidth() / 2;
+						float offsetY = tf().getY() + stone.tf().getY() - stone.tf().getHeight() / 2;
 						// draw red cross
 						g.translate(offsetX, offsetY);
 						g.setColor(Color.RED);
 						aa_on(g);
-						g.drawLine(0, 0, stone.getWidth(), stone.getHeight());
-						g.drawLine(0, stone.getHeight(), stone.getWidth(), 0);
+						g.drawLine(0, 0, stone.tf().getWidth(), stone.tf().getHeight());
+						g.drawLine(0, stone.tf().getHeight(), stone.tf().getWidth(), 0);
 						aa_off(g);
 						g.translate(-offsetX, -offsetY);
 					});
 				});
-	}
-
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-
 	}
 }

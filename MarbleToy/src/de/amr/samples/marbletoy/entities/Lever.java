@@ -16,24 +16,8 @@ public class Lever extends GameEntity implements ViewController {
 
 	public Lever(int x, int y) {
 		tf.moveTo(x, y);
-	}
-
-	@Override
-	public int getWidth() {
-		return size;
-	}
-
-	@Override
-	public int getHeight() {
-		return size;
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
+		tf.setWidth(size);
+		tf.setHeight(size);
 	}
 
 	public boolean pointsLeft() {

@@ -37,6 +37,8 @@ public class Stone extends GameEntity implements ViewController {
 	public Stone(StoneColor color, int radius) {
 		this.color = color;
 		this.radius = radius;
+		tf.setWidth(2 * radius);
+		tf.setHeight(2 * radius);
 	}
 
 	public void setColor(StoneColor color) {
@@ -56,18 +58,8 @@ public class Stone extends GameEntity implements ViewController {
 	}
 
 	@Override
-	public int getWidth() {
-		return 2 * radius;
-	}
-
-	@Override
-	public int getHeight() {
-		return 2 * radius;
-	}
-
-	@Override
 	public void draw(Graphics2D g) {
-		int size = getHeight();
+		int size = tf.getHeight();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.translate(tf.getX() - radius, tf.getY() - radius);
 		g.setColor(FILL.get(color));
@@ -79,13 +71,5 @@ public class Stone extends GameEntity implements ViewController {
 			g.drawOval(offset, offset, dia.intValue(), dia.intValue());
 		});
 		g.translate(-tf.getX() + radius, -tf.getY() + radius);
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
 	}
 }

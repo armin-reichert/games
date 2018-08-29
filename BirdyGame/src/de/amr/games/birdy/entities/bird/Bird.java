@@ -155,9 +155,9 @@ public class Bird extends GameEntityUsingSprites {
 
 	@Override
 	public Rectangle2D getCollisionBox() {
-		int margin = Math.min(getCollisionWidth() / 4, getCollisionHeight() / 4);
+		int margin = Math.min(tf.getWidth() / 4, tf.getHeight() / 4);
 		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin,
-				getCollisionWidth() - 2 * margin, getCollisionHeight() - 2 * margin);
+				tf.getWidth() - 2 * margin, tf.getHeight() - 2 * margin);
 	}
 
 	public void flap() {
@@ -171,7 +171,7 @@ public class Bird extends GameEntityUsingSprites {
 	}
 
 	public void fly() {
-		if (tf.getY() < -getHeight()) {
+		if (tf.getY() < -tf.getHeight()) {
 			tf.setVelocity(0, 0);
 		}
 		tf.setVelocityY(tf.getVelocityY() + gravity);

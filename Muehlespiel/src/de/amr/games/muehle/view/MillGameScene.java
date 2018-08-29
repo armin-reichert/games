@@ -46,12 +46,10 @@ public class MillGameScene implements ViewController, MillGameUI {
 		this.bgColor = BOARD_COLOR.darker();
 	}
 
-	@Override
 	public int getWidth() {
 		return app.settings.width;
 	}
 
-	@Override
 	public int getHeight() {
 		return app.settings.height;
 	}
@@ -75,7 +73,8 @@ public class MillGameScene implements ViewController, MillGameUI {
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
 		messageArea.setColor(Color.BLUE);
-		messageArea.setFont(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
+		messageArea.setFont(
+				Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36));
 		messageArea.tf().moveTo(0, getHeight() - 90);
 
 		controller.assistant.centerHorizontally(getWidth());
@@ -157,8 +156,10 @@ public class MillGameScene implements ViewController, MillGameUI {
 					boardUI.markPosition(g, p, Color.ORANGE);
 				}
 			});
-			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
-			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
+			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40,
+					getHeight() - 30);
+			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100,
+					getHeight() - 30);
 		}
 		if (controller.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
 				&& controller.playerInTurn().isInteractive()) {
@@ -179,9 +180,12 @@ public class MillGameScene implements ViewController, MillGameUI {
 		if (stonesLeft > 1) {
 			g.setColor(player == controller.playerInTurn() ? Color.RED : Color.DARK_GRAY);
 			g.setFont(stonesCounterFont);
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(), stoneTemplate.getRadius());
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+					RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g.drawString(String.valueOf(stonesLeft), 2 * stoneTemplate.getRadius(),
+					stoneTemplate.getRadius());
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+					RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		}
 		g.translate(-x, -y);
 	}

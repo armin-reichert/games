@@ -99,12 +99,10 @@ public class StartScene implements ViewController {
 		control = new StartSceneControl();
 	}
 
-	@Override
 	public int getWidth() {
 		return app.settings.width;
 	}
 
-	@Override
 	public int getHeight() {
 		return app.settings.height;
 	}
@@ -136,7 +134,7 @@ public class StartScene implements ViewController {
 
 		ground = app.entities.ofClass(Ground.class).findAny().get();
 		ground.setWidth(getWidth());
-		ground.tf().moveTo(0, getHeight() - ground.getHeight());
+		ground.tf().moveTo(0, getHeight() - ground.tf().getHeight());
 		ground.tf().setVelocity(app.settings.getAsFloat("world speed"), 0);
 
 		bird = app.entities.ofClass(Bird.class).findAny().get();
@@ -166,7 +164,8 @@ public class StartScene implements ViewController {
 		}
 
 		app.collisionHandler.clear();
-		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(), BirdLeftWorld);
+		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(),
+				BirdLeftWorld);
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 
 		displayText("title");
@@ -191,12 +190,12 @@ public class StartScene implements ViewController {
 		ground.draw(g);
 		bird.draw(g);
 		if (displayedText != null) {
-			displayedText.center(getWidth(), getHeight() - ground.getHeight());
+			displayedText.center(getWidth(), getHeight() - ground.tf().getHeight());
 			displayedText.draw(g);
 		}
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(), control.stateID(),
-				bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
+		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(),
+				control.stateID(), bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

@@ -24,22 +24,12 @@ public class PenBall extends GameEntity implements ViewController {
 	}
 
 	@Override
-	public int getWidth() {
-		return tf.getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return tf.getHeight();
-	}
-
-	@Override
 	public void update() {
 		tf.move();
-		if (tf.getY() > canvas.getHeight() - getHeight() || tf.getY() < 0) {
+		if (tf.getY() > canvas.getHeight() - tf.getHeight() || tf.getY() < 0) {
 			tf.setVelocityY(-tf.getVelocityY());
 		}
-		if (tf.getX() < 0 || tf.getX() > canvas.getWidth() - getWidth()) {
+		if (tf.getX() < 0 || tf.getX() > canvas.getWidth() - tf.getWidth()) {
 			tf.setVelocityX(-tf.getVelocityX());
 		}
 		color = randomColor();
@@ -50,9 +40,9 @@ public class PenBall extends GameEntity implements ViewController {
 		Graphics2D g = (Graphics2D) canvas.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.translate(tf.getX() + getWidth() / 2, tf.getY() + getHeight() / 2);
+		g.translate(tf.getX() + tf.getWidth() / 2, tf.getY() + tf.getHeight() / 2);
 		g.fillOval(0, 0, thickness, thickness);
-		g.translate(-tf.getX() - getWidth() / 2, -tf.getY() - getHeight() / 2);
+		g.translate(-tf.getX() - tf.getWidth() / 2, -tf.getY() - tf.getHeight() / 2);
 	}
 
 	@Override

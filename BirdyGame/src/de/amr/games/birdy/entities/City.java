@@ -37,14 +37,14 @@ public class City extends GameEntityUsingSprites {
 
 	private final BirdyGame app;
 	private final StateMachine<CityState, CityEvent> control;
-	private int width;
 
 	public City(BirdyGame app) {
 		this.app = app;
 		addSprite("s_night", new Sprite("bg_night"));
 		addSprite("s_day", new Sprite("bg_day"));
 		setCurrentSprite("s_day");
-		
+		tf.setWidth(currentSprite().getWidth());
+
 		control = new StateMachine<>("City control", CityState.class, Day);
 
 		control.state(Day).entry = s -> {
@@ -96,7 +96,7 @@ public class City extends GameEntityUsingSprites {
 		int numStars = randomInt(1, app.settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
 			Star star = app.entities.store(new Star());
-			star.tf().moveTo(randomInt(50, getWidth() - 50), randomInt(100, 180));
+			star.tf().moveTo(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
 		});
 		Application.LOGGER.info("Created " + numStars + " new stars");
 	}
@@ -114,8 +114,8 @@ public class City extends GameEntityUsingSprites {
 	}
 
 	public void setWidth(int width) {
-		if (this.width != width) {
-			this.width = width;
+		if (tf.getWidth() != width) {
+			tf.setWidth(width);
 			getSprites().forEach(sprite -> {
 				sprite.scale(width, sprite.getHeight());
 			});
@@ -126,7 +126,7 @@ public class City extends GameEntityUsingSprites {
 	public void draw(Graphics2D pen) {
 		pen.translate(tf.getX(), tf.getY());
 		Image image = currentSprite().currentFrame();
-		for (int x = 0; x < width; x += image.getWidth(null)) {
+		for (int x = 0; x < tf.getWidth(); x += image.getWidth(null)) {
 			pen.drawImage(image, x, 0, null);
 		}
 		app.entities.ofClass(Star.class).forEach(star -> star.draw(pen));

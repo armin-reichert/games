@@ -20,8 +20,6 @@ import de.amr.games.birdy.play.BirdyGame;
  */
 public class Obstacle extends GameEntity implements ViewController {
 
-	private int width;
-	private int height;
 	private Rectangle2D upperPart;
 	private Rectangle2D lowerPart;
 	private Rectangle2D passage;
@@ -31,6 +29,8 @@ public class Obstacle extends GameEntity implements ViewController {
 	private final Random rand = new Random();
 
 	public Obstacle(BirdyGame app, int width, int height, int passageHeight, int passageCenterY) {
+		tf.setWidth(width);
+		tf.setHeight(height);
 		int passageRadius = passageHeight / 2;
 		upperPart = new Rectangle2D.Double(0, 0, width, passageCenterY - passageRadius);
 		passage = new Rectangle2D.Double(0, passageCenterY - passageRadius, width, passageHeight);
@@ -39,20 +39,6 @@ public class Obstacle extends GameEntity implements ViewController {
 		pipeDown = Assets.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 		pipeUp = Assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(), BufferedImage.SCALE_SMOOTH);
-	}
-
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
-	}
-
-	@Override
-	public void init() {
 	}
 
 	@Override

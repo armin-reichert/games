@@ -27,8 +27,8 @@ public class Ball extends GameEntityUsingSprites {
 				tf.setVelocityX(-tf.getVelocityX());
 			}
 		}
-		if (tf.getX() > boardSize.width - getWidth()) {
-			tf.setX(boardSize.width - getWidth());
+		if (tf.getX() > boardSize.width - tf.getWidth()) {
+			tf.setX(boardSize.width - tf.getWidth());
 			if (tf.getVelocityX() > 0) {
 				tf.setVelocityX(-tf.getVelocityX());
 			}

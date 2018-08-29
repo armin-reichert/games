@@ -89,16 +89,6 @@ public class ObstacleManager extends GameEntity implements ViewController {
 	}
 
 	@Override
-	public int getWidth() {
-		return 0;
-	}
-
-	@Override
-	public int getHeight() {
-		return 0;
-	}
-
-	@Override
 	public void draw(Graphics2D g) {
 		obstacles.forEach(o -> o.draw(g));
 	}
@@ -131,7 +121,7 @@ public class ObstacleManager extends GameEntity implements ViewController {
 		Iterator<Obstacle> it = obstacles.iterator();
 		while (it.hasNext()) {
 			obstacle = it.next();
-			if (obstacle.tf().getX() + obstacle.getWidth() < 0) {
+			if (obstacle.tf().getX() + obstacle.tf().getWidth() < 0) {
 				app.collisionHandler.unregisterStart(bird, obstacle.getUpperPart());
 				app.collisionHandler.unregisterStart(bird, obstacle.getLowerPart());
 				app.collisionHandler.unregisterEnd(bird, obstacle.getPassage());

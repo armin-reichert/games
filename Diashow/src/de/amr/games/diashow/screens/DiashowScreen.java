@@ -23,12 +23,10 @@ public class DiashowScreen implements ViewController {
 		this.height = height;
 	}
 
-	@Override
 	public int getWidth() {
 		return width;
 	}
 
-	@Override
 	public int getHeight() {
 		return height;
 	}

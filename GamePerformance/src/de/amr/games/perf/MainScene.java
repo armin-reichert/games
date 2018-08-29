@@ -26,12 +26,10 @@ public class MainScene implements ViewController {
 		});
 	}
 
-	@Override
 	public int getWidth() {
 		return 1000;
 	}
 
-	@Override
 	public int getHeight() {
 		return 400;
 	}

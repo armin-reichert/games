@@ -25,14 +25,4 @@ public class ScoreDisplay extends GameEntity implements ViewController {
 		g.drawString("" + scoreLeft.points, (int) tf.getX() - 100, 50);
 		g.drawString("" + scoreRight.points, (int) tf.getX() + 100, 50);
 	}
-
-	@Override
-	public int getWidth() {
-		return 0;
-	}
-
-	@Override
-	public int getHeight() {
-		return 0;
-	}
 }

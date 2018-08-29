@@ -32,17 +32,7 @@ public class ScoreDisplay extends GameEntity implements ViewController {
 			digits[d] = digitImage.getScaledInstance(-1, round(scale) * digitImage.getHeight(),
 					Image.SCALE_SMOOTH);
 		}
-		scoreText = pointsText();
-	}
-
-	@Override
-	public int getWidth() {
-		return scoreText.length() * digits[0].getWidth(null);
-	}
-
-	@Override
-	public int getHeight() {
-		return digits[0].getHeight(null);
+		update();
 	}
 
 	private String pointsText() {
@@ -52,6 +42,8 @@ public class ScoreDisplay extends GameEntity implements ViewController {
 	@Override
 	public void update() {
 		scoreText = pointsText();
+		tf.setWidth(scoreText.length() * digits[0].getWidth(null));
+		tf.setHeight(digits[0].getHeight(null));
 	}
 
 	@Override
@@ -62,9 +54,5 @@ public class ScoreDisplay extends GameEntity implements ViewController {
 					(int) tf.getX() + i * (digits[0].getWidth(null) - round(3 * scale)), (int) tf.getY(),
 					null);
 		}
-	}
-
-	@Override
-	public void init() {
 	}
 }

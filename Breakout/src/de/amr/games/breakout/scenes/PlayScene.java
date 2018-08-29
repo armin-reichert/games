@@ -49,12 +49,10 @@ public class PlayScene implements ViewController {
 		control.setLogger(Application.LOGGER);
 	}
 
-	@Override
 	public int getWidth() {
 		return app.settings.width;
 	}
 
-	@Override
 	public int getHeight() {
 		return app.settings.height;
 	}
@@ -171,9 +169,10 @@ public class PlayScene implements ViewController {
 
 	private void resetBatAndBall() {
 		bat.speed = getWidth() / 48;
-		bat.tf().moveTo((getWidth() - bat.getWidth()) / 2, getHeight() - bat.getHeight());
+		bat.tf().moveTo((getWidth() - bat.tf().getWidth()) / 2, getHeight() - bat.tf().getHeight());
 		bat.tf().setVelocity(0, 0);
-		ball.tf().moveTo((getWidth() - ball.getWidth()) / 2, bat.tf().getY() - ball.getHeight());
+		ball.tf().moveTo((getWidth() - ball.tf().getWidth()) / 2,
+				bat.tf().getY() - ball.tf().getHeight());
 		ball.tf().setVelocity(0, 0);
 	}
 

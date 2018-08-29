@@ -39,8 +39,8 @@ public class PlayScene implements ViewController {
 	 */
 	private StateMachine<PlaySceneState, PlaySceneEvent> createStateMachine() {
 
-		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl", PlaySceneState.class,
-				Initialized);
+		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl",
+				PlaySceneState.class, Initialized);
 
 		// Initialized
 
@@ -77,6 +77,8 @@ public class PlayScene implements ViewController {
 	}
 
 	private final PongGame app;
+	private final int width;
+	private final int height;
 	private final StateMachine<PlaySceneState, PlaySceneEvent> control;
 	private Court court;
 	private Paddle paddleLeft;
@@ -86,18 +88,10 @@ public class PlayScene implements ViewController {
 
 	public PlayScene(PongGame app) {
 		this.app = app;
+		this.width = app.settings.width;
+		this.height = app.settings.height;
 		control = createStateMachine();
 		control.setLogger(Application.LOGGER);
-	}
-
-	@Override
-	public int getWidth() {
-		return app.settings.width;
-	}
-
-	@Override
-	public int getHeight() {
-		return app.settings.height;
 	}
 
 	@Override
@@ -123,7 +117,7 @@ public class PlayScene implements ViewController {
 		}
 		ball = app.entities.ofClass(Ball.class).findFirst().get();
 		score = app.entities.ofClass(ScoreDisplay.class).findFirst().get();
-		score.centerHorizontally(getWidth());
+		score.centerHorizontally(width);
 		score.tf().setY(100);
 		control.init();
 	}
@@ -155,14 +149,14 @@ public class PlayScene implements ViewController {
 	private void drawWinner(Graphics2D g, String text) {
 		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 		int w = g.getFontMetrics().stringWidth(text);
-		g.drawString(text, getWidth() / 2 - w / 2, getHeight() - 100);
+		g.drawString(text, width / 2 - w / 2, height - 100);
 	}
 
 	private void resetPaddles() {
 		paddleLeft.tf().setX(0);
-		paddleLeft.centerVertically(getHeight());
-		paddleRight.tf().setX(getWidth() - paddleRight.getWidth());
-		paddleRight.centerVertically(getHeight());
+		paddleLeft.centerVertically(height);
+		paddleRight.tf().setX(width - paddleRight.tf().getWidth());
+		paddleRight.centerVertically(height);
 	}
 
 	private void resetScores() {
@@ -173,11 +167,11 @@ public class PlayScene implements ViewController {
 	private void prepareService() {
 		resetPaddles();
 		if (!isBallOutRight()) {
-			ball.tf().moveTo(paddleLeft.tf().getX() + paddleLeft.getWidth(),
-					paddleLeft.tf().getY() + paddleLeft.getHeight() / 2 - ball.getHeight() / 2);
+			ball.tf().moveTo(paddleLeft.tf().getX() + paddleLeft.tf().getWidth(),
+					paddleLeft.tf().getY() + paddleLeft.tf().getHeight() / 2 - ball.tf().getHeight() / 2);
 		} else {
-			ball.tf().moveTo(paddleRight.tf().getX() - ball.getWidth(),
-					paddleRight.tf().getY() + paddleRight.getHeight() / 2 - ball.getHeight() / 2);
+			ball.tf().moveTo(paddleRight.tf().getX() - ball.tf().getWidth(),
+					paddleRight.tf().getY() + paddleRight.tf().getHeight() / 2 - ball.tf().getHeight() / 2);
 		}
 		ball.tf().setVelocity(0, 0);
 	}
@@ -193,11 +187,11 @@ public class PlayScene implements ViewController {
 	}
 
 	private boolean isBallOutLeft() {
-		return ball.tf().getX() + ball.getWidth() < 0;
+		return ball.tf().getX() + ball.tf().getWidth() < 0;
 	}
 
 	private boolean isBallOutRight() {
-		return ball.tf().getX() > getWidth();
+		return ball.tf().getX() > width;
 	}
 
 	private boolean leftPaddleHitsBall() {

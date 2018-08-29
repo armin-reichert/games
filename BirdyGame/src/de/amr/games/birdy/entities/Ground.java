@@ -34,7 +34,7 @@ public class Ground extends GameEntityUsingSprites {
 
 	public void setWidth(int width) {
 		tf.setWidth(width);
-		currentSprite().scale(width, getHeight());
+		currentSprite().scale(width, tf.getHeight());
 	}
 
 	public void stopMoving() {
@@ -44,7 +44,7 @@ public class Ground extends GameEntityUsingSprites {
 	@Override
 	public void draw(Graphics2D g) {
 		Image image = currentSprite().currentFrame();
-		for (float x = -startX; x < getWidth(); x += image.getWidth(null)) {
+		for (float x = -startX; x < tf.getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, (int) x, (int) tf.getY(), null);
 		}
 	}

@@ -28,11 +28,11 @@ public class Bat extends GameEntityUsingSprites {
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
 			tf.setVelocityX(-speed);
 			tf.move();
-			tf.setX(min(boardWidth - getWidth(), max(0, tf.getX())));
+			tf.setX(min(boardWidth - tf.getWidth(), max(0, tf.getX())));
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
 			tf.setVelocityX(speed);
 			tf.move();
-			tf.setX(min(boardWidth - getWidth(), max(0, tf.getX())));
+			tf.setX(min(boardWidth - tf.getWidth(), max(0, tf.getX())));
 		}
 	}
 }

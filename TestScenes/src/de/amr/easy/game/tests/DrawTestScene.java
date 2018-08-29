@@ -22,12 +22,10 @@ public class DrawTestScene implements ViewController {
 		this.app = app;
 	}
 
-	@Override
 	public int getWidth() {
 		return app.settings.width;
 	}
 
-	@Override
 	public int getHeight() {
 		return app.settings.height;
 	}
@@ -71,5 +69,4 @@ public class DrawTestScene implements ViewController {
 		Random rand = new Random();
 		return new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
 	}
-
 }

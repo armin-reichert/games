@@ -14,6 +14,8 @@ public class Ball extends GameEntity implements ViewController {
 
 	public Ball(int courtHeight) {
 		this.courtHeight = courtHeight;
+		tf.setWidth(size);
+		tf.setHeight(size);
 	}
 
 	@Override
@@ -22,8 +24,8 @@ public class Ball extends GameEntity implements ViewController {
 		if (tf.getY() < 0) {
 			tf.setY(0);
 			tf.setVelocityY(-tf.getVelocityY());
-		} else if (tf.getY() >= courtHeight - getHeight()) {
-			tf.setY(courtHeight - getHeight() - 1);
+		} else if (tf.getY() >= courtHeight - tf.getHeight()) {
+			tf.setY(courtHeight - tf.getHeight() - 1);
 			tf.setVelocityY(-tf.getVelocityY());
 		}
 	}
@@ -34,21 +36,7 @@ public class Ball extends GameEntity implements ViewController {
 		g.fillOval((int) tf.getX(), (int) tf.getY(), size, size);
 	}
 
-	@Override
-	public int getWidth() {
-		return size;
-	}
-
-	@Override
-	public int getHeight() {
-		return size;
-	}
-
 	public int getSize() {
 		return size;
-	}
-
-	@Override
-	public void init() {
 	}
 }

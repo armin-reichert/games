@@ -29,12 +29,10 @@ public class TestScene implements ViewController {
 		board = new Board();
 	}
 
-	@Override
 	public int getWidth() {
 		return app.settings.width;
 	}
 
-	@Override
 	public int getHeight() {
 		return app.settings.height;
 	}
@@ -75,12 +73,18 @@ public class TestScene implements ViewController {
 	}
 
 	private void printBoardInfo() {
-		Application.LOGGER.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
-		Application.LOGGER.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
-		Application.LOGGER.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
-		Application.LOGGER.info("Positions opening one black mill: " + toCSV(board.positionsOpeningMill(BLACK)));
-		Application.LOGGER.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
-		Application.LOGGER.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
+		Application.LOGGER
+				.info("Positions opening two white mills: " + toCSV(board.positionsOpeningTwoMills(WHITE)));
+		Application.LOGGER
+				.info("Positions opening two black mills: " + toCSV(board.positionsOpeningTwoMills(BLACK)));
+		Application.LOGGER
+				.info("Positions opening one white mill: " + toCSV(board.positionsOpeningMill(WHITE)));
+		Application.LOGGER
+				.info("Positions opening one black mill: " + toCSV(board.positionsOpeningMill(BLACK)));
+		Application.LOGGER
+				.info("Positions closing white mill: " + toCSV(board.positionsClosingMill(WHITE)));
+		Application.LOGGER
+				.info("Positions closing black mill: " + toCSV(board.positionsClosingMill(BLACK)));
 		Application.LOGGER.info("Positions from where can close white mill: "
 				+ toCSV(positions().filter(p -> board.canCloseMillMovingFrom(p, WHITE))));
 		Application.LOGGER.info("Positions from where can close black mill: "

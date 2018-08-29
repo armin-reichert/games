@@ -24,6 +24,8 @@ import de.amr.games.pong.PongGame.PlayMode;
 public class MenuScene implements ViewController {
 
 	private final PongGame app;
+	private final int width;
+	private final int height;
 	private final StateMachine<PlayMode, String> control;
 	private Color bgColor;
 	private Color bgColorSelected;
@@ -31,18 +33,10 @@ public class MenuScene implements ViewController {
 
 	public MenuScene(PongGame app) {
 		this.app = app;
+		this.width = app.settings.width;
+		this.height = app.settings.height;
 		control = createStateMachine();
 		control.setLogger(Application.LOGGER);
-	}
-
-	@Override
-	public int getWidth() {
-		return app.settings.width;
-	}
-
-	@Override
-	public int getHeight() {
-		return app.settings.height;
 	}
 
 	@Override
@@ -53,7 +47,8 @@ public class MenuScene implements ViewController {
 	}
 
 	private StateMachine<PlayMode, String> createStateMachine() {
-		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);
+		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class,
+				Player1_Player2);
 		PlayMode[] playModes = PlayMode.values();
 		for (int i = 0, n = playModes.length; i < n; i += 1) {
 			fsm.change(playModes[i], playModes[(i + 1) % n], () -> keyPressedOnce(KeyEvent.VK_DOWN));
@@ -83,23 +78,23 @@ public class MenuScene implements ViewController {
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(bgColor);
-		g.fillRect(0, 0, app.settings.width, getHeight());
+		g.fillRect(0, 0, width, height);
 		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 
 		PlayMode[] playModes = PlayMode.values();
 		int y = 60;
-		int h = getHeight() / playModes.length;
+		int h = height / playModes.length;
 		for (int i = 0; i < playModes.length; ++i) {
 			if (playModes[i] == getSelectedPlayMode()) {
 				g.setColor(bgColorSelected);
-				g.fillRect(0, h * i, getWidth(), h);
+				g.fillRect(0, h * i, width, h);
 				g.setColor(hilightColor);
 			} else {
 				g.setColor(Color.WHITE);
 			}
 			String text = getTitle(playModes[i]);
 			int w = g.getFontMetrics().stringWidth(text);
-			g.drawString(text, getWidth() / 2 - w / 2, y);
+			g.drawString(text, width / 2 - w / 2, y);
 			y += h;
 		}
 	}

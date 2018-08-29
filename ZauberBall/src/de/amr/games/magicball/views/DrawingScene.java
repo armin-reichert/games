@@ -11,28 +11,14 @@ import de.amr.games.magicball.entities.PenBall;
 
 public class DrawingScene implements ViewController {
 
-	private final int width;
-	private final int height;
 	private final BufferedImage canvas;
 	private final List<PenBall> balls = new ArrayList<>();
 
 	public DrawingScene(int width, int height, int nBalls) {
-		this.width = width;
-		this.height = height;
 		canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		for (int i = 0; i < nBalls; ++i) {
 			balls.add(new PenBall(canvas));
 		}
-	}
-
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
 	}
 
 	@Override

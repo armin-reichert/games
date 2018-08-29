@@ -33,12 +33,10 @@ public class SpriteBrowserScene implements ViewController {
 	public void init() {
 	}
 
-	@Override
 	public int getWidth() {
 		return app.settings.width;
 	}
 
-	@Override
 	public int getHeight() {
 		return app.settings.height;
 	}
