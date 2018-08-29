@@ -10,13 +10,7 @@ public class GraphicText extends GameEntityUsingSprites {
 	public GraphicText(Image image) {
 		addSprite("s_text", new Sprite(image));
 		setCurrentSprite("s_text");
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
+		tf.setWidth(currentSprite().getWidth());
+		tf.setHeight(currentSprite().getHeight());
 	}
 }

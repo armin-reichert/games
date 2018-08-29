@@ -175,7 +175,7 @@ public class PlayScene implements View,Controller {
 	}
 
 	private void stop() {
-		ground.tf().setVelocity(0, 0);
+		ground.stopMoving();
 		obstacleManager.stop();
 	}
 
