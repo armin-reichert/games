@@ -34,7 +34,7 @@ public class Ground extends GameEntityUsingSprites {
 
 	public void setWidth(int width) {
 		tf.setWidth(width);
-		currentSprite().scale(width, tf.getHeight());
+		currentSprite().scale(width, currentSprite().getHeight());
 	}
 
 	public void stopMoving() {
