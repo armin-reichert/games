@@ -14,22 +14,12 @@ public class DiashowScreen implements View, Controller {
 	private static final int KEY_NEXT = KeyEvent.VK_SPACE;
 
 	private int width;
-	private int height;
 	private int current;
 	private Image images[];
 	private int nImages = 4;
 
 	public DiashowScreen(int width, int height) {
 		this.width = width;
-		this.height = height;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
 	}
 
 	@Override
@@ -45,7 +35,6 @@ public class DiashowScreen implements View, Controller {
 	public void update() {
 		if (Keyboard.keyPressedOnce(KEY_NEXT)) {
 			current = current < nImages - 1 ? current + 1 : 0;
-			System.out.println("NEXT pressed once");
 		}
 	}
 

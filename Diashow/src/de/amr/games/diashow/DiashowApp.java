@@ -4,13 +4,13 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.diashow.screens.DiashowScreen;
 
-public class Diashow extends Application {
+public class DiashowApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new Diashow());
+		launch(new DiashowApp());
 	}
 
-	public Diashow() {
+	public DiashowApp() {
 		settings.title = "Diashow";
 		settings.width = 900;
 		settings.height = 600;
