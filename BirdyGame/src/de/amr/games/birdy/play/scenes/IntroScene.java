@@ -36,6 +36,7 @@ public class IntroScene implements ViewController {
 	private final BirdyGame app;
 	private final StateMachine<State, Object> control;
 	private City city;
+
 	private PumpingImage gameTitleImage;
 	private TextArea creditsText;
 
@@ -48,6 +49,7 @@ public class IntroScene implements ViewController {
 		control.state(ShowCredits).entry = s -> {
 			creditsText.tf().setY(getHeight());
 			creditsText.setScrollSpeed(-.75f);
+			gameTitleImage.setVisible(false);
 			Assets.sound("music/bgmusic.mp3").loop();
 		};
 
@@ -57,6 +59,11 @@ public class IntroScene implements ViewController {
 				t -> t.to().setDuration(PULSE.secToTicks(2)));
 
 		// Wait
+		control.state(Wait).entry = s -> {
+			gameTitleImage.setVisible(true);
+			creditsText.setVisible(false);
+		};
+		
 		control.changeOnTimeout(Wait, ShowGameTitle, t -> t.to().setDuration(PULSE.secToTicks(3)));
 
 		// ShowGameTitle
@@ -87,12 +94,10 @@ public class IntroScene implements ViewController {
 
 		gameTitleImage = new PumpingImage(Assets.image("title"));
 		gameTitleImage.setScale(3);
-		gameTitleImage.fnVisibility = () -> control.is(ShowGameTitle);
 
 		creditsText = new TextArea(CREDITS_TEXT);
 		creditsText.setFont(Assets.font("Pacifico-Regular"));
 		creditsText.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
-		creditsText.fnVisibility = () -> control.is(ShowCredits, Wait);
 
 		control.setLogger(Application.LOGGER);
 		control.init();

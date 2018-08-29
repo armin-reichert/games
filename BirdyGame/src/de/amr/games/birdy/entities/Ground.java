@@ -20,6 +20,8 @@ public class Ground extends GameEntityUsingSprites {
 	public Ground(BirdyGame app) {
 		addSprite("s_land", new Sprite(Assets.image("land")));
 		setCurrentSprite("s_land");
+		tf.setWidth(currentSprite().getWidth());
+		tf.setHeight(currentSprite().getHeight());
 	}
 
 	@Override
@@ -31,6 +33,7 @@ public class Ground extends GameEntityUsingSprites {
 	}
 
 	public void setWidth(int width) {
+		tf.setWidth(width);
 		currentSprite().scale(width, getHeight());
 	}
 
@@ -44,9 +47,5 @@ public class Ground extends GameEntityUsingSprites {
 		for (float x = -startX; x < getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, (int) x, (int) tf.getY(), null);
 		}
-	}
-
-	@Override
-	public void init() {
 	}
 }

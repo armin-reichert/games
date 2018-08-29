@@ -15,6 +15,7 @@ import static java.lang.Math.PI;
 
 import java.awt.geom.Rectangle2D;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
@@ -108,12 +109,15 @@ public class Bird extends GameEntityUsingSprites {
 	public Bird(BirdyGame app) {
 		this.app = app;
 		flightControl = new FlightControl();
-		// flightControl.setLogger(Application.Log);
+		flightControl.setLogger(Application.LOGGER);
 		healthControl = new HealthControl();
-		// health.setLogger(Application.Log);
+		healthControl.setLogger(Application.LOGGER);
 		addSprite("s_yellow", createFeatherSprite("bird0"));
 		addSprite("s_blue", createFeatherSprite("bird1"));
 		addSprite("s_red", createFeatherSprite("bird2"));
+		setCurrentSprite("s_yellow");
+		tf.setWidth(currentSprite().getWidth());
+		tf.setHeight(currentSprite().getHeight());
 		gravity = app.settings.getAsFloat("world gravity");
 	}
 
@@ -151,9 +155,9 @@ public class Bird extends GameEntityUsingSprites {
 
 	@Override
 	public Rectangle2D getCollisionBox() {
-		int margin = Math.min(getWidth() / 4, getHeight() / 4);
-		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin, getWidth() - 2 * margin,
-				getHeight() - 2 * margin);
+		int margin = Math.min(getCollisionWidth() / 4, getCollisionHeight() / 4);
+		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin,
+				getCollisionWidth() - 2 * margin, getCollisionHeight() - 2 * margin);
 	}
 
 	public void flap() {
