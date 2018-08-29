@@ -12,7 +12,7 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collider;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.BirdyGameApp;
 
 /**
  * An obstacle consisting of a hanging and a standing pipe with a passage in the middle.
@@ -29,7 +29,7 @@ public class Obstacle extends GameEntity implements View,Controller {
 	private boolean lighted;
 	private final Random rand = new Random();
 
-	public Obstacle(BirdyGame app, int width, int height, int passageHeight, int passageCenterY) {
+	public Obstacle(BirdyGameApp app, int width, int height, int passageHeight, int passageCenterY) {
 		tf.setWidth(width);
 		tf.setHeight(height);
 		int passageRadius = passageHeight / 2;

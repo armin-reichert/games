@@ -22,7 +22,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.play.BirdyGameEvent;
 
 /**
@@ -32,7 +32,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  */
 public class Bird extends GameEntityUsingSprites {
 
-	private final BirdyGame app;
+	private final BirdyGameApp app;
 	private final FlightControl flightControl;
 	private final HealthControl healthControl;
 	private float gravity;
@@ -106,7 +106,7 @@ public class Bird extends GameEntityUsingSprites {
 		}
 	}
 
-	public Bird(BirdyGame app) {
+	public Bird(BirdyGameApp app) {
 		this.app = app;
 		flightControl = new FlightControl();
 		flightControl.setLogger(Application.LOGGER);

@@ -6,7 +6,7 @@ import java.awt.Image;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.BirdyGameApp;
 
 /**
  * The ground.
@@ -17,7 +17,7 @@ public class Ground extends GameEntityUsingSprites {
 
 	private float startX;
 
-	public Ground(BirdyGame app) {
+	public Ground(BirdyGameApp app) {
 		addSprite("s_land", new Sprite(Assets.image("land")));
 		setCurrentSprite("s_land");
 		tf.setWidth(currentSprite().getWidth());

@@ -17,8 +17,8 @@ import java.util.logging.Logger;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * Manages the creation and deletion of obstacles.
@@ -27,11 +27,11 @@ import de.amr.games.birdy.play.BirdyGame;
  */
 public class ObstacleManager extends GameEntity implements View {
 
-	private final BirdyGame app;
+	private final BirdyGameApp app;
 	private final List<Obstacle> obstacles = new LinkedList<>();
 	private final StateMachine<ObstacleManagerState, String> control;
 
-	public ObstacleManager(BirdyGame app) {
+	public ObstacleManager(BirdyGameApp app) {
 		this.app = app;
 
 		control = new StateMachine<>(getClass().getSimpleName(), ObstacleManagerState.class, Stopped);

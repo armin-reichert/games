@@ -18,8 +18,8 @@ import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.play.BirdyGame;
 
 /**
  * Intro scene.
@@ -34,7 +34,7 @@ public class IntroScene implements View,Controller {
 		ShowCredits, Wait, ShowGameTitle, Finished
 	}
 
-	private final BirdyGame app;
+	private final BirdyGameApp app;
 	private final int width;
 	private final int height;
 	private final StateMachine<State, Object> control;
@@ -43,7 +43,7 @@ public class IntroScene implements View,Controller {
 	private PumpingImage logoAnimation;
 	private TextArea textAnimation;
 
-	public IntroScene(BirdyGame app) {
+	public IntroScene(BirdyGameApp app) {
 		this.app = app;
 		this.width = app.settings.width;
 		this.height = app.settings.height;

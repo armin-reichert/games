@@ -18,7 +18,7 @@ import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.birdy.play.BirdyGame;
+import de.amr.games.birdy.BirdyGameApp;
 
 /**
  * The city shown in the background.
@@ -35,10 +35,10 @@ public class City extends GameEntityUsingSprites {
 		SunGoesDown, SunGoesUp
 	}
 
-	private final BirdyGame app;
+	private final BirdyGameApp app;
 	private final StateMachine<CityState, CityEvent> control;
 
-	public City(BirdyGame app) {
+	public City(BirdyGameApp app) {
 		this.app = app;
 		addSprite("s_night", new Sprite("bg_night"));
 		addSprite("s_day", new Sprite("bg_day"));

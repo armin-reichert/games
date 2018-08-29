@@ -22,6 +22,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.GraphicText;
@@ -29,7 +30,6 @@ import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.play.BirdyGame;
 import de.amr.games.birdy.play.BirdyGameEvent;
 
 /**
@@ -39,7 +39,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  */
 public class PlayScene implements View,Controller {
 
-	private final BirdyGame app;
+	private final BirdyGameApp app;
 	private final PlaySceneControl control;
 	private final Score score = new Score();
 	private final ObstacleManager obstacleManager;
@@ -102,7 +102,7 @@ public class PlayScene implements View,Controller {
 		}
 	}
 
-	public PlayScene(BirdyGame game) {
+	public PlayScene(BirdyGameApp game) {
 		this.app = game;
 		control = new PlaySceneControl();
 		obstacleManager = new ObstacleManager(app);

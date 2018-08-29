@@ -24,12 +24,12 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
+import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.GraphicText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.play.BirdyGame;
 import de.amr.games.birdy.play.BirdyGameEvent;
 
 /**
@@ -88,14 +88,14 @@ public class StartScene implements View,Controller {
 		}
 	}
 
-	private final BirdyGame app;
+	private final BirdyGameApp app;
 	private final StartSceneControl control;
 	private Bird bird;
 	private City city;
 	private Ground ground;
 	private GraphicText displayedText;
 
-	public StartScene(BirdyGame game) {
+	public StartScene(BirdyGameApp game) {
 		this.app = game;
 		control = new StartSceneControl();
 	}

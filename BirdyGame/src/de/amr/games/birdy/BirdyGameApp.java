@@ -1,4 +1,4 @@
-package de.amr.games.birdy.play;
+package de.amr.games.birdy;
 
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -19,13 +19,13 @@ import de.amr.games.birdy.utils.SpritesheetReader;
  * 
  * @author Armin Reichert
  */
-public class BirdyGame extends Application {
+public class BirdyGameApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new BirdyGame());
+		launch(new BirdyGameApp());
 	}
 
-	public BirdyGame() {
+	public BirdyGameApp() {
 		// general settings
 		settings.title = "Zwick, das listige Vögelchen";
 		settings.width = 640;
