@@ -16,13 +16,13 @@ import de.amr.easy.game.view.View;
 
 public class SpriteBrowserScene implements View, Controller {
 
-	private final SpriteBrowser app;
+	private final int height;
 	private final Font font = new Font("Courier New", Font.PLAIN, 16);
 	private final List<String> spriteNames;
 	private int index;
 
-	public SpriteBrowserScene(SpriteBrowser app) {
-		this.app = app;
+	public SpriteBrowserScene(int width, int height) {
+		this.height = height;
 		spriteNames = new ArrayList<>();
 		for (String name : Assets.imageNames()) {
 			spriteNames.add(name);
@@ -32,14 +32,6 @@ public class SpriteBrowserScene implements View, Controller {
 
 	@Override
 	public void init() {
-	}
-
-	public int getWidth() {
-		return app.settings.width;
-	}
-
-	public int getHeight() {
-		return app.settings.height;
 	}
 
 	@Override
@@ -63,6 +55,6 @@ public class SpriteBrowserScene implements View, Controller {
 		g.setColor(Color.WHITE);
 		g.setFont(font);
 		g.drawImage(image, 0, 0, null);
-		g.drawString(text, 0, getHeight() - 2 * font.getSize());
+		g.drawString(text, 0, height - 2 * font.getSize());
 	}
 }
