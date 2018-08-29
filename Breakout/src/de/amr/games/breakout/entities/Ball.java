@@ -1,7 +1,6 @@
 package de.amr.games.breakout.entities;
 
 import java.awt.Dimension;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
@@ -10,31 +9,10 @@ import de.amr.games.breakout.BreakoutGame;
 public class Ball extends GameEntityUsingSprites {
 
 	private final Dimension boardSize;
-	private Sprite s_ball;
 
 	public Ball(BreakoutGame app, int size) {
 		boardSize = new Dimension(app.settings.width, app.settings.height);
-		s_ball = new Sprite("ball_green.png").scaleFrame(0, size, size);
-	}
-
-	@Override
-	public int getWidth() {
-		return currentSprite().getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return currentSprite().getHeight();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return s_ball;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(s_ball);
+		addSprite("s_ball", new Sprite("ball_green.png").scaleFrame(0, size, size));
 	}
 
 	@Override
@@ -62,9 +40,5 @@ public class Ball extends GameEntityUsingSprites {
 
 	public boolean isOut() {
 		return tf.getY() > boardSize.height;
-	}
-
-	@Override
-	public void init() {
 	}
 }

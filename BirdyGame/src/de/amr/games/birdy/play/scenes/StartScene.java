@@ -143,7 +143,6 @@ public class StartScene implements ViewController {
 		bird.init();
 		bird.tf().moveTo(getWidth() / 8, ground.tf().getY() / 2);
 		bird.tf().setVelocity(0, 0);
-		bird.setNormalFeathers(city.isNight() ? bird.BLUE_FEATHERS : bird.YELLOW_FEATHERS);
 
 		if (!app.entities.contains("title")) {
 			GameEntity titleText = new GraphicText(Assets.image("title"));

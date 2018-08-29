@@ -14,7 +14,6 @@ import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
 import static java.lang.Math.PI;
 
 import java.awt.geom.Rectangle2D;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
@@ -32,14 +31,9 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  */
 public class Bird extends GameEntityUsingSprites {
 
-	public final Sprite YELLOW_FEATHERS;
-	public final Sprite BLUE_FEATHERS;
-	public final Sprite RED_FEATHERS;
-
 	private final BirdyGame app;
 	private final FlightControl flightControl;
 	private final HealthControl healthControl;
-	private Sprite normalFeathers;
 	private float gravity;
 
 	/**
@@ -54,14 +48,25 @@ public class Bird extends GameEntityUsingSprites {
 			changeOnInput(BirdTouchedGround, Sane, Dead);
 			changeOnInput(BirdLeftWorld, Sane, Dead);
 
+			state(Sane).entry = s -> {
+				setCurrentSprite("s_yellow");
+			};
+
 			state(Injured).entry = s -> {
 				s.setDuration(PULSE.secToTicks(app.settings.get("bird injured seconds")));
-				setNormalFeathers(RED_FEATHERS);
+				setCurrentSprite("s_red");
+			};
+
+			state(Dead).entry = s -> {
+				setCurrentSprite("s_blue");
 			};
 
 			changeOnInput(BirdTouchedPipe, Injured, Injured, t -> t.from().resetTimer());
+
 			changeOnTimeout(Injured, Sane);
+
 			changeOnInput(BirdTouchedGround, Injured, Dead);
+
 			changeOnInput(BirdLeftWorld, Injured, Dead);
 
 			state(Dead).entry = s -> turnDown();
@@ -106,10 +111,9 @@ public class Bird extends GameEntityUsingSprites {
 		// flightControl.setLogger(Application.Log);
 		healthControl = new HealthControl();
 		// health.setLogger(Application.Log);
-		YELLOW_FEATHERS = createFeatherSprite("bird0");
-		BLUE_FEATHERS = createFeatherSprite("bird1");
-		RED_FEATHERS = createFeatherSprite("bird2");
-		normalFeathers = YELLOW_FEATHERS;
+		addSprite("s_yellow", createFeatherSprite("bird0"));
+		addSprite("s_blue", createFeatherSprite("bird1"));
+		addSprite("s_red", createFeatherSprite("bird2"));
 		gravity = app.settings.getAsFloat("world gravity");
 	}
 
@@ -117,26 +121,6 @@ public class Bird extends GameEntityUsingSprites {
 		Sprite sprite = new Sprite(birdName + "_0", birdName + "_1", birdName + "_2");
 		sprite.animate(AnimationType.BACK_AND_FORTH, app.settings.get("bird flap millis"));
 		return sprite;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(YELLOW_FEATHERS, BLUE_FEATHERS, RED_FEATHERS);
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return healthControl.is(Injured) ? RED_FEATHERS : normalFeathers;
-	}
-
-	@Override
-	public int getWidth() {
-		return currentSprite().getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return currentSprite().getHeight();
 	}
 
 	@Override
@@ -155,10 +139,6 @@ public class Bird extends GameEntityUsingSprites {
 	public void receiveEvent(BirdyGameEvent event) {
 		flightControl.addInput(event);
 		healthControl.addInput(event);
-	}
-
-	public void setNormalFeathers(Sprite sprite) {
-		normalFeathers = sprite;
 	}
 
 	public FlightState getFlightState() {

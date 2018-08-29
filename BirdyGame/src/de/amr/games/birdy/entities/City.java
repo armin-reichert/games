@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.entity.GameEntity;
@@ -39,21 +38,24 @@ public class City extends GameEntityUsingSprites {
 	private final BirdyGame app;
 	private final StateMachine<CityState, CityEvent> control;
 	private int width;
-	private Sprite s_night;
-	private Sprite s_day;
 
 	public City(BirdyGame app) {
 		this.app = app;
-
-		s_night = new Sprite("bg_night");
-		s_day = new Sprite("bg_day");
-
+		addSprite("s_night", new Sprite("bg_night"));
+		addSprite("s_day", new Sprite("bg_day"));
+		setCurrentSprite("s_day");
+		
 		control = new StateMachine<>("City control", CityState.class, Day);
+
+		control.state(Day).entry = s -> {
+			setCurrentSprite("s_day");
+		};
 
 		control.changeOnInput(SunGoesDown, Day, Night);
 
 		control.state(Night).entry = s -> {
 			s.setDuration(PULSE.secToTicks(10));
+			setCurrentSprite("s_night");
 			replaceStars();
 		};
 
@@ -111,28 +113,13 @@ public class City extends GameEntityUsingSprites {
 		control.addInput(SunGoesUp);
 	}
 
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
 	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	@Override
-	public int getHeight() {
-		return currentSprite().getHeight();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return isNight() ? s_night : s_day;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(s_night, s_day);
+		if (this.width != width) {
+			this.width = width;
+			getSprites().forEach(sprite -> {
+				sprite.scale(width, sprite.getHeight());
+			});
+		}
 	}
 
 	@Override

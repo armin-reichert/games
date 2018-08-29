@@ -2,7 +2,6 @@ package de.amr.games.birdy.entities;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
@@ -17,30 +16,10 @@ import de.amr.games.birdy.play.BirdyGame;
 public class Ground extends GameEntityUsingSprites {
 
 	private float startX;
-	private Sprite s_land;
 
 	public Ground(BirdyGame app) {
-		s_land = new Sprite(Assets.image("land"));
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return s_land;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(s_land);
-	}
-
-	@Override
-	public int getWidth() {
-		return currentSprite().getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return currentSprite().getHeight();
+		addSprite("s_land", new Sprite(Assets.image("land")));
+		setCurrentSprite("s_land");
 	}
 
 	@Override

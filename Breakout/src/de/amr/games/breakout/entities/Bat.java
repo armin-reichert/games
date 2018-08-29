@@ -4,7 +4,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.awt.event.KeyEvent;
-import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
@@ -14,31 +13,11 @@ public class Bat extends GameEntityUsingSprites {
 
 	private final int boardWidth;
 	public int speed;
-	private Sprite s_bat;
 
 	public Bat(int width, int height, int boardWidth) {
 		this.boardWidth = boardWidth;
-		s_bat = new Sprite("bat_blue.png").scale(width, height);
-	}
-
-	@Override
-	public int getWidth() {
-		return currentSprite().getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return currentSprite().getHeight();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return s_bat;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(s_bat);
+		addSprite("s_bat", new Sprite("bat_blue.png").scale(width, height));
+		setCurrentSprite("s_bat");
 	}
 
 	@Override
@@ -53,9 +32,5 @@ public class Bat extends GameEntityUsingSprites {
 			tf.move();
 			tf.setX(min(boardWidth - getWidth(), max(0, tf.getX())));
 		}
-	}
-
-	@Override
-	public void init() {
 	}
 }

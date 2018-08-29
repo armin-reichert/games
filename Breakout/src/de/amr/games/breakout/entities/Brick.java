@@ -1,7 +1,5 @@
 package de.amr.games.breakout.entities;
 
-import java.util.stream.Stream;
-
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 
@@ -13,38 +11,19 @@ public class Brick extends GameEntityUsingSprites {
 
 	private boolean damaged;
 	private int value;
-	private Sprite s_intact;
-	private Sprite s_damaged;
 
 	public Brick(int width, int height, Type type, int value) {
 		this.value = value;
-		s_intact = new Sprite("Bricks/brick_" + type + "_small.png").scale(width, height);
-		s_damaged = new Sprite("Bricks/brick_" + type + "_small_cracked.png").scale(width, height);
+		addSprite("s_intact", new Sprite("Bricks/brick_" + type + "_small.png").scale(width, height));
+		addSprite("s_damaged",
+				new Sprite("Bricks/brick_" + type + "_small_cracked.png").scale(width, height));
 		damaged = false;
-	}
-
-	@Override
-	public int getWidth() {
-		return currentSprite().getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return currentSprite().getHeight();
-	}
-
-	@Override
-	public Sprite currentSprite() {
-		return damaged ? s_damaged : s_intact;
-	}
-
-	@Override
-	public Stream<Sprite> getSprites() {
-		return Stream.of(s_damaged, s_intact);
+		setCurrentSprite("s_intact");
 	}
 
 	public void damage() {
 		damaged = true;
+		setCurrentSprite("s_damaged");
 	}
 
 	public boolean isDamaged() {
@@ -53,13 +32,5 @@ public class Brick extends GameEntityUsingSprites {
 
 	public int getValue() {
 		return value;
-	}
-
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public void update() {
 	}
 }
