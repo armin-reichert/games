@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGame;
@@ -25,7 +25,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class ObstacleManager extends GameEntity implements ViewController {
+public class ObstacleManager extends GameEntity implements View {
 
 	private final BirdyGame app;
 	private final List<Obstacle> obstacles = new LinkedList<>();

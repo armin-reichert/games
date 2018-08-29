@@ -11,7 +11,8 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.PongGame.PlayMode;
@@ -21,7 +22,7 @@ import de.amr.games.pong.PongGame.PlayMode;
  * 
  * @author Armin Reichert
  */
-public class MenuScene implements ViewController {
+public class MenuScene implements View, Controller {
 
 	private final PongGame app;
 	private final int width;
@@ -47,8 +48,7 @@ public class MenuScene implements ViewController {
 	}
 
 	private StateMachine<PlayMode, String> createStateMachine() {
-		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class,
-				Player1_Player2);
+		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);
 		PlayMode[] playModes = PlayMode.values();
 		for (int i = 0, n = playModes.length; i < n; i += 1) {
 			fsm.change(playModes[i], playModes[(i + 1) % n], () -> keyPressedOnce(KeyEvent.VK_DOWN));

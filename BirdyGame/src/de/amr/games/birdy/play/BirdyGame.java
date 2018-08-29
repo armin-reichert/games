@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.easy.game.view.Controller;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
@@ -50,27 +49,27 @@ public class BirdyGame extends Application {
 		settings.set("passage height", 100);
 	}
 
-	private Controller introScene;
+	private IntroScene introScene;
 
-	public Controller getIntroScene() {
+	public IntroScene getIntroScene() {
 		if (introScene == null) {
 			introScene = new IntroScene(this);
 		}
 		return introScene;
 	}
 
-	private Controller startScene;
+	private StartScene startScene;
 
-	public Controller getStartScene() {
+	public StartScene getStartScene() {
 		if (startScene == null) {
 			startScene = new StartScene(this);
 		}
 		return startScene;
 	}
 
-	private Controller playScene;
+	private PlayScene playScene;
 
-	public Controller getPlayScene() {
+	public PlayScene getPlayScene() {
 		if (playScene == null) {
 			playScene = new PlayScene(this);
 		}

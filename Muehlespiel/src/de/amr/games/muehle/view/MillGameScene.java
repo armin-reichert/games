@@ -12,7 +12,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.view.Controller;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
@@ -27,7 +27,7 @@ import de.amr.games.muehle.msg.Messages;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene implements ViewController, MillGameUI {
+public class MillGameScene implements View,Controller, MillGameUI {
 
 	private final MillGameApp app;
 	private final MillGameController controller;

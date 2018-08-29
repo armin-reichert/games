@@ -15,7 +15,8 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.controls.TextArea;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.play.BirdyGame;
@@ -25,7 +26,7 @@ import de.amr.games.birdy.play.BirdyGame;
  * 
  * @author Armin Reichert
  */
-public class IntroScene implements ViewController {
+public class IntroScene implements View,Controller {
 
 	private static final String CREDITS_TEXT = "Anna proudly presents\nin cooperation with\nProf. Zwickmann\nGeräteschuppen Software 2017";
 

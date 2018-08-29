@@ -11,12 +11,13 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.games.muehle.model.board.Board;
 import de.amr.games.muehle.view.BoardUI;
 import de.amr.games.muehle.view.MillGameUI;
 
-public class TestScene implements ViewController {
+public class TestScene implements View, Controller {
 
 	private final MillTestApp app;
 	private final Board board;

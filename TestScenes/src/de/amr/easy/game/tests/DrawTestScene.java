@@ -8,9 +8,10 @@ import java.util.Random;
 
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 
-public class DrawTestScene implements ViewController {
+public class DrawTestScene implements View, Controller {
 
 	private DrawTestApp app;
 	private BufferedImage drawArea;

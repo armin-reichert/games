@@ -9,14 +9,15 @@ import java.awt.image.BufferedImage;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 
 /**
  * Displays the game score.
  * 
  * @author Armin Reichert
  */
-public class ScoreDisplay extends GameEntity implements ViewController {
+public class ScoreDisplay extends GameEntity implements View,Controller {
 
 	private final Score score;
 	private final float scale;

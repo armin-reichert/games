@@ -11,7 +11,7 @@ import java.util.EnumMap;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 import de.amr.games.muehle.model.board.StoneColor;
 
 /**
@@ -19,7 +19,7 @@ import de.amr.games.muehle.model.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class Stone extends GameEntity implements ViewController {
+public class Stone extends GameEntity implements View {
 
 	static final EnumMap<StoneColor, Color> FILL = new EnumMap<>(StoneColor.class);
 	static final EnumMap<StoneColor, Color> EDGE = new EnumMap<>(StoneColor.class);

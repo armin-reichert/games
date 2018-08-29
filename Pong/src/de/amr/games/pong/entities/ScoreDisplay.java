@@ -6,9 +6,9 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 
-public class ScoreDisplay extends GameEntity implements ViewController {
+public class ScoreDisplay extends GameEntity implements View {
 
 	private final Score scoreLeft;
 	private final Score scoreRight;

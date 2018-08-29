@@ -21,7 +21,8 @@ import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
@@ -36,7 +37,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class StartScene implements ViewController {
+public class StartScene implements View,Controller {
 
 	public enum State {
 		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser

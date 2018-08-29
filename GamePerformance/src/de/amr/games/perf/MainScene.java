@@ -6,9 +6,10 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 
-public class MainScene implements ViewController {
+public class MainScene implements View, Controller {
 
 	private Image bgImg;
 	private int sampleIndex;

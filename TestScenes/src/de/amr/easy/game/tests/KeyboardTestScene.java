@@ -7,9 +7,10 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 
-public class KeyboardTestScene implements ViewController {
+public class KeyboardTestScene implements View, Controller {
 
 	public int getWidth() {
 		return 600;

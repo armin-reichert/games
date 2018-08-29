@@ -5,10 +5,10 @@ import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 import de.amr.games.pong.PongGame;
 
-public class Paddle extends GameEntity implements ViewController {
+public class Paddle extends GameEntity implements View {
 
 	protected int speed = 5;
 	protected Color color = Color.LIGHT_GRAY;

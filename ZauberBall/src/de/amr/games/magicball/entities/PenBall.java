@@ -7,9 +7,9 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 
-public class PenBall extends GameEntity implements ViewController {
+public class PenBall extends GameEntity implements View {
 
 	private final BufferedImage canvas;
 	private int thickness;

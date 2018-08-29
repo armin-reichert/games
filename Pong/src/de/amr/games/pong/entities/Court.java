@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.View;
 
-public class Court extends GameEntity implements ViewController {
+public class Court extends GameEntity implements View {
 
 	private Color bgColor = Color.BLACK;
 	private Color lineColor = Color.WHITE;

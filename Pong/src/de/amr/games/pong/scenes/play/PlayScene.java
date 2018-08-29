@@ -17,7 +17,8 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.ViewController;
+import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.pong.PongGame;
 import de.amr.games.pong.entities.AutoPaddleLeft;
@@ -32,7 +33,7 @@ import de.amr.games.pong.entities.ScoreDisplay;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements ViewController {
+public class PlayScene implements View, Controller {
 
 	/**
 	 * State machine for controlling the play scene.
