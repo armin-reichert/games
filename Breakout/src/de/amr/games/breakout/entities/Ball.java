@@ -4,20 +4,25 @@ import java.awt.Dimension;
 
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.breakout.BreakoutGame;
 
 public class Ball extends GameEntityUsingSprites {
 
-	private final Dimension boardSize;
+	private Dimension boardSize;
 
-	public Ball(BreakoutGame app, int size) {
-		boardSize = new Dimension(app.settings.width, app.settings.height);
-		addSprite("s_ball", new Sprite("ball_green.png").scaleFrame(0, size, size));
+	public Ball(int size) {
+		tf.setWidth(size);
+		tf.setHeight(size);
+		addSprite("s_ball", new Sprite("ball_green.png").scale(size));
 		setCurrentSprite("s_ball");
-		tf.setWidth(currentSprite().getWidth());
-		tf.setHeight(currentSprite().getHeight());
 	}
 
+	public void setBoardSize(Dimension boardSize) {
+		this.boardSize = boardSize;
+	}
+
+	public boolean isOut() {
+		return tf.getY() > boardSize.height;
+	}
 	@Override
 	public void update() {
 		tf.move();
@@ -39,9 +44,5 @@ public class Ball extends GameEntityUsingSprites {
 				tf.setVelocityY(-tf.getVelocityY());
 			}
 		}
-	}
-
-	public boolean isOut() {
-		return tf.getY() > boardSize.height;
 	}
 }

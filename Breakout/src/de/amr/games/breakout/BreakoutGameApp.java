@@ -9,13 +9,13 @@ import de.amr.games.breakout.scenes.PlayScene;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class BreakoutGame extends Application {
+public class BreakoutGameApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new BreakoutGame());
+		launch(new BreakoutGameApp());
 	}
 
-	public BreakoutGame() {
+	public BreakoutGameApp() {
 		settings.title = "Breakout";
 		settings.width = 800;
 		settings.height = 600;

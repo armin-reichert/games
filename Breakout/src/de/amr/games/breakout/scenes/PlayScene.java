@@ -9,6 +9,7 @@ import static de.amr.games.breakout.scenes.PlayState.Playing;
 import static java.awt.event.KeyEvent.VK_SPACE;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -24,7 +25,7 @@ import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.breakout.BreakoutGame;
+import de.amr.games.breakout.BreakoutGameApp;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Bat;
 import de.amr.games.breakout.entities.Brick;
@@ -36,14 +37,16 @@ import de.amr.games.breakout.entities.Brick;
  */
 public class PlayScene implements View, Controller {
 
-	private final BreakoutGame app;
+	private final BreakoutGameApp app;
 	private final PlaySceneControl control;
 	private Bat bat;
 	private Ball ball;
 	private int points;
 	private Image bgImage;
 
-	public PlayScene(BreakoutGame app) {
+	private final Font scoreFont = new Font(Font.SANS_SERIF, Font.PLAIN, 48);
+
+	public PlayScene(BreakoutGameApp app) {
 		this.app = app;
 		control = new PlaySceneControl();
 		control.setLogger(Application.LOGGER);
@@ -111,11 +114,17 @@ public class PlayScene implements View, Controller {
 
 	@Override
 	public void init() {
-		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
-				BufferedImage.SCALE_SMOOTH);
-		ball = app.entities.store(new Ball(app, app.settings.get("ball_size")));
-		bat = app.entities
-				.store(new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"), getWidth()));
+		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
+		Dimension boardSize = new Dimension(getWidth(), getHeight());
+
+		ball = new Ball(app.settings.get("ball_size"));
+		ball.setBoardSize(boardSize);
+		app.entities.store(ball);
+		
+		bat = new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"));
+		bat.setBoardSize(boardSize);
+		app.entities.store(bat);
+		
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -140,7 +149,7 @@ public class PlayScene implements View, Controller {
 	}
 
 	private void newBricks() {
-		final Brick.Type[] brickTypes = Brick.Type.values();
+		final Brick.BrickColor[] brickTypes = Brick.BrickColor.values();
 		final int brickWidth = getWidth() / 10;
 		final int brickHeight = brickWidth / 4;
 		final int brickSpacing = brickHeight / 2;
@@ -153,7 +162,7 @@ public class PlayScene implements View, Controller {
 
 		int x = startX, y = startY;
 		for (int row = 0; row < numRows; ++row) {
-			Brick.Type type = brickTypes[row];
+			Brick.BrickColor type = brickTypes[row];
 			int value = 5 * (numRows - row);
 			for (int col = 0; col < numCols; ++col) {
 				Brick brick = new Brick(brickWidth, brickHeight, type, value);
@@ -171,8 +180,7 @@ public class PlayScene implements View, Controller {
 		bat.speed = getWidth() / 48;
 		bat.tf().moveTo((getWidth() - bat.tf().getWidth()) / 2, getHeight() - bat.tf().getHeight());
 		bat.tf().setVelocity(0, 0);
-		ball.tf().moveTo((getWidth() - ball.tf().getWidth()) / 2,
-				bat.tf().getY() - ball.tf().getHeight());
+		ball.tf().moveTo((getWidth() - ball.tf().getWidth()) / 2, bat.tf().getY() - ball.tf().getHeight());
 		ball.tf().setVelocity(0, 0);
 	}
 
@@ -200,15 +208,11 @@ public class PlayScene implements View, Controller {
 		}
 	}
 
-	private final Font scoreFont = new Font(Font.SANS_SERIF, Font.PLAIN, 48);
-
 	private void drawScore(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setFont(scoreFont);
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
-		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2,
-				getHeight() * 3 / 4);
+		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
 	}
 }
