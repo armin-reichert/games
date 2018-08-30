@@ -16,7 +16,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
@@ -31,6 +30,7 @@ import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGameEvent;
+import de.amr.games.birdy.utils.Score;
 
 /**
  * Play scene of the game.

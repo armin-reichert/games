@@ -7,13 +7,13 @@ import static java.awt.event.KeyEvent.VK_Y;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pong.entities.AutoPaddleLeft;
 import de.amr.games.pong.entities.AutoPaddleRight;
 import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
+import de.amr.games.pong.entities.Score;
 import de.amr.games.pong.entities.ScoreDisplay;
 import de.amr.games.pong.scenes.menu.MenuScene;
 import de.amr.games.pong.scenes.play.PlayScene;

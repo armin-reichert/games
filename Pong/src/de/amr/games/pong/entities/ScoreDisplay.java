@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.view.View;
 

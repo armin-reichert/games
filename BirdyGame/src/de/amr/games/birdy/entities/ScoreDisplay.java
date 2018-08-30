@@ -7,9 +7,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.controls.Score;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.view.View;
+import de.amr.games.birdy.utils.Score;
 
 /**
  * Displays the game score.
