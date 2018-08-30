@@ -1,7 +1,12 @@
 package de.amr.games.pong.scenes.menu;
 
+import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.PULSE;
 import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
-import static de.amr.games.pong.PongGame.PlayMode.Player1_Player2;
+import static de.amr.games.pong.PongGameApp.PlayMode.Computer_Computer;
+import static de.amr.games.pong.PongGameApp.PlayMode.Computer_Player2;
+import static de.amr.games.pong.PongGameApp.PlayMode.Player1_Computer;
+import static de.amr.games.pong.PongGameApp.PlayMode.Player1_Player2;
 import static java.awt.event.KeyEvent.VK_ENTER;
 
 import java.awt.Color;
@@ -10,12 +15,12 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.Application;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.pong.PongGame;
-import de.amr.games.pong.PongGame.PlayMode;
+import de.amr.games.pong.PongGameApp;
+import de.amr.games.pong.PongGameApp.PlayMode;
+import de.amr.statemachine.StateMachine;
 
 /**
  * The menu scene of the "Pong" game.
@@ -24,20 +29,20 @@ import de.amr.games.pong.PongGame.PlayMode;
  */
 public class MenuScene implements View, Controller {
 
-	private final PongGame app;
+	private final PongGameApp app;
 	private final int width;
 	private final int height;
-	private final StateMachine<PlayMode, String> control;
+	private final StateMachine<PlayMode, Object> control;
 	private Color bgColor;
 	private Color bgColorSelected;
 	private Color hilightColor;
 
-	public MenuScene(PongGame app) {
+	public MenuScene(PongGameApp app) {
 		this.app = app;
 		this.width = app.settings.width;
 		this.height = app.settings.height;
 		control = createStateMachine();
-		control.setLogger(Application.LOGGER);
+		control.traceTo(LOGGER, PULSE::getFrequency);
 	}
 
 	@Override
@@ -47,19 +52,32 @@ public class MenuScene implements View, Controller {
 		hilightColor = Color.YELLOW;
 	}
 
-	private StateMachine<PlayMode, String> createStateMachine() {
-		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class,
-				Player1_Player2);
-		PlayMode[] playModes = PlayMode.values();
-		for (int i = 0, n = playModes.length; i < n; i += 1) {
-			fsm.change(playModes[i], playModes[(i + 1) % n], () -> keyPressedOnce(KeyEvent.VK_DOWN));
-			fsm.change(playModes[i], playModes[(i - 1 + n) % n], () -> keyPressedOnce(KeyEvent.VK_UP));
-		}
-		return fsm;
+	private StateMachine<PlayMode, Object> createStateMachine() {
+		return
+		//@formatter:off
+		StateMachine.define(PlayMode.class, Object.class)
+		.description("Pong Menu")
+		.initialState(Player1_Player2)
+		.states()
+		.state(Player1_Player2)
+		.state(Player1_Computer)
+		.state(Computer_Player2)
+		.state(Computer_Computer)
+		.transitions()
+		.when(PlayMode.Player1_Player2).then(Player1_Computer).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_DOWN))
+		.when(PlayMode.Player1_Computer).then(Computer_Player2).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_DOWN))
+		.when(PlayMode.Computer_Player2).then(Computer_Computer).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_DOWN))
+		.when(PlayMode.Computer_Computer).then(Player1_Player2).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_DOWN))
+		.when(PlayMode.Player1_Player2).then(Computer_Computer).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_UP))
+		.when(PlayMode.Computer_Computer).then(Computer_Player2).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_UP))
+		.when(PlayMode.Computer_Player2).then(Player1_Computer).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_UP))
+		.when(PlayMode.Player1_Computer).then(Player1_Player2).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_UP))
+		.endStateMachine();
+		//@formatter:on
 	}
 
 	public PlayMode getSelectedPlayMode() {
-		return control.stateID();
+		return control.currentState();
 	}
 
 	public void setSelectedPlayMode(PlayMode mode) {

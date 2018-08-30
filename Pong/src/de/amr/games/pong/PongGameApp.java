@@ -23,21 +23,21 @@ import de.amr.games.pong.scenes.play.PlayScene;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PongGame extends Application {
+public class PongGameApp extends Application {
 
 	public enum PlayMode {
 		Player1_Player2, Player1_Computer, Computer_Player2, Computer_Computer
 	}
 
 	public static void main(String[] args) {
-		launch(new PongGame());
+		launch(new PongGameApp());
 	}
 
 	private Score scorePlayerLeft, scorePlayerRight;
 	public MenuScene menuScene;
 	public PlayScene playScene;
 
-	public PongGame() {
+	public PongGameApp() {
 		settings.title = "Pong";
 		settings.width = 640;
 		settings.height = 480;
@@ -51,25 +51,18 @@ public class PongGame extends Application {
 		Assets.sound("plop.mp3");
 		Assets.sound("plip.mp3");
 		Assets.sound("out.mp3");
-
 		entities.store(new Court(settings.width, settings.height));
 		entities.store(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
-
 		entities.store(new Ball(settings.height));
-
 		entities.store(new AutoPaddleLeft(this));
 		entities.store(new AutoPaddleRight(this));
-
 		Paddle paddleLeft = new Paddle(this, VK_A, VK_Y);
 		entities.store("paddleLeft", paddleLeft);
-
 		Paddle paddleRight = new Paddle(this, VK_UP, VK_DOWN);
 		entities.store("paddleRight", paddleRight);
-
 		menuScene = new MenuScene(this);
 		playScene = new PlayScene(this);
 		setController(menuScene);
-
 		setPlayMode(PlayMode.Player1_Player2);
 	}
 

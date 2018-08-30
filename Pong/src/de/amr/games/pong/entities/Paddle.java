@@ -6,16 +6,16 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
-import de.amr.games.pong.PongGame;
+import de.amr.games.pong.PongGameApp;
 
 public class Paddle extends GameEntity implements View {
 
 	protected int speed = 5;
 	protected Color color = Color.LIGHT_GRAY;
-	protected PongGame game;
+	protected PongGameApp game;
 	private final int paddleUpKey, paddleDownKey;
 
-	public Paddle(PongGame game, int keyUp, int keyDown) {
+	public Paddle(PongGameApp game, int keyUp, int keyDown) {
 		this.game = game;
 		this.paddleUpKey = keyUp;
 		this.paddleDownKey = keyDown;

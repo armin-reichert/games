@@ -1,32 +1,32 @@
 package de.amr.games.pong.scenes.play;
 
-import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
-import static de.amr.games.pong.scenes.play.PlaySceneState.GameOver;
-import static de.amr.games.pong.scenes.play.PlaySceneState.Initialized;
-import static de.amr.games.pong.scenes.play.PlaySceneState.Playing;
-import static de.amr.games.pong.scenes.play.PlaySceneState.Serving;
+import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.PULSE;
+import static de.amr.games.pong.scenes.play.PlayState.GAME_OVER;
+import static de.amr.games.pong.scenes.play.PlayState.INIT;
+import static de.amr.games.pong.scenes.play.PlayState.PLAYING;
+import static de.amr.games.pong.scenes.play.PlayState.SERVING;
 import static java.awt.event.KeyEvent.VK_C;
-import static java.awt.event.KeyEvent.VK_SPACE;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
-import de.amr.games.pong.PongGame;
+import de.amr.games.pong.PongGameApp;
 import de.amr.games.pong.entities.AutoPaddleLeft;
 import de.amr.games.pong.entities.AutoPaddleRight;
 import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.ScoreDisplay;
+import de.amr.statemachine.StateMachine;
 
 /**
  * The play scene of the "Pong" game.
@@ -35,68 +35,58 @@ import de.amr.games.pong.entities.ScoreDisplay;
  */
 public class PlayScene implements View, Controller {
 
-	/**
-	 * State machine for controlling the play scene.
-	 */
-	private StateMachine<PlaySceneState, PlaySceneEvent> createStateMachine() {
-
-		StateMachine<PlaySceneState, PlaySceneEvent> fsm = new StateMachine<>("PongControl",
-				PlaySceneState.class, Initialized);
-
-		// Initialized
-
-		fsm.change(Initialized, Serving, () -> true, t -> resetScores());
-
-		// Serving
-
-		fsm.state(Serving).entry = s -> {
-			s.setDuration(Application.PULSE.secToTicks(2));
-			prepareService();
-		};
-
-		fsm.changeOnTimeout(Serving, Playing, t -> serveBall());
-
-		// Playing
-
-		fsm.state(Playing).update = s -> app.entities.all().forEach(GameEntity::update);
-
-		fsm.change(Playing, Playing, () -> leftPaddleHitsBall(), t -> bounceBallFromLeftPaddle());
-
-		fsm.change(Playing, Playing, () -> rightPaddleHitsBall(), t -> bounceBallFromRightPaddle());
-
-		fsm.change(Playing, Serving, () -> isBallOutLeft(), t -> assignPointToRightPlayer());
-
-		fsm.change(Playing, Serving, () -> isBallOutRight(), t -> assignPointToLeftPlayer());
-
-		fsm.change(Playing, GameOver, () -> leftPlayerWins() || rightPlayerWins());
-
-		// GameOver
-
-		fsm.change(GameOver, Initialized, () -> keyPressedOnce(VK_SPACE));
-
-		return fsm;
-	}
-
-	private final PongGame app;
+	private final PongGameApp app;
+	private final StateMachine<PlayState, Object> fsm;
 	private final int width;
 	private final int height;
-	private final StateMachine<PlaySceneState, PlaySceneEvent> control;
+
 	private Court court;
 	private Paddle paddleLeft;
 	private Paddle paddleRight;
 	private Ball ball;
 	private ScoreDisplay score;
 
-	public PlayScene(PongGame app) {
+	public PlayScene(PongGameApp app) {
 		this.app = app;
-		this.width = app.settings.width;
-		this.height = app.settings.height;
-		control = createStateMachine();
-		control.setLogger(Application.LOGGER);
+		width = app.settings.width;
+		height = app.settings.height;
+		fsm = createStateMachine();
+		fsm.traceTo(LOGGER, PULSE::getFrequency);
+	}
+
+	private StateMachine<PlayState, Object> createStateMachine() {
+		return
+		//@formatter:off
+		StateMachine.define(PlayState.class, Object.class)
+		.description("Pong")	
+		.initialState(INIT)
+	
+		.states()
+		.state(INIT).onEntry(this::resetPaddles)
+		.state(SERVING).timeoutAfter(() -> PULSE.secToTicks(2)).onEntry(this::prepareService)
+		.state(PLAYING).onTick(()-> app.entities.all().forEach(GameEntity::update))
+		.state(GAME_OVER)
+			
+		.transitions()
+		.when(INIT).then(SERVING).act(this::resetScores)
+		.when(SERVING).then(PLAYING).onTimeout().act(this::serveBall)
+		.stay(PLAYING).condition(this::leftPaddleHitsBall).act(this::returnBallWithLeftPaddle)
+		.stay(PLAYING).condition(this::rightPaddleHitsBall).act(this::returnBallWithRightPaddle)
+		.when(PLAYING).then(SERVING).condition(this::isBallOutLeft).act(this::assignPointToRightPlayer)
+		.when(PLAYING).then(SERVING).condition(this::isBallOutRight).act(this::assignPointToLeftPlayer)
+		.when(PLAYING).then(GAME_OVER).condition(() -> leftPlayerWins() || rightPlayerWins())
+		.when(GAME_OVER).then(INIT).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+		.endStateMachine();
+		//@formatter:on
 	}
 
 	@Override
 	public void init() {
+		initEntities();
+		fsm.init();
+	}
+
+	private void initEntities() {
 		court = app.entities.ofClass(Court.class).findFirst().get();
 		switch (app.getPlayMode()) {
 		case Computer_Computer:
@@ -118,9 +108,8 @@ public class PlayScene implements View, Controller {
 		}
 		ball = app.entities.ofClass(Ball.class).findFirst().get();
 		score = app.entities.ofClass(ScoreDisplay.class).findFirst().get();
-		score.centerHorizontally(width);
 		score.tf.setY(100);
-		control.init();
+		score.centerHorizontally(width);
 	}
 
 	@Override
@@ -128,13 +117,12 @@ public class PlayScene implements View, Controller {
 		if (Keyboard.keyPressedOnce(VK_C) && Keyboard.isControlDown()) {
 			app.setController(app.menuScene);
 		}
-		control.update();
+		fsm.update();
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		// draw in z-order:
 		court.draw(g);
 		paddleLeft.draw(g);
 		paddleRight.draw(g);
@@ -145,6 +133,7 @@ public class PlayScene implements View, Controller {
 		} else if (rightPlayerWins()) {
 			drawWinner(g, "Right wins!");
 		}
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 
 	private void drawWinner(Graphics2D g, String text) {
@@ -203,12 +192,12 @@ public class PlayScene implements View, Controller {
 		return ball.tf.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
 	}
 
-	private void bounceBallFromLeftPaddle() {
+	private void returnBallWithLeftPaddle() {
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plop.mp3").play();
 	}
 
-	private void bounceBallFromRightPaddle() {
+	private void returnBallWithRightPaddle() {
 		ball.tf.setVelocityX(-ball.tf.getVelocityX());
 		Assets.sound("plip.mp3").play();
 	}

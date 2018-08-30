@@ -2,13 +2,13 @@ package de.amr.games.pong.entities;
 
 import static java.awt.event.KeyEvent.VK_UNDEFINED;
 
-import de.amr.games.pong.PongGame;
+import de.amr.games.pong.PongGameApp;
 
 public class AutoPaddleLeft extends Paddle {
 
 	private float ballLeftY;
 
-	public AutoPaddleLeft(PongGame game) {
+	public AutoPaddleLeft(PongGameApp game) {
 		super(game, VK_UNDEFINED, VK_UNDEFINED);
 	}
 
