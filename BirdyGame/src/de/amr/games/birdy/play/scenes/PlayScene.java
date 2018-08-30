@@ -37,7 +37,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements View,Controller {
+public class PlayScene implements View, Controller {
 
 	private final BirdyGameApp app;
 	private final PlaySceneControl control;
@@ -66,8 +66,7 @@ public class PlayScene implements View,Controller {
 
 			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, t -> {
 				score.points -= 3;
-				bird.tf
-						.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.tf.getWidth());
+				bird.tf.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.tf.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				Assets.sound("sfx/hit.mp3").play();
 			});

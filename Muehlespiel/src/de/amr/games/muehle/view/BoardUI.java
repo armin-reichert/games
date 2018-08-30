@@ -30,7 +30,7 @@ import de.amr.games.muehle.model.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class BoardUI extends GameEntity implements View,Controller {
+public class BoardUI extends GameEntity implements View, Controller {
 
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3,
 			5, 0, 3, 6 };

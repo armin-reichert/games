@@ -20,7 +20,8 @@ import de.amr.games.montagsmaler.tools.ScrollingCanvas;
  */
 public class Ceremony extends ScrollingCanvas {
 
-	private static final Image OLYMPIC_RINGS = Tools.loadImageIcon("images/olympische-ringe.jpg").getImage();
+	private static final Image OLYMPIC_RINGS = Tools.loadImageIcon("images/olympische-ringe.jpg")
+			.getImage();
 	private static final Font FONT = new Font("Cooper Black", Font.PLAIN, 36);
 
 	private final List<Player> honoredPlayers = new ArrayList<Player>();

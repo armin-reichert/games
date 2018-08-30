@@ -10,7 +10,7 @@ import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 
-public class MouseTestScene implements View,Controller {
+public class MouseTestScene implements View, Controller {
 
 	private final MouseTestApp app;
 	private TextArea messageDisplay;

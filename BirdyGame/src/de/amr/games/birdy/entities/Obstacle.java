@@ -38,7 +38,8 @@ public class Obstacle extends GameEntity implements View {
 				height - passageRadius - passageCenterY);
 		pipeDown = Assets.image("pipe_down").getScaledInstance(width, (int) upperPart.getHeight(),
 				BufferedImage.SCALE_SMOOTH);
-		pipeUp = Assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(), BufferedImage.SCALE_SMOOTH);
+		pipeUp = Assets.image("pipe_up").getScaledInstance(width, (int) lowerPart.getHeight(),
+				BufferedImage.SCALE_SMOOTH);
 	}
 
 	@Override
@@ -53,8 +54,8 @@ public class Obstacle extends GameEntity implements View {
 		if (lighted) {
 			int inset = (int) passage.getWidth() / 10;
 			g.setColor(new Color(255, 255, 0, rand.nextInt(170)));
-			g.fillRect((int) passage.getX() + inset, (int) passage.getY(), (int) (passage.getWidth() - 2 * inset),
-					(int) passage.getHeight());
+			g.fillRect((int) passage.getX() + inset, (int) passage.getY(),
+					(int) (passage.getWidth() - 2 * inset), (int) passage.getHeight());
 		}
 		g.drawImage(pipeUp, 0, (int) (upperPart.getHeight() + passage.getHeight()), null);
 		g.translate(-tf.getX(), -tf.getY());
@@ -65,16 +66,18 @@ public class Obstacle extends GameEntity implements View {
 	}
 
 	public Collider getUpperPart() {
-		return () -> new Rectangle2D.Double(tf.getX(), tf.getY(), upperPart.getWidth(), upperPart.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY(), upperPart.getWidth(),
+				upperPart.getHeight());
 	}
 
 	public Collider getLowerPart() {
-		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight() + passage.getHeight(),
-				lowerPart.getWidth(), lowerPart.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(),
+				tf.getY() + upperPart.getHeight() + passage.getHeight(), lowerPart.getWidth(),
+				lowerPart.getHeight());
 	}
 
 	public Collider getPassage() {
-		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight(), passage.getWidth(),
-				passage.getHeight());
+		return () -> new Rectangle2D.Double(tf.getX(), tf.getY() + upperPart.getHeight(),
+				passage.getWidth(), passage.getHeight());
 	}
 }

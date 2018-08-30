@@ -51,8 +51,9 @@ public class EnhancedFileChooser extends JFileChooser {
 				 * Make reasonably sure we have an image format that AWT can handle so we don't try to draw
 				 * something silly.
 				 */
-				if ((name != null) && name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".jpeg")
-						|| name.toLowerCase().endsWith(".gif") || name.toLowerCase().endsWith(".png")) {
+				if ((name != null) && name.toLowerCase().endsWith(".jpg")
+						|| name.toLowerCase().endsWith(".jpeg") || name.toLowerCase().endsWith(".gif")
+						|| name.toLowerCase().endsWith(".png")) {
 					icon = new ImageIcon(name);
 					image = icon.getImage();
 					scaleImage();
@@ -67,8 +68,8 @@ public class EnhancedFileChooser extends JFileChooser {
 			double ratio = 1.0;
 
 			/*
-			 * Determine how to scale the image. Since the accessory can expand vertically make sure we don't go
-			 * larger than 150 when scaling vertically.
+			 * Determine how to scale the image. Since the accessory can expand vertically make sure we
+			 * don't go larger than 150 when scaling vertically.
 			 */
 			if (width >= height) {
 				ratio = (double) (ACCSIZE - 5) / width;
@@ -94,10 +95,10 @@ public class EnhancedFileChooser extends JFileChooser {
 			g.setColor(bg);
 
 			/*
-			 * If we don't do this, we will end up with garbage from previous images if they have larger sizes
-			 * than the one we are currently drawing. Also, it seems that the file list can paint outside of its
-			 * rectangle, and will cause odd behavior if we don't clear or fill the rectangle for the accessory
-			 * before drawing. This might be a bug in JFileChooser.
+			 * If we don't do this, we will end up with garbage from previous images if they have larger
+			 * sizes than the one we are currently drawing. Also, it seems that the file list can paint
+			 * outside of its rectangle, and will cause odd behavior if we don't clear or fill the
+			 * rectangle for the accessory before drawing. This might be a bug in JFileChooser.
 			 */
 			g.fillRect(0, 0, ACCSIZE, getHeight());
 			g.drawImage(image, getWidth() / 2 - width / 2 + 5, getHeight() / 2 - height / 2, this);

@@ -23,6 +23,7 @@ public class Ball extends GameEntityUsingSprites {
 	public boolean isOut() {
 		return tf.getY() > boardSize.height;
 	}
+
 	@Override
 	public void update() {
 		tf.move();

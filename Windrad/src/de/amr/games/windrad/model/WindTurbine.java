@@ -22,8 +22,8 @@ public class WindTurbine {
 	private final Path2D tower;
 	private final Ellipse2D.Float nacelle;
 
-	public WindTurbine(float baseX, float baseY, float towerHeight, float towerWidthBottom, float towerWidthTop,
-			float nacelleRadius, float rotorLength, float rotorThickness) {
+	public WindTurbine(float baseX, float baseY, float towerHeight, float towerWidthBottom,
+			float towerWidthTop, float nacelleRadius, float rotorLength, float rotorThickness) {
 
 		this.towerHeight = towerHeight;
 		this.towerWidthBottom = towerWidthBottom;

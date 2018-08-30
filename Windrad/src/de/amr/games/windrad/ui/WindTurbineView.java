@@ -63,8 +63,8 @@ public class WindTurbineView {
 		g.setColor(nacelleColor);
 		g.fill(turbine.getNacelle());
 
-		Ellipse2D.Float rotor = new Ellipse2D.Float(0, -turbine.getRotorThickness() / 2, turbine.getRotorLength(),
-				turbine.getRotorThickness());
+		Ellipse2D.Float rotor = new Ellipse2D.Float(0, -turbine.getRotorThickness() / 2,
+				turbine.getRotorLength(), turbine.getRotorThickness());
 		g.setColor(selected ? Color.YELLOW : rotorColor);
 		AffineTransform ot = g.getTransform();
 		for (int i = 0, n = turbine.getRotorCount(); i < n; ++i) {

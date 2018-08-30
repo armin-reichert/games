@@ -249,7 +249,8 @@ public class GameEditor extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				final Color selectedColor = JColorChooser.showDialog(GameEditor.this, "Stiftfarbe auswählen", penColor);
+				final Color selectedColor = JColorChooser.showDialog(GameEditor.this,
+						"Stiftfarbe auswählen", penColor);
 				if (selectedColor != null) {
 					penColor = selectedColor;
 					penColorPreview.setBackground(penColor);

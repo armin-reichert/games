@@ -26,7 +26,7 @@ import de.amr.games.birdy.entities.City;
  * 
  * @author Armin Reichert
  */
-public class IntroScene implements View,Controller {
+public class IntroScene implements View, Controller {
 
 	private static final String CREDITS_TEXT = "Anna proudly presents\nin cooperation with\nProf. Zwickmann\nGeräteschuppen Software 2017";
 

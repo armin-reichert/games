@@ -27,7 +27,7 @@ import de.amr.games.muehle.msg.Messages;
  * 
  * @author Armin Reichert
  */
-public class MillGameScene implements View,Controller, MillGameUI {
+public class MillGameScene implements View, Controller, MillGameUI {
 
 	private final MillGameApp app;
 	private final MillGameController controller;

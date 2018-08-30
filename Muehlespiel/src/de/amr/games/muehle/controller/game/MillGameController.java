@@ -230,7 +230,8 @@ public class MillGameController extends MillGameStateMachine implements VisualCo
 				LOGGER.info(Messages.text("stone_at_position_not_existing", p));
 			} else if (model.board.getStoneAt(p).get() != colorToRemove) {
 				LOGGER.info(Messages.text("stone_at_position_wrong_color", p));
-			} else if (model.board.inMill(p, colorToRemove) && !model.board.allStonesInMills(colorToRemove)) {
+			} else if (model.board.inMill(p, colorToRemove)
+					&& !model.board.allStonesInMills(colorToRemove)) {
 				LOGGER.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				view.removeStoneAt(p);
@@ -286,6 +287,7 @@ public class MillGameController extends MillGameStateMachine implements VisualCo
 
 	@Override
 	protected boolean shallStartNewGame() {
-		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive() || Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);
+		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive()
+				|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);
 	}
 }

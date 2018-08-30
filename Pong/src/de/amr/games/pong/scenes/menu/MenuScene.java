@@ -48,7 +48,8 @@ public class MenuScene implements View, Controller {
 	}
 
 	private StateMachine<PlayMode, String> createStateMachine() {
-		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class, Player1_Player2);
+		StateMachine<PlayMode, String> fsm = new StateMachine<>("Pong Menu", PlayMode.class,
+				Player1_Player2);
 		PlayMode[] playModes = PlayMode.values();
 		for (int i = 0, n = playModes.length; i < n; i += 1) {
 			fsm.change(playModes[i], playModes[(i + 1) % n], () -> keyPressedOnce(KeyEvent.VK_DOWN));

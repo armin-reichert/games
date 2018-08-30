@@ -32,17 +32,17 @@ public class Lever extends GameEntity implements View {
 		g.setColor(new Color(200, 200, 200));
 		g.setStroke(new BasicStroke(4));
 		g.translate(tf.getX(), tf.getY());
-		g.translate(size/2, size/2);
+		g.translate(size / 2, size / 2);
 		if (pointsLeft) {
 			g.drawLine(leg, -leg, -leg, leg);
 		} else {
 			g.drawLine(-leg, -leg, leg, leg);
 		}
-		g.translate(-size/2, -size/2);
-		g.fillOval(size/4, size/4, size/2, size/2);
+		g.translate(-size / 2, -size / 2);
+		g.fillOval(size / 4, size / 4, size / 2, size / 2);
 		g.translate(-tf.getX(), -tf.getY());
-//		g.setColor(Color.BLACK);
-//		g.setStroke(new BasicStroke(1));
-//		g.draw(getCollisionBox());
+		// g.setColor(Color.BLACK);
+		// g.setStroke(new BasicStroke(1));
+		// g.draw(getCollisionBox());
 	}
 }

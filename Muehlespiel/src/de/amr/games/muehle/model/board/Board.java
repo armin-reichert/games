@@ -567,7 +567,8 @@ public class Board {
 
 	private boolean isPartOfOpenXMill(int p, StoneColor color, int[][] mill) {
 		int q = mill[p][0], r = mill[p][1];
-		return has(p, color) && has(q, color) && has(r, null) || has(p, color) && has(q, null) && has(r, color);
+		return has(p, color) && has(q, color) && has(r, null)
+				|| has(p, color) && has(q, null) && has(r, color);
 	}
 
 	/**
@@ -634,7 +635,8 @@ public class Board {
 
 	private boolean isXMillOpenedAt(int p, StoneColor color, int[] mill) {
 		int q = mill[0], r = mill[1];
-		return has(p, null) && has(q, color) && has(r, null) || has(p, null) && has(q, null) && has(r, color);
+		return has(p, null) && has(q, color) && has(r, null)
+				|| has(p, null) && has(q, null) && has(r, color);
 	}
 
 	/**
@@ -655,8 +657,8 @@ public class Board {
 	 *                a valid position
 	 * @param color
 	 *                a stone color
-	 * @return if placing a stone of the given color at the given position would open two mills of that
-	 *         color
+	 * @return if placing a stone of the given color at the given position would open two mills of
+	 *         that color
 	 */
 	public boolean areTwoMillsOpenedAt(int p, StoneColor color) {
 		checkPosition(p);
@@ -762,7 +764,8 @@ public class Board {
 	 */
 	public IntStream positionsOpeningTwoMillsLater(StoneColor color) {
 		checkStoneColor(color);
-		return positions().filter(this::isEmptyPosition).filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
+		return positions().filter(this::isEmptyPosition)
+				.filter(p -> hasTwoMillsLaterPartnerPosition(p, color));
 	}
 
 	/**
@@ -770,12 +773,14 @@ public class Board {
 	 *                valid position
 	 * @param color
 	 *                stone color
-	 * @return if by placing a stone of the given color at the position later two mills could be opened
+	 * @return if by placing a stone of the given color at the position later two mills could be
+	 *         opened
 	 */
 	public boolean hasTwoMillsLaterPartnerPosition(int p, StoneColor color) {
 		checkPosition(p);
 		checkStoneColor(color);
-		return nextToNeighbors(p).filter(q -> get(q) == color).anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
+		return nextToNeighbors(p).filter(q -> get(q) == color)
+				.anyMatch(q -> areTwoMillsPossibleLater(p, q, color));
 	}
 
 	private boolean areTwoMillsPossibleLater(int p, int q, StoneColor color) {
@@ -793,7 +798,7 @@ public class Board {
 		if (!otherNeighbor2.isPresent()) {
 			otherNeighbor2 = neighbor(commonNeighbor, dir2);
 		}
-		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt()) && otherNeighbor2.isPresent()
-				&& isEmptyPosition(otherNeighbor2.getAsInt());
+		return otherNeighbor1.isPresent() && isEmptyPosition(otherNeighbor1.getAsInt())
+				&& otherNeighbor2.isPresent() && isEmptyPosition(otherNeighbor2.getAsInt());
 	}
 }

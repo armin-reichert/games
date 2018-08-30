@@ -37,7 +37,7 @@ import de.amr.games.birdy.play.BirdyGameEvent;
  * 
  * @author Armin Reichert
  */
-public class StartScene implements View,Controller {
+public class StartScene implements View, Controller {
 
 	public enum State {
 		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser

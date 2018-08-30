@@ -18,19 +18,24 @@ public enum RemovalRules implements RemovalRule {
 
 	STONE_IN_OPEN_MILL(
 			"Entferne Stein an Position %d, weil er Teil einer offenen Mühle ist",
-			(board, player, color) -> randomElement(
-					board.positions(color).filter(p -> !board.inMill(p, color)).filter(p -> board.isPartOfOpenMill(p, color)))),
+			(board, player,
+					color) -> randomElement(board.positions(color).filter(p -> !board.inMill(p, color))
+							.filter(p -> board.isPartOfOpenMill(p, color)))),
 
 	STONE_WHICH_CAN_MOVE(
 			"Entferne Stein an Position %d, weil er bewegt werden kann",
-			(board, player, color) -> randomElement(
-					board.positions(color).filter(p -> !board.inMill(p, color)).filter(board::hasEmptyNeighbor))),
+			(board, player,
+					color) -> randomElement(board.positions(color).filter(p -> !board.inMill(p, color))
+							.filter(board::hasEmptyNeighbor))),
 
 	RANDOM_OUTSIDE_MILL(
 			"Entferne Stein außerhalb eine Mühle an Position %d",
-			(board, player, color) -> randomElement(board.positions(color).filter(p -> !board.inMill(p, color)))),
+			(board, player,
+					color) -> randomElement(board.positions(color).filter(p -> !board.inMill(p, color)))),
 
-	RANDOM("Entferne Stein an Position %d", (board, player, color) -> randomElement(board.positions(color))),
+	RANDOM(
+			"Entferne Stein an Position %d",
+			(board, player, color) -> randomElement(board.positions(color))),
 
 	;
 
@@ -46,14 +51,16 @@ public enum RemovalRules implements RemovalRule {
 		return description;
 	}
 
-	private RemovalRules(String description, TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier,
+	private RemovalRules(String description,
+			TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier,
 			TriFunction<Board, Player, StoneColor, Boolean> condition) {
 		this.description = description;
 		this.positionSupplier = positionSupplier;
 		this.condition = condition;
 	}
 
-	private RemovalRules(String description, TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier) {
+	private RemovalRules(String description,
+			TriFunction<Board, Player, StoneColor, OptionalInt> positionSupplier) {
 		this(description, positionSupplier, (board, player, removalColor) -> true);
 	}
 

@@ -114,17 +114,18 @@ public class PlayScene implements View, Controller {
 
 	@Override
 	public void init() {
-		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
+		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
+				BufferedImage.SCALE_SMOOTH);
 		Dimension boardSize = new Dimension(getWidth(), getHeight());
 
 		ball = new Ball(app.settings.get("ball_size"));
 		ball.setBoardSize(boardSize);
 		app.entities.store(ball);
-		
+
 		bat = new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"));
 		bat.setBoardSize(boardSize);
 		app.entities.store(bat);
-		
+
 		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
 		control.init();
 	}
@@ -209,10 +210,12 @@ public class PlayScene implements View, Controller {
 	}
 
 	private void drawScore(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setFont(scoreFont);
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
-		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
+		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2,
+				getHeight() * 3 / 4);
 	}
 }
