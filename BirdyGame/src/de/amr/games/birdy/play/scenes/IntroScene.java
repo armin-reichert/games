@@ -29,8 +29,8 @@ import de.amr.games.birdy.entities.City;
  */
 public class IntroScene implements View, Controller {
 
-	private static final String CREDITS_TEXT = "Anna proudly presents" + "\nin cooperation with"
-			+ "\nProf. Zwickmann" + "\nGeräteschuppen Software 2017";
+	private static final String CREDITS_TEXT = "Anna proudly presents" + "\nin cooperation with" + "\nProf. Zwickmann"
+			+ "\nGeräteschuppen Software 2017";
 
 	public enum State {
 		CREDITS, WAITING, TITLE, COMPLETE
@@ -46,7 +46,7 @@ public class IntroScene implements View, Controller {
 	private TextArea textAnimation;
 
 	public IntroScene(BirdyGameApp app) {
-		
+
 		this.width = app.settings.width;
 		this.height = app.settings.height;
 		this.entities = app.entities;
@@ -56,15 +56,14 @@ public class IntroScene implements View, Controller {
 		// ShowCredits
 		fsm.state(CREDITS).entry = s -> {
 			textAnimation.tf.setY(height);
-			textAnimation.setScrollSpeed(-.75f);
+			textAnimation.setSpeedY(-.75f);
 			logoAnimation.setVisible(false);
 			Assets.sound("music/bgmusic.mp3").loop();
 		};
 
 		fsm.state(CREDITS).update = s -> textAnimation.update();
 
-		fsm.change(CREDITS, WAITING,
-				() -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2,
+		fsm.change(CREDITS, WAITING, () -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2,
 				t -> t.to().setDuration(PULSE.secToTicks(2)));
 
 		// Wait
@@ -95,9 +94,8 @@ public class IntroScene implements View, Controller {
 		logoAnimation.setScale(3);
 		logoAnimation.center(width, height);
 
-		textAnimation = new TextArea(CREDITS_TEXT);
-		textAnimation.setFont(Assets.font("Pacifico-Regular"));
-		textAnimation.setColor(city.isNight() ? Color.WHITE : Color.DARK_GRAY);
+		textAnimation = TextArea.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))
+				.color(city.isNight() ? Color.WHITE : Color.DARK_GRAY).build();
 		textAnimation.centerHorizontally(width);
 
 		fsm.setLogger(Application.LOGGER);
