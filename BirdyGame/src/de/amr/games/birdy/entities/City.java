@@ -1,10 +1,10 @@
 package de.amr.games.birdy.entities;
 
 import static de.amr.easy.game.Application.PULSE;
-import static de.amr.games.birdy.entities.City.CityEvent.SunGoesDown;
-import static de.amr.games.birdy.entities.City.CityEvent.SunGoesUp;
-import static de.amr.games.birdy.entities.City.CityState.Day;
-import static de.amr.games.birdy.entities.City.CityState.Night;
+import static de.amr.games.birdy.entities.City.DayEvent.SUNRISE;
+import static de.amr.games.birdy.entities.City.DayEvent.SUNSET;
+import static de.amr.games.birdy.entities.City.DayTime.DAY;
+import static de.amr.games.birdy.entities.City.DayTime.NIGHT;
 import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.awt.Graphics2D;
@@ -27,68 +27,71 @@ import de.amr.games.birdy.BirdyGameApp;
  */
 public class City extends GameEntityUsingSprites {
 
-	public enum CityState {
-		Day, Night
+	public enum DayTime {
+		DAY, NIGHT
 	}
 
-	public enum CityEvent {
-		SunGoesDown, SunGoesUp
+	public enum DayEvent {
+		SUNSET, SUNRISE
 	}
 
 	private final BirdyGameApp app;
-	private final StateMachine<CityState, CityEvent> control;
+	private final StateMachine<DayTime, DayEvent> fsm;
 
 	public City(BirdyGameApp app) {
 		this.app = app;
+
 		setSprite("s_night", Sprite.ofAssets("bg_night"));
 		setSprite("s_day", Sprite.ofAssets("bg_day"));
 		setCurrentSprite("s_day");
+
 		tf.setWidth(currentSprite().getWidth());
+		tf.setHeight(currentSprite().getHeight());
 
-		control = new StateMachine<>("City control", CityState.class, Day);
+		fsm = new StateMachine<>("City", DayTime.class, DAY);
 
-		control.state(Day).entry = s -> {
+		fsm.state(DAY).entry = s -> {
 			setCurrentSprite("s_day");
 		};
 
-		control.changeOnInput(SunGoesDown, Day, Night);
+		fsm.changeOnInput(SUNSET, DAY, NIGHT);
 
-		control.state(Night).entry = s -> {
+		fsm.state(NIGHT).entry = s -> {
 			s.setDuration(PULSE.secToTicks(10));
 			setCurrentSprite("s_night");
 			replaceStars();
 		};
 
-		control.state(Night).update = s -> {
+		fsm.state(NIGHT).update = s -> {
 			app.entities.ofClass(Star.class).forEach(GameEntity::update);
 		};
 
-		control.state(Night).exit = s -> {
+		fsm.state(NIGHT).exit = s -> {
 			app.entities.removeAll(Star.class);
 		};
 
-		control.changeOnTimeout(Night, Night, t -> {
+		fsm.changeOnTimeout(NIGHT, NIGHT, t -> {
 			replaceStars();
 			t.from().resetTimer();
 		});
 
-		control.changeOnInput(SunGoesUp, Night, Day);
+		fsm.changeOnInput(SUNRISE, NIGHT, DAY);
 	}
 
 	@Override
 	public void init() {
-		control.init();
-		control.setLogger(Application.LOGGER);
+		fsm.init();
+		fsm.setLogger(Application.LOGGER);
 	}
 
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_N)) {
-			letSunGoDown();
+			sunset();
 		} else if (Keyboard.keyPressedOnce(KeyEvent.VK_D)) {
-			letSunGoUp();
+			sunrise();
 		}
-		control.update();
+		fsm.update();
 	}
 
 	private void replaceStars() {
@@ -102,15 +105,15 @@ public class City extends GameEntityUsingSprites {
 	}
 
 	public boolean isNight() {
-		return control.is(Night);
+		return fsm.is(NIGHT);
 	}
 
-	public void letSunGoDown() {
-		control.addInput(SunGoesDown);
+	public void sunset() {
+		fsm.addInput(SUNSET);
 	}
 
-	public void letSunGoUp() {
-		control.addInput(SunGoesUp);
+	public void sunrise() {
+		fsm.addInput(SUNRISE);
 	}
 
 	public void setWidth(int width) {
@@ -123,13 +126,13 @@ public class City extends GameEntityUsingSprites {
 	}
 
 	@Override
-	public void draw(Graphics2D pen) {
-		pen.translate(tf.getX(), tf.getY());
+	public void draw(Graphics2D g) {
+		g.translate(tf.getX(), tf.getY());
 		Image image = currentSprite().currentFrame();
 		for (int x = 0; x < tf.getWidth(); x += image.getWidth(null)) {
-			pen.drawImage(image, x, 0, null);
+			g.drawImage(image, x, 0, null);
 		}
-		app.entities.ofClass(Star.class).forEach(star -> star.draw(pen));
-		pen.translate(-tf.getX(), -tf.getY());
+		app.entities.ofClass(Star.class).forEach(star -> star.draw(g));
+		g.translate(-tf.getX(), -tf.getY());
 	}
 }

@@ -85,13 +85,12 @@ public class IntroScene implements View, Controller {
 		city = entities.ofClass(City.class).findAny().get();
 		city.setWidth(width);
 		if (new Random().nextBoolean()) {
-			city.letSunGoDown();
+			city.sunset();
 		} else {
-			city.letSunGoUp();
+			city.sunrise();
 		}
 
-		logoAnimation = new PumpingImage(Assets.image("title"));
-		logoAnimation.setScale(3);
+		logoAnimation = PumpingImage.create().image(Assets.image("title")).scale(3).build();
 		logoAnimation.center(width, height);
 
 		textAnimation = TextArea.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))

@@ -154,7 +154,7 @@ public class StartScene implements View, Controller {
 		}
 
 		if (!app.entities.contains("text_ready")) {
-			PumpingImage readyText = new PumpingImage(Assets.image("text_ready"));
+			PumpingImage readyText = PumpingImage.create().image(Assets.image("text_ready")).build();
 			app.entities.store("text_ready", readyText);
 		}
 
