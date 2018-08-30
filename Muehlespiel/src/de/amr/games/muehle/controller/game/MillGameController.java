@@ -14,7 +14,7 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.view.View;
-import de.amr.easy.game.view.VisualController;
+import de.amr.easy.game.view.ViewController;
 import de.amr.easy.statemachine.State;
 import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.MillGameApp;
@@ -36,7 +36,7 @@ import de.amr.games.muehle.view.MillGameUI;
  * 
  * @author Armin Reichert
  */
-public class MillGameController extends MillGameStateMachine implements VisualController {
+public class MillGameController extends MillGameStateMachine implements ViewController {
 
 	public final MillGameApp app;
 	public final MillGameModel model;
