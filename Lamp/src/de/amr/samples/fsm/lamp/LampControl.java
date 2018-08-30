@@ -1,24 +1,56 @@
 package de.amr.samples.fsm.lamp;
 
-import de.amr.easy.statemachine.StateMachine;
+import static de.amr.samples.fsm.lamp.LampControl.LampState.OFF;
+import static de.amr.samples.fsm.lamp.LampControl.LampState.ON;
 
-public class LampControl extends StateMachine<Boolean, Boolean> {
+import de.amr.samples.fsm.lamp.LampControl.LampEvent;
+import de.amr.samples.fsm.lamp.LampControl.LampState;
+import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.StateMachineClient;
+
+public class LampControl implements StateMachineClient<LampState, LampEvent> {
 
 	// states
-	public static final boolean OFF = false;
-	public static final boolean ON = true;
+	public enum LampState {
+		ON, OFF
+	}
 
 	// events
-	public static final boolean TOGGLE = true;
+	public static interface LampEvent {
+	}
+	
+	public static class ToggleEvent implements LampEvent {
+	}
+
+	private StateMachine<LampState, LampEvent> fsm;
+
+	@Override
+	public StateMachine<LampState, LampEvent> getStateMachine() {
+		return fsm;
+	}
 
 	public LampControl(Lamp lamp) {
-		super("Lamp Control", Boolean.class, OFF);
-		changeOnInput(TOGGLE, OFF, ON, t -> lamp.switchOn());
-		changeOnInput(TOGGLE, ON, OFF, t -> lamp.switchOff());
+
+		//@formatter:off
+		fsm = StateMachine
+			.define(LampState.class, LampEvent.class)
+			.initialState(OFF)
+			.states()
+				.state(ON)
+				.state(OFF)
+			.transitions()
+				.when(OFF)
+					.on(ToggleEvent.class).act(lamp::switchOn)
+					.then(ON)
+				.when(ON)
+					.on(ToggleEvent.class).act(lamp::switchOff)
+					.then(OFF)
+		.endStateMachine();
+		//@formatter:off
 	}
 
 	public void toggle() {
-		addInput(TOGGLE);
-		update();
+		fsm.process(new ToggleEvent());
+		fsm.update();
 	}
 }

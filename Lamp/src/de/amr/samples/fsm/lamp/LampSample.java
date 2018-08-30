@@ -29,6 +29,6 @@ public class LampSample {
 		lamp = new Lamp();
 		lampControl = new LampControl(lamp);
 		lamp.getLightSwitch().addActionListener(e -> lampControl.toggle());
-		lampControl.init();
+		lampControl.getStateMachine().init();
 	}
 }
