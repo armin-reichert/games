@@ -40,8 +40,8 @@ public class City extends GameEntityUsingSprites {
 
 	public City(BirdyGameApp app) {
 		this.app = app;
-		setSprite("s_night", new Sprite("bg_night"));
-		setSprite("s_day", new Sprite("bg_day"));
+		setSprite("s_night", Sprite.ofAssets("bg_night"));
+		setSprite("s_day", Sprite.ofAssets("bg_day"));
 		setCurrentSprite("s_day");
 		tf.setWidth(currentSprite().getWidth());
 

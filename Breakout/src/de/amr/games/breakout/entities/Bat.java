@@ -16,7 +16,7 @@ public class Bat extends GameEntityUsingSprites {
 	public int speed;
 
 	public Bat(int width, int height) {
-		setSprite("s_bat", new Sprite("bat_blue.png").scale(width, height));
+		setSprite("s_bat", Sprite.ofAssets("bat_blue.png").scale(width, height));
 		setCurrentSprite("s_bat");
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());

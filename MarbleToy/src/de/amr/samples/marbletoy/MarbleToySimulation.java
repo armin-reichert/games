@@ -25,8 +25,8 @@ public class MarbleToySimulation extends Application {
 
 	@Override
 	public void init() {
-		Marble marble = new Marble(new Sprite(Assets.image("marble.png")).scale(50, 50));
-		MarbleToy toy = new MarbleToy(new Sprite(Assets.image("toy.png")), marble);
+		Marble marble = new Marble(Sprite.of(Assets.image("marble.png")).scale(50, 50));
+		MarbleToy toy = new MarbleToy(Sprite.of(Assets.image("toy.png")), marble);
 		toy.setLeverControl(new LeverControl(toy));
 		entities.store(toy);
 		setController(new MainScene(this));

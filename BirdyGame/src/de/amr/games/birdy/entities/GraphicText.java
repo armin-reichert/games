@@ -8,7 +8,7 @@ import de.amr.easy.game.sprite.Sprite;
 public class GraphicText extends GameEntityUsingSprites {
 
 	public GraphicText(Image image) {
-		setSprite("s_text", new Sprite(image));
+		setSprite("s_text", Sprite.of(image));
 		setCurrentSprite("s_text");
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());

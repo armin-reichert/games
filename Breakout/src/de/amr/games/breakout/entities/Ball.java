@@ -12,7 +12,7 @@ public class Ball extends GameEntityUsingSprites {
 	public Ball(int size) {
 		tf.setWidth(size);
 		tf.setHeight(size);
-		setSprite("s_ball", new Sprite("ball_green.png").scale(size));
+		setSprite("s_ball", Sprite.ofAssets("ball_green.png").scale(size));
 		setCurrentSprite("s_ball");
 	}
 
