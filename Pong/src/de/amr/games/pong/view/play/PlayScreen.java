@@ -6,8 +6,13 @@ import static de.amr.games.pong.view.play.PlayState.GAME_OVER;
 import static de.amr.games.pong.view.play.PlayState.INIT;
 import static de.amr.games.pong.view.play.PlayState.PLAYING;
 import static de.amr.games.pong.view.play.PlayState.SERVING;
-import static java.awt.event.KeyEvent.VK_C;
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_UP;
+import static java.awt.event.KeyEvent.VK_Y;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -15,7 +20,6 @@ import java.awt.event.KeyEvent;
 import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
@@ -25,31 +29,25 @@ import de.amr.games.pong.entities.AutoPaddleRight;
 import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
-import de.amr.games.pong.entities.ScoreDisplay;
+import de.amr.games.pong.model.Game;
 import de.amr.statemachine.StateMachine;
 
 /**
- * The play scene of the "Pong" game.
+ * The play view of the "Pong" game.
  * 
  * @author Armin Reichert
  */
-public class PlayView implements View, Controller {
+public class PlayScreen implements View, Controller {
 
+	private final Game game;
 	private final PongGameApp app;
 	private final StateMachine<PlayState, Object> fsm;
-	private final int width;
-	private final int height;
+	private final Dimension size;
 
-	private Court court;
-	private Paddle paddleLeft;
-	private Paddle paddleRight;
-	private Ball ball;
-	private ScoreDisplay score;
-
-	public PlayView(PongGameApp app) {
+	public PlayScreen(PongGameApp app) {
 		this.app = app;
-		width = app.settings.width;
-		height = app.settings.height;
+		this.game = app.game;
+		size = new Dimension(app.settings.width, app.settings.height);
 		fsm = createStateMachine();
 		fsm.traceTo(LOGGER, PULSE::getFrequency);
 	}
@@ -58,26 +56,69 @@ public class PlayView implements View, Controller {
 		return
 		//@formatter:off
 		StateMachine.define(PlayState.class, Object.class)
-		.description("Pong")	
-		.initialState(INIT)
+			.description("Pong")	
+			.initialState(INIT)
 	
 		.states()
-		.state(INIT).onEntry(this::resetPaddles)
-		.state(SERVING).timeoutAfter(() -> PULSE.secToTicks(2)).onEntry(this::prepareService)
-		.state(PLAYING).onTick(()-> app.entities.all().forEach(GameEntity::update))
-		.state(GAME_OVER)
+			.state(INIT).onEntry(this::resetPaddles)
+			.state(SERVING).timeoutAfter(() -> PULSE.secToTicks(2)).onEntry(this::prepareService)
+			.state(PLAYING).onTick(this::updateEntities)
+			.state(GAME_OVER)
 			
 		.transitions()
-		.when(INIT).then(SERVING).act(this::resetScores)
-		.when(SERVING).then(PLAYING).onTimeout().act(this::serveBall)
-		.stay(PLAYING).condition(this::leftPaddleHitsBall).act(this::returnBallWithLeftPaddle)
-		.stay(PLAYING).condition(this::rightPaddleHitsBall).act(this::returnBallWithRightPaddle)
-		.when(PLAYING).then(SERVING).condition(this::isBallOutLeft).act(this::assignPointToRightPlayer)
-		.when(PLAYING).then(SERVING).condition(this::isBallOutRight).act(this::assignPointToLeftPlayer)
-		.when(PLAYING).then(GAME_OVER).condition(() -> leftPlayerWins() || rightPlayerWins())
-		.when(GAME_OVER).then(INIT).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+			.when(INIT).then(SERVING).act(this::resetScores)
+			.when(SERVING).then(PLAYING).onTimeout().act(this::serveBall)
+			.stay(PLAYING).condition(this::leftPaddleHitsBall).act(this::returnBallWithLeftPaddle)
+			.stay(PLAYING).condition(this::rightPaddleHitsBall).act(this::returnBallWithRightPaddle)
+			.when(PLAYING).then(SERVING).condition(this::isBallOutLeft).act(this::assignPointToRightPlayer)
+			.when(PLAYING).then(SERVING).condition(this::isBallOutRight).act(this::assignPointToLeftPlayer)
+			.when(PLAYING).then(GAME_OVER).condition(() -> leftPlayerWins() || rightPlayerWins())
+			.when(GAME_OVER).then(INIT).condition(() -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+
 		.endStateMachine();
 		//@formatter:on
+	}
+
+	private Court court;
+	private Paddle paddleLeft;
+	private Paddle paddleRight;
+	private Ball ball;
+
+	private void initEntities() {
+		court = new Court(size);
+		ball = new Ball(10, Color.YELLOW);
+		ball.setCourtSize(size);
+		switch (game.playMode) {
+		case Computer_Computer:
+			paddleLeft = new AutoPaddleLeft();
+			paddleRight = new AutoPaddleRight();
+			break;
+		case Computer_Player2:
+			paddleLeft = new AutoPaddleLeft();
+			paddleRight = new Paddle(VK_UP, VK_DOWN);
+			break;
+		case Player1_Computer:
+			paddleLeft = new Paddle(VK_A, VK_Y);
+			paddleRight = new AutoPaddleRight();
+			break;
+		case Player1_Player2:
+			paddleLeft = new Paddle(VK_A, VK_Y);
+			paddleRight = new Paddle(VK_UP, VK_DOWN);
+			break;
+		}
+		paddleLeft.setCourtSize(size);
+		paddleLeft.setSpeed(5);
+		paddleLeft.setBall(ball);
+		paddleRight.setCourtSize(size);
+		paddleRight.setSpeed(5);
+		paddleRight.setBall(ball);
+	}
+
+	private void updateEntities() {
+		court.update();
+		ball.update();
+		paddleLeft.update();
+		paddleRight.update();
 	}
 
 	@Override
@@ -86,36 +127,10 @@ public class PlayView implements View, Controller {
 		fsm.init();
 	}
 
-	private void initEntities() {
-		court = app.entities.ofClass(Court.class).findFirst().get();
-		switch (app.getPlayMode()) {
-		case Computer_Computer:
-			paddleLeft = app.entities.ofClass(AutoPaddleLeft.class).findFirst().get();
-			paddleRight = app.entities.ofClass(AutoPaddleRight.class).findFirst().get();
-			break;
-		case Computer_Player2:
-			paddleLeft = app.entities.ofClass(AutoPaddleLeft.class).findFirst().get();
-			paddleRight = app.entities.ofName("paddleRight");
-			break;
-		case Player1_Computer:
-			paddleLeft = app.entities.ofName("paddleLeft");
-			paddleRight = app.entities.ofClass(AutoPaddleRight.class).findFirst().get();
-			break;
-		case Player1_Player2:
-			paddleLeft = app.entities.ofName("paddleLeft");
-			paddleRight = app.entities.ofName("paddleRight");
-			break;
-		}
-		ball = app.entities.ofClass(Ball.class).findFirst().get();
-		score = app.entities.ofClass(ScoreDisplay.class).findFirst().get();
-		score.tf.setY(100);
-		score.centerHorizontally(width);
-	}
-
 	@Override
 	public void update() {
-		if (Keyboard.keyPressedOnce(VK_C) && Keyboard.isControlDown()) {
-			app.setController(app.menuScene);
+		if (Keyboard.keyPressedOnce(KeyEvent.VK_M)) {
+			app.setController(app.menuViewController);
 		}
 		fsm.update();
 	}
@@ -127,11 +142,16 @@ public class PlayView implements View, Controller {
 		paddleLeft.draw(g);
 		paddleRight.draw(g);
 		ball.draw(g);
-		score.draw(g);
+		g.translate(0, size.height / 2);
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
+		g.drawString("" + game.scoreLeft, size.width / 4, 0);
+		g.drawString("" + game.scoreRight, size.width * 3 / 4, 0);
+		g.translate(0, -size.height / 2);
 		if (leftPlayerWins()) {
-			drawWinner(g, "Left wins!");
+			drawWinner(g, "Left Player wins!");
 		} else if (rightPlayerWins()) {
-			drawWinner(g, "Right wins!");
+			drawWinner(g, "Right Player wins!");
 		}
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
@@ -139,19 +159,19 @@ public class PlayView implements View, Controller {
 	private void drawWinner(Graphics2D g, String text) {
 		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 		int w = g.getFontMetrics().stringWidth(text);
-		g.drawString(text, width / 2 - w / 2, height - 100);
+		g.drawString(text, size.width / 2 - w / 2, size.height - 100);
 	}
 
 	private void resetPaddles() {
 		paddleLeft.tf.setX(0);
-		paddleLeft.centerVertically(height);
-		paddleRight.tf.setX(width - paddleRight.tf.getWidth());
-		paddleRight.centerVertically(height);
+		paddleLeft.centerVertically(size.height);
+		paddleRight.tf.setX(size.width - paddleRight.tf.getWidth());
+		paddleRight.centerVertically(size.height);
 	}
 
 	private void resetScores() {
-		app.getScorePlayerLeft().reset();
-		app.getScorePlayerRight().reset();
+		game.scoreLeft = 0;
+		game.scoreRight = 0;
 	}
 
 	private void prepareService() {
@@ -181,7 +201,7 @@ public class PlayView implements View, Controller {
 	}
 
 	private boolean isBallOutRight() {
-		return ball.tf.getX() > width;
+		return ball.tf.getX() > size.width;
 	}
 
 	private boolean leftPaddleHitsBall() {
@@ -203,18 +223,18 @@ public class PlayView implements View, Controller {
 	}
 
 	private boolean leftPlayerWins() {
-		return app.getScorePlayerLeft().isWinning();
+		return game.scoreLeft == 11;
 	}
 
 	private boolean rightPlayerWins() {
-		return app.getScorePlayerRight().isWinning();
-	}
-
-	private void assignPointToRightPlayer() {
-		app.getScorePlayerRight().points++;
+		return game.scoreRight == 11;
 	}
 
 	private void assignPointToLeftPlayer() {
-		app.getScorePlayerLeft().points++;
+		game.scoreLeft += 1;
+	}
+
+	private void assignPointToRightPlayer() {
+		game.scoreRight += 1;
 	}
 }

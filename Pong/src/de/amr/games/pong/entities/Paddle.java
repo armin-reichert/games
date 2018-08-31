@@ -1,34 +1,51 @@
 package de.amr.games.pong.entities;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
-import de.amr.games.pong.PongGameApp;
 
 public class Paddle extends GameEntity implements View {
 
-	protected int speed = 5;
+	private final int upKey;
+	private final int downKey;
+	protected Dimension courtSize;
+	protected int speed;
 	protected Color color = Color.LIGHT_GRAY;
-	protected PongGameApp game;
-	private final int paddleUpKey, paddleDownKey;
+	protected Ball ball;
 
-	public Paddle(PongGameApp game, int keyUp, int keyDown) {
-		this.game = game;
-		this.paddleUpKey = keyUp;
-		this.paddleDownKey = keyDown;
+	public Paddle(int up, int down) {
+		this.upKey = up;
+		this.downKey = down;
 		tf.setWidth(15);
 		tf.setHeight(60);
 	}
 
+	public void setCourtSize(Dimension courtSize) {
+		this.courtSize = courtSize;
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public void setBall(Ball ball) {
+		this.ball = ball;
+	}
+
 	@Override
 	public void update() {
-		if (Keyboard.keyDown(paddleUpKey)) {
+		if (Keyboard.keyDown(upKey)) {
 			tf.setVelocityY(-speed);
 		}
-		if (Keyboard.keyDown(paddleDownKey)) {
+		if (Keyboard.keyDown(downKey)) {
 			tf.setVelocityY(speed);
 		}
 		moveAndStopAtBorder();
@@ -38,8 +55,8 @@ public class Paddle extends GameEntity implements View {
 		tf.move();
 		if (tf.getY() < 0) {
 			tf.setY(0);
-		} else if (tf.getY() >= game.settings.height - tf.getHeight()) {
-			tf.setY(game.settings.height - tf.getHeight());
+		} else if (tf.getY() >= courtSize.height - tf.getHeight()) {
+			tf.setY(courtSize.height - tf.getHeight());
 		}
 		tf.setVelocityY(0);
 	}

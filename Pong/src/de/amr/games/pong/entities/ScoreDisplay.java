@@ -19,9 +19,5 @@ public class ScoreDisplay extends GameEntity implements View {
 
 	@Override
 	public void draw(Graphics2D g) {
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
-		g.drawString("" + scoreLeft.points, (int) tf.getX() - 100, 50);
-		g.drawString("" + scoreRight.points, (int) tf.getX() + 100, 50);
 	}
 }

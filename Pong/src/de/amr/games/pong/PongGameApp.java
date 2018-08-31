@@ -1,22 +1,12 @@
 package de.amr.games.pong;
 
-import static java.awt.event.KeyEvent.VK_A;
-import static java.awt.event.KeyEvent.VK_DOWN;
-import static java.awt.event.KeyEvent.VK_UP;
-import static java.awt.event.KeyEvent.VK_Y;
-
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
-import de.amr.games.pong.entities.AutoPaddleLeft;
-import de.amr.games.pong.entities.AutoPaddleRight;
-import de.amr.games.pong.entities.Ball;
-import de.amr.games.pong.entities.Court;
-import de.amr.games.pong.entities.Paddle;
-import de.amr.games.pong.entities.Score;
-import de.amr.games.pong.entities.ScoreDisplay;
-import de.amr.games.pong.view.menu.MenuView;
-import de.amr.games.pong.view.play.PlayView;
+import de.amr.games.pong.model.Game;
+import de.amr.games.pong.model.Game.PlayMode;
+import de.amr.games.pong.view.menu.MenuScreen;
+import de.amr.games.pong.view.play.PlayScreen;
 
 /**
  * The classic "Pong" game with different play modes.
@@ -25,60 +15,36 @@ import de.amr.games.pong.view.play.PlayView;
  */
 public class PongGameApp extends Application {
 
-	public enum PlayMode {
-		Player1_Player2, Player1_Computer, Computer_Player2, Computer_Computer
-	}
-
 	public static void main(String[] args) {
 		launch(new PongGameApp());
 	}
 
-	private Score scorePlayerLeft, scorePlayerRight;
-	public MenuView menuScene;
-	public PlayView playScene;
+	public Game game;
+	public MenuScreen menuViewController;
+	public PlayScreen playViewController;
 
 	public PongGameApp() {
 		settings.title = "Pong";
 		settings.width = 640;
 		settings.height = 480;
 		settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
-		scorePlayerLeft = new Score(points -> points == 11);
-		scorePlayerRight = new Score(points -> points == 11);
 	}
 
 	@Override
 	public void init() {
+		game = new Game();
+		game.scoreLeft = 11;
+		game.scoreRight = 11;
+		game.playMode = PlayMode.Player1_Player2;
+		loadSounds();
+		menuViewController = new MenuScreen(this);
+		playViewController = new PlayScreen(this);
+		setController(menuViewController);
+	}
+
+	private void loadSounds() {
 		Assets.sound("plop.mp3");
 		Assets.sound("plip.mp3");
 		Assets.sound("out.mp3");
-		entities.store(new Court(settings.width, settings.height));
-		entities.store(new ScoreDisplay(getScorePlayerLeft(), getScorePlayerRight()));
-		entities.store(new Ball(settings.height));
-		entities.store(new AutoPaddleLeft(this));
-		entities.store(new AutoPaddleRight(this));
-		Paddle paddleLeft = new Paddle(this, VK_A, VK_Y);
-		entities.store("paddleLeft", paddleLeft);
-		Paddle paddleRight = new Paddle(this, VK_UP, VK_DOWN);
-		entities.store("paddleRight", paddleRight);
-		menuScene = new MenuView(this);
-		playScene = new PlayView(this);
-		setController(menuScene);
-		setPlayMode(PlayMode.Player1_Player2);
-	}
-
-	public void setPlayMode(PlayMode playMode) {
-		menuScene.setSelectedPlayMode(playMode);
-	}
-
-	public PlayMode getPlayMode() {
-		return menuScene.getSelectedPlayMode();
-	}
-
-	public Score getScorePlayerLeft() {
-		return scorePlayerLeft;
-	}
-
-	public Score getScorePlayerRight() {
-		return scorePlayerRight;
 	}
 }

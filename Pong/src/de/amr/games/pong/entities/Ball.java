@@ -1,6 +1,7 @@
 package de.amr.games.pong.entities;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -8,24 +9,29 @@ import de.amr.easy.game.view.View;
 
 public class Ball extends GameEntity implements View {
 
-	private final int courtHeight;
-	private int size = 16;
-	private Color color = Color.YELLOW;
+	private Dimension courtSize;;
+	private int size;
+	private Color color;
 
-	public Ball(int courtHeight) {
-		this.courtHeight = courtHeight;
+	public Ball(int size, Color color) {
+		this.size = size;
+		this.color = color;
 		tf.setWidth(size);
 		tf.setHeight(size);
+	}
+
+	public void setCourtSize(Dimension courtSize) {
+		this.courtSize = courtSize;
 	}
 
 	@Override
 	public void update() {
 		tf.move();
-		if (tf.getY() < 0) {
+		if (tf.getY() <= 0) {
 			tf.setY(0);
 			tf.setVelocityY(-tf.getVelocityY());
-		} else if (tf.getY() >= courtHeight - tf.getHeight()) {
-			tf.setY(courtHeight - tf.getHeight() - 1);
+		} else if (tf.getY() + tf.getHeight() >= courtSize.height) {
+			tf.setY(courtSize.height - 1 - tf.getHeight());
 			tf.setVelocityY(-tf.getVelocityY());
 		}
 	}
@@ -34,9 +40,5 @@ public class Ball extends GameEntity implements View {
 	public void draw(Graphics2D g) {
 		g.setColor(color);
 		g.fillOval((int) tf.getX(), (int) tf.getY(), size, size);
-	}
-
-	public int getSize() {
-		return size;
 	}
 }

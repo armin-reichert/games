@@ -1,6 +1,7 @@
 package de.amr.games.pong.entities;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 
 import de.amr.easy.game.entity.GameEntity;
@@ -12,9 +13,9 @@ public class Court extends GameEntity implements View {
 	private Color lineColor = Color.WHITE;
 	private int lineWidth = 5;
 
-	public Court(int width, int height) {
-		tf.setWidth(width);
-		tf.setHeight(height);
+	public Court(Dimension size) {
+		tf.setWidth(size.width);
+		tf.setHeight(size.height);
 	}
 
 	@Override
