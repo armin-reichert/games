@@ -20,8 +20,11 @@ public class Paddle extends GameEntity implements View {
 	public Paddle(int up, int down) {
 		this.upKey = up;
 		this.downKey = down;
-		tf.setWidth(15);
-		tf.setHeight(60);
+	}
+	
+	public void setSize(int w, int h) {
+		tf.setWidth(w);
+		tf.setHeight(h);
 	}
 
 	public void setCourtSize(Dimension courtSize) {

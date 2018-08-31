@@ -106,9 +106,11 @@ public class PlayScreen implements View, Controller {
 			paddleRight = new Paddle(VK_UP, VK_DOWN);
 			break;
 		}
+		paddleLeft.setSize(15, 60);
 		paddleLeft.setCourtSize(size);
 		paddleLeft.setSpeed(5);
 		paddleLeft.setBall(ball);
+		paddleRight.setSize(15, 60);
 		paddleRight.setCourtSize(size);
 		paddleRight.setSpeed(5);
 		paddleRight.setBall(ball);
