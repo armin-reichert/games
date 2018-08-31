@@ -1,11 +1,11 @@
-package de.amr.games.pong.view.play;
+package de.amr.games.pong.ui.play;
 
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.PULSE;
-import static de.amr.games.pong.view.play.PlayState.GAME_OVER;
-import static de.amr.games.pong.view.play.PlayState.INIT;
-import static de.amr.games.pong.view.play.PlayState.PLAYING;
-import static de.amr.games.pong.view.play.PlayState.SERVING;
+import static de.amr.games.pong.ui.play.PlayState.GAME_OVER;
+import static de.amr.games.pong.ui.play.PlayState.INIT;
+import static de.amr.games.pong.ui.play.PlayState.PLAYING;
+import static de.amr.games.pong.ui.play.PlayState.SERVING;
 import static java.awt.event.KeyEvent.VK_A;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_UP;

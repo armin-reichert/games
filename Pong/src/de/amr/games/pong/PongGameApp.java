@@ -5,8 +5,8 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pong.model.Game;
 import de.amr.games.pong.model.Game.PlayMode;
-import de.amr.games.pong.view.menu.MenuScreen;
-import de.amr.games.pong.view.play.PlayScreen;
+import de.amr.games.pong.ui.menu.MenuScreen;
+import de.amr.games.pong.ui.play.PlayScreen;
 
 /**
  * The classic "Pong" game with different play modes.
