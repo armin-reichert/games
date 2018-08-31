@@ -1,4 +1,4 @@
-package de.amr.games.pong.scenes.menu;
+package de.amr.games.pong.view.menu;
 
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.PULSE;
@@ -27,7 +27,7 @@ import de.amr.statemachine.StateMachine;
  * 
  * @author Armin Reichert
  */
-public class MenuScene implements View, Controller {
+public class MenuView implements View, Controller {
 
 	private final PongGameApp app;
 	private final int width;
@@ -37,7 +37,7 @@ public class MenuScene implements View, Controller {
 	private Color bgColorSelected;
 	private Color hilightColor;
 
-	public MenuScene(PongGameApp app) {
+	public MenuView(PongGameApp app) {
 		this.app = app;
 		this.width = app.settings.width;
 		this.height = app.settings.height;

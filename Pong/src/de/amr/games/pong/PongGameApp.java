@@ -15,8 +15,8 @@ import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.entities.Score;
 import de.amr.games.pong.entities.ScoreDisplay;
-import de.amr.games.pong.scenes.menu.MenuScene;
-import de.amr.games.pong.scenes.play.PlayScene;
+import de.amr.games.pong.view.menu.MenuView;
+import de.amr.games.pong.view.play.PlayView;
 
 /**
  * The classic "Pong" game with different play modes.
@@ -34,8 +34,8 @@ public class PongGameApp extends Application {
 	}
 
 	private Score scorePlayerLeft, scorePlayerRight;
-	public MenuScene menuScene;
-	public PlayScene playScene;
+	public MenuView menuScene;
+	public PlayView playScene;
 
 	public PongGameApp() {
 		settings.title = "Pong";
@@ -60,8 +60,8 @@ public class PongGameApp extends Application {
 		entities.store("paddleLeft", paddleLeft);
 		Paddle paddleRight = new Paddle(this, VK_UP, VK_DOWN);
 		entities.store("paddleRight", paddleRight);
-		menuScene = new MenuScene(this);
-		playScene = new PlayScene(this);
+		menuScene = new MenuView(this);
+		playScene = new PlayView(this);
 		setController(menuScene);
 		setPlayMode(PlayMode.Player1_Player2);
 	}

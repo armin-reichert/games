@@ -1,11 +1,11 @@
-package de.amr.games.pong.scenes.play;
+package de.amr.games.pong.view.play;
 
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.PULSE;
-import static de.amr.games.pong.scenes.play.PlayState.GAME_OVER;
-import static de.amr.games.pong.scenes.play.PlayState.INIT;
-import static de.amr.games.pong.scenes.play.PlayState.PLAYING;
-import static de.amr.games.pong.scenes.play.PlayState.SERVING;
+import static de.amr.games.pong.view.play.PlayState.GAME_OVER;
+import static de.amr.games.pong.view.play.PlayState.INIT;
+import static de.amr.games.pong.view.play.PlayState.PLAYING;
+import static de.amr.games.pong.view.play.PlayState.SERVING;
 import static java.awt.event.KeyEvent.VK_C;
 
 import java.awt.Font;
@@ -33,7 +33,7 @@ import de.amr.statemachine.StateMachine;
  * 
  * @author Armin Reichert
  */
-public class PlayScene implements View, Controller {
+public class PlayView implements View, Controller {
 
 	private final PongGameApp app;
 	private final StateMachine<PlayState, Object> fsm;
@@ -46,7 +46,7 @@ public class PlayScene implements View, Controller {
 	private Ball ball;
 	private ScoreDisplay score;
 
-	public PlayScene(PongGameApp app) {
+	public PlayView(PongGameApp app) {
 		this.app = app;
 		width = app.settings.width;
 		height = app.settings.height;
