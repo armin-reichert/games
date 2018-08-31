@@ -9,19 +9,20 @@ import de.amr.easy.game.view.View;
 
 public class Ball extends GameEntity implements View {
 
-	private Dimension courtSize;;
-	private int size;
+	private Dimension courtSize;
 	private Color color;
 
-	public Ball(int size, Color color) {
-		this.size = size;
-		this.color = color;
+	public Ball(int size) {
 		tf.setWidth(size);
 		tf.setHeight(size);
 	}
 
 	public void setCourtSize(Dimension courtSize) {
 		this.courtSize = courtSize;
+	}
+	
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 	@Override
@@ -39,6 +40,6 @@ public class Ball extends GameEntity implements View {
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(color);
-		g.fillOval((int) tf.getX(), (int) tf.getY(), size, size);
+		g.fillOval((int) tf.getX(), (int) tf.getY(), tf.getWidth(), tf.getHeight());
 	}
 }

@@ -1,9 +1,13 @@
 package de.amr.games.pong;
 
+import java.awt.Dimension;
+
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pong.model.Game;
+import de.amr.games.pong.model.Game.PlayMode;
+import de.amr.games.pong.ui.ScreenManager;
 import de.amr.games.pong.ui.menu.MenuScreen;
 import de.amr.games.pong.ui.play.PlayScreen;
 
@@ -12,15 +16,15 @@ import de.amr.games.pong.ui.play.PlayScreen;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PongGameApp extends Application {
+public class PongGameApp extends Application implements ScreenManager {
 
 	public static void main(String[] args) {
 		launch(new PongGameApp());
 	}
 
-	public Game game;
-	public MenuScreen menuScreen;
-	public PlayScreen playScreen;
+	private Game game;
+	private MenuScreen menuScreen;
+	private PlayScreen playScreen;
 
 	public PongGameApp() {
 		settings.title = "Pong";
@@ -33,9 +37,21 @@ public class PongGameApp extends Application {
 	public void init() {
 		game = new Game();
 		loadSounds();
-		menuScreen = new MenuScreen(this);
-		playScreen = new PlayScreen(this);
+		Dimension size = new Dimension(settings.width, settings.height);
+		menuScreen = new MenuScreen(this, size);
+		playScreen = new PlayScreen(this, game, size);
 		setController(menuScreen);
+	}
+
+	@Override
+	public void selectMenuScreen() {
+		setController(menuScreen);
+	}
+
+	@Override
+	public void selectPlayScreen(PlayMode playMode) {
+		game.playMode = playMode;
+		setController(playScreen);
 	}
 
 	private void loadSounds() {

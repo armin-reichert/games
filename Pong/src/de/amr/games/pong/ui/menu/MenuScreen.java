@@ -10,6 +10,7 @@ import static de.amr.games.pong.model.Game.PlayMode.Player1_Player2;
 import static java.awt.event.KeyEvent.VK_ENTER;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -18,9 +19,8 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.games.pong.PongGameApp;
-import de.amr.games.pong.model.Game;
 import de.amr.games.pong.model.Game.PlayMode;
+import de.amr.games.pong.ui.ScreenManager;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -30,20 +30,16 @@ import de.amr.statemachine.StateMachine;
  */
 public class MenuScreen implements Controller, View {
 
-	private final PongGameApp app;
-	private final Game game;
-	private final int width;
-	private final int height;
+	private final ScreenManager screenManager;
+	private final Dimension size;
 	private final StateMachine<PlayMode, Object> fsm;
 	private Color bgColor;
 	private Color bgColorSelected;
 	private Color hilightColor;
 
-	public MenuScreen(PongGameApp app) {
-		this.app = app;
-		this.game = app.game;
-		this.width = app.settings.width;
-		this.height = app.settings.height;
+	public MenuScreen(ScreenManager screenManager, Dimension size) {
+		this.screenManager = screenManager;
+		this.size = size;
 		fsm = createStateMachine();
 		fsm.traceTo(LOGGER, PULSE::getFrequency);
 	}
@@ -57,13 +53,13 @@ public class MenuScreen implements Controller, View {
 			
 			.states()
 			
-				.state(Player1_Player2).onEntry(this::setPlayMode)
+				.state(Player1_Player2)
 
-				.state(Player1_Computer).onEntry(this::setPlayMode)
+				.state(Player1_Computer)
 				
-				.state(Computer_Player2).onEntry(this::setPlayMode)
+				.state(Computer_Player2)
 				
-				.state(Computer_Computer).onEntry(this::setPlayMode)
+				.state(Computer_Computer)
 		
 			.transitions()
 				.when(PlayMode.Player1_Player2).then(Player1_Computer)
@@ -93,10 +89,6 @@ public class MenuScreen implements Controller, View {
 		.endStateMachine();
 		//@formatter:on
 	}
-	
-	private void setPlayMode() {
-		game.playMode = fsm.currentState();
-	}
 
 	@Override
 	public void init() {
@@ -109,7 +101,7 @@ public class MenuScreen implements Controller, View {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_ENTER)) {
-			app.setController(app.playScreen);
+			screenManager.selectPlayScreen(fsm.currentState());
 		}
 		fsm.update();
 	}
@@ -118,28 +110,28 @@ public class MenuScreen implements Controller, View {
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(bgColor);
-		g.fillRect(0, 0, width, height);
+		g.fillRect(0, 0, size.width, size.height);
 		g.setFont(new Font("Arial Black", Font.PLAIN, 28));
 		PlayMode[] playModes = PlayMode.values();
 		int y = 60;
-		int h = height / playModes.length;
+		int h = size.height / playModes.length;
 		for (int i = 0; i < playModes.length; ++i) {
-			if (playModes[i] == app.game.playMode) {
+			if (playModes[i] == fsm.currentState()) {
 				g.setColor(bgColorSelected);
-				g.fillRect(0, h * i, width, h);
+				g.fillRect(0, h * i, size.width, h);
 				g.setColor(hilightColor);
 			} else {
 				g.setColor(Color.WHITE);
 			}
-			String text = getTitle(playModes[i]);
+			String text = itemText(playModes[i]);
 			int w = g.getFontMetrics().stringWidth(text);
-			g.drawString(text, width / 2 - w / 2, y);
+			g.drawString(text, size.width / 2 - w / 2, y);
 			y += h;
 		}
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 	}
 
-	private String getTitle(PlayMode mode) {
+	private String itemText(PlayMode mode) {
 		switch (mode) {
 		case Computer_Computer:
 			return "Computer - Computer";

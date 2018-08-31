@@ -1,6 +1,5 @@
 package de.amr.games.pong.ui.play;
 
-import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.PULSE;
 import static de.amr.games.pong.ui.play.PlayState.GAME_OVER;
 import static de.amr.games.pong.ui.play.PlayState.INIT;
@@ -20,17 +19,18 @@ import java.awt.event.KeyEvent;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.games.pong.PongGameApp;
 import de.amr.games.pong.entities.AutoPaddleLeft;
 import de.amr.games.pong.entities.AutoPaddleRight;
 import de.amr.games.pong.entities.Ball;
 import de.amr.games.pong.entities.Court;
 import de.amr.games.pong.entities.Paddle;
 import de.amr.games.pong.model.Game;
+import de.amr.games.pong.ui.ScreenManager;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -40,17 +40,17 @@ import de.amr.statemachine.StateMachine;
  */
 public class PlayScreen implements View, Controller {
 
+	private final ScreenManager screenManager;
 	private final Game game;
-	private final PongGameApp app;
 	private final StateMachine<PlayState, Object> fsm;
 	private final Dimension size;
 
-	public PlayScreen(PongGameApp app) {
-		this.app = app;
-		this.game = app.game;
-		size = new Dimension(app.settings.width, app.settings.height);
+	public PlayScreen(ScreenManager screenManager, Game game, Dimension size) {
+		this.screenManager = screenManager;
+		this.game = game;
+		this.size = size;
 		fsm = createStateMachine();
-		fsm.traceTo(LOGGER, PULSE::getFrequency);
+		fsm.traceTo(Application.LOGGER, PULSE::getFrequency);
 	}
 
 	private StateMachine<PlayState, Object> createStateMachine() {
@@ -86,7 +86,8 @@ public class PlayScreen implements View, Controller {
 
 	private void initEntities() {
 		court = new Court(size);
-		ball = new Ball(10, Color.YELLOW);
+		ball = new Ball(10);
+		ball.setColor(Color.YELLOW);
 		ball.setCourtSize(size);
 		switch (game.playMode) {
 		case Computer_Computer:
@@ -130,7 +131,7 @@ public class PlayScreen implements View, Controller {
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_M)) {
-			app.setController(app.menuScreen);
+			screenManager.selectMenuScreen();
 		}
 		fsm.update();
 	}
