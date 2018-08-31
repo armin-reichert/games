@@ -9,5 +9,10 @@ public class Game {
 	public int scoreLeft;
 	public int scoreRight;
 	public PlayMode playMode;
-
+	
+	public Game() {
+		scoreLeft = 11;
+		scoreRight = 11;
+		playMode = PlayMode.Player1_Player2;
+	}
 }

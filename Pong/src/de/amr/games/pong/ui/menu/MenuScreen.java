@@ -109,7 +109,7 @@ public class MenuScreen implements Controller, View {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_ENTER)) {
-			app.setController(app.playViewController);
+			app.setController(app.playScreen);
 		}
 		fsm.update();
 	}

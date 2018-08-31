@@ -61,7 +61,7 @@ public class PlayScreen implements View, Controller {
 			.initialState(INIT)
 	
 		.states()
-			.state(INIT).onEntry(this::resetPaddles)
+			.state(INIT).onEntry(this::initEntities)
 			.state(SERVING).timeoutAfter(() -> PULSE.secToTicks(2)).onEntry(this::prepareService)
 			.state(PLAYING).onTick(this::updateEntities)
 			.state(GAME_OVER)
@@ -112,6 +112,7 @@ public class PlayScreen implements View, Controller {
 			paddle[i].setSpeed(5);
 			paddle[i].setBall(ball);
 		});
+		resetPaddles();
 	}
 
 	private void updateEntities() {
@@ -123,14 +124,13 @@ public class PlayScreen implements View, Controller {
 
 	@Override
 	public void init() {
-		initEntities();
 		fsm.init();
 	}
 
 	@Override
 	public void update() {
 		if (Keyboard.keyPressedOnce(KeyEvent.VK_M)) {
-			app.setController(app.menuViewController);
+			app.setController(app.menuScreen);
 		}
 		fsm.update();
 	}
@@ -205,11 +205,11 @@ public class PlayScreen implements View, Controller {
 	}
 
 	private boolean leftPaddleHitsBall() {
-		return ball.tf.getVelocityX() <= 0 && paddle[0].hitsBall(ball);
+		return ball.tf.getVelocityX() <= 0 && paddle[0].collidesWith(ball);
 	}
 
 	private boolean rightPaddleHitsBall() {
-		return ball.tf.getVelocityX() >= 0 && paddle[1].hitsBall(ball);
+		return ball.tf.getVelocityX() >= 0 && paddle[1].collidesWith(ball);
 	}
 
 	private void returnBallWithLeftPaddle() {

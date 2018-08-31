@@ -69,8 +69,4 @@ public class Paddle extends GameEntity implements View {
 		g.setColor(color);
 		g.fillRect((int) tf.getX(), (int) tf.getY(), tf.getWidth(), tf.getHeight());
 	}
-
-	public boolean hitsBall(Ball ball) {
-		return getCollisionBox().intersects(ball.getCollisionBox());
-	}
 }

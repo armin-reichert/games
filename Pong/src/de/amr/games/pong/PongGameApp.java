@@ -4,7 +4,6 @@ import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.pong.model.Game;
-import de.amr.games.pong.model.Game.PlayMode;
 import de.amr.games.pong.ui.menu.MenuScreen;
 import de.amr.games.pong.ui.play.PlayScreen;
 
@@ -20,8 +19,8 @@ public class PongGameApp extends Application {
 	}
 
 	public Game game;
-	public MenuScreen menuViewController;
-	public PlayScreen playViewController;
+	public MenuScreen menuScreen;
+	public PlayScreen playScreen;
 
 	public PongGameApp() {
 		settings.title = "Pong";
@@ -33,13 +32,10 @@ public class PongGameApp extends Application {
 	@Override
 	public void init() {
 		game = new Game();
-		game.scoreLeft = 11;
-		game.scoreRight = 11;
-		game.playMode = PlayMode.Player1_Player2;
 		loadSounds();
-		menuViewController = new MenuScreen(this);
-		playViewController = new PlayScreen(this);
-		setController(menuViewController);
+		menuScreen = new MenuScreen(this);
+		playScreen = new PlayScreen(this);
+		setController(menuScreen);
 	}
 
 	private void loadSounds() {
