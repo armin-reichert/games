@@ -86,7 +86,7 @@ public class PlayScreen implements View, Controller {
 
 	private void initEntities() {
 		court = new Court(size);
-		ball = new Ball(10);
+		ball = new Ball(12);
 		ball.setColor(Color.YELLOW);
 		ball.setCourtSize(size);
 		switch (game.playMode) {
@@ -111,6 +111,7 @@ public class PlayScreen implements View, Controller {
 			paddle[i].setSize(15, 60);
 			paddle[i].setCourtSize(size);
 			paddle[i].setSpeed(5);
+			paddle[i].setColor(Color.LIGHT_GRAY);
 			paddle[i].setBall(ball);
 		});
 		resetPaddles();

@@ -14,7 +14,7 @@ public class Paddle extends GameEntity implements View {
 	private final int downKey;
 	protected Dimension courtSize;
 	protected int speed;
-	protected Color color = Color.LIGHT_GRAY;
+	protected Color color;
 	protected Ball ball;
 
 	public Paddle(int up, int down) {
