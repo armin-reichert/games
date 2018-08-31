@@ -21,7 +21,7 @@ public class Paddle extends GameEntity implements View {
 		this.upKey = up;
 		this.downKey = down;
 	}
-	
+
 	public void setSize(int w, int h) {
 		tf.setWidth(w);
 		tf.setHeight(h);
@@ -47,21 +47,21 @@ public class Paddle extends GameEntity implements View {
 	public void update() {
 		if (Keyboard.keyDown(upKey)) {
 			tf.setVelocityY(-speed);
-		}
-		if (Keyboard.keyDown(downKey)) {
+		} else if (Keyboard.keyDown(downKey)) {
 			tf.setVelocityY(speed);
+		} else {
+			tf.setVelocityY(0);
 		}
-		moveAndStopAtBorder();
+		move();
 	}
 
-	protected void moveAndStopAtBorder() {
+	protected void move() {
 		tf.move();
 		if (tf.getY() < 0) {
 			tf.setY(0);
 		} else if (tf.getY() >= courtSize.height - tf.getHeight()) {
 			tf.setY(courtSize.height - tf.getHeight());
 		}
-		tf.setVelocityY(0);
 	}
 
 	@Override

@@ -12,6 +12,7 @@ public class AutoPaddleRight extends Paddle {
 
 	@Override
 	public void update() {
+		tf.setVelocityY(0);
 		float targetY = courtSize.height / 2 + tf.getHeight();
 		if (ball.tf.getVelocityX() > 0) {
 			computeBallPositionRight();
@@ -23,7 +24,7 @@ public class AutoPaddleRight extends Paddle {
 		} else if (diff > ball.tf.getWidth()) {
 			tf.setVelocityY(-speed);
 		}
-		moveAndStopAtBorder();
+		move();
 	}
 
 	private void computeBallPositionRight() {
