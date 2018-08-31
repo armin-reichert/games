@@ -91,11 +91,11 @@ public class IntroScene implements View, Controller {
 		}
 
 		logoAnimation = PumpingImage.create().image(Assets.image("title")).scale(3).build();
-		logoAnimation.center(width, height);
+		logoAnimation.tf.center(width, height);
 
 		textAnimation = TextArea.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))
 				.color(city.isNight() ? Color.WHITE : Color.DARK_GRAY).build();
-		textAnimation.centerHorizontally(width);
+		textAnimation.tf.centerX(width);
 
 		fsm.setLogger(Application.LOGGER);
 		fsm.init();

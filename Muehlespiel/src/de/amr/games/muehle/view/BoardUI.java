@@ -86,7 +86,7 @@ public class BoardUI extends GameEntity implements View, Controller {
 	public void putStoneAt(int p, StoneColor color) {
 		board.putStoneAt(p, color);
 		Stone stone = new Stone(color, getStoneRadius());
-		stone.tf.moveTo(centerPoint(p));
+		stone.tf.setPosition(centerPoint(p));
 		stones[p] = stone;
 	}
 
@@ -99,7 +99,7 @@ public class BoardUI extends GameEntity implements View, Controller {
 			int from = move.from().get(), to = move.to().get();
 			board.moveStone(from, to);
 			Stone stone = stones[from];
-			stone.tf.moveTo(centerPoint(to));
+			stone.tf.setPosition(centerPoint(to));
 			stones[to] = stone;
 			stones[from] = null;
 		}

@@ -166,9 +166,9 @@ public class PlayScreen implements View, Controller {
 
 	private void resetPaddles() {
 		paddle[0].tf.setX(0);
-		paddle[0].centerVertically(size.height);
+		paddle[0].tf.centerY(size.height);
 		paddle[1].tf.setX(size.width - paddle[1].tf.getWidth());
-		paddle[1].centerVertically(size.height);
+		paddle[1].tf.centerY(size.height);
 	}
 
 	private void resetScores() {
@@ -179,10 +179,10 @@ public class PlayScreen implements View, Controller {
 	private void prepareService() {
 		resetPaddles();
 		if (!isBallOutRight()) {
-			ball.tf.moveTo(paddle[0].tf.getX() + paddle[0].tf.getWidth(),
+			ball.tf.setPosition(paddle[0].tf.getX() + paddle[0].tf.getWidth(),
 					paddle[0].tf.getY() + paddle[0].tf.getHeight() / 2 - ball.tf.getHeight() / 2);
 		} else {
-			ball.tf.moveTo(paddle[1].tf.getX() - ball.tf.getWidth(),
+			ball.tf.setPosition(paddle[1].tf.getX() - ball.tf.getWidth(),
 					paddle[1].tf.getY() + paddle[1].tf.getHeight() / 2 - ball.tf.getHeight() / 2);
 		}
 		ball.tf.setVelocity(0, 0);

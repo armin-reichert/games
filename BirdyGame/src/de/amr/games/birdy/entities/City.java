@@ -99,7 +99,7 @@ public class City extends GameEntityUsingSprites {
 		int numStars = randomInt(1, app.settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
 			Star star = app.entities.store(new Star());
-			star.tf.moveTo(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
+			star.tf.setPosition(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
 		});
 		Application.LOGGER.info("Created " + numStars + " new stars");
 	}

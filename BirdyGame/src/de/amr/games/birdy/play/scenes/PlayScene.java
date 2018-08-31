@@ -126,12 +126,12 @@ public class PlayScene implements View, Controller {
 		city = app.entities.ofClass(City.class).findAny().get();
 		bird = app.entities.ofClass(Bird.class).findAny().get();
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
-		scoreDisplay.centerHorizontally(getWidth());
+		scoreDisplay.tf.centerX(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
 		gameOverText = app.entities.store(new GraphicText(Assets.image("text_game_over")));
-		gameOverText.center(getWidth(), getHeight());
+		gameOverText.tf.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
-		world.tf.moveTo(0, -getHeight());
+		world.tf.setPosition(0, -getHeight());
 
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 		app.collisionHandler.registerEnd(bird, world, BirdLeftWorld);

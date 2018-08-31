@@ -135,12 +135,12 @@ public class StartScene implements View, Controller {
 
 		ground = app.entities.ofClass(Ground.class).findAny().get();
 		ground.setWidth(getWidth());
-		ground.tf.moveTo(0, getHeight() - ground.tf.getHeight());
+		ground.tf.setPosition(0, getHeight() - ground.tf.getHeight());
 		ground.tf.setVelocity(app.settings.getAsFloat("world speed"), 0);
 
 		bird = app.entities.ofClass(Bird.class).findAny().get();
 		bird.init();
-		bird.tf.moveTo(getWidth() / 8, ground.tf.getY() / 2);
+		bird.tf.setPosition(getWidth() / 8, ground.tf.getY() / 2);
 		bird.tf.setVelocity(0, 0);
 
 		if (!app.entities.contains("title")) {
@@ -160,7 +160,7 @@ public class StartScene implements View, Controller {
 
 		if (!app.entities.contains("world")) {
 			Area world = new Area(getWidth(), 2 * getHeight());
-			world.tf.moveTo(0, -getHeight());
+			world.tf.setPosition(0, -getHeight());
 			app.entities.store("world", world);
 		}
 
@@ -191,7 +191,7 @@ public class StartScene implements View, Controller {
 		ground.draw(g);
 		bird.draw(g);
 		if (displayedText != null) {
-			displayedText.center(getWidth(), getHeight() - ground.tf.getHeight());
+			displayedText.tf.center(getWidth(), getHeight() - ground.tf.getHeight());
 			displayedText.draw(g);
 		}
 		g.setColor(Color.BLACK);

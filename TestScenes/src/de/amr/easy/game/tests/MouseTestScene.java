@@ -59,7 +59,7 @@ public class MouseTestScene implements View, Controller {
 	public void draw(Graphics2D g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
-		messageDisplay.center(getWidth(), getHeight());
+		messageDisplay.tf.center(getWidth(), getHeight());
 		messageDisplay.draw(g);
 		g.translate(Mouse.getX(), Mouse.getY());
 		g.setColor(Color.BLACK);

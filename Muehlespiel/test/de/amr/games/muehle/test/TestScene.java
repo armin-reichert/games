@@ -45,7 +45,7 @@ public class TestScene implements View, Controller {
 		boardUI.setBgColor(MillGameUI.BOARD_COLOR);
 		boardUI.setLineColor(MillGameUI.LINE_COLOR);
 		boardUI.showPositionNumbers();
-		boardUI.center(getWidth(), getHeight());
+		boardUI.tf.center(getWidth(), getHeight());
 	}
 
 	@Override

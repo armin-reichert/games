@@ -14,7 +14,7 @@ public class Lever extends GameEntity implements View {
 	private boolean pointsLeft;
 
 	public Lever(int x, int y) {
-		tf.moveTo(x - size / 2, y - size / 2);
+		tf.setPosition(x - size / 2, y - size / 2);
 		tf.setWidth(size);
 		tf.setHeight(size);
 	}

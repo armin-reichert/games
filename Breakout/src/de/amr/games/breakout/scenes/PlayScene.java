@@ -167,7 +167,7 @@ public class PlayScene implements View, Controller {
 			int value = 5 * (numRows - row);
 			for (int col = 0; col < numCols; ++col) {
 				Brick brick = new Brick(brickWidth, brickHeight, type, value);
-				brick.tf.moveTo(x, y);
+				brick.tf.setPosition(x, y);
 				app.entities.store(brick);
 				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
 				x += hSpace;
@@ -179,9 +179,9 @@ public class PlayScene implements View, Controller {
 
 	private void resetBatAndBall() {
 		bat.speed = getWidth() / 48;
-		bat.tf.moveTo((getWidth() - bat.tf.getWidth()) / 2, getHeight() - bat.tf.getHeight());
+		bat.tf.setPosition((getWidth() - bat.tf.getWidth()) / 2, getHeight() - bat.tf.getHeight());
 		bat.tf.setVelocity(0, 0);
-		ball.tf.moveTo((getWidth() - ball.tf.getWidth()) / 2, bat.tf.getY() - ball.tf.getHeight());
+		ball.tf.setPosition((getWidth() - ball.tf.getWidth()) / 2, bat.tf.getY() - ball.tf.getHeight());
 		ball.tf.setVelocity(0, 0);
 	}
 

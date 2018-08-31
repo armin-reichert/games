@@ -77,7 +77,7 @@ public class MarbleRouter extends StateMachine<RoutingPoint, Character> {
 	}
 
 	private void placeMarbleCenteredAt(RoutingPoint p) {
-		marble.tf.moveTo(p.getLocation().x - marble.tf.getWidth() / 2,
+		marble.tf.setPosition(p.getLocation().x - marble.tf.getWidth() / 2,
 				p.getLocation().y - marble.tf.getHeight() / 2);
 	}
 

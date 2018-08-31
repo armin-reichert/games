@@ -65,7 +65,7 @@ public class MillGameScene implements View, Controller, MillGameUI {
 		boardUI.setSize(getWidth() * 3 / 4);
 		boardUI.setBgColor(BOARD_COLOR);
 		boardUI.setLineColor(LINE_COLOR);
-		boardUI.centerHorizontally(getWidth());
+		boardUI.tf.centerX(getWidth());
 		boardUI.tf.setY(50);
 
 		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
@@ -73,9 +73,9 @@ public class MillGameScene implements View, Controller, MillGameUI {
 
 		messageArea = TextArea.create().color(Color.BLUE)
 				.font(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36)).build();
-		messageArea.tf.moveTo(0, getHeight() - 90);
+		messageArea.tf.setPosition(0, getHeight() - 90);
 
-		controller.assistant.centerHorizontally(getWidth());
+		controller.assistant.tf.centerX(getWidth());
 		controller.assistant.tf.setY(getHeight() / 2 - 100);
 	}
 
@@ -146,7 +146,7 @@ public class MillGameScene implements View, Controller, MillGameUI {
 		g.fillRect(0, 0, getWidth(), getHeight());
 		boardUI.draw(g);
 		controller.assistant.draw(g);
-		messageArea.centerHorizontally(getWidth());
+		messageArea.tf.centerX(getWidth());
 		messageArea.draw(g);
 		if (controller.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
 			controller.getPositionNearMouse().ifPresent(p -> {
