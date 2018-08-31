@@ -89,12 +89,24 @@ public class MenuScreen implements Controller, View {
 		.endStateMachine();
 		//@formatter:on
 	}
+	
+	
+	public void setBgColor(Color bgColor) {
+		this.bgColor = bgColor;
+	}
+	
+	
+	public void setBgColorSelected(Color bgColorSelected) {
+		this.bgColorSelected = bgColorSelected;
+	}
+	
+	
+	public void setHilightColor(Color hilightColor) {
+		this.hilightColor = hilightColor;
+	}
 
 	@Override
 	public void init() {
-		bgColor = Color.LIGHT_GRAY;
-		bgColorSelected = bgColor.darker();
-		hilightColor = Color.YELLOW;
 		fsm.init();
 	}
 

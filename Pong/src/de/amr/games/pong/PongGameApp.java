@@ -1,5 +1,6 @@
 package de.amr.games.pong;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
 import de.amr.easy.game.Application;
@@ -37,20 +38,29 @@ public class PongGameApp extends Application implements ScreenManager {
 	public void init() {
 		game = new Game();
 		loadSounds();
-		Dimension size = new Dimension(settings.width, settings.height);
-		menuScreen = new MenuScreen(this, size);
-		playScreen = new PlayScreen(this, game, size);
-		setController(menuScreen);
+		selectMenuScreen();
 	}
 
 	@Override
 	public void selectMenuScreen() {
-		setController(menuScreen);
+		if (menuScreen == null) {
+			Dimension size = new Dimension(settings.width, settings.height);
+			menuScreen = new MenuScreen(this, size);
+			menuScreen.setBgColor(Color.BLACK);
+			menuScreen.setBgColorSelected(Color.GRAY);
+			menuScreen.setHilightColor(Color.YELLOW);
+			menuScreen.init();
+		}
+		setController(menuScreen, false);
 	}
 
 	@Override
 	public void selectPlayScreen(PlayMode playMode) {
 		game.playMode = playMode;
+		if (playScreen == null) {
+			Dimension size = new Dimension(settings.width, settings.height);
+			playScreen = new PlayScreen(this, game, size);
+		}
 		setController(playScreen);
 	}
 
