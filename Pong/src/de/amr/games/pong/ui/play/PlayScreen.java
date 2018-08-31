@@ -18,6 +18,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.input.Keyboard;
@@ -80,8 +81,7 @@ public class PlayScreen implements View, Controller {
 	}
 
 	private Court court;
-	private Paddle paddleLeft;
-	private Paddle paddleRight;
+	private Paddle paddle[] = new Paddle[2];
 	private Ball ball;
 
 	private void initEntities() {
@@ -90,37 +90,35 @@ public class PlayScreen implements View, Controller {
 		ball.setCourtSize(size);
 		switch (game.playMode) {
 		case Computer_Computer:
-			paddleLeft = new AutoPaddleLeft();
-			paddleRight = new AutoPaddleRight();
+			paddle[0] = new AutoPaddleLeft();
+			paddle[1] = new AutoPaddleRight();
 			break;
 		case Computer_Player2:
-			paddleLeft = new AutoPaddleLeft();
-			paddleRight = new Paddle(VK_UP, VK_DOWN);
+			paddle[0] = new AutoPaddleLeft();
+			paddle[1] = new Paddle(VK_UP, VK_DOWN);
 			break;
 		case Player1_Computer:
-			paddleLeft = new Paddle(VK_A, VK_Y);
-			paddleRight = new AutoPaddleRight();
+			paddle[0] = new Paddle(VK_A, VK_Y);
+			paddle[1] = new AutoPaddleRight();
 			break;
 		case Player1_Player2:
-			paddleLeft = new Paddle(VK_A, VK_Y);
-			paddleRight = new Paddle(VK_UP, VK_DOWN);
+			paddle[0] = new Paddle(VK_A, VK_Y);
+			paddle[1] = new Paddle(VK_UP, VK_DOWN);
 			break;
 		}
-		paddleLeft.setSize(15, 60);
-		paddleLeft.setCourtSize(size);
-		paddleLeft.setSpeed(5);
-		paddleLeft.setBall(ball);
-		paddleRight.setSize(15, 60);
-		paddleRight.setCourtSize(size);
-		paddleRight.setSpeed(5);
-		paddleRight.setBall(ball);
+		IntStream.rangeClosed(0, 1).forEach(i -> {
+			paddle[i].setSize(15, 60);
+			paddle[i].setCourtSize(size);
+			paddle[i].setSpeed(5);
+			paddle[i].setBall(ball);
+		});
 	}
 
 	private void updateEntities() {
 		court.update();
 		ball.update();
-		paddleLeft.update();
-		paddleRight.update();
+		paddle[0].update();
+		paddle[1].update();
 	}
 
 	@Override
@@ -141,8 +139,8 @@ public class PlayScreen implements View, Controller {
 	public void draw(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		court.draw(g);
-		paddleLeft.draw(g);
-		paddleRight.draw(g);
+		paddle[0].draw(g);
+		paddle[1].draw(g);
 		ball.draw(g);
 		g.translate(0, size.height / 2);
 		g.setColor(Color.WHITE);
@@ -165,10 +163,10 @@ public class PlayScreen implements View, Controller {
 	}
 
 	private void resetPaddles() {
-		paddleLeft.tf.setX(0);
-		paddleLeft.centerVertically(size.height);
-		paddleRight.tf.setX(size.width - paddleRight.tf.getWidth());
-		paddleRight.centerVertically(size.height);
+		paddle[0].tf.setX(0);
+		paddle[0].centerVertically(size.height);
+		paddle[1].tf.setX(size.width - paddle[1].tf.getWidth());
+		paddle[1].centerVertically(size.height);
 	}
 
 	private void resetScores() {
@@ -179,11 +177,11 @@ public class PlayScreen implements View, Controller {
 	private void prepareService() {
 		resetPaddles();
 		if (!isBallOutRight()) {
-			ball.tf.moveTo(paddleLeft.tf.getX() + paddleLeft.tf.getWidth(),
-					paddleLeft.tf.getY() + paddleLeft.tf.getHeight() / 2 - ball.tf.getHeight() / 2);
+			ball.tf.moveTo(paddle[0].tf.getX() + paddle[0].tf.getWidth(),
+					paddle[0].tf.getY() + paddle[0].tf.getHeight() / 2 - ball.tf.getHeight() / 2);
 		} else {
-			ball.tf.moveTo(paddleRight.tf.getX() - ball.tf.getWidth(),
-					paddleRight.tf.getY() + paddleRight.tf.getHeight() / 2 - ball.tf.getHeight() / 2);
+			ball.tf.moveTo(paddle[1].tf.getX() - ball.tf.getWidth(),
+					paddle[1].tf.getY() + paddle[1].tf.getHeight() / 2 - ball.tf.getHeight() / 2);
 		}
 		ball.tf.setVelocity(0, 0);
 	}
@@ -207,11 +205,11 @@ public class PlayScreen implements View, Controller {
 	}
 
 	private boolean leftPaddleHitsBall() {
-		return ball.tf.getVelocityX() <= 0 && paddleLeft.hitsBall(ball);
+		return ball.tf.getVelocityX() <= 0 && paddle[0].hitsBall(ball);
 	}
 
 	private boolean rightPaddleHitsBall() {
-		return ball.tf.getVelocityX() >= 0 && paddleRight.hitsBall(ball);
+		return ball.tf.getVelocityX() >= 0 && paddle[1].hitsBall(ball);
 	}
 
 	private void returnBallWithLeftPaddle() {
