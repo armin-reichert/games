@@ -13,7 +13,7 @@ public class SpriteBrowserApp extends Application {
 		settings.title = "Birdy Sprites";
 		settings.width = 1024;
 		settings.height = 1024;
-		Application.PULSE.setFrequency(10);
+		Application.CLOCK.setFrequency(10);
 	}
 
 	@Override

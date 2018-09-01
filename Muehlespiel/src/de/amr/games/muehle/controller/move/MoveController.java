@@ -99,7 +99,7 @@ public class MoveController extends StateMachine<MoveState, MoveEvent> {
 			int from = move.from().get(), to = move.to().get();
 			gameUI.getStoneAt(from).ifPresent(stone -> {
 				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to))
-						/ Application.PULSE.secToTicks(moveTimeSec);
+						/ Application.CLOCK.secToTicks(moveTimeSec);
 				Direction dir = getDirection(from, to).get();
 				if (dir == Direction.NORTH) {
 					stone.tf.setVelocity(0, -speed);

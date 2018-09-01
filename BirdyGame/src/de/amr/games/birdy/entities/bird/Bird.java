@@ -1,6 +1,6 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.easy.game.Application.PULSE;
+import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.games.birdy.entities.bird.FlightState.Crashing;
 import static de.amr.games.birdy.entities.bird.FlightState.Flying;
 import static de.amr.games.birdy.entities.bird.FlightState.OnGround;
@@ -54,7 +54,7 @@ public class Bird extends GameEntityUsingSprites {
 			};
 
 			state(Injured).entry = s -> {
-				s.setDuration(PULSE.secToTicks(app.settings.get("bird injured seconds")));
+				s.setDuration(CLOCK.secToTicks(app.settings.get("bird injured seconds")));
 				setCurrentSprite("s_red");
 			};
 

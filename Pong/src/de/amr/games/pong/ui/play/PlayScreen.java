@@ -1,6 +1,6 @@
 package de.amr.games.pong.ui.play;
 
-import static de.amr.easy.game.Application.PULSE;
+import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.games.pong.ui.play.PlayState.GAME_OVER;
 import static de.amr.games.pong.ui.play.PlayState.INIT;
 import static de.amr.games.pong.ui.play.PlayState.PLAYING;
@@ -50,7 +50,7 @@ public class PlayScreen implements View, Controller {
 		this.game = game;
 		this.size = size;
 		fsm = createStateMachine();
-		fsm.traceTo(Application.LOGGER, PULSE::getFrequency);
+		fsm.traceTo(Application.LOGGER, CLOCK::getFrequency);
 	}
 
 	private StateMachine<PlayState, Object> createStateMachine() {
@@ -62,7 +62,7 @@ public class PlayScreen implements View, Controller {
 	
 		.states()
 			.state(INIT).onEntry(this::initEntities)
-			.state(SERVING).timeoutAfter(() -> PULSE.secToTicks(2)).onEntry(this::prepareService)
+			.state(SERVING).timeoutAfter(() -> CLOCK.secToTicks(2)).onEntry(this::prepareService)
 			.state(PLAYING).onTick(this::updateEntities)
 			.state(GAME_OVER)
 			

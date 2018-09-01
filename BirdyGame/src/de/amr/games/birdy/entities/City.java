@@ -1,6 +1,6 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.Application.PULSE;
+import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNRISE;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNSET;
 import static de.amr.games.birdy.entities.City.DayTime.DAY;
@@ -57,7 +57,7 @@ public class City extends GameEntityUsingSprites {
 		fsm.changeOnInput(SUNSET, DAY, NIGHT);
 
 		fsm.state(NIGHT).entry = s -> {
-			s.setDuration(PULSE.secToTicks(10));
+			s.setDuration(CLOCK.secToTicks(10));
 			setCurrentSprite("s_night");
 			replaceStars();
 		};

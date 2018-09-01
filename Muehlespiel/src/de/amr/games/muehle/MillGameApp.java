@@ -24,7 +24,7 @@ public class MillGameApp extends Application {
 		settings.width = 800;
 		settings.height = 800;
 		settings.fullScreenMode = null;
-		PULSE.setFrequency(25);
+		CLOCK.setFrequency(25);
 	}
 
 	@Override

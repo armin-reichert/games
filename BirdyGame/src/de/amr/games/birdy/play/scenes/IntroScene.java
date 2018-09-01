@@ -1,6 +1,6 @@
 package de.amr.games.birdy.play.scenes;
 
-import static de.amr.easy.game.Application.PULSE;
+import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.COMPLETE;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.CREDITS;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.TITLE;
@@ -64,7 +64,7 @@ public class IntroScene implements View, Controller {
 		fsm.state(CREDITS).update = s -> textAnimation.update();
 
 		fsm.change(CREDITS, WAITING, () -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2,
-				t -> t.to().setDuration(PULSE.secToTicks(2)));
+				t -> t.to().setDuration(CLOCK.secToTicks(2)));
 
 		// Wait
 		fsm.state(WAITING).entry = s -> {
@@ -72,7 +72,7 @@ public class IntroScene implements View, Controller {
 			textAnimation.setVisible(false);
 		};
 
-		fsm.changeOnTimeout(WAITING, TITLE, t -> t.to().setDuration(PULSE.secToTicks(3)));
+		fsm.changeOnTimeout(WAITING, TITLE, t -> t.to().setDuration(CLOCK.secToTicks(3)));
 
 		// ShowGameTitle
 		fsm.changeOnTimeout(TITLE, COMPLETE);

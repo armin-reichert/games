@@ -17,7 +17,7 @@ public class MainScene implements View, Controller {
 	private int stepX = 20;
 
 	public MainScene(GamePerformanceApp app) {
-		Application.PULSE.addRenderListener(e -> {
+		Application.CLOCK.addRenderListener(e -> {
 			if ("fps".equals(e.getPropertyName())) {
 				fpsValues[sampleIndex++] = (Integer) e.getNewValue();
 				if (sampleIndex * stepX >= getWidth()) {
