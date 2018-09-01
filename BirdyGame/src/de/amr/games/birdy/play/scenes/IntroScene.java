@@ -64,7 +64,7 @@ public class IntroScene implements View, Controller {
 		fsm.state(CREDITS).update = s -> textAnimation.update();
 
 		fsm.change(CREDITS, WAITING, () -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2,
-				t -> t.to().setDuration(CLOCK.secToTicks(2)));
+				t -> t.to().setDuration(CLOCK.sec(2)));
 
 		// Wait
 		fsm.state(WAITING).entry = s -> {
@@ -72,7 +72,7 @@ public class IntroScene implements View, Controller {
 			textAnimation.setVisible(false);
 		};
 
-		fsm.changeOnTimeout(WAITING, TITLE, t -> t.to().setDuration(CLOCK.secToTicks(3)));
+		fsm.changeOnTimeout(WAITING, TITLE, t -> t.to().setDuration(CLOCK.sec(3)));
 
 		// ShowGameTitle
 		fsm.changeOnTimeout(TITLE, COMPLETE);

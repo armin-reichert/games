@@ -57,7 +57,7 @@ public class City extends GameEntityUsingSprites {
 		fsm.changeOnInput(SUNSET, DAY, NIGHT);
 
 		fsm.state(NIGHT).entry = s -> {
-			s.setDuration(CLOCK.secToTicks(10));
+			s.setDuration(CLOCK.sec(10));
 			setCurrentSprite("s_night");
 			replaceStars();
 		};

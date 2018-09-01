@@ -66,7 +66,7 @@ public class StartScene implements View, Controller {
 			// Ready ---
 
 			state(Ready).entry = s -> {
-				s.setDuration(CLOCK.secToTicks(app.settings.getAsFloat("ready time sec")));
+				s.setDuration(CLOCK.sec(app.settings.getAsFloat("ready time sec")));
 				displayText("readyText");
 			};
 

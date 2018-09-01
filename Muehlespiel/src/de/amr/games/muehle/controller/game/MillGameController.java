@@ -181,7 +181,7 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 	protected void switchPlacing(Transition<MillGameState, MillGameEvent> change) {
 		turnPlacingTo(playerNotInTurn());
 		if (!turn.isInteractive()) {
-			pause(Application.CLOCK.secToTicks(placingTimeSeconds));
+			pause(Application.CLOCK.sec(placingTimeSeconds));
 		}
 	}
 
@@ -282,7 +282,7 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 	@Override
 	protected void onGameOver(State state) {
 		announceWinner(playerNotInTurn());
-		pause(Application.CLOCK.secToTicks(3));
+		pause(Application.CLOCK.sec(3));
 	}
 
 	@Override

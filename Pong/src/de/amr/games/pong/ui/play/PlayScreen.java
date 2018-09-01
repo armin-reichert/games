@@ -62,7 +62,7 @@ public class PlayScreen implements View, Controller {
 	
 		.states()
 			.state(INIT).onEntry(this::initEntities)
-			.state(SERVING).timeoutAfter(() -> CLOCK.secToTicks(2)).onEntry(this::prepareService)
+			.state(SERVING).timeoutAfter(() -> CLOCK.sec(2)).onEntry(this::prepareService)
 			.state(PLAYING).onTick(this::updateEntities)
 			.state(GAME_OVER)
 			

@@ -54,7 +54,7 @@ public class Bird extends GameEntityUsingSprites {
 			};
 
 			state(Injured).entry = s -> {
-				s.setDuration(CLOCK.secToTicks(app.settings.get("bird injured seconds")));
+				s.setDuration(CLOCK.sec(app.settings.get("bird injured seconds")));
 				setCurrentSprite("s_red");
 			};
 
