@@ -113,7 +113,7 @@ public class MenuScreen implements Controller, View {
 	@Override
 	public void update() {
 		if (keyPressedOnce(VK_ENTER)) {
-			screenManager.selectPlayScreen(fsm.currentState());
+			screenManager.selectPlayScreen(fsm.getState());
 		}
 		fsm.update();
 	}
@@ -128,7 +128,7 @@ public class MenuScreen implements Controller, View {
 		int y = 60;
 		int h = size.height / playModes.length;
 		for (int i = 0; i < playModes.length; ++i) {
-			if (playModes[i] == fsm.currentState()) {
+			if (playModes[i] == fsm.getState()) {
 				g.setColor(bgColorSelected);
 				g.fillRect(0, h * i, size.width, h);
 				g.setColor(hilightColor);
