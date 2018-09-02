@@ -19,7 +19,7 @@ import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.BirdyGameApp;
-import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -50,7 +50,7 @@ public class City extends GameEntityUsingSprites {
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());
 
-		fsm = new StateMachine<>(DayTime.class, MatchStrategy.BY_EQUALITY);
+		fsm = new StateMachine<>(DayTime.class, Match.BY_EQUALITY);
 		fsm.setDescription("City");
 		fsm.setInitialState(DAY);
 

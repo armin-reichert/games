@@ -9,6 +9,7 @@ import static de.amr.games.birdy.entities.bird.HealthState.Dead;
 import static de.amr.games.birdy.entities.bird.HealthState.Injured;
 import static de.amr.games.birdy.entities.bird.HealthState.Sane;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdCrashed;
+import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
@@ -23,7 +24,7 @@ import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.play.BirdyGameEvent;
-import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -45,12 +46,13 @@ public class Bird extends GameEntityUsingSprites {
 
 		public HealthControl() {
 
-			super(HealthState.class, MatchStrategy.BY_EQUALITY);
+			super(HealthState.class, Match.BY_EQUALITY);
 			setDescription("Bird Health Control");
 			setInitialState(Sane);
 
 			state(Sane).setOnEntry(() -> setCurrentSprite("s_yellow"));
 
+			addTransitionOnEventObject(Sane, Sane, null, null, BirdLeftPassage);
 			addTransitionOnEventObject(Sane, Injured, null, null, BirdTouchedPipe);
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdTouchedGround);
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdLeftWorld);
@@ -58,15 +60,19 @@ public class Bird extends GameEntityUsingSprites {
 			state(Injured).setDuration(() -> CLOCK.sec(app.settings.get("bird injured seconds")));
 			state(Injured).setOnEntry(() -> setCurrentSprite("s_red"));
 
+			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
+			addTransitionOnTimeout(Injured, Sane, null, null);
+			addTransitionOnEventObject(Injured, Injured, null, null, BirdCrashed);
+			addTransitionOnEventObject(Injured, Injured, null, null, BirdLeftPassage);
+			addTransitionOnEventObject(Injured, Dead, null, null, BirdTouchedGround);
+			addTransitionOnEventObject(Injured, Dead, null, null, BirdLeftWorld);
+
 			state(Dead).setOnEntry(() -> {
 				setCurrentSprite("s_blue");
 				turnDown();
 			});
-
-			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
-			addTransitionOnTimeout(Injured, Sane, null, null);
-			addTransitionOnEventObject(Injured, Dead, null, null, BirdTouchedGround);
-			addTransitionOnEventObject(Injured, Dead, null, null, BirdLeftWorld);
+			
+			addTransitionOnEventObject(Dead, Dead, null, null, BirdTouchedGround);
 		}
 	}
 
@@ -77,7 +83,7 @@ public class Bird extends GameEntityUsingSprites {
 
 		public FlightControl() {
 
-			super(FlightState.class, MatchStrategy.BY_EQUALITY);
+			super(FlightState.class, Match.BY_EQUALITY);
 			setDescription("Bird Flight Control");
 			setInitialState(Flying);
 
@@ -89,6 +95,8 @@ public class Bird extends GameEntityUsingSprites {
 				}
 			});
 
+			addTransitionOnEventObject(Flying, Flying, null, null, BirdLeftPassage);
+			addTransitionOnEventObject(Flying, Crashing, null, null, BirdTouchedPipe);
 			addTransitionOnEventObject(Flying, Crashing, null, null, BirdCrashed);
 			addTransitionOnEventObject(Flying, Crashing, null, null, BirdLeftWorld);
 			addTransitionOnEventObject(Flying, OnGround, null, null, BirdTouchedGround);
@@ -96,12 +104,17 @@ public class Bird extends GameEntityUsingSprites {
 			state(Crashing).setOnEntry(() -> turnDown());
 			state(Crashing).setOnTick(() -> fall(3));
 
+			addTransitionOnEventObject(Crashing, Crashing, null, null, BirdCrashed);
+			addTransitionOnEventObject(Crashing, Crashing, null, null, BirdLeftPassage);
+			addTransitionOnEventObject(Crashing, Crashing, null, null, BirdTouchedPipe);
 			addTransitionOnEventObject(Crashing, OnGround, null, null, BirdTouchedGround);
 
 			state(OnGround).setOnEntry(() -> {
 				Assets.sound("sfx/die.mp3").play();
 				turnDown();
 			});
+			
+			addTransitionOnEventObject(OnGround, OnGround, null, null, BirdTouchedGround);
 		}
 	}
 

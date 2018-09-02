@@ -30,6 +30,7 @@ import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGameEvent;
 import de.amr.games.birdy.utils.Score;
+import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -57,7 +58,7 @@ public class PlayScene implements View, Controller {
 
 		public PlaySceneControl() {
 
-			super(State.class);
+			super(State.class, Match.BY_EQUALITY);
 			setDescription("Play Scene Control");
 			setInitialState(Playing);
 
@@ -98,6 +99,8 @@ public class PlayScene implements View, Controller {
 
 			addTransition(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE), null);
 
+			addTransitionOnEventObject(GameOver, GameOver, null, null, BirdTouchedPipe);
+			addTransitionOnEventObject(GameOver, GameOver, null, null, BirdLeftPassage);
 			addTransitionOnEventObject(GameOver, GameOver, null, e -> Assets.sound("music/bgmusic.mp3").stop(),
 					BirdTouchedGround);
 

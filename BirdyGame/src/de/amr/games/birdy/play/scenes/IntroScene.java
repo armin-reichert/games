@@ -4,7 +4,7 @@ import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.COMPLETE;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.CREDITS;
-import static de.amr.games.birdy.play.scenes.IntroScene.State.TITLE;
+import static de.amr.games.birdy.play.scenes.IntroScene.State.LOGO;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.WAITING;
 
 import java.awt.Color;
@@ -20,7 +20,7 @@ import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.City;
-import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
 /**
@@ -30,11 +30,11 @@ import de.amr.statemachine.StateMachine;
  */
 public class IntroScene implements View, Controller {
 
-	private static final String CREDITS_TEXT = "Anna proudly presents" + "\nin cooperation with"
-			+ "\nProf. Zwickmann" + "\nGeräteschuppen Software 2017";
+	private static final String CREDITS_TEXT = String.join("\n", "Anna proudly presents", "in cooperation with",
+			"Prof. Zwickmann", "Geräteschuppen Software 2017");
 
 	public enum State {
-		CREDITS, WAITING, TITLE, COMPLETE
+		CREDITS, WAITING, LOGO, COMPLETE
 	}
 
 	private final int width;
@@ -43,8 +43,8 @@ public class IntroScene implements View, Controller {
 
 	private final EntityMap entities;
 	private City city;
-	private PumpingImage logoAnimation;
-	private TextArea textAnimation;
+	private PumpingImage logo;
+	private TextArea credits;
 
 	public IntroScene(BirdyGameApp app) {
 
@@ -52,42 +52,36 @@ public class IntroScene implements View, Controller {
 		this.height = app.settings.height;
 		this.entities = app.entities;
 
-		fsm = new StateMachine<>(State.class, MatchStrategy.BY_EQUALITY);
+		fsm = new StateMachine<>(State.class, Match.BY_EQUALITY);
+		fsm.traceTo(LOGGER, CLOCK::getFrequency);
 		fsm.setDescription("Intro Scene");
 		fsm.setInitialState(CREDITS);
 
-		// ShowCredits
-
 		fsm.state(CREDITS).setOnEntry(() -> {
-			textAnimation.tf.setY(height);
-			textAnimation.setSpeedY(-.75f);
-			logoAnimation.setVisible(false);
+			credits.start();
 			Assets.sound("music/bgmusic.mp3").loop();
 		});
 
-		fsm.state(CREDITS).setOnTick(() -> textAnimation.update());
+		fsm.state(CREDITS).setOnTick(() -> credits.update());
+		fsm.addTransition(CREDITS, WAITING, () -> {
+			return credits.isCompleted();
+		}, e -> credits.stop());
 
-		fsm.addTransition(CREDITS, WAITING,
-				() -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2, null);
-
-		fsm.state(WAITING).setDuration(() -> CLOCK.sec(2));
-
-		// Wait
-
-		fsm.state(WAITING).setOnEntry(() -> {
-			logoAnimation.setVisible(true);
-			textAnimation.setVisible(false);
+		fsm.state(CREDITS).setOnExit(() -> {
+			credits.stop();
 		});
 
-		fsm.addTransition(WAITING, TITLE, null, null);
+		fsm.state(WAITING).setDuration(() -> CLOCK.sec(2));
+		fsm.addTransitionOnTimeout(WAITING, LOGO, null, null);
 
-		// ShowGameTitle
+		fsm.state(LOGO).setOnEntry(() -> {
+			logo.setVisible(true);
+			credits.setVisible(false);
+		});
+		fsm.state(LOGO).setDuration(() -> CLOCK.sec(3));
+		fsm.addTransitionOnTimeout(LOGO, COMPLETE, null, null);
 
-		fsm.state(TITLE).setDuration(() -> CLOCK.sec(3));
-
-		fsm.addTransitionOnTimeout(TITLE, COMPLETE, null, null);
-
-		fsm.state(TITLE).setOnExit(() -> app.setController(app.getStartScene()));
+		fsm.state(LOGO).setOnExit(() -> app.setController(app.getStartScene()));
 	}
 
 	@Override
@@ -100,14 +94,17 @@ public class IntroScene implements View, Controller {
 			city.sunrise();
 		}
 
-		logoAnimation = PumpingImage.create().image(Assets.image("title")).scale(3).build();
-		logoAnimation.tf.center(width, height);
-
-		textAnimation = TextArea.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))
+		credits = TextArea.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))
 				.color(city.isNight() ? Color.WHITE : Color.DARK_GRAY).build();
-		textAnimation.tf.centerX(width);
+		credits.tf.centerX(width);
+		credits.tf.setY(height);
+		credits.setSpeedY(-.75f);
+		credits.setCompletion(() -> credits.tf.getY() < height / 4);
 
-		fsm.traceTo(LOGGER, CLOCK::getFrequency);
+		logo = PumpingImage.create().image(Assets.image("title")).scale(3).build();
+		logo.tf.center(width, height);
+		logo.setVisible(false);
+
 		fsm.init();
 	}
 
@@ -118,6 +115,6 @@ public class IntroScene implements View, Controller {
 
 	@Override
 	public void draw(Graphics2D g) {
-		Stream.of(city, logoAnimation, textAnimation).forEach(e -> e.draw(g));
+		Stream.of(city, logo, credits).forEach(e -> e.draw(g));
 	}
 }
