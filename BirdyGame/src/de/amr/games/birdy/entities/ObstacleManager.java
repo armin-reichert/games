@@ -16,9 +16,10 @@ import java.util.logging.Logger;
 
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.bird.Bird;
+import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.StateMachine;
 
 /**
  * Manages the creation and deletion of obstacles.
@@ -34,37 +35,39 @@ public class ObstacleManager extends GameEntity implements View {
 	public ObstacleManager(BirdyGameApp app) {
 		this.app = app;
 
-		control = new StateMachine<>(getClass().getSimpleName(), ObstacleManagerState.class, Stopped);
+		control = new StateMachine<>(ObstacleManagerState.class, MatchStrategy.BY_EQUALITY);
+		control.setDescription(getClass().getSimpleName());
+		control.setInitialState(Stopped);
 
 		// Stay breeding for some random time from interval [MIN_PIPE_TIME, MAX_PIPE_TIME]:
-		control.state(Breeding).entry = s -> {
+		control.state(Breeding).setDuration(() -> {
 			int minCreationTime = CLOCK.sec(app.settings.getAsFloat("min pipe creation sec"));
 			int maxCreationTime = CLOCK.sec(app.settings.getAsFloat("max pipe creation sec"));
-			s.setDuration(randomInt(minCreationTime, maxCreationTime));
-		};
+			return randomInt(minCreationTime, maxCreationTime);
+		});
 
 		// Update (move) pipes during breeding:
-		control.state(Breeding).update = s -> obstacles.forEach(Obstacle::update);
+		control.state(Breeding).setOnTick(() -> obstacles.forEach(Obstacle::update));
 
 		// When breeding time is over, it's birthday:
-		control.changeOnTimeout(Breeding, Birth);
+		control.addTransitionOnTimeout(Breeding, Birth, null, null);
 
 		// On birthday, update (add/remove) obstacles:
-		control.state(Birth).entry = s -> updateObstacles();
+		control.state(Birth).setOnEntry(() -> updateObstacles());
 
 		// And immediately become breeding again, like the M-people
-		control.change(Birth, Breeding);
+		control.addTransition(Birth, Breeding, null, null);
 
 		// On "Stop" event, enter "Stopped" state:
-		control.changeOnInput("Stop", Breeding, Stopped);
-		control.changeOnInput("Stop", Birth, Stopped);
+		control.addTransitionOnEventObject(Breeding, Stopped, null, null, "Stop");
+		control.addTransitionOnEventObject(Birth, Stopped, null, null, "Stop");
 
 		// On "Start" event, become breeding again:
-		control.changeOnInput("Start", Stopped, Breeding);
+		control.addTransitionOnEventObject(Stopped, Breeding, null, null, "Start");
 	}
 
 	public void setLogger(Logger log) {
-		control.setLogger(log);
+		control.traceTo(log, CLOCK::getFrequency);
 	}
 
 	@Override
@@ -74,12 +77,12 @@ public class ObstacleManager extends GameEntity implements View {
 	}
 
 	public void start() {
-		control.addInput("Start");
+		control.enqueue("Start");
 		control.update();
 	}
 
 	public void stop() {
-		control.addInput("Stop");
+		control.enqueue("Stop");
 		control.update();
 	}
 

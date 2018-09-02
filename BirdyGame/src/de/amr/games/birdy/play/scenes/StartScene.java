@@ -23,7 +23,6 @@ import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
@@ -31,6 +30,8 @@ import de.amr.games.birdy.entities.GraphicText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGameEvent;
+import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.StateMachine;
 
 /**
  * Start scene of the game: bird flaps in the air until user presses the JUMP key.
@@ -46,45 +47,43 @@ public class StartScene implements View, Controller {
 	private class StartSceneControl extends StateMachine<State, BirdyGameEvent> {
 
 		public StartSceneControl() {
-			super("Start Scene Control", State.class, Starting);
+
+			super(State.class, MatchStrategy.BY_EQUALITY);
+
+			setDescription("Start Scene Control");
+			setInitialState(Starting);
 
 			// Starting ---
 
-			state(Starting).entry = s -> {
+			state(Starting).setOnEntry(() -> {
 				reset();
 				if (!Assets.sound("music/bgmusic.mp3").isRunning()) {
 					Assets.sound("music/bgmusic.mp3").loop();
 				}
-			};
+			});
 
-			state(Starting).update = s -> keepBirdInAir();
+			state(Starting).setOnTick(() -> keepBirdInAir());
 
-			change(Starting, Ready, () -> Keyboard.keyDown(app.settings.get("jump key")));
-
-			changeOnInput(BirdTouchedGround, Starting, GameOver);
+			addTransition(Starting, Ready, () -> Keyboard.keyDown(app.settings.get("jump key")), null);
+			addTransitionOnEventObject(Starting, GameOver, null, null, BirdTouchedGround);
 
 			// Ready ---
 
-			state(Ready).entry = s -> {
-				s.setDuration(CLOCK.sec(app.settings.getAsFloat("ready time sec")));
-				displayText("readyText");
-			};
-
-			changeOnTimeout(Ready, StartPlaying, t -> app.setController(app.getPlayScene()));
-
-			changeOnInput(BirdTouchedGround, Ready, GameOver, t -> displayText("title"));
-
-			state(Ready).exit = s -> displayedText = null;
+			state(Ready).setDuration(() -> CLOCK.sec(app.settings.getAsFloat("ready time sec")));
+			state(Ready).setOnEntry(() -> displayText("readyText"));
+			addTransitionOnTimeout(Ready, StartPlaying, null, e -> app.setController(app.getPlayScene()));
+			addTransitionOnEventObject(Ready, GameOver, null, e -> displayText("title"), BirdTouchedGround);
+			state(Ready).setOnExit(() -> displayedText = null);
 
 			// GameOver ---
 
-			state(GameOver).entry = s -> {
+			state(GameOver).setOnEntry(() -> {
 				stop();
 				displayedText = app.entities.ofName("game_over");
 				Assets.sounds().forEach(Sound::stop);
-			};
+			});
 
-			change(GameOver, Starting, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
+			addTransition(GameOver, Starting, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE), null);
 		}
 	}
 
@@ -165,8 +164,7 @@ public class StartScene implements View, Controller {
 		}
 
 		app.collisionHandler.clear();
-		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(),
-				BirdLeftWorld);
+		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(), BirdLeftWorld);
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 
 		displayText("title");
@@ -177,7 +175,7 @@ public class StartScene implements View, Controller {
 		for (Collision c : app.collisionHandler.collisions()) {
 			BirdyGameEvent event = (BirdyGameEvent) c.getAppEvent();
 			bird.receiveEvent(event);
-			control.addInput(event);
+			control.enqueue(event);
 		}
 		city.update();
 		ground.update();
@@ -197,6 +195,6 @@ public class StartScene implements View, Controller {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
 		g.drawString(format("%s: (%s)  Bird: Flight: (%s) Sanity: (%s)", control.getDescription(),
-				control.stateID(), bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
+				control.getState(), bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

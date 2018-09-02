@@ -20,7 +20,6 @@ import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
@@ -31,6 +30,7 @@ import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGameEvent;
 import de.amr.games.birdy.utils.Score;
+import de.amr.statemachine.StateMachine;
 
 /**
  * Play scene of the game.
@@ -56,48 +56,52 @@ public class PlayScene implements View, Controller {
 	private class PlaySceneControl extends StateMachine<State, BirdyGameEvent> {
 
 		public PlaySceneControl() {
-			super("Play Scene Control", State.class, Playing);
 
-			state(Playing).entry = s -> {
+			super(State.class);
+			setDescription("Play Scene Control");
+			setInitialState(Playing);
+
+			state(Playing).setOnEntry(() -> {
 				score.reset();
 				obstacleManager.init();
 				start();
-			};
+			});
 
-			changeOnInput(BirdTouchedPipe, Playing, Playing, () -> score.points > 3, t -> {
+			addTransitionOnEventObject(Playing, Playing, () -> score.points > 3, e -> {
 				score.points -= 3;
 				bird.tf.setX(bird.tf.getX() + app.settings.getAsInt("pipe width") + bird.tf.getWidth());
 				bird.receiveEvent(BirdTouchedPipe);
 				Assets.sound("sfx/hit.mp3").play();
-			});
+			}, BirdTouchedPipe);
 
-			changeOnInput(BirdTouchedPipe, Playing, GameOver, () -> score.points <= 3, t -> {
+			addTransitionOnEventObject(Playing, GameOver, () -> score.points <= 3, t -> {
 				bird.receiveEvent(BirdCrashed);
 				Assets.sound("sfx/hit.mp3").play();
-			});
+			}, BirdTouchedPipe);
 
-			changeOnInput(BirdLeftPassage, Playing, Playing, t -> {
+			addTransitionOnEventObject(Playing, Playing, null, e -> {
 				score.points++;
 				Assets.sound("sfx/point.mp3").play();
-			});
+			}, BirdLeftPassage);
 
-			changeOnInput(BirdTouchedGround, Playing, GameOver, t -> {
+			addTransitionOnEventObject(Playing, GameOver, null, e -> {
 				bird.receiveEvent(BirdTouchedGround);
 				Assets.sound("music/bgmusic.mp3").stop();
-			});
+			}, BirdTouchedGround);
 
-			changeOnInput(BirdLeftWorld, Playing, GameOver, t -> {
+			addTransitionOnEventObject(Playing, GameOver, null, e -> {
 				bird.receiveEvent(BirdLeftWorld);
 				Assets.sound("music/bgmusic.mp3").stop();
-			});
+			}, BirdLeftWorld);
 
-			state(GameOver).entry = s -> stop();
+			state(GameOver).setOnEntry(() -> stop());
 
-			change(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE));
-			changeOnInput(BirdTouchedGround, GameOver, GameOver,
-					t -> Assets.sound("music/bgmusic.mp3").stop());
+			addTransition(GameOver, StartingNewGame, () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE), null);
 
-			state(StartingNewGame).entry = s -> app.setController(app.getStartScene());
+			addTransitionOnEventObject(GameOver, GameOver, null, e -> Assets.sound("music/bgmusic.mp3").stop(),
+					BirdTouchedGround);
+
+			state(StartingNewGame).setOnEntry(() -> app.setController(app.getStartScene()));
 		}
 	}
 
@@ -108,7 +112,7 @@ public class PlayScene implements View, Controller {
 	}
 
 	public void receive(BirdyGameEvent event) {
-		control.addInput(event);
+		control.enqueue(event);
 		bird.receiveEvent(event);
 	}
 
@@ -162,7 +166,7 @@ public class PlayScene implements View, Controller {
 		ground.draw(g);
 		scoreDisplay.draw(g);
 		bird.draw(g);
-		if (control.is(GameOver)) {
+		if (control.getState() == GameOver) {
 			gameOverText.draw(g);
 		}
 		showState(g);
@@ -183,7 +187,7 @@ public class PlayScene implements View, Controller {
 	private void showState(Graphics2D g) {
 		g.setColor(Color.BLACK);
 		g.setFont(stateTextFont);
-		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.stateID(),
+		g.drawString(format("%s: %s  Bird: %s & %s", control.getDescription(), control.getState(),
 				bird.getFlightState(), bird.getHealthState()), 20, getHeight() - 50);
 	}
 }

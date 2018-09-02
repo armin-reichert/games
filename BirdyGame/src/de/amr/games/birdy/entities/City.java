@@ -1,6 +1,7 @@
 package de.amr.games.birdy.entities;
 
 import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNRISE;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNSET;
 import static de.amr.games.birdy.entities.City.DayTime.DAY;
@@ -17,8 +18,9 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGameApp;
+import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.StateMachine;
 
 /**
  * The city shown in the background.
@@ -48,40 +50,45 @@ public class City extends GameEntityUsingSprites {
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());
 
-		fsm = new StateMachine<>("City", DayTime.class, DAY);
+		fsm = new StateMachine<>(DayTime.class, MatchStrategy.BY_EQUALITY);
+		fsm.setDescription("City");
+		fsm.setInitialState(DAY);
 
-		fsm.state(DAY).entry = s -> {
+		fsm.state(DAY).setOnEntry(() -> {
 			setCurrentSprite("s_day");
-		};
-
-		fsm.changeOnInput(SUNSET, DAY, NIGHT);
-
-		fsm.state(NIGHT).entry = s -> {
-			s.setDuration(CLOCK.sec(10));
-			setCurrentSprite("s_night");
-			replaceStars();
-		};
-
-		fsm.state(NIGHT).update = s -> {
-			app.entities.ofClass(Star.class).forEach(GameEntity::update);
-		};
-
-		fsm.state(NIGHT).exit = s -> {
-			app.entities.removeAll(Star.class);
-		};
-
-		fsm.changeOnTimeout(NIGHT, NIGHT, t -> {
-			replaceStars();
-			t.from().resetTimer();
 		});
 
-		fsm.changeOnInput(SUNRISE, NIGHT, DAY);
+		fsm.addTransitionOnEventObject(DAY, NIGHT, null, null, SUNSET);
+		fsm.addTransitionOnEventObject(DAY, DAY, null, null, SUNRISE);
+		
+
+		fsm.state(NIGHT).setDuration(() -> CLOCK.sec(10));
+
+		fsm.state(NIGHT).setOnEntry(() -> {
+			setCurrentSprite("s_night");
+			replaceStars();
+		});
+
+		fsm.state(NIGHT).setOnTick(() -> {
+			app.entities.ofClass(Star.class).forEach(GameEntity::update);
+		});
+
+		fsm.state(NIGHT).setOnExit(() -> {
+			app.entities.removeAll(Star.class);
+		});
+
+		fsm.addTransitionOnTimeout(NIGHT, NIGHT, null, e -> {
+			replaceStars();
+			fsm.state(NIGHT).resetTimer();
+		});
+
+		fsm.addTransitionOnEventObject(NIGHT, DAY, null, null, SUNRISE);
 	}
 
 	@Override
 	public void init() {
 		fsm.init();
-		fsm.setLogger(Application.LOGGER);
+		fsm.traceTo(LOGGER, CLOCK::getFrequency);
 	}
 
 	@Override
@@ -105,15 +112,15 @@ public class City extends GameEntityUsingSprites {
 	}
 
 	public boolean isNight() {
-		return fsm.is(NIGHT);
+		return fsm.getState() == NIGHT;
 	}
 
 	public void sunset() {
-		fsm.addInput(SUNSET);
+		fsm.enqueue(SUNSET);
 	}
 
 	public void sunrise() {
-		fsm.addInput(SUNRISE);
+		fsm.enqueue(SUNRISE);
 	}
 
 	public void setWidth(int width) {

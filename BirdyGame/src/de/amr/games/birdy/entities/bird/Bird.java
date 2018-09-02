@@ -1,6 +1,7 @@
 package de.amr.games.birdy.entities.bird;
 
 import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.birdy.entities.bird.FlightState.Crashing;
 import static de.amr.games.birdy.entities.bird.FlightState.Flying;
 import static de.amr.games.birdy.entities.bird.FlightState.OnGround;
@@ -15,15 +16,15 @@ import static java.lang.Math.PI;
 
 import java.awt.geom.Rectangle2D;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.play.BirdyGameEvent;
+import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.StateMachine;
 
 /**
  * The little bird.
@@ -43,34 +44,29 @@ public class Bird extends GameEntityUsingSprites {
 	private class HealthControl extends StateMachine<HealthState, BirdyGameEvent> {
 
 		public HealthControl() {
-			super("Bird Health Control", HealthState.class, Sane);
 
-			changeOnInput(BirdTouchedPipe, Sane, Injured);
-			changeOnInput(BirdTouchedGround, Sane, Dead);
-			changeOnInput(BirdLeftWorld, Sane, Dead);
+			super(HealthState.class, MatchStrategy.BY_EQUALITY);
+			setDescription("Bird Health Control");
+			setInitialState(Sane);
 
-			state(Sane).entry = s -> {
-				setCurrentSprite("s_yellow");
-			};
+			state(Sane).setOnEntry(() -> setCurrentSprite("s_yellow"));
 
-			state(Injured).entry = s -> {
-				s.setDuration(CLOCK.sec(app.settings.get("bird injured seconds")));
-				setCurrentSprite("s_red");
-			};
+			addTransitionOnEventObject(Sane, Injured, null, null, BirdTouchedPipe);
+			addTransitionOnEventObject(Sane, Dead, null, null, BirdTouchedGround);
+			addTransitionOnEventObject(Sane, Dead, null, null, BirdLeftWorld);
 
-			state(Dead).entry = s -> {
+			state(Injured).setDuration(() -> CLOCK.sec(app.settings.get("bird injured seconds")));
+			state(Injured).setOnEntry(() -> setCurrentSprite("s_red"));
+
+			state(Dead).setOnEntry(() -> {
 				setCurrentSprite("s_blue");
-			};
+				turnDown();
+			});
 
-			changeOnInput(BirdTouchedPipe, Injured, Injured, t -> t.from().resetTimer());
-
-			changeOnTimeout(Injured, Sane);
-
-			changeOnInput(BirdTouchedGround, Injured, Dead);
-
-			changeOnInput(BirdLeftWorld, Injured, Dead);
-
-			state(Dead).entry = s -> turnDown();
+			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
+			addTransitionOnTimeout(Injured, Sane, null, null);
+			addTransitionOnEventObject(Injured, Dead, null, null, BirdTouchedGround);
+			addTransitionOnEventObject(Injured, Dead, null, null, BirdLeftWorld);
 		}
 	}
 
@@ -80,38 +76,41 @@ public class Bird extends GameEntityUsingSprites {
 	private class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
 
 		public FlightControl() {
-			super("Bird Flight Control", FlightState.class, Flying);
 
-			state(Flying).update = s -> {
+			super(FlightState.class, MatchStrategy.BY_EQUALITY);
+			setDescription("Bird Flight Control");
+			setInitialState(Flying);
+
+			state(Flying).setOnTick(() -> {
 				if (Keyboard.keyDown(app.settings.get("jump key"))) {
 					flap();
 				} else {
 					fly();
 				}
-			};
+			});
 
-			changeOnInput(BirdCrashed, Flying, Crashing);
-			changeOnInput(BirdLeftWorld, Flying, Crashing);
-			changeOnInput(BirdTouchedGround, Flying, OnGround);
+			addTransitionOnEventObject(Flying, Crashing, null, null, BirdCrashed);
+			addTransitionOnEventObject(Flying, Crashing, null, null, BirdLeftWorld);
+			addTransitionOnEventObject(Flying, OnGround, null, null, BirdTouchedGround);
 
-			state(Crashing).entry = s -> turnDown();
-			state(Crashing).update = s -> fall(3);
+			state(Crashing).setOnEntry(() -> turnDown());
+			state(Crashing).setOnTick(() -> fall(3));
 
-			changeOnInput(BirdTouchedGround, Crashing, OnGround);
+			addTransitionOnEventObject(Crashing, OnGround, null, null, BirdTouchedGround);
 
-			state(OnGround).entry = s -> {
+			state(OnGround).setOnEntry(() -> {
 				Assets.sound("sfx/die.mp3").play();
 				turnDown();
-			};
+			});
 		}
 	}
 
 	public Bird(BirdyGameApp app) {
 		this.app = app;
 		flightControl = new FlightControl();
-		flightControl.setLogger(Application.LOGGER);
+		flightControl.traceTo(LOGGER, CLOCK::getFrequency);
 		healthControl = new HealthControl();
-		healthControl.setLogger(Application.LOGGER);
+		healthControl.traceTo(LOGGER, CLOCK::getFrequency);
 		setSprite("s_yellow", createFeatherSprite("bird0"));
 		setSprite("s_blue", createFeatherSprite("bird1"));
 		setSprite("s_red", createFeatherSprite("bird2"));
@@ -141,23 +140,23 @@ public class Bird extends GameEntityUsingSprites {
 	}
 
 	public void receiveEvent(BirdyGameEvent event) {
-		flightControl.addInput(event);
-		healthControl.addInput(event);
+		flightControl.enqueue(event);
+		healthControl.enqueue(event);
 	}
 
 	public FlightState getFlightState() {
-		return flightControl.stateID();
+		return flightControl.getState();
 	}
 
 	public HealthState getHealthState() {
-		return healthControl.stateID();
+		return healthControl.getState();
 	}
 
 	@Override
 	public Rectangle2D getCollisionBox() {
 		int margin = Math.min(tf.getWidth() / 4, tf.getHeight() / 4);
-		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin,
-				tf.getWidth() - 2 * margin, tf.getHeight() - 2 * margin);
+		return new Rectangle2D.Double(tf.getX() + margin, tf.getY() + margin, tf.getWidth() - 2 * margin,
+				tf.getHeight() - 2 * margin);
 	}
 
 	public void flap() {

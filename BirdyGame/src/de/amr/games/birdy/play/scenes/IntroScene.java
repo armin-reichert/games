@@ -1,6 +1,7 @@
 package de.amr.games.birdy.play.scenes;
 
 import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.COMPLETE;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.CREDITS;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.TITLE;
@@ -11,16 +12,16 @@ import java.awt.Graphics2D;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.entity.EntityMap;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.City;
+import de.amr.statemachine.MatchStrategy;
+import de.amr.statemachine.StateMachine;
 
 /**
  * Intro scene.
@@ -29,8 +30,8 @@ import de.amr.games.birdy.entities.City;
  */
 public class IntroScene implements View, Controller {
 
-	private static final String CREDITS_TEXT = "Anna proudly presents" + "\nin cooperation with" + "\nProf. Zwickmann"
-			+ "\nGeräteschuppen Software 2017";
+	private static final String CREDITS_TEXT = "Anna proudly presents" + "\nin cooperation with"
+			+ "\nProf. Zwickmann" + "\nGeräteschuppen Software 2017";
 
 	public enum State {
 		CREDITS, WAITING, TITLE, COMPLETE
@@ -38,7 +39,7 @@ public class IntroScene implements View, Controller {
 
 	private final int width;
 	private final int height;
-	private final StateMachine<State, Object> fsm;
+	private final StateMachine<State, Void> fsm;
 
 	private final EntityMap entities;
 	private City city;
@@ -51,33 +52,42 @@ public class IntroScene implements View, Controller {
 		this.height = app.settings.height;
 		this.entities = app.entities;
 
-		fsm = new StateMachine<>("Intro Scene", State.class, CREDITS);
+		fsm = new StateMachine<>(State.class, MatchStrategy.BY_EQUALITY);
+		fsm.setDescription("Intro Scene");
+		fsm.setInitialState(CREDITS);
 
 		// ShowCredits
-		fsm.state(CREDITS).entry = s -> {
+
+		fsm.state(CREDITS).setOnEntry(() -> {
 			textAnimation.tf.setY(height);
 			textAnimation.setSpeedY(-.75f);
 			logoAnimation.setVisible(false);
 			Assets.sound("music/bgmusic.mp3").loop();
-		};
+		});
 
-		fsm.state(CREDITS).update = s -> textAnimation.update();
+		fsm.state(CREDITS).setOnTick(() -> textAnimation.update());
 
-		fsm.change(CREDITS, WAITING, () -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2,
-				t -> t.to().setDuration(CLOCK.sec(2)));
+		fsm.addTransition(CREDITS, WAITING,
+				() -> textAnimation.tf.getY() < (height - textAnimation.getHeight()) / 2, null);
+
+		fsm.state(WAITING).setDuration(() -> CLOCK.sec(2));
 
 		// Wait
-		fsm.state(WAITING).entry = s -> {
+
+		fsm.state(WAITING).setOnEntry(() -> {
 			logoAnimation.setVisible(true);
 			textAnimation.setVisible(false);
-		};
+		});
 
-		fsm.changeOnTimeout(WAITING, TITLE, t -> t.to().setDuration(CLOCK.sec(3)));
+		fsm.addTransition(WAITING, TITLE, null, null);
 
 		// ShowGameTitle
-		fsm.changeOnTimeout(TITLE, COMPLETE);
 
-		fsm.state(TITLE).exit = s -> app.setController(app.getStartScene());
+		fsm.state(TITLE).setDuration(() -> CLOCK.sec(3));
+
+		fsm.addTransitionOnTimeout(TITLE, COMPLETE, null, null);
+
+		fsm.state(TITLE).setOnExit(() -> app.setController(app.getStartScene()));
 	}
 
 	@Override
@@ -97,7 +107,7 @@ public class IntroScene implements View, Controller {
 				.color(city.isNight() ? Color.WHITE : Color.DARK_GRAY).build();
 		textAnimation.tf.centerX(width);
 
-		fsm.setLogger(Application.LOGGER);
+		fsm.traceTo(LOGGER, CLOCK::getFrequency);
 		fsm.init();
 	}
 
