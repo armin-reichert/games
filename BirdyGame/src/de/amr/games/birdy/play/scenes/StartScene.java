@@ -18,7 +18,7 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.controls.PumpingImage;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.controls.ScrollableImage;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
@@ -26,7 +26,6 @@ import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.entities.GraphicText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
 import de.amr.games.birdy.play.BirdyGameEvent;
@@ -92,7 +91,7 @@ public class StartScene implements View, Controller {
 	private Bird bird;
 	private City city;
 	private Ground ground;
-	private GraphicText displayedText;
+	private ScrollableImage displayedText;
 
 	public StartScene(BirdyGameApp game) {
 		this.app = game;
@@ -143,12 +142,12 @@ public class StartScene implements View, Controller {
 		bird.tf.setVelocity(0, 0);
 
 		if (!app.entities.contains("title")) {
-			GameEntity titleText = new GraphicText(Assets.image("title"));
+			ScrollableImage titleText = new ScrollableImage(Assets.image("title"));
 			app.entities.store("title", titleText);
 		}
 
 		if (!app.entities.contains("text_game_over")) {
-			GameEntity gameOverText = new GraphicText(Assets.image("text_game_over"));
+			ScrollableImage gameOverText = new ScrollableImage(Assets.image("text_game_over"));
 			app.entities.store("text_game_over", gameOverText);
 		}
 

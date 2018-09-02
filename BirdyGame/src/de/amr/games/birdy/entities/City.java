@@ -2,6 +2,7 @@ package de.amr.games.birdy.entities;
 
 import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNRISE;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNSET;
 import static de.amr.games.birdy.entities.City.DayTime.DAY;
@@ -18,7 +19,6 @@ import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.BirdyGameApp;
 import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
@@ -37,11 +37,9 @@ public class City extends GameEntityUsingSprites {
 		SUNSET, SUNRISE
 	}
 
-	private final BirdyGameApp app;
 	private final StateMachine<DayTime, DayEvent> fsm;
 
-	public City(BirdyGameApp app) {
-		this.app = app;
+	public City() {
 
 		setSprite("s_night", Sprite.ofAssets("bg_night"));
 		setSprite("s_day", Sprite.ofAssets("bg_day"));
@@ -70,11 +68,11 @@ public class City extends GameEntityUsingSprites {
 		});
 
 		fsm.state(NIGHT).setOnTick(() -> {
-			app.entities.ofClass(Star.class).forEach(GameEntity::update);
+			app().entities.ofClass(Star.class).forEach(GameEntity::update);
 		});
 
 		fsm.state(NIGHT).setOnExit(() -> {
-			app.entities.removeAll(Star.class);
+			app().entities.removeAll(Star.class);
 		});
 
 		fsm.addTransitionOnTimeout(NIGHT, NIGHT, null, e -> {
@@ -102,10 +100,10 @@ public class City extends GameEntityUsingSprites {
 	}
 
 	private void replaceStars() {
-		app.entities.removeAll(Star.class);
-		int numStars = randomInt(1, app.settings.get("max stars"));
+		app().entities.removeAll(Star.class);
+		int numStars = randomInt(1, app().settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
-			Star star = app.entities.store(new Star());
+			Star star = app().entities.store(new Star());
 			star.tf.setPosition(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
 		});
 		Application.LOGGER.info("Created " + numStars + " new stars");
@@ -139,7 +137,7 @@ public class City extends GameEntityUsingSprites {
 		for (int x = 0; x < tf.getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
-		app.entities.ofClass(Star.class).forEach(star -> star.draw(g));
+		app().entities.ofClass(Star.class).forEach(star -> star.draw(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 }

@@ -16,6 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.controls.ScrollableImage;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
@@ -23,7 +24,6 @@ import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
-import de.amr.games.birdy.entities.GraphicText;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
@@ -47,7 +47,7 @@ public class PlayScene implements View, Controller {
 	private Bird bird;
 	private City city;
 	private Ground ground;
-	private GraphicText gameOverText;
+	private ScrollableImage gameOverText;
 	private ScoreDisplay scoreDisplay;
 
 	public enum State {
@@ -135,7 +135,7 @@ public class PlayScene implements View, Controller {
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
 		scoreDisplay.tf.centerX(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
-		gameOverText = app.entities.store(new GraphicText(Assets.image("text_game_over")));
+		gameOverText = app.entities.store(new ScrollableImage(Assets.image("text_game_over")));
 		gameOverText.tf.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tf.setPosition(0, -getHeight());

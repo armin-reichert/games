@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controls.PumpingImage;
 import de.amr.easy.game.controls.TextArea;
-import de.amr.easy.game.entity.EntityMap;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
@@ -41,7 +40,6 @@ public class IntroScene implements View, Controller {
 	private final int height;
 	private final StateMachine<State, Void> fsm;
 
-	private final EntityMap entities;
 	private City city;
 	private PumpingImage logo;
 	private TextArea credits;
@@ -50,7 +48,6 @@ public class IntroScene implements View, Controller {
 
 		this.width = app.settings.width;
 		this.height = app.settings.height;
-		this.entities = app.entities;
 
 		fsm = new StateMachine<>(State.class, Match.BY_EQUALITY);
 		fsm.traceTo(LOGGER, CLOCK::getFrequency);
@@ -86,7 +83,7 @@ public class IntroScene implements View, Controller {
 
 	@Override
 	public void init() {
-		city = entities.ofClass(City.class).findAny().get();
+		city = new City();
 		city.setWidth(width);
 		if (new Random().nextBoolean()) {
 			city.sunset();

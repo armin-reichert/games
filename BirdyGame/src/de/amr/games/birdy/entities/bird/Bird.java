@@ -2,6 +2,7 @@ package de.amr.games.birdy.entities.bird;
 
 import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.entities.bird.FlightState.Crashing;
 import static de.amr.games.birdy.entities.bird.FlightState.Flying;
 import static de.amr.games.birdy.entities.bird.FlightState.OnGround;
@@ -22,7 +23,6 @@ import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.sprite.AnimationType;
 import de.amr.easy.game.sprite.Sprite;
-import de.amr.games.birdy.BirdyGameApp;
 import de.amr.games.birdy.play.BirdyGameEvent;
 import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
@@ -34,7 +34,6 @@ import de.amr.statemachine.StateMachine;
  */
 public class Bird extends GameEntityUsingSprites {
 
-	private final BirdyGameApp app;
 	private final FlightControl flightControl;
 	private final HealthControl healthControl;
 	private float gravity;
@@ -57,7 +56,7 @@ public class Bird extends GameEntityUsingSprites {
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdTouchedGround);
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdLeftWorld);
 
-			state(Injured).setDuration(() -> CLOCK.sec(app.settings.get("bird injured seconds")));
+			state(Injured).setDuration(() -> CLOCK.sec(app().settings.get("bird injured seconds")));
 			state(Injured).setOnEntry(() -> setCurrentSprite("s_red"));
 
 			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
@@ -88,7 +87,7 @@ public class Bird extends GameEntityUsingSprites {
 			setInitialState(Flying);
 
 			state(Flying).setOnTick(() -> {
-				if (Keyboard.keyDown(app.settings.get("jump key"))) {
+				if (Keyboard.keyDown(app().settings.get("jump key"))) {
 					flap();
 				} else {
 					fly();
@@ -118,8 +117,7 @@ public class Bird extends GameEntityUsingSprites {
 		}
 	}
 
-	public Bird(BirdyGameApp app) {
-		this.app = app;
+	public Bird() {
 		flightControl = new FlightControl();
 		flightControl.traceTo(LOGGER, CLOCK::getFrequency);
 		healthControl = new HealthControl();
@@ -130,12 +128,12 @@ public class Bird extends GameEntityUsingSprites {
 		setCurrentSprite("s_yellow");
 		tf.setWidth(currentSprite().getWidth());
 		tf.setHeight(currentSprite().getHeight());
-		gravity = app.settings.getAsFloat("world gravity");
+		gravity = app().settings.getAsFloat("world gravity");
 	}
 
 	private Sprite createFeatherSprite(String birdName) {
 		Sprite sprite = Sprite.ofAssets(birdName + "_0", birdName + "_1", birdName + "_2");
-		sprite.animate(AnimationType.BACK_AND_FORTH, app.settings.get("bird flap millis"));
+		sprite.animate(AnimationType.BACK_AND_FORTH, app().settings.get("bird flap millis"));
 		return sprite;
 	}
 
