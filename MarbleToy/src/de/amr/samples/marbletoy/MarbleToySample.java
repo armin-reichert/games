@@ -5,7 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.amr.samples.marbletoy.entities.Marble;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 import de.amr.samples.marbletoy.fsm.LeverControl;
 import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine;
@@ -26,7 +25,7 @@ public class MarbleToySample {
 	private final Set<String> fsmAccepted = new LinkedHashSet<>();
 
 	public MarbleToySample(int maxInputLength) {
-		MarbleToy toy = new MarbleToy(null, new Marble(null));
+		MarbleToy toy = new MarbleToy();
 		fsm = new LeverControl(toy);
 		inputs = createWordsIncludingLength(maxInputLength, 'A', 'B');
 		for (String input : inputs) {

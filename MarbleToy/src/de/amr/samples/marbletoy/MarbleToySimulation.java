@@ -3,12 +3,8 @@ package de.amr.samples.marbletoy;
 import java.awt.Color;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.sprite.Sprite;
-import de.amr.samples.marbletoy.entities.Marble;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 import de.amr.samples.marbletoy.fsm.LeverControl;
-import de.amr.samples.marbletoy.scenes.MainScene;
 
 public class MarbleToySimulation extends Application {
 
@@ -21,14 +17,13 @@ public class MarbleToySimulation extends Application {
 		settings.width = 600;
 		settings.height = 410;
 		settings.bgColor = Color.WHITE;
+		CLOCK.setFrequency(2);
 	}
 
 	@Override
 	public void init() {
-		Marble marble = new Marble(Sprite.of(Assets.image("marble.png")).scale(50, 50));
-		MarbleToy toy = new MarbleToy(Sprite.of(Assets.image("toy.png")), marble);
+		MarbleToy toy = new MarbleToy();
 		toy.setLeverControl(new LeverControl(toy));
-		entities.store(toy);
-		setController(new MainScene(this));
+		setController(toy);
 	}
 }

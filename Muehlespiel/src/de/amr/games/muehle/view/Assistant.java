@@ -58,9 +58,9 @@ public class Assistant extends GameEntityUsingSprites {
 		this.board = control.model.board;
 		this.helpLevel = HelpLevel.OFF;
 		setSprite("s_alien", Sprite.of(Assets.image("images/alien.png")).scale(100, 100));
-		setCurrentSprite("s_alien");
-		tf.setWidth(currentSprite().getWidth());
-		tf.setHeight(currentSprite().getHeight());
+		setSelectedSprite("s_alien");
+		tf.setWidth(getSelectedSprite().getWidth());
+		tf.setHeight(getSelectedSprite().getHeight());
 	}
 
 	public void setView(MillGameUI view) {

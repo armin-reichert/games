@@ -49,7 +49,7 @@ public class Bird extends GameEntityUsingSprites {
 			setDescription("Bird Health Control");
 			setInitialState(Sane);
 
-			state(Sane).setOnEntry(() -> setCurrentSprite("s_yellow"));
+			state(Sane).setOnEntry(() -> setSelectedSprite("s_yellow"));
 
 			addTransitionOnEventObject(Sane, Sane, null, null, BirdLeftPassage);
 			addTransitionOnEventObject(Sane, Injured, null, null, BirdTouchedPipe);
@@ -57,7 +57,7 @@ public class Bird extends GameEntityUsingSprites {
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdLeftWorld);
 
 			state(Injured).setDuration(() -> CLOCK.sec(app().settings.get("bird injured seconds")));
-			state(Injured).setOnEntry(() -> setCurrentSprite("s_red"));
+			state(Injured).setOnEntry(() -> setSelectedSprite("s_red"));
 
 			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
 			addTransitionOnTimeout(Injured, Sane, null, null);
@@ -67,7 +67,7 @@ public class Bird extends GameEntityUsingSprites {
 			addTransitionOnEventObject(Injured, Dead, null, null, BirdLeftWorld);
 
 			state(Dead).setOnEntry(() -> {
-				setCurrentSprite("s_blue");
+				setSelectedSprite("s_blue");
 				turnDown();
 			});
 			
@@ -125,9 +125,9 @@ public class Bird extends GameEntityUsingSprites {
 		setSprite("s_yellow", createFeatherSprite("bird0"));
 		setSprite("s_blue", createFeatherSprite("bird1"));
 		setSprite("s_red", createFeatherSprite("bird2"));
-		setCurrentSprite("s_yellow");
-		tf.setWidth(currentSprite().getWidth());
-		tf.setHeight(currentSprite().getHeight());
+		setSelectedSprite("s_yellow");
+		tf.setWidth(getSelectedSprite().getWidth());
+		tf.setHeight(getSelectedSprite().getHeight());
 		gravity = app().settings.getAsFloat("world gravity");
 	}
 
@@ -147,7 +147,7 @@ public class Bird extends GameEntityUsingSprites {
 	public void update() {
 		flightControl.update();
 		healthControl.update();
-		currentSprite().enableAnimation(tf.getVelocityY() < 0);
+		getSelectedSprite().enableAnimation(tf.getVelocityY() < 0);
 	}
 
 	public void receiveEvent(BirdyGameEvent event) {

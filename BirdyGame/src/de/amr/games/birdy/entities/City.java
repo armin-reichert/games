@@ -43,17 +43,17 @@ public class City extends GameEntityUsingSprites {
 
 		setSprite("s_night", Sprite.ofAssets("bg_night"));
 		setSprite("s_day", Sprite.ofAssets("bg_day"));
-		setCurrentSprite("s_day");
+		setSelectedSprite("s_day");
 
-		tf.setWidth(currentSprite().getWidth());
-		tf.setHeight(currentSprite().getHeight());
+		tf.setWidth(getSelectedSprite().getWidth());
+		tf.setHeight(getSelectedSprite().getHeight());
 
 		fsm = new StateMachine<>(DayTime.class, Match.BY_EQUALITY);
 		fsm.setDescription("City");
 		fsm.setInitialState(DAY);
 
 		fsm.state(DAY).setOnEntry(() -> {
-			setCurrentSprite("s_day");
+			setSelectedSprite("s_day");
 		});
 
 		fsm.addTransitionOnEventObject(DAY, NIGHT, null, null, SUNSET);
@@ -63,7 +63,7 @@ public class City extends GameEntityUsingSprites {
 		fsm.state(NIGHT).setDuration(() -> CLOCK.sec(10));
 
 		fsm.state(NIGHT).setOnEntry(() -> {
-			setCurrentSprite("s_night");
+			setSelectedSprite("s_night");
 			replaceStars();
 		});
 
@@ -133,7 +133,7 @@ public class City extends GameEntityUsingSprites {
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
-		Image image = currentSprite().currentFrame();
+		Image image = getSelectedSprite().currentFrame();
 		for (int x = 0; x < tf.getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}

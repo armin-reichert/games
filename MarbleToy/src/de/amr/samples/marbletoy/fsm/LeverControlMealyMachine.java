@@ -11,46 +11,56 @@ import static de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState.RRR
 
 import java.util.function.Consumer;
 
-import de.amr.easy.statemachine.StateMachine;
-import de.amr.easy.statemachine.Transition;
-import de.amr.samples.marbletoy.fsm.LeverControlMealyMachine.ToyState;
+import de.amr.statemachine.Match;
+import de.amr.statemachine.StateMachine;
 
-public class LeverControlMealyMachine extends StateMachine<ToyState, Character> {
+public class LeverControlMealyMachine {
 
 	public enum ToyState {
-		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR;
-	};
+		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR
+	}
 
+	private final StateMachine<ToyState, Character> fsm;
 	private final StringBuilder output = new StringBuilder();
-	private final Consumer<Transition<ToyState, Character>> C = t -> output.append('C');
-	private final Consumer<Transition<ToyState, Character>> D = t -> output.append('D');
+	private final Consumer<Character> C = c -> output.append('C');
+	private final Consumer<Character> D = c -> output.append('D');
 
 	public LeverControlMealyMachine() {
-		super("Mealy Machine for Marble-Toy", ToyState.class, ToyState.LLL);
-		changeOnInput('A', LLL, RLL, C);
-		changeOnInput('B', LLL, LRR, C);
-		changeOnInput('A', LLR, RLR, C);
-		changeOnInput('B', LLR, LRL, D);
-		changeOnInput('A', LRL, RRL, C);
-		changeOnInput('B', LRL, LLL, D);
-		changeOnInput('A', LRR, RRR, C);
-		changeOnInput('B', LRR, LLR, D);
-		changeOnInput('A', RLL, LLR, C);
-		changeOnInput('B', RLL, RRR, C);
-		changeOnInput('A', RLR, LLL, D);
-		changeOnInput('B', RLR, RRL, D);
-		changeOnInput('A', RRL, LRR, C);
-		changeOnInput('B', RRL, RLL, D);
-		changeOnInput('A', RRR, LRL, D);
-		changeOnInput('B', RRR, RLR, D);
+		//@formatter:off
+		fsm = StateMachine.define(ToyState.class, Character.class, Match.BY_EQUALITY)
+				.description("Marble-Toy (Mealy)")
+				.initialState(ToyState.LLL)
+				
+				.states()
+				
+				.transitions()
+					.when(LLL).then(RLL).on('A').act(C)
+					.when(LLL).then(LRR).on('B').act(C)
+					.when(LLR).then(RLR).on('A').act(C)
+					.when(LLR).then(LRL).on('B').act(D)
+					.when(LRL).then(RRL).on('A').act(C)
+					.when(LRL).then(LLL).on('B').act(D)
+					.when(LRR).then(RRR).on('A').act(C)
+					.when(LRR).then(LLR).on('B').act(D)
+					.when(RLL).then(LLR).on('A').act(C)
+					.when(RLL).then(RRR).on('B').act(C)
+					.when(RLR).then(LLL).on('A').act(D)
+					.when(RLR).then(RRL).on('B').act(D)
+					.when(RRL).then(LRR).on('A').act(C)
+					.when(RRL).then(RLL).on('B').act(D)
+					.when(RRR).then(LRL).on('A').act(D)
+					.when(RRR).then(RLR).on('B').act(D)
+		
+		.endStateMachine();
+		//@formatter:on
 	}
 
 	public boolean process(String input) {
-		init();
+		fsm.init();
 		output.setLength(0);
 		input.chars().forEach(ch -> {
-			addInput((char) ch);
-			update();
+			fsm.enqueue((char) ch);
+			fsm.update();
 		});
 		return output.length() > 0 && output.charAt(output.length() - 1) == 'D';
 	}

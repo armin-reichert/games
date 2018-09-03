@@ -5,11 +5,11 @@ import de.amr.easy.game.sprite.Sprite;
 
 public class Marble extends GameEntityUsingSprites {
 
-	public Marble(Sprite sprite) {
-		setSprite("s_marble", sprite);
-		setCurrentSprite("s_marble");
-		tf.setWidth(currentSprite().getWidth());
-		tf.setHeight(currentSprite().getHeight());
+	public Marble() {
+		setSprite("s_marble", Sprite.ofAssets("marble.png").scale(50));
+		setSelectedSprite("s_marble");
+		tf.setWidth(getSelectedSprite().getWidth());
+		tf.setHeight(getSelectedSprite().getHeight());
 	}
 
 	@Override

@@ -21,12 +21,12 @@ public class Brick extends GameEntityUsingSprites {
 				Sprite.ofAssets("Bricks/brick_" + color + "_small.png").scale(width, height));
 		setSprite("s_damaged",
 				Sprite.ofAssets("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
-		setCurrentSprite("s_intact");
+		setSelectedSprite("s_intact");
 	}
 
 	public void damage() {
 		damaged = true;
-		setCurrentSprite("s_damaged");
+		setSelectedSprite("s_damaged");
 	}
 
 	public boolean isDamaged() {

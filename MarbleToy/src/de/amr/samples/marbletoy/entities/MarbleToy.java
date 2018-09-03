@@ -15,8 +15,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.EnumSet;
 import java.util.Random;
-import java.util.logging.Logger;
 
+import de.amr.easy.game.Application;
+import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
 import de.amr.samples.marbletoy.fsm.LeverControl;
@@ -33,40 +34,41 @@ public class MarbleToy extends GameEntityUsingSprites {
 	private LeverControl leverControl;
 	private MarbleRouter router;
 
-	public MarbleToy(Sprite sprite, Marble marble) {
-		setSprite("s_toy", sprite);
-		setCurrentSprite("s_toy");
-		this.marble = marble;
+	public MarbleToy() {
+		setSprite("s_toy", Sprite.of(Assets.image("toy.png")));
+		setSelectedSprite("s_toy");
+		this.marble = new Marble();
 		marble.tf.setPosition(-marble.tf.getWidth(), -marble.tf.getHeight());
 		levers[0] = new Lever(178, 82);
 		levers[1] = new Lever(424, 82);
 		levers[2] = new Lever(301, 204);
 		router = new MarbleRouter(this);
-		router.setLogger(Logger.getGlobal());
+		router.getFsm().traceTo(Application.LOGGER, Application.CLOCK::getFrequency);
 	}
 
 	public void setLeverControl(LeverControl leverControl) {
 		this.leverControl = leverControl;
-		leverControl.setLogger(Logger.getGlobal());
+		leverControl.getFsm().traceTo(Application.LOGGER, Application.CLOCK::getFrequency);
 	}
 
 	@Override
 	public void init() {
-		leverControl.init();
-		router.init();
-		router.addInput('A');
+		leverControl.getFsm().init();
+		router.getFsm().init();
+		router.getFsm().enqueue('A');
 	}
 
 	@Override
 	public void update() {
-		if (router.is(C, D)) {
+		if (router.getFsm().getState() == C || router.getFsm().getState() == D) {
 			Character nextSlot = new Random().nextBoolean() ? 'A' : 'B';
-			router.init();
-			router.addInput(nextSlot);
-			leverControl.addInput(nextSlot);
+			router.getFsm().init();
+			router.getFsm().enqueue(nextSlot);
+			leverControl.getFsm().enqueue(nextSlot);
 		}
-		leverControl.update();
-		router.update();
+		leverControl.getFsm().update();
+		router.getFsm().update();
+		marble.update();
 	}
 
 	public Marble getMarble() {

@@ -17,59 +17,77 @@ import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRL_D;
 import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRR;
 import static de.amr.samples.marbletoy.fsm.LeverControl.ToyState.RRR_D;
 
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.samples.marbletoy.entities.MarbleToy;
-import de.amr.samples.marbletoy.fsm.LeverControl.ToyState;
+import de.amr.statemachine.Match;
+import de.amr.statemachine.StateMachine;
 
-public class LeverControl extends StateMachine<ToyState, Character> {
+public class LeverControl {
 
 	public enum ToyState {
 		LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR, LLL_D, LLR_D, LRL_D, LRR_D, RLL_D, RLR_D, RRL_D, RRR_D;
 	};
 
+	private final StateMachine<ToyState, Character> fsm;
+
 	public LeverControl(MarbleToy toy) {
-		super("Marble Toy Lever Control", ToyState.class, LLL);
+		//@formatter:off
+		fsm = StateMachine.define(ToyState.class, Character.class, Match.BY_EQUALITY)
+				
+				.description("Marble Toy Lever Control")
+				.initialState(LLL)
+
+				.states()
+				
+				.transitions()
+
+					.on('A').when(LLL).then(RLL)
+					.on('B').when(LLL).then(LRR)
+					.on('A').when(LLL_D).then(RLL)
+					.on('B').when(LLL_D).then(LRR)
+					.on('A').when(LLR).then(RLR)
+					.on('B').when(LLR).then(LRL_D)
+					.on('A').when(LLR_D).then(RLR)
+					.on('B').when(LLR_D).then(LRL_D)
+					.on('A').when(LRL).then(RRL)
+					.on('B').when(LRL).then(LLL_D)
+					.on('A').when(LRL_D).then(RRL)
+					.on('B').when(LRL_D).then(LLL_D)
+					.on('A').when(LRR).then(RRR)
+					.on('B').when(LRR).then(LLR_D)
+					.on('A').when(LRR_D).then(RRR)
+					.on('B').when(LRR_D).then(LLR_D)
+					.on('A').when(RLL).then(LLR)
+					.on('B').when(RLL).then(RRR)
+					.on('A').when(RLL_D).then(LLR)
+					.on('B').when(RLL_D).then(RRR)
+					.on('A').when(RLR).then(LLL_D)
+					.on('B').when(RLR).then(RRL_D)
+					.on('A').when(RLR_D).then(LLL_D)
+					.on('B').when(RLR_D).then(RRL_D)
+					.on('A').when(RRL).then(LRR)
+					.on('B').when(RRL).then(RLL_D)
+					.on('A').when(RRL_D).then(LRR)
+					.on('B').when(RRL_D).then(RLL_D)
+					.on('A').when(RRR).then(LRL_D)
+					.on('B').when(RRR).then(RLR_D)
+					.on('A').when(RRR_D).then(LRL_D)
+					.on('B').when(RRR_D).then(RLR_D)
+		
+		.endStateMachine();
+		//@formatter:on
 
 		for (ToyState stateID : ToyState.values()) {
-			state(stateID).entry = state -> updateLevers(toy);
+			fsm.state(stateID).setOnEntry(() -> updateLevers(toy));
 		}
-
-		changeOnInput('A', LLL, RLL);
-		changeOnInput('B', LLL, LRR);
-		changeOnInput('A', LLL_D, RLL);
-		changeOnInput('B', LLL_D, LRR);
-		changeOnInput('A', LLR, RLR);
-		changeOnInput('B', LLR, LRL_D);
-		changeOnInput('A', LLR_D, RLR);
-		changeOnInput('B', LLR_D, LRL_D);
-		changeOnInput('A', LRL, RRL);
-		changeOnInput('B', LRL, LLL_D);
-		changeOnInput('A', LRL_D, RRL);
-		changeOnInput('B', LRL_D, LLL_D);
-		changeOnInput('A', LRR, RRR);
-		changeOnInput('B', LRR, LLR_D);
-		changeOnInput('A', LRR_D, RRR);
-		changeOnInput('B', LRR_D, LLR_D);
-		changeOnInput('A', RLL, LLR);
-		changeOnInput('B', RLL, RRR);
-		changeOnInput('A', RLL_D, LLR);
-		changeOnInput('B', RLL_D, RRR);
-		changeOnInput('A', RLR, LLL_D);
-		changeOnInput('B', RLR, RRL_D);
-		changeOnInput('A', RLR_D, LLL_D);
-		changeOnInput('B', RLR_D, RRL_D);
-		changeOnInput('A', RRL, LRR);
-		changeOnInput('B', RRL, RLL_D);
-		changeOnInput('A', RRL_D, LRR);
-		changeOnInput('B', RRL_D, RLL_D);
-		changeOnInput('A', RRR, LRL_D);
-		changeOnInput('B', RRR, RLR_D);
-		changeOnInput('A', RRR_D, LRL_D);
-		changeOnInput('B', RRR_D, RLR_D);
+	}
+	
+	
+	public StateMachine<ToyState, Character> getFsm() {
+		return fsm;
 	}
 
 	public boolean isFinalState() {
-		return stateID().name().endsWith("_D");
+		return fsm.getState().name().endsWith("_D");
 	}
 
 	void updateLevers(MarbleToy toy) {
@@ -79,14 +97,14 @@ public class LeverControl extends StateMachine<ToyState, Character> {
 	}
 
 	public boolean isRoutingLeft(int leverIndex) {
-		return stateID().name().charAt(leverIndex) == 'L';
+		return fsm.getState().name().charAt(leverIndex) == 'L';
 	}
 
 	public boolean process(String input) {
-		init();
+		fsm.init();
 		input.chars().forEach(ch -> {
-			addInput((char) ch);
-			update();
+			fsm.enqueue((char) ch);
+			fsm.update();
 		});
 		return isFinalState();
 	}
