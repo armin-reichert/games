@@ -1,12 +1,10 @@
-package de.amr.games.breakout.scenes;
+package de.amr.games.breakout.controller;
 
-import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
-import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBat;
-import static de.amr.games.breakout.scenes.PlayEvent.BallHitsBrick;
-import static de.amr.games.breakout.scenes.PlayState.BallOut;
-import static de.amr.games.breakout.scenes.PlayState.Initialized;
-import static de.amr.games.breakout.scenes.PlayState.Playing;
-import static java.awt.event.KeyEvent.VK_SPACE;
+import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.games.breakout.controller.PlayState.BallOut;
+import static de.amr.games.breakout.controller.PlayState.Initialized;
+import static de.amr.games.breakout.controller.PlayState.Playing;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,21 +12,23 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntity;
 import de.amr.easy.game.entity.collision.Collision;
+import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
-import de.amr.easy.statemachine.StateMachine;
 import de.amr.games.breakout.BreakoutGameApp;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Bat;
 import de.amr.games.breakout.entities.Brick;
+import de.amr.statemachine.Match;
+import de.amr.statemachine.StateMachine;
 
 /**
  * The playing scene.
@@ -38,7 +38,7 @@ import de.amr.games.breakout.entities.Brick;
 public class PlayScene implements View, Controller {
 
 	private final BreakoutGameApp app;
-	private final PlaySceneControl control;
+	private final StateMachine<PlayState, PlayEvent> control;
 	private Bat bat;
 	private Ball ball;
 	private int points;
@@ -48,72 +48,6 @@ public class PlayScene implements View, Controller {
 
 	public PlayScene(BreakoutGameApp app) {
 		this.app = app;
-		control = new PlaySceneControl();
-		control.setLogger(Application.LOGGER);
-	}
-
-	public int getWidth() {
-		return app.settings.width;
-	}
-
-	public int getHeight() {
-		return app.settings.height;
-	}
-
-	private class PlaySceneControl extends StateMachine<PlayState, PlayEvent> {
-
-		public PlaySceneControl() {
-			super("BreakoutGameControl", PlayState.class, Initialized);
-
-			// Initialized
-			state(Initialized).entry = s -> {
-				points = 0;
-				resetBatAndBall();
-				newBricks();
-			};
-
-			change(Initialized, Playing, () -> keyPressedOnce(VK_SPACE));
-
-			// Playing
-			state(Playing).entry = s -> launchBall();
-
-			state(Playing).update = s -> {
-				if (app.entities.ofClass(Brick.class).count() == 0) {
-					resetBatAndBall();
-					newBricks();
-				}
-				app.entities.all().forEach(GameEntity::update);
-			};
-
-			changeOnInput(BallHitsBat, Playing, Playing, t -> {
-				ball.tf.setVelocityY(-ball.tf.getVelocityY());
-				Assets.sound("Sounds/plop.mp3").play();
-			});
-
-			changeOnInput(BallHitsBrick, Playing, Playing, t -> {
-				Brick brick = t.getInput().get().getUserData();
-				if (brick.isDamaged()) {
-					app.entities.removeEntity(brick);
-					app.collisionHandler.unregisterStart(ball, brick);
-					points += brick.getValue();
-					Assets.sound("Sounds/point.mp3").play();
-				} else {
-					brick.damage();
-					ball.tf.setVelocityY(-ball.tf.getVelocityY());
-				}
-			});
-
-			change(Playing, BallOut, () -> ball.isOut());
-
-			// BallOut
-			state(BallOut).entry = s -> resetBatAndBall();
-
-			change(BallOut, Playing, () -> keyPressedOnce(VK_SPACE));
-		}
-	}
-
-	@Override
-	public void init() {
 		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
 				BufferedImage.SCALE_SMOOTH);
 		Dimension boardSize = new Dimension(getWidth(), getHeight());
@@ -126,7 +60,80 @@ public class PlayScene implements View, Controller {
 		bat.setBoardSize(boardSize);
 		app.entities.store(bat);
 
-		app.collisionHandler.registerStart(ball, bat, BallHitsBat);
+		app.collisionHandler.registerStart(ball, bat, new BallHitsBatEvent());
+		control = buildStateMachine();
+		control.traceTo(LOGGER, CLOCK::getFrequency);
+	}
+
+	public int getWidth() {
+		return app.settings.width;
+	}
+
+	public int getHeight() {
+		return app.settings.height;
+	}
+
+	private StateMachine<PlayState, PlayEvent> buildStateMachine() {
+		//@formatter:off
+		return StateMachine.define(PlayState.class, PlayEvent.class, Match.BY_CLASS)
+			
+			.description("BreakoutGameControl")
+			.initialState(Initialized)
+
+			.states()
+			
+				.state(Initialized).onEntry( () -> {
+					points = 0;
+					resetBatAndBall();
+					newBricks();
+				})
+				
+				.state(Playing)
+					.onEntry(this::launchBall)
+					.onTick( () -> {
+						if (app.entities.ofClass(Brick.class).count() == 0) {
+							resetBatAndBall();
+							newBricks();
+							launchBall();
+						}
+						app.entities.all().forEach(GameEntity::update);
+					})
+					
+				.state(BallOut)
+					.onEntry(this::resetBatAndBall)
+
+			.transitions()
+			
+				.when(Initialized).then(Playing).condition( () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE) )
+
+				.stay(Playing).on(BallHitsBatEvent.class).act(e -> {
+					ball.tf.setVelocityY(-ball.tf.getVelocityY());
+					Assets.sound("Sounds/plop.mp3").play();
+				})
+				
+				.stay(Playing).on(BallHitsBrickEvent.class).act(e -> {
+					Brick brick = ((BallHitsBrickEvent) e).brick;
+					if (brick.isDamaged()) {
+						app.entities.removeEntity(brick);
+						app.collisionHandler.unregisterStart(ball, brick);
+						points += brick.getValue();
+						Assets.sound("Sounds/point.mp3").play();
+					} else {
+						brick.damage();
+						ball.tf.setVelocityY(-ball.tf.getVelocityY());
+					}
+				})
+
+			  .when(Playing).then(BallOut).condition(ball::isOut)
+
+			  .when(BallOut).then(Playing).condition( () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE))
+			
+			.endStateMachine();
+			//@formatter:on
+	}
+
+	@Override
+	public void init() {
 		control.init();
 	}
 
@@ -141,10 +148,8 @@ public class PlayScene implements View, Controller {
 		if (bgImage != null) {
 			g.drawImage(bgImage, 0, 0, null);
 		}
-		app.entities.all().forEach(entity -> {
-			if (entity instanceof View) {
-				((View) entity).draw(g);
-			}
+		app.entities.all().filter(entity -> entity instanceof View).forEach(entity -> {
+			((View) entity).draw(g);
 		});
 		drawScore(g);
 	}
@@ -169,7 +174,7 @@ public class PlayScene implements View, Controller {
 				Brick brick = new Brick(brickWidth, brickHeight, type, value);
 				brick.tf.setPosition(x, y);
 				app.entities.store(brick);
-				app.collisionHandler.registerStart(ball, brick, BallHitsBrick);
+				app.collisionHandler.registerStart(ball, brick, new BallHitsBrickEvent(brick));
 				x += hSpace;
 			}
 			x = startX;
@@ -198,24 +203,15 @@ public class PlayScene implements View, Controller {
 	private void handleCollisions() {
 		for (Collision coll : app.collisionHandler.collisions()) {
 			PlayEvent event = coll.getAppEvent();
-			switch (event) {
-			case BallHitsBrick:
-				event.setUserData(coll.getSecond());
-				break;
-			case BallHitsBat:
-				break;
-			}
-			control.addInput(event);
+			control.enqueue(event);
 		}
 	}
 
 	private void drawScore(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setFont(scoreFont);
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
-		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2,
-				getHeight() * 3 / 4);
+		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
 	}
 }

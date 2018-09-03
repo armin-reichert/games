@@ -2,7 +2,7 @@ package de.amr.games.breakout;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.games.breakout.scenes.PlayScene;
+import de.amr.games.breakout.controller.PlayScene;
 
 /**
  * A simple "Breakout" game.
