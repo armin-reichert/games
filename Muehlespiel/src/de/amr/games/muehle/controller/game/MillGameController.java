@@ -1,22 +1,26 @@
 package de.amr.games.muehle.controller.game;
 
+import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
+import static de.amr.games.muehle.controller.game.MillGameState.GAME_OVER;
+import static de.amr.games.muehle.controller.game.MillGameState.MOVING;
+import static de.amr.games.muehle.controller.game.MillGameState.MOVING_REMOVING;
+import static de.amr.games.muehle.controller.game.MillGameState.PLACING;
+import static de.amr.games.muehle.controller.game.MillGameState.PLACING_REMOVING;
+import static de.amr.games.muehle.controller.game.MillGameState.STARTING;
 import static de.amr.games.muehle.model.board.StoneColor.BLACK;
 import static de.amr.games.muehle.model.board.StoneColor.WHITE;
 
 import java.awt.event.KeyEvent;
 import java.util.OptionalInt;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.input.Mouse;
 import de.amr.easy.game.view.View;
 import de.amr.easy.game.view.ViewController;
-import de.amr.easy.statemachine.State;
-import de.amr.easy.statemachine.Transition;
 import de.amr.games.muehle.MillGameApp;
 import de.amr.games.muehle.controller.move.MoveController;
 import de.amr.games.muehle.controller.move.MoveState;
@@ -30,17 +34,20 @@ import de.amr.games.muehle.msg.Messages;
 import de.amr.games.muehle.view.Assistant;
 import de.amr.games.muehle.view.MillGameScene;
 import de.amr.games.muehle.view.MillGameUI;
+import de.amr.statemachine.Match;
+import de.amr.statemachine.StateMachine;
 
 /**
  * Controller for the mill game application.
  * 
  * @author Armin Reichert
  */
-public class MillGameController extends MillGameStateMachine implements ViewController {
+public class MillGameController implements ViewController {
 
 	public final MillGameApp app;
 	public final MillGameModel model;
 	public final Assistant assistant;
+	private final StateMachine<MillGameState, MillGameEvent> fsm;
 	private MillGameUI view;
 	private Player whitePlayer;
 	private Player blackPlayer;
@@ -55,11 +62,92 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 		this.app = app;
 		this.model = model;
 		this.assistant = new Assistant(this);
+		this.fsm = buildStateMachine();
 		this.moveTimeSeconds = 0.75f;
 		this.placingTimeSeconds = 1.5f;
 		this.positionNearMouse = OptionalInt.empty();
 	}
 
+	private StateMachine<MillGameState, MillGameEvent> buildStateMachine() {
+		//@formatter:off
+		return StateMachine.define(MillGameState.class, MillGameEvent.class, Match.BY_EQUALITY)
+
+				.description("MillGameControl")
+				.initialState(STARTING)
+
+				.states()
+				
+					.state(STARTING)
+						.onEntry(this::resetGame)
+
+					.state(PLACING)
+						.onTick(this::tryToPlaceStone)
+					
+					.state(PLACING_REMOVING)
+						.onEntry(this::startRemoving)
+					  .onTick(this::tryToRemoveStone)
+
+					.state(MOVING)
+						.onTick(this::updateMove)
+
+					.state(MOVING_REMOVING)
+						.onEntry(this::startRemoving)
+						.onTick(this::tryToRemoveStone)
+
+					.state(GAME_OVER)
+						.onEntry(this::onGameOver)
+						
+				.transitions()
+
+					.when(STARTING).then(PLACING)
+
+					.when(PLACING).then(PLACING_REMOVING)
+						.on(STONE_PLACED_IN_MILL)
+						.act(this::onMillClosedByPlacing)
+
+					.when(PLACING).then(MOVING)
+						.on(STONE_PLACED)
+						.condition(this::areAllStonesPlaced)
+						.act(this::switchMoving)
+						
+					.stay(PLACING)
+						.on(STONE_PLACED)
+						.act(this::switchPlacing)
+
+					.when(PLACING_REMOVING).then(MOVING)
+						.on(STONE_REMOVED)
+						.condition(this::areAllStonesPlaced)
+						.act(this::switchMoving)
+
+					.when(PLACING_REMOVING).then(PLACING)
+						.on(STONE_REMOVED)
+						.act(this::switchPlacing)
+
+					.when(MOVING).then(GAME_OVER)
+						.condition(this::isGameOver)
+
+					.when(MOVING).then(MOVING_REMOVING)
+						.condition(this::isMillClosedByMove)
+
+					.stay(MOVING)
+						.condition(this::isMoveComplete)
+						.act(this::switchMoving)
+
+					.when(MOVING_REMOVING).then(MOVING)
+						.on(STONE_REMOVED)
+						.act(this::switchMoving)
+
+					.when(GAME_OVER).then(STARTING)
+						.act(this::shallStartNewGame)
+		
+		.endStateMachine();
+		//@formatter:off
+	}
+
+	public StateMachine<MillGameState, MillGameEvent> getFsm() {
+		return fsm;
+	}
+	
 	public Player whitePlayer() {
 		return whitePlayer;
 	}
@@ -109,7 +197,7 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 		setBlackPlayer(new Zwick(model, BLACK));
 		setView(gameScene);
 		gameScene.init();
-		super.init();
+		fsm.init();
 		assistant.init();
 		assistedPlayer = whitePlayer;
 	}
@@ -117,7 +205,7 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 	@Override
 	public void update() {
 		readUserInput();
-		super.update();
+		fsm.update();
 		assistant.update();
 	}
 
@@ -165,40 +253,35 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 	private void turnMovingTo(Player player) {
 		turn = player;
 		moveControl = new MoveController(turn, view, moveTimeSeconds);
-		moveControl.setLogger(LOGGER);
-		moveControl.init();
+		moveControl.getFsm().traceTo(LOGGER, CLOCK::getFrequency);
+		moveControl.getFsm().init();
 		view.showMessage("must_move", turn.name());
 	}
 
 	// implement methods from base class
 
-	@Override
 	protected boolean areAllStonesPlaced() {
 		return model.blackStonesPlaced == 9;
 	}
 
-	@Override
-	protected void switchPlacing(Transition<MillGameState, MillGameEvent> change) {
+	protected void switchPlacing() {
 		turnPlacingTo(playerNotInTurn());
 		if (!turn.isInteractive()) {
-			pause(Application.CLOCK.sec(placingTimeSeconds));
+//			pause(Application.CLOCK.sec(placingTimeSeconds));
 		}
 	}
 
-	@Override
-	protected void onMillClosedByPlacing(Transition<MillGameState, MillGameEvent> change) {
+	protected void onMillClosedByPlacing() {
 		if (assistedPlayer == turn) {
 			assistant.tellMillClosed();
 		}
 	}
 
-	@Override
-	protected void switchMoving(Transition<MillGameState, MillGameEvent> change) {
+	protected void switchMoving() {
 		turnMovingTo(playerNotInTurn());
 	}
 
-	@Override
-	protected void tryToPlaceStone(State state) {
+	protected void tryToPlaceStone() {
 		if (assistedPlayer == turn) {
 			assistant.givePlacingHint(assistedPlayer);
 		}
@@ -212,9 +295,9 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 					model.blackStonesPlaced += 1;
 				}
 				if (model.board.inMill(placedAt, placedColor)) {
-					addInput(STONE_PLACED_IN_MILL);
+					fsm.enqueue(STONE_PLACED_IN_MILL);
 				} else {
-					addInput(STONE_PLACED);
+					fsm.enqueue(STONE_PLACED);
 				}
 			} else {
 				LOGGER.info(Messages.text("stone_at_position", placedAt));
@@ -222,8 +305,7 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 		});
 	}
 
-	@Override
-	protected void tryToRemoveStone(State state) {
+	protected void tryToRemoveStone() {
 		turn.supplyRemovalPosition().ifPresent(p -> {
 			StoneColor colorToRemove = playerNotInTurn().color();
 			if (model.board.isEmptyPosition(p)) {
@@ -235,28 +317,24 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 				LOGGER.info(Messages.text("stone_cannot_be_removed_from_mill"));
 			} else {
 				view.removeStoneAt(p);
-				addInput(STONE_REMOVED);
+				fsm.enqueue(STONE_REMOVED);
 				LOGGER.info(Messages.text("removed_stone_at_position", turn.name(), p));
 			}
 		});
 	}
 
-	@Override
-	protected void startRemoving(State state) {
+	protected void startRemoving() {
 		view.showMessage("must_take", turn.name(), playerNotInTurn().name());
 	}
 
-	@Override
-	protected void updateMove(State state) {
-		moveControl.update();
+	protected void updateMove() {
+		moveControl.getFsm().update();
 	}
 
-	@Override
 	protected boolean isMoveComplete() {
-		return moveControl.is(MoveState.COMPLETE);
+		return moveControl.getFsm().getState() == MoveState.COMPLETE;
 	}
 
-	@Override
 	protected boolean isMillClosedByMove() {
 		if (isMoveComplete()) {
 			Move move = moveControl.getMove().get();
@@ -267,25 +345,21 @@ public class MillGameController extends MillGameStateMachine implements ViewCont
 		return false;
 	}
 
-	@Override
-	protected void resetGame(State state) {
+	protected void resetGame() {
 		view.clearBoard();
 		model.whiteStonesPlaced = model.blackStonesPlaced = 0;
 		turnPlacingTo(whitePlayer);
 	}
 
-	@Override
 	protected boolean isGameOver() {
 		return model.board.stoneCount(turn.color()) < 3 || (!turn.canJump() && turn.isTrapped());
 	}
 
-	@Override
-	protected void onGameOver(State state) {
+	protected void onGameOver() {
 		announceWinner(playerNotInTurn());
-		pause(Application.CLOCK.sec(3));
+//		pause(Application.CLOCK.sec(3));
 	}
 
-	@Override
 	protected boolean shallStartNewGame() {
 		return !whitePlayer.isInteractive() && !blackPlayer.isInteractive()
 				|| Keyboard.keyPressedOnce(KeyEvent.VK_SPACE);

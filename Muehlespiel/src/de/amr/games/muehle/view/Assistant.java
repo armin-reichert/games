@@ -98,14 +98,12 @@ public class Assistant extends GameEntityUsingSprites {
 				&& Stream.of(SoundID.values()).map(SoundID::sound).anyMatch(Sound::isRunning)) {
 			super.draw(g);
 			if (helpLevel == HelpLevel.HIGH && control.playerInTurn().isInteractive()) {
-				if (control.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
-					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().color()),
-							Color.GREEN);
-					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().color()),
-							Color.YELLOW);
-					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().color()),
-							Color.RED);
-				} else if (control.is(MillGameState.MOVING, MillGameState.MOVING_REMOVING)) {
+				MillGameState state = control.getFsm().getState();
+				if (state == MillGameState.PLACING || state == MillGameState.PLACING_REMOVING) {
+					view.markPositions(g, board.positionsClosingMill(control.playerInTurn().color()), Color.GREEN);
+					view.markPositions(g, board.positionsOpeningTwoMills(control.playerInTurn().color()), Color.YELLOW);
+					view.markPositions(g, board.positionsClosingMill(control.playerNotInTurn().color()), Color.RED);
+				} else if (state == MillGameState.MOVING || state == MillGameState.MOVING_REMOVING) {
 					markPossibleMoveStarts(g, control.playerInTurn().color(), Color.GREEN);
 					markTrappingPosition(g, control.playerInTurn().color(), control.playerNotInTurn().color(),
 							Color.RED);
@@ -116,12 +114,10 @@ public class Assistant extends GameEntityUsingSprites {
 
 	private void markPossibleMoveStarts(Graphics2D g, StoneColor stoneColor, Color color) {
 		(control.playerInTurn().canJump() ? board.positions(stoneColor)
-				: board.positionsWithEmptyNeighbor(stoneColor))
-						.forEach(p -> view.markPosition(g, p, color));
+				: board.positionsWithEmptyNeighbor(stoneColor)).forEach(p -> view.markPosition(g, p, color));
 	}
 
-	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other,
-			Color color) {
+	private void markTrappingPosition(Graphics2D g, StoneColor either, StoneColor other, Color color) {
 		if (board.positionsWithEmptyNeighbor(other).count() == 1) {
 			int singleFreePosition = board.positionsWithEmptyNeighbor(other).findFirst().getAsInt();
 			if (neighbors(singleFreePosition).filter(board::hasStoneAt)

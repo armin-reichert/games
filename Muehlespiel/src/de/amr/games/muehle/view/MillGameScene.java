@@ -148,16 +148,18 @@ public class MillGameScene implements View, Controller, MillGameUI {
 		controller.assistant.draw(g);
 		messageArea.tf.centerX(getWidth());
 		messageArea.draw(g);
-		if (controller.is(MillGameState.PLACING, MillGameState.PLACING_REMOVING)) {
+		MillGameState state = controller.getFsm().getState();
+		if (state == MillGameState.PLACING || state == MillGameState.PLACING_REMOVING) {
 			controller.getPositionNearMouse().ifPresent(p -> {
 				if (model.board.isEmptyPosition(p)) {
 					boardUI.markPosition(g, p, Color.ORANGE);
 				}
 			});
 			drawStonesLeft(g, controller.whitePlayer(), 9 - model.whiteStonesPlaced, 40, getHeight() - 30);
-			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100, getHeight() - 30);
+			drawStonesLeft(g, controller.blackPlayer(), 9 - model.blackStonesPlaced, getWidth() - 100,
+					getHeight() - 30);
 		}
-		if (controller.is(MillGameState.MOVING_REMOVING, MillGameState.PLACING_REMOVING)
+		if ((state == MillGameState.MOVING_REMOVING || state == MillGameState.PLACING_REMOVING)
 				&& controller.playerInTurn().isInteractive()) {
 			boardUI.markRemovableStones(g, controller.playerNotInTurn().color());
 		}
