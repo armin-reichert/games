@@ -1,5 +1,7 @@
 package de.amr.samples.marbletoy.entities;
 
+import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.samples.marbletoy.router.RoutingPoint.C;
 import static de.amr.samples.marbletoy.router.RoutingPoint.D;
 import static de.amr.samples.marbletoy.router.RoutingPoint.E;
@@ -16,7 +18,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.EnumSet;
 import java.util.Random;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.GameEntityUsingSprites;
 import de.amr.easy.game.sprite.Sprite;
@@ -31,24 +32,24 @@ public class MarbleToy extends GameEntityUsingSprites {
 	public final Lever[] levers = new Lever[3];
 	private final EnumSet<RoutingPoint> auxPoints = EnumSet.of(E, F, G, H);
 	private final Marble marble;
+	private final MarbleRouter router;
 	private LeverControl leverControl;
-	private MarbleRouter router;
 
 	public MarbleToy() {
 		setSprite("s_toy", Sprite.of(Assets.image("toy.png")));
 		setSelectedSprite("s_toy");
-		this.marble = new Marble();
+		this.marble = new Marble(50);
 		marble.tf.setPosition(-marble.tf.getWidth(), -marble.tf.getHeight());
 		levers[0] = new Lever(178, 82);
 		levers[1] = new Lever(424, 82);
 		levers[2] = new Lever(301, 204);
 		router = new MarbleRouter(this);
-		router.getFsm().traceTo(Application.LOGGER, Application.CLOCK::getFrequency);
+		router.getFsm().traceTo(LOGGER, CLOCK::getFrequency);
 	}
 
 	public void setLeverControl(LeverControl leverControl) {
 		this.leverControl = leverControl;
-		leverControl.getFsm().traceTo(Application.LOGGER, Application.CLOCK::getFrequency);
+		leverControl.getFsm().traceTo(LOGGER, CLOCK::getFrequency);
 	}
 
 	@Override
@@ -61,10 +62,10 @@ public class MarbleToy extends GameEntityUsingSprites {
 	@Override
 	public void update() {
 		if (router.getFsm().getState() == C || router.getFsm().getState() == D) {
-			Character nextSlot = new Random().nextBoolean() ? 'A' : 'B';
+			Character slot = new Random().nextBoolean() ? 'A' : 'B';
 			router.getFsm().init();
-			router.getFsm().enqueue(nextSlot);
-			leverControl.getFsm().enqueue(nextSlot);
+			router.getFsm().enqueue(slot);
+			leverControl.getFsm().enqueue(slot);
 		}
 		leverControl.getFsm().update();
 		router.getFsm().update();

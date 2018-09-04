@@ -16,7 +16,6 @@ import static de.amr.samples.marbletoy.router.RoutingPoint.X2;
 import static de.amr.samples.marbletoy.router.RoutingPoint.X3;
 
 import de.amr.easy.game.math.Vector2f;
-import de.amr.samples.marbletoy.entities.Marble;
 import de.amr.samples.marbletoy.entities.MarbleToy;
 import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
@@ -38,6 +37,7 @@ public class MarbleRouter {
 
 				.states()
 
+					.state(Initial)
 					.state(A).onEntry(() -> routeMarble(A, X1))
 					.state(B).onEntry(() -> routeMarble(B, X2))
 					.state(X1).onEntry(() -> routeMarble(X1, toy.getLever(0).pointsLeft() ? E : X3))
@@ -52,24 +52,20 @@ public class MarbleRouter {
 		
 					.when(Initial).then(A).on('A').act(e -> placeMarbleCenteredAt(A))
 					.when(Initial).then(B).on('B').act(e -> placeMarbleCenteredAt(B))
-					.when(A).then(X1).act(() -> isMarbleAtLever(0))
-					.when(B).then(X2).act(() -> isMarbleAtLever(1))
-					.when(X1).then(E).act(() -> isMarbleAt(E))
-					.when(X1).then(X3).act(() -> isMarbleAtLever(2))
-					.when(X2).then(X3).act(() -> isMarbleAtLever(2))
-					.when(X2).then(F).act(() -> isMarbleAt(F))
-					.when(X3).then(G).act(() -> isMarbleAt(G))
-					.when(X3).then(H).act(() -> isMarbleAt(H))
-					.when(E).then(G).act(() -> isMarbleAt(G))
-					.when(F).then(H).act(() -> isMarbleAt(H))
-					.when(G).then(C).act( () -> isMarbleAt(C))
-					.when(H).then(D).act( () -> isMarbleAt(D))
+					.when(A).then(X1).condition(() -> isMarbleAtLever(0))
+					.when(B).then(X2).condition(() -> isMarbleAtLever(1))
+					.when(X1).then(E).condition(() -> isMarbleAt(E))
+					.when(X1).then(X3).condition(() -> isMarbleAtLever(2))
+					.when(X2).then(X3).condition(() -> isMarbleAtLever(2))
+					.when(X2).then(F).condition(() -> isMarbleAt(F))
+					.when(X3).then(G).condition(() -> isMarbleAt(G))
+					.when(X3).then(H).condition(() -> isMarbleAt(H))
+					.when(E).then(G).condition(() -> isMarbleAt(G))
+					.when(F).then(H).condition(() -> isMarbleAt(H))
+					.when(G).then(C).condition( () -> isMarbleAt(C))
+					.when(H).then(D).condition( () -> isMarbleAt(D))
 				
 		.endStateMachine();
-		
-		for (RoutingPoint p : RoutingPoint.values()) {
-			fsm.state(p).setOnTick(toy::update);
-		}
 		//@formatter:on
 	}
 	

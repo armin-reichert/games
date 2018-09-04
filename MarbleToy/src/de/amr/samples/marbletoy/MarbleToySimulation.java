@@ -17,7 +17,6 @@ public class MarbleToySimulation extends Application {
 		settings.width = 600;
 		settings.height = 410;
 		settings.bgColor = Color.WHITE;
-		CLOCK.setFrequency(2);
 	}
 
 	@Override
