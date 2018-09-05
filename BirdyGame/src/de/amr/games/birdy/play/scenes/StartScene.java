@@ -1,6 +1,7 @@
 package de.amr.games.birdy.play.scenes;
 
 import static de.amr.easy.game.Application.app;
+import static de.amr.games.birdy.BirdyGameApp.entities;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.play.scenes.StartScene.State.GameOver;
@@ -78,7 +79,7 @@ public class StartScene implements View, Controller {
 
 			state(GameOver).setOnEntry(() -> {
 				stop();
-				displayedText = app.entities.ofName("game_over");
+				displayedText = entities.ofName("game_over");
 				Assets.sounds().forEach(Sound::stop);
 			});
 
@@ -123,47 +124,47 @@ public class StartScene implements View, Controller {
 	}
 
 	private void displayText(String name) {
-		displayedText = app.entities.ofName(name);
+		displayedText = entities.ofName(name);
 	}
 
 	private void reset() {
-		city = app.entities.ofClass(City.class).findAny().get();
+		city = entities.ofClass(City.class).findAny().get();
 		city.setWidth(getWidth());
 		city.init();
 
-		ground = app.entities.ofClass(Ground.class).findAny().get();
+		ground = entities.ofClass(Ground.class).findAny().get();
 		ground.setWidth(getWidth());
 		ground.tf.setPosition(0, getHeight() - ground.tf.getHeight());
 		ground.tf.setVelocity(app.settings.getAsFloat("world speed"), 0);
 
-		bird = app.entities.ofClass(Bird.class).findAny().get();
+		bird = entities.ofClass(Bird.class).findAny().get();
 		bird.init();
 		bird.tf.setPosition(getWidth() / 8, ground.tf.getY() / 2);
 		bird.tf.setVelocity(0, 0);
 
-		if (!app.entities.contains("title")) {
+		if (!entities.contains("title")) {
 			ScrollableImage titleText = new ScrollableImage(Assets.image("title"));
-			app.entities.store("title", titleText);
+			entities.store("title", titleText);
 		}
 
-		if (!app.entities.contains("text_game_over")) {
+		if (!entities.contains("text_game_over")) {
 			ScrollableImage gameOverText = new ScrollableImage(Assets.image("text_game_over"));
-			app.entities.store("text_game_over", gameOverText);
+			entities.store("text_game_over", gameOverText);
 		}
 
-		if (!app.entities.contains("text_ready")) {
+		if (!entities.contains("text_ready")) {
 			PumpingImage readyText = PumpingImage.create().image(Assets.image("text_ready")).build();
-			app.entities.store("text_ready", readyText);
+			entities.store("text_ready", readyText);
 		}
 
-		if (!app.entities.contains("world")) {
+		if (!entities.contains("world")) {
 			Area world = new Area(getWidth(), 2 * getHeight());
 			world.tf.setPosition(0, -getHeight());
-			app.entities.store("world", world);
+			entities.store("world", world);
 		}
 
 		app.collisionHandler.clear();
-		app.collisionHandler.registerEnd(bird, app.entities.ofClass(Area.class).findAny().get(), BirdLeftWorld);
+		app.collisionHandler.registerEnd(bird, entities.ofClass(Area.class).findAny().get(), BirdLeftWorld);
 		app.collisionHandler.registerStart(bird, ground, BirdTouchedGround);
 
 		displayText("title");

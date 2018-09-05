@@ -1,5 +1,6 @@
 package de.amr.games.birdy.play.scenes;
 
+import static de.amr.games.birdy.BirdyGameApp.entities;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdCrashed;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
@@ -129,13 +130,13 @@ public class PlayScene implements View, Controller {
 
 	@Override
 	public void init() {
-		ground = app.entities.ofClass(Ground.class).findAny().get();
-		city = app.entities.ofClass(City.class).findAny().get();
-		bird = app.entities.ofClass(Bird.class).findAny().get();
+		ground = entities.ofClass(Ground.class).findAny().get();
+		city = entities.ofClass(City.class).findAny().get();
+		bird = entities.ofClass(Bird.class).findAny().get();
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
 		scoreDisplay.tf.centerX(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
-		gameOverText = app.entities.store(new ScrollableImage(Assets.image("text_game_over")));
+		gameOverText = entities.store(new ScrollableImage(Assets.image("text_game_over")));
 		gameOverText.tf.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tf.setPosition(0, -getHeight());
