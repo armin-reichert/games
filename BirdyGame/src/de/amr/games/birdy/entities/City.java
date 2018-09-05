@@ -2,6 +2,7 @@ package de.amr.games.birdy.entities;
 
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.app;
+import static de.amr.games.birdy.BirdyGameApp.entities;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNRISE;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNSET;
 import static de.amr.games.birdy.entities.City.DayTime.DAY;
@@ -57,7 +58,6 @@ public class City extends GameEntityUsingSprites {
 
 		fsm.addTransitionOnEventObject(DAY, NIGHT, null, null, SUNSET);
 		fsm.addTransitionOnEventObject(DAY, DAY, null, null, SUNRISE);
-		
 
 		fsm.state(NIGHT).setDuration(() -> app().clock.sec(10));
 
@@ -67,11 +67,11 @@ public class City extends GameEntityUsingSprites {
 		});
 
 		fsm.state(NIGHT).setOnTick(() -> {
-			app().entities.ofClass(Star.class).forEach(GameEntity::update);
+			entities.ofClass(Star.class).forEach(GameEntity::update);
 		});
 
 		fsm.state(NIGHT).setOnExit(() -> {
-			app().entities.removeAll(Star.class);
+			entities.removeAll(Star.class);
 		});
 
 		fsm.addTransitionOnTimeout(NIGHT, NIGHT, null, e -> {
@@ -99,10 +99,10 @@ public class City extends GameEntityUsingSprites {
 	}
 
 	private void replaceStars() {
-		app().entities.removeAll(Star.class);
+		entities.removeAll(Star.class);
 		int numStars = randomInt(1, app().settings.get("max stars"));
 		IntStream.range(1, numStars).forEach(i -> {
-			Star star = app().entities.store(new Star());
+			Star star = entities.store(new Star());
 			star.tf.setPosition(randomInt(50, tf.getWidth() - 50), randomInt(100, 180));
 		});
 		Application.LOGGER.info("Created " + numStars + " new stars");
@@ -136,7 +136,7 @@ public class City extends GameEntityUsingSprites {
 		for (int x = 0; x < tf.getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
-		app().entities.ofClass(Star.class).forEach(star -> star.draw(g));
+		entities.ofClass(Star.class).forEach(star -> star.draw(g));
 		g.translate(-tf.getX(), -tf.getY());
 	}
 }

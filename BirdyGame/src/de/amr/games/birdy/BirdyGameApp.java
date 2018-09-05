@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.entity.EntityMap;
 import de.amr.easy.game.ui.FullScreen;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
@@ -48,6 +49,8 @@ public class BirdyGameApp extends Application {
 		settings.set("min pipe height", 100);
 		settings.set("passage height", 100);
 	}
+	
+	public static final EntityMap entities = new EntityMap();
 
 	private IntroScene introScene;
 

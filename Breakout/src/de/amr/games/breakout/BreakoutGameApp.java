@@ -2,6 +2,7 @@ package de.amr.games.breakout;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.entity.EntityMap;
 import de.amr.games.breakout.controller.PlayScene;
 
 /**
@@ -14,6 +15,8 @@ public class BreakoutGameApp extends Application {
 	public static void main(String[] args) {
 		launch(new BreakoutGameApp());
 	}
+	
+	public final EntityMap entities = new EntityMap();
 
 	public BreakoutGameApp() {
 		settings.title = "Breakout";
