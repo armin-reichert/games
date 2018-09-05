@@ -41,7 +41,7 @@ public class ClockRenderer {
 		gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	}
 
-	void drawClockTicks(int elapsed) {
+	void drawclockTicks(int elapsed) {
 		for (int i = elapsed - 1; i < TICK_COUNT; ++i) {
 			if (i < 0) {
 				continue;

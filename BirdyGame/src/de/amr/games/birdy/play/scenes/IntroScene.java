@@ -1,7 +1,7 @@
 package de.amr.games.birdy.play.scenes;
 
-import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.COMPLETE;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.CREDITS;
 import static de.amr.games.birdy.play.scenes.IntroScene.State.LOGO;
@@ -50,7 +50,7 @@ public class IntroScene implements View, Controller {
 		this.height = app.settings.height;
 
 		fsm = new StateMachine<>(State.class, Match.BY_EQUALITY);
-		fsm.traceTo(LOGGER, CLOCK::getFrequency);
+		fsm.traceTo(LOGGER, app().clock::getFrequency);
 		fsm.setDescription("Intro Scene");
 		fsm.setInitialState(CREDITS);
 
@@ -68,14 +68,14 @@ public class IntroScene implements View, Controller {
 			credits.stop();
 		});
 
-		fsm.state(WAITING).setDuration(() -> CLOCK.sec(2));
+		fsm.state(WAITING).setDuration(() -> app().clock.sec(2));
 		fsm.addTransitionOnTimeout(WAITING, LOGO, null, null);
 
 		fsm.state(LOGO).setOnEntry(() -> {
 			logo.setVisible(true);
 			credits.setVisible(false);
 		});
-		fsm.state(LOGO).setDuration(() -> CLOCK.sec(3));
+		fsm.state(LOGO).setDuration(() -> app().clock.sec(3));
 		fsm.addTransitionOnTimeout(LOGO, COMPLETE, null, null);
 
 		fsm.state(LOGO).setOnExit(() -> app.setController(app.getStartScene()));

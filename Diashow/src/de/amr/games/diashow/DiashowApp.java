@@ -14,7 +14,7 @@ public class DiashowApp extends Application {
 		settings.title = "Diashow";
 		settings.width = 900;
 		settings.height = 600;
-		CLOCK.setFrequency(3);
+		clock.setFrequency(3);
 	}
 
 	@Override

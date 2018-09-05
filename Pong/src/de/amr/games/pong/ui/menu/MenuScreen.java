@@ -1,7 +1,7 @@
 package de.amr.games.pong.ui.menu;
 
 import static de.amr.easy.game.Application.LOGGER;
-import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.app;
 import static de.amr.easy.game.input.Keyboard.keyPressedOnce;
 import static de.amr.games.pong.model.Game.PlayMode.Computer_Computer;
 import static de.amr.games.pong.model.Game.PlayMode.Computer_Player2;
@@ -41,7 +41,7 @@ public class MenuScreen implements Controller, View {
 		this.screenManager = screenManager;
 		this.size = size;
 		fsm = createStateMachine();
-		fsm.traceTo(LOGGER, CLOCK::getFrequency);
+		fsm.traceTo(LOGGER, app().clock::getFrequency);
 	}
 
 	private StateMachine<PlayMode, Object> createStateMachine() {

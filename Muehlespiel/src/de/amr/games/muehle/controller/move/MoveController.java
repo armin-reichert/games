@@ -1,6 +1,7 @@
 package de.amr.games.muehle.controller.move;
 
 import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.muehle.controller.move.MoveEvent.GOT_MOVE_FROM_PLAYER;
 import static de.amr.games.muehle.controller.move.MoveState.ANIMATION;
 import static de.amr.games.muehle.controller.move.MoveState.COMPLETE;
@@ -13,7 +14,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Optional;
 
-import de.amr.easy.game.Application;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.games.muehle.controller.player.Player;
 import de.amr.games.muehle.model.board.Direction;
@@ -118,7 +118,7 @@ public class MoveController {
 			int from = move.from().get(), to = move.to().get();
 			gameUI.getStoneAt(from).ifPresent(stone -> {
 				float speed = Vector2f.dist(gameUI.getLocation(from), gameUI.getLocation(to))
-						/ Application.CLOCK.sec(moveTimeSec);
+						/ app().clock.sec(moveTimeSec);
 				Direction dir = getDirection(from, to).get();
 				if (dir == Direction.NORTH) {
 					stone.tf.setVelocity(0, -speed);

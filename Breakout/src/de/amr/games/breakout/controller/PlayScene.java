@@ -1,7 +1,7 @@
 package de.amr.games.breakout.controller;
 
-import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.breakout.controller.PlayState.BallOut;
 import static de.amr.games.breakout.controller.PlayState.Initialized;
 import static de.amr.games.breakout.controller.PlayState.Playing;
@@ -62,7 +62,7 @@ public class PlayScene implements View, Controller {
 
 		app.collisionHandler.registerStart(ball, bat, new BallHitsBatEvent());
 		control = buildStateMachine();
-		control.traceTo(LOGGER, CLOCK::getFrequency);
+		control.traceTo(LOGGER, app().clock::getFrequency);
 	}
 
 	public int getWidth() {

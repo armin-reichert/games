@@ -1,7 +1,7 @@
 package de.amr.games.muehle.controller.game;
 
-import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_PLACED_IN_MILL;
 import static de.amr.games.muehle.controller.game.MillGameEvent.STONE_REMOVED;
@@ -253,7 +253,7 @@ public class MillGameController implements ViewController {
 	private void turnMovingTo(Player player) {
 		turn = player;
 		moveControl = new MoveController(turn, view, moveTimeSeconds);
-		moveControl.getFsm().traceTo(LOGGER, CLOCK::getFrequency);
+		moveControl.getFsm().traceTo(LOGGER, app().clock::getFrequency);
 		moveControl.getFsm().init();
 		view.showMessage("must_move", turn.name());
 	}
@@ -267,7 +267,7 @@ public class MillGameController implements ViewController {
 	protected void switchPlacing() {
 		turnPlacingTo(playerNotInTurn());
 		if (!turn.isInteractive()) {
-//			pause(Application.CLOCK.sec(placingTimeSeconds));
+//			pause(Application.clock.sec(placingTimeSeconds));
 		}
 	}
 
@@ -357,7 +357,7 @@ public class MillGameController implements ViewController {
 
 	protected void onGameOver() {
 		announceWinner(playerNotInTurn());
-//		pause(Application.CLOCK.sec(3));
+//		pause(Application.clock.sec(3));
 	}
 
 	protected boolean shallStartNewGame() {

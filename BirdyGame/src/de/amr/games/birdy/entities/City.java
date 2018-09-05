@@ -1,6 +1,5 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.entities.City.DayEvent.SUNRISE;
@@ -60,7 +59,7 @@ public class City extends GameEntityUsingSprites {
 		fsm.addTransitionOnEventObject(DAY, DAY, null, null, SUNRISE);
 		
 
-		fsm.state(NIGHT).setDuration(() -> CLOCK.sec(10));
+		fsm.state(NIGHT).setDuration(() -> app().clock.sec(10));
 
 		fsm.state(NIGHT).setOnEntry(() -> {
 			setSelectedSprite("s_night");
@@ -86,7 +85,7 @@ public class City extends GameEntityUsingSprites {
 	@Override
 	public void init() {
 		fsm.init();
-		fsm.traceTo(LOGGER, CLOCK::getFrequency);
+		fsm.traceTo(LOGGER, app().clock::getFrequency);
 	}
 
 	@Override

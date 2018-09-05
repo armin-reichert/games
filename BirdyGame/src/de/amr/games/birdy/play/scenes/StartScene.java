@@ -1,6 +1,6 @@
 package de.amr.games.birdy.play.scenes;
 
-import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
 import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
 import static de.amr.games.birdy.play.scenes.StartScene.State.GameOver;
@@ -68,7 +68,7 @@ public class StartScene implements View, Controller {
 
 			// Ready ---
 
-			state(Ready).setDuration(() -> CLOCK.sec(app.settings.getAsFloat("ready time sec")));
+			state(Ready).setDuration(() -> app().clock.sec(app.settings.getAsFloat("ready time sec")));
 			state(Ready).setOnEntry(() -> displayText("readyText"));
 			addTransitionOnTimeout(Ready, StartPlaying, null, e -> app.setController(app.getPlayScene()));
 			addTransitionOnEventObject(Ready, GameOver, null, e -> displayText("title"), BirdTouchedGround);

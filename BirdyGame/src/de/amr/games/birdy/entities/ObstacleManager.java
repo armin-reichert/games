@@ -1,6 +1,6 @@
 package de.amr.games.birdy.entities;
 
-import static de.amr.easy.game.Application.CLOCK;
+import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Birth;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Breeding;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Stopped;
@@ -41,8 +41,8 @@ public class ObstacleManager extends GameEntity implements View {
 
 		// Stay breeding for some random time from interval [MIN_PIPE_TIME, MAX_PIPE_TIME]:
 		control.state(Breeding).setDuration(() -> {
-			int minCreationTime = CLOCK.sec(app.settings.getAsFloat("min pipe creation sec"));
-			int maxCreationTime = CLOCK.sec(app.settings.getAsFloat("max pipe creation sec"));
+			int minCreationTime = app().clock.sec(app.settings.getAsFloat("min pipe creation sec"));
+			int maxCreationTime = app().clock.sec(app.settings.getAsFloat("max pipe creation sec"));
 			return randomInt(minCreationTime, maxCreationTime);
 		});
 
@@ -67,7 +67,7 @@ public class ObstacleManager extends GameEntity implements View {
 	}
 
 	public void setLogger(Logger log) {
-		control.traceTo(log, CLOCK::getFrequency);
+		control.traceTo(log, app().clock::getFrequency);
 	}
 
 	@Override

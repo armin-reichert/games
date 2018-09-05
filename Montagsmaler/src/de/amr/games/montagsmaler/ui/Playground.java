@@ -21,7 +21,7 @@ public class Playground extends DrawingCanvas {
 	protected void paintBelowDrawing(Graphics g) {
 		super.paintBelowDrawing(g);
 		if (elapsed > 0) {
-			clock.drawClockTicks(elapsed);
+			clock.drawclockTicks(elapsed);
 		}
 	}
 

@@ -1,6 +1,5 @@
 package de.amr.games.birdy.entities.bird;
 
-import static de.amr.easy.game.Application.CLOCK;
 import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.entities.bird.FlightState.Crashing;
@@ -56,7 +55,7 @@ public class Bird extends GameEntityUsingSprites {
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdTouchedGround);
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdLeftWorld);
 
-			state(Injured).setDuration(() -> CLOCK.sec(app().settings.get("bird injured seconds")));
+			state(Injured).setDuration(() -> app().clock.sec(app().settings.get("bird injured seconds")));
 			state(Injured).setOnEntry(() -> setSelectedSprite("s_red"));
 
 			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
@@ -119,9 +118,9 @@ public class Bird extends GameEntityUsingSprites {
 
 	public Bird() {
 		flightControl = new FlightControl();
-		flightControl.traceTo(LOGGER, CLOCK::getFrequency);
+		flightControl.traceTo(LOGGER, app().clock::getFrequency);
 		healthControl = new HealthControl();
-		healthControl.traceTo(LOGGER, CLOCK::getFrequency);
+		healthControl.traceTo(LOGGER, app().clock::getFrequency);
 		setSprite("s_yellow", createFeatherSprite("bird0"));
 		setSprite("s_blue", createFeatherSprite("bird1"));
 		setSprite("s_red", createFeatherSprite("bird2"));

@@ -23,7 +23,7 @@ public class MillTestApp extends Application {
 		settings.width = 800;
 		settings.height = 800;
 		settings.fullScreenMode = null;
-		CLOCK.setFrequency(25);
+		clock.setFrequency(25);
 	}
 
 	@Override

@@ -24,7 +24,7 @@ public class MillGameApp extends Application {
 		settings.width = 800;
 		settings.height = 800;
 		settings.fullScreenMode = null;
-		CLOCK.setFrequency(25);
+		clock.setFrequency(25);
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class MillGameApp extends Application {
 		MillGameController controller = new MillGameController(this, model);
 		controller.setMoveTimeSeconds(0.75f);
 		controller.setPlacingTimeSeconds(1.5f);
-		controller.getFsm().traceTo(LOGGER, CLOCK::getFrequency);
+		controller.getFsm().traceTo(LOGGER, clock::getFrequency);
 		setController(controller);
 	}
 }
