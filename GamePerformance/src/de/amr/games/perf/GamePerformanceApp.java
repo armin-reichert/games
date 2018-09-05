@@ -10,6 +10,7 @@ public class GamePerformanceApp extends Application {
 
 	public GamePerformanceApp() {
 		settings.title = "Game performance measurement";
+		settings.titleExtended = true;
 		settings.width = 1000;
 		// PULSE.setLogger(LOG);
 		CLOCK.setFrequency(100);
