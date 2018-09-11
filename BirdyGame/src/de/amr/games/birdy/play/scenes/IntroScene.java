@@ -68,14 +68,14 @@ public class IntroScene implements View, Controller {
 			credits.stop();
 		});
 
-		fsm.state(WAITING).setDuration(() -> app().clock.sec(2));
+		fsm.state(WAITING).setTimer(() -> app().clock.sec(2));
 		fsm.addTransitionOnTimeout(WAITING, LOGO, null, null);
 
 		fsm.state(LOGO).setOnEntry(() -> {
 			logo.setVisible(true);
 			credits.setVisible(false);
 		});
-		fsm.state(LOGO).setDuration(() -> app().clock.sec(3));
+		fsm.state(LOGO).setTimer(() -> app().clock.sec(3));
 		fsm.addTransitionOnTimeout(LOGO, COMPLETE, null, null);
 
 		fsm.state(LOGO).setOnExit(() -> app.setController(app.getStartScene()));
