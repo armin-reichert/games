@@ -17,8 +17,8 @@ import de.amr.easy.game.sprite.Sprite;
 public class Star extends GameEntityUsingSprites {
 
 	public Star() {
-		setSprite("s_star", Sprite.ofAssets("blink_00", "blink_01", "blink_02")
+		sprites.set("s_star", Sprite.ofAssets("blink_00", "blink_01", "blink_02")
 				.animate(new Random().nextBoolean() ? BACK_AND_FORTH : CYCLIC, randomInt(300, 2000)));
-		setSelectedSprite("s_star");
+		sprites.select("s_star");
 	}
 }

@@ -17,16 +17,16 @@ public class Brick extends GameEntityUsingSprites {
 		damaged = false;
 		tf.setWidth(width);
 		tf.setHeight(height);
-		setSprite("s_intact",
+		sprites.set("s_intact",
 				Sprite.ofAssets("Bricks/brick_" + color + "_small.png").scale(width, height));
-		setSprite("s_damaged",
+		sprites.set("s_damaged",
 				Sprite.ofAssets("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
-		setSelectedSprite("s_intact");
+		sprites.select("s_intact");
 	}
 
 	public void damage() {
 		damaged = true;
-		setSelectedSprite("s_damaged");
+		sprites.select("s_damaged");
 	}
 
 	public boolean isDamaged() {

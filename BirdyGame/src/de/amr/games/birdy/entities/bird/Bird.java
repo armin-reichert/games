@@ -48,7 +48,7 @@ public class Bird extends GameEntityUsingSprites {
 			setDescription("Bird Health Control");
 			setInitialState(Sane);
 
-			state(Sane).setOnEntry(() -> setSelectedSprite("s_yellow"));
+			state(Sane).setOnEntry(() -> sprites.select("s_yellow"));
 
 			addTransitionOnEventObject(Sane, Sane, null, null, BirdLeftPassage);
 			addTransitionOnEventObject(Sane, Injured, null, null, BirdTouchedPipe);
@@ -56,7 +56,7 @@ public class Bird extends GameEntityUsingSprites {
 			addTransitionOnEventObject(Sane, Dead, null, null, BirdLeftWorld);
 
 			state(Injured).setTimer(() -> app().clock.sec(app().settings.get("bird injured seconds")));
-			state(Injured).setOnEntry(() -> setSelectedSprite("s_red"));
+			state(Injured).setOnEntry(() -> sprites.select("s_red"));
 
 			addTransitionOnEventObject(Injured, Injured, null, e -> state(Injured).resetTimer(), BirdTouchedPipe);
 			addTransitionOnTimeout(Injured, Sane, null, null);
@@ -66,10 +66,10 @@ public class Bird extends GameEntityUsingSprites {
 			addTransitionOnEventObject(Injured, Dead, null, null, BirdLeftWorld);
 
 			state(Dead).setOnEntry(() -> {
-				setSelectedSprite("s_blue");
+				sprites.select("s_blue");
 				turnDown();
 			});
-			
+
 			addTransitionOnEventObject(Dead, Dead, null, null, BirdTouchedGround);
 		}
 	}
@@ -111,7 +111,7 @@ public class Bird extends GameEntityUsingSprites {
 				Assets.sound("sfx/die.mp3").play();
 				turnDown();
 			});
-			
+
 			addTransitionOnEventObject(OnGround, OnGround, null, null, BirdTouchedGround);
 		}
 	}
@@ -121,12 +121,12 @@ public class Bird extends GameEntityUsingSprites {
 		flightControl.traceTo(LOGGER, app().clock::getFrequency);
 		healthControl = new HealthControl();
 		healthControl.traceTo(LOGGER, app().clock::getFrequency);
-		setSprite("s_yellow", createFeatherSprite("bird0"));
-		setSprite("s_blue", createFeatherSprite("bird1"));
-		setSprite("s_red", createFeatherSprite("bird2"));
-		setSelectedSprite("s_yellow");
-		tf.setWidth(getSelectedSprite().getWidth());
-		tf.setHeight(getSelectedSprite().getHeight());
+		sprites.set("s_yellow", createFeatherSprite("bird0"));
+		sprites.set("s_blue", createFeatherSprite("bird1"));
+		sprites.set("s_red", createFeatherSprite("bird2"));
+		sprites.select("s_yellow");
+		tf.setWidth(sprites.current().getWidth());
+		tf.setHeight(sprites.current().getHeight());
 		gravity = app().settings.getAsFloat("world gravity");
 	}
 
@@ -146,7 +146,7 @@ public class Bird extends GameEntityUsingSprites {
 	public void update() {
 		flightControl.update();
 		healthControl.update();
-		getSelectedSprite().enableAnimation(tf.getVelocityY() < 0);
+		sprites.current().enableAnimation(tf.getVelocityY() < 0);
 	}
 
 	public void receiveEvent(BirdyGameEvent event) {

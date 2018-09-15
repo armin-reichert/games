@@ -41,19 +41,19 @@ public class City extends GameEntityUsingSprites {
 
 	public City() {
 
-		setSprite("s_night", Sprite.ofAssets("bg_night"));
-		setSprite("s_day", Sprite.ofAssets("bg_day"));
-		setSelectedSprite("s_day");
+		sprites.set("s_night", Sprite.ofAssets("bg_night"));
+		sprites.set("s_day", Sprite.ofAssets("bg_day"));
+		sprites.select("s_day");
 
-		tf.setWidth(getSelectedSprite().getWidth());
-		tf.setHeight(getSelectedSprite().getHeight());
+		tf.setWidth(sprites.current().getWidth());
+		tf.setHeight(sprites.current().getHeight());
 
 		fsm = new StateMachine<>(DayTime.class, Match.BY_EQUALITY);
 		fsm.setDescription("City");
 		fsm.setInitialState(DAY);
 
 		fsm.state(DAY).setOnEntry(() -> {
-			setSelectedSprite("s_day");
+			sprites.select("s_day");
 		});
 
 		fsm.addTransitionOnEventObject(DAY, NIGHT, null, null, SUNSET);
@@ -62,7 +62,7 @@ public class City extends GameEntityUsingSprites {
 		fsm.state(NIGHT).setTimer(() -> app().clock.sec(10));
 
 		fsm.state(NIGHT).setOnEntry(() -> {
-			setSelectedSprite("s_night");
+			sprites.select("s_night");
 			replaceStars();
 		});
 
@@ -123,7 +123,7 @@ public class City extends GameEntityUsingSprites {
 	public void setWidth(int width) {
 		if (tf.getWidth() != width) {
 			tf.setWidth(width);
-			getSprites().forEach(sprite -> {
+			sprites.forEach(sprite -> {
 				sprite.scale(width, sprite.getHeight());
 			});
 		}
@@ -132,7 +132,7 @@ public class City extends GameEntityUsingSprites {
 	@Override
 	public void draw(Graphics2D g) {
 		g.translate(tf.getX(), tf.getY());
-		Image image = getSelectedSprite().currentFrame();
+		Image image = sprites.current().currentFrame();
 		for (int x = 0; x < tf.getWidth(); x += image.getWidth(null)) {
 			g.drawImage(image, x, 0, null);
 		}
