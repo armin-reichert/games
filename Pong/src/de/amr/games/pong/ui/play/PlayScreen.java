@@ -56,7 +56,7 @@ public class PlayScreen implements View, Controller {
 	private StateMachine<PlayState, Object> createStateMachine() {
 		return
 		//@formatter:off
-		StateMachine.define(PlayState.class, Object.class)
+		StateMachine.beginStateMachine(PlayState.class, Object.class)
 			.description("Pong")	
 			.initialState(INIT)
 	

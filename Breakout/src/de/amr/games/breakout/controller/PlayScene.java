@@ -75,7 +75,7 @@ public class PlayScene implements View, Controller {
 
 	private StateMachine<PlayState, PlayEvent> buildStateMachine() {
 		//@formatter:off
-		return StateMachine.define(PlayState.class, PlayEvent.class, Match.BY_CLASS)
+		return StateMachine.beginStateMachine(PlayState.class, PlayEvent.class, Match.BY_CLASS)
 			
 			.description("BreakoutGameControl")
 			.initialState(Initialized)

@@ -70,7 +70,7 @@ public class MillGameController implements ViewController {
 
 	private StateMachine<MillGameState, MillGameEvent> buildStateMachine() {
 		//@formatter:off
-		return StateMachine.define(MillGameState.class, MillGameEvent.class, Match.BY_EQUALITY)
+		return StateMachine.beginStateMachine(MillGameState.class, MillGameEvent.class, Match.BY_EQUALITY)
 
 				.description("MillGameControl")
 				.initialState(STARTING)

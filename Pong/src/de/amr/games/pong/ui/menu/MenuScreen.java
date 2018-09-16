@@ -47,7 +47,7 @@ public class MenuScreen implements Controller, View {
 	private StateMachine<PlayMode, Object> createStateMachine() {
 		return
 		//@formatter:off
-		StateMachine.define(PlayMode.class, Object.class)
+		StateMachine.beginStateMachine(PlayMode.class, Object.class)
 			.description("Pong Menu")
 			.initialState(Player1_Player2)
 			

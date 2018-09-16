@@ -51,7 +51,7 @@ public class MoveController {
 
 	private StateMachine<MoveState, MoveEvent> buildStateMachine() {
 		//@formatter:off
-		return StateMachine.define(MoveState.class, MoveEvent.class, Match.BY_EQUALITY)
+		return StateMachine.beginStateMachine(MoveState.class, MoveEvent.class, Match.BY_EQUALITY)
 				.description("Move Control")
 				.initialState(READING_MOVE)
 				
