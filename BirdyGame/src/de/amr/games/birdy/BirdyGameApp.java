@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.EntityMap;
-import de.amr.easy.game.ui.FullScreen;
+import de.amr.easy.game.ui.FullScreenMode;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
@@ -31,7 +31,7 @@ public class BirdyGameApp extends Application {
 		settings.title = "Zwick, das listige Vögelchen";
 		settings.width = 640;
 		settings.height = 480;
-		settings.fullScreenMode = FullScreen.Mode(640, 480, 32);
+		settings.fullScreenMode = new FullScreenMode(640, 480, 32);
 		settings.fullScreenOnStart = false;
 
 		// specific settings

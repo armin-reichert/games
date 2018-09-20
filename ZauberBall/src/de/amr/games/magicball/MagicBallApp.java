@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.ui.FullScreen;
+import de.amr.easy.game.ui.FullScreenMode;
 import de.amr.games.magicball.views.DrawingScene;
 
 public class MagicBallApp extends Application {
@@ -18,7 +18,7 @@ public class MagicBallApp extends Application {
 		settings.width = 800;
 		settings.height = 600;
 		settings.bgColor = Color.WHITE;
-		settings.fullScreenMode = FullScreen.Mode(800, 600, 32);
+		settings.fullScreenMode = new FullScreenMode(800, 600, 32);
 		settings.fullScreenOnStart = false;
 	}
 
