@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.ui.widgets.PumpingImage;
-import de.amr.easy.game.ui.widgets.TextArea;
+import de.amr.easy.game.ui.widgets.MultilineText;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
@@ -42,7 +42,7 @@ public class IntroScene implements View, Controller {
 
 	private City city;
 	private PumpingImage logo;
-	private TextArea credits;
+	private MultilineText credits;
 
 	public IntroScene(BirdyGameApp app) {
 
@@ -91,11 +91,10 @@ public class IntroScene implements View, Controller {
 			city.sunrise();
 		}
 
-		credits = TextArea.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))
+		credits = MultilineText.create().text(CREDITS_TEXT).velocity(0, -1.5f).font(Assets.font("Pacifico-Regular"))
 				.color(city.isNight() ? Color.WHITE : Color.DARK_GRAY).build();
 		credits.tf.centerX(width);
 		credits.tf.setY(height);
-		credits.setSpeedY(-.75f);
 		credits.setCompletion(() -> credits.tf.getY() < height / 4);
 
 		logo = PumpingImage.create().image(Assets.image("title")).scale(3).build();

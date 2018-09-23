@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.math.Vector2f;
-import de.amr.easy.game.ui.widgets.TextArea;
+import de.amr.easy.game.ui.widgets.MultilineText;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.muehle.MillGameApp;
@@ -35,7 +35,7 @@ public class MillGameScene implements View, Controller, MillGameUI {
 
 	private final Color bgColor;
 	private BoardUI boardUI;
-	private TextArea messageArea;
+	private MultilineText messageArea;
 	private Stone stoneTemplate;
 	private Font stonesCounterFont;
 
@@ -71,7 +71,7 @@ public class MillGameScene implements View, Controller, MillGameUI {
 		stoneTemplate = new Stone(StoneColor.WHITE, boardUI.getStoneRadius());
 		stonesCounterFont = new Font(Font.MONOSPACED, Font.BOLD, 2 * boardUI.getStoneRadius());
 
-		messageArea = TextArea.create().color(Color.BLUE)
+		messageArea = MultilineText.create().color(Color.BLUE)
 				.font(Assets.storeTrueTypeFont("message-font", "fonts/Cookie-Regular.ttf", Font.PLAIN, 36)).build();
 		messageArea.tf.setPosition(0, getHeight() - 90);
 
