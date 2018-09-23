@@ -1,7 +1,7 @@
 package de.amr.games.breakout.entities;
 
 import de.amr.easy.game.entity.GameEntityUsingSprites;
-import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.game.ui.sprites.Sprite;
 
 public class Brick extends GameEntityUsingSprites {
 

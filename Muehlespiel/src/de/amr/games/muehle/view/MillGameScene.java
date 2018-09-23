@@ -9,8 +9,8 @@ import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.controls.TextArea;
 import de.amr.easy.game.math.Vector2f;
+import de.amr.easy.game.ui.widgets.TextArea;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.muehle.MillGameApp;

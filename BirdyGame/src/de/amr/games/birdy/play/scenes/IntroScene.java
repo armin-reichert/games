@@ -13,8 +13,8 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.controls.PumpingImage;
-import de.amr.easy.game.controls.TextArea;
+import de.amr.easy.game.ui.widgets.PumpingImage;
+import de.amr.easy.game.ui.widgets.TextArea;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;

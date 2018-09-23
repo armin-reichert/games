@@ -18,10 +18,10 @@ import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
-import de.amr.easy.game.controls.PumpingImage;
-import de.amr.easy.game.controls.ScrollableImage;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
+import de.amr.easy.game.ui.widgets.PumpingImage;
+import de.amr.easy.game.ui.widgets.ScrollableImage;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;

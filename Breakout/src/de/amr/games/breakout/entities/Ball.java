@@ -3,7 +3,7 @@ package de.amr.games.breakout.entities;
 import java.awt.Dimension;
 
 import de.amr.easy.game.entity.GameEntityUsingSprites;
-import de.amr.easy.game.sprite.Sprite;
+import de.amr.easy.game.ui.sprites.Sprite;
 
 public class Ball extends GameEntityUsingSprites {
 
