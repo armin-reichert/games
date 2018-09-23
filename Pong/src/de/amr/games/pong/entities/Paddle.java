@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.AbstractGameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
 
-public class Paddle extends GameEntity implements View {
+public class Paddle extends AbstractGameEntity implements View {
 
 	private final int upKey;
 	private final int downKey;

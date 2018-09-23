@@ -15,8 +15,8 @@ import java.awt.event.KeyEvent;
 import java.util.stream.IntStream;
 
 import de.amr.easy.game.Application;
-import de.amr.easy.game.entity.GameEntity;
-import de.amr.easy.game.entity.GameEntityUsingSprites;
+import de.amr.easy.game.entity.AbstractGameEntity;
+import de.amr.easy.game.entity.SpriteBasedGameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.ui.sprites.Sprite;
 import de.amr.statemachine.Match;
@@ -27,7 +27,7 @@ import de.amr.statemachine.StateMachine;
  * 
  * @author Armin Reichert
  */
-public class City extends GameEntityUsingSprites {
+public class City extends SpriteBasedGameEntity {
 
 	public enum DayTime {
 		DAY, NIGHT
@@ -67,7 +67,7 @@ public class City extends GameEntityUsingSprites {
 		});
 
 		fsm.state(NIGHT).setOnTick(() -> {
-			entities.ofClass(Star.class).forEach(GameEntity::update);
+			entities.ofClass(Star.class).forEach(AbstractGameEntity::update);
 		});
 
 		fsm.state(NIGHT).setOnExit(() -> {

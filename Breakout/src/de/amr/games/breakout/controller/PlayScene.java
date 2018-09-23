@@ -18,7 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.AbstractGameEntity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.Controller;
@@ -96,7 +96,7 @@ public class PlayScene implements View, Controller {
 							newBricks();
 							launchBall();
 						}
-						app.entities.all().forEach(GameEntity::update);
+						app.entities.all().forEach(AbstractGameEntity::update);
 					})
 					
 				.state(BallOut)

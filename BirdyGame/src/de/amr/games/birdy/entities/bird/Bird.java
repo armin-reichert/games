@@ -18,7 +18,7 @@ import static java.lang.Math.PI;
 import java.awt.geom.Rectangle2D;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntityUsingSprites;
+import de.amr.easy.game.entity.SpriteBasedGameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.ui.sprites.AnimationType;
 import de.amr.easy.game.ui.sprites.Sprite;
@@ -31,7 +31,7 @@ import de.amr.statemachine.StateMachine;
  * 
  * @author Armin Reichert
  */
-public class Bird extends GameEntityUsingSprites {
+public class Bird extends SpriteBasedGameEntity {
 
 	private final FlightControl flightControl;
 	private final HealthControl healthControl;

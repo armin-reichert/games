@@ -6,7 +6,7 @@ import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.util.Random;
 
-import de.amr.easy.game.entity.GameEntityUsingSprites;
+import de.amr.easy.game.entity.SpriteBasedGameEntity;
 import de.amr.easy.game.ui.sprites.Sprite;
 
 /**
@@ -14,7 +14,7 @@ import de.amr.easy.game.ui.sprites.Sprite;
  * 
  * @author Armin Reichert
  */
-public class Star extends GameEntityUsingSprites {
+public class Star extends SpriteBasedGameEntity {
 
 	public Star() {
 		sprites.set("s_star", Sprite.ofAssets("blink_00", "blink_01", "blink_02")

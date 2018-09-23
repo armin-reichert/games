@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.AbstractGameEntity;
 import de.amr.easy.game.entity.collision.Collider;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
@@ -18,7 +18,7 @@ import de.amr.games.birdy.BirdyGameApp;
  * 
  * @author Armin Reichert
  */
-public class Obstacle extends GameEntity implements View {
+public class Obstacle extends AbstractGameEntity implements View {
 
 	private Rectangle2D upperPart;
 	private Rectangle2D lowerPart;

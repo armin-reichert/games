@@ -6,11 +6,11 @@ import static java.lang.Math.min;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 
-import de.amr.easy.game.entity.GameEntityUsingSprites;
+import de.amr.easy.game.entity.SpriteBasedGameEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.ui.sprites.Sprite;
 
-public class Bat extends GameEntityUsingSprites {
+public class Bat extends SpriteBasedGameEntity {
 
 	private Dimension boardSize;
 	public int speed;

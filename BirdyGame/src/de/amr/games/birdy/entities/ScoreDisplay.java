@@ -7,7 +7,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import de.amr.easy.game.assets.Assets;
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.AbstractGameEntity;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.utils.Score;
 
@@ -16,7 +16,7 @@ import de.amr.games.birdy.utils.Score;
  * 
  * @author Armin Reichert
  */
-public class ScoreDisplay extends GameEntity implements View {
+public class ScoreDisplay extends AbstractGameEntity implements View {
 
 	private final Score score;
 	private final float scale;

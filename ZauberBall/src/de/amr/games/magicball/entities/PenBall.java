@@ -6,10 +6,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import de.amr.easy.game.entity.GameEntity;
+import de.amr.easy.game.entity.AbstractGameEntity;
 import de.amr.easy.game.view.View;
 
-public class PenBall extends GameEntity implements View {
+public class PenBall extends AbstractGameEntity implements View {
 
 	private final BufferedImage canvas;
 	private int thickness;
