@@ -91,10 +91,11 @@ public class IntroScene implements View, Controller {
 			city.sunrise();
 		}
 
-		credits = TextWidget.create().text(CREDITS_TEXT).velocity(0, -1.5f).font(Assets.font("Pacifico-Regular"))
+		credits = TextWidget.create().text(CREDITS_TEXT).font(Assets.font("Pacifico-Regular"))
 				.color(city.isNight() ? Color.WHITE : Color.DARK_GRAY).build();
 		credits.tf.centerX(width);
 		credits.tf.setY(height);
+		credits.tf.setVelocityY(-1.5f);
 		credits.setCompletion(() -> credits.tf.getY() < height / 4);
 
 		logo = PumpingImageWidget.create().image(Assets.image("title")).scale(3).build();
