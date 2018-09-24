@@ -19,7 +19,7 @@ import java.awt.event.KeyEvent;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.ui.widgets.ScrollableImageWidget;
+import de.amr.easy.game.ui.widgets.ImageWidget;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
@@ -48,7 +48,7 @@ public class PlayScene implements View, Controller {
 	private Bird bird;
 	private City city;
 	private Ground ground;
-	private ScrollableImageWidget gameOverText;
+	private ImageWidget gameOverText;
 	private ScoreDisplay scoreDisplay;
 
 	public enum State {
@@ -136,7 +136,7 @@ public class PlayScene implements View, Controller {
 		scoreDisplay = new ScoreDisplay(score, 1.5f);
 		scoreDisplay.tf.centerX(getWidth());
 		scoreDisplay.tf.setY(ground.tf.getY() / 4);
-		gameOverText = entities.store(new ScrollableImageWidget(Assets.image("text_game_over")));
+		gameOverText = entities.store(new ImageWidget(Assets.image("text_game_over")));
 		gameOverText.tf.center(getWidth(), getHeight());
 		Area world = new Area(getWidth(), 2 * getHeight());
 		world.tf.setPosition(0, -getHeight());

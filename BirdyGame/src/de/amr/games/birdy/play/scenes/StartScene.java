@@ -21,7 +21,7 @@ import de.amr.easy.game.assets.Sound;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.ui.widgets.PumpingImageWidget;
-import de.amr.easy.game.ui.widgets.ScrollableImageWidget;
+import de.amr.easy.game.ui.widgets.ImageWidget;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
 import de.amr.games.birdy.BirdyGameApp;
@@ -92,7 +92,7 @@ public class StartScene implements View, Controller {
 	private Bird bird;
 	private City city;
 	private Ground ground;
-	private ScrollableImageWidget displayedText;
+	private ImageWidget displayedText;
 
 	public StartScene(BirdyGameApp game) {
 		this.app = game;
@@ -143,12 +143,12 @@ public class StartScene implements View, Controller {
 		bird.tf.setVelocity(0, 0);
 
 		if (!entities.contains("title")) {
-			ScrollableImageWidget titleText = new ScrollableImageWidget(Assets.image("title"));
+			ImageWidget titleText = new ImageWidget(Assets.image("title"));
 			entities.store("title", titleText);
 		}
 
 		if (!entities.contains("text_game_over")) {
-			ScrollableImageWidget gameOverText = new ScrollableImageWidget(Assets.image("text_game_over"));
+			ImageWidget gameOverText = new ImageWidget(Assets.image("text_game_over"));
 			entities.store("text_game_over", gameOverText);
 		}
 
