@@ -55,17 +55,17 @@ public class IntroScene implements View, Controller {
 		fsm.setInitialState(CREDITS);
 
 		fsm.state(CREDITS).setOnEntry(() -> {
-			credits.start();
+			credits.startAnimation();
 			Assets.sound("music/bgmusic.mp3").loop();
 		});
 
 		fsm.state(CREDITS).setOnTick(() -> credits.update());
 		fsm.addTransition(CREDITS, WAITING, () -> {
-			return credits.isCompleted();
-		}, e -> credits.stop());
+			return credits.isAnimationCompleted();
+		}, e -> credits.stopAnimation());
 
 		fsm.state(CREDITS).setOnExit(() -> {
-			credits.stop();
+			credits.stopAnimation();
 		});
 
 		fsm.state(WAITING).setTimer(() -> app().clock.sec(2));
