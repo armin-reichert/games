@@ -1,12 +1,12 @@
 package de.amr.games.birdy;
 
+import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.EntityMap;
-import de.amr.easy.game.ui.FullScreenMode;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
@@ -31,7 +31,7 @@ public class BirdyGameApp extends Application {
 		settings.title = "Zwick, das listige Vögelchen";
 		settings.width = 640;
 		settings.height = 480;
-		settings.fullScreenMode = new FullScreenMode(640, 480, 32);
+		settings.fullScreenMode = new DisplayMode(640, 480, 32, DisplayMode.REFRESH_RATE_UNKNOWN);
 		settings.fullScreenOnStart = false;
 
 		// specific settings
@@ -49,7 +49,7 @@ public class BirdyGameApp extends Application {
 		settings.set("min pipe height", 100);
 		settings.set("passage height", 100);
 	}
-	
+
 	public static final EntityMap entities = new EntityMap();
 
 	private IntroScene introScene;
