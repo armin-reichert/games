@@ -20,7 +20,7 @@ import de.amr.games.pong.ui.play.PlayScreen;
 public class PongGameApp extends Application implements ScreenManager {
 
 	public static void main(String[] args) {
-		launch(new PongGameApp());
+		launch(new PongGameApp(), args);
 	}
 
 	private Game game;

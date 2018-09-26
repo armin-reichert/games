@@ -16,7 +16,7 @@ public class MillGameApp extends Application {
 
 	public static void main(String... args) {
 		Messages.load(args.length > 0 ? new Locale(args[0]) : Locale.getDefault());
-		launch(new MillGameApp());
+		launch(new MillGameApp(), args);
 	}
 
 	public MillGameApp() {

@@ -15,7 +15,7 @@ public class MillTestApp extends Application {
 	public static void main(String[] args) {
 		Locale locale = (args.length > 0) ? new Locale(args[0]) : Locale.getDefault();
 		Messages.load(locale);
-		launch(new MillTestApp());
+		launch(new MillTestApp(), args);
 	}
 
 	public MillTestApp() {

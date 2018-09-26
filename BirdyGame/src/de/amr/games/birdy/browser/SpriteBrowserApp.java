@@ -6,7 +6,7 @@ import de.amr.games.birdy.utils.SpritesheetReader;
 public class SpriteBrowserApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new SpriteBrowserApp());
+		launch(new SpriteBrowserApp(), args);
 	}
 
 	public SpriteBrowserApp() {

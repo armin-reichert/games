@@ -10,7 +10,7 @@ import de.amr.games.magicball.views.DrawingScene;
 public class MagicBallApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new MagicBallApp());
+		launch(new MagicBallApp(), args);
 	}
 
 	public MagicBallApp() {

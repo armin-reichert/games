@@ -23,7 +23,7 @@ import de.amr.games.birdy.utils.SpritesheetReader;
 public class BirdyGameApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new BirdyGameApp());
+		launch(new BirdyGameApp(), args);
 	}
 
 	public BirdyGameApp() {

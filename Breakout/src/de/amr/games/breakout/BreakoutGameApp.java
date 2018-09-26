@@ -13,7 +13,7 @@ import de.amr.games.breakout.controller.PlayScene;
 public class BreakoutGameApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new BreakoutGameApp());
+		launch(new BreakoutGameApp(), args);
 	}
 	
 	public final EntityMap entities = new EntityMap();

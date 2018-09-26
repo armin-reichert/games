@@ -7,7 +7,7 @@ import de.amr.games.diashow.screens.DiashowScreen;
 public class DiashowApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new DiashowApp());
+		launch(new DiashowApp(), args);
 	}
 
 	public DiashowApp() {
