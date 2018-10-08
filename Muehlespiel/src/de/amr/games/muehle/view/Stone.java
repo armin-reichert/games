@@ -10,7 +10,7 @@ import java.awt.RenderingHints;
 import java.util.EnumMap;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.AbstractGameEntity;
+import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.view.View;
 import de.amr.games.muehle.model.board.StoneColor;
 
@@ -19,7 +19,7 @@ import de.amr.games.muehle.model.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class Stone extends AbstractGameEntity implements View {
+public class Stone extends Entity implements View {
 
 	static final EnumMap<StoneColor, Color> FILL = new EnumMap<>(StoneColor.class);
 	static final EnumMap<StoneColor, Color> EDGE = new EnumMap<>(StoneColor.class);

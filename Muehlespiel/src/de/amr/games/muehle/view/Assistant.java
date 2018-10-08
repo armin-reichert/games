@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.assets.Sound;
-import de.amr.easy.game.entity.SpriteBasedGameEntity;
+import de.amr.easy.game.entity.SpriteEntity;
 import de.amr.easy.game.ui.sprites.Sprite;
 import de.amr.games.muehle.controller.game.MillGameController;
 import de.amr.games.muehle.controller.game.MillGameState;
@@ -23,7 +23,7 @@ import de.amr.games.muehle.msg.Messages;
 /**
  * An assistant providing visual and acoustic hints to the assisted player.
  */
-public class Assistant extends SpriteBasedGameEntity {
+public class Assistant extends SpriteEntity {
 
 	public enum HelpLevel {
 		OFF, NORMAL, HIGH

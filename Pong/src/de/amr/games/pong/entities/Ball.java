@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 
-import de.amr.easy.game.entity.AbstractGameEntity;
+import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.view.View;
 
-public class Ball extends AbstractGameEntity implements View {
+public class Ball extends Entity implements View {
 
 	private Dimension courtSize;
 	private Color color;

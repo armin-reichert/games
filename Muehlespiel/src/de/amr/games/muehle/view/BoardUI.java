@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
 
-import de.amr.easy.game.entity.AbstractGameEntity;
+import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.view.Controller;
 import de.amr.easy.game.view.View;
@@ -30,7 +30,7 @@ import de.amr.games.muehle.model.board.StoneColor;
  * 
  * @author Armin Reichert
  */
-public class BoardUI extends AbstractGameEntity implements View, Controller {
+public class BoardUI extends Entity implements View, Controller {
 
 	private static final int[] GRID_X = { 0, 3, 6, 1, 3, 5, 2, 3, 4, 0, 1, 2, 4, 5, 6, 2, 3, 4, 1, 3,
 			5, 0, 3, 6 };

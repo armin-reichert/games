@@ -1,9 +1,9 @@
 package de.amr.games.breakout.entities;
 
-import de.amr.easy.game.entity.SpriteBasedGameEntity;
+import de.amr.easy.game.entity.SpriteEntity;
 import de.amr.easy.game.ui.sprites.Sprite;
 
-public class Brick extends SpriteBasedGameEntity {
+public class Brick extends SpriteEntity {
 
 	public enum BrickColor {
 		pink, blue, green, violet, yellow;
