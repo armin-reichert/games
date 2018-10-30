@@ -82,7 +82,7 @@ public class BirdyGameApp extends Application {
 	@Override
 	public void init() {
 		SpritesheetReader.extractSpriteSheet();
-		Assets.sound("music/bgmusic.mp3").volume(-20);
+		Assets.sound("music/bgmusic.mp3").volume(0.5f);
 		Assets.storeTrueTypeFont("Pacifico-Regular", "fonts/Pacifico-Regular.ttf", Font.BOLD, 40);
 
 		// create entities shared by different scenes:
