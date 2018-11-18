@@ -2,8 +2,8 @@ package de.amr.games.birdy.play.scenes;
 
 import static de.amr.easy.game.Application.app;
 import static de.amr.games.birdy.BirdyGameApp.entities;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
+import static de.amr.games.birdy.play.BirdEvent.BirdLeftWorld;
+import static de.amr.games.birdy.play.BirdEvent.BirdTouchedGround;
 import static de.amr.games.birdy.play.scenes.StartScene.State.GameOver;
 import static de.amr.games.birdy.play.scenes.StartScene.State.Ready;
 import static de.amr.games.birdy.play.scenes.StartScene.State.StartPlaying;
@@ -29,7 +29,7 @@ import de.amr.games.birdy.entities.Area;
 import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.play.BirdyGameEvent;
+import de.amr.games.birdy.play.BirdEvent;
 import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
@@ -44,7 +44,7 @@ public class StartScene implements View, Controller {
 		Starting, Ready, GameOver, StartPlaying, StartSpriteBrowser
 	}
 
-	private class StartSceneControl extends StateMachine<State, BirdyGameEvent> {
+	private class StartSceneControl extends StateMachine<State, BirdEvent> {
 
 		public StartSceneControl() {
 
@@ -173,7 +173,7 @@ public class StartScene implements View, Controller {
 	@Override
 	public void update() {
 		for (Collision c : app.collisionHandler.collisions()) {
-			BirdyGameEvent event = (BirdyGameEvent) c.getAppEvent();
+			BirdEvent event = (BirdEvent) c.getAppEvent();
 			bird.receiveEvent(event);
 			control.enqueue(event);
 		}

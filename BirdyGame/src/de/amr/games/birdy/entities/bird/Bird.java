@@ -8,11 +8,11 @@ import static de.amr.games.birdy.entities.bird.FlightState.OnGround;
 import static de.amr.games.birdy.entities.bird.HealthState.Dead;
 import static de.amr.games.birdy.entities.bird.HealthState.Injured;
 import static de.amr.games.birdy.entities.bird.HealthState.Sane;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdCrashed;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
+import static de.amr.games.birdy.play.BirdEvent.BirdCrashed;
+import static de.amr.games.birdy.play.BirdEvent.BirdLeftPassage;
+import static de.amr.games.birdy.play.BirdEvent.BirdLeftWorld;
+import static de.amr.games.birdy.play.BirdEvent.BirdTouchedGround;
+import static de.amr.games.birdy.play.BirdEvent.BirdTouchedPipe;
 import static java.lang.Math.PI;
 
 import java.awt.geom.Rectangle2D;
@@ -22,7 +22,7 @@ import de.amr.easy.game.entity.SpriteEntity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.ui.sprites.AnimationType;
 import de.amr.easy.game.ui.sprites.Sprite;
-import de.amr.games.birdy.play.BirdyGameEvent;
+import de.amr.games.birdy.play.BirdEvent;
 import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
 
@@ -40,7 +40,7 @@ public class Bird extends SpriteEntity {
 	/**
 	 * State machine controlling the health state of the bird.
 	 */
-	private class HealthControl extends StateMachine<HealthState, BirdyGameEvent> {
+	private class HealthControl extends StateMachine<HealthState, BirdEvent> {
 
 		public HealthControl() {
 
@@ -77,7 +77,7 @@ public class Bird extends SpriteEntity {
 	/**
 	 * State machine controlling the flight state of the bird.
 	 */
-	private class FlightControl extends StateMachine<FlightState, BirdyGameEvent> {
+	private class FlightControl extends StateMachine<FlightState, BirdEvent> {
 
 		public FlightControl() {
 
@@ -149,7 +149,7 @@ public class Bird extends SpriteEntity {
 		sprites.current().enableAnimation(tf.getVelocityY() < 0);
 	}
 
-	public void receiveEvent(BirdyGameEvent event) {
+	public void receiveEvent(BirdEvent event) {
 		flightControl.enqueue(event);
 		healthControl.enqueue(event);
 	}

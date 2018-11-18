@@ -1,11 +1,11 @@
 package de.amr.games.birdy.play.scenes;
 
 import static de.amr.games.birdy.BirdyGameApp.entities;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdCrashed;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftWorld;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedGround;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
+import static de.amr.games.birdy.play.BirdEvent.BirdCrashed;
+import static de.amr.games.birdy.play.BirdEvent.BirdLeftPassage;
+import static de.amr.games.birdy.play.BirdEvent.BirdLeftWorld;
+import static de.amr.games.birdy.play.BirdEvent.BirdTouchedGround;
+import static de.amr.games.birdy.play.BirdEvent.BirdTouchedPipe;
 import static de.amr.games.birdy.play.scenes.PlayScene.State.GameOver;
 import static de.amr.games.birdy.play.scenes.PlayScene.State.Playing;
 import static de.amr.games.birdy.play.scenes.PlayScene.State.StartingNewGame;
@@ -29,7 +29,7 @@ import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.entities.ObstacleManager;
 import de.amr.games.birdy.entities.ScoreDisplay;
 import de.amr.games.birdy.entities.bird.Bird;
-import de.amr.games.birdy.play.BirdyGameEvent;
+import de.amr.games.birdy.play.BirdEvent;
 import de.amr.games.birdy.utils.Score;
 import de.amr.statemachine.Match;
 import de.amr.statemachine.StateMachine;
@@ -55,7 +55,7 @@ public class PlayScene implements View, Controller {
 		Playing, GameOver, StartingNewGame;
 	}
 
-	private class PlaySceneControl extends StateMachine<State, BirdyGameEvent> {
+	private class PlaySceneControl extends StateMachine<State, BirdEvent> {
 
 		public PlaySceneControl() {
 
@@ -115,7 +115,7 @@ public class PlayScene implements View, Controller {
 		obstacleManager = new ObstacleManager(app);
 	}
 
-	public void receive(BirdyGameEvent event) {
+	public void receive(BirdEvent event) {
 		control.enqueue(event);
 		bird.receiveEvent(event);
 	}
@@ -152,7 +152,7 @@ public class PlayScene implements View, Controller {
 	@Override
 	public void update() {
 		for (Collision collision : app.collisionHandler.collisions()) {
-			receive((BirdyGameEvent) collision.getAppEvent());
+			receive((BirdEvent) collision.getAppEvent());
 		}
 		control.update();
 		obstacleManager.update();

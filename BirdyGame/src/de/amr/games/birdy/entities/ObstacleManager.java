@@ -5,8 +5,8 @@ import static de.amr.games.birdy.BirdyGameApp.entities;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Birth;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Breeding;
 import static de.amr.games.birdy.entities.ObstacleManagerState.Stopped;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdLeftPassage;
-import static de.amr.games.birdy.play.BirdyGameEvent.BirdTouchedPipe;
+import static de.amr.games.birdy.play.BirdEvent.BirdLeftPassage;
+import static de.amr.games.birdy.play.BirdEvent.BirdTouchedPipe;
 import static de.amr.games.birdy.utils.Util.randomInt;
 
 import java.awt.Graphics2D;
