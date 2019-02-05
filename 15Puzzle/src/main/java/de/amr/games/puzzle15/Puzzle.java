@@ -6,14 +6,7 @@ import java.util.Random;
 public class Puzzle {
 
 	public enum Dir {
-		UP(0, -1), DOWN(0, 1), LEFT(-1, 0), RIGHT(1, 0);
-
-		private Dir(int dx, int dy) {
-			this.dx = dx;
-			this.dy = dy;
-		}
-
-		final int dx, dy;
+		UP, DOWN, LEFT, RIGHT;
 	}
 
 	private final int size;
