@@ -1,6 +1,7 @@
 package de.amr.games.puzzle15;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class Puzzle {
 
@@ -105,6 +106,20 @@ public class Puzzle {
 		return result;
 	}
 
+	public Puzzle move(Dir dir) {
+		switch (dir) {
+		case DOWN:
+			return down();
+		case LEFT:
+			return left();
+		case RIGHT:
+			return right();
+		case UP:
+			return up();
+		}
+		throw new IllegalArgumentException();
+	}
+
 	public Puzzle down() {
 		if (emptyRow == 0) {
 			throw new IllegalStateException();
@@ -135,7 +150,7 @@ public class Puzzle {
 		return result;
 	}
 
-	public void swap(int r, int c, int rr, int cc) {
+	private void swap(int r, int c, int rr, int cc) {
 		int tmp = cells[r][c];
 		cells[r][c] = cells[rr][cc];
 		cells[rr][cc] = tmp;
@@ -151,6 +166,23 @@ public class Puzzle {
 			}
 		}
 		return true;
+	}
+
+	public Puzzle shuffle(int numMoves) {
+		Puzzle result = new Puzzle(this);
+		Random rnd = new Random();
+		Dir[] dirs = Dir.values();
+		int shuffled = 0;
+		while (shuffled < numMoves) {
+			Dir dir = dirs[rnd.nextInt(4)];
+			try {
+				result = result.move(dir);
+				++shuffled;
+			} catch (IllegalStateException e) {
+				// ignore
+			}
+		}
+		return result;
 	}
 
 	public void print() {

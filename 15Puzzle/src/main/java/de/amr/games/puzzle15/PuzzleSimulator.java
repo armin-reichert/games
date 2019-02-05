@@ -19,6 +19,7 @@ public class PuzzleSimulator extends JFrame {
 		view = new PuzzleView(puzzle);
 		setTitle("15-Puzzle");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setResizable(false);
 		add(view);
 		pack();
 		setLocationRelativeTo(null);

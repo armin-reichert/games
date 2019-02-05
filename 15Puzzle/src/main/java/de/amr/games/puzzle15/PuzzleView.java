@@ -1,16 +1,21 @@
 package de.amr.games.puzzle15;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 public class PuzzleView extends JComponent {
 
@@ -18,7 +23,14 @@ public class PuzzleView extends JComponent {
 
 	private Puzzle puzzle;
 	private Font font;
-	private MouseHandler mouse;
+	private Action actionShuffle = new AbstractAction() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			puzzle = puzzle.shuffle(100);
+			repaint();
+		}
+	};
 
 	private class MouseHandler extends MouseAdapter {
 
@@ -54,8 +66,10 @@ public class PuzzleView extends JComponent {
 		this.puzzle = puzzle;
 		font = new Font(Font.SANS_SERIF, Font.BOLD, TILE_SIZE / 2);
 		setPreferredSize(new Dimension(puzzle.size() * TILE_SIZE, puzzle.size() * TILE_SIZE));
-		mouse = new MouseHandler();
-		addMouseListener(mouse);
+		addMouseListener(new MouseHandler());
+		getInputMap().put(KeyStroke.getKeyStroke('s'), "shuffle");
+		getActionMap().put("shuffle", actionShuffle);
+		requestFocus();
 	}
 
 	@Override
@@ -74,6 +88,7 @@ public class PuzzleView extends JComponent {
 				g.setColor(number != 0 ? Color.LIGHT_GRAY : solvedColor);
 				g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
 				g.setColor(Color.DARK_GRAY);
+				g.setStroke(new BasicStroke(4));
 				g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
 				g.setColor(Color.BLACK);
 				g.setFont(font);
