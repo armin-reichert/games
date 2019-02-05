@@ -83,6 +83,10 @@ public class Puzzle {
 		return emptyRow;
 	}
 
+	public int size() {
+		return size;
+	}
+
 	public int get(int row, int col) {
 		return cells[row][col];
 	}
