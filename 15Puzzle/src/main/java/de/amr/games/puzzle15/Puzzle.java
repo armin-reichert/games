@@ -44,6 +44,10 @@ public class Puzzle {
 		emptyRow = other.emptyRow;
 	}
 
+	public boolean isSolved() {
+		return hasNumbers(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

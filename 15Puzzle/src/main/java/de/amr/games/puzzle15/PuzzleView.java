@@ -30,6 +30,23 @@ public class PuzzleView extends JComponent {
 			col = e.getX() / TILE_SIZE;
 			row = e.getY() / TILE_SIZE;
 			System.out.println("Clicked on number " + puzzle.get(row, col));
+			if (puzzle.getEmptyCol() == col) {
+				if (puzzle.getEmptyRow() == row - 1) {
+					puzzle = puzzle.up();
+					repaint();
+				} else if (puzzle.getEmptyRow() == row + 1) {
+					puzzle = puzzle.down();
+					repaint();
+				}
+			} else if (puzzle.getEmptyRow() == row) {
+				if (puzzle.getEmptyCol() == col - 1) {
+					puzzle = puzzle.left();
+					repaint();
+				} else if (puzzle.getEmptyCol() == col + 1) {
+					puzzle = puzzle.right();
+					repaint();
+				}
+			}
 		}
 	}
 
@@ -48,12 +65,13 @@ public class PuzzleView extends JComponent {
 	}
 
 	private void drawPuzzle(Graphics2D g) {
+		Color solvedColor = puzzle.isSolved() ? Color.GREEN : Color.ORANGE;
 		for (int row = 0; row < puzzle.size(); ++row) {
 			for (int col = 0; col < puzzle.size(); ++col) {
 				int number = puzzle.get(row, col);
 				String text = number != 0 ? String.valueOf(number) : "";
 				g.translate(col * TILE_SIZE, row * TILE_SIZE);
-				g.setColor(number != 0 ? Color.LIGHT_GRAY : Color.ORANGE);
+				g.setColor(number != 0 ? Color.LIGHT_GRAY : solvedColor);
 				g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
 				g.setColor(Color.DARK_GRAY);
 				g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
