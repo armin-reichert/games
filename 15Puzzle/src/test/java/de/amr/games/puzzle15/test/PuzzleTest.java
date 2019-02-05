@@ -1,6 +1,7 @@
 package de.amr.games.puzzle15.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -67,16 +68,27 @@ public class PuzzleTest {
 		assertEquals(3, result.getEmptyRow());
 		assertEquals(2, result.getEmptyCol());
 	}
-	
+
 	@Test
 	public void testMoveRightThenLeft() {
 		Puzzle result = puzzle.right().left();
 		assertEquals(puzzle, result);
 	}
-	
+
 	@Test
 	public void testDownThenUp() {
 		Puzzle result = puzzle.down().up();
 		assertEquals(puzzle, result);
+	}
+
+	@Test
+	public void testAroundTheWorld() {
+		Puzzle result = puzzle.down().down().down().right().right().right().up().up().up().left().left().left();
+		assertTrue(result.hasNumbers(5, 1, 2, 3, 9, 6, 7, 4, 13, 10, 11, 8, 14, 15, 12, 0));
+	}
+
+	@Test
+	public void testHasNumbers() {
+		assertTrue(puzzle.hasNumbers(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0));
 	}
 }

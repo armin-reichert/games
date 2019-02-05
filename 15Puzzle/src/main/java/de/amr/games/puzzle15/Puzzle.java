@@ -106,7 +106,7 @@ public class Puzzle {
 		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
 		return result;
 	}
-	
+
 	public Puzzle left() {
 		if (emptyCol == size - 1) {
 			throw new IllegalStateException();
@@ -116,7 +116,7 @@ public class Puzzle {
 		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
 		return result;
 	}
-	
+
 	public Puzzle right() {
 		if (emptyCol == 0) {
 			throw new IllegalStateException();
@@ -126,11 +126,23 @@ public class Puzzle {
 		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
 		return result;
 	}
-	
+
 	public void swap(int r, int c, int rr, int cc) {
 		int tmp = cells[r][c];
 		cells[r][c] = cells[rr][cc];
 		cells[rr][cc] = tmp;
+	}
+
+	public boolean hasNumbers(int... numbers) {
+		if (numbers.length != size * size) {
+			throw new IllegalArgumentException();
+		}
+		for (int i = 0; i < numbers.length; ++i) {
+			if (cells[i / size][i % size] != numbers[i]) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void print() {
