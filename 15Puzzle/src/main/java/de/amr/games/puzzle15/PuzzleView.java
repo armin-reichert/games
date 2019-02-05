@@ -19,9 +19,8 @@ import javax.swing.KeyStroke;
 
 public class PuzzleView extends JComponent {
 
-	private static final int TILE_SIZE = 80;
-
 	private Puzzle puzzle;
+	private int tileSize;
 	private Font font;
 	private Action actionShuffle = new AbstractAction() {
 
@@ -39,8 +38,8 @@ public class PuzzleView extends JComponent {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			col = e.getX() / TILE_SIZE;
-			row = e.getY() / TILE_SIZE;
+			col = e.getX() / tileSize;
+			row = e.getY() / tileSize;
 			System.out.println("Clicked on number " + puzzle.get(row, col));
 			if (puzzle.getEmptyCol() == col) {
 				if (puzzle.getEmptyRow() == row - 1) {
@@ -62,10 +61,11 @@ public class PuzzleView extends JComponent {
 		}
 	}
 
-	public PuzzleView(Puzzle puzzle) {
+	public PuzzleView(Puzzle puzzle, int tileSize) {
 		this.puzzle = puzzle;
-		font = new Font(Font.SANS_SERIF, Font.BOLD, TILE_SIZE / 2);
-		setPreferredSize(new Dimension(puzzle.size() * TILE_SIZE, puzzle.size() * TILE_SIZE));
+		this.tileSize = tileSize;
+		font = new Font(Font.SANS_SERIF, Font.BOLD, tileSize / 2);
+		setPreferredSize(new Dimension(puzzle.size() * tileSize, puzzle.size() * tileSize));
 		addMouseListener(new MouseHandler());
 		getInputMap().put(KeyStroke.getKeyStroke('s'), "shuffle");
 		getActionMap().put("shuffle", actionShuffle);
@@ -84,20 +84,20 @@ public class PuzzleView extends JComponent {
 			for (int col = 0; col < puzzle.size(); ++col) {
 				int number = puzzle.get(row, col);
 				String text = number != 0 ? String.valueOf(number) : "";
-				g.translate(col * TILE_SIZE, row * TILE_SIZE);
+				g.translate(col * tileSize, row * tileSize);
 				g.setColor(number != 0 ? Color.LIGHT_GRAY : solvedColor);
-				g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+				g.fillRect(0, 0, tileSize, tileSize);
 				g.setColor(Color.DARK_GRAY);
 				g.setStroke(new BasicStroke(4));
-				g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
+				g.drawRect(0, 0, tileSize, tileSize);
 				g.setColor(Color.BLACK);
 				g.setFont(font);
 				Rectangle2D box = g.getFontMetrics().getStringBounds(text, g);
-				int dx = (TILE_SIZE - (int) box.getWidth()) / 2;
-				int dy = (TILE_SIZE + g.getFontMetrics().getAscent()) / 2;
+				int dx = (tileSize - (int) box.getWidth()) / 2;
+				int dy = (tileSize + g.getFontMetrics().getAscent()) / 2;
 				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				g.drawString(text, dx, dy);
-				g.translate(-col * TILE_SIZE, -row * TILE_SIZE);
+				g.translate(-col * tileSize, -row * tileSize);
 			}
 		}
 	}
