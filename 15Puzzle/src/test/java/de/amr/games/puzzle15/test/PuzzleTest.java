@@ -14,7 +14,7 @@ public class PuzzleTest {
 
 	@Before
 	public void setUp() {
-		puzzle = new Puzzle(4);
+		puzzle = new Puzzle((byte) 4);
 	}
 
 	@Test
@@ -35,8 +35,8 @@ public class PuzzleTest {
 		assertEquals(14, puzzle.get(3, 1));
 		assertEquals(15, puzzle.get(3, 2));
 		assertEquals(0, puzzle.get(3, 3));
-		assertEquals(3, puzzle.getEmptyRow());
-		assertEquals(3, puzzle.getEmptyCol());
+		assertEquals(3, puzzle.row(puzzle.blank()));
+		assertEquals(3, puzzle.col(puzzle.blank()));
 	}
 
 	@Test
@@ -53,8 +53,8 @@ public class PuzzleTest {
 	@Test()
 	public void testMoveDown() {
 		Puzzle result = puzzle.down();
-		assertEquals(2, result.getEmptyRow());
-		assertEquals(3, result.getEmptyCol());
+		assertEquals(2, result.row(result.blank()));
+		assertEquals(3, result.col(result.blank()));
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -65,8 +65,8 @@ public class PuzzleTest {
 	@Test
 	public void testMoveRight() {
 		Puzzle result = puzzle.right();
-		assertEquals(3, result.getEmptyRow());
-		assertEquals(2, result.getEmptyCol());
+		assertEquals(3, result.row(result.blank()));
+		assertEquals(2, result.col(result.blank()));
 	}
 
 	@Test

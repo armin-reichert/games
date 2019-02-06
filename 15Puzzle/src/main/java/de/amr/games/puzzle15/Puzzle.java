@@ -5,37 +5,25 @@ import java.util.Random;
 
 public class Puzzle {
 
-	public enum Dir {
-		UP, DOWN, LEFT, RIGHT;
-	}
+	private final byte size;
+	private final byte[] cells;
+	private byte blank;
 
-	private final int size;
-	private final int[][] cells;
-	private int emptyRow, emptyCol;
-
-	public Puzzle(int size) {
+	public Puzzle(byte size) {
 		this.size = size;
-		cells = new int[size][size];
-		int i = 1;
-		for (int row = 0; row < size; ++row) {
-			for (int col = 0; col < size; ++col) {
-				cells[row][col] = i++;
-			}
+		int n = size * size;
+		cells = new byte[n];
+		for (byte i = 0; i < n; ++i) {
+			cells[i] = (byte) (i + 1);
 		}
-		emptyRow = emptyCol = size - 1;
-		cells[emptyRow][emptyCol] = 0;
+		cells[n - 1] = 0;
+		blank = (byte) (n - 1);
 	}
 
 	public Puzzle(Puzzle other) {
 		size = other.size;
-		cells = new int[size][size];
-		for (int row = 0; row < size; ++row) {
-			for (int col = 0; col < size; ++col) {
-				cells[row][col] = other.cells[row][col];
-			}
-		}
-		emptyCol = other.emptyCol;
-		emptyRow = other.emptyRow;
+		cells = Arrays.copyOf(other.cells, other.cells.length);
+		blank = other.blank;
 	}
 
 	public boolean isSolved() {
@@ -46,9 +34,8 @@ public class Puzzle {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.deepHashCode(cells);
-		result = prime * result + emptyCol;
-		result = prime * result + emptyRow;
+		result = prime * result + blank;
+		result = prime * result + Arrays.hashCode(cells);
 		result = prime * result + size;
 		return result;
 	}
@@ -62,41 +49,33 @@ public class Puzzle {
 		if (getClass() != obj.getClass())
 			return false;
 		Puzzle other = (Puzzle) obj;
-		if (!Arrays.deepEquals(cells, other.cells))
+		if (blank != other.blank)
 			return false;
-		if (emptyCol != other.emptyCol)
-			return false;
-		if (emptyRow != other.emptyRow)
+		if (!Arrays.equals(cells, other.cells))
 			return false;
 		if (size != other.size)
 			return false;
 		return true;
 	}
 
-	public int getEmptyCol() {
-		return emptyCol;
-	}
-
-	public int getEmptyRow() {
-		return emptyRow;
-	}
-
-	public int size() {
+	public byte size() {
 		return size;
 	}
 
-	public int get(int row, int col) {
-		return cells[row][col];
+	public byte blank() {
+		return blank;
 	}
 
-	public Puzzle up() {
-		if (emptyRow == size - 1) {
-			throw new IllegalStateException();
-		}
-		Puzzle result = new Puzzle(this);
-		result.emptyRow = emptyRow + 1;
-		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
-		return result;
+	public byte get(int row, int col) {
+		return cells[row * size + col];
+	}
+
+	public int col(byte i) {
+		return i % size;
+	}
+
+	public int row(byte i) {
+		return i / size;
 	}
 
 	public Puzzle move(Dir dir) {
@@ -113,40 +92,53 @@ public class Puzzle {
 		throw new IllegalArgumentException();
 	}
 
-	public Puzzle down() {
-		if (emptyRow == 0) {
+	/**
+	 * Moves tile below blank tile up.
+	 * 
+	 * @return resulting puzzle
+	 */
+	public Puzzle up() {
+		if (row(blank) == size - 1) {
 			throw new IllegalStateException();
 		}
 		Puzzle result = new Puzzle(this);
-		result.emptyRow = emptyRow - 1;
-		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
+		result.blank = (byte) (blank + size);
+		result.cells[result.blank] = 0;
+		result.cells[blank] = cells[result.blank];
+		return result;
+	}
+
+	public Puzzle down() {
+		if (row(blank) == 0) {
+			throw new IllegalStateException();
+		}
+		Puzzle result = new Puzzle(this);
+		result.blank = (byte) (blank - size);
+		result.cells[result.blank] = 0;
+		result.cells[blank] = cells[result.blank];
 		return result;
 	}
 
 	public Puzzle left() {
-		if (emptyCol == size - 1) {
+		if (col(blank) == size - 1) {
 			throw new IllegalStateException();
 		}
 		Puzzle result = new Puzzle(this);
-		result.emptyCol = emptyCol + 1;
-		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
+		result.blank = (byte) (blank + 1);
+		result.cells[result.blank] = 0;
+		result.cells[blank] = cells[result.blank];
 		return result;
 	}
 
 	public Puzzle right() {
-		if (emptyCol == 0) {
+		if (col(blank) == 0) {
 			throw new IllegalStateException();
 		}
 		Puzzle result = new Puzzle(this);
-		result.emptyCol = emptyCol - 1;
-		result.swap(emptyRow, emptyCol, result.emptyRow, result.emptyCol);
+		result.blank = (byte) (blank - 1);
+		result.cells[result.blank] = 0;
+		result.cells[blank] = cells[result.blank];
 		return result;
-	}
-
-	private void swap(int r, int c, int rr, int cc) {
-		int tmp = cells[r][c];
-		cells[r][c] = cells[rr][cc];
-		cells[rr][cc] = tmp;
 	}
 
 	public boolean hasNumbers(int... numbers) {
@@ -154,7 +146,7 @@ public class Puzzle {
 			throw new IllegalArgumentException();
 		}
 		for (int i = 0; i < numbers.length; ++i) {
-			if (cells[i / size][i % size] != numbers[i]) {
+			if (cells[i] != numbers[i]) {
 				return false;
 			}
 		}
@@ -181,7 +173,7 @@ public class Puzzle {
 	public void print() {
 		for (int row = 0; row < size; ++row) {
 			for (int col = 0; col < size; ++col) {
-				int i = cells[row][col];
+				byte i = cells[row * size + col];
 				System.out.print(i == 0 ? "   " : String.format("%02d ", i));
 			}
 			System.out.println();

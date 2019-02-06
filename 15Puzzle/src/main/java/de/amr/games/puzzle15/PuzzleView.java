@@ -33,28 +33,31 @@ public class PuzzleView extends JComponent {
 
 	private class MouseHandler extends MouseAdapter {
 
-		private int row;
-		private int col;
-
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			col = e.getX() / tileSize;
-			row = e.getY() / tileSize;
-			System.out.println("Clicked on number " + puzzle.get(row, col));
-			if (puzzle.getEmptyCol() == col) {
-				if (puzzle.getEmptyRow() == row - 1) {
+			int col = e.getX() / tileSize;
+			int row = e.getY() / tileSize;
+			int number = puzzle.get(row, col);
+			int blankCol = puzzle.col(puzzle.blank());
+			int blankRow = puzzle.row(puzzle.blank());
+			if (blankCol == col) {
+				if (blankRow == row - 1) {
 					puzzle = puzzle.up();
+					System.out.println("UP: " + number);
 					repaint();
-				} else if (puzzle.getEmptyRow() == row + 1) {
+				} else if (blankRow == row + 1) {
 					puzzle = puzzle.down();
+					System.out.println("DOWN: " + number);
 					repaint();
 				}
-			} else if (puzzle.getEmptyRow() == row) {
-				if (puzzle.getEmptyCol() == col - 1) {
+			} else if (blankRow == row) {
+				if (blankCol == col - 1) {
 					puzzle = puzzle.left();
+					System.out.println("LEFT: " + number);
 					repaint();
-				} else if (puzzle.getEmptyCol() == col + 1) {
+				} else if (blankCol == col + 1) {
 					puzzle = puzzle.right();
+					System.out.println("RIGHT: " + number);
 					repaint();
 				}
 			}
