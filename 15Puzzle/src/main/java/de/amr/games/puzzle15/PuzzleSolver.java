@@ -65,7 +65,7 @@ public class PuzzleSolver {
 
 	private void enqueue(Node node) {
 		q.add(node);
-		if (maxSize < q.size() + 1) {
+		if (maxSize < q.size()) {
 			maxSize++;
 		}
 	}
