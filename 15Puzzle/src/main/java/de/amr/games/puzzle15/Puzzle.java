@@ -101,41 +101,33 @@ public class Puzzle {
 		if (row(blank) == size - 1) {
 			throw new IllegalStateException();
 		}
-		Puzzle result = new Puzzle(this);
-		result.blank = (byte) (blank + size);
-		result.cells[result.blank] = 0;
-		result.cells[blank] = cells[result.blank];
-		return result;
+		return move((byte) (blank + size));
 	}
 
 	public Puzzle down() {
 		if (row(blank) == 0) {
 			throw new IllegalStateException();
 		}
-		Puzzle result = new Puzzle(this);
-		result.blank = (byte) (blank - size);
-		result.cells[result.blank] = 0;
-		result.cells[blank] = cells[result.blank];
-		return result;
+		return move((byte) (blank - size));
 	}
 
 	public Puzzle left() {
 		if (col(blank) == size - 1) {
 			throw new IllegalStateException();
 		}
-		Puzzle result = new Puzzle(this);
-		result.blank = (byte) (blank + 1);
-		result.cells[result.blank] = 0;
-		result.cells[blank] = cells[result.blank];
-		return result;
+		return move((byte) (blank + 1));
 	}
 
 	public Puzzle right() {
 		if (col(blank) == 0) {
 			throw new IllegalStateException();
 		}
+		return move((byte) (blank - 1));
+	}
+
+	private Puzzle move(byte index) {
 		Puzzle result = new Puzzle(this);
-		result.blank = (byte) (blank - 1);
+		result.blank = (byte) (index);
 		result.cells[result.blank] = 0;
 		result.cells[blank] = cells[result.blank];
 		return result;
@@ -178,5 +170,18 @@ public class Puzzle {
 			}
 			System.out.println();
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int row = 0; row < size; ++row) {
+			for (int col = 0; col < size; ++col) {
+				byte i = cells[row * size + col];
+				sb.append(i == 0 ? "   " : String.format("%02d ", i));
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 }
