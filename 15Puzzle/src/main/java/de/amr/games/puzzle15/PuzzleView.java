@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,22 +33,17 @@ public class PuzzleView extends JComponent {
 		}
 	};
 
-	private Action actionShowChildren = new AbstractAction() {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			puzzle.possibleMoves().forEach(dir -> {
-				System.out.println(dir);
-				puzzle.move(dir).println();
-			});
-		}
-	};
-
 	private Action actionSolve = new AbstractAction() {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			new PuzzleSolver().solve(puzzle);
+			List<PuzzleSolver.Node> solution = new PuzzleSolver().solve(puzzle);
+			solution.forEach(node -> {
+				System.out.println(node);
+			});
+			solution.stream().filter(node -> node.dir != null).forEach(node -> {
+				System.out.println(node.dir);
+			});
 		}
 	};
 
@@ -84,8 +80,6 @@ public class PuzzleView extends JComponent {
 		addMouseListener(new MouseHandler());
 		getInputMap().put(KeyStroke.getKeyStroke('r'), "random");
 		getActionMap().put("random", actionShuffle);
-		getInputMap().put(KeyStroke.getKeyStroke('n'), "next");
-		getActionMap().put("next", actionShowChildren);
 		getInputMap().put(KeyStroke.getKeyStroke('s'), "solve");
 		getActionMap().put("solve", actionSolve);
 		requestFocus();

@@ -183,7 +183,7 @@ public class Puzzle {
 		throw new IllegalArgumentException();
 	}
 
-	public Stream<Dir> possibleMoves() {
+	public Stream<Dir> possibleMoveDirs() {
 		return Stream.of(Dir.values()).filter(this::canMove);
 	}
 

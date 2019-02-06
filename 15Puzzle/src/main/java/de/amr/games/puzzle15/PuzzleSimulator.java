@@ -24,5 +24,4 @@ public class PuzzleSimulator extends JFrame {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-
 }
