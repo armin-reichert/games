@@ -1,6 +1,7 @@
 package de.amr.games.puzzle15.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -47,11 +48,13 @@ public class PuzzleTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testMoveUp() {
+		assertFalse(puzzle.canMoveUp());
 		puzzle.up();
 	}
 
 	@Test()
 	public void testMoveDown() {
+		assertTrue(puzzle.canMoveDown());
 		Puzzle result = puzzle.down();
 		assertEquals(2, result.row(result.blank()));
 		assertEquals(3, result.col(result.blank()));
@@ -59,11 +62,13 @@ public class PuzzleTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testMoveLeft() {
+		assertFalse(puzzle.canMoveLeft());
 		puzzle.left();
 	}
 
 	@Test
 	public void testMoveRight() {
+		assertTrue(puzzle.canMoveRight());
 		Puzzle result = puzzle.right();
 		assertEquals(3, result.row(result.blank()));
 		assertEquals(2, result.col(result.blank()));

@@ -3,6 +3,7 @@ package de.amr.games.puzzle15;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
 
 public class Puzzle {
 
@@ -96,20 +97,36 @@ public class Puzzle {
 		throw new IllegalArgumentException();
 	}
 
+	public boolean canMoveUp() {
+		return row(blank) < size - 1;
+	}
+
+	public boolean canMoveDown() {
+		return row(blank) > 0;
+	}
+
+	public boolean canMoveLeft() {
+		return col(blank) < size - 1;
+	}
+
+	public boolean canMoveRight() {
+		return col(blank) > 0;
+	}
+
 	public Puzzle up() {
-		return swapBlankCellWith((byte) (blank + size), () -> row(blank) < size - 1);
+		return swapBlankCellWith((byte) (blank + size), this::canMoveUp);
 	}
 
 	public Puzzle down() {
-		return swapBlankCellWith((byte) (blank - size), () -> row(blank) > 0);
+		return swapBlankCellWith((byte) (blank - size), this::canMoveDown);
 	}
 
 	public Puzzle left() {
-		return swapBlankCellWith((byte) (blank + 1), () -> col(blank) < size - 1);
+		return swapBlankCellWith((byte) (blank + 1), this::canMoveLeft);
 	}
 
 	public Puzzle right() {
-		return swapBlankCellWith((byte) (blank - 1), () -> col(blank) > 0);
+		return swapBlankCellWith((byte) (blank - 1), this::canMoveRight);
 	}
 
 	private Puzzle swapBlankCellWith(byte index, BooleanSupplier precondition) {
@@ -150,6 +167,24 @@ public class Puzzle {
 			}
 		}
 		return result;
+	}
+
+	public boolean canMove(Dir dir) {
+		switch (dir) {
+		case DOWN:
+			return canMoveDown();
+		case LEFT:
+			return canMoveLeft();
+		case RIGHT:
+			return canMoveRight();
+		case UP:
+			return canMoveUp();
+		}
+		throw new IllegalArgumentException();
+	}
+
+	public Stream<Dir> possibleMoves() {
+		return Stream.of(Dir.values()).filter(this::canMove);
 	}
 
 	public void println() {
