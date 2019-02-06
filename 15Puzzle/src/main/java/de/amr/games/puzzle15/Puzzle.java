@@ -9,8 +9,11 @@ public class Puzzle {
 	private final byte[] cells;
 	private byte blank;
 
-	public Puzzle(byte size) {
-		this.size = size;
+	public Puzzle(int size) {
+		if (size > 8) {
+			throw new IllegalArgumentException();
+		}
+		this.size = (byte) size;
 		int n = size * size;
 		cells = new byte[n];
 		for (byte i = 0; i < n; ++i) {

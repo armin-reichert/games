@@ -14,7 +14,7 @@ public class PuzzleTest {
 
 	@Before
 	public void setUp() {
-		puzzle = new Puzzle((byte) 4);
+		puzzle = new Puzzle(4);
 	}
 
 	@Test
