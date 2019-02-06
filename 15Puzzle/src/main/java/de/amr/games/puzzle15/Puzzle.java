@@ -2,6 +2,7 @@ package de.amr.games.puzzle15;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.BooleanSupplier;
 
 public class Puzzle {
 
@@ -95,45 +96,31 @@ public class Puzzle {
 		throw new IllegalArgumentException();
 	}
 
-	/**
-	 * Moves tile below blank tile up.
-	 * 
-	 * @return resulting puzzle
-	 */
 	public Puzzle up() {
-		if (row(blank) == size - 1) {
-			throw new IllegalStateException();
-		}
-		return move((byte) (blank + size));
+		return swapBlankCellWith((byte) (blank + size), () -> row(blank) < size - 1);
 	}
 
 	public Puzzle down() {
-		if (row(blank) == 0) {
-			throw new IllegalStateException();
-		}
-		return move((byte) (blank - size));
+		return swapBlankCellWith((byte) (blank - size), () -> row(blank) > 0);
 	}
 
 	public Puzzle left() {
-		if (col(blank) == size - 1) {
-			throw new IllegalStateException();
-		}
-		return move((byte) (blank + 1));
+		return swapBlankCellWith((byte) (blank + 1), () -> col(blank) < size - 1);
 	}
 
 	public Puzzle right() {
-		if (col(blank) == 0) {
-			throw new IllegalStateException();
-		}
-		return move((byte) (blank - 1));
+		return swapBlankCellWith((byte) (blank - 1), () -> col(blank) > 0);
 	}
 
-	private Puzzle move(byte index) {
-		Puzzle result = new Puzzle(this);
-		result.blank = (byte) (index);
-		result.cells[result.blank] = 0;
-		result.cells[blank] = cells[result.blank];
-		return result;
+	private Puzzle swapBlankCellWith(byte index, BooleanSupplier precondition) {
+		if (precondition.getAsBoolean()) {
+			Puzzle result = new Puzzle(this);
+			result.cells[index] = 0;
+			result.cells[blank] = cells[index];
+			result.blank = index;
+			return result;
+		}
+		throw new IllegalStateException();
 	}
 
 	public boolean hasNumbers(int... numbers) {
@@ -165,14 +152,8 @@ public class Puzzle {
 		return result;
 	}
 
-	public void print() {
-		for (int row = 0; row < size; ++row) {
-			for (int col = 0; col < size; ++col) {
-				byte i = cells[row * size + col];
-				System.out.print(i == 0 ? "   " : String.format("%02d ", i));
-			}
-			System.out.println();
-		}
+	public void println() {
+		System.out.println(this);
 	}
 
 	@Override
