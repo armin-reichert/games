@@ -38,9 +38,9 @@ public class PuzzleView extends JComponent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			List<PuzzleSolver.Node> solution = new PuzzleSolver().solve(puzzle);
-			solution.forEach(node -> {
-				System.out.println(node);
-			});
+//			solution.forEach(node -> {
+//				System.out.println(node);
+//			});
 			solution.stream().filter(node -> node.dir != null).forEach(node -> {
 				System.out.println(node.dir);
 			});

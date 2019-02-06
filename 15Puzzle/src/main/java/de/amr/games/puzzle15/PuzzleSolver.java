@@ -59,33 +59,44 @@ public class PuzzleSolver {
 	}
 
 	private final Map<Node, Node> parent = new HashMap<>();
+	private final Queue<Node> q = new ArrayDeque<>();
+	private final Set<Puzzle> visited = new HashSet<>();
+	private int maxSize;
+
+	private void enqueue(Node node) {
+		q.add(node);
+		if (maxSize < q.size() + 1) {
+			maxSize++;
+		}
+	}
+
+	private Node dequeue() {
+		return q.poll();
+	}
 
 	public List<Node> solve(Puzzle puzzle) {
-
-		Queue<Node> q = new ArrayDeque<>();
-		Set<Puzzle> visited = new HashSet<>();
 		Puzzle orderedPuzzle = new Puzzle(puzzle.size());
-
+		maxSize = 0;
 		Node current = new Node(puzzle, null);
-		q.add(current);
+		enqueue(current);
 		visited.add(current.puzzle);
-
 		while (!q.isEmpty()) {
-			current = q.poll();
-			System.out.println("Queue size: " + q.size());
+			current = dequeue();
 			if (current.puzzle.equals(orderedPuzzle)) {
+				System.out.println("Max Queue size: " + maxSize);
 				return solution(current);
 			}
 			for (Dir dir : current.puzzle.possibleMoveDirs().collect(toList())) {
 				Node child = new Node(current.puzzle.move(dir), dir);
 				if (!visited.contains(child.puzzle)) {
-					q.add(child);
+					enqueue(child);
+					maxSize = Math.max(q.size(), maxSize);
 					visited.add(child.puzzle);
 					parent.put(child, current);
-					System.out.println("Queue size: " + q.size());
 				}
 			}
 		}
+		System.out.println("Max Queue size: " + maxSize);
 		return Collections.emptyList();
 	}
 
