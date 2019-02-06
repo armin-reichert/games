@@ -27,11 +27,11 @@ public class PuzzleView extends JComponent {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			puzzle = puzzle.shuffle(50);
+			puzzle = puzzle.shuffle(10);
 			repaint();
 		}
 	};
-	
+
 	private Action actionShowChildren = new AbstractAction() {
 
 		@Override
@@ -43,36 +43,36 @@ public class PuzzleView extends JComponent {
 		}
 	};
 
+	private Action actionSolve = new AbstractAction() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			new PuzzleSolver().solve(puzzle);
+		}
+	};
+
 	private class MouseHandler extends MouseAdapter {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			int col = e.getX() / tileSize;
 			int row = e.getY() / tileSize;
-			int number = puzzle.get(row, col);
 			int blankCol = puzzle.col(puzzle.blank());
 			int blankRow = puzzle.row(puzzle.blank());
 			if (blankCol == col) {
 				if (blankRow == row - 1) {
 					puzzle = puzzle.up();
-					System.out.println("UP: " + number);
-					repaint();
 				} else if (blankRow == row + 1) {
 					puzzle = puzzle.down();
-					System.out.println("DOWN: " + number);
-					repaint();
 				}
 			} else if (blankRow == row) {
 				if (blankCol == col - 1) {
 					puzzle = puzzle.left();
-					System.out.println("LEFT: " + number);
-					repaint();
 				} else if (blankCol == col + 1) {
 					puzzle = puzzle.right();
-					System.out.println("RIGHT: " + number);
-					repaint();
 				}
 			}
+			repaint();
 		}
 	}
 
@@ -82,10 +82,12 @@ public class PuzzleView extends JComponent {
 		font = new Font(Font.SANS_SERIF, Font.BOLD, tileSize / 2);
 		setPreferredSize(new Dimension(puzzle.size() * tileSize, puzzle.size() * tileSize));
 		addMouseListener(new MouseHandler());
-		getInputMap().put(KeyStroke.getKeyStroke('s'), "shuffle");
-		getActionMap().put("shuffle", actionShuffle);
+		getInputMap().put(KeyStroke.getKeyStroke('r'), "random");
+		getActionMap().put("random", actionShuffle);
 		getInputMap().put(KeyStroke.getKeyStroke('n'), "next");
 		getActionMap().put("next", actionShowChildren);
+		getInputMap().put(KeyStroke.getKeyStroke('s'), "solve");
+		getActionMap().put("solve", actionSolve);
 		requestFocus();
 	}
 
