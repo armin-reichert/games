@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 public class PuzzleApp extends JFrame {
 
@@ -41,6 +42,7 @@ public class PuzzleApp extends JFrame {
 					System.out.print(node.getDir() + " ");
 				});
 				System.out.println();
+				playSolution(get());
 			} catch (Exception x) {
 				x.printStackTrace();
 			}
@@ -78,6 +80,25 @@ public class PuzzleApp extends JFrame {
 	public void setPuzzle(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
 		view.repaint();
+	}
+
+	private void playSolution(List<Node> solution) {
+
+		Timer timer = new Timer(1000, null);
+		timer.addActionListener(e -> {
+			if (solution.isEmpty()) {
+				timer.stop();
+			} else {
+				Node node = solution.remove(0);
+				puzzle = node.getPuzzle();
+				if (node.getDir() != null) {
+					System.out.println(node.getDir());
+				}
+				System.out.println(puzzle);
+				view.repaint();
+			}
+		});
+		timer.start();
 	}
 
 }
