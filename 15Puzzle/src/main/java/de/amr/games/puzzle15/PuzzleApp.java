@@ -32,7 +32,8 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
-			return new PuzzleSolverBFS().solve(puzzle);
+//			return new PuzzleSolverBFS().solve(puzzle);
+			return new PuzzleSolverBestFirstSearch().solve(puzzle);
 		}
 
 		@Override
@@ -54,7 +55,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			puzzle = Puzzle15.shuffled(10);
+			puzzle = Puzzle15.shuffled(20);
 			view.repaint();
 		}
 	};

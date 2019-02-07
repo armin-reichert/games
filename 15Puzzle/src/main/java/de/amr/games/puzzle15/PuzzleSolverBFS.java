@@ -10,9 +10,9 @@ import java.util.Set;
 
 public class PuzzleSolverBFS implements PuzzleSolver {
 
-	private Queue<Node> q;
-	private Set<Node> visited;
-	private int maxQueueSize;
+	protected Queue<Node> q;
+	protected Set<Node> visited;
+	protected int maxQueueSize;
 
 	protected void enqueue(Node node) {
 		q.add(node);
@@ -24,10 +24,14 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 	protected Node dequeue() {
 		return q.poll();
 	}
+	
+	protected void createQueue() {
+		q = new ArrayDeque<>();
+	}
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) {
-		q = new ArrayDeque<>();
+		createQueue();
 		visited = new HashSet<>();
 		maxQueueSize = 0;
 		Node current = new Node(puzzle, null, null);
@@ -52,7 +56,7 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 		return Collections.emptyList();
 	}
 
-	private List<Node> solution(Node goal) {
+	protected List<Node> solution(Node goal) {
 		List<Node> solution = new LinkedList<>();
 		for (Node current = goal; current != null; current = current.getParent()) {
 			solution.add(0, current);

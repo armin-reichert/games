@@ -8,30 +8,35 @@ import java.util.stream.Stream;
 
 public class Puzzle15 {
 
-	private static final byte[] ORDERED = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
+	private static final byte[] ORDERED_SEQ = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
+
+	public static final Puzzle15 ORDERED = new Puzzle15(ORDERED_SEQ);
 
 	private final byte[] cells;
 
-	private Puzzle15() {
-		cells = Arrays.copyOf(ORDERED, 16);
+	private Puzzle15(byte[] seq) {
+		cells = new byte[16];
+		for (byte i = 0; i < 16; ++i) {
+			cells[i] = seq[i];
+		}
 	}
 
 	private Puzzle15(Puzzle15 other) {
-		cells = Arrays.copyOf(other.cells, 16);
+		this(other.cells);
 	}
-	
+
 	public static Puzzle15 ordered() {
-		return new Puzzle15();
+		return new Puzzle15(ORDERED_SEQ);
 	}
 
 	public static Puzzle15 random() {
-		Puzzle15 puzzle = new Puzzle15();
+		Puzzle15 puzzle = new Puzzle15(ORDERED_SEQ);
 		shuffleArray(puzzle.cells);
 		return puzzle;
 	}
 
 	public static Puzzle15 shuffled(int numMoves) {
-		Puzzle15 puzzle = new Puzzle15();
+		Puzzle15 puzzle = new Puzzle15(ORDERED_SEQ);
 		int moves = 0;
 		while (moves < numMoves) {
 			Dir dir = Dir.values()[new Random().nextInt(4)];
@@ -66,7 +71,7 @@ public class Puzzle15 {
 	}
 
 	public boolean isOrdered() {
-		return Arrays.equals(cells, ORDERED);
+		return Arrays.equals(cells, ORDERED_SEQ);
 	}
 
 	public byte blank() {
@@ -82,11 +87,11 @@ public class Puzzle15 {
 		return cells[row * 4 + col];
 	}
 
-	public int col(byte i) {
+	public static int col(byte i) {
 		return i % 4;
 	}
 
-	public int row(byte i) {
+	public static int row(byte i) {
 		return i / 4;
 	}
 

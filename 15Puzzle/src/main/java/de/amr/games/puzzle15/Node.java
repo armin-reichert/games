@@ -5,6 +5,7 @@ public class Node {
 	private Puzzle15 puzzle;
 	private Dir dir;
 	private Node parent;
+	private int score;
 
 	public Node(Puzzle15 puzzle, Dir dir, Node parent) {
 		this.puzzle = puzzle;
@@ -24,9 +25,24 @@ public class Node {
 		return parent;
 	}
 
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
 	@Override
 	public String toString() {
-		return dir == null ? puzzle.toString() : dir + "\n" + puzzle;
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		if (dir != null) {
+			sb.append("dir:").append(dir).append("\n");
+		}
+		sb.append("score:").append(score).append("\n");
+		sb.append(puzzle);
+		return sb.toString();
 	}
 
 	@Override

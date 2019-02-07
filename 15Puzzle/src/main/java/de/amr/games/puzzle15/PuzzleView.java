@@ -27,8 +27,8 @@ public class PuzzleView extends JComponent {
 		public void mouseClicked(MouseEvent e) {
 			int col = e.getX() / tileSize;
 			int row = e.getY() / tileSize;
-			int blankCol = app.getPuzzle().col(app.getPuzzle().blank());
-			int blankRow = app.getPuzzle().row(app.getPuzzle().blank());
+			int blankCol = Puzzle15.col(app.getPuzzle().blank());
+			int blankRow = Puzzle15.row(app.getPuzzle().blank());
 			if (blankCol == col) {
 				if (blankRow == row - 1) {
 					app.setPuzzle(app.getPuzzle().up());
