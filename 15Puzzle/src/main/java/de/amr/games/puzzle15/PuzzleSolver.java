@@ -10,52 +10,6 @@ import java.util.Set;
 
 public class PuzzleSolver {
 
-	public static class Node {
-
-		public final Puzzle15 puzzle;
-		public final Dir dir;
-		private Node parent;
-
-		public Node(Puzzle15 puzzle, Dir dir, Node parent) {
-			this.puzzle = puzzle;
-			this.dir = dir;
-			this.parent = parent;
-		}
-
-		@Override
-		public String toString() {
-			return dir == null ? puzzle.toString() : dir + "\n" + puzzle;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((dir == null) ? 0 : dir.hashCode());
-			result = prime * result + ((puzzle == null) ? 0 : puzzle.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Node other = (Node) obj;
-			if (dir != other.dir)
-				return false;
-			if (puzzle == null) {
-				if (other.puzzle != null)
-					return false;
-			} else if (!puzzle.equals(other.puzzle))
-				return false;
-			return true;
-		}
-	}
-
 	private Queue<Node> q;
 	private Set<Node> visited;
 	private int maxQueueSize;
@@ -80,13 +34,13 @@ public class PuzzleSolver {
 		visited.add(current);
 		while (!q.isEmpty()) {
 			current = dequeue();
-			if (current.puzzle.isOrdered()) {
+			if (current.getPuzzle().isOrdered()) {
 				System.out.println("Max Queue size: " + maxQueueSize);
 				return solution(current);
 			}
-			Iterable<Dir> possibleDirs = current.puzzle.possibleMoveDirs()::iterator;
+			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
 			for (Dir dir : possibleDirs) {
-				Node child = new Node(current.puzzle.move(dir), dir, current);
+				Node child = new Node(current.getPuzzle().move(dir), dir, current);
 				if (!visited.contains(child)) {
 					enqueue(child);
 					visited.add(child);
@@ -99,7 +53,7 @@ public class PuzzleSolver {
 
 	private List<Node> solution(Node goal) {
 		List<Node> solution = new LinkedList<>();
-		for (Node current = goal; current != null; current = current.parent) {
+		for (Node current = goal; current != null; current = current.getParent()) {
 			solution.add(0, current);
 		}
 		return solution;

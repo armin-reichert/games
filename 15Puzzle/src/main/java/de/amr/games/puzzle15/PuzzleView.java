@@ -19,8 +19,6 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
-import de.amr.games.puzzle15.PuzzleSolver.Node;
-
 public class PuzzleView extends JComponent {
 
 	private Puzzle15 puzzle;
@@ -46,7 +44,7 @@ public class PuzzleView extends JComponent {
 		}
 	};
 
-	private class SolverThread extends SwingWorker<List<PuzzleSolver.Node>, Void> {
+	private class SolverThread extends SwingWorker<List<Node>, Void> {
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
@@ -56,8 +54,8 @@ public class PuzzleView extends JComponent {
 		@Override
 		protected void done() {
 			try {
-				get().stream().filter(node -> node.dir != null).forEach(node -> {
-					System.out.print(node.dir + " ");
+				get().stream().filter(node -> node.getDir() != null).forEach(node -> {
+					System.out.print(node.getDir() + " ");
 				});
 				System.out.println();
 			} catch (Exception x) {
