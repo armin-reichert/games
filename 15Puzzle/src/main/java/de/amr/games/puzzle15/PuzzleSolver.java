@@ -56,8 +56,8 @@ public class PuzzleSolver {
 		}
 	}
 
-	private final Queue<Node> q = new ArrayDeque<>();
-	private final Set<Node> visited = new HashSet<>();
+	private Queue<Node> q;
+	private Set<Node> visited;
 	private int maxQueueSize;
 
 	private void enqueue(Node node) {
@@ -72,6 +72,8 @@ public class PuzzleSolver {
 	}
 
 	public List<Node> solve(Puzzle15 puzzle) {
+		q = new ArrayDeque<>();
+		visited = new HashSet<>();
 		maxQueueSize = 0;
 		Node current = new Node(puzzle, null, null);
 		enqueue(current);
@@ -97,10 +99,8 @@ public class PuzzleSolver {
 
 	private List<Node> solution(Node goal) {
 		List<Node> solution = new LinkedList<>();
-		Node current = goal;
-		while (current != null) {
+		for (Node current = goal; current != null; current = current.parent) {
 			solution.add(0, current);
-			current = current.parent;
 		}
 		return solution;
 	}
