@@ -32,18 +32,20 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
-//			return new PuzzleSolverBFS().solve(puzzle);
+			// return new PuzzleSolverBFS().solve(puzzle);
 			return new PuzzleSolverBestFirstSearch().solve(puzzle);
 		}
 
 		@Override
 		protected void done() {
 			try {
-				get().stream().filter(node -> node.getDir() != null).forEach(node -> {
+				List<Node> solution = get();
+				System.out.println("Found solution of length " + solution.size());
+				solution.stream().filter(node -> node.getDir() != null).forEach(node -> {
 					System.out.print(node.getDir() + " ");
 				});
 				System.out.println();
-				playSolution(get());
+				playSolution(solution);
 			} catch (Exception x) {
 				x.printStackTrace();
 			}
@@ -55,7 +57,8 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			puzzle = Puzzle15.shuffled(20);
+//			puzzle = Puzzle15.shuffled(20);
+			puzzle = Puzzle15.random();
 			view.repaint();
 		}
 	};

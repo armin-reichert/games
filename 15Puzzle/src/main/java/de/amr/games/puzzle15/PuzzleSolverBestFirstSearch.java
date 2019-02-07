@@ -33,7 +33,10 @@ public class PuzzleSolverBestFirstSearch extends PuzzleSolverBFS {
 		q.add(node);
 		if (maxQueueSize < q.size()) {
 			maxQueueSize++;
+			if (maxQueueSize%1000 == 0) {
+				System.out.println("Queue size reached " + maxQueueSize);
+			}
 		}
-		System.out.println("Enqueued node with score " + node.getScore());
+//		System.out.println("Enqueued node with score " + node.getScore());
 	}
 }
