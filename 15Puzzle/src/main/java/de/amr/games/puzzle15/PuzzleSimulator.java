@@ -10,12 +10,10 @@ public class PuzzleSimulator extends JFrame {
 		EventQueue.invokeLater(PuzzleSimulator::new);
 	}
 
-	private Puzzle15 puzzle;
 	private PuzzleView view;
 
 	public PuzzleSimulator() {
-		puzzle = new Puzzle15();
-		view = new PuzzleView(puzzle, 100);
+		view = new PuzzleView(new Puzzle15(), 100);
 		setTitle("15-Puzzle");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);

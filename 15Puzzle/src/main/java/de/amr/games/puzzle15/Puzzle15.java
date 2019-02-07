@@ -26,6 +26,19 @@ public class Puzzle15 {
 		return puzzle;
 	}
 
+	public static Puzzle15 shuffled(int numMoves) {
+		Puzzle15 puzzle = new Puzzle15();
+		int moves = 0;
+		while (moves < numMoves) {
+			Dir dir = Dir.values()[new Random().nextInt(4)];
+			if (puzzle.canMove(dir)) {
+				puzzle = puzzle.move(dir);
+				moves++;
+			}
+		}
+		return puzzle;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
