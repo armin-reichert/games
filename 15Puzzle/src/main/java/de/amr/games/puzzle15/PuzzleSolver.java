@@ -1,7 +1,5 @@
 package de.amr.games.puzzle15;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,9 +16,10 @@ public class PuzzleSolver {
 		public final Dir dir;
 		private Node parent;
 
-		public Node(Puzzle15 puzzle, Dir dir) {
+		public Node(Puzzle15 puzzle, Dir dir, Node parent) {
 			this.puzzle = puzzle;
 			this.dir = dir;
+			this.parent = parent;
 		}
 
 		@Override
@@ -58,7 +57,7 @@ public class PuzzleSolver {
 	}
 
 	private final Queue<Node> q = new ArrayDeque<>();
-	private final Set<Puzzle15> visited = new HashSet<>();
+	private final Set<Node> visited = new HashSet<>();
 	private int maxQueueSize;
 
 	private void enqueue(Node node) {
@@ -74,22 +73,22 @@ public class PuzzleSolver {
 
 	public List<Node> solve(Puzzle15 puzzle) {
 		maxQueueSize = 0;
-		Node current = new Node(puzzle, null);
+		Node current = new Node(puzzle, null, null);
 		enqueue(current);
-		visited.add(current.puzzle);
+		visited.add(current);
 		while (!q.isEmpty()) {
 			current = dequeue();
 			if (current.puzzle.isSolved()) {
 				System.out.println("Max Queue size: " + maxQueueSize);
 				return solution(current);
 			}
-			for (Dir dir : current.puzzle.possibleMoveDirs().collect(toList())) {
-				Node child = new Node(current.puzzle.move(dir), dir);
-				if (!visited.contains(child.puzzle)) {
+			Iterable<Dir> possibleDirs = current.puzzle.possibleMoveDirs()::iterator;
+			for (Dir dir : possibleDirs) {
+				Node child = new Node(current.puzzle.move(dir), dir, current);
+				if (!visited.contains(child)) {
 					enqueue(child);
+					visited.add(child);
 					maxQueueSize = Math.max(q.size(), maxQueueSize);
-					visited.add(child.puzzle);
-					child.parent = current;
 				}
 			}
 		}

@@ -186,6 +186,7 @@ public class Puzzle15 {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
 		for (int row = 0; row < 4; ++row) {
 			for (int col = 0; col < 4; ++col) {
 				byte i = cells[row * 4 + col];
