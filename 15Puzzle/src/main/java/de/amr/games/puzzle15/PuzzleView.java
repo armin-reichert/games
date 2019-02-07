@@ -111,7 +111,7 @@ public class PuzzleView extends JComponent {
 	}
 
 	private void drawPuzzle(Graphics2D g) {
-		Color blankColor = puzzle.isSolved() ? Color.GREEN : Color.ORANGE;
+		Color blankColor = puzzle.isOrdered() ? Color.GREEN : Color.ORANGE;
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		for (int row = 0; row < 4; ++row) {
 			for (int col = 0; col < 4; ++col) {

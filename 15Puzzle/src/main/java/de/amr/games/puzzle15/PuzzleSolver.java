@@ -80,7 +80,7 @@ public class PuzzleSolver {
 		visited.add(current);
 		while (!q.isEmpty()) {
 			current = dequeue();
-			if (current.puzzle.isSolved()) {
+			if (current.puzzle.isOrdered()) {
 				System.out.println("Max Queue size: " + maxQueueSize);
 				return solution(current);
 			}

@@ -65,7 +65,7 @@ public class Puzzle15 {
 		return true;
 	}
 
-	public boolean isSolved() {
+	public boolean isOrdered() {
 		return Arrays.equals(cells, ORDERED);
 	}
 
