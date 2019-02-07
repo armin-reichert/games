@@ -28,7 +28,7 @@ public class PuzzleView extends JComponent {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			puzzle = puzzle.shuffle(10);
+			puzzle.shuffle();
 			repaint();
 		}
 	};

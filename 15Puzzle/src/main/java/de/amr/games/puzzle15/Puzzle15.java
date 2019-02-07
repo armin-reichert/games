@@ -2,6 +2,7 @@ package de.amr.games.puzzle15;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
 
@@ -134,21 +135,19 @@ public class Puzzle15 {
 		return true;
 	}
 
-	public Puzzle15 shuffle(int numMoves) {
-		Puzzle15 result = new Puzzle15(this);
-		Random rnd = new Random();
-		Dir[] dirs = Dir.values();
-		int shuffled = 0;
-		while (shuffled < numMoves) {
-			Dir dir = dirs[rnd.nextInt(4)];
-			try {
-				result = result.move(dir);
-				++shuffled;
-			} catch (IllegalStateException e) {
-				// ignore
-			}
+	public void shuffle() {
+		shuffleArray(cells);
+	}
+
+	// Durstenfeld shuffle
+	private static void shuffleArray(byte[] array) {
+		Random rnd = ThreadLocalRandom.current();
+		for (int i = array.length - 1; i > 0; i--) {
+			int index = rnd.nextInt(i + 1);
+			byte a = array[index];
+			array[index] = array[i];
+			array[i] = a;
 		}
-		return result;
 	}
 
 	public boolean canMove(Dir dir) {

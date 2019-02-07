@@ -4,11 +4,9 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -16,8 +14,9 @@ public class PuzzleSolver {
 
 	public static class Node {
 
-		public Puzzle15 puzzle;
-		public Dir dir;
+		public final Puzzle15 puzzle;
+		public final Dir dir;
+		private Node parent;
 
 		public Node(Puzzle15 puzzle, Dir dir) {
 			this.puzzle = puzzle;
@@ -58,15 +57,14 @@ public class PuzzleSolver {
 		}
 	}
 
-	private final Map<Node, Node> parent = new HashMap<>();
 	private final Queue<Node> q = new ArrayDeque<>();
 	private final Set<Puzzle15> visited = new HashSet<>();
-	private int maxSize;
+	private int maxQueueSize;
 
 	private void enqueue(Node node) {
 		q.add(node);
-		if (maxSize < q.size()) {
-			maxSize++;
+		if (maxQueueSize < q.size()) {
+			maxQueueSize++;
 		}
 	}
 
@@ -75,28 +73,26 @@ public class PuzzleSolver {
 	}
 
 	public List<Node> solve(Puzzle15 puzzle) {
-		Puzzle15 orderedPuzzle = new Puzzle15();
-		maxSize = 0;
+		maxQueueSize = 0;
 		Node current = new Node(puzzle, null);
 		enqueue(current);
 		visited.add(current.puzzle);
 		while (!q.isEmpty()) {
 			current = dequeue();
-			if (current.puzzle.equals(orderedPuzzle)) {
-				System.out.println("Max Queue size: " + maxSize);
+			if (current.puzzle.isSolved()) {
+				System.out.println("Max Queue size: " + maxQueueSize);
 				return solution(current);
 			}
 			for (Dir dir : current.puzzle.possibleMoveDirs().collect(toList())) {
 				Node child = new Node(current.puzzle.move(dir), dir);
 				if (!visited.contains(child.puzzle)) {
 					enqueue(child);
-					maxSize = Math.max(q.size(), maxSize);
+					maxQueueSize = Math.max(q.size(), maxQueueSize);
 					visited.add(child.puzzle);
-					parent.put(child, current);
+					child.parent = current;
 				}
 			}
 		}
-		System.out.println("Max Queue size: " + maxSize);
 		return Collections.emptyList();
 	}
 
@@ -105,7 +101,7 @@ public class PuzzleSolver {
 		Node current = goal;
 		while (current != null) {
 			solution.add(0, current);
-			current = parent.get(current);
+			current = current.parent;
 		}
 		return solution;
 	}
