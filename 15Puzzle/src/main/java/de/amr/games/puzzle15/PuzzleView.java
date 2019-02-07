@@ -17,6 +17,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
+
+import de.amr.games.puzzle15.PuzzleSolver.Node;
 
 public class PuzzleView extends JComponent {
 
@@ -28,7 +31,7 @@ public class PuzzleView extends JComponent {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			puzzle.shuffle();
+			puzzle = Puzzle15.random();
 			repaint();
 		}
 	};
@@ -38,13 +41,29 @@ public class PuzzleView extends JComponent {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("Solving...");
-			List<PuzzleSolver.Node> solution = new PuzzleSolver().solve(puzzle);
-			solution.stream().filter(node -> node.dir != null).forEach(node -> {
-				System.out.print(node.dir + " ");
-			});
-			System.out.println();
+			new SolverThread().execute();
 		}
 	};
+
+	private class SolverThread extends SwingWorker<List<PuzzleSolver.Node>, Void> {
+
+		@Override
+		protected List<Node> doInBackground() throws Exception {
+			return new PuzzleSolver().solve(puzzle);
+		}
+
+		@Override
+		protected void done() {
+			try {
+				get().stream().filter(node -> node.dir != null).forEach(node -> {
+					System.out.print(node.dir + " ");
+				});
+				System.out.println();
+			} catch (Exception x) {
+				x.printStackTrace();
+			}
+		}
+	}
 
 	private class MouseHandler extends MouseAdapter {
 
