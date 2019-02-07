@@ -20,6 +20,12 @@ public class Puzzle15 {
 		cells = Arrays.copyOf(other.cells, 16);
 	}
 
+	public static Puzzle15 random() {
+		Puzzle15 puzzle = new Puzzle15();
+		shuffleArray(puzzle.cells);
+		return puzzle;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -98,22 +104,22 @@ public class Puzzle15 {
 	}
 
 	public Puzzle15 up() {
-		return swapBlankCellWith((byte) (blank() + 4), this::canMoveUp);
+		return move((byte) (blank() + 4), this::canMoveUp);
 	}
 
 	public Puzzle15 down() {
-		return swapBlankCellWith((byte) (blank() - 4), this::canMoveDown);
+		return move((byte) (blank() - 4), this::canMoveDown);
 	}
 
 	public Puzzle15 left() {
-		return swapBlankCellWith((byte) (blank() + 1), this::canMoveLeft);
+		return move((byte) (blank() + 1), this::canMoveLeft);
 	}
 
 	public Puzzle15 right() {
-		return swapBlankCellWith((byte) (blank() - 1), this::canMoveRight);
+		return move((byte) (blank() - 1), this::canMoveRight);
 	}
 
-	private Puzzle15 swapBlankCellWith(byte index, BooleanSupplier precondition) {
+	private Puzzle15 move(byte index, BooleanSupplier precondition) {
 		if (precondition.getAsBoolean()) {
 			Puzzle15 result = new Puzzle15(this);
 			result.cells[index] = 0;
@@ -127,16 +133,12 @@ public class Puzzle15 {
 		if (numbers.length != cells.length) {
 			throw new IllegalArgumentException();
 		}
-		for (int i = 0; i < numbers.length; ++i) {
+		for (byte i = 0; i < numbers.length; ++i) {
 			if (cells[i] != numbers[i]) {
 				return false;
 			}
 		}
 		return true;
-	}
-
-	public void shuffle() {
-		shuffleArray(cells);
 	}
 
 	// Durstenfeld shuffle
@@ -166,10 +168,6 @@ public class Puzzle15 {
 
 	public Stream<Dir> possibleMoveDirs() {
 		return Stream.of(Dir.values()).filter(this::canMove);
-	}
-
-	public void println() {
-		System.out.println(this);
 	}
 
 	@Override
