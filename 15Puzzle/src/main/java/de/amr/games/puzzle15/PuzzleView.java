@@ -40,8 +40,9 @@ public class PuzzleView extends JComponent {
 			System.out.println("Solving...");
 			List<PuzzleSolver.Node> solution = new PuzzleSolver().solve(puzzle);
 			solution.stream().filter(node -> node.dir != null).forEach(node -> {
-				System.out.println(node.dir);
+				System.out.print(node.dir + " ");
 			});
+			System.out.println();
 		}
 	};
 

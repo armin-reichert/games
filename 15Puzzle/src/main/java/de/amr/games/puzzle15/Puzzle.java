@@ -9,7 +9,6 @@ public class Puzzle {
 
 	private final byte size;
 	private final byte[] cells;
-	private byte blank;
 
 	public Puzzle(int size) {
 		if (size > 8) {
@@ -22,13 +21,11 @@ public class Puzzle {
 			cells[i] = (byte) (i + 1);
 		}
 		cells[n - 1] = 0;
-		blank = (byte) (n - 1);
 	}
 
 	public Puzzle(Puzzle other) {
 		size = other.size;
 		cells = Arrays.copyOf(other.cells, other.cells.length);
-		blank = other.blank;
 	}
 
 	public boolean isSolved() {
@@ -39,7 +36,6 @@ public class Puzzle {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + blank;
 		result = prime * result + Arrays.hashCode(cells);
 		result = prime * result + size;
 		return result;
@@ -54,8 +50,6 @@ public class Puzzle {
 		if (getClass() != obj.getClass())
 			return false;
 		Puzzle other = (Puzzle) obj;
-		if (blank != other.blank)
-			return false;
 		if (!Arrays.equals(cells, other.cells))
 			return false;
 		if (size != other.size)
@@ -68,7 +62,12 @@ public class Puzzle {
 	}
 
 	public byte blank() {
-		return blank;
+		for (byte i = 0; i < cells.length; ++i) {
+			if (cells[i] == 0) {
+				return i;
+			}
+		}
+		throw new IllegalStateException();
 	}
 
 	public byte get(int row, int col) {
@@ -98,43 +97,42 @@ public class Puzzle {
 	}
 
 	public boolean canMoveUp() {
-		return row(blank) < size - 1;
+		return row(blank()) < size - 1;
 	}
 
 	public boolean canMoveDown() {
-		return row(blank) > 0;
+		return row(blank()) > 0;
 	}
 
 	public boolean canMoveLeft() {
-		return col(blank) < size - 1;
+		return col(blank()) < size - 1;
 	}
 
 	public boolean canMoveRight() {
-		return col(blank) > 0;
+		return col(blank()) > 0;
 	}
 
 	public Puzzle up() {
-		return swapBlankCellWith((byte) (blank + size), this::canMoveUp);
+		return swapBlankCellWith((byte) (blank() + size), this::canMoveUp);
 	}
 
 	public Puzzle down() {
-		return swapBlankCellWith((byte) (blank - size), this::canMoveDown);
+		return swapBlankCellWith((byte) (blank() - size), this::canMoveDown);
 	}
 
 	public Puzzle left() {
-		return swapBlankCellWith((byte) (blank + 1), this::canMoveLeft);
+		return swapBlankCellWith((byte) (blank() + 1), this::canMoveLeft);
 	}
 
 	public Puzzle right() {
-		return swapBlankCellWith((byte) (blank - 1), this::canMoveRight);
+		return swapBlankCellWith((byte) (blank() - 1), this::canMoveRight);
 	}
 
 	private Puzzle swapBlankCellWith(byte index, BooleanSupplier precondition) {
 		if (precondition.getAsBoolean()) {
 			Puzzle result = new Puzzle(this);
 			result.cells[index] = 0;
-			result.cells[blank] = cells[index];
-			result.blank = index;
+			result.cells[blank()] = cells[index];
 			return result;
 		}
 		throw new IllegalStateException();
