@@ -5,31 +5,18 @@ import java.util.Random;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Stream;
 
-public class Puzzle {
+public class Puzzle15 {
 
-	private final byte size;
+	private static final byte[] ORDERED = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
+
 	private final byte[] cells;
 
-	public Puzzle(int size) {
-		if (size > 8) {
-			throw new IllegalArgumentException();
-		}
-		this.size = (byte) size;
-		int n = size * size;
-		cells = new byte[n];
-		for (byte i = 0; i < n; ++i) {
-			cells[i] = (byte) (i + 1);
-		}
-		cells[n - 1] = 0;
+	public Puzzle15() {
+		cells = Arrays.copyOf(ORDERED, 16);
 	}
 
-	public Puzzle(Puzzle other) {
-		size = other.size;
-		cells = Arrays.copyOf(other.cells, other.cells.length);
-	}
-
-	public boolean isSolved() {
-		return hasNumbers(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0);
+	public Puzzle15(Puzzle15 other) {
+		cells = Arrays.copyOf(other.cells, 16);
 	}
 
 	@Override
@@ -37,7 +24,6 @@ public class Puzzle {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Arrays.hashCode(cells);
-		result = prime * result + size;
 		return result;
 	}
 
@@ -49,16 +35,14 @@ public class Puzzle {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Puzzle other = (Puzzle) obj;
+		Puzzle15 other = (Puzzle15) obj;
 		if (!Arrays.equals(cells, other.cells))
-			return false;
-		if (size != other.size)
 			return false;
 		return true;
 	}
 
-	public byte size() {
-		return size;
+	public boolean isSolved() {
+		return Arrays.equals(cells, ORDERED);
 	}
 
 	public byte blank() {
@@ -71,18 +55,18 @@ public class Puzzle {
 	}
 
 	public byte get(int row, int col) {
-		return cells[row * size + col];
+		return cells[row * 4 + col];
 	}
 
 	public int col(byte i) {
-		return i % size;
+		return i % 4;
 	}
 
 	public int row(byte i) {
-		return i / size;
+		return i / 4;
 	}
 
-	public Puzzle move(Dir dir) {
+	public Puzzle15 move(Dir dir) {
 		switch (dir) {
 		case DOWN:
 			return down();
@@ -97,7 +81,7 @@ public class Puzzle {
 	}
 
 	public boolean canMoveUp() {
-		return row(blank()) < size - 1;
+		return row(blank()) < 3;
 	}
 
 	public boolean canMoveDown() {
@@ -105,32 +89,32 @@ public class Puzzle {
 	}
 
 	public boolean canMoveLeft() {
-		return col(blank()) < size - 1;
+		return col(blank()) < 3;
 	}
 
 	public boolean canMoveRight() {
 		return col(blank()) > 0;
 	}
 
-	public Puzzle up() {
-		return swapBlankCellWith((byte) (blank() + size), this::canMoveUp);
+	public Puzzle15 up() {
+		return swapBlankCellWith((byte) (blank() + 4), this::canMoveUp);
 	}
 
-	public Puzzle down() {
-		return swapBlankCellWith((byte) (blank() - size), this::canMoveDown);
+	public Puzzle15 down() {
+		return swapBlankCellWith((byte) (blank() - 4), this::canMoveDown);
 	}
 
-	public Puzzle left() {
+	public Puzzle15 left() {
 		return swapBlankCellWith((byte) (blank() + 1), this::canMoveLeft);
 	}
 
-	public Puzzle right() {
+	public Puzzle15 right() {
 		return swapBlankCellWith((byte) (blank() - 1), this::canMoveRight);
 	}
 
-	private Puzzle swapBlankCellWith(byte index, BooleanSupplier precondition) {
+	private Puzzle15 swapBlankCellWith(byte index, BooleanSupplier precondition) {
 		if (precondition.getAsBoolean()) {
-			Puzzle result = new Puzzle(this);
+			Puzzle15 result = new Puzzle15(this);
 			result.cells[index] = 0;
 			result.cells[blank()] = cells[index];
 			return result;
@@ -139,7 +123,7 @@ public class Puzzle {
 	}
 
 	public boolean hasNumbers(int... numbers) {
-		if (numbers.length != size * size) {
+		if (numbers.length != cells.length) {
 			throw new IllegalArgumentException();
 		}
 		for (int i = 0; i < numbers.length; ++i) {
@@ -150,8 +134,8 @@ public class Puzzle {
 		return true;
 	}
 
-	public Puzzle shuffle(int numMoves) {
-		Puzzle result = new Puzzle(this);
+	public Puzzle15 shuffle(int numMoves) {
+		Puzzle15 result = new Puzzle15(this);
 		Random rnd = new Random();
 		Dir[] dirs = Dir.values();
 		int shuffled = 0;
@@ -192,9 +176,9 @@ public class Puzzle {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int row = 0; row < size; ++row) {
-			for (int col = 0; col < size; ++col) {
-				byte i = cells[row * size + col];
+		for (int row = 0; row < 4; ++row) {
+			for (int col = 0; col < 4; ++col) {
+				byte i = cells[row * 4 + col];
 				sb.append(i == 0 ? "   " : String.format("%02d ", i));
 			}
 			sb.append("\n");

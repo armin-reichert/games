@@ -20,7 +20,7 @@ import javax.swing.KeyStroke;
 
 public class PuzzleView extends JComponent {
 
-	private Puzzle puzzle;
+	private Puzzle15 puzzle;
 	private int tileSize;
 	private Font font;
 
@@ -71,11 +71,11 @@ public class PuzzleView extends JComponent {
 		}
 	}
 
-	public PuzzleView(Puzzle puzzle, int tileSize) {
+	public PuzzleView(Puzzle15 puzzle, int tileSize) {
 		this.puzzle = puzzle;
 		this.tileSize = tileSize;
 		font = new Font(Font.SANS_SERIF, Font.BOLD, tileSize / 2);
-		setPreferredSize(new Dimension(puzzle.size() * tileSize, puzzle.size() * tileSize));
+		setPreferredSize(new Dimension(4 * tileSize, 4 * tileSize));
 		addMouseListener(new MouseHandler());
 		getInputMap().put(KeyStroke.getKeyStroke('r'), "random");
 		getActionMap().put("random", actionShuffle);
@@ -93,8 +93,8 @@ public class PuzzleView extends JComponent {
 	private void drawPuzzle(Graphics2D g) {
 		Color blankColor = puzzle.isSolved() ? Color.GREEN : Color.ORANGE;
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		for (int row = 0; row < puzzle.size(); ++row) {
-			for (int col = 0; col < puzzle.size(); ++col) {
+		for (int row = 0; row < 4; ++row) {
+			for (int col = 0; col < 4; ++col) {
 				int number = puzzle.get(row, col);
 				g.translate(col * tileSize, row * tileSize);
 				if (number == 0) {

@@ -16,10 +16,10 @@ public class PuzzleSolver {
 
 	public static class Node {
 
-		public Puzzle puzzle;
+		public Puzzle15 puzzle;
 		public Dir dir;
 
-		public Node(Puzzle puzzle, Dir dir) {
+		public Node(Puzzle15 puzzle, Dir dir) {
 			this.puzzle = puzzle;
 			this.dir = dir;
 		}
@@ -60,7 +60,7 @@ public class PuzzleSolver {
 
 	private final Map<Node, Node> parent = new HashMap<>();
 	private final Queue<Node> q = new ArrayDeque<>();
-	private final Set<Puzzle> visited = new HashSet<>();
+	private final Set<Puzzle15> visited = new HashSet<>();
 	private int maxSize;
 
 	private void enqueue(Node node) {
@@ -74,8 +74,8 @@ public class PuzzleSolver {
 		return q.poll();
 	}
 
-	public List<Node> solve(Puzzle puzzle) {
-		Puzzle orderedPuzzle = new Puzzle(puzzle.size());
+	public List<Node> solve(Puzzle15 puzzle) {
+		Puzzle15 orderedPuzzle = new Puzzle15();
 		maxSize = 0;
 		Node current = new Node(puzzle, null);
 		enqueue(current);

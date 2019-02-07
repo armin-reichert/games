@@ -7,15 +7,15 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.amr.games.puzzle15.Puzzle;
+import de.amr.games.puzzle15.Puzzle15;
 
 public class PuzzleTest {
 
-	private Puzzle puzzle;
+	private Puzzle15 puzzle;
 
 	@Before
 	public void setUp() {
-		puzzle = new Puzzle(4);
+		puzzle = new Puzzle15();
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class PuzzleTest {
 
 	@Test
 	public void testEquals() {
-		Puzzle copy = new Puzzle(puzzle);
+		Puzzle15 copy = new Puzzle15(puzzle);
 		assertEquals(puzzle, copy);
 	}
 
@@ -55,7 +55,7 @@ public class PuzzleTest {
 	@Test()
 	public void testMoveDown() {
 		assertTrue(puzzle.canMoveDown());
-		Puzzle result = puzzle.down();
+		Puzzle15 result = puzzle.down();
 		assertEquals(2, result.row(result.blank()));
 		assertEquals(3, result.col(result.blank()));
 	}
@@ -69,26 +69,26 @@ public class PuzzleTest {
 	@Test
 	public void testMoveRight() {
 		assertTrue(puzzle.canMoveRight());
-		Puzzle result = puzzle.right();
+		Puzzle15 result = puzzle.right();
 		assertEquals(3, result.row(result.blank()));
 		assertEquals(2, result.col(result.blank()));
 	}
 
 	@Test
 	public void testMoveRightThenLeft() {
-		Puzzle result = puzzle.right().left();
+		Puzzle15 result = puzzle.right().left();
 		assertEquals(puzzle, result);
 	}
 
 	@Test
 	public void testDownThenUp() {
-		Puzzle result = puzzle.down().up();
+		Puzzle15 result = puzzle.down().up();
 		assertEquals(puzzle, result);
 	}
 
 	@Test
 	public void testAroundTheWorld() {
-		Puzzle result = puzzle.down().down().down().right().right().right().up().up().up().left().left().left();
+		Puzzle15 result = puzzle.down().down().down().right().right().right().up().up().up().left().left().left();
 		assertTrue(result.hasNumbers(5, 1, 2, 3, 9, 6, 7, 4, 13, 10, 11, 8, 14, 15, 12, 0));
 	}
 
