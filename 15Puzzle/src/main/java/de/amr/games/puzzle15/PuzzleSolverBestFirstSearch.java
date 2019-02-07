@@ -9,14 +9,17 @@ import java.util.PriorityQueue;
 public class PuzzleSolverBestFirstSearch extends PuzzleSolverBFS {
 
 	private static int manhattanDistFromOrdered(Puzzle15 puzzle) {
-		int dist = 0;
+		int total = 0;
 		for (byte row = 0; row < 4; ++row) {
 			for (byte col = 0; col < 4; ++col) {
 				byte number = puzzle.get(row, col);
-				dist += Math.abs(row(number) - row) + Math.abs(col(number) - col);
+				if (number != 0) {
+					int dist = Math.abs(row((byte) (number - 1)) - row) + Math.abs(col((byte) (number - 1)) - col);
+					total += dist;
+				}
 			}
 		}
-		return dist;
+		return total;
 	}
 
 	@Override

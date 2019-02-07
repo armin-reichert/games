@@ -87,12 +87,12 @@ public class Puzzle15 {
 		return cells[row * 4 + col];
 	}
 
-	public static int col(byte i) {
-		return i % 4;
+	public static int col(byte index) {
+		return index % 4;
 	}
 
-	public static int row(byte i) {
-		return i / 4;
+	public static int row(byte index) {
+		return index / 4;
 	}
 
 	public Puzzle15 move(Dir dir) {
