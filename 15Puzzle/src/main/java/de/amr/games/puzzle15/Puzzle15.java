@@ -12,12 +12,16 @@ public class Puzzle15 {
 
 	private final byte[] cells;
 
-	public Puzzle15() {
+	private Puzzle15() {
 		cells = Arrays.copyOf(ORDERED, 16);
 	}
 
-	public Puzzle15(Puzzle15 other) {
+	private Puzzle15(Puzzle15 other) {
 		cells = Arrays.copyOf(other.cells, 16);
+	}
+	
+	public static Puzzle15 ordered() {
+		return new Puzzle15();
 	}
 
 	public static Puzzle15 random() {

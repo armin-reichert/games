@@ -15,7 +15,7 @@ public class PuzzleTest {
 
 	@Before
 	public void setUp() {
-		puzzle = new Puzzle15();
+		puzzle = Puzzle15.ordered();
 	}
 
 	@Test
@@ -42,8 +42,8 @@ public class PuzzleTest {
 
 	@Test
 	public void testEquals() {
-		Puzzle15 copy = new Puzzle15(puzzle);
-		assertEquals(puzzle, copy);
+		Puzzle15 other = Puzzle15.ordered();
+		assertEquals(puzzle, other);
 	}
 
 	@Test(expected = IllegalStateException.class)
