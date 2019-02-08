@@ -14,10 +14,9 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
 import de.amr.games.puzzle15.model.Puzzle15;
-import de.amr.games.puzzle15.solver.Heuristics;
 import de.amr.games.puzzle15.solver.Node;
 import de.amr.games.puzzle15.solver.PuzzleSolver;
-import de.amr.games.puzzle15.solver.PuzzleSolverBestFirstSearch;
+import de.amr.games.puzzle15.solver.PuzzleSolverAStar;
 
 public class PuzzleApp extends JFrame {
 
@@ -43,7 +42,9 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
-			solver = new PuzzleSolverBestFirstSearch(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
+			// solver = new PuzzleSolverBestFirstSearch(node ->
+			// Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
+			solver = new PuzzleSolverAStar();
 			return solver.solve(puzzle);
 		}
 

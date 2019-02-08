@@ -11,6 +11,7 @@ public class Node {
 	// not used in equality test:
 	private Dir dir;
 	private Node parent;
+	private int distFromSource;
 	private int score;
 
 	public Node(Puzzle15 puzzle) {
@@ -35,6 +36,14 @@ public class Node {
 
 	public void setParent(Node parent) {
 		this.parent = parent;
+	}
+
+	public int getDistFromSource() {
+		return distFromSource;
+	}
+
+	public void setDistFromSource(int distFromSource) {
+		this.distFromSource = distFromSource;
 	}
 
 	public int getScore() {
