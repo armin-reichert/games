@@ -1,5 +1,6 @@
 package de.amr.games.puzzle15;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -9,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -67,29 +67,33 @@ public class PuzzleView extends JComponent {
 	}
 
 	private void drawPuzzle(Graphics2D g) {
-		Color blankColor = app.getPuzzle().isOrdered() ? Color.GREEN : Color.ORANGE;
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		for (int row = 0; row < 4; ++row) {
 			for (int col = 0; col < 4; ++col) {
 				int number = app.getPuzzle().get(row, col);
 				g.translate(col * tileSize, row * tileSize);
-				if (number == 0) {
-					g.setColor(blankColor);
-					g.fillRect(0, 0, tileSize, tileSize);
-				} else {
-					g.setColor(Color.BLACK);
+				if (number != 0) {
+					Color bg = Color.RED.brighter();
+					g.setColor(bg);
+					g.fillRoundRect(0, 0, tileSize, tileSize, tileSize / 3, tileSize / 3);
+					g.setColor(bg.darker());
+					g.setStroke(new BasicStroke(3));
+					g.drawRoundRect(0, 0, tileSize, tileSize, tileSize / 3, tileSize / 3);
+					g.setColor(Color.WHITE);
 					g.setFont(font);
 					FontMetrics fm = g.getFontMetrics();
 					String text = String.valueOf(number);
-					Rectangle2D box = fm.getStringBounds(text, g);
-					g.drawString(text, (tileSize - (int) box.getWidth()) / 2, tileSize - fm.getAscent() / 2);
+					g.drawString(text, (tileSize - fm.stringWidth(text)) / 2,
+							(tileSize - (fm.getAscent() + fm.getDescent()) / 2));
 				}
-				g.setColor(Color.DARK_GRAY);
-				g.drawRect(0, 0, tileSize, tileSize);
 				g.translate(-col * tileSize, -row * tileSize);
 			}
 		}
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
 
 }
