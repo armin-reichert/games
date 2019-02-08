@@ -14,6 +14,7 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
 import de.amr.games.puzzle15.model.Puzzle15;
+import de.amr.games.puzzle15.solver.Heuristics;
 import de.amr.games.puzzle15.solver.Node;
 import de.amr.games.puzzle15.solver.PuzzleSolver;
 import de.amr.games.puzzle15.solver.PuzzleSolverBestFirstSearch;
@@ -38,10 +39,11 @@ public class PuzzleApp extends JFrame {
 
 	private class SolverThread extends SwingWorker<List<Node>, Void> {
 
-		private PuzzleSolver solver = new PuzzleSolverBestFirstSearch();
+		private PuzzleSolver solver;
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
+			solver = new PuzzleSolverBestFirstSearch(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
 			return solver.solve(puzzle);
 		}
 
@@ -50,7 +52,7 @@ public class PuzzleApp extends JFrame {
 			try {
 				List<Node> solution = get();
 				System.out.println("Max queue size " + solver.getMaxQueueSize());
-				System.out.println("Found solution of length " + solution.size());
+				System.out.println("Found solution of length " + (solution.size() - 1));
 				System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
 				System.out.println();
@@ -78,9 +80,10 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// setPuzzle(Puzzle15.shuffled(20));
 			setPuzzle(Puzzle15.random());
+			boolean solvable = puzzle.isSolvable();
 			System.out.println(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
+			actionSolve.setEnabled(solvable);
 		}
 	};
 

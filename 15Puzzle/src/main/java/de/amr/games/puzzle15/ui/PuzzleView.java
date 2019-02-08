@@ -22,6 +22,7 @@ public class PuzzleView extends JComponent {
 	private PuzzleApp app;
 	private int tileSize;
 	private Font font;
+	private int borderWidth = 10;
 
 	private class MouseHandler extends MouseAdapter {
 
@@ -52,7 +53,7 @@ public class PuzzleView extends JComponent {
 		this.app = app;
 		this.tileSize = tileSize;
 		font = new Font(Font.SANS_SERIF, Font.BOLD, tileSize / 2);
-		setPreferredSize(new Dimension(4 * tileSize, 4 * tileSize));
+		setPreferredSize(new Dimension(2 * borderWidth + 4 * tileSize, 2 * borderWidth + 4 * tileSize));
 		addMouseListener(new MouseHandler());
 		requestFocusInWindow();
 	}
@@ -69,16 +70,17 @@ public class PuzzleView extends JComponent {
 	}
 
 	private void drawPuzzle(Graphics2D g) {
-		g.setColor(Color.WHITE);
+		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.translate(borderWidth, borderWidth);
 		for (int row = 0; row < 4; ++row) {
 			for (int col = 0; col < 4; ++col) {
 				int number = app.getPuzzle().get(row, col);
 				g.translate(col * tileSize, row * tileSize);
 				if (number != 0) {
-					Color bg = new Color(0xe1, 0xcc, 0x4f);
+					Color bg = new Color(0xda, 0xa5, 0x20);
 					g.setColor(bg);
 					g.fillRoundRect(0, 0, tileSize, tileSize, tileSize / 3, tileSize / 3);
 					g.setColor(bg.darker());
@@ -101,6 +103,7 @@ public class PuzzleView extends JComponent {
 				g.translate(-col * tileSize, -row * tileSize);
 			}
 		}
+		g.translate(-borderWidth, -borderWidth);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}

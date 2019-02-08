@@ -14,7 +14,6 @@ import de.amr.games.puzzle15.model.Puzzle15;
 public class PuzzleSolverBFS implements PuzzleSolver {
 
 	protected Queue<Node> q;
-	protected Set<Node> visited;
 	protected int maxQueueSize;
 
 	protected void enqueue(Node node) {
@@ -30,27 +29,28 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 
 	protected void createQueue() {
 		q = new ArrayDeque<>();
+		maxQueueSize = 0;
 	}
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) {
 		createQueue();
-		visited = new HashSet<>();
-		maxQueueSize = 0;
-		Node current = new Node(puzzle, null, null);
-		enqueue(current);
+		Set<Node> visited = new HashSet<>();
+		Node current = new Node(puzzle);
 		visited.add(current);
+		enqueue(current);
 		while (!q.isEmpty()) {
 			current = dequeue();
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
-			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
-			for (Dir dir : possibleDirs) {
-				Node child = new Node(current.getPuzzle().move(dir), dir, current);
+			for (Dir dir : current.getPuzzle().possibleMoveDirs()) {
+				Node child = new Node(current.getPuzzle().move(dir));
 				if (!visited.contains(child)) {
-					enqueue(child);
+					child.setDir(dir);
+					child.setParent(current);
 					visited.add(child);
+					enqueue(child);
 					maxQueueSize = Math.max(q.size(), maxQueueSize);
 				}
 			}

@@ -7,6 +7,6 @@ import de.amr.games.puzzle15.model.Puzzle15;
 public interface PuzzleSolver {
 
 	List<Node> solve(Puzzle15 puzzle);
-	
+
 	int getMaxQueueSize();
 }

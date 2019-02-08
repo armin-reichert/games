@@ -1,19 +1,20 @@
 package de.amr.games.puzzle15.solver;
 
+import java.util.Objects;
+
 import de.amr.games.puzzle15.model.Dir;
 import de.amr.games.puzzle15.model.Puzzle15;
 
 public class Node {
 
-	private Puzzle15 puzzle;
+	private final Puzzle15 puzzle;
+	// not used in equality test:
 	private Dir dir;
 	private Node parent;
 	private int score;
 
-	public Node(Puzzle15 puzzle, Dir dir, Node parent) {
+	public Node(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
-		this.dir = dir;
-		this.parent = parent;
 	}
 
 	public Puzzle15 getPuzzle() {
@@ -24,16 +25,24 @@ public class Node {
 		return dir;
 	}
 
+	public void setDir(Dir dir) {
+		this.dir = dir;
+	}
+
 	public Node getParent() {
 		return parent;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
+	public void setParent(Node parent) {
+		this.parent = parent;
 	}
 
 	public int getScore() {
 		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
 	}
 
 	@Override
@@ -50,11 +59,7 @@ public class Node {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((dir == null) ? 0 : dir.hashCode());
-		result = prime * result + ((puzzle == null) ? 0 : puzzle.hashCode());
-		return result;
+		return Objects.hash(puzzle);
 	}
 
 	@Override
@@ -66,13 +71,6 @@ public class Node {
 		if (getClass() != obj.getClass())
 			return false;
 		Node other = (Node) obj;
-		if (dir != other.dir)
-			return false;
-		if (puzzle == null) {
-			if (other.puzzle != null)
-				return false;
-		} else if (!puzzle.equals(other.puzzle))
-			return false;
-		return true;
+		return Objects.equals(puzzle, other.puzzle);
 	}
 }
