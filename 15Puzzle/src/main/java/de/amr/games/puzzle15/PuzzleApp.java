@@ -46,8 +46,8 @@ public class PuzzleApp extends JFrame {
 				List<Node> solution = get();
 				System.out.println("Max queue size " + solver.getMaxQueueSize());
 				System.out.println("Found solution of length " + solution.size());
-				System.out
-						.println(solution.stream().filter(Objects::nonNull).map(Object::toString).collect(joining(" ")));
+				System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
+						.collect(joining(" ")));
 				System.out.println();
 				playSolution(solution);
 			} catch (Exception x) {
