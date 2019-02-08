@@ -24,7 +24,7 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 	protected Node dequeue() {
 		return q.poll();
 	}
-	
+
 	protected void createQueue() {
 		q = new ArrayDeque<>();
 	}
@@ -40,7 +40,6 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 		while (!q.isEmpty()) {
 			current = dequeue();
 			if (current.getPuzzle().isOrdered()) {
-				System.out.println("Max Queue size: " + maxQueueSize);
 				return solution(current);
 			}
 			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
@@ -62,5 +61,10 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 			solution.add(0, current);
 		}
 		return solution;
+	}
+
+	@Override
+	public int getMaxQueueSize() {
+		return maxQueueSize;
 	}
 }

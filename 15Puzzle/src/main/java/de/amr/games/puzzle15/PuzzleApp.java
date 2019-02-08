@@ -30,16 +30,18 @@ public class PuzzleApp extends JFrame {
 
 	private class SolverThread extends SwingWorker<List<Node>, Void> {
 
+		private PuzzleSolver solver = new PuzzleSolverBestFirstSearch();
+
 		@Override
 		protected List<Node> doInBackground() throws Exception {
-			// return new PuzzleSolverBFS().solve(puzzle);
-			return new PuzzleSolverBestFirstSearch().solve(puzzle);
+			return solver.solve(puzzle);
 		}
 
 		@Override
 		protected void done() {
 			try {
 				List<Node> solution = get();
+				System.out.println("Max queue size " + solver.getMaxQueueSize());
 				System.out.println("Found solution of length " + solution.size());
 				solution.stream().filter(node -> node.getDir() != null).forEach(node -> {
 					System.out.print(node.getDir() + " ");
@@ -51,13 +53,26 @@ public class PuzzleApp extends JFrame {
 			}
 			view.repaint();
 		}
+
+		private void playSolution(List<Node> solution) {
+			Timer timer = new Timer(100, null);
+			timer.addActionListener(e -> {
+				if (solution.isEmpty()) {
+					timer.stop();
+				} else {
+					puzzle = solution.remove(0).getPuzzle();
+					view.repaint();
+				}
+			});
+			timer.start();
+		}
 	}
 
 	private Action actionShuffle = new AbstractAction("Shuffle") {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-//			puzzle = Puzzle15.shuffled(20);
+			// puzzle = Puzzle15.shuffled(20);
 			puzzle = Puzzle15.random();
 			view.repaint();
 		}
@@ -84,25 +99,6 @@ public class PuzzleApp extends JFrame {
 	public void setPuzzle(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
 		view.repaint();
-	}
-
-	private void playSolution(List<Node> solution) {
-
-		Timer timer = new Timer(1000, null);
-		timer.addActionListener(e -> {
-			if (solution.isEmpty()) {
-				timer.stop();
-			} else {
-				Node node = solution.remove(0);
-				puzzle = node.getPuzzle();
-				if (node.getDir() != null) {
-					System.out.println(node.getDir());
-				}
-				System.out.println(puzzle);
-				view.repaint();
-			}
-		});
-		timer.start();
 	}
 
 }
