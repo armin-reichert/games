@@ -5,11 +5,11 @@ import static java.util.Comparator.comparingInt;
 import java.util.PriorityQueue;
 import java.util.function.Function;
 
-public class PuzzleSolverBestFirstSearch extends PuzzleSolverBFS {
+public class SolverBestFirstSearch extends SolverBFS {
 
-	private Function<Node, Integer> fnHeuristics;
+	protected Function<Node, Integer> fnHeuristics;
 
-	public PuzzleSolverBestFirstSearch(Function<Node, Integer> fnHeuristics) {
+	public SolverBestFirstSearch(Function<Node, Integer> fnHeuristics) {
 		this.fnHeuristics = fnHeuristics;
 	}
 
@@ -23,11 +23,5 @@ public class PuzzleSolverBestFirstSearch extends PuzzleSolverBFS {
 	protected void enqueue(Node node) {
 		node.setScore(fnHeuristics.apply(node));
 		q.add(node);
-		if (maxQueueSize < q.size()) {
-			maxQueueSize++;
-			if (maxQueueSize % 1000 == 0) {
-				System.out.println("Queue size reached " + maxQueueSize);
-			}
-		}
 	}
 }

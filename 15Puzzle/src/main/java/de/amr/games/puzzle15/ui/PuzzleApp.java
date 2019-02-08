@@ -1,5 +1,6 @@
 package de.amr.games.puzzle15.ui;
 
+import static de.amr.games.puzzle15.solver.Heuristics.manhattanDistFromOrdered;
 import static java.util.stream.Collectors.joining;
 
 import java.awt.EventQueue;
@@ -15,8 +16,8 @@ import javax.swing.Timer;
 
 import de.amr.games.puzzle15.model.Puzzle15;
 import de.amr.games.puzzle15.solver.Node;
-import de.amr.games.puzzle15.solver.PuzzleSolver;
-import de.amr.games.puzzle15.solver.PuzzleSolverAStar;
+import de.amr.games.puzzle15.solver.Solver;
+import de.amr.games.puzzle15.solver.SolverAStar;
 
 public class PuzzleApp extends JFrame {
 
@@ -38,13 +39,12 @@ public class PuzzleApp extends JFrame {
 
 	private class SolverThread extends SwingWorker<List<Node>, Void> {
 
-		private PuzzleSolver solver;
+		private Solver solver;
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
-			// solver = new PuzzleSolverBestFirstSearch(node ->
-			// Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
-			solver = new PuzzleSolverAStar();
+			// solver = new PuzzleSolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()));
+			solver = new SolverAStar(node -> manhattanDistFromOrdered(node.getPuzzle()));
 			return solver.solve(puzzle);
 		}
 

@@ -11,25 +11,18 @@ import java.util.Set;
 import de.amr.games.puzzle15.model.Dir;
 import de.amr.games.puzzle15.model.Puzzle15;
 
-public class PuzzleSolverBFS implements PuzzleSolver {
+public class SolverBFS implements Solver {
 
 	protected Queue<Node> q;
 	protected int maxQueueSize;
 
-	protected void enqueue(Node node) {
-		q.add(node);
-		if (maxQueueSize < q.size()) {
-			maxQueueSize++;
-		}
-	}
-
-	protected Node dequeue() {
-		return q.poll();
-	}
-
 	protected void createQueue() {
 		q = new ArrayDeque<>();
 		maxQueueSize = 0;
+	}
+
+	protected void enqueue(Node node) {
+		q.add(node);
 	}
 
 	@Override
@@ -40,7 +33,7 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 		visited.add(current);
 		enqueue(current);
 		while (!q.isEmpty()) {
-			current = dequeue();
+			current = q.poll();
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
@@ -51,9 +44,9 @@ public class PuzzleSolverBFS implements PuzzleSolver {
 					child.setParent(current);
 					visited.add(child);
 					enqueue(child);
-					maxQueueSize = Math.max(q.size(), maxQueueSize);
 				}
 			}
+			maxQueueSize = Math.max(q.size(), maxQueueSize);
 		}
 		return Collections.emptyList();
 	}

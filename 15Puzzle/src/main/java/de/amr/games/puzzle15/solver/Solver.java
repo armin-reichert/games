@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.amr.games.puzzle15.model.Puzzle15;
 
-public interface PuzzleSolver {
+public interface Solver {
 
 	List<Node> solve(Puzzle15 puzzle);
 
