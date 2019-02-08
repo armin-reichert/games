@@ -1,8 +1,11 @@
 package de.amr.games.puzzle15;
 
+import static java.util.stream.Collectors.joining;
+
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -19,7 +22,7 @@ public class PuzzleApp extends JFrame {
 	private Puzzle15 puzzle;
 	private PuzzleView view;
 
-	private Action actionSolve = new AbstractAction() {
+	private Action actionSolve = new AbstractAction("Solve") {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -43,9 +46,8 @@ public class PuzzleApp extends JFrame {
 				List<Node> solution = get();
 				System.out.println("Max queue size " + solver.getMaxQueueSize());
 				System.out.println("Found solution of length " + solution.size());
-				solution.stream().filter(node -> node.getDir() != null).forEach(node -> {
-					System.out.print(node.getDir() + " ");
-				});
+				System.out
+						.println(solution.stream().filter(Objects::nonNull).map(Object::toString).collect(joining(" ")));
 				System.out.println();
 				playSolution(solution);
 			} catch (Exception x) {
@@ -78,12 +80,12 @@ public class PuzzleApp extends JFrame {
 
 	public PuzzleApp() {
 		puzzle = Puzzle15.ordered();
-		view = new PuzzleView(this, 100);
-		view.onKey('r', actionShuffle);
-		view.onKey('s', actionSolve);
 		setTitle("15-Puzzle");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
+		view = new PuzzleView(this, 100);
+		view.bindKeyToAction('r', actionShuffle);
+		view.bindKeyToAction('s', actionSolve);
 		add(view);
 		pack();
 		setLocationRelativeTo(null);

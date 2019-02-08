@@ -55,9 +55,9 @@ public class PuzzleView extends JComponent {
 		requestFocusInWindow();
 	}
 
-	public void onKey(char key, Action action) {
-		getInputMap().put(KeyStroke.getKeyStroke(key), action.hashCode());
-		getActionMap().put(action.hashCode(), action);
+	public void bindKeyToAction(char key, Action action) {
+		getInputMap().put(KeyStroke.getKeyStroke(key), action.getValue(Action.NAME));
+		getActionMap().put(action.getValue(Action.NAME), action);
 	}
 
 	@Override
