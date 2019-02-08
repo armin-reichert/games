@@ -1,4 +1,7 @@
-package de.amr.games.puzzle15;
+package de.amr.games.puzzle15.solver;
+
+import de.amr.games.puzzle15.model.Dir;
+import de.amr.games.puzzle15.model.Puzzle15;
 
 public class Node {
 

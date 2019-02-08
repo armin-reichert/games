@@ -1,4 +1,4 @@
-package de.amr.games.puzzle15;
+package de.amr.games.puzzle15.ui;
 
 import static java.util.stream.Collectors.joining;
 
@@ -12,6 +12,11 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+
+import de.amr.games.puzzle15.model.Puzzle15;
+import de.amr.games.puzzle15.solver.Node;
+import de.amr.games.puzzle15.solver.PuzzleSolver;
+import de.amr.games.puzzle15.solver.PuzzleSolverBestFirstSearch;
 
 public class PuzzleApp extends JFrame {
 

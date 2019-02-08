@@ -1,4 +1,4 @@
-package de.amr.games.puzzle15;
+package de.amr.games.puzzle15.ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,6 +14,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+
+import de.amr.games.puzzle15.model.Puzzle15;
 
 public class PuzzleView extends JComponent {
 

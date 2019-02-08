@@ -1,4 +1,4 @@
-package de.amr.games.puzzle15;
+package de.amr.games.puzzle15.model;
 
 import java.util.Arrays;
 import java.util.Random;

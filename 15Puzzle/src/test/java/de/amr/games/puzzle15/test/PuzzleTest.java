@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.amr.games.puzzle15.Puzzle15;
+import de.amr.games.puzzle15.model.Puzzle15;
 
 public class PuzzleTest {
 

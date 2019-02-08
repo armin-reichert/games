@@ -1,4 +1,4 @@
-package de.amr.games.puzzle15;
+package de.amr.games.puzzle15.solver;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+
+import de.amr.games.puzzle15.model.Dir;
+import de.amr.games.puzzle15.model.Puzzle15;
 
 public class PuzzleSolverBFS implements PuzzleSolver {
 

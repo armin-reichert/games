@@ -1,10 +1,12 @@
-package de.amr.games.puzzle15;
+package de.amr.games.puzzle15.solver;
 
-import static de.amr.games.puzzle15.Puzzle15.col;
-import static de.amr.games.puzzle15.Puzzle15.row;
+import static de.amr.games.puzzle15.model.Puzzle15.col;
+import static de.amr.games.puzzle15.model.Puzzle15.row;
 import static java.util.Comparator.comparingInt;
 
 import java.util.PriorityQueue;
+
+import de.amr.games.puzzle15.model.Puzzle15;
 
 public class PuzzleSolverBestFirstSearch extends PuzzleSolverBFS {
 
