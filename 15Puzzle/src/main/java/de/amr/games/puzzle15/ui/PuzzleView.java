@@ -78,7 +78,7 @@ public class PuzzleView extends JComponent {
 				int number = app.getPuzzle().get(row, col);
 				g.translate(col * tileSize, row * tileSize);
 				if (number != 0) {
-					Color bg = Color.RED.brighter();
+					Color bg = new Color(0xe1, 0xcc, 0x4f);
 					g.setColor(bg);
 					g.fillRoundRect(0, 0, tileSize, tileSize, tileSize / 3, tileSize / 3);
 					g.setColor(bg.darker());
@@ -90,6 +90,13 @@ public class PuzzleView extends JComponent {
 					String text = String.valueOf(number);
 					g.drawString(text, (tileSize - fm.stringWidth(text)) / 2,
 							(tileSize - (fm.getAscent() + fm.getDescent()) / 2));
+				} else {
+					if (!app.getPuzzle().isSolvable()) {
+						g.setColor(Color.RED);
+						g.fillOval(5, 5, tileSize - 10, tileSize - 10);
+						g.setColor(Color.WHITE);
+						g.fillRect(10, tileSize / 2 - 5, tileSize - 20, 10);
+					}
 				}
 				g.translate(-col * tileSize, -row * tileSize);
 			}
