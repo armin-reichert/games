@@ -96,4 +96,13 @@ public class PuzzleTest {
 	public void testHasNumbers() {
 		assertTrue(puzzle.hasNumbers(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0));
 	}
+	
+	@Test
+	public void testNumInversions() {
+		assertEquals(0, puzzle.numInversions());
+		Puzzle15 p = Puzzle15.of(2, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0);
+		assertEquals(1, p.numInversions());
+	}
+	
+	
 }

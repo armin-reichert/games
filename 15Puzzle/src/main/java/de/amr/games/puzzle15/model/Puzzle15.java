@@ -14,6 +14,13 @@ public class Puzzle15 {
 
 	private final byte[] cells;
 
+	private Puzzle15(int[] seq) {
+		cells = new byte[16];
+		for (byte i = 0; i < 16; ++i) {
+			cells[i] = (byte) seq[i];
+		}
+	}
+
 	private Puzzle15(byte[] seq) {
 		cells = new byte[16];
 		for (byte i = 0; i < 16; ++i) {
@@ -23,6 +30,10 @@ public class Puzzle15 {
 
 	private Puzzle15(Puzzle15 other) {
 		this(other.cells);
+	}
+
+	public static Puzzle15 of(int... cells) {
+		return new Puzzle15(cells);
 	}
 
 	public static Puzzle15 ordered() {
@@ -205,4 +216,39 @@ public class Puzzle15 {
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * 
+	 * <p>
+	 * If N is even, puzzle instance is solvable if
+	 * <ul>
+	 * <li>the blank is on an even row counting from the bottom (second-last, fourth-last, etc.) and
+	 * number of inversions is odd.
+	 * <li>the blank is on an odd row counting from the bottom (last, third-last, fifth-last, etc.) and
+	 * number of inversions is even.
+	 * </ul>
+	 * 
+	 * @see https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
+	 */
+	public boolean isSolvable() {
+		int numInversions = numInversions(), row = 4 - row(blank());
+		return even(row) != even(numInversions);
+	}
+
+	private boolean even(int n) {
+		return n % 2 == 0;
+	}
+
+	public int numInversions() {
+		int cnt = 0;
+		for (int i = 0; i < 15; ++i) {
+			for (int j = i + 1; j < 16; ++j) {
+				if (cells[i] != 0 && cells[j] != 0 && cells[i] > cells[j]) {
+					++cnt;
+				}
+			}
+		}
+		return cnt;
+	}
+
 }

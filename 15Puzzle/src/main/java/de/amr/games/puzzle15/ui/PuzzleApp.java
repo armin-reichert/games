@@ -80,6 +80,7 @@ public class PuzzleApp extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			// setPuzzle(Puzzle15.shuffled(20));
 			setPuzzle(Puzzle15.random());
+			System.out.println(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
 		}
 	};
 
