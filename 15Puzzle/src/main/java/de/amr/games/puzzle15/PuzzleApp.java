@@ -60,8 +60,7 @@ public class PuzzleApp extends JFrame {
 				if (solution.isEmpty()) {
 					timer.stop();
 				} else {
-					puzzle = solution.remove(0).getPuzzle();
-					view.repaint();
+					setPuzzle(solution.remove(0).getPuzzle());
 				}
 			});
 			timer.start();
@@ -72,9 +71,8 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// puzzle = Puzzle15.shuffled(20);
-			puzzle = Puzzle15.random();
-			view.repaint();
+			// setPuzzle(Puzzle15.shuffled(20));
+			setPuzzle(Puzzle15.random());
 		}
 	};
 
