@@ -3,7 +3,6 @@ package de.amr.games.puzzle15.solver;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -49,14 +48,6 @@ public class SolverBFS implements Solver {
 			maxQueueSize = Math.max(q.size(), maxQueueSize);
 		}
 		return Collections.emptyList();
-	}
-
-	protected List<Node> solution(Node goal) {
-		List<Node> solution = new LinkedList<>();
-		for (Node current = goal; current != null; current = current.getParent()) {
-			solution.add(0, current);
-		}
-		return solution;
 	}
 
 	@Override
