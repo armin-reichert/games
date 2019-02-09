@@ -58,6 +58,7 @@ public class SolverAStar extends SolverBestFirstSearch {
 				if (existing != null && tentative_dist >= existing.getDistFromSource()) {
 					continue;
 				}
+				successor.setDir(dir);
 				successor.setParent(current);
 				successor.setDistFromSource(tentative_dist);
 				successor.setScore(tentative_dist + fnHeuristics.apply(successor));
