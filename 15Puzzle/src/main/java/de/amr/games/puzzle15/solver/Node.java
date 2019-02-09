@@ -61,7 +61,8 @@ public class Node {
 		if (dir != null) {
 			sb.append("dir:").append(dir).append("\n");
 		}
-		sb.append("score:").append(score).append("\n");
+		sb.append("distFromSource (g): ").append(distFromSource).append("\n");
+		sb.append("score (f): ").append(score).append("\n");
 		sb.append(puzzle);
 		return sb.toString();
 	}

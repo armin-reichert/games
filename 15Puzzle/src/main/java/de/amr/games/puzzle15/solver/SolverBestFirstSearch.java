@@ -14,8 +14,8 @@ public class SolverBestFirstSearch extends SolverBFS {
 	}
 
 	@Override
-	protected void createQueue() {
-		q = new PriorityQueue<>(comparingInt(Node::getScore));
+	protected void createQueue(int initialCapacity) {
+		q = new PriorityQueue<>(initialCapacity, comparingInt(Node::getScore));
 		maxQueueSize = 0;
 	}
 

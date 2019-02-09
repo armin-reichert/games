@@ -16,8 +16,8 @@ public class SolverBFS implements Solver {
 	protected Queue<Node> q;
 	protected int maxQueueSize;
 
-	protected void createQueue() {
-		q = new ArrayDeque<>();
+	protected void createQueue(int initialCapacity) {
+		q = new ArrayDeque<>(initialCapacity);
 		maxQueueSize = 0;
 	}
 
@@ -27,7 +27,7 @@ public class SolverBFS implements Solver {
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) {
-		createQueue();
+		createQueue(100);
 		Set<Node> visited = new HashSet<>();
 		Node current = new Node(puzzle);
 		visited.add(current);
