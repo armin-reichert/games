@@ -38,7 +38,7 @@ public class SolverAStar extends SolverBestFirstSearch {
 		closed = new HashSet<>();
 		Node current = new Node(puzzle);
 		current.setDistFromSource(0);
-		// current.setScore(fnHeuristics.apply(current));
+		current.setScore(fnHeuristics.apply(current)); // not necessary
 		enqueue(current);
 		while (!q.isEmpty()) {
 			current = q.poll();
