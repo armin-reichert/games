@@ -118,7 +118,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			setPuzzle(Puzzle15.random());
+			setPuzzle(Puzzle15.shuffled());
 			boolean solvable = puzzle.isSolvable();
 			System.out.println(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
 			actionSolveBFS.setEnabled(solvable);
@@ -127,13 +127,20 @@ public class PuzzleApp extends JFrame {
 		}
 	};
 
+	private Action actionRandomMoves = new AbstractAction("Make 100 Random Moves") {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setPuzzle(Puzzle15.randomMoves(100));
+		}
+	};
+	
 	public PuzzleApp() {
 		puzzle = Puzzle15.ordered();
 		setTitle("15-Puzzle");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 		view = new PuzzleView(this, 100);
-		view.bindKeyToAction('s', actionShuffle);
 		add(view);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -141,6 +148,7 @@ public class PuzzleApp extends JFrame {
 
 		JMenu puzzleMenu = new JMenu("Puzzle");
 		menuBar.add(puzzleMenu);
+		puzzleMenu.add(actionRandomMoves);
 		puzzleMenu.add(actionShuffle);
 
 		JMenu solverMenu = new JMenu("Solver");

@@ -40,13 +40,13 @@ public class Puzzle15 {
 		return new Puzzle15(ORDERED_SEQ);
 	}
 
-	public static Puzzle15 random() {
+	public static Puzzle15 shuffled() {
 		Puzzle15 puzzle = new Puzzle15(ORDERED_SEQ);
 		shuffleArray(puzzle.cells);
 		return puzzle;
 	}
 
-	public static Puzzle15 shuffled(int numMoves) {
+	public static Puzzle15 randomMoves(int numMoves) {
 		Puzzle15 puzzle = new Puzzle15(ORDERED_SEQ);
 		int moves = 0;
 		while (moves < numMoves) {
