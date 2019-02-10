@@ -70,7 +70,7 @@ public class PuzzleView extends JComponent {
 	}
 
 	private void drawPuzzle(Graphics2D g) {
-		g.setColor(Color.LIGHT_GRAY);
+		g.setColor(new Color(0xff, 0xfa, 0xf0));
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

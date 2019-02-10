@@ -2,7 +2,10 @@ package de.amr.games.puzzle15.ui;
 
 import static java.util.stream.Collectors.joining;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +15,8 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -40,12 +45,13 @@ public class PuzzleApp extends JFrame {
 
 	private Puzzle15 puzzle;
 	private PuzzleView view;
+	private JTextArea console;
 
 	private Action actionSolveBFS = new AbstractAction("Breadth-First Search") {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("Solving...");
+			writeConsole("Solving...");
 			new SolverThread(new SolverBFS()).execute();
 		}
 	};
@@ -54,7 +60,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("Solving...");
+			writeConsole("Solving...");
 			new SolverThread(
 					new SolverBestFirstSearch(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()))).execute();
 		}
@@ -64,7 +70,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("Solving...");
+			writeConsole("Solving...");
 			new SolverThread(new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle())))
 					.execute();
 		}
@@ -89,11 +95,10 @@ public class PuzzleApp extends JFrame {
 		protected void done() {
 			try {
 				List<Node> solution = get();
-				System.out.println("Max queue size " + solver.getMaxQueueSize());
-				System.out.println("Found solution of length " + (solution.size() - 1));
-				System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
+				writeConsole("Max queue size " + solver.getMaxQueueSize());
+				writeConsole("Found solution of length " + (solution.size() - 1));
+				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
-				System.out.println();
 				playSolution(solution);
 			} catch (Exception x) {
 				x.printStackTrace();
@@ -120,7 +125,7 @@ public class PuzzleApp extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			setPuzzle(Puzzle15.shuffled());
 			boolean solvable = puzzle.isSolvable();
-			System.out.println(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
+			writeConsole(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
 			actionSolveBFS.setEnabled(solvable);
 			actionSolveBestFirst.setEnabled(solvable);
 			actionSolveAStar.setEnabled(solvable);
@@ -134,14 +139,29 @@ public class PuzzleApp extends JFrame {
 			setPuzzle(Puzzle15.randomMoves(100));
 		}
 	};
-	
+
+	private void writeConsole(String text) {
+		console.append(text + "\n");
+		System.out.println(text);
+	}
+
 	public PuzzleApp() {
 		puzzle = Puzzle15.ordered();
 		setTitle("15-Puzzle");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
+
 		view = new PuzzleView(this, 100);
 		add(view);
+
+		console = new JTextArea();
+		console.setBackground(Color.BLACK);
+		console.setForeground(Color.GREEN);
+		console.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		console.setEditable(false);
+		console.setColumns(80);
+		console.setLineWrap(true);
+		add(new JScrollPane(console), BorderLayout.EAST);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
