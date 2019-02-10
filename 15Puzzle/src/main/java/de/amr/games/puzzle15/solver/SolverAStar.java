@@ -24,7 +24,7 @@ public class SolverAStar implements Solver {
 	private Function<Node, Integer> fnHeuristics;
 	private PriorityQueue<Node> q;
 	private Map<Puzzle15, Node> openList;
-	private Set<Node> closedList;
+	private Set<Puzzle15> closedList;
 	private int maxQueueSize;
 
 	public SolverAStar(Function<Node, Integer> fnHeuristics) {
@@ -38,6 +38,12 @@ public class SolverAStar implements Solver {
 
 	private void addToOpenList(Node node) {
 		q.add(node);
+		if (q.size() > maxQueueSize) {
+			if (q.size() / 10_000 > maxQueueSize / 10_000) {
+				System.out.println("Queue size=" + q.size());
+			}
+			maxQueueSize = q.size();
+		}
 		openList.put(node.getPuzzle(), node);
 	}
 
@@ -54,7 +60,7 @@ public class SolverAStar implements Solver {
 		closedList = new HashSet<>();
 
 		Node current = new Node(puzzle);
-		current.setDistFromSource(0);
+		current.setDistFromSource(0); // not necessary
 		current.setScore(fnHeuristics.apply(current)); // not necessary
 		addToOpenList(current);
 
@@ -64,18 +70,17 @@ public class SolverAStar implements Solver {
 				return solution(current);
 			}
 			openList.remove(current.getPuzzle());
-			closedList.add(current);
+			closedList.add(current.getPuzzle());
 
 			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
 			for (Dir dir : possibleDirs) {
-				Puzzle15 successorPuzzle = current.getPuzzle().move(dir);
-				Node successor = new Node(successorPuzzle);
-				if (closedList.contains(successor)) {
+				Node successor = new Node(current.getPuzzle().move(dir));
+				if (closedList.contains(successor.getPuzzle())) {
 					continue;
 				}
 				int tentative_dist = current.getDistFromSource() + 1;
-				boolean alreadyInOpenList = openList.containsKey(successorPuzzle);
-				if (alreadyInOpenList && tentative_dist >= openList.get(successorPuzzle).getDistFromSource()) {
+				boolean alreadyInOpenList = openList.containsKey(successor.getPuzzle());
+				if (alreadyInOpenList && tentative_dist >= openList.get(successor.getPuzzle()).getDistFromSource()) {
 					continue;
 				}
 				successor.setDir(dir);
@@ -87,12 +92,6 @@ public class SolverAStar implements Solver {
 				} else {
 					addToOpenList(successor);
 				}
-			}
-			if (q.size() > maxQueueSize) {
-				if (q.size() / 10_000 > maxQueueSize / 10_000) {
-					System.out.println("Queue size=" + q.size());
-				}
-				maxQueueSize = q.size();
 			}
 		}
 		return Collections.emptyList();
