@@ -1,5 +1,7 @@
 package de.amr.games.puzzle15.solver;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import de.amr.games.puzzle15.model.Dir;
@@ -7,7 +9,9 @@ import de.amr.games.puzzle15.model.Puzzle15;
 
 public class Node {
 
+	// key for equality of nodes
 	private final Puzzle15 puzzle;
+
 	// not used in equality test:
 	private Dir dir;
 	private Node parent;
@@ -16,6 +20,18 @@ public class Node {
 
 	public Node(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
+	}
+
+	public List<Node> successors() {
+		List<Node> successors = new ArrayList<>(4);
+		for (Dir dir : puzzle.possibleMoveDirs()) {
+			Node successor = new Node(puzzle.move(dir));
+			successor.dir = dir;
+			successor.parent = this;
+			successor.distFromSource = distFromSource + 1;
+			successors.add(successor);
+		}
+		return successors;
 	}
 
 	public Puzzle15 getPuzzle() {

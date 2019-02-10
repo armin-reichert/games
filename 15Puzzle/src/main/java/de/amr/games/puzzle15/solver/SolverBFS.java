@@ -7,45 +7,30 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import de.amr.games.puzzle15.model.Dir;
 import de.amr.games.puzzle15.model.Puzzle15;
 
+/**
+ * Breadth-First Search solver for 15-puzzle.
+ * 
+ * @author Armin Reichert
+ */
 public class SolverBFS implements Solver {
 
 	protected Queue<Node> q;
 	protected int maxQueueSize;
-
-	protected void createQueue(int initialCapacity) {
-		q = new ArrayDeque<>(initialCapacity);
-	}
-
-	protected void enqueue(Node node) {
-		q.add(node);
-	}
+	protected final Set<Puzzle15> visited = new HashSet<>();
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) {
-		createQueue(100);
-		maxQueueSize = 0;
-		Set<Node> visited = new HashSet<>();
-		Node current = new Node(puzzle);
-		visited.add(current);
-		enqueue(current);
+		createQueue(1000);
+		visited.clear();
+		expand(new Node(puzzle));
 		while (!q.isEmpty()) {
-			current = q.poll();
+			Node current = q.poll();
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
-			for (Dir dir : current.getPuzzle().possibleMoveDirs()) {
-				Node child = new Node(current.getPuzzle().move(dir));
-				if (!visited.contains(child)) {
-					child.setDir(dir);
-					child.setParent(current);
-					visited.add(child);
-					enqueue(child);
-				}
-			}
-			maxQueueSize = Math.max(q.size(), maxQueueSize);
+			current.successors().stream().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expand);
 		}
 		return Collections.emptyList();
 	}
@@ -54,4 +39,16 @@ public class SolverBFS implements Solver {
 	public int getMaxQueueSize() {
 		return maxQueueSize;
 	}
+
+	protected void createQueue(int initialCapacity) {
+		q = new ArrayDeque<>(initialCapacity);
+		maxQueueSize = 0;
+	}
+
+	protected void expand(Node node) {
+		q.add(node);
+		maxQueueSize = Math.max(q.size(), maxQueueSize);
+		visited.add(node.getPuzzle());
+	}
+
 }
