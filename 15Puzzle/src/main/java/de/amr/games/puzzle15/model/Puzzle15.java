@@ -1,11 +1,9 @@
 package de.amr.games.puzzle15.model;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Puzzle15 {
@@ -201,8 +199,8 @@ public class Puzzle15 {
 		throw new IllegalArgumentException();
 	}
 
-	public List<Dir> possibleMoveDirs() {
-		return Stream.of(Dir.values()).filter(this::canMove).collect(Collectors.toList());
+	public Stream<Dir> possibleMoveDirs() {
+		return Stream.of(Dir.values()).filter(this::canMove);
 	}
 
 	@Override

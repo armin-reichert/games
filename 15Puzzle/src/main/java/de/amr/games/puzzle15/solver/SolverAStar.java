@@ -23,7 +23,7 @@ public class SolverAStar implements Solver {
 
 	private Function<Node, Integer> fnHeuristics;
 	private PriorityQueue<Node> q;
-	private Map<Node, Node> openList;
+	private Map<Puzzle15, Node> openList;
 	private Set<Node> closedList;
 	private int maxQueueSize;
 
@@ -38,7 +38,7 @@ public class SolverAStar implements Solver {
 
 	private void addToOpenList(Node node) {
 		q.add(node);
-		openList.put(node, node);
+		openList.put(node.getPuzzle(), node);
 	}
 
 	private void decreaseKey(Node node) {
@@ -63,24 +63,26 @@ public class SolverAStar implements Solver {
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
-			openList.remove(current);
+			openList.remove(current.getPuzzle());
 			closedList.add(current);
 
-			for (Dir dir : current.getPuzzle().possibleMoveDirs()) {
-				Node successor = new Node(current.getPuzzle().move(dir));
+			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
+			for (Dir dir : possibleDirs) {
+				Puzzle15 successorPuzzle = current.getPuzzle().move(dir);
+				Node successor = new Node(successorPuzzle);
 				if (closedList.contains(successor)) {
 					continue;
 				}
 				int tentative_dist = current.getDistFromSource() + 1;
-				Node existing = openList.get(successor);
-				if (existing != null && tentative_dist >= existing.getDistFromSource()) {
+				boolean alreadyInOpenList = openList.containsKey(successorPuzzle);
+				if (alreadyInOpenList && tentative_dist >= openList.get(successorPuzzle).getDistFromSource()) {
 					continue;
 				}
 				successor.setDir(dir);
 				successor.setParent(current);
 				successor.setDistFromSource(tentative_dist);
 				successor.setScore(tentative_dist + fnHeuristics.apply(successor));
-				if (existing != null) {
+				if (alreadyInOpenList) {
 					decreaseKey(successor);
 				} else {
 					addToOpenList(successor);

@@ -1,8 +1,7 @@
 package de.amr.games.puzzle15.solver;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import de.amr.games.puzzle15.model.Dir;
 import de.amr.games.puzzle15.model.Puzzle15;
@@ -22,16 +21,14 @@ public class Node {
 		this.puzzle = puzzle;
 	}
 
-	public List<Node> successors() {
-		List<Node> successors = new ArrayList<>(4);
-		for (Dir dir : puzzle.possibleMoveDirs()) {
+	public Stream<Node> successors() {
+		return puzzle.possibleMoveDirs().map(dir -> {
 			Node successor = new Node(puzzle.move(dir));
 			successor.dir = dir;
 			successor.parent = this;
 			successor.distFromSource = distFromSource + 1;
-			successors.add(successor);
-		}
-		return successors;
+			return successor;
+		});
 	}
 
 	public Puzzle15 getPuzzle() {

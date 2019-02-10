@@ -30,7 +30,7 @@ public class SolverBFS implements Solver {
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
-			current.successors().stream().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expand);
+			current.successors().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expand);
 		}
 		return Collections.emptyList();
 	}
