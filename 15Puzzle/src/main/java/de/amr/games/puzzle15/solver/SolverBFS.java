@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import de.amr.games.puzzle15.model.Puzzle15;
 
@@ -19,6 +20,11 @@ public class SolverBFS implements Solver {
 	protected Queue<Node> q;
 	protected int maxQueueSize;
 	protected final Set<Puzzle15> visited = new HashSet<>();
+	protected Predicate<Solver> givingUpCondition;
+
+	public SolverBFS(Predicate<Solver> givingUpCondition) {
+		this.givingUpCondition = givingUpCondition;
+	}
 
 	protected void createQueue(int initialCapacity) {
 		q = new ArrayDeque<>(initialCapacity);
@@ -26,7 +32,7 @@ public class SolverBFS implements Solver {
 	}
 
 	@Override
-	public List<Node> solve(Puzzle15 puzzle) {
+	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		createQueue(1000);
 		visited.clear();
 		expand(new Node(puzzle));
@@ -36,6 +42,9 @@ public class SolverBFS implements Solver {
 				return solution(current);
 			}
 			current.successors().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expand);
+			if (givingUpCondition.test(this)) {
+				throw new SolverGivingUpException("Queue size: " + q.size());
+			}
 		}
 		return Collections.emptyList();
 	}

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import de.amr.games.puzzle15.model.Dir;
 import de.amr.games.puzzle15.model.Puzzle15;
@@ -26,9 +27,11 @@ public class SolverAStar implements Solver {
 	private Map<Puzzle15, Node> openList;
 	private Set<Puzzle15> closedList;
 	private int maxQueueSize;
+	private Predicate<Solver> givingUpCondition;
 
-	public SolverAStar(Function<Node, Integer> fnHeuristics) {
+	public SolverAStar(Function<Node, Integer> fnHeuristics, Predicate<Solver> givingUpCondition) {
 		this.fnHeuristics = fnHeuristics;
+		this.givingUpCondition = givingUpCondition;
 	}
 
 	@Override
@@ -48,7 +51,7 @@ public class SolverAStar implements Solver {
 	}
 
 	@Override
-	public List<Node> solve(Puzzle15 puzzle) {
+	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		frontier = new PriorityQueue<>(1000, comparingInt(Node::getScore));
 		maxQueueSize = 0;
 		openList = new HashMap<>();
@@ -66,7 +69,7 @@ public class SolverAStar implements Solver {
 
 			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
 			for (Dir dir : possibleDirs) {
-				Puzzle15 nextPuzzle = current.getPuzzle().move(dir); 
+				Puzzle15 nextPuzzle = current.getPuzzle().move(dir);
 				if (closedList.contains(nextPuzzle)) {
 					continue;
 				}
@@ -87,6 +90,9 @@ public class SolverAStar implements Solver {
 				} else {
 					addToFrontier(next);
 				}
+			}
+			if (givingUpCondition.test(this)) {
+				throw new SolverGivingUpException("Queue size: " + frontier.size());
 			}
 		}
 		return Collections.emptyList();

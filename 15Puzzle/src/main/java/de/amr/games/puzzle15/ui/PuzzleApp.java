@@ -1,5 +1,6 @@
 package de.amr.games.puzzle15.ui;
 
+import static de.amr.games.puzzle15.solver.Heuristics.manhattanDistFromOrdered;
 import static java.util.stream.Collectors.joining;
 
 import java.awt.BorderLayout;
@@ -9,6 +10,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,7 +29,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import de.amr.games.puzzle15.model.Puzzle15;
-import de.amr.games.puzzle15.solver.Heuristics;
 import de.amr.games.puzzle15.solver.Node;
 import de.amr.games.puzzle15.solver.Solver;
 import de.amr.games.puzzle15.solver.SolverAStar;
@@ -55,7 +57,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBFS();
+			selectedSolver = new SolverBFS(limitQueueSize(1_000_000));
 		}
 	};
 
@@ -63,8 +65,8 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBestFirstSearch(
-					node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
+			selectedSolver = new SolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()),
+					limitQueueSize(1_000_000));
 		}
 	};
 
@@ -72,7 +74,8 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
+			selectedSolver = new SolverAStar(node -> manhattanDistFromOrdered(node.getPuzzle()),
+					limitQueueSize(1_000_000));
 		}
 	};
 
@@ -116,8 +119,10 @@ public class PuzzleApp extends JFrame {
 				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
 				writeConsole("\n");
-			} catch (Exception x) {
-				x.printStackTrace();
+			} catch (ExecutionException x) {
+				writeConsole("Solving aborted: " + x.getMessage());
+			} catch (InterruptedException x) {
+				writeConsole("Solving interrupted: " + x.getMessage());
 			}
 			view.repaint();
 		}
@@ -158,9 +163,7 @@ public class PuzzleApp extends JFrame {
 			setSolution(null);
 			boolean solvable = puzzle.isSolvable();
 			writeConsole(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
-			actionSolveBFS.setEnabled(solvable);
-			actionSolveBestFirst.setEnabled(solvable);
-			actionSolveAStar.setEnabled(solvable);
+			actionRunSolver.setEnabled(solvable);
 		}
 	};
 
@@ -187,6 +190,10 @@ public class PuzzleApp extends JFrame {
 	private void writeConsole(String text) {
 		console.append(text + "\n");
 		System.out.println(text);
+	}
+
+	private Predicate<Solver> limitQueueSize(int size) {
+		return solver -> solver.getMaxQueueSize() > size;
 	}
 
 	public PuzzleApp() {
@@ -226,7 +233,8 @@ public class PuzzleApp extends JFrame {
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBFS)));
 		menuBar.add(solverMenu);
 		bg.getElements().nextElement().setSelected(true);
-		selectedSolver = new SolverBestFirstSearch(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
+		selectedSolver = new SolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()),
+				limitQueueSize(1_000_000));
 
 		pack();
 		setLocationRelativeTo(null);

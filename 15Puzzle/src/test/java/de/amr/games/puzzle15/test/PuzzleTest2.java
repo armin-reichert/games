@@ -11,6 +11,7 @@ import de.amr.games.puzzle15.solver.Heuristics;
 import de.amr.games.puzzle15.solver.Node;
 import de.amr.games.puzzle15.solver.Solver;
 import de.amr.games.puzzle15.solver.SolverAStar;
+import de.amr.games.puzzle15.solver.SolverGivingUpException;
 
 /**
  * https://codegolf.stackexchange.com/questions/6884/solve-the-15-puzzle-the-tile-sliding-puzzle
@@ -20,12 +21,18 @@ public class PuzzleTest2 {
 
 	private void test(int... cells) {
 		Puzzle15 puzzle = Puzzle15.of(cells);
-		Solver solver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
-		List<Node> solution = solver.solve(puzzle);
-		System.out.println("Solution found, max queue size=" + solver.getMaxQueueSize());
-		System.out.println(puzzle);
-		System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(String::valueOf)
-				.collect(Collectors.joining(" ")));
+		Solver solver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
+				s -> s.getMaxQueueSize() > 1_000_000);
+		List<Node> solution;
+		try {
+			solution = solver.solve(puzzle);
+			System.out.println("Solution found, max queue size=" + solver.getMaxQueueSize());
+			System.out.println(puzzle);
+			System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(String::valueOf)
+					.collect(Collectors.joining(" ")));
+		} catch (SolverGivingUpException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
@@ -51,7 +58,7 @@ public class PuzzleTest2 {
 
 	@Test
 	public void test4() {
-		// slow, 
+		// slow,
 		test(11, 4, 12, 2, 5, 10, 3, 15, 14, 1, 6, 7, 0, 9, 8, 13);
 	}
 

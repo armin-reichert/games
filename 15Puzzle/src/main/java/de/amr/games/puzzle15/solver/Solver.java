@@ -7,7 +7,7 @@ import de.amr.games.puzzle15.model.Puzzle15;
 
 public interface Solver {
 
-	List<Node> solve(Puzzle15 puzzle);
+	List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException;
 
 	default List<Node> solution(Node goal) {
 		List<Node> solution = new LinkedList<>();
