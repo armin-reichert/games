@@ -12,9 +12,11 @@ import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -43,16 +45,17 @@ public class PuzzleApp extends JFrame {
 		EventQueue.invokeLater(PuzzleApp::new);
 	}
 
-	private Puzzle15 puzzle;
+	private Puzzle15 puzzle, savedPuzzle;
 	private PuzzleView view;
 	private JTextArea console;
+	private Solver selectedSolver;
+	private List<Node> solution;
 
 	private Action actionSolveBFS = new AbstractAction("Breadth-First Search") {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			writeConsole("Solving...");
-			new SolverThread(new SolverBFS()).execute();
+			selectedSolver = new SolverBFS();
 		}
 	};
 
@@ -60,9 +63,8 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			writeConsole("Solving...");
-			new SolverThread(
-					new SolverBestFirstSearch(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()))).execute();
+			selectedSolver = new SolverBestFirstSearch(
+					node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
 		}
 	};
 
@@ -70,60 +72,90 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			writeConsole("Solving...");
-			new SolverThread(new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle())))
-					.execute();
+			selectedSolver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
 		}
 	};
 
-	private class SolverThread extends SwingWorker<List<Node>, Void> {
+	private Action actionRunSolver = new AbstractAction("Solve") {
 
-		private Solver solver;
-
-		public SolverThread(Solver solver) {
-			this.solver = solver;
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (selectedSolver != null) {
+				writeConsole(String.format("Solving puzzle using %s...", selectedSolverName()));
+				new SolverThread().execute();
+			}
 		}
+	};
+
+	private String selectedSolverName() {
+		if (selectedSolver.getClass() == SolverBFS.class) {
+			return "Breadth-First Search";
+		}
+		if (selectedSolver.getClass() == SolverBestFirstSearch.class) {
+			return "Best-First Search";
+		}
+		if (selectedSolver.getClass() == SolverAStar.class) {
+			return "A* Search";
+		}
+		return "";
+	}
+
+	private class SolverThread extends SwingWorker<List<Node>, Void> {
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
-			// solver = new PuzzleSolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()));
-			// solver = new SolverAStar(node -> manhattanDistFromOrdered(node.getPuzzle()));
-			return solver.solve(puzzle);
+			return selectedSolver.solve(puzzle);
 		}
 
 		@Override
 		protected void done() {
 			try {
-				List<Node> solution = get();
-				writeConsole("Max queue size " + solver.getMaxQueueSize());
+				setSolution(get());
+				writeConsole("Max queue size " + selectedSolver.getMaxQueueSize());
 				writeConsole("Found solution of length " + (solution.size() - 1));
 				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
-				playSolution(solution);
+				writeConsole("\n");
 			} catch (Exception x) {
 				x.printStackTrace();
 			}
 			view.repaint();
 		}
+	}
 
-		private void playSolution(List<Node> solution) {
-			Timer timer = new Timer(100, null);
-			timer.addActionListener(e -> {
+	private Action actionPlaySolution = new AbstractAction("Play Solution") {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			if (solution == null) {
+				return;
+			}
+			savedPuzzle = puzzle;
+			Timer playTimer = new Timer(100, null);
+			Timer resetTimer = new Timer(2000, null);
+			resetTimer.addActionListener(e -> {
+				setPuzzle(savedPuzzle);
+				resetTimer.stop();
+			});
+			playTimer.addActionListener(e -> {
 				if (solution.isEmpty()) {
-					timer.stop();
+					playTimer.stop();
+					resetTimer.start();
 				} else {
 					setPuzzle(solution.remove(0).getPuzzle());
 				}
 			});
-			timer.start();
+			playTimer.start();
 		}
-	}
+	};
 
 	private Action actionShuffle = new AbstractAction("Shuffle") {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			setPuzzle(Puzzle15.shuffled());
+			savedPuzzle = puzzle;
+			setSolution(null);
 			boolean solvable = puzzle.isSolvable();
 			writeConsole(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
 			actionSolveBFS.setEnabled(solvable);
@@ -137,6 +169,18 @@ public class PuzzleApp extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			setPuzzle(Puzzle15.randomMoves(100));
+			savedPuzzle = puzzle;
+			setSolution(null);
+		}
+	};
+
+	private Action actionResetPuzzle = new AbstractAction("Reset Puzzle") {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setPuzzle(Puzzle15.ordered());
+			savedPuzzle = puzzle;
+			setSolution(null);
 		}
 	};
 
@@ -170,12 +214,19 @@ public class PuzzleApp extends JFrame {
 		menuBar.add(puzzleMenu);
 		puzzleMenu.add(actionRandomMoves);
 		puzzleMenu.add(actionShuffle);
+		puzzleMenu.add(actionResetPuzzle);
 
 		JMenu solverMenu = new JMenu("Solver");
-		solverMenu.add(actionSolveBFS);
-		solverMenu.add(actionSolveBestFirst);
-		solverMenu.add(actionSolveAStar);
+		solverMenu.add(actionRunSolver);
+		solverMenu.add(actionPlaySolution);
+		solverMenu.addSeparator();
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBestFirst)));
+		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveAStar)));
+		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBFS)));
 		menuBar.add(solverMenu);
+		bg.getElements().nextElement().setSelected(true);
+		selectedSolver = new SolverBestFirstSearch(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()));
 
 		pack();
 		setLocationRelativeTo(null);
@@ -189,6 +240,11 @@ public class PuzzleApp extends JFrame {
 	public void setPuzzle(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
 		view.repaint();
+	}
+
+	private void setSolution(List<Node> solution) {
+		this.solution = solution;
+		actionPlaySolution.setEnabled(solution != null && !solution.isEmpty());
 	}
 
 }

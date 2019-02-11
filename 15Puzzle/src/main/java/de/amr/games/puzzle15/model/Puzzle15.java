@@ -10,8 +10,6 @@ public class Puzzle15 {
 
 	private static final byte[] ORDERED_SEQ = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
 
-	public static final Puzzle15 ORDERED = new Puzzle15(ORDERED_SEQ);
-
 	private final byte[] cells;
 
 	private Puzzle15(int[] seq) {
