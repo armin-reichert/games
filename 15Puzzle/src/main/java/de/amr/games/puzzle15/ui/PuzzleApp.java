@@ -47,6 +47,14 @@ public class PuzzleApp extends JFrame {
 		EventQueue.invokeLater(PuzzleApp::new);
 	}
 
+	private static Predicate<Solver> queueSizeOver(int size) {
+		return solver -> solver.getMaxQueueSize() > size;
+	}
+
+	private static Predicate<Solver> runtimeOver(int millis) {
+		return solver -> solver.runningTimeMillis() > millis;
+	}
+
 	private Puzzle15 puzzle, savedPuzzle;
 	private PuzzleView view;
 	private JTextArea console;
@@ -57,7 +65,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBFS(limitQueueSize(1_000_000));
+			selectedSolver = new SolverBFS(queueSizeOver(1_000_000));
 		}
 	};
 
@@ -66,7 +74,7 @@ public class PuzzleApp extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			selectedSolver = new SolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()),
-					limitQueueSize(1_000_000));
+					queueSizeOver(1_000_000));
 		}
 	};
 
@@ -75,7 +83,7 @@ public class PuzzleApp extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			selectedSolver = new SolverAStar(node -> manhattanDistFromOrdered(node.getPuzzle()),
-					limitQueueSize(1_000_000));
+					queueSizeOver(1_000_000).or(runtimeOver(10_000)));
 		}
 	};
 
@@ -84,7 +92,7 @@ public class PuzzleApp extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (selectedSolver != null) {
-				writeConsole(String.format("Solving puzzle using %s...", selectedSolverName()));
+				writeConsole(String.format("\nSolving puzzle using %s...", selectedSolverName()));
 				new SolverThread().execute();
 			}
 		}
@@ -118,7 +126,6 @@ public class PuzzleApp extends JFrame {
 				writeConsole("Found solution of length " + (solution.size() - 1));
 				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
-				writeConsole("\n");
 			} catch (ExecutionException x) {
 				writeConsole("Solving aborted: " + x.getMessage());
 			} catch (InterruptedException x) {
@@ -192,10 +199,6 @@ public class PuzzleApp extends JFrame {
 		System.out.println(text);
 	}
 
-	private Predicate<Solver> limitQueueSize(int size) {
-		return solver -> solver.getMaxQueueSize() > size;
-	}
-
 	public PuzzleApp() {
 		puzzle = Puzzle15.ordered();
 		setTitle("15-Puzzle");
@@ -234,7 +237,7 @@ public class PuzzleApp extends JFrame {
 		menuBar.add(solverMenu);
 		bg.getElements().nextElement().setSelected(true);
 		selectedSolver = new SolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()),
-				limitQueueSize(1_000_000));
+				queueSizeOver(1_000_000));
 
 		pack();
 		setLocationRelativeTo(null);

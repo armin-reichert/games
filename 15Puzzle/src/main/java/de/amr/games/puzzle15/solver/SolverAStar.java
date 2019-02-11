@@ -28,6 +28,7 @@ public class SolverAStar implements Solver {
 	private Set<Puzzle15> closedList;
 	private int maxQueueSize;
 	private Predicate<Solver> givingUpCondition;
+	private long startTime;
 
 	public SolverAStar(Function<Node, Integer> fnHeuristics, Predicate<Solver> givingUpCondition) {
 		this.fnHeuristics = fnHeuristics;
@@ -52,6 +53,7 @@ public class SolverAStar implements Solver {
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
+		startTime = System.nanoTime();
 		frontier = new PriorityQueue<>(1000, comparingInt(Node::getScore));
 		maxQueueSize = 0;
 		openList = new HashMap<>();
@@ -92,9 +94,15 @@ public class SolverAStar implements Solver {
 				}
 			}
 			if (givingUpCondition.test(this)) {
-				throw new SolverGivingUpException("Queue size: " + frontier.size());
+				throw new SolverGivingUpException(
+						"Queue size: " + frontier.size() + ", running (millis): " + runningTimeMillis());
 			}
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public long runningTimeMillis() {
+		return (System.nanoTime() - startTime) / 1_000_000L;
 	}
 }

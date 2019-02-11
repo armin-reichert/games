@@ -21,6 +21,7 @@ public class SolverBFS implements Solver {
 	protected int maxQueueSize;
 	protected final Set<Puzzle15> visited = new HashSet<>();
 	protected Predicate<Solver> givingUpCondition;
+	protected long startTime;
 
 	public SolverBFS(Predicate<Solver> givingUpCondition) {
 		this.givingUpCondition = givingUpCondition;
@@ -33,6 +34,7 @@ public class SolverBFS implements Solver {
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
+		startTime = System.nanoTime();
 		createQueue(1000);
 		visited.clear();
 		expand(new Node(puzzle));
@@ -58,5 +60,10 @@ public class SolverBFS implements Solver {
 	@Override
 	public int getMaxQueueSize() {
 		return maxQueueSize;
+	}
+	
+	@Override
+	public long runningTimeMillis() {
+		return (System.nanoTime() - startTime) / 1_000_000;
 	}
 }

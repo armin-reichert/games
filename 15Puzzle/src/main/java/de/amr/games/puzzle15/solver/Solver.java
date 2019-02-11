@@ -18,4 +18,6 @@ public interface Solver {
 	}
 
 	int getMaxQueueSize();
+	
+	long runningTimeMillis();
 }
