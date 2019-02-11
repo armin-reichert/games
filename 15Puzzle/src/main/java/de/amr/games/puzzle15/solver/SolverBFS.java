@@ -20,6 +20,11 @@ public class SolverBFS implements Solver {
 	protected int maxQueueSize;
 	protected final Set<Puzzle15> visited = new HashSet<>();
 
+	protected void createQueue(int initialCapacity) {
+		q = new ArrayDeque<>(initialCapacity);
+		maxQueueSize = 0;
+	}
+
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) {
 		createQueue(1000);
@@ -35,20 +40,14 @@ public class SolverBFS implements Solver {
 		return Collections.emptyList();
 	}
 
-	@Override
-	public int getMaxQueueSize() {
-		return maxQueueSize;
-	}
-
-	protected void createQueue(int initialCapacity) {
-		q = new ArrayDeque<>(initialCapacity);
-		maxQueueSize = 0;
-	}
-
 	protected void expand(Node node) {
 		q.add(node);
 		maxQueueSize = Math.max(q.size(), maxQueueSize);
 		visited.add(node.getPuzzle());
 	}
 
+	@Override
+	public int getMaxQueueSize() {
+		return maxQueueSize;
+	}
 }

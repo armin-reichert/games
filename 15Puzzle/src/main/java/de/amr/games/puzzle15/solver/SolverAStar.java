@@ -22,7 +22,7 @@ import de.amr.games.puzzle15.model.Puzzle15;
 public class SolverAStar implements Solver {
 
 	private Function<Node, Integer> fnHeuristics;
-	private PriorityQueue<Node> q;
+	private PriorityQueue<Node> frontier;
 	private Map<Puzzle15, Node> openList;
 	private Set<Puzzle15> closedList;
 	private int maxQueueSize;
@@ -36,36 +36,28 @@ public class SolverAStar implements Solver {
 		return maxQueueSize;
 	}
 
-	private void addToOpenList(Node node) {
-		q.add(node);
-		if (q.size() > maxQueueSize) {
-			if (q.size() / 10_000 > maxQueueSize / 10_000) {
-				System.out.println("Queue size=" + q.size());
+	private void addToFrontier(Node node) {
+		frontier.add(node);
+		if (frontier.size() > maxQueueSize) {
+			if (frontier.size() / 10_000 > maxQueueSize / 10_000) {
+				System.out.println("Queue size=" + frontier.size());
 			}
-			maxQueueSize = q.size();
+			maxQueueSize = frontier.size();
 		}
 		openList.put(node.getPuzzle(), node);
 	}
 
-	private void decreaseKey(Node node) {
-		q.remove(node);
-		q.add(node);
-	}
-
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) {
-		q = new PriorityQueue<>(1000, comparingInt(Node::getScore));
+		frontier = new PriorityQueue<>(1000, comparingInt(Node::getScore));
 		maxQueueSize = 0;
 		openList = new HashMap<>();
 		closedList = new HashSet<>();
 
-		Node current = new Node(puzzle);
-		current.setDistFromSource(0); // not necessary
-		current.setScore(fnHeuristics.apply(current)); // not necessary
-		addToOpenList(current);
+		addToFrontier(new Node(puzzle));
 
-		while (!q.isEmpty()) {
-			current = q.poll();
+		while (!frontier.isEmpty()) {
+			Node current = frontier.poll();
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
@@ -74,23 +66,26 @@ public class SolverAStar implements Solver {
 
 			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
 			for (Dir dir : possibleDirs) {
-				Node successor = new Node(current.getPuzzle().move(dir));
-				if (closedList.contains(successor.getPuzzle())) {
+				Puzzle15 nextPuzzle = current.getPuzzle().move(dir); 
+				if (closedList.contains(nextPuzzle)) {
 					continue;
 				}
-				int tentative_dist = current.getDistFromSource() + 1;
-				boolean alreadyInOpenList = openList.containsKey(successor.getPuzzle());
-				if (alreadyInOpenList && tentative_dist >= openList.get(successor.getPuzzle()).getDistFromSource()) {
+				int numMoves = current.getMovesSoFar() + 1;
+				boolean revisited = openList.containsKey(nextPuzzle);
+				if (revisited && numMoves >= openList.get(nextPuzzle).getMovesSoFar()) {
 					continue;
 				}
-				successor.setDir(dir);
-				successor.setParent(current);
-				successor.setDistFromSource(tentative_dist);
-				successor.setScore(tentative_dist + fnHeuristics.apply(successor));
-				if (alreadyInOpenList) {
-					decreaseKey(successor);
+				Node next = new Node(nextPuzzle);
+				next.setParent(current);
+				next.setDir(dir);
+				next.setMovesSoFar(numMoves);
+				next.setScore(numMoves + fnHeuristics.apply(next));
+				if (revisited) {
+					// "decrease-key"
+					frontier.remove(next); // removes the existing node from the queue!
+					frontier.add(next);
 				} else {
-					addToOpenList(successor);
+					addToFrontier(next);
 				}
 			}
 		}

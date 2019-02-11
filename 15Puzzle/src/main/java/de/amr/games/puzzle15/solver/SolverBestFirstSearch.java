@@ -6,18 +6,18 @@ import java.util.PriorityQueue;
 import java.util.function.Function;
 
 /**
- * Best-First Search.
+ * Best-First Search puzzle solver.
  * 
  * <p>
- * Always expands the node with the smallest heuristics cost (e.g. estimated remaining distance to
- * the target).
+ * Always expands the node with the smallest heuristic cost (e.g. the estimated number of moves
+ * leading to the target).
  * 
  * @author Armin Reichert
  *
  */
 public class SolverBestFirstSearch extends SolverBFS {
 
-	protected Function<Node, Integer> fnHeuristics;
+	private Function<Node, Integer> fnHeuristics;
 
 	public SolverBestFirstSearch(Function<Node, Integer> fnHeuristics) {
 		this.fnHeuristics = fnHeuristics;

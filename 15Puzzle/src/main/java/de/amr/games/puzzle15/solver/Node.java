@@ -8,13 +8,12 @@ import de.amr.games.puzzle15.model.Puzzle15;
 
 public class Node {
 
-	// key for equality of nodes
 	private final Puzzle15 puzzle;
 
 	// not used in equality test:
 	private Dir dir;
 	private Node parent;
-	private int distFromSource;
+	private int movesSoFar;
 	private int score;
 
 	public Node(Puzzle15 puzzle) {
@@ -26,7 +25,7 @@ public class Node {
 			Node successor = new Node(puzzle.move(dir));
 			successor.dir = dir;
 			successor.parent = this;
-			successor.distFromSource = distFromSource + 1;
+			successor.movesSoFar = movesSoFar + 1;
 			return successor;
 		});
 	}
@@ -51,12 +50,12 @@ public class Node {
 		this.parent = parent;
 	}
 
-	public int getDistFromSource() {
-		return distFromSource;
+	public int getMovesSoFar() {
+		return movesSoFar;
 	}
 
-	public void setDistFromSource(int distFromSource) {
-		this.distFromSource = distFromSource;
+	public void setMovesSoFar(int n) {
+		this.movesSoFar = n;
 	}
 
 	public int getScore() {
@@ -74,8 +73,8 @@ public class Node {
 		if (dir != null) {
 			sb.append("dir:").append(dir).append("\n");
 		}
-		sb.append("distFromSource (g): ").append(distFromSource).append("\n");
-		sb.append("score (f): ").append(score).append("\n");
+		sb.append("movesSoFar ('g'): ").append(movesSoFar).append("\n");
+		sb.append("score      ('f'): ").append(score).append("\n");
 		sb.append(puzzle);
 		return sb.toString();
 	}
