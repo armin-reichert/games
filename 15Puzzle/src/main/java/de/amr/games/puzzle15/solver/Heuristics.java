@@ -21,7 +21,7 @@ public class Heuristics {
 		return dist;
 	}
 
-	public static int manhattanHeuristics(Node node) {
+	public static int manhattan(Node node) {
 		return manhattanDistFromOrdered(node.getPuzzle());
 	}
 }

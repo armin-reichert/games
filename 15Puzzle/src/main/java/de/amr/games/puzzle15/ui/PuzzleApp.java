@@ -18,6 +18,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -35,6 +36,11 @@ import de.amr.games.puzzle15.solver.SolverAStar;
 import de.amr.games.puzzle15.solver.SolverBFS;
 import de.amr.games.puzzle15.solver.SolverBestFirstSearch;
 
+/**
+ * 15-puzzle application.
+ * 
+ * @author Armin Reichert
+ */
 public class PuzzleApp extends JFrame {
 
 	public static void main(String[] args) {
@@ -73,7 +79,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBestFirstSearch(Heuristics::manhattanHeuristics, queueSizeOver(1_000_000));
+			selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, queueSizeOver(1_000_000));
 		}
 	};
 
@@ -81,7 +87,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverAStar(Heuristics::manhattanHeuristics,
+			selectedSolver = new SolverAStar(Heuristics::manhattan,
 					queueSizeOver(1_000_000).or(runtimeOver(10_000)));
 		}
 	};
@@ -97,18 +103,70 @@ public class PuzzleApp extends JFrame {
 		}
 	};
 
-	private String selectedSolverName() {
-		if (selectedSolver.getClass() == SolverBFS.class) {
-			return "Breadth-First Search";
+	private Action actionPlaySolution = new AbstractAction("Play Solution") {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			if (solution == null) {
+				return;
+			}
+			savedPuzzle = puzzle;
+			Timer playTimer = new Timer(100, null);
+			Timer resetTimer = new Timer(2000, null);
+			resetTimer.addActionListener(e -> {
+				setPuzzle(savedPuzzle);
+				resetTimer.stop();
+				updateActionState();
+			});
+			playTimer.addActionListener(e -> {
+				if (solution.isEmpty()) {
+					playTimer.stop();
+					resetTimer.start();
+				} else {
+					setPuzzle(solution.remove(0).getPuzzle());
+				}
+			});
+			playTimer.start();
 		}
-		if (selectedSolver.getClass() == SolverBestFirstSearch.class) {
-			return "Best-First Search";
+	};
+
+	private Action actionShuffle = new AbstractAction("Shuffle") {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setPuzzle(Puzzle15.shuffled());
+			savedPuzzle = puzzle;
+			setSolution(null);
+			boolean solvable = puzzle.isSolvable();
+			writeConsole(solvable ? "Solvable!" : "Not solvable!");
+			updateActionState();
 		}
-		if (selectedSolver.getClass() == SolverAStar.class) {
-			return "A* Search";
+	};
+
+	private Action actionRandomMoves = new AbstractAction("Make Random Moves") {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				int numMoves = Integer
+						.valueOf(JOptionPane.showInputDialog(PuzzleApp.this, "How many random moves?", 10));
+				setPuzzle(Puzzle15.randomMoves(numMoves));
+				savedPuzzle = puzzle;
+				setSolution(null);
+			} catch (NumberFormatException x) {
+			}
 		}
-		return "";
-	}
+	};
+
+	private Action actionResetPuzzle = new AbstractAction("Reset Puzzle") {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setPuzzle(Puzzle15.ordered());
+			savedPuzzle = puzzle;
+			setSolution(null);
+		}
+	};
 
 	private class SolverThread extends SwingWorker<List<Node>, Void> {
 
@@ -134,68 +192,45 @@ public class PuzzleApp extends JFrame {
 		}
 	}
 
-	private Action actionPlaySolution = new AbstractAction("Play Solution") {
-
-		@Override
-		public void actionPerformed(ActionEvent event) {
-			if (solution == null) {
-				return;
-			}
-			savedPuzzle = puzzle;
-			Timer playTimer = new Timer(100, null);
-			Timer resetTimer = new Timer(2000, null);
-			resetTimer.addActionListener(e -> {
-				setPuzzle(savedPuzzle);
-				resetTimer.stop();
-			});
-			playTimer.addActionListener(e -> {
-				if (solution.isEmpty()) {
-					playTimer.stop();
-					resetTimer.start();
-				} else {
-					setPuzzle(solution.remove(0).getPuzzle());
-				}
-			});
-			playTimer.start();
-		}
-	};
-
-	private Action actionShuffle = new AbstractAction("Shuffle") {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			setPuzzle(Puzzle15.shuffled());
-			savedPuzzle = puzzle;
-			setSolution(null);
-			boolean solvable = puzzle.isSolvable();
-			writeConsole(puzzle.isSolvable() ? "Solvable!" : "Not solvable!");
-			actionRunSolver.setEnabled(solvable);
-		}
-	};
-
-	private Action actionRandomMoves = new AbstractAction("Make 100 Random Moves") {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			setPuzzle(Puzzle15.randomMoves(100));
-			savedPuzzle = puzzle;
-			setSolution(null);
-		}
-	};
-
-	private Action actionResetPuzzle = new AbstractAction("Reset Puzzle") {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			setPuzzle(Puzzle15.ordered());
-			savedPuzzle = puzzle;
-			setSolution(null);
-		}
-	};
-
 	private void writeConsole(String text) {
 		console.append(text + "\n");
 		System.out.println(text);
+	}
+
+	private String selectedSolverName() {
+		if (selectedSolver.getClass() == SolverBFS.class) {
+			return "Breadth-First Search";
+		}
+		if (selectedSolver.getClass() == SolverBestFirstSearch.class) {
+			return "Best-First Search";
+		}
+		if (selectedSolver.getClass() == SolverAStar.class) {
+			return "A* Search";
+		}
+		return "";
+	}
+
+	private void setSolution(List<Node> solution) {
+		this.solution = solution;
+		updateActionState();
+	}
+
+	private void updateActionState() {
+		boolean solvable = puzzle.isSolvable();
+		actionRunSolver.setEnabled(solvable);
+		actionSolveAStar.setEnabled(solvable);
+		actionSolveBestFirst.setEnabled(solvable);
+		actionSolveBFS.setEnabled(solvable);
+		actionPlaySolution.setEnabled(solution != null && solution.size() > 0);
+	}
+
+	public Puzzle15 getPuzzle() {
+		return puzzle;
+	}
+
+	public void setPuzzle(Puzzle15 puzzle) {
+		this.puzzle = puzzle;
+		view.repaint();
 	}
 
 	public PuzzleApp() {
@@ -235,25 +270,11 @@ public class PuzzleApp extends JFrame {
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBFS)));
 		menuBar.add(solverMenu);
 		bg.getElements().nextElement().setSelected(true);
-		selectedSolver = new SolverBestFirstSearch(Heuristics::manhattanHeuristics, queueSizeOver(1_000_000));
+		selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, queueSizeOver(1_000_000));
 
 		pack();
 		setLocationRelativeTo(null);
 		setVisible(true);
-	}
-
-	public Puzzle15 getPuzzle() {
-		return puzzle;
-	}
-
-	public void setPuzzle(Puzzle15 puzzle) {
-		this.puzzle = puzzle;
-		view.repaint();
-	}
-
-	private void setSolution(List<Node> solution) {
-		this.solution = solution;
-		actionPlaySolution.setEnabled(solution != null && !solution.isEmpty());
 	}
 
 }
