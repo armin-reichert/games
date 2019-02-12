@@ -1,5 +1,7 @@
 package de.amr.games.puzzle15.ui;
 
+import static de.amr.games.puzzle15.solver.Solver.queueSizeOver;
+import static de.amr.games.puzzle15.solver.Solver.runtimeOver;
 import static java.util.stream.Collectors.joining;
 
 import java.awt.BorderLayout;
@@ -10,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Predicate;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -51,14 +52,6 @@ public class PuzzleApp extends JFrame {
 			e.printStackTrace();
 		}
 		EventQueue.invokeLater(PuzzleApp::new);
-	}
-
-	private static Predicate<Solver> queueSizeOver(int size) {
-		return solver -> solver.getMaxQueueSize() > size;
-	}
-
-	private static Predicate<Solver> runtimeOver(int millis) {
-		return solver -> solver.runningTimeMillis() > millis;
 	}
 
 	private Puzzle15 puzzle, savedPuzzle;
@@ -179,14 +172,16 @@ public class PuzzleApp extends JFrame {
 		protected void done() {
 			try {
 				setSolution(get());
-				writeConsole("Max queue size " + selectedSolver.getMaxQueueSize());
+				writeConsole("Max queue size " + selectedSolver.getMaxFrontierSize());
 				writeConsole("Found solution of length " + (solution.size() - 1));
 				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
 			} catch (ExecutionException x) {
 				writeConsole("Solver aborted: " + x.getMessage());
+				x.printStackTrace();
 			} catch (InterruptedException x) {
 				writeConsole("Solver interrupted: " + x.getMessage());
+				x.printStackTrace();
 			}
 			view.repaint();
 		}

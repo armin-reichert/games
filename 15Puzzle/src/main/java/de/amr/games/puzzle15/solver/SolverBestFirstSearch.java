@@ -7,33 +7,33 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Best-First Search puzzle solver.
+ * (Greedy) Best-First Search puzzle solver.
  * 
  * <p>
- * Always expands the node with the smallest heuristic cost (e.g. the estimated number of moves
- * leading to the target).
+ * Always expands the node with the smallest cost (e.g. the estimated number of moves leading to the
+ * target). Does not take the length of the path to the current node into account. Runs fast but
+ * doesn't find the optimal solution in general.
  * 
  * @author Armin Reichert
- *
  */
 public class SolverBestFirstSearch extends SolverBFS {
 
-	private Function<Node, Integer> fnHeuristics;
+	private Function<Node, Integer> fnNodeCost;
 
-	public SolverBestFirstSearch(Function<Node, Integer> fnHeuristics, Predicate<Solver> givingUpCondition) {
+	public SolverBestFirstSearch(Function<Node, Integer> fnNodeCost, Predicate<Solver> givingUpCondition) {
 		super(givingUpCondition);
-		this.fnHeuristics = fnHeuristics;
+		this.fnNodeCost = fnNodeCost;
 	}
 
 	@Override
-	protected void createQueue(int initialCapacity) {
-		q = new PriorityQueue<>(initialCapacity, comparingInt(Node::getScore));
-		maxQueueSize = 0;
+	protected void createFrontier(int initialCapacity) {
+		frontier = new PriorityQueue<>(initialCapacity, comparingInt(Node::getScore));
+		updateMaxFrontierSize();
 	}
 
 	@Override
-	protected void expand(Node node) {
-		node.setScore(fnHeuristics.apply(node));
-		super.expand(node);
+	protected void expandFrontier(Node node) {
+		node.setScore(fnNodeCost.apply(node));
+		super.expandFrontier(node);
 	}
 }

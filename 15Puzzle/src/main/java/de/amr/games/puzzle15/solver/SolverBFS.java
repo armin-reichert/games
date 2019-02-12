@@ -11,59 +11,51 @@ import java.util.function.Predicate;
 import de.amr.games.puzzle15.model.Puzzle15;
 
 /**
- * Breadth-First Search solver for 15-puzzle.
+ * Breadth-First Search solver for 15-puzzle. Rather useless because of memory consumption.
  * 
  * @author Armin Reichert
  */
-public class SolverBFS implements Solver {
+public class SolverBFS extends AbstractSolver {
 
-	protected Queue<Node> q;
-	protected int maxQueueSize;
+	protected Queue<Node> frontier;
 	protected final Set<Puzzle15> visited = new HashSet<>();
-	protected Predicate<Solver> givingUpCondition;
-	protected long startTime;
 
 	public SolverBFS(Predicate<Solver> givingUpCondition) {
-		this.givingUpCondition = givingUpCondition;
+		super(givingUpCondition);
 	}
 
-	protected void createQueue(int initialCapacity) {
-		q = new ArrayDeque<>(initialCapacity);
-		maxQueueSize = 0;
+	@Override
+	protected int getFrontierSize() {
+		return frontier.size();
+	}
+
+	protected void createFrontier(int initialCapacity) {
+		frontier = new ArrayDeque<>(initialCapacity);
+		updateMaxFrontierSize();
+	}
+
+	@Override
+	protected void expandFrontier(Node node) {
+		frontier.add(node);
+		visited.add(node.getPuzzle());
+		updateMaxFrontierSize();
 	}
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
-		startTime = System.nanoTime();
-		createQueue(1000);
+		startClock();
+		createFrontier(1000);
 		visited.clear();
-		expand(new Node(puzzle));
-		while (!q.isEmpty()) {
-			Node current = q.poll();
+		expandFrontier(new Node(puzzle));
+		while (!frontier.isEmpty()) {
+			maybeGiveUp();
+			Node current = frontier.poll();
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
-			current.successors().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expand);
-			if (givingUpCondition.test(this)) {
-				throw new SolverGivingUpException("Queue size: " + q.size());
-			}
+			current.successors().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expandFrontier);
 		}
 		return Collections.emptyList();
 	}
 
-	protected void expand(Node node) {
-		q.add(node);
-		maxQueueSize = Math.max(q.size(), maxQueueSize);
-		visited.add(node.getPuzzle());
-	}
-
-	@Override
-	public int getMaxQueueSize() {
-		return maxQueueSize;
-	}
-	
-	@Override
-	public long runningTimeMillis() {
-		return (System.nanoTime() - startTime) / 1_000_000;
-	}
 }

@@ -16,59 +16,57 @@ import de.amr.games.puzzle15.model.Dir;
 import de.amr.games.puzzle15.model.Puzzle15;
 
 /**
- * A* solver for 15-puzzle.
+ * A*-based solver for 15-puzzle. Finds the optimal solution but needs much memory and runs rather
+ * slowly.
  * 
  * @author Armin Reichert
  */
-public class SolverAStar implements Solver {
+public class SolverAStar extends AbstractSolver {
 
-	private Function<Node, Integer> fnHeuristics;
-	private PriorityQueue<Node> frontier;
-	private Map<Puzzle15, Node> openList;
-	private Set<Puzzle15> closedList;
-	private int maxQueueSize;
-	private Predicate<Solver> givingUpCondition;
-	private long startTime;
+	private final Function<Node, Integer> fnHeuristicNodeCost;
+	private final PriorityQueue<Node> frontier;
+	private final Map<Puzzle15, Node> openList;
+	private final Set<Puzzle15> closedList;
 
-	public SolverAStar(Function<Node, Integer> fnHeuristics, Predicate<Solver> givingUpCondition) {
-		this.fnHeuristics = fnHeuristics;
-		this.givingUpCondition = givingUpCondition;
+	public SolverAStar(Function<Node, Integer> fnHeuristicNodeCost, Predicate<Solver> givingUpCondition) {
+		super(givingUpCondition);
+		this.fnHeuristicNodeCost = fnHeuristicNodeCost;
+		frontier = new PriorityQueue<>(1000, comparingInt(Node::getScore));
+		openList = new HashMap<>();
+		closedList = new HashSet<>();
 	}
 
 	@Override
-	public int getMaxQueueSize() {
-		return maxQueueSize;
+	protected int getFrontierSize() {
+		return frontier.size();
 	}
 
-	private void addToFrontier(Node node) {
+	@Override
+	protected void expandFrontier(Node node) {
 		frontier.add(node);
-		if (frontier.size() > maxQueueSize) {
-			if (frontier.size() / 10_000 > maxQueueSize / 10_000) {
-				System.out.println("Queue size=" + frontier.size());
-			}
-			maxQueueSize = frontier.size();
-		}
 		openList.put(node.getPuzzle(), node);
+		updateMaxFrontierSize();
 	}
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
-		startTime = System.nanoTime();
-		frontier = new PriorityQueue<>(1000, comparingInt(Node::getScore));
-		maxQueueSize = 0;
-		openList = new HashMap<>();
-		closedList = new HashSet<>();
+		startClock();
+		updateMaxFrontierSize();
 
-		addToFrontier(new Node(puzzle));
+		frontier.clear();
+		openList.clear();
+		closedList.clear();
+
+		expandFrontier(new Node(puzzle));
 
 		while (!frontier.isEmpty()) {
+			maybeGiveUp();
 			Node current = frontier.poll();
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
 			openList.remove(current.getPuzzle());
 			closedList.add(current.getPuzzle());
-
 			Iterable<Dir> possibleDirs = current.getPuzzle().possibleMoveDirs()::iterator;
 			for (Dir dir : possibleDirs) {
 				Puzzle15 nextPuzzle = current.getPuzzle().move(dir);
@@ -84,25 +82,16 @@ public class SolverAStar implements Solver {
 				next.setParent(current);
 				next.setDir(dir);
 				next.setMovesSoFar(numMoves);
-				next.setScore(numMoves + fnHeuristics.apply(next));
+				next.setScore(numMoves + fnHeuristicNodeCost.apply(next));
 				if (revisited) {
 					// "decrease-key"
 					frontier.remove(next); // removes the existing node from the queue!
 					frontier.add(next);
 				} else {
-					addToFrontier(next);
+					expandFrontier(next);
 				}
-			}
-			if (givingUpCondition.test(this)) {
-				throw new SolverGivingUpException(
-						"Queue size: " + frontier.size() + ", running (millis): " + runningTimeMillis());
 			}
 		}
 		return Collections.emptyList();
-	}
-
-	@Override
-	public long runningTimeMillis() {
-		return (System.nanoTime() - startTime) / 1_000_000L;
 	}
 }

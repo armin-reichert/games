@@ -22,11 +22,11 @@ public class PuzzleTest2 {
 	private void test(int... cells) {
 		Puzzle15 puzzle = Puzzle15.of(cells);
 		Solver solver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
-				s -> s.getMaxQueueSize() > 1_000_000);
+				s -> s.getMaxFrontierSize() > 1_000_000);
 		List<Node> solution;
 		try {
 			solution = solver.solve(puzzle);
-			System.out.println("Solution found, max queue size=" + solver.getMaxQueueSize());
+			System.out.println("Solution found, max queue size=" + solver.getMaxFrontierSize());
 			System.out.println(puzzle);
 			System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(String::valueOf)
 					.collect(Collectors.joining(" ")));
