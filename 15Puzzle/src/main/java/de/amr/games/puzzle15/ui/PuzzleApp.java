@@ -1,6 +1,5 @@
 package de.amr.games.puzzle15.ui;
 
-import static de.amr.games.puzzle15.solver.Heuristics.manhattanDistFromOrdered;
 import static java.util.stream.Collectors.joining;
 
 import java.awt.BorderLayout;
@@ -29,6 +28,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import de.amr.games.puzzle15.model.Puzzle15;
+import de.amr.games.puzzle15.solver.Heuristics;
 import de.amr.games.puzzle15.solver.Node;
 import de.amr.games.puzzle15.solver.Solver;
 import de.amr.games.puzzle15.solver.SolverAStar;
@@ -73,8 +73,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()),
-					queueSizeOver(1_000_000));
+			selectedSolver = new SolverBestFirstSearch(Heuristics::manhattanHeuristics, queueSizeOver(1_000_000));
 		}
 	};
 
@@ -82,7 +81,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverAStar(node -> manhattanDistFromOrdered(node.getPuzzle()),
+			selectedSolver = new SolverAStar(Heuristics::manhattanHeuristics,
 					queueSizeOver(1_000_000).or(runtimeOver(10_000)));
 		}
 	};
@@ -236,8 +235,7 @@ public class PuzzleApp extends JFrame {
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBFS)));
 		menuBar.add(solverMenu);
 		bg.getElements().nextElement().setSelected(true);
-		selectedSolver = new SolverBestFirstSearch(node -> manhattanDistFromOrdered(node.getPuzzle()),
-				queueSizeOver(1_000_000));
+		selectedSolver = new SolverBestFirstSearch(Heuristics::manhattanHeuristics, queueSizeOver(1_000_000));
 
 		pack();
 		setLocationRelativeTo(null);

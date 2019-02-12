@@ -20,4 +20,8 @@ public class Heuristics {
 		}
 		return dist;
 	}
+
+	public static int manhattanHeuristics(Node node) {
+		return manhattanDistFromOrdered(node.getPuzzle());
+	}
 }
