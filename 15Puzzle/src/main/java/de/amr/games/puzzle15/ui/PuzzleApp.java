@@ -98,7 +98,7 @@ public class PuzzleApp extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			if (selectedSolver != null) {
 				writeConsole(String.format("\nSolving puzzle using %s...", selectedSolverName()));
-				new SolverThread().execute();
+				new SolverTask().execute();
 			}
 		}
 	};
@@ -158,7 +158,7 @@ public class PuzzleApp extends JFrame {
 		}
 	};
 
-	private Action actionResetPuzzle = new AbstractAction("Reset Puzzle") {
+	private Action actionResetPuzzle = new AbstractAction("Reset") {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -168,7 +168,7 @@ public class PuzzleApp extends JFrame {
 		}
 	};
 
-	private class SolverThread extends SwingWorker<List<Node>, Void> {
+	private class SolverTask extends SwingWorker<List<Node>, Void> {
 
 		@Override
 		protected List<Node> doInBackground() throws Exception {
@@ -184,9 +184,9 @@ public class PuzzleApp extends JFrame {
 				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
 			} catch (ExecutionException x) {
-				writeConsole("Solving aborted: " + x.getMessage());
+				writeConsole("Solver aborted: " + x.getMessage());
 			} catch (InterruptedException x) {
-				writeConsole("Solving interrupted: " + x.getMessage());
+				writeConsole("Solver interrupted: " + x.getMessage());
 			}
 			view.repaint();
 		}
@@ -235,12 +235,13 @@ public class PuzzleApp extends JFrame {
 
 	public PuzzleApp() {
 		puzzle = Puzzle15.ordered();
+
 		setTitle("15-Puzzle");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 
 		view = new PuzzleView(this, 100);
-		add(view);
+		add(view, BorderLayout.CENTER);
 
 		console = new JTextArea();
 		console.setBackground(Color.BLACK);
@@ -251,11 +252,10 @@ public class PuzzleApp extends JFrame {
 		console.setLineWrap(true);
 		add(new JScrollPane(console), BorderLayout.EAST);
 
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
+		setJMenuBar(new JMenuBar());
 
 		JMenu puzzleMenu = new JMenu("Puzzle");
-		menuBar.add(puzzleMenu);
+		getJMenuBar().add(puzzleMenu);
 		puzzleMenu.add(actionRandomMoves);
 		puzzleMenu.add(actionShuffle);
 		puzzleMenu.add(actionResetPuzzle);
@@ -268,7 +268,7 @@ public class PuzzleApp extends JFrame {
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBestFirst)));
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveAStar)));
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBFS)));
-		menuBar.add(solverMenu);
+		getJMenuBar().add(solverMenu);
 		bg.getElements().nextElement().setSelected(true);
 		selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, queueSizeOver(1_000_000));
 
