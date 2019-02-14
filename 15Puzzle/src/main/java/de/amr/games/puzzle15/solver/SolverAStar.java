@@ -51,7 +51,7 @@ public class SolverAStar extends AbstractSolver {
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		startClock();
-		updateMaxFrontierSize();
+		resetMaxFrontierSize();
 
 		frontier.clear();
 		openList.clear();

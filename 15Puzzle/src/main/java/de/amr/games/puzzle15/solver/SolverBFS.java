@@ -31,7 +31,7 @@ public class SolverBFS extends AbstractSolver {
 
 	protected void createFrontier(int initialCapacity) {
 		frontier = new ArrayDeque<>(initialCapacity);
-		updateMaxFrontierSize();
+		resetMaxFrontierSize();
 	}
 
 	@Override

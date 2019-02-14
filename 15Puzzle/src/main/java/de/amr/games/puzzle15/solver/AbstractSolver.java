@@ -44,13 +44,13 @@ public abstract class AbstractSolver implements Solver {
 	public long getRunningTime() {
 		return (System.nanoTime() - startTime) / 1_000_000;
 	}
+	
+	protected void resetMaxFrontierSize() {
+		maxFrontierSize = 0;
+	}
 
 	protected void updateMaxFrontierSize() {
 		int size = getFrontierSize();
-		if (size == 0) {
-			maxFrontierSize = 0;
-			return;
-		}
 		if (size > maxFrontierSize) {
 			if (size / 10_000 > maxFrontierSize / 10_000) {
 				System.out.println("Frontier size: " + size);

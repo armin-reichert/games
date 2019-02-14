@@ -28,7 +28,7 @@ public class SolverBestFirstSearch extends SolverBFS {
 	@Override
 	protected void createFrontier(int initialCapacity) {
 		frontier = new PriorityQueue<>(initialCapacity, comparingInt(Node::getScore));
-		updateMaxFrontierSize();
+		resetMaxFrontierSize();
 	}
 
 	@Override
