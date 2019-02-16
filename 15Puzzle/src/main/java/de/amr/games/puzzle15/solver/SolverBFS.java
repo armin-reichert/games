@@ -34,7 +34,6 @@ public class SolverBFS extends AbstractSolver {
 		resetMaxFrontierSize();
 	}
 
-	@Override
 	protected void expandFrontier(Node node) {
 		frontier.add(node);
 		visited.add(node.getPuzzle());
@@ -57,5 +56,4 @@ public class SolverBFS extends AbstractSolver {
 		}
 		return Collections.emptyList();
 	}
-
 }

@@ -41,7 +41,6 @@ public class SolverAStar extends AbstractSolver {
 		return frontier.size();
 	}
 
-	@Override
 	protected void expandFrontier(Node node) {
 		frontier.add(node);
 		openList.put(node.getPuzzle(), node);

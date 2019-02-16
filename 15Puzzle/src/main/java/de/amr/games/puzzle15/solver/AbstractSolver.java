@@ -27,8 +27,6 @@ public abstract class AbstractSolver implements Solver {
 		return solution;
 	}
 
-	protected abstract void expandFrontier(Node node);
-
 	protected abstract int getFrontierSize();
 
 	@Override

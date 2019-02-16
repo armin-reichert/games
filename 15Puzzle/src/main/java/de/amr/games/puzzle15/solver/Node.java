@@ -15,6 +15,7 @@ public class Node {
 	private Node parent;
 	private int movesSoFar;
 	private int score;
+	private int depth;
 
 	public Node(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
@@ -64,6 +65,14 @@ public class Node {
 
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public int getDepth() {
+		return depth;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 
 	@Override
