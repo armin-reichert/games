@@ -1,7 +1,7 @@
 package de.amr.games.puzzle15.solver;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import de.amr.games.puzzle15.model.Puzzle15;
 
@@ -12,15 +12,15 @@ public class SolverIDDFS implements Solver {
 	private SolverDepthLimitedDFS dls;
 
 	@Override
-	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
+	public Optional<List<Node>> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		for (int depth = 0; depth <= MAX_DEPTH; ++depth) {
 			dls = new SolverDepthLimitedDFS(depth);
-			List<Node> solution = dls.solve(puzzle);
-			if (!solution.isEmpty()) {
+			Optional<List<Node>> solution = dls.solve(puzzle);
+			if (solution.isPresent()) {
 				return solution;
 			}
 		}
-		return Collections.emptyList();
+		return Optional.empty();
 	}
 
 	@Override

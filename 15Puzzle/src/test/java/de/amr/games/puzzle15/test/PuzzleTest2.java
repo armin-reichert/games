@@ -2,6 +2,7 @@ package de.amr.games.puzzle15.test;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
@@ -24,13 +25,16 @@ public class PuzzleTest2 {
 		Puzzle15 puzzle = Puzzle15.of(cells);
 		Solver solver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
 				s -> s.getMaxFrontierSize() > 1_000_000);
-		List<Node> solution;
 		try {
-			solution = solver.solve(puzzle);
+			Optional<List<Node>> solution = solver.solve(puzzle);
+			if (!solution.isPresent()) {
+				System.out.println("No solution found");
+				return;
+			}
 			System.out.println("Solution found, max queue size=" + solver.getMaxFrontierSize());
 			System.out.println(puzzle);
-			System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(String::valueOf)
-					.collect(Collectors.joining(" ")));
+			System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull)
+					.map(String::valueOf).collect(Collectors.joining(" ")));
 		} catch (SolverGivingUpException e) {
 			e.printStackTrace();
 		}
@@ -39,13 +43,16 @@ public class PuzzleTest2 {
 	private void testIDDFS(int... cells) {
 		Puzzle15 puzzle = Puzzle15.of(cells);
 		Solver solver = new SolverIDDFS();
-		List<Node> solution;
 		try {
-			solution = solver.solve(puzzle);
+			Optional<List<Node>> solution = solver.solve(puzzle);
+			if (!solution.isPresent()) {
+				System.out.println("No solution found");
+				return;
+			}
 			System.out.println("Solution found, max queue size=" + solver.getMaxFrontierSize());
 			System.out.println(puzzle);
-			System.out.println(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(String::valueOf)
-					.collect(Collectors.joining(" ")));
+			System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull)
+					.map(String::valueOf).collect(Collectors.joining(" ")));
 		} catch (SolverGivingUpException e) {
 			e.printStackTrace();
 		}
@@ -55,7 +62,7 @@ public class PuzzleTest2 {
 	public void test1() {
 		// fast, may queue size = 18
 		// DOWN DOWN DOWN LEFT UP UP UP LEFT DOWN DOWN DOWN LEFT UP UP UP
-//		testAStar(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
+		// testAStar(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
 		testIDDFS(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
 	}
 

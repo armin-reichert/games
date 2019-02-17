@@ -9,8 +9,10 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
@@ -81,7 +83,7 @@ public class PuzzleApp extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			selectedSolver = new SolverAStar(Heuristics::manhattan,
-					queueSizeOver(1_000_000).or(runtimeOver(10_000)));
+					queueSizeOver(1_000_000).or(runtimeOver(30_000)));
 		}
 	};
 
@@ -104,7 +106,7 @@ public class PuzzleApp extends JFrame {
 				return;
 			}
 			savedPuzzle = puzzle;
-			Timer playTimer = new Timer(100, null);
+			Timer playTimer = new Timer(500, null);
 			Timer resetTimer = new Timer(2000, null);
 			resetTimer.addActionListener(e -> {
 				setPuzzle(savedPuzzle);
@@ -161,20 +163,26 @@ public class PuzzleApp extends JFrame {
 		}
 	};
 
-	private class SolverTask extends SwingWorker<List<Node>, Void> {
+	private class SolverTask extends SwingWorker<Optional<List<Node>>, Void> {
 
 		@Override
-		protected List<Node> doInBackground() throws Exception {
+		protected Optional<List<Node>> doInBackground() throws Exception {
 			return selectedSolver.solve(puzzle);
 		}
 
 		@Override
 		protected void done() {
 			try {
-				setSolution(get());
+				Optional<List<Node>> solution = get();
+				if (!solution.isPresent()) {
+					writeConsole("No solution found");
+					setSolution(Collections.emptyList());
+					return;
+				}
+				setSolution(solution.get());
 				writeConsole("Max queue size " + selectedSolver.getMaxFrontierSize());
-				writeConsole("Found solution of length " + (solution.size() - 1));
-				writeConsole(solution.stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
+				writeConsole("Found solution of length " + (solution.get().size() - 1));
+				writeConsole(solution.get().stream().map(Node::getDir).filter(Objects::nonNull).map(Object::toString)
 						.collect(joining(" ")));
 			} catch (ExecutionException x) {
 				writeConsole("Solver aborted: " + x.getMessage());
@@ -271,5 +279,4 @@ public class PuzzleApp extends JFrame {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-
 }

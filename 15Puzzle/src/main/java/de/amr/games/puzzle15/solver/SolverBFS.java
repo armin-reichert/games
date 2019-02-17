@@ -1,9 +1,9 @@
 package de.amr.games.puzzle15.solver;
 
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -41,7 +41,7 @@ public class SolverBFS extends AbstractSolver {
 	}
 
 	@Override
-	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
+	public Optional<List<Node>> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		startClock();
 		createFrontier(1000);
 		visited.clear();
@@ -50,10 +50,10 @@ public class SolverBFS extends AbstractSolver {
 			maybeGiveUp();
 			Node current = frontier.poll();
 			if (current.getPuzzle().isOrdered()) {
-				return solution(current);
+				return Optional.of(solution(current));
 			}
 			current.successors().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::expandFrontier);
 		}
-		return Collections.emptyList();
+		return Optional.empty();
 	}
 }

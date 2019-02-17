@@ -2,11 +2,11 @@ package de.amr.games.puzzle15.solver;
 
 import static java.util.Comparator.comparingInt;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
@@ -48,7 +48,7 @@ public class SolverAStar extends AbstractSolver {
 	}
 
 	@Override
-	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
+	public Optional<List<Node>> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		startClock();
 		resetMaxFrontierSize();
 
@@ -62,7 +62,7 @@ public class SolverAStar extends AbstractSolver {
 			maybeGiveUp();
 			Node current = frontier.poll();
 			if (current.getPuzzle().isOrdered()) {
-				return solution(current);
+				return Optional.of(solution(current));
 			}
 			openList.remove(current.getPuzzle());
 			closedList.add(current.getPuzzle());
@@ -91,6 +91,6 @@ public class SolverAStar extends AbstractSolver {
 				}
 			}
 		}
-		return Collections.emptyList();
+		return Optional.empty();
 	}
 }
