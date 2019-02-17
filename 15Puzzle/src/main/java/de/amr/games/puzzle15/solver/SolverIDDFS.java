@@ -17,16 +17,19 @@ public class SolverIDDFS implements Solver {
 	public Optional<List<Node>> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		maxFrontierSize = 0;
 		totalRuntime = 0;
+		System.out.print("Running DLS of depth: ");
 		for (int depth = 0; depth <= MAX_DEPTH; ++depth) {
+			System.out.print(" " + depth);
 			dls = new SolverDepthLimitedDFS(depth);
-			System.out.println("Running DLS including depth " + depth);
 			Optional<List<Node>> solution = dls.solve(puzzle);
 			maxFrontierSize = Math.max(maxFrontierSize, dls.getMaxFrontierSize());
 			totalRuntime += dls.getRunningTime();
 			if (solution.isPresent()) {
+				System.out.println();
 				return solution;
 			}
 		}
+		System.out.println();
 		return Optional.empty();
 	}
 

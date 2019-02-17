@@ -15,7 +15,6 @@ public class Node {
 	private Node parent;
 	private int movesSoFar;
 	private int score;
-	private int depth;
 
 	public Node(Puzzle15 puzzle) {
 		this.puzzle = puzzle;
@@ -26,7 +25,6 @@ public class Node {
 			Node successor = new Node(puzzle.move(dir));
 			successor.dir = dir;
 			successor.parent = this;
-			successor.depth = depth + 1;
 			successor.movesSoFar = movesSoFar + 1;
 			return successor;
 		});
@@ -66,14 +64,6 @@ public class Node {
 
 	public void setScore(int score) {
 		this.score = score;
-	}
-
-	public int getDepth() {
-		return depth;
-	}
-
-	public void setDepth(int depth) {
-		this.depth = depth;
 	}
 
 	@Override

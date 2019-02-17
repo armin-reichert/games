@@ -11,8 +11,8 @@ import de.amr.games.puzzle15.model.Puzzle15;
 
 public class SolverDepthLimitedDFS extends AbstractSolver {
 
-	private final Deque<Node> frontier;
-	private final Set<Puzzle15> visited;
+	protected final Deque<Node> frontier;
+	protected final Set<Puzzle15> visited;
 	private int maxDepth;
 
 	public SolverDepthLimitedDFS(int maxDepth) {
@@ -31,18 +31,21 @@ public class SolverDepthLimitedDFS extends AbstractSolver {
 		while (!frontier.isEmpty()) {
 			maybeGiveUp();
 			Node current = frontier.poll();
-//			System.out.println("Polling node " + current);
 			if (current.getPuzzle().isOrdered()) {
 				return Optional.of(solution(current));
 			}
-			if (current.getDepth() < maxDepth) {
-				current.successors().filter(succ -> !visited.contains(succ.getPuzzle())).forEach(this::addToFrontier);
+			if (current.getMovesSoFar() < maxDepth) {
+				expand(current);
 			}
 		}
 		return Optional.empty();
 	}
 
-	private void addToFrontier(Node node) {
+	protected void expand(Node node) {
+		node.successors().filter(succ -> !visited.contains(succ.getPuzzle())).forEach(this::addToFrontier);
+	}
+
+	protected void addToFrontier(Node node) {
 		frontier.push(node);
 		visited.add(node.getPuzzle());
 		updateMaxFrontierSize();
