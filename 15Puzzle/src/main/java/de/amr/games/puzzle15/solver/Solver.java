@@ -8,12 +8,12 @@ import de.amr.games.puzzle15.model.Puzzle15;
 
 public interface Solver {
 
-	static Predicate<Solver> queueSizeOver(int size) {
+	static Predicate<Solver> frontierSizeMax(int size) {
 		return solver -> solver.getMaxFrontierSize() > size;
 	}
 
-	static Predicate<Solver> runtimeOver(int millis) {
-		return solver -> solver.getRunningTime() > millis;
+	static Predicate<Solver> runtimeSecMax(int seconds) {
+		return solver -> solver.getRunningTime() > 1000 * seconds;
 	}
 
 	/**

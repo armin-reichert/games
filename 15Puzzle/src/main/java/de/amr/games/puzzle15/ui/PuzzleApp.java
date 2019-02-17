@@ -1,7 +1,7 @@
 package de.amr.games.puzzle15.ui;
 
-import static de.amr.games.puzzle15.solver.Solver.queueSizeOver;
-import static de.amr.games.puzzle15.solver.Solver.runtimeOver;
+import static de.amr.games.puzzle15.solver.Solver.frontierSizeMax;
+import static de.amr.games.puzzle15.solver.Solver.runtimeSecMax;
 import static java.util.stream.Collectors.joining;
 
 import java.awt.BorderLayout;
@@ -66,7 +66,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBFS(queueSizeOver(1_000_000));
+			selectedSolver = new SolverBFS(frontierSizeMax(1_000_000));
 		}
 	};
 
@@ -74,7 +74,7 @@ public class PuzzleApp extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, queueSizeOver(1_000_000));
+			selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, frontierSizeMax(1_000_000));
 		}
 	};
 
@@ -83,7 +83,7 @@ public class PuzzleApp extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			selectedSolver = new SolverAStar(Heuristics::manhattan,
-					queueSizeOver(1_000_000).or(runtimeOver(30_000)));
+					frontierSizeMax(1_000_000).or(runtimeSecMax(30)));
 		}
 	};
 
@@ -273,7 +273,7 @@ public class PuzzleApp extends JFrame {
 		bg.add(solverMenu.add(new JRadioButtonMenuItem(actionSolveBFS)));
 		getJMenuBar().add(solverMenu);
 		bg.getElements().nextElement().setSelected(true);
-		selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, queueSizeOver(1_000_000));
+		selectedSolver = new SolverBestFirstSearch(Heuristics::manhattan, frontierSizeMax(1_000_000));
 
 		pack();
 		setLocationRelativeTo(null);
