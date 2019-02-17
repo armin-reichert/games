@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.amr.games.puzzle15.model.Puzzle15;
 
-public class PuzzleTest {
+public class PuzzleModelTest {
 
 	private Puzzle15 puzzle;
 

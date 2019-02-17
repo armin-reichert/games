@@ -19,7 +19,7 @@ import de.amr.games.puzzle15.solver.SolverIDDFS;
  * https://codegolf.stackexchange.com/questions/6884/solve-the-15-puzzle-the-tile-sliding-puzzle
  *
  */
-public class PuzzleTest2 {
+public class PuzzleSolverTest {
 
 	private void testAStar(int... cells) {
 		Puzzle15 puzzle = Puzzle15.of(cells);
