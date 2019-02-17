@@ -9,16 +9,17 @@ import java.util.Set;
 
 import de.amr.games.puzzle15.model.Puzzle15;
 
-class SolverDepthLimitedDFS extends AbstractSolver {
+public class SolverDepthLimitedDFS extends AbstractSolver {
 
-	private Deque<Node> frontier;
-	private final Set<Puzzle15> visited = new HashSet<>();
+	private final Deque<Node> frontier;
+	private final Set<Puzzle15> visited;
 	private int maxDepth;
 
 	public SolverDepthLimitedDFS(int maxDepth) {
 		super(solver -> false);
-		this.maxDepth = maxDepth;
 		frontier = new ArrayDeque<>();
+		visited = new HashSet<>();
+		this.maxDepth = maxDepth;
 	}
 
 	@Override
@@ -34,8 +35,8 @@ class SolverDepthLimitedDFS extends AbstractSolver {
 			if (current.getPuzzle().isOrdered()) {
 				return solution(current);
 			}
-			if (current.getDepth() <= maxDepth) {
-				current.successors().filter(node -> !visited.contains(node.getPuzzle())).forEach(this::addToFrontier);
+			if (current.getDepth() < maxDepth) {
+				current.successors().filter(succ -> !visited.contains(succ.getPuzzle())).forEach(this::addToFrontier);
 			}
 		}
 		return Collections.emptyList();

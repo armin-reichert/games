@@ -13,11 +13,11 @@ public class SolverIDDFS implements Solver {
 
 	@Override
 	public List<Node> solve(Puzzle15 puzzle) throws SolverGivingUpException {
-		for (int depth = 0; depth < MAX_DEPTH; ++depth) {
+		for (int depth = 0; depth <= MAX_DEPTH; ++depth) {
 			dls = new SolverDepthLimitedDFS(depth);
-			List<Node> path = dls.solve(puzzle);
-			if (!path.isEmpty()) {
-				return path;
+			List<Node> solution = dls.solve(puzzle);
+			if (!solution.isEmpty()) {
+				return solution;
 			}
 		}
 		return Collections.emptyList();
