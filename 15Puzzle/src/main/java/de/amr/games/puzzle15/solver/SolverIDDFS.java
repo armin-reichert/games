@@ -15,6 +15,7 @@ public class SolverIDDFS implements Solver {
 	public Optional<List<Node>> solve(Puzzle15 puzzle) throws SolverGivingUpException {
 		for (int depth = 0; depth <= MAX_DEPTH; ++depth) {
 			dls = new SolverDepthLimitedDFS(depth);
+			System.out.println("Running DLS of depth " + depth);
 			Optional<List<Node>> solution = dls.solve(puzzle);
 			if (solution.isPresent()) {
 				return solution;

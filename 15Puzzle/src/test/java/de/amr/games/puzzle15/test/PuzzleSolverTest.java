@@ -22,37 +22,33 @@ import de.amr.games.puzzle15.solver.SolverIDDFS;
 public class PuzzleSolverTest {
 
 	private void testAStar(int... cells) {
-		Puzzle15 puzzle = Puzzle15.of(cells);
-		Solver solver = new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
-				s -> s.getMaxFrontierSize() > 1_000_000);
-		try {
-			Optional<List<Node>> solution = solver.solve(puzzle);
-			if (!solution.isPresent()) {
-				System.out.println("No solution found");
-				return;
-			}
-			System.out.println("Solution found, max queue size=" + solver.getMaxFrontierSize());
-			System.out.println(puzzle);
-			System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull)
-					.map(String::valueOf).collect(Collectors.joining(" ")));
-		} catch (SolverGivingUpException e) {
-			e.printStackTrace();
-		}
+		System.out.println("A* solver:");
+		test(new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
+				s -> s.getMaxFrontierSize() > 1_000_000), cells);
 	}
 
 	private void testIDDFS(int... cells) {
+		System.out.println("IDDFS solver:");
+		test(new SolverIDDFS(), cells);
+	}
+
+	private void test(Solver solver, int... cells) {
+		if (cells.length != 16) {
+			throw new IllegalArgumentException("Illegal number of cells" + cells.length);
+		}
 		Puzzle15 puzzle = Puzzle15.of(cells);
-		Solver solver = new SolverIDDFS();
+		System.out.println(puzzle);
 		try {
 			Optional<List<Node>> solution = solver.solve(puzzle);
 			if (!solution.isPresent()) {
 				System.out.println("No solution found");
-				return;
+			} else {
+				System.out.println(String.format("Solution length=%d, max queue size=%,d", solution.get().size(),
+						solver.getMaxFrontierSize()));
+				System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull)
+						.map(String::valueOf).collect(Collectors.joining(" ")));
+				System.out.println();
 			}
-			System.out.println("Solution found, max queue size=" + solver.getMaxFrontierSize());
-			System.out.println(puzzle);
-			System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull)
-					.map(String::valueOf).collect(Collectors.joining(" ")));
 		} catch (SolverGivingUpException e) {
 			e.printStackTrace();
 		}
@@ -60,9 +56,9 @@ public class PuzzleSolverTest {
 
 	@Test
 	public void test1() {
-		// fast, may queue size = 18
+		// A*: fast, max queue size=18
 		// DOWN DOWN DOWN LEFT UP UP UP LEFT DOWN DOWN DOWN LEFT UP UP UP
-		// testAStar(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
+		testAStar(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
 		testIDDFS(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
 	}
 
@@ -74,10 +70,11 @@ public class PuzzleSolverTest {
 
 	@Test
 	public void test3() {
-		// slow, max queue size=161383
+		// A*: slow, max queue size=161.383
 		// LEFT UP UP RIGHT RIGHT DOWN LEFT UP LEFT LEFT DOWN DOWN RIGHT RIGHT UP LEFT LEFT DOWN DOWN RIGHT
 		// RIGHT UP RIGHT UP LEFT LEFT UP RIGHT DOWN DOWN RIGHT DOWN LEFT LEFT UP UP LEFT UP
 		testAStar(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
+		testIDDFS(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
 	}
 
 	@Test

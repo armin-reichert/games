@@ -26,6 +26,7 @@ public class Node {
 			Node successor = new Node(puzzle.move(dir));
 			successor.dir = dir;
 			successor.parent = this;
+			successor.depth = depth + 1;
 			successor.movesSoFar = movesSoFar + 1;
 			return successor;
 		});

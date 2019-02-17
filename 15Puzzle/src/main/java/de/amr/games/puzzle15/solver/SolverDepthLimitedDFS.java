@@ -27,11 +27,11 @@ public class SolverDepthLimitedDFS extends AbstractSolver {
 		startClock();
 		frontier.clear();
 		visited.clear();
-		maxDepth = 0;
 		addToFrontier(new Node(puzzle));
 		while (!frontier.isEmpty()) {
 			maybeGiveUp();
 			Node current = frontier.poll();
+//			System.out.println("Polling node " + current);
 			if (current.getPuzzle().isOrdered()) {
 				return Optional.of(solution(current));
 			}
