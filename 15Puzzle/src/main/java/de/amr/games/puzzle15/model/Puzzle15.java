@@ -114,8 +114,9 @@ public class Puzzle15 {
 			return right();
 		case UP:
 			return up();
+		default:
+			throw new IllegalArgumentException();
 		}
-		throw new IllegalArgumentException();
 	}
 
 	public boolean canMoveUp() {
@@ -193,8 +194,9 @@ public class Puzzle15 {
 			return canMoveRight();
 		case UP:
 			return canMoveUp();
+		default:
+			throw new IllegalArgumentException();
 		}
-		throw new IllegalArgumentException();
 	}
 
 	public Stream<Dir> possibleMoveDirs() {
