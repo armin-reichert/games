@@ -16,10 +16,11 @@ public class Bat extends SpriteEntity {
 	public int speed;
 
 	public Bat(int width, int height) {
-		sprites.set("s_bat", Sprite.ofAssets("bat_blue.png").scale(width, height));
+		Sprite sprite = Sprite.ofAssets("bat_blue.png").scale(width, height);
+		sprites.set("s_bat", sprite);
 		sprites.select("s_bat");
-		tf.setWidth(sprites.current().getWidth());
-		tf.setHeight(sprites.current().getHeight());
+		tf.setWidth(sprite.getWidth());
+		tf.setHeight(sprite.getHeight());
 	}
 
 	public void setBoardSize(Dimension boardSize) {
@@ -33,7 +34,8 @@ public class Bat extends SpriteEntity {
 			tf.setVelocityX(-speed);
 			tf.move();
 			tf.setX(min(boardSize.width - tf.getWidth(), max(0, tf.getX())));
-		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
+		}
+		else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
 			tf.setVelocityX(speed);
 			tf.move();
 			tf.setX(min(boardSize.width - tf.getWidth(), max(0, tf.getX())));
