@@ -2,10 +2,10 @@ package de.amr.games.breakout.entities;
 
 import java.awt.Dimension;
 
-import de.amr.easy.game.entity.SpriteEntity;
+import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.ui.sprites.Sprite;
 
-public class Ball extends SpriteEntity {
+public class Ball extends Entity {
 
 	private Dimension boardSize;
 
