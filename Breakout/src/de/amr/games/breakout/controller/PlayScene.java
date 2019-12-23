@@ -21,7 +21,7 @@ import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.Lifecycle;
 import de.amr.easy.game.view.View;
 import de.amr.games.breakout.BreakoutGameApp;
 import de.amr.games.breakout.entities.Ball;
@@ -35,7 +35,7 @@ import de.amr.statemachine.core.StateMachine;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PlayScene implements View, Controller {
+public class PlayScene implements View, Lifecycle {
 
 	private final BreakoutGameApp app;
 	private final StateMachine<PlayState, PlayEvent> control;

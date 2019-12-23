@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.amr.easy.game.view.Controller;
+import de.amr.easy.game.view.Lifecycle;
 import de.amr.easy.game.view.View;
 import de.amr.games.magicball.entities.PenBall;
 
-public class DrawingScene implements View, Controller {
+public class DrawingScene implements View, Lifecycle {
 
 	private final BufferedImage canvas;
 	private final List<PenBall> balls = new ArrayList<>();
