@@ -27,8 +27,8 @@ import de.amr.games.breakout.BreakoutGameApp;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Bat;
 import de.amr.games.breakout.entities.Brick;
-import de.amr.statemachine.Match;
-import de.amr.statemachine.StateMachine;
+import de.amr.statemachine.core.Match;
+import de.amr.statemachine.core.StateMachine;
 
 /**
  * The playing scene.
