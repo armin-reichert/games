@@ -27,7 +27,7 @@ import de.amr.games.breakout.BreakoutGameApp;
 import de.amr.games.breakout.entities.Ball;
 import de.amr.games.breakout.entities.Bat;
 import de.amr.games.breakout.entities.Brick;
-import de.amr.statemachine.core.Match;
+import de.amr.statemachine.core.EventMatchStrategy;
 import de.amr.statemachine.core.StateMachine;
 
 /**
@@ -75,7 +75,7 @@ public class PlayScene implements View, Lifecycle {
 
 	private StateMachine<PlayState, PlayEvent> buildStateMachine() {
 		//@formatter:off
-		return StateMachine.beginStateMachine(PlayState.class, PlayEvent.class, Match.BY_CLASS)
+		return StateMachine.beginStateMachine(PlayState.class, PlayEvent.class, EventMatchStrategy.BY_CLASS)
 			
 			.description("BreakoutGameControl")
 			.initialState(Initialized)
