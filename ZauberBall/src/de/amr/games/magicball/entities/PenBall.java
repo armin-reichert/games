@@ -6,10 +6,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.entity.Entity;
-import de.amr.easy.game.view.View;
 
-public class PenBall extends Entity implements View {
+public class PenBall extends Entity implements Lifecycle {
 
 	private final BufferedImage canvas;
 	private int thickness;
@@ -21,6 +21,10 @@ public class PenBall extends Entity implements View {
 		color = randomColor();
 		tf.setWidth(thickness);
 		tf.setHeight(thickness);
+	}
+	
+	@Override
+	public void init() {
 	}
 
 	@Override

@@ -1,19 +1,21 @@
 package de.amr.games.breakout.entities;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 
+import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.ui.sprites.Sprite;
 
-public class Ball extends Entity {
+public class Ball extends Entity implements Lifecycle {
 
+	private Sprite sprite;
 	private Dimension boardSize;
 
 	public Ball(int size) {
 		tf.setWidth(size);
 		tf.setHeight(size);
-		sprites.set("s_ball", Sprite.ofAssets("ball_green.png").scale(size));
-		sprites.select("s_ball");
+		sprite = Sprite.ofAssets("ball_green.png").scale(size);
 	}
 
 	public void setBoardSize(Dimension boardSize) {
@@ -22,6 +24,18 @@ public class Ball extends Entity {
 
 	public boolean isOut() {
 		return tf.getY() > boardSize.height;
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		Graphics2D g = (Graphics2D) g2.create();
+		g.translate(tf.getX(), tf.getY());
+		sprite.draw(g);
+		g.dispose();
+	}
+
+	@Override
+	public void init() {
 	}
 
 	@Override

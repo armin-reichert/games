@@ -19,7 +19,6 @@ import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controller.Lifecycle;
-import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
@@ -96,7 +95,7 @@ public class PlayScene implements View, Lifecycle {
 							newBricks();
 							launchBall();
 						}
-						app.entities.all().forEach(Entity::update);
+						app.entities.all().forEach(e -> ((Lifecycle)e).update());
 					})
 					
 				.state(BallOut)
