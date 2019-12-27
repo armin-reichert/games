@@ -18,10 +18,10 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.Lifecycle;
 import de.amr.easy.game.view.View;
 import de.amr.games.breakout.BreakoutGameApp;
 import de.amr.games.breakout.entities.Ball;

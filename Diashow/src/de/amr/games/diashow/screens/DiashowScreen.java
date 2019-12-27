@@ -5,8 +5,8 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.input.Keyboard;
-import de.amr.easy.game.view.Lifecycle;
 import de.amr.easy.game.view.View;
 
 public class DiashowScreen implements View, Lifecycle {

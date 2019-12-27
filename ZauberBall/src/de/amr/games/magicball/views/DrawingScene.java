@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.amr.easy.game.view.Lifecycle;
+import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.view.View;
 import de.amr.games.magicball.entities.PenBall;
 
