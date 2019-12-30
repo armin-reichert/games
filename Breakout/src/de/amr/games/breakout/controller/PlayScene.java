@@ -1,7 +1,6 @@
 package de.amr.games.breakout.controller;
 
 import static de.amr.easy.game.Application.LOGGER;
-import static de.amr.easy.game.Application.app;
 import static de.amr.games.breakout.controller.PlayState.BallOut;
 import static de.amr.games.breakout.controller.PlayState.Initialized;
 import static de.amr.games.breakout.controller.PlayState.Playing;
@@ -47,8 +46,7 @@ public class PlayScene implements View, Lifecycle {
 
 	public PlayScene(BreakoutGameApp app) {
 		this.app = app;
-		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(),
-				BufferedImage.SCALE_SMOOTH);
+		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
 		Dimension boardSize = new Dimension(getWidth(), getHeight());
 
 		ball = new Ball(app.settings.get("ball_size"));
@@ -61,7 +59,7 @@ public class PlayScene implements View, Lifecycle {
 
 		app.collisionHandler.registerStart(ball, bat, new BallHitsBatEvent());
 		control = buildStateMachine();
-		control.traceTo(LOGGER, app().clock::getFrequency);
+		control.setLogger(LOGGER);
 	}
 
 	public int getWidth() {
