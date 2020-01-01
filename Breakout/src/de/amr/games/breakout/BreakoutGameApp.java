@@ -1,6 +1,6 @@
 package de.amr.games.breakout;
 
-import de.amr.easy.game.Application;
+import de.amr.easy.game.GenericApplication;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.entity.EntityMap;
 import de.amr.games.breakout.controller.PlayScene;
@@ -10,7 +10,7 @@ import de.amr.games.breakout.controller.PlayScene;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class BreakoutGameApp extends Application {
+public class BreakoutGameApp extends GenericApplication {
 
 	public static void main(String[] args) {
 		launch(new BreakoutGameApp(), args);

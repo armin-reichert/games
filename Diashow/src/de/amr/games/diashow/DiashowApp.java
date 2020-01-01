@@ -1,10 +1,10 @@
 package de.amr.games.diashow;
 
-import de.amr.easy.game.Application;
+import de.amr.easy.game.GenericApplication;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.diashow.screens.DiashowScreen;
 
-public class DiashowApp extends Application {
+public class DiashowApp extends GenericApplication {
 
 	public static void main(String[] args) {
 		launch(new DiashowApp(), args);
