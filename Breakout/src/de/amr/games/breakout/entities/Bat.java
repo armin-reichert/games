@@ -13,7 +13,7 @@ import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.ui.sprites.Sprite;
 
-public class Bat extends Entity implements Lifecycle{
+public class Bat extends Entity implements Lifecycle {
 
 	private Sprite sprite;
 	private Dimension boardSize;
@@ -28,7 +28,7 @@ public class Bat extends Entity implements Lifecycle{
 	public void setBoardSize(Dimension boardSize) {
 		this.boardSize = boardSize;
 	}
-	
+
 	@Override
 	public void init() {
 	}
@@ -40,8 +40,7 @@ public class Bat extends Entity implements Lifecycle{
 			tf.setVelocityX(-speed);
 			tf.move();
 			tf.setX(min(boardSize.width - tf.getWidth(), max(0, tf.getX())));
-		}
-		else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
+		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
 			tf.setVelocityX(speed);
 			tf.move();
 			tf.setX(min(boardSize.width - tf.getWidth(), max(0, tf.getX())));

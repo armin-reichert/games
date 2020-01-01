@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Random;
 
 import de.amr.easy.game.controller.Lifecycle;
-import de.amr.easy.game.view.View;
+import de.amr.easy.game.entity.Entity;
 import de.amr.games.magicball.entities.PenBall;
 
-public class DrawingScene implements View, Lifecycle {
+public class DrawingScene extends Entity implements Lifecycle {
 
 	private final BufferedImage canvas;
 	private final List<PenBall> balls = new ArrayList<>();

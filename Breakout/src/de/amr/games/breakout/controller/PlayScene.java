@@ -18,6 +18,7 @@ import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controller.Lifecycle;
+import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
@@ -33,7 +34,7 @@ import de.amr.statemachine.core.StateMachine;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PlayScene implements View, Lifecycle {
+public class PlayScene extends Entity implements Lifecycle {
 
 	private final BreakoutGameApp app;
 	private final StateMachine<PlayState, PlayEvent> control;

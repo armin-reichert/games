@@ -2,12 +2,13 @@ package de.amr.games.breakout.entities;
 
 import java.awt.Graphics2D;
 
+import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.ui.sprites.Sprite;
 import de.amr.easy.game.ui.sprites.SpriteMap;
 
-public class Brick extends Entity {
+public class Brick extends Entity implements Lifecycle {
 
 	public enum BrickColor {
 		pink, blue, green, violet, yellow;
@@ -23,8 +24,7 @@ public class Brick extends Entity {
 		tf.setWidth(width);
 		tf.setHeight(height);
 		sprites.set("s_intact", Sprite.ofAssets("Bricks/brick_" + color + "_small.png").scale(width, height));
-		sprites.set("s_damaged",
-				Sprite.ofAssets("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
+		sprites.set("s_damaged", Sprite.ofAssets("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
 		sprites.select("s_intact");
 	}
 
@@ -40,7 +40,15 @@ public class Brick extends Entity {
 	public int getValue() {
 		return value;
 	}
-	
+
+	@Override
+	public void init() {
+	}
+
+	@Override
+	public void update() {
+	}
+
 	@Override
 	public void draw(Graphics2D g) {
 		sprites.current().ifPresent(sprite -> {
