@@ -3,11 +3,11 @@ package de.amr.games.magicball;
 import java.awt.Color;
 import java.awt.DisplayMode;
 
-import de.amr.easy.game.GenericApplication;
+import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.games.magicball.views.DrawingScene;
 
-public class MagicBallApp extends GenericApplication {
+public class MagicBallApp extends Application {
 
 	public static void main(String[] args) {
 		launch(new MagicBallApp(), args);
