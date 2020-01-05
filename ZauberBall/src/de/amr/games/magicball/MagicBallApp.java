@@ -14,17 +14,17 @@ public class MagicBallApp extends GenericApplication {
 	}
 
 	public MagicBallApp() {
-		settings.title = "Zauberball";
-		settings.width = 800;
-		settings.height = 600;
-		settings.bgColor = Color.WHITE;
-		settings.fullScreenMode = new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN);
-		settings.fullScreenOnStart = false;
+		settings().title = "Zauberball";
+		settings().width = 800;
+		settings().height = 600;
+		settings().bgColor = Color.WHITE;
+		settings().fullScreenMode = new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN);
+		settings().fullScreenOnStart = false;
 	}
 
 	@Override
 	public void init() {
 		Assets.image("ball.png");
-		setController(new DrawingScene(settings.width, settings.height, 3));
+		setController(new DrawingScene(settings().width, settings().height, 3));
 	}
 }

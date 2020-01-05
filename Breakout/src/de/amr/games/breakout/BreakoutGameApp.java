@@ -19,12 +19,12 @@ public class BreakoutGameApp extends GenericApplication {
 	public final EntityMap entities = new EntityMap();
 
 	public BreakoutGameApp() {
-		settings.title = "Breakout";
-		settings.width = 800;
-		settings.height = 600;
-		settings.set("ball_size", 12);
-		settings.set("bat_width", 96);
-		settings.set("bat_height", 12);
+		settings().title = "Breakout";
+		settings().width = 800;
+		settings().height = 600;
+		settings().set("ball_size", 12);
+		settings().set("bat_width", 96);
+		settings().set("bat_height", 12);
 	}
 
 	@Override

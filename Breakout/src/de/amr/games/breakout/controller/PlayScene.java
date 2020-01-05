@@ -50,11 +50,11 @@ public class PlayScene extends Entity implements Lifecycle {
 		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
 		Dimension boardSize = new Dimension(getWidth(), getHeight());
 
-		ball = new Ball(app.settings.get("ball_size"));
+		ball = new Ball(app.settings().get("ball_size"));
 		ball.setBoardSize(boardSize);
 		app.entities.store(ball);
 
-		bat = new Bat(app.settings.get("bat_width"), app.settings.get("bat_height"));
+		bat = new Bat(app.settings().get("bat_width"), app.settings().get("bat_height"));
 		bat.setBoardSize(boardSize);
 		app.entities.store(bat);
 
@@ -64,11 +64,11 @@ public class PlayScene extends Entity implements Lifecycle {
 	}
 
 	public int getWidth() {
-		return app.settings.width;
+		return app.settings().width;
 	}
 
 	public int getHeight() {
-		return app.settings.height;
+		return app.settings().height;
 	}
 
 	private StateMachine<PlayState, PlayEvent> buildStateMachine() {
