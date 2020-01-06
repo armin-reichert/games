@@ -58,7 +58,7 @@ public class PlayScene extends Entity implements Lifecycle {
 		bat.setBoardSize(boardSize);
 		app.entities.store(bat);
 
-		app.collisionHandler.registerStart(ball, bat, new BallHitsBatEvent());
+		app.collisionHandler().registerStart(ball, bat, new BallHitsBatEvent());
 		control = buildStateMachine();
 		control.setLogger(LOGGER);
 	}
@@ -113,7 +113,7 @@ public class PlayScene extends Entity implements Lifecycle {
 					Brick brick = ((BallHitsBrickEvent) e).brick;
 					if (brick.isDamaged()) {
 						app.entities.removeEntity(brick);
-						app.collisionHandler.unregisterStart(ball, brick);
+						app.collisionHandler().unregisterStart(ball, brick);
 						points += brick.getValue();
 						Assets.sound("Sounds/point.mp3").play();
 					} else {
@@ -172,7 +172,7 @@ public class PlayScene extends Entity implements Lifecycle {
 				Brick brick = new Brick(brickWidth, brickHeight, type, value);
 				brick.tf.setPosition(x, y);
 				app.entities.store(brick);
-				app.collisionHandler.registerStart(ball, brick, new BallHitsBrickEvent(brick));
+				app.collisionHandler().registerStart(ball, brick, new BallHitsBrickEvent(brick));
 				x += hSpace;
 			}
 			x = startX;
@@ -199,7 +199,7 @@ public class PlayScene extends Entity implements Lifecycle {
 	}
 
 	private void handleCollisions() {
-		for (Collision coll : app.collisionHandler.collisions()) {
+		for (Collision coll : app.collisionHandler().collisions()) {
 			PlayEvent event = coll.getAppEvent();
 			control.enqueue(event);
 		}
