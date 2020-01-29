@@ -2,18 +2,20 @@ package de.amr.games.diashow;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.config.AppSettings;
 import de.amr.games.diashow.screens.DiashowScreen;
 
 public class DiashowApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new DiashowApp(), args);
+		launch(DiashowApp.class, args);
 	}
 
-	public DiashowApp() {
-		settings().title = "Diashow";
-		settings().width = 900;
-		settings().height = 600;
+	@Override
+	protected void configure(AppSettings settings) {
+		settings.title = "Diashow";
+		settings.width = 900;
+		settings.height = 600;
 	}
 
 	@Override

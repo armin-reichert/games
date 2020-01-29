@@ -2,6 +2,7 @@ package de.amr.games.breakout;
 
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
+import de.amr.easy.game.config.AppSettings;
 import de.amr.easy.game.entity.EntityMap;
 import de.amr.games.breakout.controller.PlayScene;
 
@@ -13,18 +14,19 @@ import de.amr.games.breakout.controller.PlayScene;
 public class BreakoutGameApp extends Application {
 
 	public static void main(String[] args) {
-		launch(new BreakoutGameApp(), args);
+		launch(BreakoutGameApp.class, args);
 	}
-	
+
 	public final EntityMap entities = new EntityMap();
 
-	public BreakoutGameApp() {
-		settings().title = "Breakout";
-		settings().width = 800;
-		settings().height = 600;
-		settings().set("ball_size", 12);
-		settings().set("bat_width", 96);
-		settings().set("bat_height", 12);
+	@Override
+	protected void configure(AppSettings settings) {
+		settings.title = "Breakout";
+		settings.width = 800;
+		settings.height = 600;
+		settings.set("ball_size", 12);
+		settings.set("bat_width", 96);
+		settings.set("bat_height", 12);
 	}
 
 	@Override
