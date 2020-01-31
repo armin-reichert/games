@@ -60,7 +60,7 @@ public class PlayScene extends Entity implements Lifecycle {
 
 		app.collisionHandler().registerStart(ball, bat, new BallHitsBatEvent());
 		control = buildStateMachine();
-		control.setLogger(LOGGER);
+		control.getTracer().setLogger(LOGGER);
 	}
 
 	public int getWidth() {
