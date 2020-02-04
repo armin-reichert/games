@@ -20,7 +20,7 @@ public class DiashowApp extends Application {
 
 	@Override
 	public void init() {
-		clock().setFrequency(3);
+		clock().setTargetFramerate(3);
 		Assets.image("0.jpg");
 		Assets.image("1.jpg");
 		Assets.image("2.jpg");
