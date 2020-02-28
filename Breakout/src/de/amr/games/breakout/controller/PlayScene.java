@@ -43,8 +43,6 @@ public class PlayScene extends Entity implements Lifecycle {
 	private int points;
 	private Image bgImage;
 
-	private final Font scoreFont = new Font(Font.SANS_SERIF, Font.PLAIN, 48);
-
 	public PlayScene(BreakoutGameApp app) {
 		this.app = app;
 		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
@@ -208,7 +206,7 @@ public class PlayScene extends Entity implements Lifecycle {
 	private void drawScore(Graphics2D g) {
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
-		g.setFont(scoreFont);
+		g.setFont(Assets.font("scoreFont"));
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
 		g.drawString(String.valueOf(points), (int) (getWidth() - bounds.getWidth()) / 2, getHeight() * 3 / 4);
 	}

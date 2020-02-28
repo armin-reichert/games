@@ -1,5 +1,7 @@
 package de.amr.games.breakout;
 
+import java.awt.Font;
+
 import de.amr.easy.game.Application;
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.config.AppSettings;
@@ -36,6 +38,7 @@ public class BreakoutGameApp extends Application {
 		Assets.image("bat_blue.png");
 		Assets.sound("Sounds/plop.mp3");
 		Assets.sound("Sounds/point.mp3");
+		Assets.storeTrueTypeFont("scoreFont", "PressStart2P-Regular.ttf", Font.BOLD, 48);
 		setController(new PlayScene(this));
 	}
 }
