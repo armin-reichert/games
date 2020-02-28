@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -17,7 +16,6 @@ import java.util.Random;
 
 import de.amr.easy.game.assets.Assets;
 import de.amr.easy.game.controller.Lifecycle;
-import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.entity.collision.Collision;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.view.View;
@@ -33,7 +31,7 @@ import de.amr.statemachine.core.StateMachine;
  * 
  * @author Armin Reichert & Anna Schillo
  */
-public class PlayScene extends Entity implements Lifecycle {
+public class PlayScene implements View, Lifecycle {
 
 	private final BreakoutGameApp app;
 	private final StateMachine<PlayState, PlayEvent> control;
@@ -203,7 +201,6 @@ public class PlayScene extends Entity implements Lifecycle {
 	}
 
 	private void drawScore(Graphics2D g) {
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(Color.RED);
 		g.setFont(Assets.font("scoreFont"));
 		Rectangle2D bounds = g.getFontMetrics().getStringBounds(String.valueOf(points), g);
