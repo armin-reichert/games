@@ -22,8 +22,8 @@ public class Bat extends Entity implements Lifecycle, View {
 
 	public Bat(int width, int height) {
 		sprite = Sprite.ofAssets("bat_blue.png").scale(width, height);
-		tf.width =(sprite.getWidth());
-		tf.height =(sprite.getHeight());
+		tf.width = (sprite.getWidth());
+		tf.height = (sprite.getHeight());
 	}
 
 	public void setBoardSize(Dimension boardSize) {
@@ -36,15 +36,15 @@ public class Bat extends Entity implements Lifecycle, View {
 
 	@Override
 	public void update() {
-		tf.setVelocityX(0);
+		tf.vx = 0;
 		if (Keyboard.keyDown(KeyEvent.VK_LEFT)) {
-			tf.setVelocityX(-speed);
+			tf.vx = -speed;
 			tf.move();
-			tf.x=(min(boardSize.width - tf.width, max(0, tf.x)));
+			tf.x = (min(boardSize.width - tf.width, max(0, tf.x)));
 		} else if (Keyboard.keyDown(KeyEvent.VK_RIGHT)) {
-			tf.setVelocityX(speed);
+			tf.vx = speed;
 			tf.move();
-			tf.x=(min(boardSize.width - tf.width, max(0, tf.x)));
+			tf.x = (min(boardSize.width - tf.width, max(0, tf.x)));
 		}
 	}
 

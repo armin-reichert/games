@@ -14,8 +14,8 @@ public class Ball extends Entity implements Lifecycle, View {
 	private Dimension boardSize;
 
 	public Ball(int size) {
-		tf.width =(size);
-		tf.height =(size);
+		tf.width = (size);
+		tf.height = (size);
 		sprite = Sprite.ofAssets("ball_green.png").scale(size);
 	}
 
@@ -43,21 +43,21 @@ public class Ball extends Entity implements Lifecycle, View {
 	public void update() {
 		tf.move();
 		if (tf.x < 0) {
-			tf.x=(0);
-			if (tf.getVelocityX() < 0) {
-				tf.setVelocityX(-tf.getVelocityX());
+			tf.x = (0);
+			if (tf.vx < 0) {
+				tf.vx *= -1;
 			}
 		}
 		if (tf.x > boardSize.width - tf.width) {
-			tf.x=(boardSize.width - tf.width);
-			if (tf.getVelocityX() > 0) {
-				tf.setVelocityX(-tf.getVelocityX());
+			tf.x = (boardSize.width - tf.width);
+			if (tf.vx > 0) {
+				tf.vx *= -1;
 			}
 		}
 		if (tf.y < 0) {
-			tf.y=(0);
-			if (tf.getVelocityY() < 0) {
-				tf.setVelocityY(-tf.getVelocityY());
+			tf.y = (0);
+			if (tf.vy < 0) {
+				tf.vy *= -1;
 			}
 		}
 	}

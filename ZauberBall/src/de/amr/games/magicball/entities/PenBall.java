@@ -20,8 +20,8 @@ public class PenBall extends Entity implements Lifecycle, View {
 		this.canvas = canvas;
 		thickness = 5;
 		color = randomColor();
-		tf.width =(thickness);
-		tf.height =(thickness);
+		tf.width = (thickness);
+		tf.height = (thickness);
 	}
 
 	@Override
@@ -32,10 +32,10 @@ public class PenBall extends Entity implements Lifecycle, View {
 	public void update() {
 		tf.move();
 		if (tf.y > canvas.getHeight() - tf.height || tf.y < 0) {
-			tf.setVelocityY(-tf.getVelocityY());
+			tf.vy *= -1;
 		}
 		if (tf.x < 0 || tf.x > canvas.getWidth() - tf.width) {
-			tf.setVelocityX(-tf.getVelocityX());
+			tf.vx *= -1;
 		}
 		color = randomColor();
 		updateImage();

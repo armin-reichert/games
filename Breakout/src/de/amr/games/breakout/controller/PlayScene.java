@@ -100,7 +100,7 @@ public class PlayScene implements View, Lifecycle {
 				.when(Initialized).then(Playing).condition( () -> Keyboard.keyPressedOnce(KeyEvent.VK_SPACE) )
 
 				.stay(Playing).on(BallHitsBatEvent.class).act(e -> {
-					ball.tf.setVelocityY(-ball.tf.getVelocityY());
+					ball.tf.vy *= -1;
 					Assets.sound("Sounds/plop.mp3").play();
 				})
 				
@@ -113,7 +113,7 @@ public class PlayScene implements View, Lifecycle {
 						Assets.sound("Sounds/point.mp3").play();
 					} else {
 						brick.damage();
-						ball.tf.setVelocityY(-ball.tf.getVelocityY());
+						ball.tf.vy *= -1;
 					}
 				})
 
