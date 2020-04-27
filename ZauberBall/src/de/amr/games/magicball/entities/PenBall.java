@@ -8,8 +8,9 @@ import java.util.Random;
 
 import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.entity.Entity;
+import de.amr.easy.game.view.View;
 
-public class PenBall extends Entity implements Lifecycle {
+public class PenBall extends Entity implements Lifecycle, View {
 
 	private final BufferedImage canvas;
 	private int thickness;
@@ -22,7 +23,7 @@ public class PenBall extends Entity implements Lifecycle {
 		tf.setWidth(thickness);
 		tf.setHeight(thickness);
 	}
-	
+
 	@Override
 	public void init() {
 	}

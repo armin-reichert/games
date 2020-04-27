@@ -7,8 +7,9 @@ import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.ui.sprites.Sprite;
 import de.amr.easy.game.ui.sprites.SpriteMap;
+import de.amr.easy.game.view.View;
 
-public class Brick extends Entity implements Lifecycle {
+public class Brick extends Entity implements Lifecycle, View {
 
 	public enum BrickColor {
 		pink, blue, green, violet, yellow;

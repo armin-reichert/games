@@ -6,8 +6,9 @@ import java.awt.Graphics2D;
 import de.amr.easy.game.controller.Lifecycle;
 import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.ui.sprites.Sprite;
+import de.amr.easy.game.view.View;
 
-public class Ball extends Entity implements Lifecycle {
+public class Ball extends Entity implements Lifecycle, View {
 
 	private Sprite sprite;
 	private Dimension boardSize;

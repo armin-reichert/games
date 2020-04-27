@@ -12,8 +12,9 @@ import de.amr.easy.game.entity.Entity;
 import de.amr.easy.game.input.Keyboard;
 import de.amr.easy.game.math.Vector2f;
 import de.amr.easy.game.ui.sprites.Sprite;
+import de.amr.easy.game.view.View;
 
-public class Bat extends Entity implements Lifecycle {
+public class Bat extends Entity implements Lifecycle, View {
 
 	private Sprite sprite;
 	private Dimension boardSize;
