@@ -20,8 +20,8 @@ public class PenBall extends Entity implements Lifecycle, View {
 		this.canvas = canvas;
 		thickness = 5;
 		color = randomColor();
-		tf.setWidth(thickness);
-		tf.setHeight(thickness);
+		tf.width =(thickness);
+		tf.height =(thickness);
 	}
 
 	@Override
@@ -31,10 +31,10 @@ public class PenBall extends Entity implements Lifecycle, View {
 	@Override
 	public void update() {
 		tf.move();
-		if (tf.getY() > canvas.getHeight() - tf.getHeight() || tf.getY() < 0) {
+		if (tf.y > canvas.getHeight() - tf.height || tf.y < 0) {
 			tf.setVelocityY(-tf.getVelocityY());
 		}
-		if (tf.getX() < 0 || tf.getX() > canvas.getWidth() - tf.getWidth()) {
+		if (tf.x < 0 || tf.x > canvas.getWidth() - tf.width) {
 			tf.setVelocityX(-tf.getVelocityX());
 		}
 		color = randomColor();
@@ -45,9 +45,9 @@ public class PenBall extends Entity implements Lifecycle, View {
 		Graphics2D g = (Graphics2D) canvas.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(color);
-		g.translate(tf.getX() + tf.getWidth() / 2, tf.getY() + tf.getHeight() / 2);
+		g.translate(tf.x + tf.width / 2, tf.y + tf.height / 2);
 		g.fillOval(0, 0, thickness, thickness);
-		g.translate(-tf.getX() - tf.getWidth() / 2, -tf.getY() - tf.getHeight() / 2);
+		g.translate(-tf.x - tf.width / 2, -tf.y - tf.height / 2);
 	}
 
 	@Override

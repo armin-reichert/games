@@ -14,8 +14,8 @@ public class Ball extends Entity implements Lifecycle, View {
 	private Dimension boardSize;
 
 	public Ball(int size) {
-		tf.setWidth(size);
-		tf.setHeight(size);
+		tf.width =(size);
+		tf.height =(size);
 		sprite = Sprite.ofAssets("ball_green.png").scale(size);
 	}
 
@@ -24,13 +24,13 @@ public class Ball extends Entity implements Lifecycle, View {
 	}
 
 	public boolean isOut() {
-		return tf.getY() > boardSize.height;
+		return tf.y > boardSize.height;
 	}
 
 	@Override
 	public void draw(Graphics2D g2) {
 		Graphics2D g = (Graphics2D) g2.create();
-		g.translate(tf.getX(), tf.getY());
+		g.translate(tf.x, tf.y);
 		sprite.draw(g);
 		g.dispose();
 	}
@@ -42,20 +42,20 @@ public class Ball extends Entity implements Lifecycle, View {
 	@Override
 	public void update() {
 		tf.move();
-		if (tf.getX() < 0) {
-			tf.setX(0);
+		if (tf.x < 0) {
+			tf.x=(0);
 			if (tf.getVelocityX() < 0) {
 				tf.setVelocityX(-tf.getVelocityX());
 			}
 		}
-		if (tf.getX() > boardSize.width - tf.getWidth()) {
-			tf.setX(boardSize.width - tf.getWidth());
+		if (tf.x > boardSize.width - tf.width) {
+			tf.x=(boardSize.width - tf.width);
 			if (tf.getVelocityX() > 0) {
 				tf.setVelocityX(-tf.getVelocityX());
 			}
 		}
-		if (tf.getY() < 0) {
-			tf.setY(0);
+		if (tf.y < 0) {
+			tf.y=(0);
 			if (tf.getVelocityY() < 0) {
 				tf.setVelocityY(-tf.getVelocityY());
 			}

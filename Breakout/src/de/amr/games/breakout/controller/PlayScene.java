@@ -177,9 +177,9 @@ public class PlayScene implements View, Lifecycle {
 
 	private void resetBatAndBall() {
 		bat.speed = getWidth() / 48;
-		bat.tf.setPosition((getWidth() - bat.tf.getWidth()) / 2, getHeight() - bat.tf.getHeight());
+		bat.tf.setPosition((getWidth() - bat.tf.width) / 2, getHeight() - bat.tf.height);
 		bat.tf.setVelocity(0, 0);
-		ball.tf.setPosition((getWidth() - ball.tf.getWidth()) / 2, bat.tf.getY() - ball.tf.getHeight());
+		ball.tf.setPosition((getWidth() - ball.tf.width) / 2, bat.tf.y - ball.tf.height);
 		ball.tf.setVelocity(0, 0);
 	}
 

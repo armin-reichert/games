@@ -22,8 +22,8 @@ public class Brick extends Entity implements Lifecycle, View {
 	public Brick(int width, int height, BrickColor color, int value) {
 		this.value = value;
 		damaged = false;
-		tf.setWidth(width);
-		tf.setHeight(height);
+		tf.width = width;
+		tf.height = height;
 		sprites.set("s_intact", Sprite.ofAssets("Bricks/brick_" + color + "_small.png").scale(width, height));
 		sprites.set("s_damaged", Sprite.ofAssets("Bricks/brick_" + color + "_small_cracked.png").scale(width, height));
 		sprites.select("s_intact");
