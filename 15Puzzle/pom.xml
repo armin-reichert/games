@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.amr.games.15puzzle</groupId>
   <artifactId>15Puzzle</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
   <build>
     <plugins>
       <plugin>
