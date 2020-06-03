@@ -89,7 +89,7 @@ public class PuzzleSolverTest {
 		testAStar(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
 
 		// IDDFS: very slow, out of memory
-		testIDDFS(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
+//		testIDDFS(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
 		
 		testHillClimbing(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
 	}
