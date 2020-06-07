@@ -19,7 +19,7 @@ public class MagicBallApp extends Application {
 		settings.width = 800;
 		settings.height = 600;
 		settings.fullScreenMode = new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN);
-		settings.fullScreenOnStart = false;
+		settings.fullScreen = false;
 	}
 
 	@Override
