@@ -1,6 +1,5 @@
 package de.amr.games.magicball;
 
-import java.awt.Color;
 import java.awt.DisplayMode;
 
 import de.amr.easy.game.Application;
@@ -19,7 +18,6 @@ public class MagicBallApp extends Application {
 		settings.title = "Zauberball";
 		settings.width = 800;
 		settings.height = 600;
-		settings.bgColor = Color.WHITE;
 		settings.fullScreenMode = new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN);
 		settings.fullScreenOnStart = false;
 	}
