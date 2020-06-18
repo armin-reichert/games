@@ -50,7 +50,9 @@ public class Bat extends Entity implements Lifecycle, View {
 
 	@Override
 	public void draw(Graphics2D g) {
-		Vector2f position = tf.getPosition();
-		g.drawImage(sprite.currentFrame(), position.roundedX(), position.roundedY(), null);
+		sprite.currentFrame().ifPresent(frame -> {
+			Vector2f position = tf.getPosition();
+			g.drawImage(frame, position.roundedX(), position.roundedY(), null);
+		});
 	}
 }

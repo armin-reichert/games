@@ -42,6 +42,7 @@ public class PlayScene implements View, Lifecycle {
 
 	public PlayScene(BreakoutGameApp app) {
 		this.app = app;
+		app.createCollisionHandler();
 		bgImage = Assets.image("background.jpg").getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
 		Dimension boardSize = new Dimension(getWidth(), getHeight());
 
