@@ -1,6 +1,5 @@
 package de.amr.games.breakout.controller;
 
-import static de.amr.easy.game.Application.LOGGER;
 import static de.amr.games.breakout.controller.PlayState.BallOut;
 import static de.amr.games.breakout.controller.PlayState.Initialized;
 import static de.amr.games.breakout.controller.PlayState.Playing;
@@ -58,7 +57,6 @@ public class PlayScene implements View, Lifecycle {
 			handler.registerStart(ball, bat, new BallHitsBatEvent());
 		});
 		control = buildStateMachine();
-		control.getTracer().setLogger(LOGGER);
 	}
 
 	public int getWidth() {
