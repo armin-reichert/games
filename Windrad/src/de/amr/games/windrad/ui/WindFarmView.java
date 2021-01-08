@@ -15,7 +15,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -105,11 +105,15 @@ public class WindFarmView extends JPanel {
 		}
 	}
 
-	public WindFarmView(WindFarm farm, int width, int height) throws IOException {
+	public WindFarmView(WindFarm farm, int width, int height) {
 		this.farm = farm;
 		helpOn = true;
 		selectedIndex = 0;
-		bgImage = ImageIO.read(getClass().getResourceAsStream("/hintergrund.png"));
+		try (InputStream is = getClass().getResourceAsStream("/hintergrund.png")) {
+			bgImage = ImageIO.read(is);
+		} catch (Exception x) {
+			throw new RuntimeException("Could not load background image", x);
+		}
 		for (WindTurbine turbine : farm.turbines) {
 			turbineViews.add(new WindTurbineView(this, turbine));
 		}
@@ -189,8 +193,8 @@ public class WindFarmView extends JPanel {
 		// Sonne
 		int sunDiameter = 40;
 		g.setColor(Color.YELLOW);
-		g.fillOval((int) (farm.sunCenter.x - sunDiameter / 2),
-				(int) (farm.sunCenter.y - sunDiameter / 2), sunDiameter, sunDiameter);
+		g.fillOval((int) (farm.sunCenter.x - sunDiameter / 2), (int) (farm.sunCenter.y - sunDiameter / 2), sunDiameter,
+				sunDiameter);
 
 		// Windräder
 		if (!turbineViews.isEmpty()) {
@@ -215,8 +219,7 @@ public class WindFarmView extends JPanel {
 	private void selectByPosition(double modelX, double modelY) {
 		for (WindTurbineView view : turbineViews) {
 			WindTurbine turbine = view.getTurbine();
-			if (turbine.getNacelle().contains(modelX, modelY)
-					|| turbine.getTower().contains(modelX, modelY)) {
+			if (turbine.getNacelle().contains(modelX, modelY) || turbine.getTower().contains(modelX, modelY)) {
 				selectedIndex = turbineViews.indexOf(view);
 				break;
 			}
@@ -279,8 +282,8 @@ public class WindFarmView extends JPanel {
 		float nacelleRadius = towerWidthTop;
 		float rotorLength = towerHeight / 2 - WindTurbine.getMinBottomDistance();
 		float rotorThickness = rotorLength / 10;
-		WindTurbine turbine = new WindTurbine(0, y, towerHeight, towerWidthBottom, towerWidthTop,
-				nacelleRadius, rotorLength, rotorThickness);
+		WindTurbine turbine = new WindTurbine(0, y, towerHeight, towerWidthBottom, towerWidthTop, nacelleRadius,
+				rotorLength, rotorThickness);
 		farm.turbines.add(turbine);
 		turbineViews.add(new WindTurbineView(this, turbine));
 		selectTurbine(turbine);
