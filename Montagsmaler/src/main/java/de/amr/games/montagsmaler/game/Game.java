@@ -1,15 +1,12 @@
 package de.amr.games.montagsmaler.game;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.Timer;
 
 /**
- * Represents the game with two teams, a current player and operations to start, pause and stop a
- * game. The state changes of the game trigger events that can be handled for example by the user
- * interface objects.
+ * Represents the game with two teams, a current player and operations to start, pause and stop a game. The state
+ * changes of the game trigger events that can be handled for example by the user interface objects.
  */
 public class Game extends PropertyChangeSource {
 
@@ -23,6 +20,25 @@ public class Game extends PropertyChangeSource {
 	private Player currentPlayer;
 	private int elapsed;
 	private int speed;
+
+	public Game(Team team1, Team team2) {
+		this.team1 = team1;
+		this.team2 = team2;
+		currentTeam = team1;
+		currentPlayer = team1.isEmpty() ? null : team1.getPlayers().get(0);
+		elapsed = 0;
+		clock = new Timer(100, e -> doTick());
+		setSpeed(1);
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
+		clock.setDelay(PULSE_MILLIS / speed);
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
 
 	private void setElapsed(int newValue) {
 		int oldValue = elapsed;
@@ -61,34 +77,9 @@ public class Game extends PropertyChangeSource {
 		try {
 			Thread.sleep(1000 * seconds);
 		} catch (InterruptedException e) {
-
+			Thread.currentThread().interrupt();
 		}
 		clock.start();
-	}
-
-	public Game(Team team1, Team team2) {
-		this.team1 = team1;
-		this.team2 = team2;
-		currentTeam = team1;
-		currentPlayer = team1.isEmpty() ? null : team1.getPlayers().get(0);
-		elapsed = 0;
-		clock = new Timer(0, new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doTick();
-			}
-		});
-		setSpeed(1);
-	}
-
-	public void setSpeed(int speed) {
-		this.speed = speed;
-		clock.setDelay(PULSE_MILLIS / speed);
-	}
-
-	public int getSpeed() {
-		return speed;
 	}
 
 	public Team getTeam1() {
@@ -145,5 +136,4 @@ public class Game extends PropertyChangeSource {
 			return team2;
 		}
 	}
-
 }
