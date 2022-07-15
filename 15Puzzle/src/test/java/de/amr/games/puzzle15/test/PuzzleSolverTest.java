@@ -35,8 +35,8 @@ public class PuzzleSolverTest {
 			} else {
 				System.out.println(String.format("Solution length=%d, max queue size=%,d", solution.get().size(),
 						solver.getMaxFrontierSize()));
-				System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull)
-						.map(String::valueOf).collect(Collectors.joining(" ")));
+				System.out.println(solution.get().stream().map(Node::getDir).filter(Objects::nonNull).map(String::valueOf)
+						.collect(Collectors.joining(" ")));
 				System.out.println();
 			}
 		} catch (SolverGivingUpException e) {
@@ -47,7 +47,7 @@ public class PuzzleSolverTest {
 	private void testAStar(int... cells) {
 		System.out.println("A* solver:");
 		test(new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
-				s -> s.getMaxFrontierSize() > 1_000_000), cells);
+				s -> s.getMaxFrontierSize() > 200_000), cells);
 	}
 
 	private void testHillClimbing(int... cells) {
@@ -66,10 +66,10 @@ public class PuzzleSolverTest {
 
 		// A*: fast, Solution length=16, max queue size=18
 		testAStar(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
-		
+
 		// IDDFS: medium, Solution length=26, max queue size=34
 		testIDDFS(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
-		
+
 		// Hill-climbing: fast, Solution length=16, max queue size=18
 		testHillClimbing(5, 1, 7, 3, 9, 2, 11, 4, 13, 6, 15, 8, 0, 10, 14, 12);
 	}
@@ -84,13 +84,13 @@ public class PuzzleSolverTest {
 	public void test3() {
 		// LEFT UP UP RIGHT RIGHT DOWN LEFT UP LEFT LEFT DOWN DOWN RIGHT RIGHT UP LEFT LEFT DOWN DOWN RIGHT
 		// RIGHT UP RIGHT UP LEFT LEFT UP RIGHT DOWN DOWN RIGHT DOWN LEFT LEFT UP UP LEFT UP
-		
+
 		// A*: slow, Solution length=39, max queue size=161.383
 		testAStar(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
 
 		// IDDFS: very slow, out of memory
 //		testIDDFS(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
-		
+
 		testHillClimbing(5, 2, 4, 8, 10, 0, 3, 14, 13, 6, 11, 12, 1, 15, 9, 7);
 	}
 
@@ -101,8 +101,8 @@ public class PuzzleSolverTest {
 
 	@Test
 	public void test5() {
-		
-		// A*: 
+
+		// A*:
 		testAStar(5, 8, 7, 11, 1, 6, 12, 2, 9, 0, 13, 10, 14, 3, 4, 15);
 	}
 }

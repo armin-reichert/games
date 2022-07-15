@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.amr.games.breakout</groupId>
-	<artifactId>breakout</artifactId>
+	<groupId>de.amr.games.diashow</groupId>
+	<artifactId>diashow</artifactId>
 	<version>1.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<mainClass>de.amr.games.breakout.BreakoutGameApp</mainClass>
+		<mainClass>de.amr.games.diashow.DiashowApp</mainClass>
 		<maven.compiler.source>18</maven.compiler.source>
 		<maven.compiler.target>18</maven.compiler.target>
 	</properties>
@@ -16,6 +16,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.4.1</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -35,6 +36,7 @@
 						</goals>
 					</execution>
 				</executions>
+
 			</plugin>
 		</plugins>
 	</build>
