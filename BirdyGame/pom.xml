@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.amr.games</groupId>
+		<artifactId>game-samples</artifactId>
+		<version>1.0</version>
+		<relativePath>../game-samples</relativePath>
+	</parent>
+
+	<artifactId>BirdyGame</artifactId>
+	<description>Flappy Bird like game</description>
+
+	<properties>
+		<mainClass>de.amr.games.birdy.BirdyGameApp</mainClass>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>${mainClass}</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.amr.easy.game</groupId>
+			<artifactId>easy-game-framework</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+
+</project>
