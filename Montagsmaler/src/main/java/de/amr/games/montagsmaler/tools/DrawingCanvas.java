@@ -13,8 +13,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import de.amr.games.montagsmaler.Tools;
-
 /**
  * A canvas with interactive drawiing capability.
  * 

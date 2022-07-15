@@ -24,11 +24,11 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-import de.amr.games.montagsmaler.Tools;
 import de.amr.games.montagsmaler.game.Game;
 import de.amr.games.montagsmaler.game.Player;
 import de.amr.games.montagsmaler.game.Team;
 import de.amr.games.montagsmaler.tools.EnhancedFileChooser;
+import de.amr.games.montagsmaler.tools.Tools;
 
 public class GameEditor extends JDialog {
 

@@ -7,21 +7,20 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.amr.games.montagsmaler.Tools;
 import de.amr.games.montagsmaler.game.Game;
 import de.amr.games.montagsmaler.game.Player;
 import de.amr.games.montagsmaler.game.Team;
 import de.amr.games.montagsmaler.sounds.Sound;
 import de.amr.games.montagsmaler.tools.ScrollingCanvas;
+import de.amr.games.montagsmaler.tools.Tools;
 
 /**
- * The ceremony for the winners (or for both teams in case of a draw). Plays a hymn and shows the
- * photos of the honored players in a scrolling area.
+ * The ceremony for the winners (or for both teams in case of a draw). Plays a hymn and shows the photos of the honored
+ * players in a scrolling area.
  */
 public class Ceremony extends ScrollingCanvas {
 
-	private static final Image OLYMPIC_RINGS = Tools.loadImageIcon("images/olympische-ringe.jpg")
-			.getImage();
+	private static final Image OLYMPIC_RINGS = Tools.loadImageIcon("images/olympische-ringe.jpg").getImage();
 	private static final Font FONT = new Font("Cooper Black", Font.PLAIN, 36);
 
 	private final List<Player> honoredPlayers = new ArrayList<Player>();

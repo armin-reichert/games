@@ -1,4 +1,4 @@
-package de.amr.games.montagsmaler;
+package de.amr.games.montagsmaler.tools;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -32,7 +32,7 @@ public class Tools {
 	}
 
 	public static ImageIcon loadImageIcon(String path) {
-		URL url = Tools.class.getResource(path);
+		URL url = Tools.class.getResource("/de/amr/games/montagsmaler/" + path);
 		if (url == null) {
 			System.err.println("Could not load icon from path: " + path);
 			return null;
@@ -41,8 +41,7 @@ public class Tools {
 	}
 
 	public static Cursor createCursor(String path, Point hotspot, String name) {
-		return Toolkit.getDefaultToolkit().createCustomCursor(loadImageIcon(path).getImage(), hotspot,
-				name);
+		return Toolkit.getDefaultToolkit().createCustomCursor(loadImageIcon(path).getImage(), hotspot, name);
 	}
 
 	public static Color randomPenColor() {

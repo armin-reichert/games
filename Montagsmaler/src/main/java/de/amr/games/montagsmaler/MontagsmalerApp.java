@@ -25,6 +25,7 @@ package de.amr.games.montagsmaler;
 
 import javax.swing.SwingUtilities;
 
+import de.amr.games.montagsmaler.tools.Tools;
 import de.amr.games.montagsmaler.ui.MontagsmalerUI;
 
 /**

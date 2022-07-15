@@ -29,11 +29,11 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.amr.games.montagsmaler.Tools;
 import de.amr.games.montagsmaler.game.Game;
 import de.amr.games.montagsmaler.game.Player;
 import de.amr.games.montagsmaler.game.Team;
 import de.amr.games.montagsmaler.sounds.Sound;
+import de.amr.games.montagsmaler.tools.Tools;
 
 /**
  * The Montagsmaler game UI.

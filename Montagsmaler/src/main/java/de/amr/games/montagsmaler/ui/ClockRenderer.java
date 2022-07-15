@@ -7,7 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
-import de.amr.games.montagsmaler.Tools;
+import de.amr.games.montagsmaler.tools.Tools;
 
 public class ClockRenderer {
 

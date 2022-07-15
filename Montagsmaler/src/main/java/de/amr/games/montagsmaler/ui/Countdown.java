@@ -12,7 +12,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.Timer;
 
-import de.amr.games.montagsmaler.Tools;
+import de.amr.games.montagsmaler.tools.Tools;
 
 public class Countdown implements ActionListener {
 
