@@ -55,7 +55,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	private final TeamPanel[] teamPanels;
 
 	private final Action actionClearTablet = new AbstractAction() {
-
 		{
 			putValue(LARGE_ICON_KEY, Tools.loadImageIcon("icons32/cancel.png"));
 			putValue(SHORT_DESCRIPTION, "Bild löschen");
@@ -68,7 +67,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	};
 
 	private final Action actionStartGame = new AbstractAction() {
-
 		{
 			putValue(LARGE_ICON_KEY, Tools.loadImageIcon("icons32/clock_go.png"));
 			putValue(SHORT_DESCRIPTION, "Spiel starten");
@@ -89,7 +87,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	};
 
 	private final Action actionClearPoints = new AbstractAction() {
-
 		{
 			putValue(NAME, "Punkte zurücksetzen");
 		}
@@ -107,7 +104,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	};
 
 	private final Action actionSolutionFound = new AbstractAction() {
-
 		{
 			putValue(LARGE_ICON_KEY, Tools.loadImageIcon("icons32/accept.png"));
 			putValue(SHORT_DESCRIPTION, "Bild wurde erraten");
@@ -128,7 +124,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	};
 
 	private final Action actionEditTeamName = new AbstractAction() {
-
 		{
 			putValue(NAME, "Team umbenennen...");
 			putValue(SMALL_ICON, Tools.loadImageIcon("icons16/group_edit.png"));
@@ -157,7 +152,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	};
 
 	private final Action actionAddPlayer = new AbstractAction() {
-
 		{
 			putValue(NAME, "Maler hinzufügen...");
 			putValue(SMALL_ICON, Tools.loadImageIcon("icons16/group_add.png"));
@@ -170,7 +164,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 	};
 
 	private final Action actionExitGame = new AbstractAction() {
-
 		{
 			putValue(NAME, "Spiel beenden");
 		}
