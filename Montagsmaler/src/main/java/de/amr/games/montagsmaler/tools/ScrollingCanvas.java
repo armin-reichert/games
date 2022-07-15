@@ -26,7 +26,7 @@ public class ScrollingCanvas extends DrawingCanvas implements ActionListener {
 		timer.setInitialDelay(initialDelay);
 		timer.setDelay(delay);
 		setEnabled(false); // disable interactive drawing capability
-		gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		bufferContext.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	}
 
 	/**
@@ -85,19 +85,19 @@ public class ScrollingCanvas extends DrawingCanvas implements ActionListener {
 	}
 
 	protected void text(String text) {
-		gfx.setBackground(getBackground());
-		gfx.setFont(getFont());
-		gfx.setColor(getForeground());
-		int w = (int) gfx.getFontMetrics(getFont()).getStringBounds(text, gfx).getWidth();
-		gfx.drawString(text, computeX(w), y);
+		bufferContext.setBackground(getBackground());
+		bufferContext.setFont(getFont());
+		bufferContext.setColor(getForeground());
+		int w = (int) bufferContext.getFontMetrics(getFont()).getStringBounds(text, bufferContext).getWidth();
+		bufferContext.drawString(text, computeX(w), y);
 		linefeed(getLineHeight());
 	}
 
 	protected void image(Image img) {
-		gfx.setBackground(getBackground());
-		gfx.setFont(getFont());
-		gfx.setColor(getForeground());
-		gfx.drawImage(img, computeX(img.getWidth(null)), y, null);
+		bufferContext.setBackground(getBackground());
+		bufferContext.setFont(getFont());
+		bufferContext.setColor(getForeground());
+		bufferContext.drawImage(img, computeX(img.getWidth(null)), y, null);
 		linefeed(img.getHeight(null));
 	}
 

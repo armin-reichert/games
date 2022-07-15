@@ -20,19 +20,20 @@ import javax.swing.JPanel;
  */
 public class DrawingCanvas extends JPanel {
 
-	private static final Cursor BRUSH_CURSOR = Tools.createCursor("icons32/bullet_brush.png",
-			new Point(0, 31), "Brush Cursor");
+	private static final Cursor BRUSH_CURSOR = Tools.createCursor("icons32/bullet_brush.png", new Point(0, 31),
+			"Brush Cursor");
 
 	private static final int CLEAR_AREA_SIZE = 80;
+
 	private static final Image CLEAR_DRAWING = Tools.loadImageIcon("images/remove_256.png").getImage()
 			.getScaledInstance(CLEAR_AREA_SIZE, CLEAR_AREA_SIZE, Image.SCALE_SMOOTH);
 
-	private final MouseController mouseHandler;
-	protected BufferedImage buffer;
-	protected Graphics2D gfx;
-	private int penSize = 8;
+	private final MouseController mouseHandler = new MouseController();
+	protected final BufferedImage buffer;
+	protected final Graphics2D bufferContext;
 
 	private class MouseController extends MouseAdapter {
+		private int penSize = 8;
 
 		private void clearOrDraw(MouseEvent e) {
 			if (e.getPoint().distance(0, 0) <= CLEAR_AREA_SIZE) {
@@ -40,6 +41,12 @@ public class DrawingCanvas extends JPanel {
 			} else {
 				draw(e.getX(), e.getY());
 			}
+		}
+
+		private void draw(int x, int y) {
+			bufferContext.setColor(getForeground());
+			bufferContext.fillOval(x, y, penSize, penSize);
+			repaint();
 		}
 
 		@Override
@@ -53,9 +60,25 @@ public class DrawingCanvas extends JPanel {
 		}
 	}
 
-	private void draw(int x, int y) {
-		gfx.setColor(getForeground());
-		gfx.fillOval(x, y, penSize, penSize);
+	public DrawingCanvas(Dimension size) {
+		buffer = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+		bufferContext = buffer.createGraphics();
+		setBackground(Color.BLACK);
+		setEnabled(true);
+		setPreferredSize(size);
+		setMaximumSize(size);
+	}
+
+	public void clear() {
+		bufferContext.setColor(getBackground());
+		bufferContext.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
+		repaint();
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		enableInteractiveDrawing(enabled);
 		repaint();
 	}
 
@@ -85,32 +108,9 @@ public class DrawingCanvas extends JPanel {
 
 	protected void paintBelowDrawing(Graphics g) {
 		if (isEnabled()) {
-			gfx.drawImage(CLEAR_DRAWING, 0, 0, null);
+			bufferContext.drawImage(CLEAR_DRAWING, 0, 0, null);
 		} else {
-			gfx.clearRect(0, 0, CLEAR_AREA_SIZE, CLEAR_AREA_SIZE);
+			bufferContext.clearRect(0, 0, CLEAR_AREA_SIZE, CLEAR_AREA_SIZE);
 		}
-	}
-
-	public DrawingCanvas(Dimension size) {
-		mouseHandler = new MouseController();
-		buffer = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-		gfx = buffer.createGraphics();
-		setBackground(Color.BLACK);
-		setEnabled(true);
-		setPreferredSize(size);
-		setMaximumSize(size);
-	}
-
-	public void clear() {
-		gfx.setColor(getBackground());
-		gfx.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
-		repaint();
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		super.setEnabled(enabled);
-		enableInteractiveDrawing(enabled);
-		repaint();
 	}
 }

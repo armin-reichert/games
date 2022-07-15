@@ -28,7 +28,7 @@ public class Playground extends DrawingCanvas {
 	public Playground(Dimension size) {
 		super(size);
 		clock = new ClockRenderer(buffer);
-		countdown = new Countdown(this, buffer, gfx);
+		countdown = new Countdown(this, buffer, bufferContext);
 		countdown.setMaximumSize(Math.min(size.width, size.height));
 	}
 
