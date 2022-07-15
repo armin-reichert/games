@@ -24,8 +24,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import de.amr.games.montagsmaler.game.Game;
 import de.amr.games.montagsmaler.game.Team;
@@ -43,13 +41,11 @@ import de.amr.games.montagsmaler.ui.action.StartGameAction;
 
 /**
  * The Montagsmaler game UI.
- * 
- * @author <a href="mailto:armin.reichert@web.de">Armin Reichert</a>
  */
 public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 
-	static final int TEAMPANEL_WIDTH = 210;
-	static final Dimension PLAYGROUND_SIZE = new Dimension(800, 640);
+	public static final int TEAMPANEL_WIDTH = 210;
+	public static final Dimension PLAYGROUND_SIZE = new Dimension(800, 640);
 
 	private final Game game;
 	private final Playground playground;
@@ -100,13 +96,9 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 		teamSwitcher.addTab(game.getTeam2().getName(), teamPanels[1]);
 		teamSwitcher.setPreferredSize(new Dimension(TEAMPANEL_WIDTH, 600));
 		teamSwitcher.setMaximumSize(teamSwitcher.getPreferredSize());
-		teamSwitcher.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				int tabIndex = teamSwitcher.getSelectedIndex();
-				game.setCurrentTeam(tabIndex == 0 ? game.getTeam1() : game.getTeam2());
-			}
+		teamSwitcher.addChangeListener(e -> {
+			int tabIndex = teamSwitcher.getSelectedIndex();
+			game.setCurrentTeam(tabIndex == 0 ? game.getTeam1() : game.getTeam2());
 		});
 
 		requestFocus();
@@ -173,8 +165,6 @@ public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 			Sound.GAMEOVER.start();
 			playground.setEnabled(false);
 			actionStartGame.setEnabled(true);
-			// TODO when game has ended and drawing has been guessed, enable action
-			// actionImageSolved.setEnabled(false);
 		} else if ("elapsed".equals(property)) {
 			// elapsed time changed
 			Sound.TICK.start();
