@@ -24,6 +24,7 @@
 	<module>../diashow</module>
 	<module>../GameOfLife</module>
 	<module>../nine-mens-morris</module>
+	<module>../Pong</module>
 	</modules>
 
 	<dependencies>
