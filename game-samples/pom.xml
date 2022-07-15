@@ -22,6 +22,7 @@
 	<module>../15Puzzle</module>
 	<module>../Breakout</module>
 	<module>../diashow</module>
+	<module>../game-of-life</module>
 	</modules>
 
 	<dependencies>
