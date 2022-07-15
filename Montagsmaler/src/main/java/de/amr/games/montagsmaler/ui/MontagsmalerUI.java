@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -41,24 +40,10 @@ import de.amr.games.montagsmaler.sounds.Sound;
  * 
  * @author <a href="mailto:armin.reichert@web.de">Armin Reichert</a>
  */
-public class MontagsMalerUI extends JFrame implements PropertyChangeListener {
+public class MontagsmalerUI extends JFrame implements PropertyChangeListener {
 
 	static final int TEAMPANEL_WIDTH = 210;
 	static final Dimension PLAYGROUND_SIZE = new Dimension(800, 640);
-
-	/**
-	 * The entry point into the Montagsmaler game.
-	 */
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				Tools.setLookAndFeel("Nimbus");
-				new MontagsMalerUI().setVisible(true);
-			}
-		});
-	}
 
 	private final Game game;
 	private final Playground playground;
@@ -153,7 +138,7 @@ public class MontagsMalerUI extends JFrame implements PropertyChangeListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (game.getCurrentTeam() != null) {
-				String title = JOptionPane.showInputDialog(MontagsMalerUI.this, "Team umbenennen",
+				String title = JOptionPane.showInputDialog(MontagsmalerUI.this, "Team umbenennen",
 						game.getCurrentTeam().getName());
 				if (title != null && title.trim().length() > 0) {
 					game.getCurrentTeam().setName(title);
@@ -254,7 +239,7 @@ public class MontagsMalerUI extends JFrame implements PropertyChangeListener {
 		actionPanel.getActionMap().put("clearTablet", actionClearTablet);
 	}
 
-	public MontagsMalerUI() {
+	public MontagsmalerUI() {
 		game = new Game(new Team("Team1"), new Team("Team2"));
 		game.addPropertyChangeListener(this);
 
@@ -303,6 +288,7 @@ public class MontagsMalerUI extends JFrame implements PropertyChangeListener {
 		setTitle("Die Montagsmaler - \u00a9 2013 Geräteschuppen Software");
 		setResizable(false);
 		pack();
+		setLocationRelativeTo(null);
 	}
 
 	@Override

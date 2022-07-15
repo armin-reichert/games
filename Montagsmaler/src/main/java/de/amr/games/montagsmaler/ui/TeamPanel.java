@@ -26,7 +26,7 @@ import de.amr.games.montagsmaler.game.Team;
 
 public class TeamPanel extends JPanel {
 
-	private static final int TEAMPANEL_WIDTH = MontagsMalerUI.TEAMPANEL_WIDTH;
+	private static final int TEAMPANEL_WIDTH = MontagsmalerUI.TEAMPANEL_WIDTH;
 
 	private final Game game;
 	private final Team team;

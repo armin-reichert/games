@@ -2,6 +2,8 @@
 /target/
 /.settings/
 
+*.db
+
 # Compiled class file
 *.class
 
