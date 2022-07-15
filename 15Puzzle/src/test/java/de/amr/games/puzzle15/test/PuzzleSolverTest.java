@@ -22,6 +22,8 @@ import de.amr.games.puzzle15.solver.SolverIDDFS;
  */
 public class PuzzleSolverTest {
 
+	public static final int MAX_Q_SIZE = 100_000;
+
 	private void test(Solver solver, int... cells) {
 		if (cells.length != 16) {
 			throw new IllegalArgumentException("Illegal number of cells" + cells.length);
@@ -47,7 +49,7 @@ public class PuzzleSolverTest {
 	private void testAStar(int... cells) {
 		System.out.println("A* solver:");
 		test(new SolverAStar(node -> Heuristics.manhattanDistFromOrdered(node.getPuzzle()),
-				s -> s.getMaxFrontierSize() > 200_000), cells);
+				s -> s.getMaxFrontierSize() > MAX_Q_SIZE), cells);
 	}
 
 	private void testHillClimbing(int... cells) {
