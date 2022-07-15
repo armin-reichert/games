@@ -23,6 +23,7 @@
 	<module>../Breakout</module>
 	<module>../diashow</module>
 	<module>../GameOfLife</module>
+	<module>../nine-mens-morris</module>
 	</modules>
 
 	<dependencies>
