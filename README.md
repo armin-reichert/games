@@ -16,7 +16,7 @@ Some simple games. To build, go into subfolder `game-samples` and run `mvn clean
 
 ### Game of Life
 
-![Game Of Life(/screenshots/game-of-life.png "Game of Life")
+![Game Of Life](/screenshots/game-of-life.png "Game of Life")
 
 ### Montagsmaler
 
