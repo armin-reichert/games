@@ -55,7 +55,7 @@ public record MapCoordinate(int x, int y) {
 		throw new IllegalArgumentException();
 	}
 
-	public String asLetterDigit() {
+	public String toLetterDigitFormat() {
 		return String.valueOf(LETTERS_ARRAY[y]) + String.valueOf(x + 1);
 	}
 }
