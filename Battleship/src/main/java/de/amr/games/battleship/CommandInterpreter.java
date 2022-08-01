@@ -65,10 +65,10 @@ public class CommandInterpreter {
 
 	private void executeCommand(String commandString) {
 		if (commandString.startsWith("add ")) {
-			executeAddCommand(commandString.substring(4));
+			doAddShip(commandString.substring(4));
 			game.printPlayer(player);
 		} else if (commandString.startsWith("delete ")) {
-			executeDeleteCommand(commandString.substring(7));
+			doDeleteShip(commandString.substring(7));
 		} else if ("help".equals(commandString)) {
 			printHelp();
 		} else if ("map".equals(commandString)) {
@@ -100,7 +100,7 @@ public class CommandInterpreter {
 	}
 
 	// Example: add carrier h I3
-	private void executeAddCommand(String paramString) {
+	private void doAddShip(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 3) {
 			error("Command 'add' needs 3 parameters: <shiptype> <orientation> <coordinate>");
@@ -132,7 +132,7 @@ public class CommandInterpreter {
 		}
 	}
 
-	private void executeDeleteCommand(String paramString) {
+	private void doDeleteShip(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 1) {
 			error("Command 'delete' needs 1 parameter: <shiptype>");
