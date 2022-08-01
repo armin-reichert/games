@@ -19,6 +19,7 @@
 	
 	<modules>
 	<module>../15Puzzle</module>
+	<module>../Battleship</module>
 	<module>../BirdyGame</module>
 	<module>../Breakout</module>
 	<module>../diashow</module>
