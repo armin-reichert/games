@@ -59,7 +59,7 @@ public class CommandInterpreter {
 	}
 
 	private String readCommand() {
-		message("Enter command (%s), enter 'help' for help:", player == BattleshipGame.PLAYER1 ? "Player 1" : "Player 2");
+		message("(%s): Enter 'help' for help:", BattleshipGame.playerName(player));
 		return sc.nextLine().trim();
 	}
 
@@ -71,8 +71,10 @@ public class CommandInterpreter {
 			printHelp();
 		} else if ("map".equals(commandString)) {
 			game.printPlayer(player);
-		} else if (commandString.startsWith("player ")) {
-			executePlayerCommand(commandString.substring(7));
+		} else if ("player1".equals(commandString)) {
+			player = BattleshipGame.PLAYER1;
+		} else if ("player2".equals(commandString)) {
+			player = BattleshipGame.PLAYER2;
 		} else if ("quit".equals(commandString)) {
 			quit = true;
 		} else {
@@ -85,38 +87,19 @@ public class CommandInterpreter {
 		message("\thelp: Print this help text");
 		message("\tquit: Quit program");
 		message("\tmap:  Prints the map for the current player");
-		message("\tplayer <n>: Select player (1 or 2)");
+		message("\tplayer1: Select player 1");
+		message("\tplayer2: Select player 2");
 		message("\tadd <ship> <orient> <coord>: Add ship to map");
 		message("\t\t<ship>:   battleship, carrier, cruiser, destroyer, submarine");
 		message("\t\t<orient>: h, v");
 		message("\t\t<coord>:  A1, ..., J10");
 	}
 
-	private void executePlayerCommand(String paramString) {
-		var params = paramString.trim().split(" ");
-		if (params.length != 1) {
-			error("Command 'player' needs 1 parameter: number (1 or 2)");
-			return;
-		}
-		int number = -1;
-		try {
-			number = Integer.parseInt(params[0]);
-		} catch (Exception e) {
-			error("Not a valid player number: %s", params[0]);
-			return;
-		}
-		if (number != 1 && number != 2) {
-			error("Player number must be 1 or 2");
-			return;
-		}
-		player = number == 1 ? BattleshipGame.PLAYER1 : BattleshipGame.PLAYER2;
-	}
-
 	// Example: add carrier h I3
 	private void executeAddCommand(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 3) {
-			error("add needs 3 parameters: shiptype orientation coordinate");
+			error("Command 'add' needs 3 parameters: <shiptype> <orientation> <coordinate>");
 			return;
 		}
 		var typeString = params[0];

@@ -52,6 +52,16 @@ public class BattleshipGame {
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
 
+	public static String playerName(int player) {
+		if (player == PLAYER1) {
+			return "Player #1";
+		}
+		if (player == PLAYER2) {
+			return "Player #2";
+		}
+		throw new IllegalArgumentException();
+	}
+
 	public static String orientationName(int orientation) {
 		if (orientation == HORIZONTAL) {
 			return "horizontal";
@@ -106,7 +116,7 @@ public class BattleshipGame {
 	}
 
 	public boolean addShip(int player, byte type, int x, int y, int orientation) {
-		message("Player %d: %s %s at %s", player, orientationName(orientation), shipTypeName(type),
+		message("%s: %s %s at %s", playerName(player), orientationName(orientation), shipTypeName(type),
 				new MapCoordinate(x, y).toLetterDigitFormat());
 		if (orientation == HORIZONTAL) {
 			return addShip(playerData[player], type, x, y, shipSize(type), 1);
@@ -144,8 +154,7 @@ public class BattleshipGame {
 	}
 
 	public void printPlayer(int player) {
-		var playerName = player == PLAYER1 ? "Player #1" : "Player #2";
-		message("\n        %s", playerName);
+		message("\n        %s", playerName(player));
 		printMap(playerData[player].map, new PrintWriter(System.out, true));
 	}
 
