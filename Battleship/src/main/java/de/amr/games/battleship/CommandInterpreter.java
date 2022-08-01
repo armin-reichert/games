@@ -51,14 +51,14 @@ public class CommandInterpreter {
 
 	public void run() {
 		do {
-			var command = readCommand(sc);
+			var command = readCommand();
 			executeCommand(command);
 		} while (!quit);
 		message("Goodbye");
 		sc.close();
 	}
 
-	private String readCommand(Scanner sc) {
+	private String readCommand() {
 		message("Enter command (%s), enter 'help' for help:", player == BattleshipGame.PLAYER1 ? "Player 1" : "Player 2");
 		return sc.nextLine().trim();
 	}
