@@ -46,7 +46,7 @@ public class CommandInterpreter {
 
 	public CommandInterpreter(BattleshipGame game) {
 		this.game = game;
-		player = 1;
+		player = BattleshipGame.PLAYER1;
 	}
 
 	public void run() {
@@ -59,7 +59,7 @@ public class CommandInterpreter {
 	}
 
 	private String readCommand(Scanner sc) {
-		message("Enter command (Player %d), enter 'help' for help:", player);
+		message("Enter command (%s), enter 'help' for help:", player == BattleshipGame.PLAYER1 ? "Player 1" : "Player 2");
 		return sc.nextLine().trim();
 	}
 
@@ -98,7 +98,7 @@ public class CommandInterpreter {
 			error("Command 'player' needs 1 parameter: number (1 or 2)");
 			return;
 		}
-		int number = 0;
+		int number = -1;
 		try {
 			number = Integer.parseInt(params[0]);
 		} catch (Exception e) {
@@ -109,7 +109,7 @@ public class CommandInterpreter {
 			error("Player number must be 1 or 2");
 			return;
 		}
-		player = number;
+		player = number == 1 ? BattleshipGame.PLAYER1 : BattleshipGame.PLAYER2;
 	}
 
 	// Example: add carrier h I3

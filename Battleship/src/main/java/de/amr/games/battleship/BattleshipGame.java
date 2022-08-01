@@ -34,28 +34,51 @@ public class BattleshipGame {
 
 	public static final int MAPSIZE = 10;
 
-	public static final byte MAP_WATER = 0;
-	public static final byte MAP_CARRIER = 1;
-	public static final byte MAP_BATTLESHIP = 2;
-	public static final byte MAP_CRUISER = 3;
-	public static final byte MAP_SUBMARINE = 4;
-	public static final byte MAP_DESTROYER = 5;
+	public static final byte MAP_WATER = -1;
+	public static final byte MAP_CARRIER = 0;
+	public static final byte MAP_BATTLESHIP = 1;
+	public static final byte MAP_CRUISER = 2;
+	public static final byte MAP_SUBMARINE = 3;
+	public static final byte MAP_DESTROYER = 4;
 
 	private static final int[] SHIP_SIZES = { 5, 4, 3, 3, 2 };
 	private static final char[] SHIP_CODES = { 'C', 'B', 'U', 'S', 'D' };
 	private static final List<String> SHIP_TYPE_NAMES = List.of("carrier", "battleship", "cruiser", "submarine",
 			"destroyer");
 
+	public static final int PLAYER1 = 0;
+	public static final int PLAYER2 = 1;
+
+	public static class PlayerData {
+		public final byte[][] map = new byte[MAPSIZE][MAPSIZE];
+		public final boolean[] shipUsed = new boolean[5];
+
+		public PlayerData() {
+			reset();
+		}
+
+		public void reset() {
+			for (int x = 0; x < MAPSIZE; ++x) {
+				for (int y = 0; y < MAPSIZE; ++y) {
+					map[x][y] = MAP_WATER;
+				}
+			}
+			for (int i = 0; i < shipUsed.length; ++i) {
+				shipUsed[i] = false;
+			}
+		}
+	}
+
 	public static int shipSize(byte type) {
-		return SHIP_SIZES[type - 1];
+		return SHIP_SIZES[type];
 	}
 
 	public static char shipCode(byte type) {
-		return SHIP_CODES[type - 1];
+		return SHIP_CODES[type];
 	}
 
 	public static String shipTypeName(byte type) {
-		return SHIP_TYPE_NAMES.get(type - 1);
+		return SHIP_TYPE_NAMES.get(type);
 	}
 
 	public static byte shipType(String shipType) {
@@ -63,7 +86,7 @@ public class BattleshipGame {
 		if (index == -1) {
 			throw new IllegalArgumentException();
 		}
-		return (byte) (index + 1);
+		return (byte) (index);
 	}
 
 	public static boolean isValidOrientation(String orientation) {
@@ -82,42 +105,22 @@ public class BattleshipGame {
 		System.out.println(msg.formatted(args));
 	}
 
-	public final byte[][] mapPlayer1;
-	public final byte[][] mapPlayer2;
+	public PlayerData[] playerData = new PlayerData[2];
 
 	public BattleshipGame() {
-		mapPlayer1 = new byte[MAPSIZE][MAPSIZE];
-		mapPlayer2 = new byte[MAPSIZE][MAPSIZE];
-	}
-
-	public void clearMap(int player) {
-		var map = map(player);
-		for (int x = 0; x < MAPSIZE; ++x) {
-			for (int y = 0; y < MAPSIZE; ++y) {
-				map[x][y] = MAP_WATER;
-			}
-		}
-	}
-
-	private byte[][] map(int player) {
-		if (player == 1) {
-			return mapPlayer1;
-		}
-		if (player == 2) {
-			return mapPlayer2;
-		}
-		throw new IllegalArgumentException();
+		playerData[0] = new PlayerData();
+		playerData[1] = new PlayerData();
 	}
 
 	public boolean addShipHori(int player, byte type, int x, int y) {
 		message("Player %d: %s horizontal at %s", player, shipTypeName(type),
 				new MapCoordinate(x, y).toLetterDigitFormat());
-		return addShip(map(player), type, x, y, shipSize(type), 1);
+		return addShip(playerData[player].map, type, x, y, shipSize(type), 1);
 	}
 
 	public boolean addShipVert(int player, byte type, int x, int y) {
 		message("Player %d: %s vertical at %s", player, shipTypeName(type), new MapCoordinate(x, y).toLetterDigitFormat());
-		return addShip(map(player), type, x, y, 1, shipSize(type));
+		return addShip(playerData[player].map, type, x, y, 1, shipSize(type));
 	}
 
 	private boolean addShip(byte[][] map, byte type, int x, int y, int sizeX, int sizeY) {
@@ -144,8 +147,9 @@ public class BattleshipGame {
 	}
 
 	public void printPlayer(int player) {
-		message("\n        Player %d", player);
-		printMap(map(player), new PrintWriter(System.out, true));
+		var playerName = player == PLAYER1 ? "Player #1" : "Player #2";
+		message("\n        %s", playerName);
+		printMap(playerData[player].map, new PrintWriter(System.out, true));
 	}
 
 	private void printMap(byte[][] map, PrintWriter w) {
@@ -157,7 +161,7 @@ public class BattleshipGame {
 		for (int y = 0; y < MAPSIZE; ++y) {
 			for (int x = 0; x < MAPSIZE; ++x) {
 				byte value = map[x][y];
-				char ch = value == MAP_WATER ? '.' : shipCode(value);
+				char ch = value == MAP_WATER ? '~' : shipCode(value);
 				if (x == 0) {
 					w.print(MapCoordinate.letter(y) + " ");
 				}
