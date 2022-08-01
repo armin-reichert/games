@@ -67,6 +67,8 @@ public class CommandInterpreter {
 		if (commandString.startsWith("add ")) {
 			executeAddCommand(commandString.substring(4));
 			game.printPlayer(player);
+		} else if (commandString.startsWith("delete ")) {
+			executeDeleteCommand(commandString.substring(7));
 		} else if ("help".equals(commandString)) {
 			printHelp();
 		} else if ("map".equals(commandString)) {
@@ -75,6 +77,8 @@ public class CommandInterpreter {
 			player = BattleshipGame.PLAYER1;
 		} else if ("player2".equals(commandString)) {
 			player = BattleshipGame.PLAYER2;
+		} else if ("reset".equals(commandString)) {
+			game.resetPlayer(player);
 		} else if ("quit".equals(commandString)) {
 			quit = true;
 		} else {
@@ -120,10 +124,26 @@ public class CommandInterpreter {
 			error("Illegal coordinate: %s", coordString);
 			return;
 		}
+		var type = BattleshipGame.shipType(typeString);
 		if ("h".equalsIgnoreCase(orientString)) {
-			game.addShip(player, BattleshipGame.shipType(typeString), coord.x(), coord.y(), BattleshipGame.HORIZONTAL);
+			game.addShip(player, type, coord.x(), coord.y(), BattleshipGame.HORIZONTAL);
 		} else {
-			game.addShip(player, BattleshipGame.shipType(typeString), coord.x(), coord.y(), BattleshipGame.VERTICAL);
+			game.addShip(player, type, coord.x(), coord.y(), BattleshipGame.VERTICAL);
 		}
+	}
+
+	private void executeDeleteCommand(String paramString) {
+		String[] params = paramString.trim().split(" ");
+		if (params.length != 1) {
+			error("Command 'delete' needs 1 parameter: <shiptype>");
+			return;
+		}
+		var typeString = params[0];
+		if (!BattleshipGame.isValidShipType(typeString)) {
+			error("Invalid ship type: %s", typeString);
+			return;
+		}
+		var type = BattleshipGame.shipType(typeString);
+		game.deleteShip(player, type);
 	}
 }

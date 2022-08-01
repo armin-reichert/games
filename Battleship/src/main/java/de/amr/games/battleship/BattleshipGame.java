@@ -37,7 +37,7 @@ public class BattleshipGame {
 	public static final int HORIZONTAL = 0;
 	public static final int VERTICAL = 1;
 
-	public static final byte MAP_WATER = -1;
+	public static final byte MAP_WATER = -127;
 	public static final byte MAP_CARRIER = 0;
 	public static final byte MAP_BATTLESHIP = 1;
 	public static final byte MAP_CRUISER = 2;
@@ -51,6 +51,10 @@ public class BattleshipGame {
 
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
+
+	private static void error(String msg, Object... args) {
+		System.err.println(msg.formatted(args));
+	}
 
 	public static String playerName(int player) {
 		if (player == PLAYER1) {
@@ -113,6 +117,43 @@ public class BattleshipGame {
 	public BattleshipGame() {
 		playerData[0] = new PlayerData();
 		playerData[1] = new PlayerData();
+	}
+
+	public PlayerData playerData(int player) {
+		if (player == PLAYER1) {
+			return playerData[PLAYER1];
+		} else if (player == PLAYER2) {
+			return playerData[PLAYER2];
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public void resetPlayer(int player) {
+		if (player == PLAYER1) {
+			playerData[PLAYER1].reset();
+		} else if (player == PLAYER2) {
+			playerData[PLAYER2].reset();
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public void deleteShip(int player, byte type) {
+		if (!playerData(player).shipUsed[type]) {
+			error("Player has no %s", shipTypeName(type));
+			return;
+		}
+		for (int x = 0; x < MAPSIZE; ++x) {
+			for (int y = 0; y < MAPSIZE; ++y) {
+				byte value = playerData(player).map[x][y];
+				if (value == type) {
+					playerData(player).map[x][y] = MAP_WATER;
+				}
+			}
+		}
+		playerData(player).shipUsed[type] = false;
+
 	}
 
 	public boolean addShip(int player, byte type, int x, int y, int orientation) {
