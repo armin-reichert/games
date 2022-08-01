@@ -34,6 +34,9 @@ public class BattleshipGame {
 
 	public static final int MAPSIZE = 10;
 
+	public static final int HORIZONTAL = 0;
+	public static final int VERTICAL = 1;
+
 	public static final byte MAP_WATER = -1;
 	public static final byte MAP_CARRIER = 0;
 	public static final byte MAP_BATTLESHIP = 1;
@@ -49,24 +52,14 @@ public class BattleshipGame {
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
 
-	public static class PlayerData {
-		public final byte[][] map = new byte[MAPSIZE][MAPSIZE];
-		public final boolean[] shipUsed = new boolean[5];
-
-		public PlayerData() {
-			reset();
+	public static String orientationName(int orientation) {
+		if (orientation == HORIZONTAL) {
+			return "horizontal";
 		}
-
-		public void reset() {
-			for (int x = 0; x < MAPSIZE; ++x) {
-				for (int y = 0; y < MAPSIZE; ++y) {
-					map[x][y] = MAP_WATER;
-				}
-			}
-			for (int i = 0; i < shipUsed.length; ++i) {
-				shipUsed[i] = false;
-			}
+		if (orientation == VERTICAL) {
+			return "vertical";
 		}
+		throw new IllegalArgumentException();
 	}
 
 	public static int shipSize(byte type) {
@@ -112,18 +105,21 @@ public class BattleshipGame {
 		playerData[1] = new PlayerData();
 	}
 
-	public boolean addShipHori(int player, byte type, int x, int y) {
-		message("Player %d: %s horizontal at %s", player, shipTypeName(type),
+	public boolean addShip(int player, byte type, int x, int y, int orientation) {
+		message("Player %d: %s %s at %s", player, orientationName(orientation), shipTypeName(type),
 				new MapCoordinate(x, y).toLetterDigitFormat());
-		return addShip(playerData[player].map, type, x, y, shipSize(type), 1);
+		if (orientation == HORIZONTAL) {
+			return addShip(playerData[player], type, x, y, shipSize(type), 1);
+		} else {
+			return addShip(playerData[player], type, x, y, 1, shipSize(type));
+		}
 	}
 
-	public boolean addShipVert(int player, byte type, int x, int y) {
-		message("Player %d: %s vertical at %s", player, shipTypeName(type), new MapCoordinate(x, y).toLetterDigitFormat());
-		return addShip(playerData[player].map, type, x, y, 1, shipSize(type));
-	}
-
-	private boolean addShip(byte[][] map, byte type, int x, int y, int sizeX, int sizeY) {
+	private boolean addShip(PlayerData playerData, byte type, int x, int y, int sizeX, int sizeY) {
+		if (playerData.shipUsed[type]) {
+			message("Player has already a %s", shipTypeName(type));
+			return false;
+		}
 		if (x + sizeX > MAPSIZE) {
 			message("Cannot place ship. x exceeds map");
 			return false;
@@ -134,15 +130,16 @@ public class BattleshipGame {
 		}
 		for (int i = 0; i < sizeX; ++i) {
 			for (int j = 0; j < sizeY; ++j) {
-				byte value = map[x + i][y + j];
+				byte value = playerData.map[x + i][y + j];
 				if (value != MAP_WATER) {
 					message("Cannot place ship. Overlaps with %s at %s", shipTypeName(value),
 							new MapCoordinate(x, y).toLetterDigitFormat());
 					return false;
 				}
-				map[x + i][y + j] = type;
+				playerData.map[x + i][y + j] = type;
 			}
 		}
+		playerData.shipUsed[type] = true;
 		return true;
 	}
 

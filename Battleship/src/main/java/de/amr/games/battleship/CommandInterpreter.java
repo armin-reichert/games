@@ -138,9 +138,9 @@ public class CommandInterpreter {
 			return;
 		}
 		if ("h".equalsIgnoreCase(orientString)) {
-			game.addShipHori(player, BattleshipGame.shipType(typeString), coord.x(), coord.y());
+			game.addShip(player, BattleshipGame.shipType(typeString), coord.x(), coord.y(), BattleshipGame.HORIZONTAL);
 		} else {
-			game.addShipVert(player, BattleshipGame.shipType(typeString), coord.x(), coord.y());
+			game.addShip(player, BattleshipGame.shipType(typeString), coord.x(), coord.y(), BattleshipGame.VERTICAL);
 		}
 	}
 }
