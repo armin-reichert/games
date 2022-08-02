@@ -67,7 +67,7 @@ public class CommandInterpreter {
 			player = BattleshipGame.PLAYER2;
 			ui.printPlayerMap(game, player);
 		} else if ("reset".equals(input)) {
-			game.resetPlayer(player);
+			game.getPlayer(player).reset();
 			ui.printPlayerMap(game, player);
 		} else if ("quit".equals(input)) {
 			quit = true;

@@ -29,9 +29,6 @@ package de.amr.games.battleship;
  */
 public class BattleshipGame {
 
-	public record Result(boolean success, String message) {
-	}
-
 	public static final int MAPSIZE = 10;
 
 	public static final int HORIZONTAL = 0;
@@ -81,16 +78,6 @@ public class BattleshipGame {
 			return players[PLAYER1];
 		} else if (player == PLAYER2) {
 			return players[PLAYER2];
-		} else {
-			throw new IllegalArgumentException();
-		}
-	}
-
-	public void resetPlayer(int player) {
-		if (player == PLAYER1) {
-			players[PLAYER1].reset();
-		} else if (player == PLAYER2) {
-			players[PLAYER2].reset();
 		} else {
 			throw new IllegalArgumentException();
 		}
