@@ -59,7 +59,7 @@ public class BattleshipUI {
 		message("         - battleship, carrier, cruiser, destroyer, submarine");
 		message("         - h, v");
 		message("         - a1, ..., j10");
-		message("del:     Delete ship from map e.g. 'del cruiser'");
+		message("del:     Deletes all ships of given type e.g. 'del cruiser'");
 		message("         - battleship, carrier, cruiser, destroyer, submarine");
 		message("reset:   Resets map to initial state");
 	}
