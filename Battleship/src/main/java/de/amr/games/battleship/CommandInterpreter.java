@@ -50,26 +50,28 @@ public class CommandInterpreter {
 	}
 
 	private void parseInput(String input) {
-		if (input.startsWith("add ")) {
-			doAddShip(input.substring(4));
+		var parts = splitIntoParts(input);
+		var command = parts[0];
+		if ("add".equals(command)) {
+			doAddShip(parts);
 			ui.printPlayerMap(game, player);
-		} else if (input.startsWith("del ")) {
-			doDeleteShip(input.substring(4));
+		} else if ("del".equals(command)) {
+			doDeleteShip(parts);
 			ui.printPlayerMap(game, player);
-		} else if ("help".equals(input)) {
+		} else if ("help".equals(command)) {
 			ui.printHelp();
-		} else if ("map".equals(input)) {
+		} else if ("map".equals(command)) {
 			ui.printPlayerMap(game, player);
-		} else if ("player1".equals(input)) {
+		} else if ("player1".equals(command)) {
 			player = BattleshipGame.PLAYER1;
 			ui.printPlayerMap(game, player);
-		} else if ("player2".equals(input)) {
+		} else if ("player2".equals(command)) {
 			player = BattleshipGame.PLAYER2;
 			ui.printPlayerMap(game, player);
-		} else if ("reset".equals(input)) {
+		} else if ("reset".equals(command)) {
 			game.getPlayer(player).reset();
 			ui.printPlayerMap(game, player);
-		} else if ("quit".equals(input)) {
+		} else if ("quit".equals(command)) {
 			quit = true;
 		} else {
 			ui.message("Did not understand");
@@ -87,32 +89,31 @@ public class CommandInterpreter {
 	}
 
 	// Example: add carrier h i3
-	private void doAddShip(String paramString) {
-		String[] p = getParamsTrimmed(paramString);
-		if (p.length != 3) {
+	private void doAddShip(String[] parts) {
+		if (parts.length != 4) {
 			ui.message("Command 'add' needs 3 parameters: shiptype orientation coordinate");
 			return;
 		}
 
-		if (!ui.isValidShipType(p[0])) {
-			ui.message("Invalid ship type: %s", p[0]);
+		if (!ui.isValidShipType(parts[1])) {
+			ui.message("Invalid ship type: %s", parts[1]);
 			return;
 		}
-		var type = ui.shipType(p[0]);
+		var type = ui.shipType(parts[1]);
 
 		int orientation = -1;
 		try {
-			orientation = parseOrientation(p[1]);
+			orientation = parseOrientation(parts[2]);
 		} catch (Exception e) {
-			ui.message("Invalid orientation: %s", p[1]);
+			ui.message("Invalid orientation: %s", parts[2]);
 			return;
 		}
 
 		MapCoordinate coord = null;
 		try {
-			coord = MapCoordinate.valueOf(p[2]);
+			coord = MapCoordinate.valueOf(parts[3]);
 		} catch (IllegalArgumentException x) {
-			ui.message("Illegal coordinate: %s", p[2]);
+			ui.message("Illegal coordinate: %s", parts[3]);
 			return;
 		}
 
@@ -125,19 +126,17 @@ public class CommandInterpreter {
 		}
 	}
 
-	private void doDeleteShip(String paramString) {
-		String[] params = getParamsTrimmed(paramString);
-		if (params.length != 1) {
+	private void doDeleteShip(String[] parts) {
+		if (parts.length != 2) {
 			ui.message("Command 'delete' needs 1 parameter: shiptype");
 			return;
 		}
 
-		var typeString = params[0];
-		if (!ui.isValidShipType(typeString)) {
-			ui.message("Invalid ship type: %s", typeString);
+		if (!ui.isValidShipType(parts[1])) {
+			ui.message("Invalid ship type: %s", parts[1]);
 			return;
 		}
-		var type = ui.shipType(typeString);
+		var type = ui.shipType(parts[1]);
 
 		var result = game.deleteShip(player, type);
 		if (result.success()) {
@@ -147,11 +146,11 @@ public class CommandInterpreter {
 		}
 	}
 
-	private String[] getParamsTrimmed(String paramString) {
-		String[] params = paramString.trim().split(" ");
-		for (int i = 0; i < params.length; ++i) {
-			params[i] = params[i].trim();
+	private String[] splitIntoParts(String s) {
+		String[] parts = s.trim().split(" ");
+		for (int i = 0; i < parts.length; ++i) {
+			parts[i] = parts[i].trim();
 		}
-		return params;
+		return parts;
 	}
 }
