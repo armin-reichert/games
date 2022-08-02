@@ -59,42 +59,41 @@ public class Converter {
 	public static byte parseShipType(String s) {
 		var ss = s.trim().toLowerCase();
 		if ("battleship".equals(ss)) {
-			return BattleshipGame.MAP_BATTLESHIP;
+			return BattleshipGame.BATTLESHIP;
 		}
 		if ("carrier".equals(ss)) {
-			return BattleshipGame.MAP_AIRCRAFT_CARRIER;
+			return BattleshipGame.AIRCRAFT_CARRIER;
 		}
 		if ("cruiser".equals(ss)) {
-			return BattleshipGame.MAP_CRUISER;
+			return BattleshipGame.CRUISER;
 		}
 		if ("destroyer".equals(ss)) {
-			return BattleshipGame.MAP_DESTROYER;
+			return BattleshipGame.DESTROYER;
 		}
 		if ("submarine".equals(ss)) {
-			return BattleshipGame.MAP_SUBMARINE;
+			return BattleshipGame.SUBMARINE;
 		}
 		throw new ConvertException("Illegal ship type value '%s'", s);
 	}
 
 	public static String shipTypeName(byte type) {
 		return switch (type) {
-		case BattleshipGame.MAP_BATTLESHIP -> "Battleship";
-		case BattleshipGame.MAP_AIRCRAFT_CARRIER -> "Carrier";
-		case BattleshipGame.MAP_CRUISER -> "Cruiser";
-		case BattleshipGame.MAP_DESTROYER -> "Destroyer";
-		case BattleshipGame.MAP_SUBMARINE -> "Submarine";
+		case BattleshipGame.BATTLESHIP -> "Battleship";
+		case BattleshipGame.AIRCRAFT_CARRIER -> "Aircraft Carrier";
+		case BattleshipGame.CRUISER -> "Cruiser";
+		case BattleshipGame.DESTROYER -> "Destroyer";
+		case BattleshipGame.SUBMARINE -> "Submarine";
 		default -> throw new IllegalArgumentException();
 		};
 	}
 
 	public static String playerName(int player) {
-		if (player == BattleshipGame.PLAYER1) {
+		if (player == BattleshipGame.PLAYER_1) {
 			return "Player #1";
 		}
-		if (player == BattleshipGame.PLAYER2) {
+		if (player == BattleshipGame.PLAYER_2) {
 			return "Player #2";
 		}
 		throw new IllegalArgumentException();
 	}
-
 }

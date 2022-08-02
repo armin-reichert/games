@@ -28,17 +28,21 @@ import java.util.Arrays;
 
 public class Player {
 
-	public final byte[][] map = new byte[BattleshipGame.MAPSIZE][BattleshipGame.MAPSIZE];
+	private final byte[][] map = new byte[BattleshipGame.MAPSIZE][BattleshipGame.MAPSIZE];
 	private final int[] shipsUsed = new int[5];
 
 	public Player() {
 		reset();
 	}
 
+	public byte[][] getMap() {
+		return map;
+	}
+
 	public void reset() {
 		for (int x = 0; x < BattleshipGame.MAPSIZE; ++x) {
 			for (int y = 0; y < BattleshipGame.MAPSIZE; ++y) {
-				map[x][y] = BattleshipGame.MAP_WATER;
+				map[x][y] = BattleshipGame.WATER;
 			}
 		}
 		Arrays.fill(shipsUsed, 0);
@@ -65,7 +69,7 @@ public class Player {
 		for (int i = 0; i < sizeX; ++i) {
 			for (int j = 0; j < sizeY; ++j) {
 				byte value = map[x + i][y + j];
-				if (value != BattleshipGame.MAP_WATER) {
+				if (value != BattleshipGame.WATER) {
 					return new Result(false, "Map already used at " + new MapCoordinate(x, y).toLetterDigitFormat());
 				}
 				map[x + i][y + j] = type;
@@ -83,7 +87,7 @@ public class Player {
 			for (int y = 0; y < BattleshipGame.MAPSIZE; ++y) {
 				byte value = map[x][y];
 				if (value == type) {
-					map[x][y] = BattleshipGame.MAP_WATER;
+					map[x][y] = BattleshipGame.WATER;
 				}
 			}
 		}

@@ -37,7 +37,7 @@ public class CommandInterpreter {
 	public CommandInterpreter(BattleshipGame game) {
 		this.game = game;
 		this.ui = new BattleshipUI();
-		player = BattleshipGame.PLAYER1;
+		player = BattleshipGame.PLAYER_1;
 	}
 
 	public void run() {
@@ -69,11 +69,11 @@ public class CommandInterpreter {
 			ui.printPlayerMap(game, player);
 		}
 		case "player1" -> {
-			player = BattleshipGame.PLAYER1;
+			player = BattleshipGame.PLAYER_1;
 			ui.printPlayerMap(game, player);
 		}
 		case "player2" -> {
-			player = BattleshipGame.PLAYER2;
+			player = BattleshipGame.PLAYER_2;
 			ui.printPlayerMap(game, player);
 		}
 		case "quit" -> {

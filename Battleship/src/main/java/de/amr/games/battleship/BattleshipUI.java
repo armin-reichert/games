@@ -66,7 +66,7 @@ public class BattleshipUI {
 
 	public void printPlayerMap(BattleshipGame game, int player) {
 		message("\n      %s", Converter.playerName(player));
-		printMap(game.getPlayer(player).map, new PrintWriter(System.out, true));
+		printMap(game.getPlayer(player).getMap(), new PrintWriter(System.out, true));
 	}
 
 	private void printMap(byte[][] map, PrintWriter w) {
@@ -78,7 +78,7 @@ public class BattleshipUI {
 		for (int y = 0; y < BattleshipGame.MAPSIZE; ++y) {
 			for (int x = 0; x < BattleshipGame.MAPSIZE; ++x) {
 				byte value = map[x][y];
-				char ch = value == BattleshipGame.MAP_WATER ? '~' : BattleshipGame.shipCode(value);
+				char ch = value == BattleshipGame.WATER ? '~' : BattleshipGame.shipCode(value);
 				if (x == 0) {
 					w.print(MapCoordinate.letter(y) + " ");
 				}

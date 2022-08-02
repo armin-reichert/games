@@ -34,65 +34,58 @@ public class BattleshipGame {
 	public static final int HORIZONTAL = 0;
 	public static final int VERTICAL = 1;
 
-	public static final byte MAP_WATER = -127;
+	public static final byte WATER = -127;
 
-	public static final byte MAP_AIRCRAFT_CARRIER = 0;
-	public static final byte MAP_BATTLESHIP = 1;
-	public static final byte MAP_CRUISER = 2;
-	public static final byte MAP_SUBMARINE = 3;
-	public static final byte MAP_DESTROYER = 4;
+	public static final byte AIRCRAFT_CARRIER = 0;
+	public static final byte BATTLESHIP = 1;
+	public static final byte CRUISER = 2;
+	public static final byte SUBMARINE = 3;
+	public static final byte DESTROYER = 4;
 
-	public static final int PLAYER1 = 0;
-	public static final int PLAYER2 = 1;
+	public static final int PLAYER_1 = 0;
+	public static final int PLAYER_2 = 1;
 
 	public static int shipSize(byte type) {
 		return switch (type) {
-		case MAP_AIRCRAFT_CARRIER -> 5;
-		case MAP_BATTLESHIP -> 4;
-		case MAP_CRUISER -> 3;
-		case MAP_DESTROYER -> 2;
-		case MAP_SUBMARINE -> 1;
+		case AIRCRAFT_CARRIER -> 5;
+		case BATTLESHIP -> 4;
+		case CRUISER -> 3;
+		case DESTROYER -> 2;
+		case SUBMARINE -> 1;
 		default -> throw new IllegalArgumentException();
 		};
 	}
 
 	public static int shipsAvailable(byte type) {
 		return switch (type) {
-		case MAP_AIRCRAFT_CARRIER -> 1;
-		case MAP_BATTLESHIP -> 1;
-		case MAP_CRUISER -> 1;
-		case MAP_DESTROYER -> 2;
-		case MAP_SUBMARINE -> 2;
+		case AIRCRAFT_CARRIER -> 1;
+		case BATTLESHIP -> 1;
+		case CRUISER -> 1;
+		case DESTROYER -> 2;
+		case SUBMARINE -> 2;
 		default -> throw new IllegalArgumentException();
 		};
 	}
 
 	public static char shipCode(byte type) {
 		return switch (type) {
-		case MAP_AIRCRAFT_CARRIER -> 'A';
-		case MAP_BATTLESHIP -> 'B';
-		case MAP_CRUISER -> 'C';
-		case MAP_SUBMARINE -> 'S';
-		case MAP_DESTROYER -> 'D';
+		case AIRCRAFT_CARRIER -> 'A';
+		case BATTLESHIP -> 'B';
+		case CRUISER -> 'C';
+		case SUBMARINE -> 'S';
+		case DESTROYER -> 'D';
 		default -> throw new IllegalArgumentException();
 		};
 	}
 
-	private Player[] players = new Player[2];
+	private final Player[] players = new Player[2];
 
 	public BattleshipGame() {
 		players[0] = new Player();
 		players[1] = new Player();
 	}
 
-	public Player getPlayer(int player) {
-		if (player == PLAYER1) {
-			return players[PLAYER1];
-		} else if (player == PLAYER2) {
-			return players[PLAYER2];
-		} else {
-			throw new IllegalArgumentException();
-		}
+	public Player getPlayer(int playerIndex) {
+		return players[playerIndex];
 	}
-
 }
