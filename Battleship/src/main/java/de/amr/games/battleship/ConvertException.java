@@ -24,35 +24,13 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Armin Reichert
  *
  */
-public record MapCoordinate(int x, int y) {
+public class ConvertException extends RuntimeException {
 
-	private static final String LETTERS = "ABCDEFGHIJ";
-	private static final char[] LETTERS_ARRAY = LETTERS.toCharArray();
-	private static final Pattern PATTERN = Pattern.compile("[a-jA-J]([1-9]|10)");
-
-	public static char letter(int y) {
-		return LETTERS_ARRAY[y];
-	}
-
-	public static MapCoordinate valueOf(String s) {
-		var matcher = PATTERN.matcher(s);
-		if (!matcher.matches()) {
-			throw new ConvertException("Illegal coordinate value: '%s'", s);
-		}
-		var letter = s.substring(0, 1);
-		var number = Integer.valueOf(s.substring(1));
-		var x = number - 1;
-		var y = LETTERS.indexOf(letter.toUpperCase());
-		return new MapCoordinate(x, y);
-	}
-
-	public String toLetterDigitFormat() {
-		return String.valueOf(LETTERS_ARRAY[y]) + String.valueOf(x + 1);
+	public ConvertException(String msg, Object... args) {
+		super(msg.formatted(args));
 	}
 }

@@ -25,7 +25,6 @@ SOFTWARE.
 package de.amr.games.battleship;
 
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -33,13 +32,7 @@ import java.util.Scanner;
  */
 public class BattleshipUI {
 
-	private static final List<String> SHIP_TYPE_NAMES = List.of(//
-			"Carrier", "Battleship", "Cruiser", "Submarine", "Destroyer");
-
 	private final Scanner sc = new Scanner(System.in);
-
-	public BattleshipUI() {
-	}
 
 	public String readLine(String prompt) {
 		message(prompt);
@@ -53,43 +46,6 @@ public class BattleshipUI {
 
 	public void message(String msg, Object... args) {
 		System.out.println(msg.formatted(args));
-	}
-
-	public String playerName(int player) {
-		if (player == BattleshipGame.PLAYER1) {
-			return "Player #1";
-		}
-		if (player == BattleshipGame.PLAYER2) {
-			return "Player #2";
-		}
-		throw new IllegalArgumentException();
-	}
-
-	public String shipTypeName(byte type) {
-		return SHIP_TYPE_NAMES.get(type);
-	}
-
-	public byte shipType(String shipTypeName) {
-		for (int i = 0; i < SHIP_TYPE_NAMES.size(); ++i) {
-			if (SHIP_TYPE_NAMES.get(i).equalsIgnoreCase(shipTypeName)) {
-				return (byte) i;
-			}
-		}
-		throw new IllegalArgumentException();
-	}
-
-	public boolean isValidShipType(String shipType) {
-		return SHIP_TYPE_NAMES.stream().anyMatch(name -> name.equalsIgnoreCase(shipType));
-	}
-
-	public String orientationName(int orientation) {
-		if (orientation == BattleshipGame.HORIZONTAL) {
-			return "horizontal";
-		}
-		if (orientation == BattleshipGame.VERTICAL) {
-			return "vertical";
-		}
-		throw new IllegalArgumentException();
 	}
 
 	public void printHelp() {
@@ -108,7 +64,7 @@ public class BattleshipUI {
 	}
 
 	public void printPlayerMap(BattleshipGame game, int player) {
-		message("\n      %s", playerName(player));
+		message("\n      %s", Converter.playerName(player));
 		printMap(game.getPlayer(player).map, new PrintWriter(System.out, true));
 	}
 

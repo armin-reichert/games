@@ -42,7 +42,7 @@ public class CommandInterpreter {
 
 	public void run() {
 		do {
-			var prompt = "[%s] (Enter 'help' for help):".formatted(ui.playerName(player));
+			var prompt = "[%s] (Enter 'help' for help):".formatted(Converter.playerName(player));
 			var input = ui.readLine(prompt);
 			parseInput(input);
 		} while (!quit);
@@ -88,16 +88,6 @@ public class CommandInterpreter {
 		}
 	}
 
-	private static int parseOrientation(String orientation) {
-		if ("h".equals(orientation)) {
-			return BattleshipGame.HORIZONTAL;
-		}
-		if ("v".equals(orientation)) {
-			return BattleshipGame.VERTICAL;
-		}
-		throw new IllegalArgumentException();
-	}
-
 	// Example: add carrier h i3
 	private void doAddShip(String[] parts) {
 		if (parts.length != 4) {
@@ -105,32 +95,34 @@ public class CommandInterpreter {
 			return;
 		}
 
-		if (!ui.isValidShipType(parts[1])) {
-			ui.message("Invalid ship type: %s", parts[1]);
+		var type = Byte.MAX_VALUE;
+		try {
+			type = Converter.parseShipType(parts[1]);
+		} catch (ConvertException x) {
+			ui.message(x.getMessage());
 			return;
 		}
-		var type = ui.shipType(parts[1]);
 
 		int orientation = -1;
 		try {
-			orientation = parseOrientation(parts[2]);
-		} catch (Exception e) {
-			ui.message("Invalid orientation: %s", parts[2]);
+			orientation = Converter.parseOrientation(parts[2]);
+		} catch (ConvertException x) {
+			ui.message(x.getMessage());
 			return;
 		}
 
 		MapCoordinate coord = null;
 		try {
 			coord = MapCoordinate.valueOf(parts[3]);
-		} catch (IllegalArgumentException x) {
-			ui.message("Illegal coordinate: %s", parts[3]);
+		} catch (ConvertException x) {
+			ui.message(x.getMessage());
 			return;
 		}
 
 		var result = game.addShip(player, type, coord.x(), coord.y(), orientation);
 		if (result.success()) {
-			ui.message("%s: added %s %s at %s", ui.playerName(player), ui.shipTypeName(type), ui.orientationName(orientation),
-					coord.toLetterDigitFormat());
+			ui.message("%s: added %s %s at %s", Converter.playerName(player), Converter.shipTypeName(type),
+					Converter.orientationName(orientation), coord.toLetterDigitFormat());
 		} else {
 			ui.message(result.message());
 		}
@@ -142,15 +134,17 @@ public class CommandInterpreter {
 			return;
 		}
 
-		if (!ui.isValidShipType(parts[1])) {
-			ui.message("Invalid ship type: %s", parts[1]);
+		var type = Byte.MAX_VALUE;
+		try {
+			type = Converter.parseShipType(parts[1]);
+		} catch (ConvertException x) {
+			ui.message(x.getMessage());
 			return;
 		}
-		var type = ui.shipType(parts[1]);
 
 		var result = game.deleteShip(player, type);
 		if (result.success()) {
-			ui.message("%s: %s deleted", ui.playerName(player), ui.shipTypeName(type));
+			ui.message("%s: %s deleted", Converter.playerName(player), Converter.shipTypeName(type));
 		} else {
 			ui.message(result.message());
 		}
