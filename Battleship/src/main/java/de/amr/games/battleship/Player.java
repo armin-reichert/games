@@ -48,8 +48,8 @@ public class Player {
 		Arrays.fill(shipsUsed, 0);
 	}
 
-	public Result addShip(byte type, int x, int y, int orientation) {
-		if (orientation == BattleshipGame.HORIZONTAL) {
+	public Result addShip(byte type, int x, int y, boolean horizontal) {
+		if (horizontal) {
 			return addShip(type, x, y, BattleshipGame.shipSize(type), 1);
 		} else {
 			return addShip(type, x, y, 1, BattleshipGame.shipSize(type));

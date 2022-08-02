@@ -108,7 +108,7 @@ public class CommandInterpreter {
 			return;
 		}
 
-		var result = game.getPlayer(player).addShip(type, coord.x(), coord.y(), orientation);
+		var result = game.getPlayer(player).addShip(type, coord.x(), coord.y(), orientation == BattleshipGame.HORIZONTAL);
 		if (result.success()) {
 			ui.message("%s: added %s %s at %s", Converter.playerName(player), Converter.shipTypeName(type),
 					Converter.orientationName(orientation), coord.toLetterDigitFormat());
