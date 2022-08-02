@@ -194,8 +194,8 @@ public class BattleshipGame {
 		return true;
 	}
 
-	public void printPlayer(int player) {
-		message("\n        %s", playerName(player));
+	public void printPlayerMap(int player) {
+		message("\n      %s", playerName(player));
 		printMap(playerData[player].map, new PrintWriter(System.out, true));
 	}
 

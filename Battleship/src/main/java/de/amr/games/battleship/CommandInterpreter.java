@@ -51,35 +51,35 @@ public class CommandInterpreter {
 
 	public void run() {
 		do {
-			var command = readCommand();
-			executeCommand(command);
+			var input = readInput();
+			parseInput(input);
 		} while (!quit);
-		message("Goodbye");
 		sc.close();
+		message("Goodbye");
 	}
 
-	private String readCommand() {
+	private String readInput() {
 		message("(%s): Enter 'help' for help:", BattleshipGame.playerName(player));
 		return sc.nextLine().trim();
 	}
 
-	private void executeCommand(String commandString) {
-		if (commandString.startsWith("add ")) {
-			doAddShip(commandString.substring(4));
-			game.printPlayer(player);
-		} else if (commandString.startsWith("delete ")) {
-			doDeleteShip(commandString.substring(7));
-		} else if ("help".equals(commandString)) {
+	private void parseInput(String input) {
+		if (input.startsWith("add ")) {
+			doAddShip(input.substring(4));
+			game.printPlayerMap(player);
+		} else if (input.startsWith("del ")) {
+			doDeleteShip(input.substring(4));
+		} else if ("help".equals(input)) {
 			printHelp();
-		} else if ("map".equals(commandString)) {
-			game.printPlayer(player);
-		} else if ("player1".equals(commandString)) {
+		} else if ("map".equals(input)) {
+			game.printPlayerMap(player);
+		} else if ("player1".equals(input)) {
 			player = BattleshipGame.PLAYER1;
-		} else if ("player2".equals(commandString)) {
+		} else if ("player2".equals(input)) {
 			player = BattleshipGame.PLAYER2;
-		} else if ("reset".equals(commandString)) {
+		} else if ("reset".equals(input)) {
 			game.resetPlayer(player);
-		} else if ("quit".equals(commandString)) {
+		} else if ("quit".equals(input)) {
 			quit = true;
 		} else {
 			message("Did not understand");
@@ -88,15 +88,17 @@ public class CommandInterpreter {
 
 	private void printHelp() {
 		message("Available commands:");
-		message("\thelp: Print this help text");
-		message("\tquit: Quit program");
-		message("\tmap:  Prints the map for the current player");
-		message("\tplayer1: Select player 1");
-		message("\tplayer2: Select player 2");
-		message("\tadd <ship> <orient> <coord>: Add ship to map");
-		message("\t\t<ship>:   battleship, carrier, cruiser, destroyer, submarine");
-		message("\t\t<orient>: h, v");
-		message("\t\t<coord>:  A1, ..., J10");
+		message("\thelp:       Print this help text");
+		message("\tquit:       Quit program");
+		message("\tplayer1:    Select player 1");
+		message("\tplayer2:    Select player 2");
+		message("\tmap:        Print map for current player");
+		message("\tadd ship orientation coord: Add ship to map");
+		message("\t\tship:        battleship, carrier, cruiser, destroyer, submarine");
+		message("\t\torientation: h, v");
+		message("\t\tcoord:       a1, ..., j10");
+		message("\tdel ship: Delete ship from map");
+		message("\t\tship:        battleship, carrier, cruiser, destroyer, submarine");
 	}
 
 	// Example: add carrier h I3
