@@ -86,41 +86,41 @@ public class CommandInterpreter {
 		throw new IllegalArgumentException();
 	}
 
-	// Example: add carrier h I3
+	// Example: add carrier h i3
 	private void doAddShip(String paramString) {
-		String[] params = getParamsTrimmed(paramString);
-		if (params.length != 3) {
+		String[] p = getParamsTrimmed(paramString);
+		if (p.length != 3) {
 			ui.message("Command 'add' needs 3 parameters: shiptype orientation coordinate");
 			return;
 		}
 
-		if (!ui.isValidShipType(params[0])) {
-			ui.message("Invalid ship type: %s", params[0]);
+		if (!ui.isValidShipType(p[0])) {
+			ui.message("Invalid ship type: %s", p[0]);
 			return;
 		}
-		var type = ui.shipType(params[0]);
+		var type = ui.shipType(p[0]);
 
 		int orientation = -1;
 		try {
-			orientation = parseOrientation(params[1]);
+			orientation = parseOrientation(p[1]);
 		} catch (Exception e) {
-			ui.message("Invalid orientation: %s", params[1]);
+			ui.message("Invalid orientation: %s", p[1]);
 			return;
 		}
 
 		MapCoordinate coord = null;
 		try {
-			coord = MapCoordinate.valueOf(params[2]);
+			coord = MapCoordinate.valueOf(p[2]);
 		} catch (IllegalArgumentException x) {
-			ui.message("Illegal coordinate: %s", params[2]);
+			ui.message("Illegal coordinate: %s", p[2]);
 			return;
 		}
 
-		ui.message("%s: %s %s at %s", ui.playerName(player), ui.orientationName(orientation), ui.shipTypeName(type),
-				coord.toLetterDigitFormat());
-
 		var result = game.addShip(player, type, coord.x(), coord.y(), orientation);
-		if (!result.success()) {
+		if (result.success()) {
+			ui.message("%s: added %s %s at %s", ui.playerName(player), ui.shipTypeName(type), ui.orientationName(orientation),
+					coord.toLetterDigitFormat());
+		} else {
 			ui.message(result.message());
 		}
 	}
@@ -140,7 +140,9 @@ public class CommandInterpreter {
 		var type = ui.shipType(typeString);
 
 		var result = game.deleteShip(player, type);
-		if (!result.success()) {
+		if (result.success()) {
+			ui.message("%s: %s deleted", ui.playerName(player), ui.shipTypeName(type));
+		} else {
 			ui.message(result.message());
 		}
 	}

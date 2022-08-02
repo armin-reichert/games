@@ -60,11 +60,11 @@ public class BattleshipGame {
 
 	public static char shipCode(byte type) {
 		return switch (type) {
-		case MAP_CARRIER -> 'c';
-		case MAP_BATTLESHIP -> 'b';
-		case MAP_CRUISER -> 'u';
-		case MAP_SUBMARINE -> 's';
-		case MAP_DESTROYER -> 'd';
+		case MAP_CARRIER -> 'C';
+		case MAP_BATTLESHIP -> 'B';
+		case MAP_CRUISER -> 'U';
+		case MAP_SUBMARINE -> 'S';
+		case MAP_DESTROYER -> 'D';
 		default -> throw new IllegalArgumentException();
 		};
 	}

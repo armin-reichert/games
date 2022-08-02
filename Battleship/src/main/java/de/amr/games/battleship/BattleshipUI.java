@@ -33,8 +33,8 @@ import java.util.Scanner;
  */
 public class BattleshipUI {
 
-	private static final List<String> SHIP_TYPE_NAMES = List.of("carrier", "battleship", "cruiser", "submarine",
-			"destroyer");
+	private static final List<String> SHIP_TYPE_NAMES = List.of(//
+			"Carrier", "Battleship", "Cruiser", "Submarine", "Destroyer");
 
 	private final Scanner sc = new Scanner(System.in);
 
@@ -70,11 +70,12 @@ public class BattleshipUI {
 	}
 
 	public byte shipType(String shipTypeName) {
-		int index = SHIP_TYPE_NAMES.indexOf(shipTypeName.toLowerCase());
-		if (index == -1) {
-			throw new IllegalArgumentException();
+		for (int i = 0; i < SHIP_TYPE_NAMES.size(); ++i) {
+			if (SHIP_TYPE_NAMES.get(i).equalsIgnoreCase(shipTypeName)) {
+				return (byte) i;
+			}
 		}
-		return (byte) index;
+		throw new IllegalArgumentException();
 	}
 
 	public boolean isValidShipType(String shipType) {
