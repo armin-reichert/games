@@ -45,21 +45,21 @@ public class CommandInterpreter {
 		do {
 			var prompt = "[%s] (Enter 'help' for help):".formatted(Converter.playerName(player));
 			var input = ui.readLine(prompt);
-			parseInput(input);
+			executeCommand(input);
 		} while (!quit);
 		ui.close();
 	}
 
-	private void parseInput(String input) {
-		var parts = splitIntoParts(input);
-		var command = parts[0];
+	private void executeCommand(String input) {
+		var commandAndParams = splitIntoParts(input);
+		var command = commandAndParams[0];
 		switch (command) {
 		case "add" -> {
-			doAddShip(parts);
+			doAddShip(commandAndParams);
 			ui.printPlayerMap(game, player);
 		}
 		case "del" -> {
-			doDeleteShip(parts);
+			doDeleteShip(commandAndParams);
 			ui.printPlayerMap(game, player);
 		}
 		case "help" -> {
