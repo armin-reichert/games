@@ -41,6 +41,7 @@ public class CommandInterpreter {
 	}
 
 	public void run() {
+		ui.printHelp();
 		do {
 			var prompt = "[%s] (Enter 'help' for help):".formatted(Converter.playerName(player));
 			var input = ui.readLine(prompt);

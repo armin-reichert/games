@@ -50,17 +50,18 @@ public class BattleshipUI {
 
 	public void printHelp() {
 		message("Available commands:");
-		message("\thelp:       Print this help text");
-		message("\tquit:       Quit program");
-		message("\tplayer1:    Select player 1");
-		message("\tplayer2:    Select player 2");
-		message("\tmap:        Print map for current player");
-		message("\tadd ship orientation coord: Add ship to map");
-		message("\t\tship:        battleship, carrier, cruiser, destroyer, submarine");
-		message("\t\torientation: h, v");
-		message("\t\tcoord:       a1, ..., j10");
-		message("\tdel ship: Delete ship from map");
-		message("\t\tship:        battleship, carrier, cruiser, destroyer, submarine");
+		message("help:    Print this help text");
+		message("quit:    Quit program");
+		message("player1: Select player 1");
+		message("player2: Select player 2");
+		message("map:     Print map for current player");
+		message("add:     Add ship to map e.g. 'add carrier v a4'");
+		message("         - battleship, carrier, cruiser, destroyer, submarine");
+		message("         - h, v");
+		message("         - a1, ..., j10");
+		message("del:     Delete ship from map e.g. 'del cruiser'");
+		message("         - battleship, carrier, cruiser, destroyer, submarine");
+		message("reset:   Resets map to initial state");
 	}
 
 	public void printPlayerMap(BattleshipGame game, int player) {
