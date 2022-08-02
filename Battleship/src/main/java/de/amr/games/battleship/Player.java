@@ -24,6 +24,8 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
+import java.util.Arrays;
+
 public class Player {
 
 	public final byte[][] map = new byte[BattleshipGame.MAPSIZE][BattleshipGame.MAPSIZE];
@@ -39,8 +41,6 @@ public class Player {
 				map[x][y] = BattleshipGame.MAP_WATER;
 			}
 		}
-		for (int i = 0; i < shipUsed.length; ++i) {
-			shipUsed[i] = false;
-		}
+		Arrays.fill(shipUsed, false);
 	}
 }
