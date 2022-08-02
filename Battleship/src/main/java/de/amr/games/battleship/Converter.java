@@ -24,8 +24,6 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-import java.util.List;
-
 /**
  * @author Armin Reichert
  */
@@ -33,9 +31,6 @@ public class Converter {
 
 	private Converter() {
 	}
-
-	private static final List<String> SHIP_TYPE_NAMES = List.of(//
-			"Carrier", "Battleship", "Cruiser", "Submarine", "Destroyer");
 
 	public static int parseOrientation(String s) {
 		if ("h".equals(s)) {
@@ -62,16 +57,34 @@ public class Converter {
 	}
 
 	public static byte parseShipType(String s) {
-		for (int i = 0; i < SHIP_TYPE_NAMES.size(); ++i) {
-			if (SHIP_TYPE_NAMES.get(i).equalsIgnoreCase(s)) {
-				return (byte) i;
-			}
+		var ss = s.trim().toLowerCase();
+		if ("battleship".equals(ss)) {
+			return BattleshipGame.MAP_BATTLESHIP;
+		}
+		if ("carrier".equals(ss)) {
+			return BattleshipGame.MAP_CARRIER;
+		}
+		if ("cruiser".equals(ss)) {
+			return BattleshipGame.MAP_CRUISER;
+		}
+		if ("destroyer".equals(ss)) {
+			return BattleshipGame.MAP_DESTROYER;
+		}
+		if ("submarine".equals(ss)) {
+			return BattleshipGame.MAP_SUBMARINE;
 		}
 		throw new ConvertException("Illegal ship type value '%s'", s);
 	}
 
 	public static String shipTypeName(byte type) {
-		return SHIP_TYPE_NAMES.get(type);
+		return switch (type) {
+		case BattleshipGame.MAP_BATTLESHIP -> "Battleship";
+		case BattleshipGame.MAP_CARRIER -> "Carrier";
+		case BattleshipGame.MAP_CRUISER -> "Cruiser";
+		case BattleshipGame.MAP_DESTROYER -> "Destroyer";
+		case BattleshipGame.MAP_SUBMARINE -> "Submarine";
+		default -> throw new IllegalArgumentException();
+		};
 	}
 
 	public static String playerName(int player) {

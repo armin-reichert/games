@@ -24,12 +24,13 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Player {
 
 	public final byte[][] map = new byte[BattleshipGame.MAPSIZE][BattleshipGame.MAPSIZE];
-	public final boolean[] shipUsed = new boolean[5];
+	private final Set<Byte> shipsUsed = new HashSet<>();
 
 	public Player() {
 		reset();
@@ -41,6 +42,18 @@ public class Player {
 				map[x][y] = BattleshipGame.MAP_WATER;
 			}
 		}
-		Arrays.fill(shipUsed, false);
+		shipsUsed.clear();
+	}
+
+	public boolean isShipUsed(byte type) {
+		return shipsUsed.contains(type);
+	}
+
+	public void setShipUsed(byte type, boolean used) {
+		if (used) {
+			shipsUsed.add(type);
+		} else {
+			shipsUsed.remove(type);
+		}
 	}
 }

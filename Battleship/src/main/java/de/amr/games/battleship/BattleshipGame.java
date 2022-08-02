@@ -35,11 +35,11 @@ public class BattleshipGame {
 	public static final int VERTICAL = 1;
 
 	public static final byte MAP_WATER = -127;
-	public static final byte MAP_CARRIER = 0;
-	public static final byte MAP_BATTLESHIP = 1;
-	public static final byte MAP_CRUISER = 2;
-	public static final byte MAP_SUBMARINE = 3;
-	public static final byte MAP_DESTROYER = 4;
+	public static final byte MAP_CARRIER = 1;
+	public static final byte MAP_BATTLESHIP = 2;
+	public static final byte MAP_CRUISER = 3;
+	public static final byte MAP_SUBMARINE = 4;
+	public static final byte MAP_DESTROYER = 5;
 
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
@@ -84,7 +84,7 @@ public class BattleshipGame {
 	}
 
 	public Result deleteShip(int player, byte type) {
-		if (!getPlayer(player).shipUsed[type]) {
+		if (!getPlayer(player).isShipUsed(type)) {
 			return new Result(false, "Ship type not used yet");
 		}
 		for (int x = 0; x < MAPSIZE; ++x) {
@@ -95,7 +95,7 @@ public class BattleshipGame {
 				}
 			}
 		}
-		getPlayer(player).shipUsed[type] = false;
+		getPlayer(player).setShipUsed(type, false);
 		return new Result(true, "");
 	}
 
@@ -108,7 +108,7 @@ public class BattleshipGame {
 	}
 
 	private Result addShip(Player playerData, byte type, int x, int y, int sizeX, int sizeY) {
-		if (playerData.shipUsed[type]) {
+		if (playerData.isShipUsed(type)) {
 			return new Result(false, "Ship type already used");
 		}
 		if (x + sizeX > MAPSIZE) {
@@ -126,7 +126,7 @@ public class BattleshipGame {
 				playerData.map[x + i][y + j] = type;
 			}
 		}
-		playerData.shipUsed[type] = true;
+		playerData.setShipUsed(type, true);
 		return new Result(true, "");
 	}
 }
