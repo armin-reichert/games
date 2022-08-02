@@ -41,18 +41,29 @@ public class BattleshipGame {
 	public static final byte MAP_SUBMARINE = 3;
 	public static final byte MAP_DESTROYER = 4;
 
-	private static final int[] SHIP_SIZES = { 5, 4, 3, 3, 2 };
-	private static final char[] SHIP_CODES = { 'C', 'B', 'U', 'S', 'D' };
-
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
 
 	public static int shipSize(byte type) {
-		return SHIP_SIZES[type];
+		return switch (type) {
+		case MAP_CARRIER -> 5;
+		case MAP_BATTLESHIP -> 4;
+		case MAP_CRUISER -> 3;
+		case MAP_SUBMARINE -> 3;
+		case MAP_DESTROYER -> 2;
+		default -> throw new IllegalArgumentException();
+		};
 	}
 
 	public static char shipCode(byte type) {
-		return SHIP_CODES[type];
+		return switch (type) {
+		case MAP_CARRIER -> 'c';
+		case MAP_BATTLESHIP -> 'b';
+		case MAP_CRUISER -> 'u';
+		case MAP_SUBMARINE -> 's';
+		case MAP_DESTROYER -> 'd';
+		default -> throw new IllegalArgumentException();
+		};
 	}
 
 	public static void message(String msg, Object... args) {

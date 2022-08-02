@@ -63,16 +63,20 @@ public class CommandInterpreter {
 			ui.printPlayerMap(game, player);
 		} else if (input.startsWith("del ")) {
 			doDeleteShip(input.substring(4));
+			ui.printPlayerMap(game, player);
 		} else if ("help".equals(input)) {
 			ui.printHelp();
 		} else if ("map".equals(input)) {
 			ui.printPlayerMap(game, player);
 		} else if ("player1".equals(input)) {
 			player = BattleshipGame.PLAYER1;
+			ui.printPlayerMap(game, player);
 		} else if ("player2".equals(input)) {
 			player = BattleshipGame.PLAYER2;
+			ui.printPlayerMap(game, player);
 		} else if ("reset".equals(input)) {
 			game.resetPlayer(player);
+			ui.printPlayerMap(game, player);
 		} else if ("quit".equals(input)) {
 			quit = true;
 		} else {
@@ -97,6 +101,7 @@ public class CommandInterpreter {
 			ui.message("Command 'add' needs 3 parameters: <shiptype> <orientation> <coordinate>");
 			return;
 		}
+
 		var typeString = params[0];
 		if (!ui.isValidShipType(typeString)) {
 			ui.message("Invalid ship type: %s", typeString);
@@ -133,6 +138,7 @@ public class CommandInterpreter {
 			ui.message("Command 'delete' needs 1 parameter: <shiptype>");
 			return;
 		}
+
 		var typeString = params[0];
 		if (!ui.isValidShipType(typeString)) {
 			ui.message("Invalid ship type: %s", typeString);
