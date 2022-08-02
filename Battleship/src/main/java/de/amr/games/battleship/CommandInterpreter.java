@@ -52,29 +52,39 @@ public class CommandInterpreter {
 	private void parseInput(String input) {
 		var parts = splitIntoParts(input);
 		var command = parts[0];
-		if ("add".equals(command)) {
+		switch (command) {
+		case "add" -> {
 			doAddShip(parts);
 			ui.printPlayerMap(game, player);
-		} else if ("del".equals(command)) {
+		}
+		case "del" -> {
 			doDeleteShip(parts);
 			ui.printPlayerMap(game, player);
-		} else if ("help".equals(command)) {
+		}
+		case "help" -> {
 			ui.printHelp();
-		} else if ("map".equals(command)) {
+		}
+		case "map" -> {
 			ui.printPlayerMap(game, player);
-		} else if ("player1".equals(command)) {
+		}
+		case "player1" -> {
 			player = BattleshipGame.PLAYER1;
 			ui.printPlayerMap(game, player);
-		} else if ("player2".equals(command)) {
+		}
+		case "player2" -> {
 			player = BattleshipGame.PLAYER2;
 			ui.printPlayerMap(game, player);
-		} else if ("reset".equals(command)) {
+		}
+		case "quit" -> {
+			quit = true;
+		}
+		case "reset" -> {
 			game.getPlayer(player).reset();
 			ui.printPlayerMap(game, player);
-		} else if ("quit".equals(command)) {
-			quit = true;
-		} else {
+		}
+		default -> {
 			ui.message("Did not understand");
+		}
 		}
 	}
 
