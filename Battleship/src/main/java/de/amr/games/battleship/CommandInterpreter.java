@@ -88,37 +88,34 @@ public class CommandInterpreter {
 
 	// Example: add carrier h I3
 	private void doAddShip(String paramString) {
-		String[] params = paramString.trim().split(" ");
+		String[] params = getParamsTrimmed(paramString);
 		if (params.length != 3) {
 			ui.message("Command 'add' needs 3 parameters: shiptype orientation coordinate");
 			return;
 		}
 
-		var typeString = params[0].trim();
-		if (!ui.isValidShipType(typeString)) {
-			ui.message("Invalid ship type: %s", typeString);
+		if (!ui.isValidShipType(params[0])) {
+			ui.message("Invalid ship type: %s", params[0]);
 			return;
 		}
+		var type = ui.shipType(params[0]);
 
-		var orientString = params[1].trim();
 		int orientation = -1;
 		try {
-			orientation = parseOrientation(orientString);
+			orientation = parseOrientation(params[1]);
 		} catch (Exception e) {
-			ui.message("Invalid orientation: %s", orientString);
+			ui.message("Invalid orientation: %s", params[1]);
 			return;
 		}
 
-		var coordString = params[2].trim();
 		MapCoordinate coord = null;
 		try {
-			coord = MapCoordinate.valueOf(coordString);
+			coord = MapCoordinate.valueOf(params[2]);
 		} catch (IllegalArgumentException x) {
-			ui.message("Illegal coordinate: %s", coordString);
+			ui.message("Illegal coordinate: %s", params[2]);
 			return;
 		}
 
-		var type = ui.shipType(typeString);
 		ui.message("%s: %s %s at %s", ui.playerName(player), ui.orientationName(orientation), ui.shipTypeName(type),
 				coord.toLetterDigitFormat());
 
@@ -129,13 +126,13 @@ public class CommandInterpreter {
 	}
 
 	private void doDeleteShip(String paramString) {
-		String[] params = paramString.trim().split(" ");
+		String[] params = getParamsTrimmed(paramString);
 		if (params.length != 1) {
 			ui.message("Command 'delete' needs 1 parameter: shiptype");
 			return;
 		}
 
-		var typeString = params[0].trim();
+		var typeString = params[0];
 		if (!ui.isValidShipType(typeString)) {
 			ui.message("Invalid ship type: %s", typeString);
 			return;
@@ -146,5 +143,13 @@ public class CommandInterpreter {
 		if (!result.success()) {
 			ui.message(result.message());
 		}
+	}
+
+	private String[] getParamsTrimmed(String paramString) {
+		String[] params = paramString.trim().split(" ");
+		for (int i = 0; i < params.length; ++i) {
+			params[i] = params[i].trim();
+		}
+		return params;
 	}
 }
