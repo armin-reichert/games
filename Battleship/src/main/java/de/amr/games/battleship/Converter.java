@@ -62,7 +62,7 @@ public class Converter {
 			return BattleshipGame.MAP_BATTLESHIP;
 		}
 		if ("carrier".equals(ss)) {
-			return BattleshipGame.MAP_CARRIER;
+			return BattleshipGame.MAP_AIRCRAFT_CARRIER;
 		}
 		if ("cruiser".equals(ss)) {
 			return BattleshipGame.MAP_CRUISER;
@@ -79,7 +79,7 @@ public class Converter {
 	public static String shipTypeName(byte type) {
 		return switch (type) {
 		case BattleshipGame.MAP_BATTLESHIP -> "Battleship";
-		case BattleshipGame.MAP_CARRIER -> "Carrier";
+		case BattleshipGame.MAP_AIRCRAFT_CARRIER -> "Carrier";
 		case BattleshipGame.MAP_CRUISER -> "Cruiser";
 		case BattleshipGame.MAP_DESTROYER -> "Destroyer";
 		case BattleshipGame.MAP_SUBMARINE -> "Submarine";

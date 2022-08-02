@@ -36,37 +36,42 @@ public class BattleshipGame {
 
 	public static final byte MAP_WATER = -127;
 
-	public static final byte MAP_CARRIER = 1;
-	public static final byte MAP_BATTLESHIP = 2;
-	public static final byte MAP_CRUISER = 3;
-	public static final byte MAP_SUBMARINE = 4;
-	public static final byte MAP_DESTROYER = 5;
-
-	public static final byte MAP_CARRIER_HIT = -1;
-	public static final byte MAP_BATTLESHIP_HIT = -2;
-	public static final byte MAP_CRUISER_HIT = -3;
-	public static final byte MAP_SUBMARINE_HIT = -4;
-	public static final byte MAP_DESTROYER_HIT = -5;
+	public static final byte MAP_AIRCRAFT_CARRIER = 0;
+	public static final byte MAP_BATTLESHIP = 1;
+	public static final byte MAP_CRUISER = 2;
+	public static final byte MAP_SUBMARINE = 3;
+	public static final byte MAP_DESTROYER = 4;
 
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
 
 	public static int shipSize(byte type) {
 		return switch (type) {
-		case MAP_CARRIER -> 5;
+		case MAP_AIRCRAFT_CARRIER -> 5;
 		case MAP_BATTLESHIP -> 4;
 		case MAP_CRUISER -> 3;
-		case MAP_SUBMARINE -> 3;
 		case MAP_DESTROYER -> 2;
+		case MAP_SUBMARINE -> 1;
+		default -> throw new IllegalArgumentException();
+		};
+	}
+
+	public static int shipsAvailable(byte type) {
+		return switch (type) {
+		case MAP_AIRCRAFT_CARRIER -> 1;
+		case MAP_BATTLESHIP -> 1;
+		case MAP_CRUISER -> 1;
+		case MAP_DESTROYER -> 2;
+		case MAP_SUBMARINE -> 2;
 		default -> throw new IllegalArgumentException();
 		};
 	}
 
 	public static char shipCode(byte type) {
 		return switch (type) {
-		case MAP_CARRIER -> 'C';
+		case MAP_AIRCRAFT_CARRIER -> 'A';
 		case MAP_BATTLESHIP -> 'B';
-		case MAP_CRUISER -> 'U';
+		case MAP_CRUISER -> 'C';
 		case MAP_SUBMARINE -> 'S';
 		case MAP_DESTROYER -> 'D';
 		default -> throw new IllegalArgumentException();
@@ -90,50 +95,4 @@ public class BattleshipGame {
 		}
 	}
 
-	public Result deleteShip(int player, byte type) {
-		if (!getPlayer(player).isShipUsed(type)) {
-			return new Result(false, "Ship type not used yet");
-		}
-		for (int x = 0; x < MAPSIZE; ++x) {
-			for (int y = 0; y < MAPSIZE; ++y) {
-				byte value = getPlayer(player).map[x][y];
-				if (value == type) {
-					getPlayer(player).map[x][y] = MAP_WATER;
-				}
-			}
-		}
-		getPlayer(player).setShipUsed(type, false);
-		return new Result(true, "");
-	}
-
-	public Result addShip(int player, byte type, int x, int y, int orientation) {
-		if (orientation == HORIZONTAL) {
-			return addShip(players[player], type, x, y, shipSize(type), 1);
-		} else {
-			return addShip(players[player], type, x, y, 1, shipSize(type));
-		}
-	}
-
-	private Result addShip(Player playerData, byte type, int x, int y, int sizeX, int sizeY) {
-		if (playerData.isShipUsed(type)) {
-			return new Result(false, "Ship type already used");
-		}
-		if (x + sizeX > MAPSIZE) {
-			return new Result(false, "Map size exceeded in x dimension");
-		}
-		if (y + sizeY > MAPSIZE) {
-			return new Result(false, "Map size exceeded in x dimension");
-		}
-		for (int i = 0; i < sizeX; ++i) {
-			for (int j = 0; j < sizeY; ++j) {
-				byte value = playerData.map[x + i][y + j];
-				if (value != MAP_WATER) {
-					return new Result(false, "Map already used at " + new MapCoordinate(x, y).toLetterDigitFormat());
-				}
-				playerData.map[x + i][y + j] = type;
-			}
-		}
-		playerData.setShipUsed(type, true);
-		return new Result(true, "");
-	}
 }

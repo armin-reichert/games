@@ -24,13 +24,12 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
 
 public class Player {
 
 	public final byte[][] map = new byte[BattleshipGame.MAPSIZE][BattleshipGame.MAPSIZE];
-	private final Set<Byte> shipsUsed = new HashSet<>();
+	private final int[] shipsUsed = new int[5];
 
 	public Player() {
 		reset();
@@ -42,18 +41,71 @@ public class Player {
 				map[x][y] = BattleshipGame.MAP_WATER;
 			}
 		}
-		shipsUsed.clear();
+		Arrays.fill(shipsUsed, 0);
 	}
 
-	public boolean isShipUsed(byte type) {
-		return shipsUsed.contains(type);
-	}
-
-	public void setShipUsed(byte type, boolean used) {
-		if (used) {
-			shipsUsed.add(type);
+	public Result addShip(byte type, int x, int y, int orientation) {
+		if (orientation == BattleshipGame.HORIZONTAL) {
+			return addShip(type, x, y, BattleshipGame.shipSize(type), 1);
 		} else {
-			shipsUsed.remove(type);
+			return addShip(type, x, y, 1, BattleshipGame.shipSize(type));
+		}
+	}
+
+	private Result addShip(byte type, int x, int y, int sizeX, int sizeY) {
+		if (numShipsUsed(type) == BattleshipGame.shipsAvailable(type)) {
+			return new Result(false, "No more ships available");
+		}
+		if (x + sizeX > BattleshipGame.MAPSIZE) {
+			return new Result(false, "Map size exceeded in x dimension");
+		}
+		if (y + sizeY > BattleshipGame.MAPSIZE) {
+			return new Result(false, "Map size exceeded in x dimension");
+		}
+		for (int i = 0; i < sizeX; ++i) {
+			for (int j = 0; j < sizeY; ++j) {
+				byte value = map[x + i][y + j];
+				if (value != BattleshipGame.MAP_WATER) {
+					return new Result(false, "Map already used at " + new MapCoordinate(x, y).toLetterDigitFormat());
+				}
+				map[x + i][y + j] = type;
+			}
+		}
+		addShipUsage(type);
+		return new Result(true, "");
+	}
+
+	public Result deleteAllShips(byte type) {
+		if (numShipsUsed(type) == 0) {
+			return new Result(false, "Ship type not used yet");
+		}
+		for (int x = 0; x < BattleshipGame.MAPSIZE; ++x) {
+			for (int y = 0; y < BattleshipGame.MAPSIZE; ++y) {
+				byte value = map[x][y];
+				if (value == type) {
+					map[x][y] = BattleshipGame.MAP_WATER;
+				}
+			}
+		}
+		removeShipUsage(type);
+		return new Result(true, "");
+	}
+
+	public boolean isShipAvailable(byte type) {
+		return shipsUsed[type] < BattleshipGame.shipsAvailable(type);
+	}
+
+	public int numShipsUsed(byte type) {
+		return shipsUsed[type];
+	}
+
+	public void addShipUsage(byte type) {
+		shipsUsed[type]++;
+	}
+
+	public void removeShipUsage(byte type) {
+		if (shipsUsed[type] > 0) {
+			shipsUsed[type]--;
 		}
 	}
 }

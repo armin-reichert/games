@@ -59,7 +59,7 @@ public class CommandInterpreter {
 			ui.printPlayerMap(game, player);
 		}
 		case "del" -> {
-			doDeleteShip(commandAndParams);
+			doDeleteAllShipsOfType(commandAndParams);
 			ui.printPlayerMap(game, player);
 		}
 		case "help" -> {
@@ -108,7 +108,7 @@ public class CommandInterpreter {
 			return;
 		}
 
-		var result = game.addShip(player, type, coord.x(), coord.y(), orientation);
+		var result = game.getPlayer(player).addShip(type, coord.x(), coord.y(), orientation);
 		if (result.success()) {
 			ui.message("%s: added %s %s at %s", Converter.playerName(player), Converter.shipTypeName(type),
 					Converter.orientationName(orientation), coord.toLetterDigitFormat());
@@ -117,7 +117,7 @@ public class CommandInterpreter {
 		}
 	}
 
-	private void doDeleteShip(String[] parts) {
+	private void doDeleteAllShipsOfType(String[] parts) {
 		if (parts.length - 1 != 1) {
 			ui.message("Command 'delete' needs 1 parameter: shiptype");
 			return;
@@ -131,7 +131,7 @@ public class CommandInterpreter {
 			return;
 		}
 
-		var result = game.deleteShip(player, type);
+		var result = game.getPlayer(player).deleteAllShips(type);
 		if (result.success()) {
 			ui.message("%s: %s deleted", Converter.playerName(player), Converter.shipTypeName(type));
 		} else {
