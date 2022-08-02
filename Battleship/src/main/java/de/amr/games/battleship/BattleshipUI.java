@@ -26,6 +26,7 @@ package de.amr.games.battleship;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author Armin Reichert
@@ -34,6 +35,21 @@ public class BattleshipUI {
 
 	private static final List<String> SHIP_TYPE_NAMES = List.of("carrier", "battleship", "cruiser", "submarine",
 			"destroyer");
+
+	private final Scanner sc = new Scanner(System.in);
+
+	public BattleshipUI() {
+	}
+
+	public String readLine(String prompt) {
+		message(prompt);
+		return sc.nextLine().trim();
+	}
+
+	public void close() {
+		sc.close();
+		message("Goodbye");
+	}
 
 	public void message(String msg, Object... args) {
 		System.out.println(msg.formatted(args));

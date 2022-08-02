@@ -24,14 +24,11 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-import java.util.Scanner;
-
 /**
  * @author Armin Reichert
  */
 public class CommandInterpreter {
 
-	private final Scanner sc = new Scanner(System.in);
 	private final BattleshipGame game;
 	private final BattleshipUI ui;
 	private int player;
@@ -45,16 +42,11 @@ public class CommandInterpreter {
 
 	public void run() {
 		do {
-			var input = readInput();
+			var prompt = "[%s] (Enter 'help' for help):".formatted(ui.playerName(player));
+			var input = ui.readLine(prompt);
 			parseInput(input);
 		} while (!quit);
-		sc.close();
-		ui.message("Goodbye");
-	}
-
-	private String readInput() {
-		ui.message("(%s): Enter 'help' for help:", ui.playerName(player));
-		return sc.nextLine().trim();
+		ui.close();
 	}
 
 	private void parseInput(String input) {
@@ -98,17 +90,17 @@ public class CommandInterpreter {
 	private void doAddShip(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 3) {
-			ui.message("Command 'add' needs 3 parameters: <shiptype> <orientation> <coordinate>");
+			ui.message("Command 'add' needs 3 parameters: shiptype orientation coordinate");
 			return;
 		}
 
-		var typeString = params[0];
+		var typeString = params[0].trim();
 		if (!ui.isValidShipType(typeString)) {
 			ui.message("Invalid ship type: %s", typeString);
 			return;
 		}
 
-		var orientString = params[1];
+		var orientString = params[1].trim();
 		int orientation = -1;
 		try {
 			orientation = parseOrientation(orientString);
@@ -117,7 +109,7 @@ public class CommandInterpreter {
 			return;
 		}
 
-		var coordString = params[2];
+		var coordString = params[2].trim();
 		MapCoordinate coord = null;
 		try {
 			coord = MapCoordinate.valueOf(coordString);
@@ -139,11 +131,11 @@ public class CommandInterpreter {
 	private void doDeleteShip(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 1) {
-			ui.message("Command 'delete' needs 1 parameter: <shiptype>");
+			ui.message("Command 'delete' needs 1 parameter: shiptype");
 			return;
 		}
 
-		var typeString = params[0];
+		var typeString = params[0].trim();
 		if (!ui.isValidShipType(typeString)) {
 			ui.message("Invalid ship type: %s", typeString);
 			return;
