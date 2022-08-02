@@ -35,11 +35,18 @@ public class BattleshipGame {
 	public static final int VERTICAL = 1;
 
 	public static final byte MAP_WATER = -127;
+
 	public static final byte MAP_CARRIER = 1;
 	public static final byte MAP_BATTLESHIP = 2;
 	public static final byte MAP_CRUISER = 3;
 	public static final byte MAP_SUBMARINE = 4;
 	public static final byte MAP_DESTROYER = 5;
+
+	public static final byte MAP_CARRIER_HIT = -1;
+	public static final byte MAP_BATTLESHIP_HIT = -2;
+	public static final byte MAP_CRUISER_HIT = -3;
+	public static final byte MAP_SUBMARINE_HIT = -4;
+	public static final byte MAP_DESTROYER_HIT = -5;
 
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
