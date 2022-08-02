@@ -98,7 +98,7 @@ public class BattleshipGame {
 
 	public Result deleteShip(int player, byte type) {
 		if (!playerData(player).shipUsed[type]) {
-			return new Result(false, "Ship type already used");
+			return new Result(false, "Ship type not used yet");
 		}
 		for (int x = 0; x < MAPSIZE; ++x) {
 			for (int y = 0; y < MAPSIZE; ++y) {
