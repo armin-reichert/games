@@ -24,9 +24,6 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-import java.io.PrintWriter;
-import java.util.List;
-
 /**
  * @author Armin Reichert
  */
@@ -46,35 +43,9 @@ public class BattleshipGame {
 
 	private static final int[] SHIP_SIZES = { 5, 4, 3, 3, 2 };
 	private static final char[] SHIP_CODES = { 'C', 'B', 'U', 'S', 'D' };
-	private static final List<String> SHIP_TYPE_NAMES = List.of("carrier", "battleship", "cruiser", "submarine",
-			"destroyer");
 
 	public static final int PLAYER1 = 0;
 	public static final int PLAYER2 = 1;
-
-	private static void error(String msg, Object... args) {
-		System.err.println(msg.formatted(args));
-	}
-
-	public static String playerName(int player) {
-		if (player == PLAYER1) {
-			return "Player #1";
-		}
-		if (player == PLAYER2) {
-			return "Player #2";
-		}
-		throw new IllegalArgumentException();
-	}
-
-	public static String orientationName(int orientation) {
-		if (orientation == HORIZONTAL) {
-			return "horizontal";
-		}
-		if (orientation == VERTICAL) {
-			return "vertical";
-		}
-		throw new IllegalArgumentException();
-	}
 
 	public static int shipSize(byte type) {
 		return SHIP_SIZES[type];
@@ -82,30 +53,6 @@ public class BattleshipGame {
 
 	public static char shipCode(byte type) {
 		return SHIP_CODES[type];
-	}
-
-	public static String shipTypeName(byte type) {
-		return SHIP_TYPE_NAMES.get(type);
-	}
-
-	public static byte shipType(String shipType) {
-		int index = SHIP_TYPE_NAMES.indexOf(shipType.toLowerCase());
-		if (index == -1) {
-			throw new IllegalArgumentException();
-		}
-		return (byte) (index);
-	}
-
-	public static boolean isValidOrientation(String orientation) {
-		return "h".equalsIgnoreCase(orientation) || "v".equalsIgnoreCase(orientation);
-	}
-
-	public static boolean isValidShipType(String shipType) {
-		return SHIP_TYPE_NAMES.stream().anyMatch(name -> name.equalsIgnoreCase(shipType));
-	}
-
-	public static boolean isValidCoordinate(String coordinate) {
-		return MapCoordinate.valueOf(coordinate) != null;
 	}
 
 	public static void message(String msg, Object... args) {
@@ -141,7 +88,6 @@ public class BattleshipGame {
 
 	public void deleteShip(int player, byte type) {
 		if (!playerData(player).shipUsed[type]) {
-			error("Player has no %s", shipTypeName(type));
 			return;
 		}
 		for (int x = 0; x < MAPSIZE; ++x) {
@@ -157,8 +103,6 @@ public class BattleshipGame {
 	}
 
 	public boolean addShip(int player, byte type, int x, int y, int orientation) {
-		message("%s: %s %s at %s", playerName(player), orientationName(orientation), shipTypeName(type),
-				new MapCoordinate(x, y).toLetterDigitFormat());
 		if (orientation == HORIZONTAL) {
 			return addShip(playerData[player], type, x, y, shipSize(type), 1);
 		} else {
@@ -168,7 +112,6 @@ public class BattleshipGame {
 
 	private boolean addShip(PlayerData playerData, byte type, int x, int y, int sizeX, int sizeY) {
 		if (playerData.shipUsed[type]) {
-			message("Player has already a %s", shipTypeName(type));
 			return false;
 		}
 		if (x + sizeX > MAPSIZE) {
@@ -183,8 +126,6 @@ public class BattleshipGame {
 			for (int j = 0; j < sizeY; ++j) {
 				byte value = playerData.map[x + i][y + j];
 				if (value != MAP_WATER) {
-					message("Cannot place ship. Overlaps with %s at %s", shipTypeName(value),
-							new MapCoordinate(x, y).toLetterDigitFormat());
 					return false;
 				}
 				playerData.map[x + i][y + j] = type;
@@ -192,30 +133,5 @@ public class BattleshipGame {
 		}
 		playerData.shipUsed[type] = true;
 		return true;
-	}
-
-	public void printPlayerMap(int player) {
-		message("\n      %s", playerName(player));
-		printMap(playerData[player].map, new PrintWriter(System.out, true));
-	}
-
-	private void printMap(byte[][] map, PrintWriter w) {
-		w.print("  ");
-		for (int i = 1; i <= MAPSIZE; ++i) {
-			w.print(i + " ");
-		}
-		w.println();
-		for (int y = 0; y < MAPSIZE; ++y) {
-			for (int x = 0; x < MAPSIZE; ++x) {
-				byte value = map[x][y];
-				char ch = value == MAP_WATER ? '~' : shipCode(value);
-				if (x == 0) {
-					w.print(MapCoordinate.letter(y) + " ");
-				}
-				w.print(ch + " ");
-			}
-			w.println();
-		}
-		w.println();
 	}
 }

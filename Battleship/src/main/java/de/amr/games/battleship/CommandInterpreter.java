@@ -31,21 +31,15 @@ import java.util.Scanner;
  */
 public class CommandInterpreter {
 
-	private static void error(String msg, Object... args) {
-		System.err.println(msg.formatted(args));
-	}
-
-	private static void message(String msg, Object... args) {
-		System.out.println(msg.formatted(args));
-	}
-
 	private final Scanner sc = new Scanner(System.in);
 	private final BattleshipGame game;
+	private final BattleshipUI ui;
 	private int player;
 	private boolean quit;
 
 	public CommandInterpreter(BattleshipGame game) {
 		this.game = game;
+		this.ui = new BattleshipUI();
 		player = BattleshipGame.PLAYER1;
 	}
 
@@ -55,24 +49,24 @@ public class CommandInterpreter {
 			parseInput(input);
 		} while (!quit);
 		sc.close();
-		message("Goodbye");
+		ui.message("Goodbye");
 	}
 
 	private String readInput() {
-		message("(%s): Enter 'help' for help:", BattleshipGame.playerName(player));
+		ui.message("(%s): Enter 'help' for help:", ui.playerName(player));
 		return sc.nextLine().trim();
 	}
 
 	private void parseInput(String input) {
 		if (input.startsWith("add ")) {
 			doAddShip(input.substring(4));
-			game.printPlayerMap(player);
+			ui.printPlayerMap(game, player);
 		} else if (input.startsWith("del ")) {
 			doDeleteShip(input.substring(4));
 		} else if ("help".equals(input)) {
-			printHelp();
+			ui.printHelp();
 		} else if ("map".equals(input)) {
-			game.printPlayerMap(player);
+			ui.printPlayerMap(game, player);
 		} else if ("player1".equals(input)) {
 			player = BattleshipGame.PLAYER1;
 		} else if ("player2".equals(input)) {
@@ -82,70 +76,69 @@ public class CommandInterpreter {
 		} else if ("quit".equals(input)) {
 			quit = true;
 		} else {
-			message("Did not understand");
+			ui.message("Did not understand");
 		}
 	}
 
-	private void printHelp() {
-		message("Available commands:");
-		message("\thelp:       Print this help text");
-		message("\tquit:       Quit program");
-		message("\tplayer1:    Select player 1");
-		message("\tplayer2:    Select player 2");
-		message("\tmap:        Print map for current player");
-		message("\tadd ship orientation coord: Add ship to map");
-		message("\t\tship:        battleship, carrier, cruiser, destroyer, submarine");
-		message("\t\torientation: h, v");
-		message("\t\tcoord:       a1, ..., j10");
-		message("\tdel ship: Delete ship from map");
-		message("\t\tship:        battleship, carrier, cruiser, destroyer, submarine");
+	private static int parseOrientation(String orientation) {
+		if ("h".equals(orientation)) {
+			return BattleshipGame.HORIZONTAL;
+		}
+		if ("v".equals(orientation)) {
+			return BattleshipGame.VERTICAL;
+		}
+		throw new IllegalArgumentException();
 	}
 
 	// Example: add carrier h I3
 	private void doAddShip(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 3) {
-			error("Command 'add' needs 3 parameters: <shiptype> <orientation> <coordinate>");
+			ui.message("Command 'add' needs 3 parameters: <shiptype> <orientation> <coordinate>");
 			return;
 		}
 		var typeString = params[0];
-		if (!BattleshipGame.isValidShipType(typeString)) {
-			error("Invalid ship type: %s", typeString);
+		if (!ui.isValidShipType(typeString)) {
+			ui.message("Invalid ship type: %s", typeString);
 			return;
 		}
+
 		var orientString = params[1];
-		if (!BattleshipGame.isValidOrientation(orientString)) {
-			error("Invalid orientation: %s", orientString);
+		int orientation = -1;
+		try {
+			orientation = parseOrientation(orientString);
+		} catch (Exception e) {
+			ui.message("Invalid orientation: %s", orientString);
 			return;
 		}
+
 		var coordString = params[2];
 		MapCoordinate coord = null;
 		try {
 			coord = MapCoordinate.valueOf(coordString);
 		} catch (IllegalArgumentException x) {
-			error("Illegal coordinate: %s", coordString);
+			ui.message("Illegal coordinate: %s", coordString);
 			return;
 		}
-		var type = BattleshipGame.shipType(typeString);
-		if ("h".equalsIgnoreCase(orientString)) {
-			game.addShip(player, type, coord.x(), coord.y(), BattleshipGame.HORIZONTAL);
-		} else {
-			game.addShip(player, type, coord.x(), coord.y(), BattleshipGame.VERTICAL);
-		}
+
+		var type = ui.shipType(typeString);
+		ui.message("%s: %s %s at %s", ui.playerName(player), ui.orientationName(orientation), ui.shipTypeName(type),
+				coord.toLetterDigitFormat());
+		game.addShip(player, type, coord.x(), coord.y(), orientation);
 	}
 
 	private void doDeleteShip(String paramString) {
 		String[] params = paramString.trim().split(" ");
 		if (params.length != 1) {
-			error("Command 'delete' needs 1 parameter: <shiptype>");
+			ui.message("Command 'delete' needs 1 parameter: <shiptype>");
 			return;
 		}
 		var typeString = params[0];
-		if (!BattleshipGame.isValidShipType(typeString)) {
-			error("Invalid ship type: %s", typeString);
+		if (!ui.isValidShipType(typeString)) {
+			ui.message("Invalid ship type: %s", typeString);
 			return;
 		}
-		var type = BattleshipGame.shipType(typeString);
+		var type = ui.shipType(typeString);
 		game.deleteShip(player, type);
 	}
 }
