@@ -90,30 +90,18 @@ public class CommandInterpreter {
 
 	// Example: add carrier h i3
 	private void doAddShip(String[] parts) {
-		if (parts.length != 4) {
+		if (parts.length - 1 != 3) {
 			ui.message("Command 'add' needs 3 parameters: shiptype orientation coordinate");
 			return;
 		}
 
-		var type = Byte.MAX_VALUE;
+		byte type;
+		int orientation;
+		MapCoordinate coord;
 		try {
 			type = Converter.parseShipType(parts[1]);
-		} catch (ConvertException x) {
-			ui.message(x.getMessage());
-			return;
-		}
-
-		int orientation = -1;
-		try {
 			orientation = Converter.parseOrientation(parts[2]);
-		} catch (ConvertException x) {
-			ui.message(x.getMessage());
-			return;
-		}
-
-		MapCoordinate coord = null;
-		try {
-			coord = MapCoordinate.valueOf(parts[3]);
+			coord = Converter.parseMapCoordinate(parts[3]);
 		} catch (ConvertException x) {
 			ui.message(x.getMessage());
 			return;
@@ -129,12 +117,12 @@ public class CommandInterpreter {
 	}
 
 	private void doDeleteShip(String[] parts) {
-		if (parts.length != 2) {
+		if (parts.length - 1 != 1) {
 			ui.message("Command 'delete' needs 1 parameter: shiptype");
 			return;
 		}
 
-		var type = Byte.MAX_VALUE;
+		byte type;
 		try {
 			type = Converter.parseShipType(parts[1]);
 		} catch (ConvertException x) {
