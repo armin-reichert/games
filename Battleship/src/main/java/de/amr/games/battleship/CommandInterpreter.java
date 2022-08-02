@@ -129,7 +129,11 @@ public class CommandInterpreter {
 		var type = ui.shipType(typeString);
 		ui.message("%s: %s %s at %s", ui.playerName(player), ui.orientationName(orientation), ui.shipTypeName(type),
 				coord.toLetterDigitFormat());
-		game.addShip(player, type, coord.x(), coord.y(), orientation);
+
+		var result = game.addShip(player, type, coord.x(), coord.y(), orientation);
+		if (!result.success()) {
+			ui.message(result.message());
+		}
 	}
 
 	private void doDeleteShip(String paramString) {
@@ -145,6 +149,10 @@ public class CommandInterpreter {
 			return;
 		}
 		var type = ui.shipType(typeString);
-		game.deleteShip(player, type);
+
+		var result = game.deleteShip(player, type);
+		if (!result.success()) {
+			ui.message(result.message());
+		}
 	}
 }

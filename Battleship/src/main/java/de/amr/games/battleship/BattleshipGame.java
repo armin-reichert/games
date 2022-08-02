@@ -29,6 +29,9 @@ package de.amr.games.battleship;
  */
 public class BattleshipGame {
 
+	public record Result(boolean success, String message) {
+	}
+
 	public static final int MAPSIZE = 10;
 
 	public static final int HORIZONTAL = 0;
@@ -66,11 +69,7 @@ public class BattleshipGame {
 		};
 	}
 
-	public static void message(String msg, Object... args) {
-		System.out.println(msg.formatted(args));
-	}
-
-	public PlayerData[] playerData = new PlayerData[2];
+	private PlayerData[] playerData = new PlayerData[2];
 
 	public BattleshipGame() {
 		playerData[0] = new PlayerData();
@@ -97,9 +96,9 @@ public class BattleshipGame {
 		}
 	}
 
-	public void deleteShip(int player, byte type) {
+	public Result deleteShip(int player, byte type) {
 		if (!playerData(player).shipUsed[type]) {
-			return;
+			return new Result(false, "Ship type already used");
 		}
 		for (int x = 0; x < MAPSIZE; ++x) {
 			for (int y = 0; y < MAPSIZE; ++y) {
@@ -110,10 +109,10 @@ public class BattleshipGame {
 			}
 		}
 		playerData(player).shipUsed[type] = false;
-
+		return new Result(true, "");
 	}
 
-	public boolean addShip(int player, byte type, int x, int y, int orientation) {
+	public Result addShip(int player, byte type, int x, int y, int orientation) {
 		if (orientation == HORIZONTAL) {
 			return addShip(playerData[player], type, x, y, shipSize(type), 1);
 		} else {
@@ -121,28 +120,26 @@ public class BattleshipGame {
 		}
 	}
 
-	private boolean addShip(PlayerData playerData, byte type, int x, int y, int sizeX, int sizeY) {
+	private Result addShip(PlayerData playerData, byte type, int x, int y, int sizeX, int sizeY) {
 		if (playerData.shipUsed[type]) {
-			return false;
+			return new Result(false, "Ship type already used");
 		}
 		if (x + sizeX > MAPSIZE) {
-			message("Cannot place ship. x exceeds map");
-			return false;
+			return new Result(false, "Map size exceeded in x dimension");
 		}
 		if (y + sizeY > MAPSIZE) {
-			message("Cannot place ship. y exceeds map");
-			return false;
+			return new Result(false, "Map size exceeded in x dimension");
 		}
 		for (int i = 0; i < sizeX; ++i) {
 			for (int j = 0; j < sizeY; ++j) {
 				byte value = playerData.map[x + i][y + j];
 				if (value != MAP_WATER) {
-					return false;
+					return new Result(false, "Map already used at " + new MapCoordinate(x, y).toLetterDigitFormat());
 				}
 				playerData.map[x + i][y + j] = type;
 			}
 		}
 		playerData.shipUsed[type] = true;
-		return true;
+		return new Result(true, "");
 	}
 }
