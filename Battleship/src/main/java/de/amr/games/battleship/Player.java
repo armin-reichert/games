@@ -24,12 +24,12 @@ SOFTWARE.
 
 package de.amr.games.battleship;
 
-public class PlayerData {
+public class Player {
 
 	public final byte[][] map = new byte[BattleshipGame.MAPSIZE][BattleshipGame.MAPSIZE];
 	public final boolean[] shipUsed = new boolean[5];
 
-	public PlayerData() {
+	public Player() {
 		reset();
 	}
 

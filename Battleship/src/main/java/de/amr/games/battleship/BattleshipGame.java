@@ -69,18 +69,18 @@ public class BattleshipGame {
 		};
 	}
 
-	private PlayerData[] playerData = new PlayerData[2];
+	private Player[] players = new Player[2];
 
 	public BattleshipGame() {
-		playerData[0] = new PlayerData();
-		playerData[1] = new PlayerData();
+		players[0] = new Player();
+		players[1] = new Player();
 	}
 
-	public PlayerData playerData(int player) {
+	public Player getPlayer(int player) {
 		if (player == PLAYER1) {
-			return playerData[PLAYER1];
+			return players[PLAYER1];
 		} else if (player == PLAYER2) {
-			return playerData[PLAYER2];
+			return players[PLAYER2];
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -88,39 +88,39 @@ public class BattleshipGame {
 
 	public void resetPlayer(int player) {
 		if (player == PLAYER1) {
-			playerData[PLAYER1].reset();
+			players[PLAYER1].reset();
 		} else if (player == PLAYER2) {
-			playerData[PLAYER2].reset();
+			players[PLAYER2].reset();
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
 	public Result deleteShip(int player, byte type) {
-		if (!playerData(player).shipUsed[type]) {
+		if (!getPlayer(player).shipUsed[type]) {
 			return new Result(false, "Ship type not used yet");
 		}
 		for (int x = 0; x < MAPSIZE; ++x) {
 			for (int y = 0; y < MAPSIZE; ++y) {
-				byte value = playerData(player).map[x][y];
+				byte value = getPlayer(player).map[x][y];
 				if (value == type) {
-					playerData(player).map[x][y] = MAP_WATER;
+					getPlayer(player).map[x][y] = MAP_WATER;
 				}
 			}
 		}
-		playerData(player).shipUsed[type] = false;
+		getPlayer(player).shipUsed[type] = false;
 		return new Result(true, "");
 	}
 
 	public Result addShip(int player, byte type, int x, int y, int orientation) {
 		if (orientation == HORIZONTAL) {
-			return addShip(playerData[player], type, x, y, shipSize(type), 1);
+			return addShip(players[player], type, x, y, shipSize(type), 1);
 		} else {
-			return addShip(playerData[player], type, x, y, 1, shipSize(type));
+			return addShip(players[player], type, x, y, 1, shipSize(type));
 		}
 	}
 
-	private Result addShip(PlayerData playerData, byte type, int x, int y, int sizeX, int sizeY) {
+	private Result addShip(Player playerData, byte type, int x, int y, int sizeX, int sizeY) {
 		if (playerData.shipUsed[type]) {
 			return new Result(false, "Ship type already used");
 		}

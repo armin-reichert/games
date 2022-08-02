@@ -92,7 +92,7 @@ public class BattleshipUI {
 
 	public void printPlayerMap(BattleshipGame game, int player) {
 		message("\n      %s", playerName(player));
-		printMap(game.playerData(player).map, new PrintWriter(System.out, true));
+		printMap(game.getPlayer(player).map, new PrintWriter(System.out, true));
 	}
 
 	private void printMap(byte[][] map, PrintWriter w) {
