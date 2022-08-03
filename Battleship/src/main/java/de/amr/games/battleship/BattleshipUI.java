@@ -55,12 +55,12 @@ public class BattleshipUI {
 		message("player1: Select player 1");
 		message("player2: Select player 2");
 		message("map:     Print map for current player");
-		message("add:     Add ship to map e.g. 'add carrier v a4'");
-		message("         - battleship, carrier, cruiser, destroyer, submarine");
-		message("         - h, v");
-		message("         - a1, ..., j10");
+		message("add:     Add ship to map, e.g. 'add carrier v a4' or 'add a h b5'");
+		message("         type:        battleship|b, carrier|a, cruiser|c, destroyer|d, submarine|s");
+		message("         orientation: h, v");
+		message("         coordinate:  a1, ..., j10");
 		message("del:     Deletes all ships of given type e.g. 'del cruiser'");
-		message("         - battleship, carrier, cruiser, destroyer, submarine");
+		message("         type:        battleship|b, carrier|a, cruiser|c, destroyer|d, submarine|s");
 		message("reset:   Resets map to initial state");
 	}
 

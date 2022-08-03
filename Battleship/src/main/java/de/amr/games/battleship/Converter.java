@@ -57,23 +57,14 @@ public class Converter {
 	}
 
 	public static byte parseShipType(String s) {
-		var ss = s.trim().toLowerCase();
-		if ("battleship".equals(ss)) {
-			return BattleshipGame.BATTLESHIP;
-		}
-		if ("carrier".equals(ss)) {
-			return BattleshipGame.AIRCRAFT_CARRIER;
-		}
-		if ("cruiser".equals(ss)) {
-			return BattleshipGame.CRUISER;
-		}
-		if ("destroyer".equals(ss)) {
-			return BattleshipGame.DESTROYER;
-		}
-		if ("submarine".equals(ss)) {
-			return BattleshipGame.SUBMARINE;
-		}
-		throw new ConvertException("Illegal ship type value '%s'", s);
+		return switch (s.trim().toLowerCase()) {
+		case "b", "battleship" -> BattleshipGame.BATTLESHIP;
+		case "a", "carrier" -> BattleshipGame.AIRCRAFT_CARRIER;
+		case "c", "cruiser" -> BattleshipGame.CRUISER;
+		case "d", "destroyer" -> BattleshipGame.DESTROYER;
+		case "s", "submarine" -> BattleshipGame.SUBMARINE;
+		default -> throw new ConvertException("Illegal ship type value '%s'", s);
+		};
 	}
 
 	public static String shipTypeName(byte type) {
