@@ -58,20 +58,20 @@ public class BattleshipUI {
 	}
 
 	public void printHelp() {
-		message("Available commands:");
-		message("help:    Print this help text");
+		message("Battleship Game:");
+		message("help:    Print help");
 		message("fleet:   Print fleet info");
-		message("quit:    Quit program");
-		message("player1: Select player 1");
-		message("player2: Select player 2");
+		message("player1: Select player #1");
+		message("player2: Select player #2");
 		message("map:     Print map for current player");
 		message("add:     Add ship to map, e.g. 'add carrier v a4' or 'add a h b5'");
 		message("         type:        battleship|b, carrier|a, cruiser|c, destroyer|d, submarine|s");
 		message("         orientation: h, v");
 		message("         coordinate:  a1, ..., j10");
-		message("del:     Deletes all ships of given type e.g. 'del cruiser'");
+		message("del:     Delete *all* ships of given type e.g. 'del cruiser'");
 		message("         type:        battleship|b, carrier|a, cruiser|c, destroyer|d, submarine|s");
-		message("reset:   Resets map to initial state");
+		message("reset:   Clear map");
+		message("quit:    Quit game");
 	}
 
 	public void printPlayerMap(BattleshipGame game, int player) {
