@@ -48,9 +48,19 @@ public class BattleshipUI {
 		System.out.println(msg.formatted(args));
 	}
 
+	public void printFleetInfo() {
+		message(" #   Ship               Size");
+		message("1x   Aircraft Carrier      5");
+		message("1x   Battleship            4");
+		message("1x   Cruiser               3");
+		message("2x   Destroyer             2");
+		message("2x   Submarine             1");
+	}
+
 	public void printHelp() {
 		message("Available commands:");
 		message("help:    Print this help text");
+		message("fleet:   Print fleet info");
 		message("quit:    Quit program");
 		message("player1: Select player 1");
 		message("player2: Select player 2");

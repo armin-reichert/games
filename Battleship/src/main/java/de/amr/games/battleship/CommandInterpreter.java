@@ -62,6 +62,9 @@ public class CommandInterpreter {
 			doDeleteAllShipsOfType(commandAndParams);
 			ui.printPlayerMap(game, player);
 		}
+		case "fleet" -> {
+			ui.printFleetInfo();
+		}
 		case "help" -> {
 			ui.printHelp();
 		}
