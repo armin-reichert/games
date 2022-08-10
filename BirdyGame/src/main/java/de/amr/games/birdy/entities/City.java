@@ -18,8 +18,8 @@ import de.amr.easy.game.ui.sprites.Sprite;
 import de.amr.easy.game.ui.sprites.SpriteMap;
 import de.amr.games.birdy.BirdyGameApp;
 import de.amr.statemachine.api.TransitionMatchStrategy;
+import de.amr.statemachine.core.MissingTransitionBehavior;
 import de.amr.statemachine.core.StateMachine;
-import de.amr.statemachine.core.StateMachine.MissingTransitionBehavior;
 
 /**
  * The city shown in the background.

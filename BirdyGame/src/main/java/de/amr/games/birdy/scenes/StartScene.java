@@ -33,6 +33,7 @@ import de.amr.games.birdy.entities.City;
 import de.amr.games.birdy.entities.Ground;
 import de.amr.games.birdy.scenes.StartScene.StartSceneState;
 import de.amr.statemachine.api.TransitionMatchStrategy;
+import de.amr.statemachine.core.MissingTransitionBehavior;
 import de.amr.statemachine.core.StateMachine;
 
 /**

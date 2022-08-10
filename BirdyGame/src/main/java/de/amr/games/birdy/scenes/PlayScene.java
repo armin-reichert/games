@@ -32,6 +32,7 @@ import de.amr.games.birdy.entities.ObstacleController;
 import de.amr.games.birdy.entities.Score;
 import de.amr.games.birdy.scenes.PlayScene.PlaySceneState;
 import de.amr.statemachine.api.TransitionMatchStrategy;
+import de.amr.statemachine.core.MissingTransitionBehavior;
 import de.amr.statemachine.core.StateMachine;
 
 /**
