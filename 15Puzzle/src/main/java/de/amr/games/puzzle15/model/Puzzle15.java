@@ -105,18 +105,12 @@ public class Puzzle15 {
 	}
 
 	public Puzzle15 move(Dir dir) {
-		switch (dir) {
-		case DOWN:
-			return down();
-		case LEFT:
-			return left();
-		case RIGHT:
-			return right();
-		case UP:
-			return up();
-		default:
-			throw new IllegalArgumentException();
-		}
+        return switch (dir) {
+            case DOWN -> down();
+            case LEFT -> left();
+            case RIGHT -> right();
+            case UP -> up();
+        };
 	}
 
 	public boolean canMoveUp() {
@@ -185,18 +179,12 @@ public class Puzzle15 {
 	}
 
 	public boolean canMove(Dir dir) {
-		switch (dir) {
-		case DOWN:
-			return canMoveDown();
-		case LEFT:
-			return canMoveLeft();
-		case RIGHT:
-			return canMoveRight();
-		case UP:
-			return canMoveUp();
-		default:
-			throw new IllegalArgumentException();
-		}
+        return switch (dir) {
+            case DOWN -> canMoveDown();
+            case LEFT -> canMoveLeft();
+            case RIGHT -> canMoveRight();
+            case UP -> canMoveUp();
+        };
 	}
 
 	public Stream<Dir> possibleMoveDirs() {
@@ -250,5 +238,4 @@ public class Puzzle15 {
 		}
 		return cnt;
 	}
-
 }

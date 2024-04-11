@@ -18,7 +18,7 @@ import java.util.function.Predicate;
  */
 public class SolverBestFirstSearch extends SolverBFS {
 
-	private Function<Node, Integer> fnNodeCost;
+	private final Function<Node, Integer> fnNodeCost;
 
 	public SolverBestFirstSearch(Function<Node, Integer> fnNodeCost, Predicate<Solver> givingUpCondition) {
 		super(givingUpCondition);
