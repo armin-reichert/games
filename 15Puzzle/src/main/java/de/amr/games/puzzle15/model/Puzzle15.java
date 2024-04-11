@@ -74,10 +74,8 @@ public class Puzzle15 {
 		if (getClass() != obj.getClass())
 			return false;
 		Puzzle15 other = (Puzzle15) obj;
-		if (!Arrays.equals(cells, other.cells))
-			return false;
-		return true;
-	}
+        return Arrays.equals(cells, other.cells);
+    }
 
 	public boolean isOrdered() {
 		return Arrays.equals(cells, ORDERED_SEQ);
@@ -206,18 +204,18 @@ public class Puzzle15 {
 	}
 
 	/**
-	 * 
-	 * <p>
-	 * If N is even, puzzle instance is solvable if
-	 * <ul>
-	 * <li>the blank is on an even row counting from the bottom (second-last, fourth-last, etc.) and
-	 * number of inversions is odd.
-	 * <li>the blank is on an odd row counting from the bottom (last, third-last, fifth-last, etc.) and
-	 * number of inversions is even.
-	 * </ul>
-	 * 
-	 * @see https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
-	 */
+     *
+     * <p>
+     * If N is even, puzzle instance is solvable if
+     * <ul>
+     * <li>the blank is on an even row counting from the bottom (second-last, fourth-last, etc.) and
+     * number of inversions is odd.
+     * <li>the blank is on an odd row counting from the bottom (last, third-last, fifth-last, etc.) and
+     * number of inversions is even.
+     * </ul>
+     *
+     * @see <a href="https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/">...</a>
+     */
 	public boolean isSolvable() {
 		int numInversions = numInversions(), row = 4 - row(blank());
 		return even(row) != even(numInversions);
