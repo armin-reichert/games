@@ -1,23 +1,15 @@
 package de.amr.games.montagsmaler.tools;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Toolkit;
+import org.tinylog.Logger;
+
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import java.awt.*;
 import java.net.URL;
 import java.util.MissingResourceException;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class Tools {
-
-	private static final Logger LOGGER = LogManager.getFormatterLogger();
 
 	private static final Random RND = new Random();
 
@@ -33,11 +25,11 @@ public class Tools {
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.error("Could not set LAF %s, using system LAF instead.", lafName);
+			Logger.error("Could not set LAF %s, using system LAF instead.", lafName);
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception x) {
-				LOGGER.throwing(x);
+				Logger.error(x);
 			}
 		}
 	}
@@ -45,10 +37,10 @@ public class Tools {
 	public static ImageIcon loadImageIcon(String path) {
 		URL url = Tools.class.getResource("/de/amr/games/montagsmaler/" + path);
 		if (url == null) {
-			LOGGER.error("Could not load icon from path '%s'", path);
+			Logger.error("Could not load icon from path '%s'", path);
 			throw new MissingResourceException("Could not load icon from path: \" + path", "", "");
 		}
-		LOGGER.trace("Icon from URL '%s' loaded", url.toExternalForm());
+		Logger.trace("Icon from URL '%s' loaded", url.toExternalForm());
 		return new ImageIcon(url);
 	}
 
